@@ -1168,4 +1168,1018 @@ Finally, I must admit that I very nearly called this essay ``The Cathedral and t
 
 This essay was improved by conversations with a large number of people who helped debug it. Particular thanks to Jeff Dutky <dutky@wam.umd.edu>, who suggested the ``debugging is parallelizable'' formulation, and helped develop the analysis that proceeds from it. Also to Nancy Lebovitz <nancyl@universe.digex.net> for her suggestion that I emulate Weinberg by quoting Kropotkin. Perceptive criticisms also came from Joan Eslinger <wombat@kilimanjaro.engr.sgi.com> and Marty Franz <marty@net-link.net> of the General Technics list. Glen Vandenburg <glv@vanderburg.org> pointeed out the importance of self-selection in contributor populations and suggested the fruitful idea that much development rectifies `bugs of omission'; Daniel Upper <upper@peak.org> suggested the natural analogies for this. I'm grateful to the members of PLUG, the Philadelphia Linux User's group, for providing the first test audience for the first public version of this essay. Paula Matuszek <matusp00@mh.us.sbphrd.com> enlightened me about the practice of software management. Phil Hudson <phil.hudson@iname.com> reminded me that the social organization of the hacker culture mirrors the organization of its software, and vice-versa. John Buck <johnbuck@sea.ece.umassd.edu> pointed out that MATLAB makes an instructive parallel to Emacs. Russell Johnston <russjj@mail.com> brought me to consciousness about some of the mechanisms discussed in ``How Many Eyeballs Tame Complexity.'' Finally, Linus Torvalds's comments were helpful and his early endorsement very encouraging.
 
+
+
+
+
+
+The Cathedral and the Bazaar
+大教堂和集市
+Eric Steven Raymond  埃里克·史蒂文·雷蒙德
+Thyrsus Enterprises  Thyrsus 企业
+
+<esr@thyrsus.com>
+
+This is version 3.0  这是 3.0 版
+
+Copyright © 2000 Eric S. Raymond
+版权所有 © 2000 Eric S. Raymond
+
+Copyright  版权
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the Open Publication License, version 2.0.
+根据 Open Publication License 2.0 版的条款，允许复制、分发和/或修改本文档。
+
+$Date: 2002/08/02 09:02:14 $
+$Date：2002/08/02 09：02：14 $
+Revision History  修订历史记录
+Revision 1.57  修订版 1.57	11 September 2000  2000 年 9 月 11 日	esr
+New major section ``How Many Eyeballs Tame Complexity''.
+新的主要部分 ''多少眼球驯服复杂性''。
+Revision 1.52  修订版 1.52	28 August 2000  2000 年 8 月 28 日	esr
+MATLAB is a reinforcing parallel to Emacs. Corbatoó & Vyssotsky got it in 1965.
+MATLAB 是 Emacs 的增强并行函数。Corbatoó & Vyssotsky在1965年得到了它。
+Revision 1.51  修订版 1.51	24 August 2000  2000 年 8 月 24 日	esr
+First DocBook version. Minor updates to Fall 2000 on the time-sensitive material.
+第一个 DocBook 版本。对 2000 年秋季对时效性材料进行了小幅更新。
+Revision 1.49  修订版 1.49	5 May 2000  2000 年 5 月 5 日	esr
+Added the HBS note on deadlines and scheduling.
+添加了 HBS 关于截止日期和计划的说明。
+Revision 1.51  修订版 1.51	31 August 1999  31 八月 1999	esr
+This the version that O'Reilly printed in the first edition of the book.
+这是 O'Reilly 在本书第一版中印刷的版本。
+Revision 1.45  修订版 1.45	8 August 1999  8 八月 1999	esr
+Added the endnotes on the Snafu Principle, (pre)historical examples of bazaar development, and originality in the bazaar.
+添加了关于 Snafu 原则、集市发展的（前）历史示例和集市的原创性的尾注。
+Revision 1.44  修订版 1.44	29 July 1999  29 七月 1999	esr
+Added the ``On Management and the Maginot Line'' section, some insights about the usefulness of bazaars for exploring design space, and substantially improved the Epilog.
+添加了“论管理和马其诺防线”部分，关于集市对探索设计空间的有用性的一些见解，并大大改进了 Epilog。
+Revision 1.40  修订版 1.40	20 Nov 1998  1998 年 11 月 20 日	esr
+Added a correction of Brooks based on the Halloween Documents.
+添加了基于万圣节文件对 Brooks 的更正。
+Revision 1.39  修订版 1.39	28 July 1998  28 七月 1998	esr
+I removed Paul Eggert's 'graph on GPL vs. bazaar in response to cogent aguments from RMS on
+我删除了 Paul Eggert 的 GPL 与 bazaar 的图表，以回应 RMS 的令人信服的
+Revision 1.31  修订版 1.31	February 10 1998   1998 年 2 月 10 日	esr
+Added ``Epilog: Netscape Embraces the Bazaar!''
+添加 ''Epilog： Netscape Embraces the Bazaar！''
+Revision 1.29  修订版 1.29	February 9 1998  1998 年 2 月 9 日	esr
+Changed ``free software'' to ``open source''.
+将 ''free software'' 改为 ''open source''。
+Revision 1.27  修订版 1.27	18 November 1997  1997 年 11 月 18 日	esr
+Added the Perl Conference anecdote.
+添加了 Perl Conference 轶事。
+Revision 1.20  修订版 1.20	7 July 1997  1997 年 7 月 7 日	esr
+Added the bibliography.   添加了参考书目。
+Revision 1.16  修订版 1.16	21 May 1997  21 五月 1997	esr
+First official presentation at the Linux Kongress.
+在 Linux Kongress 上首次正式展示。
+
+Abstract  抽象
+
+I anatomize a successful open-source project, fetchmail, that was run as a deliberate test of the surprising theories about software engineering suggested by the history of Linux. I discuss these theories in terms of two fundamentally different development styles, the ``cathedral'' model of most of the commercial world versus the ``bazaar'' model of the Linux world. I show that these models derive from opposing assumptions about the nature of the software-debugging task. I then make a sustained argument from the Linux experience for the proposition that ``Given enough eyeballs, all bugs are shallow'', suggest productive analogies with other self-correcting systems of selfish agents, and conclude with some exploration of the implications of this insight for the future of software.
+我剖析了一个成功的开源项目 fetchmail，该项目是作为对 Linux 历史中提出的关于软件工程的令人惊讶的理论的有意测试而运行的。我从两种根本不同的开发风格来讨论这些理论，大多数商业世界的 “大教堂” 模型与 Linux 世界的 “集市 ”模型。我表明，这些模型源自对软件调试任务性质的相反假设。然后，我从 Linux 经验中对“只要有足够的眼球，所有错误都是肤浅的”这个命题提出了一个持续的论点，提出了与其他自私代理的自我纠正系统的富有成效的类比，并总结了这一见解对软件未来的影响的一些探索。
+
+Table of Contents  目录
+
+The Cathedral and the Bazaar
+大教堂和集市
+The Mail Must Get Through
+邮件必须通过
+The Importance of Having Users
+拥有用户的重要性
+Release Early, Release Often
+尽早发布，经常发布
+How Many Eyeballs Tame Complexity
+多少眼球驯服复杂性
+When Is a Rose Not a Rose?
+什么时候玫瑰不是玫瑰？
+Popclient becomes Fetchmail
+Popclient 变为 Fetchmail
+Fetchmail Grows Up  Fetchmail 成长起来
+A Few More Lessons from Fetchmail
+Fetchmail 的更多经验教训
+Necessary Preconditions for the Bazaar Style
+集市风格的必要前提条件
+The Social Context of Open-Source Software
+开源软件的社交环境
+On Management and the Maginot Line
+关于管理和马其诺防线
+Epilog: Netscape Embraces the Bazaar
+Epilog：Netscape 拥抱集市
+Notes  笔记
+Bibliography  书目
+Acknowledgements  确认
+
+The Cathedral and the Bazaar
+大教堂和集市
+
+Linux is subversive. Who would have thought even five years ago (1991) that a world-class operating system could coalesce as if by magic out of part-time hacking by several thousand developers scattered all over the planet, connected only by the tenuous strands of the Internet?
+Linux 是颠覆性的。即使在五年前（1991 年），谁会想到一个世界级的作系统可以像魔法一样从分散在全球各地的数千名开发人员的兼职黑客攻击中凝聚起来，仅通过互联网的脆弱线路连接起来？
+
+Certainly not I. By the time Linux swam onto my radar screen in early 1993, I had already been involved in Unix and open-source development for ten years. I was one of the first GNU contributors in the mid-1980s. I had released a good deal of open-source software onto the net, developing or co-developing several programs (nethack, Emacs's VC and GUD modes, xlife, and others) that are still in wide use today. I thought I knew how it was done.
+我当然不是。到 1993 年初 Linux 出现在我的雷达屏幕上时，我已经从事 Unix 和开源开发十年了。我是 1980 年代中期最早的 GNU 贡献者之一。我已经在网上发布了大量开源软件，开发或共同开发了几个程序（nethack、Emacs 的 VC 和 GUD 模式、xlife 等），这些程序今天仍然被广泛使用。我以为我知道它是怎么做到的。
+
+Linux overturned much of what I thought I knew. I had been preaching the Unix gospel of small tools, rapid prototyping and evolutionary programming for years. But I also believed there was a certain critical complexity above which a more centralized, a priori approach was required. I believed that the most important software (operating systems and really large tools like the Emacs programming editor) needed to be built like cathedrals, carefully crafted by individual wizards or small bands of mages working in splendid isolation, with no beta to be released before its time.
+Linux 推翻了我自以为知道的大部分内容。多年来，我一直在宣扬小工具、快速原型设计和进化编程的 Unix 福音。但我也相信存在一定的临界复杂性，超过这个复杂性就需要一种更加集中的、先验的方法。我相信最重要的软件（作系统和像 Emacs 编程编辑器这样的真正大型工具）需要像大教堂一样构建，由个人巫师或一小群法师精心打造，在它的时间之前没有发布。
+
+Linus Torvalds's style of development—release early and often, delegate everything you can, be open to the point of promiscuity—came as a surprise. No quiet, reverent cathedral-building here—rather, the Linux community seemed to resemble a great babbling bazaar of differing agendas and approaches (aptly symbolized by the Linux archive sites, who'd take submissions from anyone) out of which a coherent and stable system could seemingly emerge only by a succession of miracles.
+Linus Torvalds 的开发风格 — 尽早并经常发布，尽可能委派一切，开放到滥交的地步 — 令人惊讶。这里没有安静、虔诚的大教堂建筑——相反，Linux 社区似乎就像一个由不同议程和方法组成的喋喋不休的大集市（恰如其分地象征着 Linux 档案网站，他们会接受任何人的提交），一个连贯而稳定的系统似乎只能通过一连串的奇迹出现。
+
+The fact that this bazaar style seemed to work, and work well, came as a distinct shock. As I learned my way around, I worked hard not just at individual projects, but also at trying to understand why the Linux world not only didn't fly apart in confusion but seemed to go from strength to strength at a speed barely imaginable to cathedral-builders.
+事实上，这种集市风格似乎奏效了，而且效果很好，这让人感到非常震惊。随着我的学习，我不仅在单个项目中努力工作，而且还试图理解为什么 Linux 世界不仅没有在混乱中分崩离析，而且似乎以大教堂建造者几乎无法想象的速度不断壮大。
+
+By mid-1996 I thought I was beginning to understand. Chance handed me a perfect way to test my theory, in the form of an open-source project that I could consciously try to run in the bazaar style. So I did—and it was a significant success.
+到 1996 年年中，我以为我开始理解了。Chance 给了我一个完美的方法来测试我的理论，以一个开源项目的形式，我可以有意识地尝试以 bazaar 风格运行。所以我就这样做了——而且取得了巨大的成功。
+
+This is the story of that project. I'll use it to propose some aphorisms about effective open-source development. Not all of these are things I first learned in the Linux world, but we'll see how the Linux world gives them particular point. If I'm correct, they'll help you understand exactly what it is that makes the Linux community such a fountain of good software—and, perhaps, they will help you become more productive yourself.
+这就是那个项目的故事。我将用它来提出一些关于有效开源开发的格言。并非所有这些都是我最初在 Linux 世界中学到的东西，但我们将看到 Linux 世界如何赋予它们特定的观点。如果我是对的，他们将帮助您准确理解是什么使 Linux 社区成为如此优秀软件的源泉 — 也许，他们将帮助您提高自己的工作效率。
+
+The Mail Must Get Through
+邮件必须通过
+
+Since 1993 I'd been running the technical side of a small free-access Internet service provider called Chester County InterLink (CCIL) in West Chester, Pennsylvania. I co-founded CCIL and wrote our unique multiuser bulletin-board software—you can check it out by telnetting to locke.ccil.org. Today it supports almost three thousand users on thirty lines. The job allowed me 24-hour-a-day access to the net through CCIL's 56K line—in fact, the job practically demanded it!
+自 1993 年以来，我一直在宾夕法尼亚州西切斯特的一家名为 Chester County InterLink （CCIL） 的小型免费访问互联网服务提供商负责技术方面工作。我是 CCIL 的联合创始人，并编写了我们独特的多用户公告板软件 — 您可以通过 telnet 到 locke.ccil.org 来查看它。今天，它在 30 条线路上支持近 3000 名用户。这份工作允许我每天 24 小时通过 CCIL 的 56K 线路上网——事实上，这份工作几乎需要它！
+
+I had gotten quite used to instant Internet email. I found having to periodically telnet over to locke to check my mail annoying. What I wanted was for my mail to be delivered on snark (my home system) so that I would be notified when it arrived and could handle it using all my local tools.
+我已经习惯了即时 Internet 电子邮件。我发现必须定期 telnet 转到 locke 来检查我的邮件很烦人。我想要的是让我的邮件在 snark（我的家庭系统）上投递，这样我就可以在邮件到达时收到通知，并可以使用我所有的本地工具进行处理。
+
+The Internet's native mail forwarding protocol, SMTP (Simple Mail Transfer Protocol), wouldn't suit, because it works best when machines are connected full-time, while my personal machine isn't always on the Internet, and doesn't have a static IP address. What I needed was a program that would reach out over my intermittent dialup connection and pull across my mail to be delivered locally. I knew such things existed, and that most of them used a simple application protocol called POP (Post Office Protocol). POP is now widely supported by most common mail clients, but at the time, it wasn't built in to the mail reader I was using.
+Internet 的本机邮件转发协议 SMTP（简单邮件传输协议）不适合，因为它在机器全时连接时效果最佳，而我的个人机器并不总是在 Internet 上，也没有静态 IP 地址。我需要的是一个程序，它可以通过我间歇性的拨号连接联系并拉取我的邮件以在本地投递。我知道这样的东西存在，而且他们中的大多数都使用一种叫做 POP（邮局协议）的简单应用程序协议。POP 现在受到大多数常见邮件客户端的广泛支持，但当时，它并没有内置到我使用的邮件阅读器中。
+
+I needed a POP3 client. So I went out on the Internet and found one. Actually, I found three or four. I used one of them for a while, but it was missing what seemed an obvious feature, the ability to hack the addresses on fetched mail so replies would work properly.
+我需要一个 POP3 客户端。所以我上网找了一个。实际上，我找到了三四个。我使用了其中的一个一段时间，但它缺少一个似乎明显的功能，即破解已获取邮件地址的能力，以便回复正常工作。
+
+The problem was this: suppose someone named `joe' on locke sent me mail. If I fetched the mail to snark and then tried to reply to it, my mailer would cheerfully try to ship it to a nonexistent `joe' on snark. Hand-editing reply addresses to tack on <@ccil.org> quickly got to be a serious pain.
+问题是这样的：假设 locke 上名叫“joe”的人发送了 我邮件。 如果我将邮件提取到 snark，然后尝试回复 它，我的邮件发送者会很高兴地尝试将其运送到不存在的“乔”中 在 SNARK 上。 手动编辑回复地址以附加 <@ccil.org> 很快就变成了严重的痛苦。
+
+This was clearly something the computer ought to be doing for me. But none of the existing POP clients knew how! And this brings us to the first lesson:
+这显然是计算机应该为我做的事情。但是现有的 POP 客户都不知道怎么做！这就把我们带到了第一课：
+
+1. Every good work of software starts by scratching a developer's personal itch.
+1. 软件的每一件好作品都是从抓开发人员的个人痒点开始的。
+
+Perhaps this should have been obvious (it's long been proverbial that ``Necessity is the mother of invention'') but too often software developers spend their days grinding away for pay at programs they neither need nor love. But not in the Linux world—which may explain why the average quality of software originated in the Linux community is so high.
+也许这应该是显而易见的（长期以来，人们一直认为“需求是发明之母”），但软件开发人员往往把他们的时间花在他们既不需要也不喜欢的程序上，以换取报酬。但在 Linux 世界中并非如此，这可能解释了为什么源自 Linux 社区的软件的平均质量如此之高。
+
+So, did I immediately launch into a furious whirl of coding up a brand-new POP3 client to compete with the existing ones? Not on your life! I looked carefully at the POP utilities I had in hand, asking myself ``Which one is closest to what I want?'' Because:
+那么，我是否立即展开了一场激烈的漩涡，编写了一个全新的 POP3 客户端来与现有的客户端竞争呢？不是你的生活！我仔细查看了手头的 POP 实用程序，问自己“哪一个最接近我想要的？因为：
+
+2. Good programmers know what to write. Great ones know what to rewrite (and reuse).
+2. 优秀的程序员知道该写什么。伟大的人知道该重写（和重用）什么。
+
+While I don't claim to be a great programmer, I try to imitate one. An important trait of the great ones is constructive laziness. They know that you get an A not for effort but for results, and that it's almost always easier to start from a good partial solution than from nothing at all.
+虽然我不声称自己是一名出色的程序员，但我会尝试模仿一位。大人物的一个重要特征是建设性的懒惰。他们知道，你得到 A 不是因为努力，而是因为结果，而且从一个好的部分解决方案开始几乎总是比什么都没有更容易。
+
+Linus Torvalds, for example, didn't actually try to write Linux from scratch. Instead, he started by reusing code and ideas from Minix, a tiny Unix-like operating system for PC clones. Eventually all the Minix code went away or was completely rewritten—but while it was there, it provided scaffolding for the infant that would eventually become Linux.
+例如，Linus Torvalds 实际上并没有尝试从头开始编写 Linux。相反，他首先重用了 Minix 的代码和想法，Minix 是一个用于 PC 克隆的小型类 Unix作系统。最终，所有 Minix 代码都消失了或被完全重写 — 但是当它存在时，它为最终成为 Linux 的婴儿提供了脚手架。
+
+In the same spirit, I went looking for an existing POP utility that was reasonably well coded, to use as a development base.
+本着同样的精神，我开始寻找一个编码相当好的现有 POP 实用程序，以用作开发基础。
+
+The source-sharing tradition of the Unix world has always been friendly to code reuse (this is why the GNU project chose Unix as a base OS, in spite of serious reservations about the OS itself). The Linux world has taken this tradition nearly to its technological limit; it has terabytes of open sources generally available. So spending time looking for some else's almost-good-enough is more likely to give you good results in the Linux world than anywhere else.
+Unix 世界的源代码共享传统一直对代码重用友好（这就是 GNU 项目选择 Unix 作为基础作系统的原因，尽管对作系统本身持严重保留意见）。Linux 世界几乎将这一传统发挥到了技术极限;它具有已普遍提供的 TB 级开源。因此，花时间寻找其他几乎足够好的 Linux 世界比其他任何地方都更有可能给你带来好的结果。
+
+And it did for me. With those I'd found earlier, my second search made up a total of nine candidates—fetchpop, PopTart, get-mail, gwpop, pimp, pop-perl, popc, popmail and upop. The one I first settled on was `fetchpop' by Seung-Hong Oh. I put my header-rewrite feature in it, and made various other improvements which the author accepted into his 1.9 release.
+它对我来说确实如此。加上我之前找到的那些，我的第二次搜索总共包括 9 个候选者 — fetchpop、PopTart、get-mail、gwpop、pimp、pop-perl、popc、popmail 和 upop。我首先确定的是 Seung-Hong Oh 的“fetchpop”。我在其中添加了我的 header-rewrite 功能，并进行了各种其他改进，作者在他的 1.9 版本中接受了这些改进。
+
+A few weeks later, though, I stumbled across the code for popclient by Carl Harris, and found I had a problem. Though fetchpop had some good original ideas in it (such as its background-daemon mode), it could only handle POP3 and was rather amateurishly coded (Seung-Hong was at that time a bright but inexperienced programmer, and both traits showed). Carl's code was better, quite professional and solid, but his program lacked several important and rather tricky-to-implement fetchpop features (including those I'd coded myself).
+但是，几周后，我偶然发现了 Carl Harris 编写的 popclient 代码，发现我遇到了问题。尽管 fetchpop 有一些很好的原创想法（例如它的 background-daemon 模式），但它只能处理 POP3 并且编码相当业余（Seung-Hong 当时是一个聪明但缺乏经验的程序员，这两个特征都表现出来了）。Carl 的代码更好，相当专业和可靠，但他的程序缺少几个重要且相当难以实现的 fetchpop 功能（包括我自己编写的那些）。
+
+Stay or switch? If I switched, I'd be throwing away the coding I'd already done in exchange for a better development base.
+留下还是转换？如果我切换，我将丢弃已经完成的编码，以换取更好的开发基础。
+
+A practical motive to switch was the presence of multiple-protocol support. POP3 is the most commonly used of the post-office server protocols, but not the only one. Fetchpop and the other competition didn't do POP2, RPOP, or APOP, and I was already having vague thoughts of perhaps adding IMAP (Internet Message Access Protocol, the most recently designed and most powerful post-office protocol) just for fun.
+转换的一个实际动机是多协议支持的存在。POP3 是邮局服务器协议中最常用的，但不是唯一的协议。Fetchpop 和其他竞争对手没有做 POP2、RPOP 或 APOP，我已经模糊地想到也许可以添加 IMAP （Internet 消息访问协议，最近设计且最 强大的邮局协议）只是为了好玩。
+
+But I had a more theoretical reason to think switching might be as good an idea as well, something I learned long before Linux.
+但我有一个更理论上的理由认为切换也可能是一个好主意，这是我在 Linux 之前很久就学到的。
+
+3. ``Plan to throw one away; you will, anyhow.'' (Fred Brooks, The Mythical Man-Month, Chapter 11)
+3. “计划扔掉一个;无论如何，你会的。（弗雷德·布鲁克斯，《神话般的男人月》，第 11 章）
+
+Or, to put it another way, you often don't really understand the problem until after the first time you implement a solution. The second time, maybe you know enough to do it right. So if you want to get it right, be ready to start over at least once [JB].
+或者，换句话说，您通常只有在第一次实施解决方案后才能真正理解问题。第二次，也许你有足够的知识来做正确的事情。因此，如果您想正确地进行作，至少要准备好重新开始 一次 [JB]。
+
+Well (I told myself) the changes to fetchpop had been my first try. So I switched.
+好吧（我告诉自己）对 fetchpop 的更改是我的第一次尝试。所以我换了。
+
+After I sent my first set of popclient patches to Carl Harris on 25 June 1996, I found out that he had basically lost interest in popclient some time before. The code was a bit dusty, with minor bugs hanging out. I had many changes to make, and we quickly agreed that the logical thing for me to do was take over the program.
+在我于 1996 年 6 月 25 日将我的第一套 popclient 补丁发送给 Carl Harris 后，我发现他之前基本上已经对 popclient 失去了兴趣。代码有点尘土飞扬，有一些小错误悬而未决。我有很多改变要做，我们很快就同意，对我来说，合乎逻辑的事情是接管这个项目。
+
+Without my actually noticing, the project had escalated. No longer was I just contemplating minor patches to an existing POP client. I took on maintaining an entire one, and there were ideas bubbling in my head that I knew would probably lead to major changes.
+在我真正没有注意到的情况下，项目已经升级了。我不再只是考虑对现有 POP 客户端进行小补丁。我开始维护一个完整的网站，我知道我脑海中冒出了一些想法，这些想法可能会导致重大变化。
+
+In a software culture that encourages code-sharing, this is a natural way for a project to evolve. I was acting out this principle:
+在鼓励代码共享的软件文化中，这是项目发展的自然方式。我正在执行这个原则：
+
+4. If you have the right attitude, interesting problems will find you.
+4. 如果你有正确的态度，有趣的问题会找到你。
+
+But Carl Harris's attitude was even more important. He understood that
+但卡尔·哈里斯的态度更为重要。他明白这一点
+
+5. When you lose interest in a program, your last duty to it is to hand it off to a competent successor.
+5. 当你对某个项目失去兴趣时，你对它的最后责任是把它交给一个有能力的继任者。
+
+Without ever having to discuss it, Carl and I knew we had a common goal of having the best solution out there. The only question for either of us was whether I could establish that I was a safe pair of hands. Once I did that, he acted with grace and dispatch. I hope I will do as well when it comes my turn.
+无需讨论，Carl 和我就知道我们有一个共同的目标，即拥有最好的解决方案。我们俩唯一的问题是我是否能证明我是一双安全的手。一旦我这样做了，他就优雅而迅速地行事。我希望轮到我时也能做得好。
+
+The Importance of Having Users
+拥有用户的重要性
+
+And so I inherited popclient. Just as importantly, I inherited popclient's user base. Users are wonderful things to have, and not just because they demonstrate that you're serving a need, that you've done something right. Properly cultivated, they can become co-developers.
+所以我继承了 popclient。同样重要的是，我继承了 popclient 的用户群。拥有用户是一件美妙的事情，这不仅仅是因为他们表明您正在满足需求，并且您做对了事情。如果培养得当，他们可以成为共同开发者。
+
+Another strength of the Unix tradition, one that Linux pushes to a happy extreme, is that a lot of users are hackers too. Because source code is available, they can be effective hackers. This can be tremendously useful for shortening debugging time. Given a bit of encouragement, your users will diagnose problems, suggest fixes, and help improve the code far more quickly than you could unaided.
+Unix 传统的另一个优势，也是 Linux 推向了一个快乐的极端，是很多用户也是黑客。因为源代码可用，所以它们可能很有效 黑客。 这对于缩短调试时间非常有用 时间。 只要稍加鼓励，您的用户就会诊断 问题、建议修复并帮助更快地改进代码 比你自己能做到的要多。
+
+6. Treating your users as co-developers is your least-hassle route to rapid code improvement and effective debugging.
+6. 将您的用户视为共同开发人员是您快速改进代码和有效调试的最轻松途径。
+
+The power of this effect is easy to underestimate. In fact, pretty well all of us in the open-source world drastically underestimated how well it would scale up with number of users and against system complexity, until Linus Torvalds showed us differently.
+这种效果的力量很容易被低估。事实上，开源世界的所有人都大大低估了它随着用户数量和系统复杂性的增加而扩展的能力，直到 Linus Torvalds 向我们展示了不同的情况。
+
+In fact, I think Linus's cleverest and most consequential hack was not the construction of the Linux kernel itself, but rather his invention of the Linux development model. When I expressed this opinion in his presence once, he smiled and quietly repeated something he has often said: ``I'm basically a very lazy person who likes to get credit for things other people actually do.'' Lazy like a fox. Or, as Robert Heinlein famously wrote of one of his characters, too lazy to fail.
+事实上，我认为 Linus 最聪明、影响最大的黑客不是 Linux 内核本身的构建，而是他发明的 Linux 开发模型。有一次我在他面前表达这个观点时，他微笑着悄悄地重复了他经常说的话：“我基本上是一个非常懒惰的人，喜欢为别人实际做的事情获得赞誉。懒得像只狐狸。或者，正如罗伯特·海因莱因 （Robert Heinlein） 对他的一个人物的著名描述，懒得失败。
+
+In retrospect, one precedent for the methods and success of Linux can be seen in the development of the GNU Emacs Lisp library and Lisp code archives. In contrast to the cathedral-building style of the Emacs C core and most other GNU tools, the evolution of the Lisp code pool was fluid and very user-driven. Ideas and prototype modes were often rewritten three or four times before reaching a stable final form. And loosely-coupled collaborations enabled by the Internet, a la Linux, were frequent.
+回想起来，Linux 的方法和成功的一个先例可以在 GNU Emacs Lisp 库和 Lisp 代码档案的开发中看到。与 Emacs C 核心和大多数其他 GNU 工具的大教堂式构建风格相反，Lisp 代码池的演变是流畅的，并且非常用户驱动。想法和原型模式在达到稳定的最终形式之前通常会重写三到四次。由 Internet（类似于 Linux）实现的松散耦合协作非常频繁。
+
+Indeed, my own most successful single hack previous to fetchmail was probably Emacs VC (version control) mode, a Linux-like collaboration by email with three other people, only one of whom (Richard Stallman, the author of Emacs and founder of the Free Software Foundation) I have met to this day. It was a front-end for SCCS, RCS and later CVS from within Emacs that offered ``one-touch'' version control operations. It evolved from a tiny, crude sccs.el mode somebody else had written. And the development of VC succeeded because, unlike Emacs itself, Emacs Lisp code could go through release/test/improve generations very quickly.
+事实上，在使用 fetchmail 之前，我自己最成功的一次黑客攻击可能是 Emacs VC（版本控制）模式，这是一种类似 Linux 的协作，通过电子邮件与其他三个人进行协作，其中只有一个人（Richard Stallman，Emacs 的作者和自由软件基金会的创始人）我见过面直到今天。它是 Emacs 中 SCCS、RCS 和后来的 CVS 的前端，提供“一键式”版本控制作。它是从别人编写的一个小而粗糙的 sccs.el 模式演变而来的。VC 的开发之所以成功，是因为与 Emacs 本身不同，Emacs Lisp 代码可以非常快速地完成发布 / 测试 / 改进的几代。
+
+The Emacs story is not unique. There have been other software products with a two-level architecture and a two-tier user community that combined a cathedral-mode core and a bazaar-mode toolbox. One such is MATLAB, a commercial data-analysis and visualization tool. Users of MATLAB and other products with a similar structure invariably report that the action, the ferment, the innovation mostly takes place in the open part of the tool where a large and varied community can tinker with it.
+Emacs 的故事并非独一无二。还有其他软件产品具有两级架构和两层用户社区，它们结合了大教堂模式的核心和集市模式的工具箱。其中一种是 MATLAB，一种商业数据分析和可视化工具。MATLAB 和其他具有类似结构的产品的用户总是报告说，作、发酵、创新主要发生在工具的开放部分，一个庞大而不同的社区可以对其进行修补。
+
+ Release Early, Release Often
+尽早发布，经常发布
+
+Early and frequent releases are a critical part of the Linux development model. Most developers (including me) used to believe this was bad policy for larger than trivial projects, because early versions are almost by definition buggy versions and you don't want to wear out the patience of your users.
+早期和频繁的发布是 Linux 开发模型的关键部分。大多数开发人员（包括我）过去都认为，对于大型项目来说，这是一个糟糕的策略，因为早期版本几乎是有缺陷的版本，你不想耗尽用户的耐心。
+
+This belief reinforced the general commitment to a cathedral-building style of development. If the overriding objective was for users to see as few bugs as possible, why then you'd only release a version every six months (or less often), and work like a dog on debugging between releases. The Emacs C core was developed this way. The Lisp library, in effect, was not—because there were active Lisp archives outside the FSF's control, where you could go to find new and development code versions independently of Emacs's release cycle [QR].
+这种信念加强了对大教堂建筑式开发方式的普遍承诺。如果首要目标是让用户看到尽可能少的 bug，那为什么你只每 6 个月（或更频繁）发布一个版本，并像狗一样在版本之间进行调试。Emacs C 核心就是以这种方式开发的。实际上，Lisp 库不是 — 因为在 FSF 的控制之外存在活跃的 Lisp 档案库，你可以独立于 Emacs 的发布周期 [QR] 去查找新的和开发代码版本。
+
+The most important of these, the Ohio State Emacs Lisp archive, anticipated the spirit and many of the features of today's big Linux archives. But few of us really thought very hard about what we were doing, or about what the very existence of that archive suggested about problems in the FSF's cathedral-building development model. I made one serious attempt around 1992 to get a lot of the Ohio code formally merged into the official Emacs Lisp library. I ran into political trouble and was largely unsuccessful.
+其中最重要的 Ohio State Emacs Lisp 档案馆预示了当今大型 Linux 档案馆的精神和许多特性。但是我们中很少有人真正认真地思考我们正在做什么，或者那个档案的存在本身就暗示了 FSF 的大教堂建筑开发模式中的问题。我在 1992 年左右做了一次认真的尝试，将许多俄亥俄州代码正式合并到官方的 Emacs Lisp 库中。我遇到了政治麻烦，基本上没有成功。
+
+But by a year later, as Linux became widely visible, it was clear that something different and much healthier was going on there. Linus's open development policy was the very opposite of cathedral-building. Linux's Internet archives were burgeoning, multiple distributions were being floated. And all of this was driven by an unheard-of frequency of core system releases.
+但到一年后，随着 Linux 的广泛普及，很明显那里正在发生一些不同且更健康的事情。莱纳斯的开放式发展政策与大教堂建设截然相反。Linux 的 Internet 档案正在蓬勃发展，多个发行版正在浮出水面。而这一切都是由前所未有的核心系统发布频率推动的。
+
+Linus was treating his users as co-developers in the most effective possible way:
+Linus 以最有效的方式将他的用户视为共同开发者：
+
+7. Release early. Release often. And listen to your customers.
+7. 提早发布。经常发布。倾听您的客户。
+
+Linus's innovation wasn't so much in doing quick-turnaround releases incorporating lots of user feedback (something like this had been Unix-world tradition for a long time), but in scaling it up to a level of intensity that matched the complexity of what he was developing. In those early times (around 1991) it wasn't unknown for him to release a new kernel more than once a day! Because he cultivated his base of co-developers and leveraged the Internet for collaboration harder than anyone else, this worked.
+Linus 的创新不在于进行包含大量用户反馈的快速周转版本（类似的事情长期以来一直是 Unix 世界的传统），而是将其扩展到与他正在开发的复杂性相匹配的强度水平。在那些早期（1991 年左右），他每天发布新内核不止一次并不陌生！因为他培养了自己的共同开发者基础，并且比任何人都更努力地利用 Internet 进行协作，所以这奏效了。
+
+But how did it work? And was it something I could duplicate, or did it rely on some unique genius of Linus Torvalds?
+但它是如何运作的呢？它是我可以复制的，还是依赖于 Linus Torvalds 的某个独特天才？
+
+I didn't think so. Granted, Linus is a damn fine hacker. How many of us could engineer an entire production-quality operating system kernel from scratch? But Linux didn't represent any awesome conceptual leap forward. Linus is not (or at least, not yet) an innovative genius of design in the way that, say, Richard Stallman or James Gosling (of NeWS and Java) are. Rather, Linus seems to me to be a genius of engineering and implementation, with a sixth sense for avoiding bugs and development dead-ends and a true knack for finding the minimum-effort path from point A to point B. Indeed, the whole design of Linux breathes this quality and mirrors Linus's essentially conservative and simplifying design approach.
+我不这么认为。诚然，Linus 是个该死的优秀黑客。我们中有多少人可以从头开始设计一个完整的生产质量作系统内核？但 Linux 并没有代表任何了不起的概念飞跃。Linus 不是（或者至少现在不是）像 Richard Stallman 或 James Gosling（来自 NeWS 和 Java）那样的创新设计天才。相反，在我看来，Linus 是工程和实现方面的天才，具有避免 bug 和开发死胡同的第六感，并且真正擅长找到从 A 点到 B 点的最小努力路径。事实上，Linux 的整个设计都体现了这种品质，并反映了 Linus 本质上保守和简化的设计方法。
+
+So, if rapid releases and leveraging the Internet medium to the hilt were not accidents but integral parts of Linus's engineering-genius insight into the minimum-effort path, what was he maximizing? What was he cranking out of the machinery?
+那么，如果快速发布和充分利用互联网媒体不是偶然，而是 Linus 对最小努力路径的工程天才洞察力的一个组成部分，那么他正在最大化什么？他从机器里拿出什么东西来？
+
+Put that way, the question answers itself. Linus was keeping his hacker/users constantly stimulated and rewarded—stimulated by the prospect of having an ego-satisfying piece of the action, rewarded by the sight of constant (even daily) improvement in their work.
+这样说，问题就自己回答了。Linus 让他的黑客/用户不断受到刺激和奖励——受到满足自我的前景的刺激，受到他们工作不断（甚至每天）改进的回报。
+
+Linus was directly aiming to maximize the number of person-hours thrown at debugging and development, even at the possible cost of instability in the code and user-base burnout if any serious bug proved intractable. Linus was behaving as though he believed something like this:
+Linus 的直接目标是最大限度地增加用于调试和开发的工时，即使如果任何严重错误被证明是棘手的，则可能会以代码不稳定和用户群倦怠为代价。莱纳斯的行为就像他相信这样的事情：
+
+8. Given a large enough beta-tester and co-developer base, almost every problem will be characterized quickly and the fix obvious to someone.
+8. 给定足够大的 beta 测试人员和共同开发者基础，几乎每个问题都会很快被描述出来，并且修复方法对某人来说是显而易见的。
+
+Or, less formally, ``Given enough eyeballs, all bugs are shallow.'' I dub this: ``Linus's Law''.
+或者，不那么正式地说，“只要有足够的眼球，所有的虫子都是肤浅的。我把它称为：“莱纳斯定律”。
+
+My original formulation was that every problem ``will be transparent to somebody''. Linus demurred that the person who understands and fixes the problem is not necessarily or even usually the person who first characterizes it. ``Somebody finds the problem,'' he says, ``and somebody else understands it. And I'll go on record as saying that finding it is the bigger challenge.'' That correction is important; we'll see how in the next section, when we examine the practice of debugging in more detail. But the key point is that both parts of the process (finding and fixing) tend to happen rapidly.
+我最初的表述是，每个问题“对某人都是透明的”。莱纳斯反驳说，理解和解决问题的人不一定，甚至通常不是首先描述它的人。“有人发现了问题，”他说，“还有人发现了问题 明白它。我要记录下来说，找到它是 更大的挑战。这种纠正很重要;我们将在 下一节，当我们在 More 细节。 但关键是，该过程的两个部分（查找 和修复）往往会迅速发生。
+
+In Linus's Law, I think, lies the core difference underlying the cathedral-builder and bazaar styles. In the cathedral-builder view of programming, bugs and development problems are tricky, insidious, deep phenomena. It takes months of scrutiny by a dedicated few to develop confidence that you've winkled them all out. Thus the long release intervals, and the inevitable disappointment when long-awaited releases are not perfect.
+我认为，在莱纳斯定律中，隐藏着大教堂建造者和集市风格的核心区别。在编程的 cathedral-builder 观点中，错误和开发问题是棘手的、阴险的、深刻的现象。少数专职人员需要几个月的审查才能建立信心，相信你已经把他们全部眨了眨眼。因此，漫长的发布间隔，以及当期待已久的发布并不完美时不可避免的失望。
+
+In the bazaar view, on the other hand, you assume that bugs are generally shallow phenomena—or, at least, that they turn shallow pretty quickly when exposed to a thousand eager co-developers pounding on every single new release. Accordingly you release often in order to get more corrections, and as a beneficial side effect you have less to lose if an occasional botch gets out the door.
+另一方面，在集市视图中，您假设 bug 通常是肤浅的现象，或者至少，当暴露在一千个热心的合作开发人员对每个新版本的冲击下时，它们会很快变得肤浅。因此，您经常发布以获得更多的更正，并且作为一个有益的副作用，如果偶尔出现错误，您的损失会更少。
+
+And that's it. That's enough. If ``Linus's Law'' is false, then any system as complex as the Linux kernel, being hacked over by as many hands as the that kernel was, should at some point have collapsed under the weight of unforseen bad interactions and undiscovered ``deep'' bugs. If it's true, on the other hand, it is sufficient to explain Linux's relative lack of bugginess and its continuous uptimes spanning months or even years.
+就是这样。够了。如果“莱纳斯定律”是错误的，那么任何像 Linux 内核这样复杂的系统，被和该内核一样多的人入侵，应该在某个时候在不可预见的不良交互和未被发现的“深层”错误的重压下崩溃。另一方面，如果这是真的，就足以解释 Linux 相对没有错误以及持续数月甚至数年的持续正常运行时间。
+
+Maybe it shouldn't have been such a surprise, at that. Sociologists years ago discovered that the averaged opinion of a mass of equally expert (or equally ignorant) observers is quite a bit more reliable a predictor than the opinion of a single randomly-chosen one of the observers. They called this the Delphi effect. It appears that what Linus has shown is that this applies even to debugging an operating system—that the Delphi effect can tame development complexity even at the complexity level of an OS kernel. [CV]
+也许这不应该如此令人惊讶。社会学家几年前发现，一大群同样专家（或同样无知）的观察者的平均看法比随机选择的观察者的观点要可靠得多。他们称之为德尔菲效应。看起来 Linus 已经证明，这甚至适用于调试作系统 — Delphi 效应甚至可以降低开发复杂性，甚至在作系统内核的复杂度级别上也是如此。[简历]
+
+One special feature of the Linux situation that clearly helps along the Delphi effect is the fact that the contributors for any given project are self-selected. An early respondent pointed out that contributions are received not from a random sample, but from people who are interested enough to use the software, learn about how it works, attempt to find solutions to problems they encounter, and actually produce an apparently reasonable fix. Anyone who passes all these filters is highly likely to have something useful to contribute.
+Linux 情况的一个特殊功能显然有助于德尔菲效应，即任何给定项目的贡献者都是自选的。一位早期的受访者指出，投稿不是来自随机样本，而是来自对使用该软件足够感兴趣、了解其工作原理、尝试为他们遇到的问题找到解决方案并实际提出明显合理的解决方案的人。任何通过所有这些过滤器的人都极有可能做出一些有用的贡献。
+
+Linus's Law can be rephrased as ``Debugging is parallelizable''. Although debugging requires debuggers to communicate with some coordinating developer, it doesn't require significant coordination between debuggers. Thus it doesn't fall prey to the same quadratic complexity and management costs that make adding developers problematic.
+Linus 定律可以改写为 ''Debugging is parallelizable'' 。尽管调试需要调试器与一些协调的开发人员通信，但它不需要调试器之间的大量协调。因此，它不会成为使添加开发人员成为问题的二次复杂性和管理成本的牺牲品。
+
+In practice, the theoretical loss of efficiency due to duplication of work by debuggers almost never seems to be an issue in the Linux world. One effect of a ``release early and often'' policy is to minimize such duplication by propagating fed-back fixes quickly [JH].
+在实践中，由于重复 在 Linux 中，调试器的工作似乎从来都不是问题 世界。 “尽早并经常发布”政策的一个效果是 通过快速传播反馈修复来最大限度地减少此类重复 [JH]。
+
+Brooks (the author of The Mythical Man-Month) even made an off-hand observation related to this: ``The total cost of maintaining a widely used program is typically 40 percent or more of the cost of developing it. Surprisingly this cost is strongly affected by the number of users. More users find more bugs.'' [emphasis added].
+布鲁克斯（《神话人物月》的作者）甚至对此进行了不经意的观察：“维护一个被广泛使用的程序的总成本通常是开发它的 40% 或更多。令人惊讶的是，此成本受用户数量的强烈影响。更多的用户发现更多的错误。[强调后加]。
+
+More users find more bugs because adding more users adds more different ways of stressing the program. This effect is amplified when the users are co-developers. Each one approaches the task of bug characterization with a slightly different perceptual set and analytical toolkit, a different angle on the problem. The ``Delphi effect'' seems to work precisely because of this variation. In the specific context of debugging, the variation also tends to reduce duplication of effort.
+更多的用户会发现更多的错误，因为添加更多用户会增加更多不同的程序压力方式。当用户是共同开发者时，这种影响会被放大。每个人都使用略有不同的感知集和分析工具包来处理错误表征的任务，从不同的角度看待问题。“德尔菲效应”似乎正是因为这种变化而起作用的。在调试的特定上下文中，变体也往往会减少重复工作。
+
+So adding more beta-testers may not reduce the complexity of the current ``deepest'' bug from the developer's point of view, but it increases the probability that someone's toolkit will be matched to the problem in such a way that the bug is shallow to that person.
+因此，添加更多的 beta 测试人员可能不会降低当前 “deepest”错误的复杂性 的角度来看，但它增加了某人的工具包 将以这样一种方式匹配到问题，使 bug 是浅层的 对那个人。
+
+Linus coppers his bets, too. In case there are serious bugs, Linux kernel version are numbered in such a way that potential users can make a choice either to run the last version designated ``stable'' or to ride the cutting edge and risk bugs in order to get new features. This tactic is not yet systematically imitated by most Linux hackers, but perhaps it should be; the fact that either choice is available makes both more attractive. [HBS]
+莱纳斯也赌上了。 万一有 是严重的错误，Linux 内核版本的编号方式使潜在用户可以选择运行指定为 ''stable'' 的最后一个版本，或者利用前沿并冒着错误的风险来获得新功能。大多数 Linux 黑客尚未系统地模仿这种策略，但也许应该这样做;任何一种选择都可用这一事实使两者都更具吸引力。[哈佛商学院] 
+
+How Many Eyeballs Tame Complexity
+多少眼球驯服复杂性
+
+It's one thing to observe in the large that the bazaar style greatly accelerates debugging and code evolution. It's another to understand exactly how and why it does so at the micro-level of day-to-day developer and tester behavior. In this section (written three years after the original paper, using insights by developers who read it and re-examined their own behavior) we'll take a hard look at the actual mechanisms. Non-technically inclined readers can safely skip to the next section.
+在大型中观察到 bazaar 样式极大地加速了调试和代码演化是一回事。在开发人员和测试人员日常行为的微观层面上，确切地理解它是如何以及为什么这样做的，这是另一回事。在本节中（在原始论文发布三年后撰写，利用了阅读该论文并重新检查自身行为的开发人员的见解），我们将认真研究实际的机制。不熟悉技术的读者可以放心地跳到下一部分。
+
+One key to understanding is to realize exactly why it is that the kind of bug report non–source-aware users normally turn in tends not to be very useful. Non–source-aware users tend to report only surface symptoms; they take their environment for granted, so they (a) omit critical background data, and (b) seldom include a reliable recipe for reproducing the bug.
+理解的一个关键是要准确理解为什么不了解源代码的用户通常会提交那种错误报告往往不是很有用。不了解源的用户往往只报告表面症状;他们认为自己的环境是理所当然的，因此他们 （a） 省略了关键的背景数据，并且 （b） 很少包含重现错误的可靠配方。
+
+The underlying problem here is a mismatch between the tester's and the developer's mental models of the program; the tester, on the outside looking in, and the developer on the inside looking out. In closed-source development they're both stuck in these roles, and tend to talk past each other and find each other deeply frustrating.
+这里的根本问题是测试人员和开发人员的程序心智模型之间的不匹配;测试人员在外面看，开发人员在里面看外面。在闭源开发中，他们都被困在这些角色中，并且往往会互相推诿，发现彼此都非常沮丧。
+
+Open-source development breaks this bind, making it far easier for tester and developer to develop a shared representation grounded in the actual source code and to communicate effectively about it. Practically, there is a huge difference in leverage for the developer between the kind of bug report that just reports externally-visible symptoms and the kind that hooks directly to the developer's source-code–based mental representation of the program.
+开源开发打破了这种束缚，使测试人员和开发人员更容易开发基于实际源代码的共享表示，并就此进行有效沟通。实际上，对于开发人员来说，仅报告外部可见症状的 bug 报告与直接挂接到开发人员基于源代码的程序心理表示的那种 bug 报告在杠杆作用上存在巨大差异。
+
+Most bugs, most of the time, are easily nailed given even an incomplete but suggestive characterization of their error conditions at source-code level. When someone among your beta-testers can point out, "there's a boundary problem in line nnn", or even just "under conditions X, Y, and Z, this variable rolls over", a quick look at the offending code often suffices to pin down the exact mode of failure and generate a fix.
+大多数时候，大多数 bug 很容易被钉住，因为即使是在源代码级别对其错误条件的不完整但具有暗示性的描述。当你的 beta 测试人员中有人可以指出，“第 nnn 行存在边界问题”，甚至只是“在条件 X、Y 和 Z 下，这个变量翻转”时，快速浏览一下有问题的代码通常就足以确定确切的失败模式并生成修复程序。
+
+Thus, source-code awareness by both parties greatly enhances both good communication and the synergy between what a beta-tester reports and what the core developer(s) know. In turn, this means that the core developers' time tends to be well conserved, even with many collaborators.
+因此，双方的源代码意识极大地增强了良好的沟通以及 beta 测试人员报告的内容与核心开发人员所知道的内容之间的协同作用。反过来，这意味着核心开发人员的时间往往会得到很好的节省，即使有很多合作者也是如此。
+
+Another characteristic of the open-source method that conserves developer time is the communication structure of typical open-source projects. Above I used the term "core developer"; this reflects a distinction between the project core (typically quite small; a single core developer is common, and one to three is typical) and the project halo of beta-testers and available contributors (which often numbers in the hundreds).
+开源方法节省开发人员时间的另一个特点是典型开源项目的通信结构。上面我使用了“核心开发人员”一词;这反映了项目核心（通常非常小;一个核心开发人员很常见，通常为一到三个）与 beta 测试人员和可用贡献者的项目光环（通常有数百个）之间的区别。
+
+The fundamental problem that traditional software-development organization addresses is Brook's Law: ``Adding more programmers to a late project makes it later.'' More generally, Brooks's Law predicts that the complexity and communication costs of a project rise with the square of the number of developers, while work done only rises linearly.
+传统软件开发组织解决的根本问题是布鲁克定律：“为后期项目添加更多程序员会使其更晚。更一般地说，布鲁克斯定律预测，项目的复杂性和沟通成本随着开发人员数量的平方而增加，而完成的工作只会线性增加。
+
+Brooks's Law is founded on experience that bugs tend strongly to cluster at the interfaces between code written by different people, and that communications/coordination overhead on a project tends to rise with the number of interfaces between human beings. Thus, problems scale with the number of communications paths between developers, which scales as the square of the humber of developers (more precisely, according to the formula N*(N - 1)/2 where N is the number of developers).
+布鲁克斯定律建立在这样的经验之上：错误往往强烈地聚集在不同人编写的代码之间的接口上，并且项目的通信/协调开销往往会随着人类之间接口数量的增加而增加。因此，问题随开发人员之间的通信路径数量而变化，其比例为开发人员的平方（更准确地说，根据公式 N*（N - 1）/2，其中 N 是开发人员的数量）。
+
+The Brooks's Law analysis (and the resulting fear of large numbers in development groups) rests on a hidden assummption: that the communications structure of the project is necessarily a complete graph, that everybody talks to everybody else. But on open-source projects, the halo developers work on what are in effect separable parallel subtasks and interact with each other very little; code changes and bug reports stream through the core group, and only within that small core group do we pay the full Brooksian overhead. [SU]
+布鲁克斯定律分析（以及由此产生的对开发组中大量人员的恐惧）建立在一个隐藏的假设之上：项目的通信结构必然是一个完整的图表，每个人都与其他人交谈。但在开源项目中，halo 开发人员从事实际上是可分离的并行子任务，并且彼此之间的交互很少;代码更改和错误报告流经核心组，只有在这个小核心组内，我们才会支付全部的 Brooksian 开销。[苏]
+
+There are are still more reasons that source-code–level bug reporting tends to be very efficient. They center around the fact that a single error can often have multiple possible symptoms, manifesting differently depending on details of the user's usage pattern and environment. Such errors tend to be exactly the sort of complex and subtle bugs (such as dynamic-memory-management errors or nondeterministic interrupt-window artifacts) that are hardest to reproduce at will or to pin down by static analysis, and which do the most to create long-term problems in software.
+还有更多原因表明源代码级的 bug 报告往往非常有效。它们围绕这样一个事实展开，即单个错误通常具有多种可能的症状，根据用户的使用模式和环境的详细信息，这些症状的表现会有所不同。此类错误往往正是那种复杂而微妙的错误（例如动态内存管理错误或非确定性中断窗口工件），它们最难随意重现或通过静态分析确定，并且最容易在软件中造成长期问题。
+
+A tester who sends in a tentative source-code–level characterization of such a multi-symptom bug (e.g. "It looks to me like there's a window in the signal handling near line 1250" or "Where are you zeroing that buffer?") may give a developer, otherwise too close to the code to see it, the critical clue to a half-dozen disparate symptoms. In cases like this, it may be hard or even impossible to know which externally-visible misbehaviour was caused by precisely which bug—but with frequent releases, it's unnecessary to know. Other collaborators will be likely to find out quickly whether their bug has been fixed or not. In many cases, source-level bug reports will cause misbehaviours to drop out without ever having been attributed to any specific fix.
+如果测试人员发送了这种多症状错误的暂定源代码级特征（例如，“在我看来，信号处理中靠近第 1250 行的地方有一个窗口”或“你在哪里将那个缓冲区归零？”）可能会给开发人员提供六种不同症状的关键线索，否则开发人员离代码太近而看不到它。在这种情况下，可能很难甚至不可能知道哪些外部可见的不当行为是由哪个错误引起的，但对于频繁的发布，没有必要知道。其他协作者可能会很快发现他们的 bug 是否已修复。在许多情况下，源代码级的错误报告会导致错误行为消失，而从未归因于任何特定的修复。
+
+Complex multi-symptom errors also tend to have multiple trace paths from surface symptoms back to the actual bug. Which of the trace paths a given developer or tester can chase may depend on subtleties of that person's environment, and may well change in a not obviously deterministic way over time. In effect, each developer and tester samples a semi-random set of the program's state space when looking for the etiology of a symptom. The more subtle and complex the bug, the less likely that skill will be able to guarantee the relevance of that sample.
+复杂的多症状错误也往往具有从表面症状到实际 bug 的多个跟踪路径。给定的开发人员或测试人员可以追踪哪些跟踪路径可能取决于该人环境的微妙之处，并且可能会随着时间的推移以一种不明显的确定性方式发生变化。实际上，每个开发人员和测试人员在查找症状的病因时都会对程序的状态空间进行一组半随机采样。错误越微妙和复杂，该技能就越不可能保证该样本的相关性。
+
+For simple and easily reproducible bugs, then, the accent will be on the "semi" rather than the "random"; debugging skill and intimacy with the code and its architecture will matter a lot. But for complex bugs, the accent will be on the "random". Under these circumstances many people running traces will be much more effective than a few people running traces sequentially—even if the few have a much higher average skill level.
+对于简单且易于重现的 bug，重音将位于 “semi” 而不是 “random” 上;调试技能和对代码及其架构的熟悉程度将非常重要。但对于复杂的 bug，重音将是 “random” 的。在这些情况下，许多人运行跟踪将比少数人按顺序运行跟踪更有效，即使少数人的平均技能水平要高得多。
+
+This effect will be greatly amplified if the difficulty of following trace paths from different surface symptoms back to a bug varies significantly in a way that can't be predicted by looking at the symptoms. A single developer sampling those paths sequentially will be as likely to pick a difficult trace path on the first try as an easy one. On the other hand, suppose many people are trying trace paths in parallel while doing rapid releases. Then it is likely one of them will find the easiest path immediately, and nail the bug in a much shorter time. The project maintainer will see that, ship a new release, and the other people running traces on the same bug will be able to stop before having spent too much time on their more difficult traces [RJ].
+如果从不同的表面症状追踪路径追溯到错误的难度差异很大，并且无法通过查看症状来预测，那么这种影响将大大放大。按顺序对这些路径进行采样的单个开发人员在第一次尝试时选择困难的跟踪路径的可能性与选择简单的跟踪路径的可能性一样大。另一方面，假设许多人在进行快速发布时尝试并行跟踪路径。然后，他们中的一个人很可能会立即找到最简单的路径，并在更短的时间内找出错误。项目维护者将看到这一点，发布新版本，并且对同一 bug 运行跟踪的其他人将能够在花费太多时间在更困难的跟踪 [RJ] 上之前停止。
+
+When Is a Rose Not a Rose?
+什么时候玫瑰不是玫瑰？
+
+Having studied Linus's behavior and formed a theory about why it was successful, I made a conscious decision to test this theory on my new (admittedly much less complex and ambitious) project.
+在研究了 Linus 的行为并形成了一个关于它为什么成功的理论后，我有意识地决定在我的新项目（诚然没有那么复杂和雄心勃勃）中测试这个理论。
+
+But the first thing I did was reorganize and simplify popclient a lot. Carl Harris's implementation was very sound, but exhibited a kind of unnecessary complexity common to many C programmers. He treated the code as central and the data structures as support for the code. As a result, the code was beautiful but the data structure design ad-hoc and rather ugly (at least by the high standards of this veteran LISP hacker).
+但我做的第一件事是重新组织和简化 popclient。Carl Harris 的实现非常可靠，但表现出许多 C 程序员常见的一种不必要的复杂性。他将代码视为中心，将数据结构视为对代码的支持。因此，代码很漂亮，但数据结构设计是临时的，而且相当丑陋（至少按照这位资深 LISP 黑客的高标准）。
+
+I had another purpose for rewriting besides improving the code and the data structure design, however. That was to evolve it into something I understood completely. It's no fun to be responsible for fixing bugs in a program you don't understand.
+然而，除了改进代码和数据结构设计之外，我还有另一个重写的目的。那就是把它演变成我完全理解的东西。负责修复您不理解的程序中的错误可不是一件有趣的事情。
+
+For the first month or so, then, I was simply following out the implications of Carl's basic design. The first serious change I made was to add IMAP support. I did this by reorganizing the protocol machines into a generic driver and three method tables (for POP2, POP3, and IMAP). This and the previous changes illustrate a general principle that's good for programmers to keep in mind, especially in languages like C that don't naturally do dynamic typing:
+那么，在第一个月左右的时间里，我只是在关注 Carl 的基本设计的含义。我所做的第一个重大更改是添加 IMAP 支持。我通过将协议计算机重新组织成一个通用驱动程序和三个方法表（用于 POP2、POP3 和 IMAP）来实现这一点。此更改和前面的更改说明了程序员需要牢记的一般原则，尤其是在像 C 这样自然不执行动态类型的语言中：
+
+9. Smart data structures and dumb code works a lot better than the other way around.
+9. 智能数据结构和愚蠢的代码比相反的效果要好得多。
+
+Brooks, Chapter 9: ``Show me your flowchart and conceal your tables, and I shall continue to be mystified. Show me your tables, and I won't usually need your flowchart; it'll be obvious.'' Allowing for thirty years of terminological/cultural shift, it's the same point.
+布鲁克斯，第 9 章：“给我看看你的流程图，把你的表格藏起来，我还会继续感到困惑。给我看看你的表格，我通常不需要你的流程图;这将是显而易见的。考虑到 30 年的术语/文化转变，这是同样的观点。
+
+At this point (early September 1996, about six weeks from zero) I started thinking that a name change might be in order—after all, it wasn't just a POP client any more. But I hesitated, because there was as yet nothing genuinely new in the design. My version of popclient had yet to develop an identity of its own.
+此时（1996 年 9 月初，距离零大约六周）我开始认为更改名称可能是必要的 — 毕竟，它不再只是一个 POP 客户端。但我犹豫了，因为设计中还没有什么真正的新东西。我的 popclient 版本尚未形成自己的身份。
+
+That changed, radically, when popclient learned how to forward fetched mail to the SMTP port. I'll get to that in a moment. But first: I said earlier that I'd decided to use this project to test my theory about what Linus Torvalds had done right. How (you may well ask) did I do that? In these ways:
+当 popclient 学会如何将获取的邮件转发到 SMTP 端口时，情况发生了根本性的变化。我稍后会谈到这一点。但首先：我之前说过，我决定用这个项目来检验我关于 Linus Torvalds 做对了什么的理论。我（你可能会问）我是怎么做到的？通过以下方式：
+
+I released early and often (almost never less often than every ten days; during periods of intense development, once a day).
+我提早且经常发布（几乎从不少于每 10 天一次;在紧张发育期间，每天一次）。
+
+I grew my beta list by adding to it everyone who contacted me about fetchmail.
+我通过添加所有就 fetchmail 联系我的人来增加我的测试版列表。
+
+I sent chatty announcements to the beta list whenever I released, encouraging people to participate.
+每当我发布时，我都会向 beta 列表发送闲聊的公告，鼓励人们参与。
+
+And I listened to my beta-testers, polling them about design decisions and stroking them whenever they sent in patches and feedback.
+我听取了我的 beta 测试人员的意见，对他们的设计决策进行了调查，并在他们发送补丁和反馈时抚摸他们。
+
+The payoff from these simple measures was immediate. From the beginning of the project, I got bug reports of a quality most developers would kill for, often with good fixes attached. I got thoughtful criticism, I got fan mail, I got intelligent feature suggestions. Which leads to:
+这些简单措施的回报是立竿见影的。从项目开始，我就收到了大多数开发人员都会为之付出代价的 bug 报告，并且通常附有很好的修复。我收到了深思熟虑的批评，我收到了粉丝邮件，我收到了智能功能建议。这导致：
+
+10. If you treat your beta-testers as if they're your most valuable resource, they will respond by becoming your most valuable resource.
+10. 如果您将 beta 测试人员视为您最宝贵的资源，他们就会成为您最有价值的资源。
+
+One interesting measure of fetchmail's success is the sheer size of the project beta list, fetchmail-friends. At the time of latest revision of this paper (November 2000) it has 287 members and is adding two or three a week.
+衡量 fetchmail 成功的一个有趣标准是项目 beta 列表 fetchmail-friends 的庞大规模。在本文最新修订时（2000 年 11 月），它有 287 名成员，并且每周增加两到三名成员。
+
+Actually, when I revised in late May 1997 I found the list was beginning to lose members from its high of close to 300 for an interesting reason. Several people have asked me to unsubscribe them because fetchmail is working so well for them that they no longer need to see the list traffic! Perhaps this is part of the normal life-cycle of a mature bazaar-style project.
+实际上，当我在 1997 年 5 月下旬修订时，我发现这个列表的成员开始从接近 300 的高位流失，原因很有趣。有几个人要求我取消订阅他们，因为 fetchmail 对他们来说运行得非常好，他们不再需要查看列表流量！也许这是一个成熟的集市式项目的正常生命周期的一部分。
+
+Popclient becomes Fetchmail
+Popclient 变为 Fetchmail
+
+The real turning point in the project was when Harry Hochheiser sent me his scratch code for forwarding mail to the client machine's SMTP port. I realized almost immediately that a reliable implementation of this feature would make all the other mail delivery modes next to obsolete.
+该项目的真正转折点是 Harry Hochheiser 向我发送了他的草稿代码，用于将邮件转发到客户端计算机的 SMTP 端口。我几乎立即意识到，此功能的可靠实现将使所有其他邮件投递模式几乎过时。
+
+For many weeks I had been tweaking fetchmail rather incrementally while feeling like the interface design was serviceable but grubby—inelegant and with too many exiguous options hanging out all over. The options to dump fetched mail to a mailbox file or standard output particularly bothered me, but I couldn't figure out why.
+许多周以来，我一直在逐步调整 fetchmail，同时感觉界面设计可用但肮脏——不优雅，而且到处都是繁琐的选项。将获取的邮件转储到邮箱文件或标准输出的选项特别困扰我，但我不知道为什么。
+
+(If you don't care about the technicalia of Internet mail, the next two paragraphs can be safely skipped.)
+（如果您不关心 Internet 邮件的技术，可以安全地跳过接下来的两段。
+
+What I saw when I thought about SMTP forwarding was that popclient had been trying to do too many things. It had been designed to be both a mail transport agent (MTA) and a local delivery agent (MDA). With SMTP forwarding, it could get out of the MDA business and be a pure MTA, handing off mail to other programs for local delivery just as sendmail does.
+当我考虑 SMTP 转发时，我看到 popclient 一直在尝试做太多事情。它被设计为既是邮件传输代理 （MTA） 又是本地投递代理 （MDA）。通过 SMTP 转发，它可以脱离 MDA 业务，成为一个纯粹的 MTA，像 sendmail 一样将邮件交给其他程序进行本地投递。
+
+Why mess with all the complexity of configuring a mail delivery agent or setting up lock-and-append on a mailbox when port 25 is almost guaranteed to be there on any platform with TCP/IP support in the first place? Especially when this means retrieved mail is guaranteed to look like normal sender-initiated SMTP mail, which is really what we want anyway.
+当端口 25 几乎可以保证在任何支持 TCP/IP 的平台上存在时，为什么还要处理配置邮件投递代理或在邮箱上设置锁定和附加的所有复杂性呢？特别是当这意味着检索到的邮件可以保证看起来像普通的发件人发起的 SMTP 邮件时，这正是我们想要的。
+
+(Back to a higher level....)
+（回到更高的层次......
+
+Even if you didn't follow the preceding technical jargon, there are several important lessons here. First, this SMTP-forwarding concept was the biggest single payoff I got from consciously trying to emulate Linus's methods. A user gave me this terrific idea—all I had to do was understand the implications.
+即使您没有遵循前面的技术术语，这里也有几个重要的教训。首先，这个 SMTP 转发概念是我有意识地尝试模仿 Linus 的方法所获得的最大回报。一位用户给了我这个绝妙的主意 — 我所要做的就是理解其中的含义。
+
+11. The next best thing to having good ideas is recognizing good ideas from your users. Sometimes the latter is better.
+11. 拥有好主意的下一个最佳办法是识别用户的好主意。有时后者更好。
+
+Interestingly enough, you will quickly find that if you are completely and self-deprecatingly truthful about how much you owe other people, the world at large will treat you as though you did every bit of the invention yourself and are just being becomingly modest about your innate genius. We can all see how well this worked for Linus!
+有趣的是，你很快就会发现，如果你完全地、自嘲地诚实地承认你欠别人多少钱，那么整个世界都会把你当作你自己做了所有发明，只是对你与生俱来的天才变得谦虚。我们都可以看到这对 Linus 来说有多有效！
+
+(When I gave my talk at the first Perl Conference in August 1997, hacker extraordinaire Larry Wall was in the front row. As I got to the last line above he called out, religious-revival style, ``Tell it, tell it, brother!''. The whole audience laughed, because they knew this had worked for the inventor of Perl, too.)
+（当我在 1997 年 8 月的第一届 Perl 会议上发表演讲时，杰出的黑客 Larry Wall 坐在前排。当我读到上面的最后一行时，他以宗教复兴的风格喊道，“告诉它，告诉它，兄弟！“全场都笑了，因为他们知道这对 Perl 的发明者也很有用。
+
+After a very few weeks of running the project in the same spirit, I began to get similar praise not just from my users but from other people to whom the word leaked out. I stashed away some of that email; I'll look at it again sometime if I ever start wondering whether my life has been worthwhile :-).
+在以同样的精神运行该项目几周后，我开始从我的用户和其他泄露消息的人那里得到类似的赞扬。我藏了一些电子邮件;如果我开始怀疑我的生活是否值得，我会在某个时候再看一遍 ：-）。
+
+But there are two more fundamental, non-political lessons here that are general to all kinds of design.
+但这里还有两个更基本的、非政治的教训，它们适用于各种设计。
+
+12. Often, the most striking and innovative solutions come from realizing that your concept of the problem was wrong.
+12. 通常，最引人注目和创新的解决方案来自于意识到你对问题的概念是错误的。
+
+I had been trying to solve the wrong problem by continuing to develop popclient as a combined MTA/MDA with all kinds of funky local delivery modes. Fetchmail's design needed to be rethought from the ground up as a pure MTA, a part of the normal SMTP-speaking Internet mail path.
+我一直在尝试通过继续将 popclient 开发为具有各种时髦本地交付模式的 MTA/MDA 组合来解决错误的问题。Fetchmail 的设计需要从头开始重新思考，作为一个纯粹的 MTA，它是正常的 SMTP 语言 Internet 邮件路径的一部分。
+
+When you hit a wall in development—when you find yourself hard put to think past the next patch—it's often time to ask not whether you've got the right answer, but whether you're asking the right question. Perhaps the problem needs to be reframed.
+当您在开发过程中遇到困难时，当您发现自己难以思考下一个补丁时，通常该问的不是你是否得到了正确的答案，而是你是否提出了正确的问题。也许这个问题需要重新构建。
+
+Well, I had reframed my problem. Clearly, the right thing to do was (1) hack SMTP forwarding support into the generic driver, (2) make it the default mode, and (3) eventually throw out all the other delivery modes, especially the deliver-to-file and deliver-to-standard-output options.
+好吧，我已经重新构建了我的问题。显然，正确的做法是 （1） 将 SMTP 转发支持改入通用驱动程序，（2） 使其成为默认模式，以及 （3） 最终丢弃所有其他传递模式，尤其是 deliver-to-file 和 deliver-to-standard-output 选项。
+
+I hesitated over step 3 for some time, fearing to upset long-time popclient users dependent on the alternate delivery mechanisms. In theory, they could immediately switch to .forward files or their non-sendmail equivalents to get the same effects. In practice the transition might have been messy.
+我对第 3 步犹豫了一段时间，害怕不安 依赖于备用传递的长期 popClient 用户 机制。 理论上，他们可以立即切换到 .forward 文件或其非 sendmail 等效项来获得相同的效果。在实践中，过渡可能是混乱的。
+
+But when I did it, the benefits proved huge. The cruftiest parts of the driver code vanished. Configuration got radically simpler—no more grovelling around for the system MDA and user's mailbox, no more worries about whether the underlying OS supports file locking.
+但当我这样做时，事实证明好处非常巨大。驱动程序代码中最粗糙的部分消失了。配置从根本上变得更加简单 — 不再需要为系统 MDA 和用户邮箱卑躬屈膝，也不再需要担心底层作系统是否支持文件锁定。
+
+Also, the only way to lose mail vanished. If you specified delivery to a file and the disk got full, your mail got lost. This can't happen with SMTP forwarding because your SMTP listener won't return OK unless the message can be delivered or at least spooled for later delivery.
+此外，丢失邮件的唯一方法也消失了。如果指定了传送到文件，并且磁盘已满，则邮件会丢失。SMTP 转发不会发生这种情况，因为您的 SMTP 侦听器不会返回 OK，除非邮件可以传送或至少假脱机以供以后传送。
+
+Also, performance improved (though not so you'd notice it in a single run). Another not insignificant benefit of this change was that the manual page got a lot simpler.
+此外，性能也有所提高（尽管不会让您在一次运行中注意到它）。这个变化的另一个不小的好处是手册页变得简单了很多。
+
+Later, I had to bring delivery via a user-specified local MDA back in order to allow handling of some obscure situations involving dynamic SLIP. But I found a much simpler way to do it.
+后来，我不得不通过用户指定的本地 MDA 返回交付，以便处理一些涉及动态 SLIP 的模糊情况。但我找到了一个更简单的方法。
+
+The moral? Don't hesitate to throw away superannuated features when you can do it without loss of effectiveness. Antoine de Saint-Exupéry (who was an aviator and aircraft designer when he wasn't authoring classic children's books) said:
+道德？不要犹豫，扔掉过时的功能，只要你能做到而不会失去效果。安托万·德·圣埃克苏佩里（Antoine de Saint-Exupéry，当他不创作经典儿童读物时，他是一名飞行员和飞机设计师）说：
+
+13. ``Perfection (in design) is achieved not when there is nothing more to add, but rather when there is nothing more to take away.''
+13. “（设计中）完美不是在没有更多可添加的情况下实现的，而是在没有什么可带走的时候实现的。
+
+When your code is getting both better and simpler, that is when you know it's right. And in the process, the fetchmail design acquired an identity of its own, different from the ancestral popclient.
+当您的代码变得更好、更简单时，就是您 知道这是对的。在这个过程中，fetchmail 设计获得了自己的身份，与祖先的 popclient 不同。
+
+It was time for the name change. The new design looked much more like a dual of sendmail than the old popclient had; both are MTAs, but where sendmail pushes then delivers, the new popclient pulls then delivers. So, two months off the blocks, I renamed it fetchmail.
+是时候改名了。新设计看起来比旧的 popclient 更像 sendmail 的对立;两者都是 MTA，但 Sendmail 推送然后传送，新的 PopClient 先拉取又传送。所以，两个月后，我把它改名为 fetchmail。
+
+There is a more general lesson in this story about how SMTP delivery came to fetchmail. It is not only debugging that is parallelizable; development and (to a perhaps surprising extent) exploration of design space is, too. When your development mode is rapidly iterative, development and enhancement may become special cases of debugging—fixing `bugs of omission' in the original capabilities or concept of the software.
+在这个故事中，有一个更普遍的教训，关于 SMTP 投递是如何进入 fetchmail 的。不仅调试是可并行化的;开发和（也许在某种程度上）对设计空间的探索也是如此。当您的开发模式是快速迭代的时，开发和增强可能会成为调试的特殊情况，即修复软件原始功能或概念中的“遗漏错误”。
+
+Even at a higher level of design, it can be very valuable to have lots of co-developers random-walking through the design space near your product. Consider the way a puddle of water finds a drain, or better yet how ants find food: exploration essentially by diffusion, followed by exploitation mediated by a scalable communication mechanism. This works very well; as with Harry Hochheiser and me, one of your outriders may well find a huge win nearby that you were just a little too close-focused to see.
+即使在更高的设计层次上，让许多合作开发人员随机浏览产品附近的设计空间也非常有价值。想想一滩水找到排水管的方式，或者更好的是蚂蚁如何找到食物：基本上是通过扩散进行探索，然后是由可扩展的通信机制介导的开发。这效果很好;就像 Harry Hochheiser 和我一样，你的一位 Outrider 很可能会在附近找到一场巨大的胜利，而你只是有点太近而无法看到。
+
+Fetchmail Grows Up  Fetchmail 成长起来
+
+There I was with a neat and innovative design, code that I knew worked well because I used it every day, and a burgeoning beta list. It gradually dawned on me that I was no longer engaged in a trivial personal hack that might happen to be useful to few other people. I had my hands on a program that every hacker with a Unix box and a SLIP/PPP mail connection really needs.
+在那里，我有一个整洁而创新的设计，我知道代码很好用，因为我每天都在使用它，还有一个蓬勃发展的 beta 列表。我逐渐意识到，我不再参与可能对其他人有用的琐碎的个人黑客攻击。我手头有一个程序，每个拥有 Unix 机器和 SLIP/PPP 邮件连接的黑客都真正需要。
+
+With the SMTP forwarding feature, it pulled far enough in front of the competition to potentially become a ``category killer'', one of those classic programs that fills its niche so competently that the alternatives are not just discarded but almost forgotten.
+凭借 SMTP 转发功能，它在竞争对手面前拉得足够远，有可能成为“类别杀手”，这是那些非常有能力填补其利基市场的经典程序之一，以至于替代方案不仅被丢弃，而且几乎被遗忘。
+
+I think you can't really aim or plan for a result like this. You have to get pulled into it by design ideas so powerful that afterward the results just seem inevitable, natural, even foreordained. The only way to try for ideas like that is by having lots of ideas—or by having the engineering judgment to take other peoples' good ideas beyond where the originators thought they could go.
+我认为你不能真的为了这样的结果而瞄准或计划。你必须被如此强大的设计理念所吸引，以至于之后的结果似乎是不可避免的、自然的，甚至是命中注定的。尝试这种想法的唯一方法是拥有大量的想法，或者通过工程判断，将其他人的好想法带到创始人认为他们可以达到的范围之外。
+
+Andy Tanenbaum had the original idea to build a simple native Unix for IBM PCs, for use as a teaching tool (he called it Minix). Linus Torvalds pushed the Minix concept further than Andrew probably thought it could go—and it grew into something wonderful. In the same way (though on a smaller scale), I took some ideas by Carl Harris and Harry Hochheiser and pushed them hard. Neither of us was `original' in the romantic way people think is genius. But then, most science and engineering and software development isn't done by original genius, hacker mythology to the contrary.
+Andy Tanenbaum 最初的想法是为 IBM PC 构建一个简单的原生 Unix，用作教学工具（他称之为 Minix）。Linus Torvalds 将 Minix 概念推得比 Andrew 想象的要远，它逐渐发展成了美妙的东西。以同样的方式（尽管规模较小），我采纳了 Carl Harris 和 Harry Hochheiser 的一些想法，并大力推动它们。我们俩都不是人们认为是天才的浪漫方式的“原创”。但是，大多数科学、工程和软件开发都不是由原创天才完成的，黑客神话恰恰相反。
+
+The results were pretty heady stuff all the same—in fact, just the kind of success every hacker lives for! And they meant I would have to set my standards even higher. To make fetchmail as good as I now saw it could be, I'd have to write not just for my own needs, but also include and support features necessary to others but outside my orbit. And do that while keeping the program simple and robust.
+结果都是相当令人陶醉的东西——事实上，这正是每个黑客都为之而生的成功！他们意味着我必须把我的标准定得更高。为了使 fetchmail 像我现在看到的那样好，我不仅要根据自己的需要编写，还要包含和支持其他人需要但在我轨道之外的功能。并在保持程序简单和健壮的同时做到这一点。
+
+The first and overwhelmingly most important feature I wrote after realizing this was multidrop support—the ability to fetch mail from mailboxes that had accumulated all mail for a group of users, and then route each piece of mail to its individual recipients.
+在意识到这一点后，我编写的第一个也是最重要的功能是多丢弃支持，即能够从已为一组用户累积所有邮件的邮箱中获取邮件，然后将每封邮件路由到其各个收件人。
+
+I decided to add the multidrop support partly because some users were clamoring for it, but mostly because I thought it would shake bugs out of the single-drop code by forcing me to deal with addressing in full generality. And so it proved. Getting RFC 822 address parsing right took me a remarkably long time, not because any individual piece of it is hard but because it involved a pile of interdependent and fussy details.
+我决定添加 multidrop 支持，部分原因是一些用户大声疾呼，但主要是因为我认为它会迫使我完全通用地处理寻址，从而摆脱 single-drop 代码中的错误。事实也证明了这一点。正确解析 RFC 822 地址花了我非常长的时间，不是因为它的任何单个部分都很难，而是因为它涉及一堆相互依赖且繁琐的细节。
+
+But multidrop addressing turned out to be an excellent design decision as well. Here's how I knew:
+但事实证明，multidrop 寻址也是一个很好的设计决策。我是这样知道的：
+
+14. Any tool should be useful in the expected way, but a truly great tool lends itself to uses you never expected.
+14. 任何工具都应该以预期的方式有用，但真正伟大的工具适合于您意想不到的用途。
+
+The unexpected use for multidrop fetchmail is to run mailing lists with the list kept, and alias expansion done, on the client side of the Internet connection. This means someone running a personal machine through an ISP account can manage a mailing list without continuing access to the ISP's alias files.
+multidrop fetchmail 的意外用途是运行邮件 lists 中保留 list 并完成别名扩展，在 Internet 连接的客户端。这意味着通过 ISP 帐户运行个人计算机的人可以管理邮件列表，而无需继续访问 ISP 的别名文件。
+
+Another important change demanded by my beta-testers was support for 8-bit MIME (Multipurpose Internet Mail Extensions) operation. This was pretty easy to do, because I had been careful to keep the code 8-bit clean (that is, to not press the 8th bit, unused in the ASCII character set, into service to carry information within the program). Not because I anticipated the demand for this feature, but rather in obedience to another rule:
+我的 beta 测试人员要求的另一个重要更改是支持 8 位 MIME（多用途 Internet 邮件扩展）作。这很容易做到，因为我一直小心翼翼地保持代码 8 位干净（即，不要将 ASCII 字符集中未使用的第 8 位投入使用，以便在程序中传递信息）。不是因为我预料到对此功能的需求，而是遵循另一个规则：
+
+15. When writing gateway software of any kind, take pains to disturb the data stream as little as possible—and never throw away information unless the recipient forces you to!
+15. 在编写任何类型的网关软件时，请采用 尽可能少地干扰数据流的痛苦，以及 除非收件人强迫您丢弃信息，否则永远不要丢弃信息！
+
+Had I not obeyed this rule, 8-bit MIME support would have been difficult and buggy. As it was, all I had to do is read the MIME standard (RFC 1652) and add a trivial bit of header-generation logic.
+如果我不遵守这条规则，8 位 MIME 支持将很困难且有问题。事实上，我所要做的就是阅读 MIME 标准 （RFC 1652） 并添加一些微不足道的标头生成逻辑。
+
+Some European users bugged me into adding an option to limit the number of messages retrieved per session (so they can control costs from their expensive phone networks). I resisted this for a long time, and I'm still not entirely happy about it. But if you're writing for the world, you have to listen to your customers—this doesn't change just because they're not paying you in money.
+一些欧洲用户怂恿我添加一个选项来限制每个会话检索的消息数量（这样他们就可以控制昂贵的电话网络的成本）。我抵制了很长时间，但我仍然对此并不完全满意。但是，如果你为全世界写作，你必须倾听你的客户——这不会仅仅因为他们不付钱给你而改变。
+
+A Few More Lessons from Fetchmail
+Fetchmail 的更多经验教训
+
+Before we go back to general software-engineering issues, there are a couple more specific lessons from the fetchmail experience to ponder. Nontechnical readers can safely skip this section.
+在我们回到一般的软件工程问题之前，从 fetchmail 经验中有几个更具体的教训需要思考。非技术读者可以放心地跳过本节。
+
+The rc (control) file syntax includes optional `noise' keywords that are entirely ignored by the parser. The English-like syntax they allow is considerably more readable than the traditional terse keyword-value pairs you get when you strip them all out.
+rc （control） 文件语法包括可选的 'noise' 关键字，解析器完全忽略这些关键字。它们允许的类似英语的语法比你得到的传统简洁的关键字-值对在你全部去掉时得到的可读性要好得多。
+
+These started out as a late-night experiment when I noticed how much the rc file declarations were beginning to resemble an imperative minilanguage. (This is also why I changed the original popclient ``server'' keyword to ``poll'').
+这些开始是一个深夜的实验，当时我注意到 rc 文件声明开始变得多么类似于命令式迷你语言。（这也是为什么我把原来的 popclient ''server'' 关键字改成 ''poll'' 的原因）。
+
+It seemed to me that trying to make that imperative minilanguage more like English might make it easier to use. Now, although I'm a convinced partisan of the ``make it a language'' school of design as exemplified by Emacs and HTML and many database engines, I am not normally a big fan of ``English-like'' syntaxes.
+在我看来，尝试使这种命令式迷你语言更像英语可能会使其更易于使用。现在，尽管我坚信以 Emacs 和 HTML 以及许多数据库引擎为代表的“使其成为一种语言”的设计流派，但我通常不是“类似英语”语法的忠实粉丝。
+
+Traditionally programmers have tended to favor control syntaxes that are very precise and compact and have no redundancy at all. This is a cultural legacy from when computing resources were expensive, so parsing stages had to be as cheap and simple as possible. English, with about 50% redundancy, looked like a very inappropriate model then.
+传统上，程序员倾向于使用非常精确和紧凑且完全没有冗余的控制语法。这是计算资源昂贵的文化遗产，因此解析阶段必须尽可能便宜和简单。英语，大约有 50% 的冗余，在当时看起来是一个非常不合适的模式。
+
+This is not my reason for normally avoiding English-like syntaxes; I mention it here only to demolish it. With cheap cycles and core, terseness should not be an end in itself. Nowadays it's more important for a language to be convenient for humans than to be cheap for the computer.
+这不是我通常避免使用类似英语的语法的原因;我在这里提到它只是为了拆除它。对于廉价的 cycles 和 core，简洁本身不应该是目的。如今，一种语言对人类来说方便比对计算机来说便宜更重要。
+
+There remain, however, good reasons to be wary. One is the complexity cost of the parsing stage—you don't want to raise that to the point where it's a significant source of bugs and user confusion in itself. Another is that trying to make a language syntax English-like often demands that the ``English'' it speaks be bent seriously out of shape, so much so that the superficial resemblance to natural language is as confusing as a traditional syntax would have been. (You see this bad effect in a lot of so-called ``fourth generation'' and commercial database-query languages.)
+然而，我们仍有充分的理由保持警惕。一个是解析阶段的复杂性成本 — 您不想将其提高到它本身就是 bug 和用户混淆的重要来源的地步。另一个是，试图使语言语法像英语一样，往往要求它所说的 “英语” 严重变形，以至于与自然语言的表面相似之处与传统语法一样令人困惑。（您可以在许多所谓的 “第四代” 和商业数据库查询语言中看到这种不良影响。
+
+The fetchmail control syntax seems to avoid these problems because the language domain is extremely restricted. It's nowhere near a general-purpose language; the things it says simply are not very complicated, so there's little potential for confusion in moving mentally between a tiny subset of English and the actual control language. I think there may be a broader lesson here:
+fetchmail 控制语法似乎避免了这些问题，因为语言域受到极大限制。它远不是一种通用语言;它所说的内容并不是很复杂，因此在脑海中在英语的一小部分和实际的控制语言之间移动时，几乎没有混淆的可能性。我认为这里可能有一个更广泛的教训：
+
+16. When your language is nowhere near Turing-complete, syntactic sugar can be your friend.
+16. 当你的语言远未达到图灵完备时，句法糖可以成为你的朋友。
+
+Another lesson is about security by obscurity. Some fetchmail users asked me to change the software to store passwords encrypted in the rc file, so snoopers wouldn't be able to casually see them.
+另一个教训是关于通过隐匿性实现安全。一些 fetchmail 用户要求我更改软件以存储在 rc 文件中加密的密码，这样窥探者就无法随便看到它们。
+
+I didn't do it, because this doesn't actually add protection. Anyone who's acquired permissions to read your rc file will be able to run fetchmail as you anyway—and if it's your password they're after, they'd be able to rip the necessary decoder out of the fetchmail code itself to get it.
+我没有这样做，因为这实际上并没有增加保护。任何获得读取 rc 文件权限的人都可以以您的身份运行 fetchmail——如果他们想要的是您的密码，他们将能够从 fetchmail 代码本身中撕下必要的解码器来获取它。
+
+All .fetchmailrc password encryption would have done is give a false sense of security to people who don't think very hard. The general rule here is:
+密码加密所做的只是 .fetchmailrc 给那些不认真思考的人一种虚假的安全感。这里的一般规则是：
+
+17. A security system is only as secure as its secret. Beware of pseudo-secrets.
+17. 安全系统的安全性取决于其秘密。当心伪秘密。
+
+ Necessary Preconditions for the Bazaar Style
+集市风格的必要前提条件
+
+Early reviewers and test audiences for this essay consistently raised questions about the preconditions for successful bazaar-style development, including both the qualifications of the project leader and the state of code at the time one goes public and starts to try to build a co-developer community.
+本文的早期审阅者和测试受众一直对成功的 Bazaar 式开发的先决条件提出问题，包括项目负责人的资格和公开并开始尝试构建共同开发者社区时的代码状态。
+
+It's fairly clear that one cannot code from the ground up in bazaar style [IN]. One can test, debug and improve in bazaar style, but it would be very hard to originate a project in bazaar mode. Linus didn't try it. I didn't either. Your nascent developer community needs to have something runnable and testable to play with.
+很明显，我们不能以 bazaar 风格 [IN] 从头开始编码。 一个可以测试、调试 并在 Bazaar 风格中进行改进，但要 在 Bazaar 模式下发起一个项目。莱纳斯没有尝试。我也没有。您的新生开发人员社区需要一些可运行且可测试的东西。
+
+When you start community-building, what you need to be able to present is a plausible promise. Your program doesn't have to work particularly well. It can be crude, buggy, incomplete, and poorly documented. What it must not fail to do is (a) run, and (b) convince potential co-developers that it can be evolved into something really neat in the foreseeable future.
+当你开始社区建设时，你需要能够呈现的是一个合理的承诺。您的程序不必运行得特别好。它可能很粗糙、有问题、不完整且文档记录不佳。它不能不做的是 （a） 运行，以及 （b） 说服潜在的合作开发者，在可预见的未来，它可以演变成真正整洁的东西。
+
+Linux and fetchmail both went public with strong, attractive basic designs. Many people thinking about the bazaar model as I have presented it have correctly considered this critical, then jumped from that to the conclusion that a high degree of design intuition and cleverness in the project leader is indispensable.
+Linux 和 fetchmail 都以强大、有吸引力的基本设计上市。许多人在思考我所介绍的集市模型时，都正确地认为这一点至关重要，然后从中跳出结论，即项目负责人的高度设计直觉和聪明才智是必不可少的。
+
+But Linus got his design from Unix. I got mine initially from the ancestral popclient (though it would later change a great deal, much more proportionately speaking than has Linux). So does the leader/coordinator for a bazaar-style effort really have to have exceptional design talent, or can he get by through leveraging the design talent of others?
+但是 Linus 从 Unix 获得了他的设计。我最初从祖先的 popclient 那里得到了我的（尽管它后来发生了很大的变化，比 Linux 要成比例得多）。那么，集市式工作的领导者/协调员真的必须拥有卓越的设计才能，还是可以通过利用他人的设计才能来度过难关呢？
+
+I think it is not critical that the coordinator be able to originate designs of exceptional brilliance, but it is absolutely critical that the coordinator be able to recognize good design ideas from others.
+我认为协调者能够发起具有非凡才华的设计并不重要，但协调者能够识别他人的优秀设计理念绝对至关重要。
+
+Both the Linux and fetchmail projects show evidence of this. Linus, while not (as previously discussed) a spectacularly original designer, has displayed a powerful knack for recognizing good design and integrating it into the Linux kernel. And I have already described how the single most powerful design idea in fetchmail (SMTP forwarding) came from somebody else.
+Linux 和 fetchmail 项目都证明了这一点。Linus 虽然不是（如前所述）一个了不起的原创设计师，但已经展示了识别优秀设计并将其集成到 Linux 内核中的强大诀窍。我已经描述了 fetchmail 中最强大的设计理念（SMTP 转发）是如何来自其他人的。
+
+Early audiences of this essay complimented me by suggesting that I am prone to undervalue design originality in bazaar projects because I have a lot of it myself, and therefore take it for granted. There may be some truth to this; design (as opposed to coding or debugging) is certainly my strongest skill.
+这篇文章的早期读者称赞我说，我很容易在集市项目中低估设计的原创性，因为我自己有很多，因此认为这是理所当然的。这也许有一定的道理;设计（而不是编码或调试）无疑是我最擅长的技能。
+
+But the problem with being clever and original in software design is that it gets to be a habit—you start reflexively making things cute and complicated when you should be keeping them robust and simple. I have had projects crash on me because I made this mistake, but I managed to avoid this with fetchmail.
+但是，在软件设计中保持聪明和原创的问题在于，它变成了一种习惯——你开始条件反射地让事情变得可爱和复杂，而你本应该保持它们的健壮和简单。因为我犯了这个错误，我遇到了项目崩溃的情况，但我设法使用 fetchmail 避免了这种情况。
+
+So I believe the fetchmail project succeeded partly because I restrained my tendency to be clever; this argues (at least) against design originality being essential for successful bazaar projects. And consider Linux. Suppose Linus Torvalds had been trying to pull off fundamental innovations in operating system design during the development; does it seem at all likely that the resulting kernel would be as stable and successful as what we have?
+所以我相信 fetchmail 项目成功了，部分原因是我克制了自己聪明的倾向;这（至少）反对设计原创性对于集市项目的成功至关重要。以 Linux 为例。假设 Linus Torvalds 在开发过程中一直试图在作系统设计中实现根本性创新;最终的内核似乎有可能像我们所拥有的一样稳定和成功吗？
+
+A certain base level of design and coding skill is required, of course, but I expect almost anybody seriously thinking of launching a bazaar effort will already be above that minimum. The open-source community's internal market in reputation exerts subtle pressure on people not to launch development efforts they're not competent to follow through on. So far this seems to have worked pretty well.
+当然，这需要一定的设计和编码技能，但我预计几乎所有认真考虑发起集市工作的人都已经超过了这个最低要求。开源社区的内部声誉市场对人们施加了微妙的压力，让他们不要启动他们没有能力进行开发的工作。到目前为止，这似乎效果很好。
+
+There is another kind of skill not normally associated with software development which I think is as important as design cleverness to bazaar projects—and it may be more important. A bazaar project coordinator or leader must have good people and communications skills.
+还有另一种通常与软件开发无关的技能，我认为它与集市项目的设计聪明一样重要——而且它可能更重要。集市项目协调员或领导者必须具有良好的人际交往和沟通技巧。
+
+This should be obvious. In order to build a development community, you need to attract people, interest them in what you're doing, and keep them happy about the amount of work they're doing. Technical sizzle will go a long way towards accomplishing this, but it's far from the whole story. The personality you project matters, too.
+这应该是显而易见的。为了构建开发社区，您需要吸引人们，让他们对您正在做的事情感兴趣，并让他们对自己所做的工作量感到满意。技术上的嘶嘶声对于实现这一目标大有帮助，但这远非故事的全部。你投射的个性也很重要。
+
+It is not a coincidence that Linus is a nice guy who makes people like him and want to help him. It's not a coincidence that I'm an energetic extrovert who enjoys working a crowd and has some of the delivery and instincts of a stand-up comic. To make the bazaar model work, it helps enormously if you have at least a little skill at charming people.
+Linus 是一个让人们喜欢并想帮助他的好人，这并非巧合。我是一个精力充沛的外向者，喜欢在人群中工作，并且具有一些单口喜剧的表达和直觉，这并非巧合。要使集市模型发挥作用，如果您至少有一点吸引人的技巧，它会有很大帮助。
+
+ The Social Context of Open-Source Software
+开源软件的社交环境
+
+It is truly written: the best hacks start out as personal solutions to the author's everyday problems, and spread because the problem turns out to be typical for a large class of users. This takes us back to the matter of rule 1, restated in a perhaps more useful way:
+它确实写得好：最好的 hacks 最初是作者日常问题的个人解决方案，并且因为问题被证明是一大类用户的典型问题而传播开来的。这让我们回到了规则 1 的问题，以一种可能更有用的方式重述：
+
+18. To solve an interesting problem, start by finding a problem that is interesting to you.
+18. 要解决一个有趣的问题，首先要找到一个你感兴趣的问题。
+
+So it was with Carl Harris and the ancestral popclient, and so with me and fetchmail. But this has been understood for a long time. The interesting point, the point that the histories of Linux and fetchmail seem to demand we focus on, is the next stage—the evolution of software in the presence of a large and active community of users and co-developers.
+Carl Harris 和祖先的 popclient 也是如此，我和 fetchmail 也是如此。但这已经被理解了很长时间。有趣的一点，也是 Linux 和 fetchmail 的历史似乎要求我们关注的一点，是下一阶段 — 在庞大而活跃的用户和共同开发者社区的存在下，软件的演变。
+
+In The Mythical Man-Month, Fred Brooks observed that programmer time is not fungible; adding developers to a late software project makes it later. As we've seen previously, he argued that the complexity and communication costs of a project rise with the square of the number of developers, while work done only rises linearly. Brooks's Law has been widely regarded as a truism. But we've examined in this essay an number of ways in which the process of open-source development falsifies the assumptionms behind it—and, empirically, if Brooks's Law were the whole picture Linux would be impossible.
+在 The Mythical Man-Month 中，Fred Brooks 观察到程序员的时间是不可替代的;将开发人员添加到后期软件项目会使其更晚。正如我们之前所看到的，他认为项目的复杂性和沟通成本随着开发人员数量的平方而增加，而完成的工作只会线性增加。布鲁克斯定律被广泛认为是不言而喻的。但是，在本文中，我们研究了开源开发过程以多种方式证伪其背后的假设，而且，从经验上讲，如果布鲁克斯定律是整个画面，那么 Linux 就不可能了。
+
+Gerald Weinberg's classic The Psychology of Computer Programming supplied what, in hindsight, we can see as a vital correction to Brooks. In his discussion of ``egoless programming'', Weinberg observed that in shops where developers are not territorial about their code, and encourage other people to look for bugs and potential improvements in it, improvement happens dramatically faster than elsewhere. (Recently, Kent Beck's `extreme programming' technique of deploying coders in pairs looking over one anothers' shoulders might be seen as an attempt to force this effect.)
+杰拉尔德·温伯格 （Gerald Weinberg） 的经典著作《计算机编程心理学》（The Psychology of Computer Programming） 提供了事后看来，我们可以将其视为对布鲁克斯的重要修正。在他对“无我编程”的讨论中，Weinberg 观察到，在开发人员对他们的代码没有领土意识的商店中，并鼓励其他人寻找其中的错误和潜在的改进，改进发生的速度比其他地方快得多。（最近，Kent Beck 的“极限编程”技术将程序员分成两组，互相观察，这可能被视为试图强制这种效果。
+
+Weinberg's choice of terminology has perhaps prevented his analysis from gaining the acceptance it deserved—one has to smile at the thought of describing Internet hackers as ``egoless''. But I think his argument looks more compelling today than ever.
+Weinberg 对术语的选择可能使他的分析无法获得应有的认可——一想到将互联网黑客描述为“无我”，人们就不得不微笑。但我认为他的论点在今天看起来比以往任何时候都更有说服力。
+
+The bazaar method, by harnessing the full power of the ``egoless programming'' effect, strongly mitigates the effect of Brooks's Law. The principle behind Brooks's Law is not repealed, but given a large developer population and cheap communications its effects can be swamped by competing nonlinearities that are not otherwise visible. This resembles the relationship between Newtonian and Einsteinian physics—the older system is still valid at low energies, but if you push mass and velocity high enough you get surprises like nuclear explosions or Linux.
+集市方法通过利用“无我编程”效应的全部力量，强烈减轻了布鲁克斯定律的影响。布鲁克斯定律背后的原则并没有被废除，但考虑到大量的开发人员群体和廉价的通信，它的影响可能会被其他方式不可见的竞争非线性所淹没。这类似于牛顿和爱因斯坦物理学之间的关系——旧系统在低能量下仍然有效，但如果你把质量和速度推得足够高，你就会得到像核爆炸或 Linux 这样的意外。
+
+The history of Unix should have prepared us for what we're learning from Linux (and what I've verified experimentally on a smaller scale by deliberately copying Linus's methods [EGCS]). That is, while coding remains an essentially solitary activity, the really great hacks come from harnessing the attention and brainpower of entire communities. The developer who uses only his or her own brain in a closed project is going to fall behind the developer who knows how to create an open, evolutionary context in which feedback exploring the design space, code contributions, bug-spotting, and other improvements come from from hundreds (perhaps thousands) of people.
+Unix 的历史应该让我们为从 Linux 中学到的东西做好准备（以及我通过故意复制 Linus 的方法 [EGCS] 在较小规模上实验验证的内容）。也就是说，虽然编码本质上仍然是一项单独的活动，但真正伟大的技巧来自利用整个社区的注意力和脑力。在封闭项目中仅使用自己的大脑的开发人员将落后于知道如何创建一个开放的、渐进的上下文的开发人员，在该上下文中，探索设计空间、代码贡献、错误发现和其他改进的反馈来自数百（也许是数千）人。
+
+But the traditional Unix world was prevented from pushing this approach to the ultimate by several factors. One was the legal contraints of various licenses, trade secrets, and commercial interests. Another (in hindsight) was that the Internet wasn't yet good enough.
+但是，由于几个因素，传统的 Unix 世界无法将这种方法推向极致。一个是各种许可证、商业秘密和商业利益的法律限制。另一个（事后看来）是互联网还不够好。
+
+Before cheap Internet, there were some geographically compact communities where the culture encouraged Weinberg's ``egoless'' programming, and a developer could easily attract a lot of skilled kibitzers and co-developers. Bell Labs, the MIT AI and LCS labs, UC Berkeley—these became the home of innovations that are legendary and still potent.
+在廉价互联网出现之前，有一些地理上紧凑的社区，那里的文化鼓励 Weinberg 的“无我”编程，开发人员很容易吸引许多熟练的 kibitzer 和合作开发人员。贝尔实验室、麻省理工学院 AI 和 LCS 实验室、加州大学伯克利分校 — 这些实验室成为具有传奇色彩且仍然强大的创新之源。
+
+Linux was the first project for which a conscious and successful effort to use the entire world as its talent pool was made. I don't think it's a coincidence that the gestation period of Linux coincided with the birth of the World Wide Web, and that Linux left its infancy during the same period in 1993–1994 that saw the takeoff of the ISP industry and the explosion of mainstream interest in the Internet. Linus was the first person who learned how to play by the new rules that pervasive Internet access made possible.
+Linux 是第一个有意识地成功地利用整个世界作为其人才库的项目。我认为 Linux 的酝酿期与万维网的诞生相吻合，而 Linux 在 1993-1994 年的同一时期离开了它的婴儿期，见证了 ISP 行业的腾飞和对 Internet 的主流兴趣的爆炸式增长，这并非巧合。Linus 是第一个学会如何遵守普遍的 Internet 访问使新规则成为可能的人。
+
+While cheap Internet was a necessary condition for the Linux model to evolve, I think it was not by itself a sufficient condition. Another vital factor was the development of a leadership style and set of cooperative customs that could allow developers to attract co-developers and get maximum leverage out of the medium.
+虽然廉价的互联网是 Linux 模型发展的必要条件，但我认为它本身并不是一个充分条件。另一个重要因素是领导风格和一套合作习惯的发展，这些习惯可以让开发人员吸引合作开发人员并从媒体中获得最大的杠杆作用。
+
+But what is this leadership style and what are these customs? They cannot be based on power relationships—and even if they could be, leadership by coercion would not produce the results we see. Weinberg quotes the autobiography of the 19th-century Russian anarchist Pyotr Alexeyvich Kropotkin's Memoirs of a Revolutionist to good effect on this subject:
+但是这种领导风格是什么，这些习俗是什么？它们不能建立在权力关系的基础上——即使可以，通过胁迫来领导也不会产生我们所看到的结果。温伯格引用了 19 世纪俄国无政府主义者彼得·阿列克谢维奇·克鲁泡特金 （Pyotr Alexeyvich Kropotkin） 的自传《一个革命家回忆录》（Memoirs of a Revolutionist），对这个问题产生了很好的影响：
+
+Having been brought up in a serf-owner's family, I entered active life, like all young men of my time, with a great deal of confidence in the necessity of commanding, ordering, scolding, punishing and the like. But when, at an early stage, I had to manage serious enterprises and to deal with [free] men, and when each mistake would lead at once to heavy consequences, I began to appreciate the difference between acting on the principle of command and discipline and acting on the principle of common understanding. The former works admirably in a military parade, but it is worth nothing where real life is concerned, and the aim can be achieved only through the severe effort of many converging wills.
+我从小在一个农奴主家庭长大，像我那个时代的所有年轻人一样，对命令、命令、责骂、惩罚等的必要性充满了信心。但是，在早期阶段，我不得不管理严肃的企业，与[自由的]人打交道，当每一个错误都会立即导致严重的后果时，我开始体会到按照命令和纪律的原则行事与根据共同理解的原则行事之间的区别。前者在阅兵式中效果令人钦佩，但在现实生活中则毫无价值，只有通过许多汇聚意志的艰苦努力才能实现这一目标。
+
+The ``severe effort of many converging wills'' is precisely what a project like Linux requires—and the ``principle of command'' is effectively impossible to apply among volunteers in the anarchist's paradise we call the Internet. To operate and compete effectively, hackers who want to lead collaborative projects have to learn how to recruit and energize effective communities of interest in the mode vaguely suggested by Kropotkin's ``principle of understanding''. They must learn to use Linus's Law.[SP]
+“许多汇聚意志的艰巨努力”正是像 Linux 这样的项目所需要的——而“命令原则”实际上不可能在我们称之为互联网的无政府主义者天堂的志愿者中应用。为了有效地运作和竞争，想要领导协作项目的黑客必须学习如何以克鲁泡特金的“理解原则”隐约暗示的模式招募和激发有效的利益社区。他们必须学会使用莱纳斯定律。[SP]
+
+Earlier I referred to the ``Delphi effect'' as a possible explanation for Linus's Law. But more powerful analogies to adaptive systems in biology and economics also irresistably suggest themselves. The Linux world behaves in many respects like a free market or an ecology, a collection of selfish agents attempting to maximize utility which in the process produces a self-correcting spontaneous order more elaborate and efficient than any amount of central planning could have achieved. Here, then, is the place to seek the ``principle of understanding''.
+早些时候，我提到了“德尔菲效应”作为对莱纳斯定律的可能解释。但是，生物学和经济学中与适应性系统的更有力的类比也不可抗拒地表明了自己。Linux 世界在许多方面都表现得像一个自由市场或生态，一群自私的代理人试图最大化效用，在这个过程中产生了一个自我纠正的自发秩序，比任何数量的中央计划都更复杂、更高效。因此，这里是寻求“理解原则”的地方。
+
+The ``utility function'' Linux hackers are maximizing is not classically economic, but is the intangible of their own ego satisfaction and reputation among other hackers. (One may call their motivation ``altruistic'', but this ignores the fact that altruism is itself a form of ego satisfaction for the altruist). Voluntary cultures that work this way are not actually uncommon; one other in which I have long participated is science fiction fandom, which unlike hackerdom has long explicitly recognized ``egoboo'' (ego-boosting, or the enhancement of one's reputation among other fans) as the basic drive behind volunteer activity.
+Linux 黑客正在最大化的“效用功能”并不是经典的经济功能，而是他们自己的自我满足感和其他黑客声誉的无形体现。（人们可以称他们的动机为“利他主义”，但这忽略了这样一个事实，即利他主义本身就是利他主义者的一种自我满足形式）。以这种方式运作的自愿文化实际上并不少见;我长期参与的另一个项目是科幻小说同人圈，与黑客同人圈不同，它长期以来一直明确承认“自我提升”（自我提升，或提高自己在其他粉丝中的声誉）是志愿者活动背后的基本驱动力。
+
+Linus, by successfully positioning himself as the gatekeeper of a project in which the development is mostly done by others, and nurturing interest in the project until it became self-sustaining, has shown an acute grasp of Kropotkin's ``principle of shared understanding''. This quasi-economic view of the Linux world enables us to see how that understanding is applied.
+Linus 成功地将自己定位为一个开发项目的守门人，在这个项目中，开发主要由他人完成，并培养对该项目的兴趣，直到它能够自给自足，这表明他对克鲁泡特金的“共同理解原则”有着敏锐的理解。这种对 Linux 世界的准经济观点使我们能够看到这种理解是如何应用的。
+
+We may view Linus's method as a way to create an efficient market in ``egoboo''—to connect the selfishness of individual hackers as firmly as possible to difficult ends that can only be achieved by sustained cooperation. With the fetchmail project I have shown (albeit on a smaller scale) that his methods can be duplicated with good results. Perhaps I have even done it a bit more consciously and systematically than he.
+我们可以将 Linus 的方法视为在 “egoboo” 中创建一个有效市场的一种方式——尽可能牢固地将单个黑客的自私与只有通过持续合作才能实现的困难目标联系起来。通过 fetchmail 项目，我已经证明（尽管规模较小）他的方法可以被复制并获得良好的结果。也许我甚至比他更有意识、更系统地这样做了。
+
+Many people (especially those who politically distrust free markets) would expect a culture of self-directed egoists to be fragmented, territorial, wasteful, secretive, and hostile. But this expectation is clearly falsified by (to give just one example) the stunning variety, quality, and depth of Linux documentation. It is a hallowed given that programmers hate documenting; how is it, then, that Linux hackers generate so much documentation? Evidently Linux's free market in egoboo works better to produce virtuous, other-directed behavior than the massively-funded documentation shops of commercial software producers.
+许多人（尤其是那些在政治上不信任自由市场的人）会期望一种自我导向的利己主义文化是分裂的、领土性的、浪费的、秘密的和充满敌意的。但是，这种期望显然被 Linux 文档惊人的多样性、质量和深度所证伪（仅举一个例子）。鉴于程序员讨厌文档，这是一个神圣的;那么，Linux 黑客是如何生成如此多的文档的呢？显然，Linux 在 egoboo 的自由市场比商业软件生产商的大量资金文档商店更能产生良性、他人导向的行为。
+
+Both the fetchmail and Linux kernel projects show that by properly rewarding the egos of many other hackers, a strong developer/coordinator can use the Internet to capture the benefits of having lots of co-developers without having a project collapse into a chaotic mess. So to Brooks's Law I counter-propose the following:
+fetchmail 和 Linux 内核项目都表明，通过适当地奖励许多其他黑客的自负，一个强大的开发人员/协调者可以利用互联网来获得拥有大量共同开发人员的好处，而不会让项目陷入混乱。因此，对于布鲁克斯定律，我提出了以下建议：
+
+19: Provided the development coordinator has a communications medium at least as good as the Internet, and knows how to lead without coercion, many heads are inevitably better than one.
+19： 如果开发协调员拥有至少与互联网一样好的通信媒介，并且知道如何在没有胁迫的情况下领导，那么许多负责人必然比一个好。
+
+I think the future of open-source software will increasingly belong to people who know how to play Linus's game, people who leave behind the cathedral and embrace the bazaar. This is not to say that individual vision and brilliance will no longer matter; rather, I think that the cutting edge of open-source software will belong to people who start from individual vision and brilliance, then amplify it through the effective construction of voluntary communities of interest.
+我认为开源软件的未来将越来越多地属于那些知道如何玩 Linus 游戏的人，那些离开大教堂并拥抱集市的人。这并不是说个人的愿景和才华将不再重要;相反，我认为开源软件的前沿将属于那些从个人愿景和才华出发，然后通过有效构建自愿利益社区来放大它的人。
+
+Perhaps this is not only the future of open-source software. No closed-source developer can match the pool of talent the Linux community can bring to bear on a problem. Very few could afford even to hire the more than 200 (1999: 600, 2000: 800) people who have contributed to fetchmail!
+也许这不仅仅是 开源软件。任何闭源开发人员都无法与 Linux 社区能够为问题提供的人才库相媲美。很少有人能负担得起雇佣 200 多人（1999：600,2000：800）为 fetchmail 做出贡献的人！
+
+Perhaps in the end the open-source culture will triumph not because cooperation is morally right or software ``hoarding'' is morally wrong (assuming you believe the latter, which neither Linus nor I do), but simply because the closed-source world cannot win an evolutionary arms race with open-source communities that can put orders of magnitude more skilled time into a problem.
+也许最终开源文化会取得胜利，不是因为合作在道德上是正确的，或者软件的“囤积”在道德上是错误的（假设你相信后者，Linus 和我都不相信），而仅仅是因为闭源世界无法赢得与开源社区的进化军备竞赛，而开源社区可以将更多的熟练时间投入到问题中。
+
+On Management and the Maginot Line
+关于管理和马其诺防线
+
+The original Cathedral and Bazaar paper of 1997 ended with the vision above—that of happy networked hordes of programmer/anarchists outcompeting and overwhelming the hierarchical world of conventional closed software.
+1997 年最初的 Cathedral and Bazaar 论文以上述愿景结束 — 即快乐的网络程序员/无政府主义者大军超越并压倒传统封闭软件的等级世界。
+
+A good many skeptics weren't convinced, however; and the questions they raise deserve a fair engagement. Most of the objections to the bazaar argument come down to the claim that its proponents have underestimated the productivity-multiplying effect of conventional management.
+然而，很多怀疑论者并没有被说服;他们提出的问题值得公平对待。对集市论点的大多数反对意见都归结为这样一种说法，即它的支持者低估了传统管理的生产力倍增效应。
+
+Traditionally-minded software-development managers often object that the casualness with which project groups form and change and dissolve in the open-source world negates a significant part of the apparent advantage of numbers that the open-source community has over any single closed-source developer. They would observe that in software development it is really sustained effort over time and the degree to which customers can expect continuing investment in the product that matters, not just how many people have thrown a bone in the pot and left it to simmer.
+具有传统思想的软件开发经理经常反对说，在开源世界中，项目组的形成、变化和解散的随意性否定了开源社区相对于任何单个闭源开发人员的明显优势的很大一部分。他们会观察到，在软件开发中，重要的是随着时间的推移而持续的努力，以及客户可以期望对产品的持续投资的程度，而不仅仅是有多少人把一根骨头扔进锅里，让它炖着。
+
+There is something to this argument, to be sure; in fact, I have developed the idea that expected future service value is the key to the economics of software production in the essay The Magic Cauldron.
+可以肯定的是，这个论点是有道理的;事实上，我在 The Magic Cauldron 一文中提出了这样一个观点，即预期的未来服务价值是软件生产经济学的关键 。
+
+But this argument also has a major hidden problem; its implicit assumption that open-source development cannot deliver such sustained effort. In fact, there have been open-source projects that maintained a coherent direction and an effective maintainer community over quite long periods of time without the kinds of incentive structures or institutional controls that conventional management finds essential. The development of the GNU Emacs editor is an extreme and instructive example; it has absorbed the efforts of hundreds of contributors over 15 years into a unified architectural vision, despite high turnover and the fact that only one person (its author) has been continuously active during all that time. No closed-source editor has ever matched this longevity record.
+但这个论点也有一个重大的隐藏问题;它隐含地假设开源开发无法提供如此持续的努力。事实上，已经有一些开源项目在相当长的一段时间内保持了一致的方向和有效的维护者社区，而没有传统管理认为必要的激励结构或制度控制。GNU Emacs 编辑器的开发是一个极端而有启发性的例子;它吸收了数百名贡献者在 15 年中的努力，形成了一个统一的架构愿景，尽管人员流动率很高，而且在这段时间内只有一个人（其作者）一直活跃。从来没有闭源编辑器能比得上这个长寿记录。
+
+This suggests a reason for questioning the advantages of conventionally-managed software development that is independent of the rest of the arguments over cathedral vs. bazaar mode. If it's possible for GNU Emacs to express a consistent architectural vision over 15 years, or for an operating system like Linux to do the same over 8 years of rapidly changing hardware and platform technology; and if (as is indeed the case) there have been many well-architected open-source projects of more than 5 years duration -- then we are entitled to wonder what, if anything, the tremendous overhead of conventionally-managed development is actually buying us.
+这表明了质疑传统管理软件开发的优势的原因，该软件开发独立于其他关于大教堂与集市模式的争论。如果 GNU Emacs 可以在 15 年内表达出一致的架构愿景，或者像 Linux 这样的作系统可以在 8 年快速变化的硬件和平台技术中做同样的事情;如果（确实如此）有许多持续时间超过 5 年的架构良好的开源项目 —— 那么我们有权想知道，传统管理开发的巨大开销实际上给我们带来了什么，如果有的话。
+
+Whatever it is certainly doesn't include reliable execution by deadline, or on budget, or to all features of the specification; it's a rare `managed' project that meets even one of these goals, let alone all three. It also does not appear to be ability to adapt to changes in technology and economic context during the project lifetime, either; the open-source community has proven far more effective on that score (as one can readily verify, for example, by comparing the 30-year history of the Internet with the short half-lives of proprietary networking technologies—or the cost of the 16-bit to 32-bit transition in Microsoft Windows with the nearly effortless upward migration of Linux during the same period, not only along the Intel line of development but to more than a dozen other hardware platforms, including the 64-bit Alpha as well).
+无论它是什么，肯定不包括在截止日期前、在预算内或规范的所有功能之前可靠地执行;这是一个罕见的“管理”项目，即使满足这些目标中的一个，更不用说所有三个目标了。在项目生命周期内，它似乎也没有能力适应技术和经济环境的变化;开源社区已经证明了 在该分数上更有效（例如，人们可以很容易地验证， 通过比较互联网的 30 年历史和短片 专有网络技术的半衰期 — 或 Microsoft Windows 中的 16 位到 32 位过渡，几乎 同期 Linux 毫不费力地向上迁移，不仅 沿着 Intel 的路线发展但到十几个其他 硬件平台，包括 64 位 Alpha）。
+
+One thing many people think the traditional mode buys you is somebody to hold legally liable and potentially recover compensation from if the project goes wrong. But this is an illusion; most software licenses are written to disclaim even warranty of merchantability, let alone performance—and cases of successful recovery for software nonperformance are vanishingly rare. Even if they were common, feeling comforted by having somebody to sue would be missing the point. You didn't want to be in a lawsuit; you wanted working software.
+许多人认为传统模式为您带来的一件事是，如果项目出错，有人要承担法律责任并可能从中收回赔偿。但这是一种幻觉;大多数软件许可证的编写甚至不保证适销性，更不用说性能了 — 成功恢复软件性能不佳的情况非常罕见。即使他们很常见，因为有人起诉而感到安慰也是没有抓住重点的。你不想卷入诉讼;你想要的是工作软件。
+
+So what is all that management overhead buying?
+那么，所有这些管理开销购买是什么呢？
+
+In order to understand that, we need to understand what software development managers believe they do. A woman I know who seems to be very good at this job says software project management has five functions:
+为了理解这一点，我们需要了解软件开发经理认为他们是做什么的。我认识的一位似乎很擅长这份工作的女士说，软件项目管理有五个功能：
+
+To define goals and keep everybody pointed in the same direction
+定义目标并使每个人都朝着同一个方向前进
+
+To monitor and make sure crucial details don't get skipped
+监控并确保不会跳过关键细节
+
+To motivate people to do boring but necessary drudgework
+激励人们做无聊但必要的苦差事
+
+To organize the deployment of people for best productivity
+组织人员部署以实现最佳生产力
+
+To marshal resources needed to sustain the project
+调动维持项目所需的资源
+
+Apparently worthy goals, all of these; but under the open-source model, and in its surrounding social context, they can begin to seem strangely irrelevant. We'll take them in reverse order.
+显然值得的目标，所有这些;但在开源模型及其周围的社会环境中，它们可能会开始显得奇怪地无关紧要。我们将按相反的顺序进行。
+
+My friend reports that a lot of resource marshalling is basically defensive; once you have your people and machines and office space, you have to defend them from peer managers competing for the same resources, and from higher-ups trying to allocate the most efficient use of a limited pool.
+我的朋友报告说，很多资源编组基本上都是防御性的;一旦你有了你的人员、机器和办公空间，你就必须保护它们免受争夺相同资源的同行经理的攻击，以及试图最有效地分配有限池的上级。
+
+But open-source developers are volunteers, self-selected for both interest and ability to contribute to the projects they work on (and this remains generally true even when they are being paid a salary to hack open source.) The volunteer ethos tends to take care of the `attack' side of resource-marshalling automatically; people bring their own resources to the table. And there is little or no need for a manager to `play defense' in the conventional sense.
+但开源开发人员是志愿者，他们根据兴趣和能力自行选择，为他们所从事的项目做出贡献（即使他们拿着薪水来破解开源，这通常仍然是正确的）。志愿者的精神倾向于自动处理资源编组的“攻击”方面;人们将自己的资源带到桌面上。而且，经理很少或根本不需要传统意义上的“防守”。
+
+Anyway, in a world of cheap PCs and fast Internet links, we find pretty consistently that the only really limiting resource is skilled attention. Open-source projects, when they founder, essentially never do so for want of machines or links or office space; they die only when the developers themselves lose interest.
+无论如何，在一个廉价 PC 和快速 Internet 链接的世界里，我们一致发现唯一真正限制的资源是熟练的关注。开源项目，当它们成立时，基本上从来不会因为缺乏机器、链接或办公空间而这样做;只有当开发者自己失去兴趣时，他们才会死去。
+
+That being the case, it's doubly important that open-source hackers organize themselves for maximum productivity by self-selection—and the social milieu selects ruthlessly for competence. My friend, familiar with both the open-source world and large closed projects, believes that open source has been successful partly because its culture only accepts the most talented 5% or so of the programming population. She spends most of her time organizing the deployment of the other 95%, and has thus observed first-hand the well-known variance of a factor of one hundred in productivity between the most able programmers and the merely competent.
+既然如此，开源黑客通过自我选择来组织自己以最大限度地提高生产力就显得尤为重要，而社会环境则无情地选择能力。我的朋友熟悉开源世界和大型封闭项目，他认为开源之所以成功，部分原因是它的文化只接受最有才华的 5% 左右的编程人群。她将大部分时间花在组织其他 95% 的部署上，因此亲眼目睹了众所周知的 100 倍的生产力差异，即最有能力的程序员和唯一有能力的程序员之间的差异是 100 倍。
+
+The size of that variance has always raised an awkward question: would individual projects, and the field as a whole, be better off without more than 50% of the least able in it? Thoughtful managers have understood for a long time that if conventional software management's only function were to convert the least able from a net loss to a marginal win, the game might not be worth the candle.
+这种差异的大小总是引发一个尴尬的问题：如果单个项目和整个领域没有超过 50% 的最弱项目参与其中，情况会更好吗？深思熟虑的管理者很早就明白，如果传统软件管理的唯一功能是将能力最弱的一方从净损失转化为边际胜利，那么这场游戏可能就不值得了。
+
+The success of the open-source community sharpens this question considerably, by providing hard evidence that it is often cheaper and more effective to recruit self-selected volunteers from the Internet than it is to manage buildings full of people who would rather be doing something else.
+开源社区的成功大大突出了这个问题，因为它提供了确凿的证据，证明从 Internet 上招募自选的志愿者通常比管理满是宁愿做其他事情的人的建筑物更便宜、更有效。
+
+Which brings us neatly to the question of motivation. An equivalent and often-heard way to state my friend's point is that traditional development management is a necessary compensation for poorly motivated programmers who would not otherwise turn out good work.
+这就巧妙地把我们带到了 动机。我朋友的观点也是一种等效且经常听到的方式，即传统的开发管理是对那些积极性低下的程序员的必要补偿，否则他们不会做出好的工作。
+
+This answer usually travels with a claim that the open-source community can only be relied on only to do work that is `sexy' or technically sweet; anything else will be left undone (or done only poorly) unless it's churned out by money-motivated cubicle peons with managers cracking whips over them. I address the psychological and social reasons for being skeptical of this claim in Homesteading the Noosphere. For present purposes, however, I think it's more interesting to point out the implications of accepting it as true.
+这个答案通常伴随着这样一种说法，即开源社区只能依靠它来做 “性感 ”或技术上甜蜜的工作;其他任何事情都会被搁置（或只是做得很糟糕），除非它是由受金钱驱使的小隔间农民和经理们对他们进行鞭打。我在 Homesteading the Noosphere 中解决了对这种说法持怀疑态度的心理和社会原因。然而，就目前而言，我认为指出接受它是真的含义更有趣。
+
+If the conventional, closed-source, heavily-managed style of software development is really defended only by a sort of Maginot Line of problems conducive to boredom, then it's going to remain viable in each individual application area for only so long as nobody finds those problems really interesting and nobody else finds any way to route around them. Because the moment there is open-source competition for a `boring' piece of software, customers are going to know that it was finally tackled by someone who chose that problem to solve because of a fascination with the problem itself—which, in software as in other kinds of creative work, is a far more effective motivator than money alone.
+如果传统的、闭源的、重度管理的软件开发风格真的只由一种有利于无聊的马其诺线问题来捍卫，那么只要没有人觉得这些问题真的很有趣，也没有人找到任何绕过它们的方法，它就会在每个单独的应用领域中保持活力。因为当一个“无聊”的软件存在开源竞争时，客户就会知道它最终是由一个选择解决该问题的人来解决的，因为对问题本身很着迷——在软件中，就像在其他类型的创造性工作中一样，这是一个比单纯的金钱更有效的激励因素。
+
+Having a conventional management structure solely in order to motivate, then, is probably good tactics but bad strategy; a short-term win, but in the longer term a surer loss.
+因此，仅仅为了激励而拥有传统的管理结构可能是好的策略，但也是坏的策略;短期的胜利，但从长期来看，损失更大。
+
+So far, conventional development management looks like a bad bet now against open source on two points (resource marshalling, organization), and like it's living on borrowed time with respect to a third (motivation). And the poor beleaguered conventional manager is not going to get any succour from the monitoring issue; the strongest argument the open-source community has is that decentralized peer review trumps all the conventional methods for trying to ensure that details don't get slipped.
+到目前为止，传统的开发管理现在看起来在两个点（资源编组、组织）上与开源相比是一个糟糕的赌注，而且在第三个点（动机）方面，它似乎是靠借来的时间生活。而可怜的、四面楚歌的传统经理不会从监控中得到任何帮助 问题;开源社区最有力的论点是 去中心化同行评审胜过所有传统方法 试图确保细节不会被遗漏。
+
+Can we save defining goals as a justification for the overhead of conventional software project management? Perhaps; but to do so, we'll need good reason to believe that management committees and corporate roadmaps are more successful at defining worthy and widely shared goals than the project leaders and tribal elders who fill the analogous role in the open-source world.
+我们能否将定义目标作为传统软件项目管理开销的理由？也许;但要做到这一点，我们需要充分的理由相信，管理委员会和企业路线图在定义有价值和广泛共享的目标方面，比起在开源世界中扮演类似角色的项目领导者和部落长老更成功。
+
+That is on the face of it a pretty hard case to make. And it's not so much the open-source side of the balance (the longevity of Emacs, or Linus Torvalds's ability to mobilize hordes of developers with talk of ``world domination'') that makes it tough. Rather, it's the demonstrated awfulness of conventional mechanisms for defining the goals of software projects.
+从表面上看，这是一个相当困难的案例。让事情变得困难的并不是开源的一面（Emacs 的长寿，或者 Linus Torvalds 通过谈论“统治世界”来动员成群结队的开发人员的能力）。相反，它是定义软件项目目标的传统机制所证明的可怕之处。
+
+One of the best-known folk theorems of software engineering is that 60% to 75% of conventional software projects either are never completed or are rejected by their intended users. If that range is anywhere near true (and I've never met a manager of any experience who disputes it) then more projects than not are being aimed at goals that are either (a) not realistically attainable, or (b) just plain wrong.
+软件工程最著名的民间定理之一是 60% 到 75% 的传统软件项目要么从未完成，要么被其目标用户拒绝。如果这个范围几乎是正确的（而且我从来没有遇到过任何经验的经理对此提出异议），那么更多的项目正在瞄准 （a） 不切实际地实现，或者 （b） 完全错误的目标。
+
+This, more than any other problem, is the reason that in today's software engineering world the very phrase ``management committee'' is likely to send chills down the hearer's spine—even (or perhaps especially) if the hearer is a manager. The days when only programmers griped about this pattern are long past; Dilbert cartoons hang over executives' desks now.
+这比任何其他问题都更能说明为什么在今天的 软件工程世界 “管理委员会”这个短语本身就是 可能会让听众脊背发凉——甚至（或者也许 特别是）如果听众是经理。 只有程序员的时代 对这种模式的抱怨早已过去;Dilbert 漫画悬而未决 现在是高管的办公桌。
+
+Our reply, then, to the traditional software development manager, is simple—if the open-source community has really underestimated the value of conventional management, why do so many of you display contempt for your own process?
+那么，我们对传统软件开发经理的回答很简单 — 如果开源社区真的低估了传统管理的价值，为什么你们中有这么多人对自己的流程表现出鄙视呢？
+
+Once again the example of the open-source community sharpens this question considerably—because we have fun doing what we do. Our creative play has been racking up technical, market-share, and mind-share successes at an astounding rate. We're proving not only that we can do better software, but that joy is an asset.
+开源社区的例子再次大大突出了这个问题 — 因为我们玩得很开心 做我们所做的。 我们的创意游戏一直在积累技术、 市场份额和精神份额的成功率惊人。 我们是 这不仅证明了我们可以做出更好的软件，而且 快乐是一种资产。
+
+Two and a half years after the first version of this essay, the most radical thought I can offer to close with is no longer a vision of an open-source–dominated software world; that, after all, looks plausible to a lot of sober people in suits these days.
+在这篇文章的第一个版本发布两年半之后，我能提供的最激进的想法不再是一个开源主导的软件世界的愿景;毕竟，对于如今许多穿着西装革履的清醒人来说，这似乎是合理的。
+
+Rather, I want to suggest what may be a wider lesson about software, (and probably about every kind of creative or professional work). Human beings generally take pleasure in a task when it falls in a sort of optimal-challenge zone; not so easy as to be boring, not too hard to achieve. A happy programmer is one who is neither underutilized nor weighed down with ill-formulated goals and stressful process friction. Enjoyment predicts efficiency.
+相反，我想提出关于软件的更广泛的教训（可能还有关于各种创造性或专业工作）。当一项任务处于某种最佳挑战区时，人类通常会对它感到高兴;不要那么容易以至于无聊，也不会太难实现。一个快乐的程序员既没有得到充分利用，也没有被制定不明确的目标和压力大的流程摩擦所拖累。享受预测效率。
+
+Relating to your own work process with fear and loathing (even in the displaced, ironic way suggested by hanging up Dilbert cartoons) should therefore be regarded in itself as a sign that the process has failed. Joy, humor, and playfulness are indeed assets; it was not mainly for the alliteration that I wrote of "happy hordes" above, and it is no mere joke that the Linux mascot is a cuddly, neotenous penguin.
+因此，将自己的工作过程与恐惧和厌恶联系起来（即使是以挂断 Dilbert 漫画所暗示的错位、讽刺的方式）本身就应该被视为这个过程失败的标志。欢乐、幽默和俏皮确实是资产;我在上面写的 “happy hordes” 主要不是为了头韵，Linux 吉祥物是一只可爱的新生企鹅，这不仅仅是一个玩笑。
+
+It may well turn out that one of the most important effects of open source's success will be to teach us that play is the most economically efficient mode of creative work.
+事实证明，开源成功的最重要影响之一就是告诉我们，游戏是最具经济效益的创造性工作模式。
+
+Epilog: Netscape Embraces the Bazaar
+Epilog：Netscape 拥抱集市
+
+It's a strange feeling to realize you're helping make history....
+意识到自己正在帮助创造历史是一种奇怪的感觉......
+
+On January 22 1998, approximately seven months after I first published The Cathedral and the Bazaar, Netscape Communications, Inc. announced plans to give away the source for Netscape Communicator. I had had no clue this was going to happen before the day of the announcement.
+1998 年 1 月 22 日，在我首次出版《大教堂与集市》大约七个月后，Netscape Communications， Inc. 宣布计划 提供 Netscape Communicator 的源代码。在宣布这一天之前，我不知道会发生什么。
+
+Eric Hahn, executive vice president and chief technology officer at Netscape, emailed me shortly afterwards as follows: ``On behalf of everyone at Netscape, I want to thank you for helping us get to this point in the first place. Your thinking and writings were fundamental inspirations to our decision.''
+不久之后，Netscape 的执行副总裁兼首席技术官 Eric Hahn 给我发了一封电子邮件，内容如下：“我谨代表 Netscape 的每个人，感谢你们最初帮助我们走到这一步。你们的思想和著作是我们做出决定的根本灵感。
+
+The following week I flew out to Silicon Valley at Netscape's invitation for a day-long strategy conference (on 4 Feb 1998) with some of their top executives and technical people. We designed Netscape's source-release strategy and license together.
+接下来的一周，我应 Netscape 的邀请飞往硅谷，与他们的一些高级管理人员和技术人员一起参加了为期一天的战略会议（1998 年 2 月 4 日）。我们共同设计了 Netscape 的源代码发布策略和许可证。
+
+A few days later I wrote the following:
+几天后，我写了以下内容：
+
+Netscape is about to provide us with a large-scale, real-world test of the bazaar model in the commercial world. The open-source culture now faces a danger; if Netscape's execution doesn't work, the open-source concept may be so discredited that the commercial world won't touch it again for another decade.
+Netscape 即将为我们提供一个大规模的、真实的 bazaar 模型商业世界测试。开源文化现在面临危险;如果 Netscape 的执行不起作用，开源概念可能会名誉扫地，以至于商业世界在未来十年内都不会再次触及它。
+
+On the other hand, this is also a spectacular opportunity. Initial reaction to the move on Wall Street and elsewhere has been cautiously positive. We're being given a chance to prove ourselves, too. If Netscape regains substantial market share through this move, it just may set off a long-overdue revolution in the software industry.
+另一方面，这也是一个绝佳的机会。华尔街和其他地方对这一举动的初步反应是谨慎积极的。我们也有机会证明自己。如果 Netscape 通过此举重新获得可观的市场份额，它可能会在软件行业掀起一场姗姗来迟的革命。
+
+The next year should be a very instructive and interesting time.
+明年应该是一个非常有启发性和有趣的时期。
+
+And indeed it was. As I write in mid-2000, the development of what was later named Mozilla has been only a qualified success. It achieved Netscape's original goal, which was to deny Microsoft a monopoly lock on the browser market. It has also achieved some dramatic successes (notably the release of the next-generation Gecko rendering engine).
+确实如此。正如我在 2000 年年中写的那样，后来名为 Mozilla 的开发只是取得了合格的成功。它实现了 Netscape 的最初目标，即拒绝 Microsoft 对浏览器市场的垄断锁定。它还取得了一些巨大的成功（尤其是下一代 Gecko 渲染引擎的发布）。
+
+However, it has not yet garnered the massive development effort from outside Netscape that the Mozilla founders had originally hoped for. The problem here seems to be that for a long time the Mozilla distribution actually broke one of the basic rules of the bazaar model; it didn't ship with something potential contributors could easily run and see working. (Until more than a year after release, building Mozilla from source required a license for the proprietary Motif library.)
+然而，它还没有像 Mozilla 创始人最初希望的那样从 Netscape 外部获得大规模的开发工作。这里的问题似乎是，在很长一段时间内，Mozilla 发行版实际上打破了 bazaar 模型的基本规则之一;它没有附带潜在贡献者可以轻松运行并查看工作内容的内容。（直到发布一年多后，从源代码构建 Mozilla 需要专有 Motif 库的许可证。
+
+Most negatively (from the point of view of the outside world) the Mozilla group didn't ship a production-quality browser for two and a half years after the project launch—and in 1999 one of the project's principals caused a bit of a sensation by resigning, complaining of poor management and missed opportunities. ``Open source,'' he correctly observed, ``is not magic pixie dust.''
+最消极的（从外部世界的角度来看）Mozilla 集团在项目启动后的两年半内没有推出生产质量的浏览器——1999 年，该项目的一位负责人辞职，抱怨管理不善和错失机会，引起了不小的轰动。“开源，”他正确地观察到，“不是神奇的精灵尘。
+
+And indeed it is not. The long-term prognosis for Mozilla looks dramatically better now (in November 2000) than it did at the time of Jamie Zawinski's resignation letter—in the last few weeks the nightly releases have finally passed the critical threshold to production usability. But Jamie was right to point out that going open will not necessarily save an existing project that suffers from ill-defined goals or spaghetti code or any of the software engineering's other chronic ills. Mozilla has managed to provide an example simultaneously of how open source can succeed and how it could fail.
+事实上，事实并非如此。现在（2000 年 11 月）Mozilla 的长期预测看起来比 Jamie Zawinski 辞职信时要好得多 — 在过去的几周里，夜间发布终于超过了生产可用性的关键门槛。但 Jamie 正确地指出，开放并不一定能拯救一个遭受目标定义不清、意大利面条式代码或软件工程的任何其他长期弊病的现有项目。Mozilla 设法同时提供了一个示例，说明开源如何成功和失败。
+
+In the mean time, however, the open-source idea has scored successes and found backers elsewhere. Since the Netscape release we've seen a tremendous explosion of interest in the open-source development model, a trend both driven by and driving the continuing success of the Linux operating system. The trend Mozilla touched off is continuing at an accelerating rate.
+然而，与此同时，开源的想法已经取得了成功，并在其他地方找到了支持者。自 Netscape 发布以来，我们看到人们对开源开发模型的兴趣呈爆炸式增长，这一趋势既是由 Linux作系统的持续成功推动的，也是推动其持续的成功的趋势。Mozilla 所掀起的趋势正在加速发展。
+
+Notes  笔记
+
+[JB] In Programing Pearls, the noted computer-science aphorist Jon Bentley comments on Brooks's observation with ``If you plan to throw one away, you will throw away two.''. He is almost certainly right. The point of Brooks's observation, and Bentley's, isn't merely that you should expect first attempt to be wrong, it's that starting over with the right idea is usually more effective than trying to salvage a mess.
+[JB] 在《珍珠编程》一书中，著名的计算机科学格言家乔恩·本特利 （Jon Bentley） 对布鲁克斯的观察发表了评论，“如果你打算扔掉一个，你就会扔掉两个。他几乎可以肯定是对的。Brooks 和 Bentley 的观察不仅在于你应该预料到第一次尝试是错误的，而且从正确的想法重新开始通常比试图挽救一个烂摊子更有效。
+
+[QR] Examples of successful open-source, bazaar development predating the Internet explosion and unrelated to the Unix and Internet traditions have existed. The development of the info-Zip compression utility during 1990–x1992, primarily for DOS machines, was one such example. Another was the RBBS bulletin board system (again for DOS), which began in 1983 and developed a sufficiently strong community that there have been fairly regular releases up to the present (mid-1999) despite the huge technical advantages of Internet mail and file-sharing over local BBSs. While the info-Zip community relied to some extent on Internet mail, the RBBS developer culture was actually able to base a substantial on-line community on RBBS that was completely independent of the TCP/IP infrastructure.
+[QR] 在互联网爆炸之前就已经存在成功的开源集市开发的例子，这些例子与 Unix 和互联网传统无关。info-Zip 的开发 1990-x1992 年期间的压缩实用程序（主要用于 DOS 计算机）为 一个这样的例子。 另一个是 RBBS 公告板系统（同样适用于 DOS）， 它始于 1983 年，并发展了一个足够强大的社区，以至于 到目前为止（1999 年年中），已经有相当定期的发行 尽管互联网邮件和 通过本地 BBS 进行文件共享。 虽然 info-Zip 社区依赖于 在某种程度上，RBBS 开发人员文化实际上是 能够将 RBBS 建立起一个庞大的在线社区，而 RBBS 是 完全独立于 TCP/IP 基础设施。
+
+[CV] That transparency and peer review are valuable for taming the complexity of OS development turns out, after all, not to be a new concept. In 1965, very early in the history of time-sharing operating systems, Corbató and Vyssotsky, co-designers of the Multics operating system, wrote
+[CV] 毕竟，透明度和同行评审对于驯服作系统开发的复杂性很有价值，这并不是一个新概念。1965 年，在分时作系统的历史早期，Multics作系统的共同设计者 Corbató 和 Vyssotsky 写道
+
+It is expected that the Multics system will be published when it is operating substantially... Such publication is desirable for two reasons: First, the system should withstand public scrutiny and criticism volunteered by interested readers; second, in an age of increasing complexity, it is an obligation to present and future system designers to make the inner operating system as lucid as possible so as to reveal the basic system issues.
+预计 Multics 系统将在大量运行时发布......这样的出版物是可取的，原因有二：第一，该系统应该经得起公众的监督和感兴趣的读者自愿的批评;其次，在一个日益复杂的时代，现在和未来的系统设计师有义务使内部作系统尽可能清晰，以便揭示基本的系统问题。
+
+[JH] John Hasler has suggested an interesting explanation for the fact that duplication of effort doesn't seem to be a net drag on open-source development. He proposes what I'll dub ``Hasler's Law'': the costs of duplicated work tend to scale sub-qadratically with team size—that is, more slowly than the planning and management overhead that would be needed to eliminate them.
+[JH] John Hasler 提出了一个有趣的解释，即重复工作似乎并没有净拖累开源开发。他提出了我称之为“哈斯勒定律”的东西：重复工作的成本往往会随着团队规模的增加而增长，也就是说，比消除重复工作所需的规划和管理开销要慢得多。
+
+This claim actually does not contradict Brooks's Law. It may be the case that total complexity overhead and vulnerability to bugs scales with the square of team size, but that the costs from duplicated work are nevertheless a special case that scales more slowly. It's not hard to develop plausible reasons for this, starting with the undoubted fact that it is much easier to agree on functional boundaries between different developers' code that will prevent duplication of effort than it is to prevent the kinds of unplanned bad interactions across the whole system that underly most bugs.
+这种说法实际上并不与布鲁克斯定律相矛盾。 可能是 总复杂性开销和漏洞 随着团队规模的平方而扩展，但成本从 然而，重复的工作是一种特殊情况，扩展速度较慢。为此，不难找到合理的理由，首先是一个毋庸置疑的事实，即在不同开发人员的代码之间就功能边界达成一致要容易得多，这将防止重复工作，而不是防止整个系统中各种计划外的不良交互，这是大多数错误的基础。
+
+The combination of Linus's Law and Hasler's Law suggests that there are actually three critical size regimes in software projects. On small projects (I would say one to at most three developers) no management structure more elaborate than picking a lead programmer is needed. And there is some intermediate range above that in which the cost of traditional management is relatively low, so its benefits from avoiding duplication of effort, bug-tracking, and pushing to see that details are not overlooked actually net out positive.
+Linus 定律和 Hasler 定律的结合表明，软件项目中实际上存在三种临界规模制度。在小项目中（我会说 1 到 3 个开发人员），不需要比挑选一名首席程序员更详细的管理结构。此外，还有一些中间范围，其中传统管理的成本相对较低，因此避免重复工作、错误跟踪和推动确保细节不被忽视实际上是积极的。
+
+Above that, however, the combination of Linus's Law and Hasler's Law suggests there is a large-project range in which the costs and problems of traditional management rise much faster than the expected cost from duplication of effort. Not the least of these costs is a structural inability to harness the many-eyeballs effect, which (as we've seen) seems to do a much better job than traditional management at making sure bugs and details are not overlooked. Thus, in the large-project case, the combination of these laws effectively drives the net payoff of traditional management to zero.
+然而，除此之外，莱纳斯定律和哈斯勒定律的结合表明，存在一个大型项目范围，其中传统管理的成本和问题的增长速度远快于重复工作造成的预期成本。这些成本中最重要的是结构性地无法利用多眼球效应，（正如我们所看到的）在确保错误和细节不被忽视方面，这似乎比传统管理做得更好。因此，在大型项目案例中，这些法律的结合有效地将传统管理的净收益推向了零。
+
+[HBS] The split between Linux's experimental and stable versions has another function related to, but distinct from, hedging risk. The split attacks another problem: the deadliness of deadlines. When programmers are held both to an immutable feature list and a fixed drop-dead date, quality goes out the window and there is likely a colossal mess in the making. I am indebted to Marco Iansiti and Alan MacCormack of the Harvard Business School for showing me me evidence that relaxing either one of these constraints can make scheduling workable.
+[哈佛商学院]Linux 的实验版和稳定版之间的拆分还有另一个与对冲风险相关但不同的功能。拆分解决了另一个问题：截止日期的截止日期。当程序员同时受制于不可变的功能列表和固定的失效日期时，质量就会消失，并且可能会造成巨大的混乱。我非常感谢哈佛商学院的 Marco Iansiti 和 Alan MacCormack，他们向我展示了放宽这些限制中的任何一个都可以使日程安排可行的证据。
+
+One way to do this is to fix the deadline but leave the feature list flexible, allowing features to drop off if not completed by deadline. This is essentially the strategy of the "stable" kernel branch; Alan Cox (the stable-kernel maintainer) puts out releases at fairly regular intervals, but makes no guarantees about when particular bugs will be fixed or what features will beback-ported from the experimental branch.
+一种方法是固定 deadline，但保持功能列表的灵活性，如果 deadline 未完成，则允许 features 放弃。这本质上是 “稳定” 内核分支的策略;Alan Cox（稳定内核维护者）每隔一段时间发布一次版本，但不保证何时会修复特定的错误，或者哪些功能将从实验分支向后移植。
+
+The other way to do this is to set a desired feature list and deliver only when it is done. This is essentially the strategy of the "experimental" kernel branch. De Marco and Lister cited research showing that this scheduling policy ("wake me up when it's done") produces not only the highest quality but, on average, shorter delivery times than either "realistic" or "aggressive" scheduling.
+另一种方法是设置所需的功能列表，并仅在完成后交付。这本质上是 “experimental” kernel 分支的策略。De Marco 和 Lister 引用的研究表明，这种调度策略（“完成后叫醒我”）不仅产生了最高的质量，而且平均而言，比“现实”或“激进”的调度更短的交付时间。
+
+I have come to suspect (as of early 2000) that in earlier versions of this essay I severely underestimated the importance of the "wake me up when it's done" anti-deadline policy to the open-source community's productivity and quality. General experience with the rushed GNOME 1.0 release in 1999 suggests that pressure for a premature release can neutralize many of the quality benefits open source normally confers.
+我开始怀疑（截至 2000 年初）在这篇文章的早期版本中，我严重低估了“完成后唤醒我”的反截止日期政策对开源社区的生产力和质量的重要性。1999 年匆忙发布的 GNOME 1.0 的一般经验表明，过早发布的压力会抵消开源通常带来的许多质量优势。
+
+It may well turn out to be that the process transparency of open source is one of three co-equal drivers of its quality, along with "wake me up when it's done" scheduling and developer self-selection.
+事实证明，开源的流程透明度是其质量的三个同等驱动因素之一，另外两个是“完成后唤醒我”的调度和开发人员自选。
+
+[SU] It's tempting, and not entirely inaccurate, to see the core-plus-halo organization characteristic of open-source projects as an Internet-enabled spin on Brooks's own recommendation for solving the N-squared complexity problem, the "surgical-team" organization—but the differences are significant. The constellation of specialist roles such as "code librarian" that Brooks envisioned around the team leader doesn't really exist; those roles are executed instead by generalists aided by toolsets quite a bit more powerful than those of Brooks's day. Also, the open-source culture leans heavily on strong Unix traditions of modularity, APIs, and information hiding—none of which were elements of Brooks's prescription.
+[苏]将开源项目的核心加光环组织特征视为 Brooks 自己为解决 N 平方复杂性问题而提出的“外科团队”组织（“外科团队”组织）的 Internet 版本，这很诱人，但差异是显著的。Brooks 设想的围绕团队领导的“代码库管理员”等一系列专家角色实际上并不存在;相反，这些角色是由通才执行的，他们得到了比 Brooks 时代的工具集强大得多的工具集的帮助。此外，开源文化在很大程度上依赖于模块化、API 和信息隐藏的强大 Unix 传统，而这些都不是 Brooks 的良方。
+
+[RJ] The respondent who pointed out to me the effect of widely varying trace path lengths on the difficulty of characterizing a bug speculated that trace-path difficulty for multiple symptoms of the same bug varies "exponentially" (which I take to mean on a Gaussian or Poisson distribution, and agree seems very plausible). If it is experimentally possible to get a handle on the shape of this distribution, that would be extremely valuable data. Large departures from a flat equal-probability distribution of trace difficulty would suggest that even solo developers should emulate the bazaar strategy by bounding the time they spend on tracing a given symptom before they switch to another. Persistence may not always be a virtue...
+[RJ]向我指出广泛变化的跟踪路径长度对描述错误特征的难度的影响的受访者推测，同一错误的多个症状的跟踪路径难度“呈指数级”变化（我认为这是指高斯分布或泊松分布，并且同意这似乎非常合理）。如果可以通过实验获得这个分布的形状，那将是非常有价值的数据。与跟踪难度的平坦等概率分布的较大偏差表明，即使是单独的开发人员也应该效仿集市策略，在切换到另一个症状之前限制他们跟踪给定症状所花费的时间。坚持可能并不总是一种美德......
+
+[IN] An issue related to whether one can start projects from zero in the bazaar style is whether the bazaar style is capable of supporting truly innovative work. Some claim that, lacking strong leadership, the bazaar can only handle the cloning and improvement of ideas already present at the engineering state of the art, but is unable to push the state of the art. This argument was perhaps most infamously made by the Halloween Documents, two embarrassing internal Microsoft memoranda written about the open-source phenomenon. The authors compared Linux's development of a Unix-like operating system to ``chasing taillights'', and opined ``(once a project has achieved "parity" with the state-of-the-art), the level of management necessary to push towards new frontiers becomes massive.''
+[IN] 一个与集市风格是否可以从零开始项目相关的问题是，集市风格是否能够支持真正的创新工作。一些人声称，由于缺乏强有力的领导，集市只能处理已经存在于工程技术水平上的想法的克隆和改进，而无法推动技术水平。这个论点可能是万圣节文件最臭名昭著的，这是两份关于开源现象的令人尴尬的 Microsoft 内部备忘录。作者将 Linux 开发的类 Unix作系统比作“追逐尾灯”，并认为“（一旦一个项目实现了与最先进技术的”同等水平“），推动新领域所需的管理水平就会变得巨大。
+
+There are serious errors of fact implied in this argument. One is exposed when the Halloween authors themseselves later observe that ``often [...] new research ideas are first implemented and available on Linux before they are available / incorporated into other platforms.''
+这个论点暗示了严重的事实错误。当万圣节作者 themseselves 后来观察到“通常 [...] 新的研究想法首先在 Linux 上实施和可用，然后再可用/整合到其他平台。
+
+If we read ``open source'' for ``Linux'', we see that this is far from a new phenomenon. Historically, the open-source community did not invent Emacs or the World Wide Web or the Internet itself by chasing taillights or being massively managed—and in the present, there is so much innovative work going on in open source that one is spoiled for choice. The GNOME project (to pick one of many) is pushing the state of the art in GUIs and object technology hard enough to have attracted considerable notice in the computer trade press well outside the Linux community. Other examples are legion, as a visit to Freshmeat on any given day will quickly prove.
+如果我们把 ''Linux'' 读到 ''开源'' ，我们就会发现这远非一个新现象。从历史上看，开源社区并不是通过追逐尾灯或大规模管理来发明 Emacs、万维网或 Internet 本身的，而现在，开源领域正在进行如此多的创新工作，以至于人们被宠坏了。GNOME 项目（从众多项目中选择一个）正在努力推动 GUI 和对象技术的最新发展，以至于在 Linux 社区之外的计算机行业媒体上引起了相当大的关注。其他例子很多，因为在任何一天访问 Freshmeat 都会很快证明这一点。
+
+But there is a more fundamental error in the implicit assumption that the cathedral model (or the bazaar model, or any other kind of management structure) can somehow make innovation happen reliably. This is nonsense. Gangs don't have breakthrough insights—even volunteer groups of bazaar anarchists are usually incapable of genuine originality, let alone corporate committees of people with a survival stake in some status quo ante. Insight comes from individuals. The most their surrounding social machinery can ever hope to do is to be responsive to breakthrough insights—to nourish and reward and rigorously test them instead of squashing them.
+但是，在隐含的假设中，有一个更根本的错误，即大教堂模型（或集市模型，或 任何其他类型的管理结构）都可以以某种方式进行创新 可靠地发生。 这是无稽之谈。 帮派没有突破 见解——即使是 Bazaar 无政府主义者的志愿者团体通常也是 无法实现真正的原创性，更不用说公司委员会了 在某种现状中利害关系的人。 洞察力来自个人。他们最 周围的社会机器永远希望做的就是 响应突破性的见解 - 滋养和奖励它们，并严格测试它们，而不是压制它们。
+
+Some will characterize this as a romantic view, a reversion to outmoded lone-inventor stereotypes. Not so; I am not asserting that groups are incapable of developing breakthrough insights once they have been hatched; indeed, we learn from the peer-review process that such development groups are essential to producing a high-quality result. Rather I am pointing out that every such group development starts from—is necessarily sparked by—one good idea in one person's head. Cathedrals and bazaars and other social structures can catch that lightning and refine it, but they cannot make it on demand.
+有些人会将其描述为一种浪漫的观点，是对过时的孤独发明家刻板印象的回归。事实并非如此;我并不是说，一旦孵化了团队，就无法发展出突破性的见解;事实上，我们从同行评审过程中了解到，这样的开发小组对于产生高质量的结果至关重要。相反，我要指出的是，每一个这样的团队发展都是从一个人脑海中的一个好主意开始的，而且必然是由这个想法激发的。大教堂、集市和其他社会结构可以捕捉到这种闪电并对其进行改进，但它们无法按需制造。
+
+Therefore the root problem of innovation (in software, or anywhere else) is indeed how not to squash it—but, even more fundamentally, it is how to grow lots of people who can have insights in the first place.
+因此，创新（在软件或其他任何地方）的根本问题确实是如何不压制它——但更根本的是，它如何培养出大量能够首先获得洞察力的人。
+
+To suppose that cathedral-style development could manage this trick but the low entry barriers and process fluidity of the bazaar cannot would be absurd. If what it takes is one person with one good idea, then a social milieu in which one person can rapidly attract the cooperation of hundreds or thousands of others with that good idea is going inevitably to out-innovate any in which the person has to do a political sales job to a hierarchy before he can work on his idea without risk of getting fired.
+假设大教堂式的开发可以管理这个技巧，但集市的低进入门槛和流程流动性却不能，那就太荒谬了。如果只需要一个人有一个好主意，那么一个人可以用这个好主意迅速吸引成百上千的人合作的社会环境，将不可避免地超越任何一个人在他能够实现他的想法而不会有被解雇的风险之前必须向等级制度进行政治推销工作的创新。
+
+And, indeed, if we look at the history of software innovation by organizations using the cathedral model, we quickly find it is rather rare. Large corporations rely on university research for new ideas (thus the Halloween Documents authors' unease about Linux's facility at coopting that research more rapidly). Or they buy out small companies built around some innovator's brain. In neither case is the innovation native to the cathedral culture; indeed, many innovations so imported end up being quietly suffocated under the "massive level of management" the Halloween Documents' authors so extol.
+事实上，如果我们回顾一下使用 cathedral 模型的组织的软件创新历史，我们很快就会发现它相当罕见。大公司依赖大学研究来获得新想法（因此，万圣节文档的作者对 Linux 更快地利用这些研究的设施感到不安）。或者他们收购了围绕一些创新者大脑建立的小公司。在这两种情况下，创新都不是大教堂文化所固有的;事实上，许多如此进口的创新最终在万圣节文件作者如此赞扬的“大规模管理”下被悄悄地扼杀了。
+
+That, however, is a negative point. The reader would be better served by a positive one. I suggest, as an experiment, the following:
+然而，这是一个消极的一点。读者最好选择积极的读者。作为一个实验，我建议如下：
+
+Pick a criterion for originality that you believe you can apply consistently. If your definition is ``I know it when I see it'', that's not a problem for purposes of this test.
+选择一个您认为可以始终如一地应用的原创性标准。如果你的定义是 “I know it when I see it”，那么对于本测试来说，这不是问题。
+
+Pick any closed-source operating system competing with Linux, and a best source for accounts of current development work on it.
+选择任何与 Linux 竞争的闭源作系统，以及当前开发工作的最佳来源。
+
+Watch that source and Freshmeat for one month. Every day, count the number of release announcements on Freshmeat that you consider `original' work. Apply the same definition of `original' to announcements for that other OS and count them.
+关注该来源和 Freshmeat 一个月。每天，数一数您认为是“原创”作品的 Freshmeat 发布公告的数量。将 “original” 的相同定义应用于其他 OS 的公告并计算它们。
+
+Thirty days later, total up both figures.
+30 天后，这两个数字加起来。
+
+The day I wrote this, Freshmeat carried twenty-two release announcements, of which three appear they might push state of the art in some respect, This was a slow day for Freshmeat, but I will be astonished if any reader reports as many as three likely innovations a month in any closed-source channel.
+我写这篇文章的那天，Freshmeat 发行了 22 次 公告，其中三个似乎他们可能会推动最先进的 在某些方面，这对 Freshmeat 来说是缓慢的一天，但我会 如果任何读者报告多达三个可能的创新，就会感到惊讶 在任何闭源频道中一个月。
+
+[EGCS] We now have history on a project that, in several ways, may provide a more indicative test of the bazaar premise than fetchmail; EGCS, the Experimental GNU Compiler System.
+[EGCS] 我们现在有一个项目的历史，该项目在几个方面可能比 fetchmail 更能提供对集市前提的指示性测试; EGCS，实验性 GNU 编译器系统。
+
+This project was announced in mid-August of 1997 as a conscious attempt to apply the ideas in the early public versions of The Cathedral and the Bazaar. The project founders felt that the development of GCC, the Gnu C Compiler, had been stagnating. For about twenty months afterwards, GCC and EGCS continued as parallel products—both drawing from the same Internet developer population, both starting from the same GCC source base, both using pretty much the same Unix toolsets and development environment. The projects differed only in that EGCS consciously tried to apply the bazaar tactics I have previously described, while GCC retained a more cathedral-like organization with a closed developer group and infrequent releases.
+该项目于 1997 年 8 月中旬宣布，作为一个有意识的 尝试在 大教堂和集市。项目创始人认为 GCC（Gnu C 编译器）的开发一直停滞不前。在之后的大约 20 个月里，GCC 和 EGCS 继续作为并行产品 — 它们都来自相同的 Internet 开发人员群体，都来自相同的 GCC 源代码库，都使用几乎相同的 Unix 工具集和开发环境。这些项目的唯一区别在于 EGCS 有意识地尝试应用我之前描述的集市策略，而 GCC 则保留了一个更像大教堂的组织，拥有封闭的开发人员组和不频繁的发布。
+
+This was about as close to a controlled experiment as one could ask for, and the results were dramatic. Within months, the EGCS versions had pulled substantially ahead in features; better optimization, better support for FORTRAN and C++. Many people found the EGCS development snapshots to be more reliable than the most recent stable version of GCC, and major Linux distributions began to switch to EGCS.
+这几乎是人们所能要求的对照实验，而且结果是戏剧性的。几个月内，EGCS 版本在功能上大幅领先;更好的优化，更好的 FORTRAN 和 C++ 支持。许多人发现 EGCS 开发快照比最新的稳定版 GCC 更可靠，主要的 Linux 发行版开始转向 EGCS。
+
+In April of 1999, the Free Software Foundation (the official sponsors of GCC) dissolved the original GCC development group and officially handed control of the project to the the EGCS steering team.
+1999 年 4 月，自由软件基金会（GCC 的官方赞助商）解散了原来的 GCC 开发小组，并正式将项目的控制权交给了 EGCS 指导团队。
+
+[SP] Of course, Kropotkin's critique and Linus's Law raise some wider issues about the cybernetics of social organizations. Another folk theorem of software engineering suggests one of them; Conway's Law—commonly stated as ``If you have four groups working on a compiler, you'll get a 4-pass compiler''. The original statement was more general: ``Organizations which design systems are constrained to produce designs which are copies of the communication structures of these organizations.'' We might put it more succinctly as ``The means determine the ends'', or even ``Process becomes product''.
+[SP]当然，克鲁泡特金的批判和莱纳斯定律提出了一些关于社会组织控制论的更广泛的问题。软件工程的另一个民俗定理提出了其中之一;康威定律 — 通常表示为“如果您有四个小组在开发编译器，您将得到一个 4 次编译器”。最初的声明更笼统：“设计系统的组织被迫生产的设计是这些组织的通信结构的副本。我们可以更简洁地说成“手段决定目的”，甚至“过程变成产品”。
+
+It is accordingly worth noting that in the open-source community organizational form and function match on many levels. The network is everything and everywhere: not just the Internet, but the people doing the work form a distributed, loosely coupled, peer-to-peer network that provides multiple redundancy and degrades very gracefully. In both networks, each node is important only to the extent that other nodes want to cooperate with it.
+因此值得注意的是，在开源社区中，组织形式和功能在许多层面上是匹配的。网络无处不在：不仅是 Internet，而且从事工作的人都形成了一个分布式、松散耦合的点对点网络，该网络提供多重冗余并非常优雅地降级。在这两个网络中，每个节点仅在其他节点想要与之合作的范围内才重要。
+
+The peer-to-peer part is essential to the community's astonishing productivity. The point Kropotkin was trying to make about power relationships is developed further by the `SNAFU Principle': ``True communication is possible only between equals, because inferiors are more consistently rewarded for telling their superiors pleasant lies than for telling the truth.'' Creative teamwork utterly depends on true communication and is thus very seriously hindered by the presence of power relationships. The open-source community, effectively free of such power relationships, is teaching us by contrast how dreadfully much they cost in bugs, in lowered productivity, and in lost opportunities.
+点对点部分对于社区惊人的生产力至关重要。克鲁泡特金试图提出的关于权力关系的观点通过“SNAFU 原则”得到进一步发展：“真正的沟通只有在平等之间才有可能，因为下级说他们的上级愉快的谎言比说真话得到的回报更一致。创造性的团队合作完全依赖于真正的沟通，因此受到权力关系的严重阻碍。开源社区实际上没有这种权力关系，相比之下，他们正在告诉我们，他们在错误、生产力降低和机会损失方面付出了多么可怕的代价。
+
+Further, the SNAFU principle predicts in authoritarian organizations a progressive disconnect between decision-makers and reality, as more and more of the input to those who decide tends to become pleasant lies. The way this plays out in conventional software development is easy to see; there are strong incentives for the inferiors to hide, ignore, and minimize problems. When this process becomes product, software is a disaster.
+此外，SNAFU 原则预测，在威权组织中，决策者与现实之间的逐渐脱节，因为对决策者的意见越来越多，往往成为令人愉快的谎言。这在传统软件开发中的作用方式很容易看出;下级有强烈的动机去隐藏、忽视和最小化问题。当这个过程变成产品时，软件就是一场灾难。
+
+Bibliography  书目
+
+I quoted several bits from Frederick P. Brooks's classic The Mythical Man-Month because, in many respects, his insights have yet to be improved upon. I heartily recommend the 25th Anniversary edition from Addison-Wesley (ISBN 0-201-83595-9), which adds his 1986 ``No Silver Bullet'' paper.
+我引用了 Frederick P. Brooks 的经典著作中的几段 神话人物月，因为在许多方面，他的见解还有待改进。我衷心推荐 Addison-Wesley 的 25 周年纪念版 （ISBN 0-201-83595-9），其中添加了他 1986 年的“No Silver Bullet”论文。
+
+The new edition is wrapped up by an invaluable 20-years-later retrospective in which Brooks forthrightly admits to the few judgements in the original text which have not stood the test of time. I first read the retrospective after the first public version of this essay was substantially complete, and was surprised to discover that Brooks attributed bazaar-like practices to Microsoft! (In fact, however, this attribution turned out to be mistaken. In 1998 we learned from the Halloween Documents that Microsoft's internal developer community is heavily balkanized, with the kind of general source access needed to support a bazaar not even truly possible.)
+新版以 20 年后的宝贵回顾展结束，布鲁克斯在回顾展中直言不讳地承认原文中为数不多的未经时间考验的判断。在这篇文章的第一个公开版本基本完成之后，我第一次阅读了回顾，并惊讶地发现 Brooks 将类似集市的做法归功于 Microsoft！（然而，事实上，这种归因被证明是错误的。1998 年，我们从万圣节文件中吸取了教训 Microsoft 的内部开发人员社区严重分裂， 与支持 Bazaar 所需的那种一般来源访问权限 甚至真的有可能。
+
+Gerald M. Weinberg's The Psychology Of Computer Programming (New York, Van Nostrand Reinhold 1971) introduced the rather unfortunately-labeled concept of ``egoless programming''. While he was nowhere near the first person to realize the futility of the ``principle of command'', he was probably the first to recognize and argue the point in particular connection with software development.
+Gerald M. Weinberg 的 The Psychology Of Computer Programming（纽约，Van Nostrand Reinhold 1971 年）引入了一个相当不幸地被贴上“无我编程”标签的概念。虽然他远非第一个意识到“命令原则”无效的人，但他可能是第一个认识到并论证这一点的人，特别是与软件开发有关的观点。
+
+Richard P. Gabriel, contemplating the Unix culture of the pre-Linux era, reluctantly argued for the superiority of a primitive bazaar-like model in his 1989 paper ``LISP: Good News, Bad News, and How To Win Big''. Though dated in some respects, this essay is still rightly celebrated among LISP fans (including me). A correspondent reminded me that the section titled ``Worse Is Better'' reads almost as an anticipation of Linux. The paper is accessible on the World Wide Web at http://www.naggum.no/worse-is-better.html.
+Richard P. Gabriel 在思考前 Linux 时代的 Unix 文化时，在他 1989 年的论文《LISP：好消息、坏消息和如何赢得大事》中不情愿地论证了原始集市式模型的优越性。尽管在某些方面已经过时，但这篇文章仍然在 LISP 粉丝（包括我）中受到应有的赞誉。一位通讯员提醒我，标题为“Worse Is Better”的部分读起来几乎是对 Linux 的期待。该论文可通过 http://www.naggum.no/worse-is-better.html 的万维网访问。
+
+De Marco and Lister's Peopleware: Productive Projects and Teams (New York; Dorset House, 1987; ISBN 0-932633-05-6) is an underappreciated gem which I was delighted to see Fred Brooks cite in his retrospective. While little of what the authors have to say is directly applicable to the Linux or open-source communities, the authors' insight into the conditions necessary for creative work is acute and worthwhile for anyone attempting to import some of the bazaar model's virtues into a commercial context.
+De Marco 和 Lister 的 Peopleware： Productive Projects and Teams（纽约;Dorset House， 1987;ISBN 0-932633-05-6）是一颗被低估的瑰宝，我很高兴看到 Fred Brooks 在他的回顾展中引用它。虽然作者所说的内容很少直接适用于 Linux 或开源社区，但对于任何试图将集市模型的一些优点引入商业环境的人来说，作者对创造性工作必要条件的洞察力是敏锐和值得的。
+
+Finally, I must admit that I very nearly called this essay ``The Cathedral and the Agora'', the latter term being the Greek for an open market or public meeting place. The seminal ``agoric systems'' papers by Mark Miller and Eric Drexler, by describing the emergent properties of market-like computational ecologies, helped prepare me to think clearly about analogous phenomena in the open-source culture when Linux rubbed my nose in them five years later. These papers are available on the Web at http://www.agorics.com/agorpapers.html.
+最后，我必须承认，我差点把这篇文章叫做《大教堂和集市》（The Cathedral and the Agora），后者在希腊语中是公开市场或公共聚会场所的意思。Mark Miller 和 Eric Drexler 的开创性“agoric systems”论文通过描述类似市场的计算生态的涌现特性，帮助我在五年后 Linux 对开源文化中的类似现象嗤之以鼻时，为我清楚地思考它们做好了准备。这些论文可在 Web 上找到，网址为 http://www.agorics.com/agorpapers.html。
+
+Acknowledgements  确认
+
+This essay was improved by conversations with a large number of people who helped debug it. Particular thanks to Jeff Dutky <dutky@wam.umd.edu>, who suggested the ``debugging is parallelizable'' formulation, and helped develop the analysis that proceeds from it. Also to Nancy Lebovitz <nancyl@universe.digex.net> for her suggestion that I emulate Weinberg by quoting Kropotkin. Perceptive criticisms also came from Joan Eslinger <wombat@kilimanjaro.engr.sgi.com> and Marty Franz <marty@net-link.net> of the General Technics list. Glen Vandenburg <glv@vanderburg.org> pointeed out the importance of self-selection in contributor populations and suggested the fruitful idea that much development rectifies `bugs of omission'; Daniel Upper <upper@peak.org> suggested the natural analogies for this. I'm grateful to the members of PLUG, the Philadelphia Linux User's group, for providing the first test audience for the first public version of this essay. Paula Matuszek <matusp00@mh.us.sbphrd.com> enlightened me about the practice of software management. Phil Hudson <phil.hudson@iname.com> reminded me that the social organization of the hacker culture mirrors the organization of its software, and vice-versa. John Buck <johnbuck@sea.ece.umassd.edu> pointed out that MATLAB makes an instructive parallel to Emacs. Russell Johnston <russjj@mail.com> brought me to consciousness about some of the mechanisms discussed in ``How Many Eyeballs Tame Complexity.'' Finally, Linus Torvalds's comments were helpful and his early endorsement very encouraging.
+通过与大量帮助调试它的人的对话，这篇文章得到了改进。特别感谢 Jeff Dutky < dutky@wam.umd.edu> ，他建议 ''debugging 是 parallelizable“”公式，并帮助开发了 从中获利。 还要感谢南希·莱博维茨 <nancyl@universe.digex.net> 感谢她建议我通过引用克鲁泡特金来效仿温伯格。琼·埃斯林格 <wombat@kilimanjaro.engr.sgi.com> （Joan Eslinger） 和马蒂·弗朗茨 （Marty Franz） 也提出了敏锐的批评 <marty@net-link.net> 的 General Technics 列表。Glen Vandenburg <glv@vanderburg.org> 指出了 贡献者群体中的自选择，并建议 认为大量开发可以纠正“遗漏的错误”;丹尼尔·上 <upper@peak.org> 为此提出了自然的类比。我非常感谢 PLUG（费城 Linux 用户组）的成员，他们为本文的第一个公开版本提供了第一批测试读者。Paula Matuszek <matusp00@mh.us.sbphrd.com> 启发了我对软件管理的实践。 菲尔·哈德森 <phil.hudson@iname.com> 提醒我，黑客文化的社会组织反映了其软件的组织，反之亦然。约翰·巴克 <johnbuck@sea.ece.umassd.edu> 指出 MATLAB 与 Emacs 进行了具有启发性的类比。 罗素·约翰斯顿 <russjj@mail.com> 使我对《多少眼球驯服复杂性》中讨论的一些机制有所了解。最后，Linus Torvalds 的评论很有帮助，他的早期认可非常令人鼓舞。
+
+
+
+
 \end{document}
