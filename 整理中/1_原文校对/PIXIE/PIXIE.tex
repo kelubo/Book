@@ -20,6 +20,9 @@
 	chapter/number={\chinese{chapter}}
 }
 
+% 列表项向右偏移。
+\usepackage{enumitem}
+
 % 图片相关设置。
 \usepackage{graphicx}
 \graphicspath{{Images/}}
@@ -60,6 +63,15 @@ Pixie 意为“小精灵、小仙子”，BD6CR 音译为“皮鞋”。
 	\label{fig:1}
 \end{figure}
 
+Original “Pixie 2” 
+c. 1995 NorCal QRP Club 
+
+Based on “Micro-80” design 
+c. 1992 RV3GM 
+
+Loosely based on “Foxx” design 
+c. 1982 GM3OXX
+
 \chapter{原理}
 
 原理图如下：
@@ -71,7 +83,55 @@ Pixie 意为“小精灵、小仙子”，BD6CR 音译为“皮鞋”。
 		\label{fig:1}
 \end{figure}}
 
+\section{发射机}
 
+一个简单的 CW 发射机:
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.7\linewidth]{CW1}
+	\caption{CW 发射机}
+	\label{fig:1}
+\end{figure}
+
+缺点：
+
+\begin{itemize}[leftmargin=2cm]
+\item 元件发热可能导致漂移 Component heating can cause drift
+\item 天线变化可能引发频偏 Antenna changes can pull frequency
+\item 容易产生啁啾现象 Prone to Chirp
+\end{itemize}
+
+改良型 CW 发射机 - MOPA
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.7\linewidth]{CW2}
+	\caption{改良型 CW 发射机}
+	\label{fig:1}
+\end{figure}
+
+\section{接收机}
+
+一个简单的无线电接收器
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.7\linewidth]{CW3}
+	\caption{简单的无线电接收器}
+	\label{fig:1}
+\end{figure}
+
+这被称为直接变频接收机。
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.7\linewidth]{CW4}
+	\caption{直接变频接收机工作原理}
+	\label{fig:1}
+\end{figure}
+
+\section{电路分析}
 
 \textbf{\begin{figure}[htbp]
 		\centering
@@ -80,7 +140,9 @@ Pixie 意为“小精灵、小仙子”，BD6CR 音译为“皮鞋”。
 		\label{fig:1}
 \end{figure}}
 
-这一行内容至关重要，是理解Pixie收发器工作原理的关键。按键闭合=接地（0伏特） 按键开启≈7.75伏特
+这一条线至关重要，是理解 Pixie 收发器工作原理的关键。按键闭合 = 接地（0伏特），按键开启 ≈ 7.75 伏特。
+
+当电键闭合时，
 
 \begin{figure}[htbp]
 	\centering
