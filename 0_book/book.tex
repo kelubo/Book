@@ -1,24 +1,10 @@
 % book模板
 % book模板.tex
 
-\documentclass[a4paper,12pt,UTF8,twoside]{ctexbook}
+\documentclass[12pt,UTF8]{ctexbook}
 
 % 设置纸张信息。
-\RequirePackage[a4paper]{geometry}
-\geometry{
-	%textwidth=138mm,
-	%textheight=215mm,
-	%left=27mm,
-	%right=27mm,
-	%top=25.4mm, 
-	%bottom=25.4mm,
-	%headheight=2.17cm,
-	%headsep=4mm,
-	%footskip=12mm,
-	%heightrounded,
-	inner=1in,
-	outer=1.25in
-}
+\input{../common/page}
 
 % 设置字体，并解决显示难检字问题。
 \xeCJKsetup{AutoFallBack=true}
@@ -33,14 +19,24 @@
 	part/name= {第,卷},
 	part/number={\chinese{part}},
 	chapter/name={第,篇},
-	chapter/number={\chinese{chapter}}
+	chapter/number={\arabic{chapter}}
 }
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
 
 % 设置古文原文格式。
 \newenvironment{yuanwen}{\bfseries\zihao{4}}
 
-% 设置署名格式。
-\newenvironment{shuming}{\hfill\bfseries\zihao{4}}
+% 列表项向右偏移。
+\usepackage{enumitem}
 
 \title{\heiti\zihao{0} 题目}
 \author{WangFei}
@@ -67,6 +63,21 @@
 \section{2}
 剪灯新话
 《剪灯新话》，明代文言短篇小说，中国十大禁书之一，作者是瞿佑。最早在洪武十一年编订成帙，以抄本流行。\\
+
+% 图片插入
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.7\linewidth]{1}
+	\caption{图片描述}
+	\label{fig:1}
+\end{figure}
+
+% 列表
+\begin{itemize}[leftmargin=2cm]
+	\item a
+	\item b
+	\item c
+\end{itemize}
 
 \backmatter
 
