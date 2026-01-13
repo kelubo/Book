@@ -1,0 +1,5530 @@
+% 格林童话 - 原文与中译对照
+% 使用xelatex编译
+
+\documentclass[12pt,a4paper,twoside]{ctexbook}
+
+% 页面设置
+\usepackage[a4paper,
+            left=2.5cm, right=2.5cm,
+            top=2.5cm, bottom=2.5cm,
+            headsep=1cm, footskip=1cm,
+            bindingoffset=0.5cm]{geometry}
+
+% 字体设置 - 移除babel包，使用ctex内置的中文支持
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{microtype}
+\usepackage{tikz} % 用于封面装饰
+\usepackage{xcolor} % 用于颜色设置
+
+% 设置中文字体
+\setCJKmainfont{SimSun}[BoldFont=SimHei, ItalicFont=KaiTi]
+\setCJKsansfont{SimHei}
+\setCJKmonofont{SimSun}
+
+% 设置英文字体
+\setmainfont{Times New Roman}[BoldFont=Times New Roman Bold, ItalicFont=Times New Roman Italic]
+
+% 定义常用字体命令
+\newcommand{\hei}{\heiti}
+\newcommand{\song}{\songti}
+
+% 章节标题设置
+\ctexset{
+    part/name={第,卷},
+    part/number={\chinese{part}},
+    chapter/name={第,章},
+    chapter/number={\chinese{chapter}},
+    section/name={第,节},
+    section/number={\arabic{section}},
+    chapter/format={\centering\hei\zihao{2}},
+    section/format={\hei\zihao{4}}
+}
+
+% 目录设置
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{10pt}\bfseries\zihao{-3}\filcenter}{}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{section}[2.5em]{\vspace{5pt}\zihao{4}\filcenter}{}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 页眉页脚设置
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\zihao{5}\thepage}
+\fancyhead[LO]{\zihao{5}\leftmark}
+\fancyhead[RE]{\zihao{5}\rightmark}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyfoot[C]{\zihao{5} \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 段落设置
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.5em}
+
+% 原文与译文环境 - 简化版本
+\newcommand{\original}[1]{
+    \vspace{1em}
+    \noindent\textbf{【原文】}\\
+    \begin{quote}
+        #1
+    \end{quote}
+    \vspace{1em}
+}
+
+\newcommand{\translation}[1]{
+    \vspace{1em}
+    \noindent\textbf{【译文】}\\
+    \begin{quote}
+        #1
+    \end{quote}
+    \vspace{1em}
+}
+
+% 标题页信息
+\title{\hei\zihao{0} 格林童话}
+\author{\song\zihao{2} 雅各布·格林 / 威廉·格林}
+\date{\song\zihao{4} \today}
+
+\begin{document}
+
+% 封面
+\begin{titlepage}
+    \begin{center}
+        % 顶部装饰
+        \vspace*{5cm}
+        
+        % 书名
+        \begin{minipage}{0.8\textwidth}
+            \centering
+            \Huge\bfseries\hei 格林童话
+        \end{minipage}
+        
+        \vspace*{1cm}
+        
+        % 副标题
+        \begin{minipage}{0.7\textwidth}
+            \centering
+            \Large\hei 原文与中译对照
+        \end{minipage}
+        
+        \vspace*{2.5cm}
+        
+        % 装饰线条
+        \rule{0.5\textwidth}{0.8pt}
+        
+        \vspace*{1.5cm}
+        
+        % 作者
+        \begin{minipage}{0.8\textwidth}
+            \centering
+            \Large\song 雅各布·格林 / 威廉·格林
+        \end{minipage}
+        
+        \vspace*{1.5cm}
+        
+        % 装饰线条
+        \rule{0.5\textwidth}{0.8pt}
+        
+        \vspace*{2.5cm}
+        
+        % 日期
+        \begin{minipage}{0.8\textwidth}
+            \centering
+            \large\song \today
+        \end{minipage}
+        
+        \vspace*{3cm}
+    \end{center}
+\end{titlepage}
+
+% 版权页
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{8cm}
+    \song\zihao{5} 版权所有 \textcopyright\ 2026 格林童话编译组
+    \vspace*{1cm}
+    \song\zihao{5} 仅供学习交流使用
+\end{center}
+
+% 前言
+\newpage
+\chapter{前言}
+
+格林童话是德国民间文学的代表作品，由雅各布·格林和威廉·格林兄弟收集、整理、加工完成。本书收录了多篇经典童话，并提供原文与中文译文对照，以便读者学习和欣赏。
+
+格林童话自问世以来，已被翻译成世界上100多种语言，在全球范围内广泛传播。其中许多故事，如《小红帽》《白雪公主》《灰姑娘》等，早已成为世界文学宝库中的经典之作。
+
+\vspace{1cm}
+\song\zihao{4} \today
+
+% 目录
+\newpage
+\tableofcontents
+
+% 正文开始
+\mainmatter
+
+% 第一篇：小红帽
+\chapter{小红帽}
+\section{故事内容}
+
+\original{
+Rotkäppchen
+
+Es war einmal ein kleines Mädchen, das hatte eine Großmutter, die ihr alles, was sie wollte, schenkte. Da schenkte sie ihr einmal ein Käppchen aus roter Seide, das passte ihr so gut, dass sie nichts anderes mehr trug, und darum hießen alle sie Rotkäppchen.
+
+Eines Tages sprach die Mutter zu ihr: "Komm, Rotkäppchen, da hast du ein Stück Kuchen und eine Flasche Wein. Bring das der Großmutter; sie ist krank und schwach, und das wird ihr wohl tun. Mach dich auf, bevor es heiß wird, und wenn du hinausgehst, so geh ganz lieb und sonder dich nicht vom Weg, sonst fällst du und zerbrichst das Glas, und die Großmutter bekommt nichts. Und wenn du in ihr Haus kommst, so sage erst Guten Tag, und geh nicht gleich in die Kammer hinein."
+
+"Ich werde schon alles genau beachten", sagte Rotkäppchen zur Mutter, und gab ihr die Hand darauf.
+
+Die Großmutter wohnte draußen im Wald, eine halbe Stunde vom Dorf entfernt. Als Rotkäppchen nun in den Wald kam, begegnete ihr der Wolf. Rotkäppchen aber wusste nicht, was ein böses Tier das ist, und fürchtete es gar nicht.
+
+"Guten Tag, Rotkäppchen", sagte der Wolf.
+
+"Guten Tag, Wolf", antwortete Rotkäppchen.
+
+"Wo gehst du hin so früh, Rotkäppchen?"
+
+"Zum Großmutterhaus."
+
+"Was trägst du unter dem Schärpe?"
+
+"Kuchen und Wein. Die Großmutter ist krank und schwach, da soll es ihr besser machen."
+
+"Wo wohnt deine Großmutter, Rotkäppchen?"
+
+"Einen kleinen Weg weiter im Wald, unter den drei großen Eichen, dort steht ihr Haus, hinter dem Haselbusch. Du kennst ihn ja wohl."
+
+Der Wolf dachte bei sich: "So jung und frisch, das ist besser als die alte Großmutter. Ich will beide fressen, das ist einen Tag wert."
+
+Er ging ein Weilchen mit Rotkäppchen weiter, dann sagte er: "Rotkäppchen, sieh mal die schönen Blumen, die rings um dich stehen. Warum guckst du nicht hin? Du gehst ja so schnell, als ob du zur Schule ginge."
+
+Rotkäppchen sah sich um und fand, dass die Blumen im Wald sehr schön waren. Sie dachte: "Wenn ich der Großmutter eine Handvoll frischer Blumen mitbringe, die wird sich sehr freuen. Es ist noch so früh, ich komme doch noch rechtzeitig an."
+
+Da lief sie von dem Wege ab und suchte Blumen. Jedes Mal, wenn sie eine schöne fand, merkte sie, dass da noch eine schönere weiter drüben war, und so ging sie immer tiefer in den Wald hinein.
+
+Währenddessen lief der Wolf geradeswegs zum Haus der Großmutter und klopfte an die Tür.
+
+"Wer ist da?", rief die Großmutter.
+
+"Ich bin Rotkäppchen," antwortete der Wolf, "ich bringe dir Kuchen und Wein. Mach die Tür auf."
+
+"Drück nur den Knauf," rief die Großmutter, "ich bin schwach und kann nicht aufstehen."
+
+Der Wolf drückte den Knauf, die Tür sprang auf, und er ging ohne ein Wort weiter zur Bettstatt und friss die arme Großmutter. Dann zog er ihre Kleider an, setzte ihre Mütze auf und legte sich in ihr Bett.
+
+Rotkäppchen aber hatte viele Blumen gesammelt und war nun zu spät gekommen. Als sie kam und anklopfte, rief der Wolf mit verstellter Stimme: "Drück nur den Knauf, ich bin schwach und kann nicht aufstehen."
+
+Rotkäppchen drückte den Knauf, die Tür sprang auf. Als sie hereinkam, merkte sie etwas Seltsames, und sagte: "Ach, Großmutter, was hast du für große Ohren!"
+
+"Damit ich dich besser hören kann, mein Kind," antwortete der Wolf.
+
+"Ach, Großmutter, was hast du für große Augen!"
+
+"Damit ich dich besser sehen kann, mein Kind."
+
+"Ach, Großmutter, was hast du für große Hände!"
+
+"Damit ich dich besser fassen kann, mein Kind."
+
+"Und Großmutter, was hast du für ein großes Maul mit solchen scharfen Zähnen!"
+
+"Damit ich dich besser fressen kann!"
+
+Und mit diesen Worten sprang der Wolf aus dem Bett und fraß Rotkäppchen auf.
+
+Und nun war der Wolf satt und legte sich wieder ins Bett und schlief ein und schnarchte sehr laut.
+
+Da kam ein Jäger vorbei, der dachte: "Warum schnarcht die alte Frau so laut? Ich will mal sehen, ob es ihr gut geht."
+
+Er ging in die Kammer und sah den Wolf im Bett liegen. "Du alter Schurke, ich hab dich endlich erwischt!", sagte er, und machte sich bereit, den Wolf zu erschießen.
+
+Als er aber den Wolf genau ansah, dachte er: "Er hat vielleicht die Großmutter gefressen, ich muss sehen, ob ich sie noch retten kann."
+
+Also nahm er sein Messer und schnitt den Wolf mitten im Bauch auf.
+
+Kaum hatte er zwei Schnitte gemacht, da guckte Rotkäppchen heraus und rief: "Ach, wie war ich erschrocken! Der Wolf hat mich so fest geschluckt!"
+
+Und dann sprang die Großmutter auch heraus, noch lebendig, aber sehr erschrocken.
+
+Rotkäppchen holte große Steine, die füllten sie in den Bauch des Wolfes. Als der Wolf aufwachte, wollte er wegrennen, aber die Steine waren so schwer, dass er gleich zusammenstürzte und starb.
+
+Da waren alle drei froh: der Jäger nahm den Wolf pelz und Felle mit, die Großmutter aß den Kuchen und trank den Wein, den Rotkäppchen mitgebracht hatte, und Rotkäppchen dachte: "Ich werde künftig nie wieder von dem Wege ablaufen, wenn meine Mutter mir das verbietet."
+
+Und damit war das Märchen zu Ende.
+}
+
+\tr\t\translation{
+小红帽
+
+从前有个小女孩，她的外婆非常疼爱她，总是给她想要的一切。有一次，外婆送给她一顶红色的丝绒帽子，她戴起来非常合适，从此以后她就只戴这顶帽子，因此大家都叫她“小红帽”。
+
+一天，妈妈对她说：“来，小红帽，这里有一块蛋糕和一瓶葡萄酒，你把它们带给外婆吧。外婆生病了，身体很虚弱，吃了这些东西会好一些。趁天气还没热起来，你就出发吧。出门后要走大路，不要离开路径，否则你会跌倒，把玻璃瓶子摔碎，这样外婆就什么也得不到了。到了外婆家，要先问声好，不要直接就进房间。”
+
+“我会小心的。”小红帽对妈妈说，并且拉着妈妈的手保证。
+
+外婆住在森林里，离村子有半小时的路程。当小红帽走进森林时，遇到了一只狼。但小红帽不知道狼是一种坏动物，所以一点也不害怕它。
+
+“你好，小红帽。”狼说。
+
+“你好，狼。”小红帽回答。
+
+“这么早你要去哪里呀，小红帽？”
+
+“去外婆家。”
+
+“你围裙下带着什么？”
+
+“蛋糕和葡萄酒。外婆生病了，身体很虚弱，吃了这些东西会好一些。”
+
+“你的外婆住在哪里，小红帽？”
+
+“在森林里的小路尽头，三棵大橡树下，她的房子就在那里，榛树丛后面。你一定知道吧。”
+
+狼心里想：“这个小东西又年轻又新鲜，比那个老太婆好吃多了。我要把她们两个都吃掉，这值得我花一天的时间。”
+
+他和小红帽一起走了一会儿，然后说：“小红帽，你看看周围这些美丽的花。你为什么不看看呢？你走得这么快，好像要去上学似的。”
+
+小红帽环顾四周，发现森林里的花确实非常美丽。她想：“如果我给外婆带一把新鲜的花，她一定会很高兴的。现在还早，我肯定能准时到达。”
+
+于是她离开小路，去采摘鲜花。每次她发现一朵美丽的花，就会看到远处还有更美丽的一朵，就这样她一直走到了森林深处。
+
+与此同时，狼直接跑到了外婆家，敲了敲门。
+
+“谁呀？”外婆喊道。
+
+“我是小红帽，”狼回答，“我给你带来了蛋糕和葡萄酒。请开门。”
+
+“你只需要按一下门把手，”外婆喊道，“我身体虚弱，起不来。”
+
+狼按了门把手，门开了，他一言不发地走到床边，把可怜的外婆吃掉了。然后他穿上她的衣服，戴上她的帽子，躺到她的床上。
+
+小红帽摘了很多花，然后才出发。当她到达外婆家时，敲了敲门。狼用变了调的声音喊道：“你只需要按一下门把手，我身体虚弱，起不来。”
+
+小红帽按了门把手，门开了。当她走进房间时，她觉得有些奇怪，说：“哦，外婆，你的耳朵怎么这么大！”
+
+“这样我才能更好地听到你的声音，我的孩子。”狼回答。
+
+“哦，外婆，你的眼睛怎么这么大！”
+
+“这样我才能更好地看到你，我的孩子。”
+
+“哦，外婆，你的手怎么这么大！”
+
+“这样我才能更好地抓住你，我的孩子。”
+
+“还有外婆，你的嘴巴怎么这么大，牙齿这么锋利！”
+
+“这样我才能更好地吃掉你！”
+
+说完这些话，狼从床上跳起来，把小红帽吃掉了。
+
+狼吃得饱饱的，重新躺回床上，睡着了，还打着响亮的呼噜。
+
+这时，一个猎人经过，他想：“这个老太婆怎么打这么响的呼噜？我要去看看她是否安好。”
+
+他走进房间，看到狼躺在床上。“你这个老坏蛋，我终于抓住你了！”他说，准备开枪打死狼。
+
+但当他仔细看狼时，他想：“他可能已经吃掉了外婆，我必须看看是否能救她。”
+
+于是他拿出刀，在狼的肚子上划了两刀。
+
+他刚划了两刀，小红帽就探出头来，喊道：“哦，我吓死了！狼把我吃得这么紧！”
+
+然后外婆也跳了出来，还活着，但非常害怕。
+
+小红帽拿来大石头，把狼的肚子填满。当狼醒来时，想逃跑，但石头太重了，他立刻倒在地上死了。
+
+这时三个人都很高兴：猎人拿走了狼的皮和毛，外婆吃了小红帽带来的蛋糕，喝了葡萄酒，小红帽想：“我以后再也不会违背妈妈的话，离开大路了。”
+
+故事就这样结束了。
+}
+
+% 第二篇：白雪公主
+\chapter{白雪公主}
+\section{故事内容}
+
+\original{
+Schneewittchen
+
+Es war einmal eine Königin, die saß an ihrem Fenster, das hatte einen Rahmen aus schwarzem Ebenholz. Der Schnee fiel draußen, und die Königin nähte und blickte zum Schnee hinaus. Plötzlich stach sie sich mit der Nadel in den Finger, und drei Tropfen Blut fielen ins Schnee. Der rote Blut auf dem weißen Schnee, das sah so schön aus, dass sie dachte: "Ach, wenn ich nur ein Kind hätte, so weiß wie Schnee, so rot wie Blut und so schwarzhaarig wie dieser Ebenrahmen!"
+
+Bald darauf bekam sie ein Mädchen, das war so weiß wie Schnee, so rot wie Blut und hatte schwarze Haare, also rief sie es Schneewittchen. Aber als das Kind geboren war, starb die Königin.
+
+Der König heiratete bald eine andere Frau, die war sehr schön, aber eine eitel und boshaft Frau. Sie hatte einen Spiegel, den sie jeden Tag fragte: "Spieglein, Spieglein an der Wand, wer ist die Schönste im ganzen Land?"
+
+Und der Spiegel antwortete immer: "Frau Königin, Ihr seid die Schönste im ganzen Land."
+
+Da war die Königin zufrieden, denn sie wusste, dass der Spiegel immer die Wahrheit sagte.
+
+Schneewittchen aber wuchs heran und wurde immer schöner. Als es sieben Jahre alt war, war es so schön, dass es selbst die Königin an Schönheit übertraf. Eines Tages fragte die Königin den Spiegel wieder: "Spieglein, Spieglein an der Wand, wer ist die Schönste im ganzen Land?"
+
+Und der Spiegel antwortete: "Frau Königin, Ihr seid schön, es ist wahr, aber Schneewittchen ist tausendmal schöner als Ihr."
+
+Die Königin wurde böse und voller Neid. Sie konnte nicht ruhig schlafen, weil sie das denken musste, dass Schneewittchen schöner war als sie.
+
+Endlich rief sie einen Jäger und sagte zu ihm: "Bring Schneewittchen hinaus in den Wald, ich will es nie wieder sehen. Töt es und bring mir sein Lunge und Leber als Beweis."
+
+Der Jäger nahm Schneewittchen mit in den Wald. Als er sein Schwert ziehen wollte, um es zu töten, fing das arme Kind an zu weinen und bat ihn: "Ach, guter Jäger, lass mich leben! Ich will in den Wald gehen und nie wieder nach Hause kommen."
+
+Der Jäger hatte Mitleid mit dem Kind und ließ es laufen. Er tötete stattdessen ein Wild und nahm seine Lunge und Leber, um der Königin zu zeigen.
+
+Schneewittchen aber war allein im großen Wald. Es begann zu weinen, aber es lief weiter und weiter, bis es ein kleines Häuschen fand. Das Häuschen war so klein, dass alles darin sehr klein war: kleine Stühle, ein kleines Tisch, sieben kleine Teller, sieben kleine Messer und Gabeln, sieben kleine Gläser und sieben kleine Betten nebeneinander.
+
+Schneewittchen war hungrig und durstig, also aß es von jedem Tellern ein bisschen Brot und Butter und trank aus jedem Glas einen kleinen Schluck Wein. Dann war es müde und legte sich in eines der Betten, aber keines passte. Endlich fand es eins, das passte, und schlief ein.
+
+Abends kamen sieben Zwerge nach Hause. Sie waren klein, aber stark, und arbeiteten im Berg als Bergleute. Als sie ins Haus kamen, merkten sie, dass jemand da gewesen war. "Wer hat meinen Stuhl berührt?", fragte der erste. "Wer hat von meinem Teller gegessen?", fragte der zweite. "Wer hat von meinem Brot gegessen?", fragte der dritte. "Wer hat von meiner Butter gegessen?", fragte der vierte. "Wer hat mein Messer berührt?", fragte der fünfte. "Wer hat meine Gabel benutzt?", fragte der sechste. "Wer hat aus meinem Glas getrunken?", fragte der siebte.
+
+Dann gingen sie ins Schlafzimmer und sahen Schneewittchen im Bett schlafen. "Wie schön ist das Kind!", riefen sie alle auf einmal. Sie ließen es schlafen und wachten über es.
+
+Am nächsten Morgen erwachte Schneewittchen. Die Zwerge fragten sie, wer sie sei und wie sie dazu gekommen sei. Schneewittchen erzählte ihnen alles, und die Zwerge sagten: "Wenn du bei uns bleiben willst und unser Haus für uns ordnest, kochst und waschst, machen und strickst, so kannst du bei uns bleiben. Wir werden dich behüten und dir nichts zuleiden lassen."
+
+Schneewittchen sagte ja, und so lebte sie bei den sieben Zwergen.
+
+Die Königin aber nahm an, dass Schneewittchen tot war. Eines Tages fragte sie wieder den Spiegel: "Spieglein, Spieglein an der Wand, wer ist die Schönste im ganzen Land?"
+
+Und der Spiegel antwortete: "Frau Königin, Ihr seid schön, es ist wahr, aber Schneewittchen lebt bei den sieben Zwergen, und sie ist tausendmal schöner als Ihr."
+
+Die Königin war wütend, denn sie wusste nun, dass der Jäger sie belogen hatte. Sie verkleidete sich als eine alte Krämerin und ging in den Wald zu den Zwergen.
+
+Als die Zwerge ausgingen, klopfte sie an die Tür und rief: "Schöne Ware, schöne Ware! Spangen und Schnallen!"
+
+Schneewittchen fragte: "Was habt Ihr zu verkaufen?"
+
+"Schöne Spangen", antwortete die Krämerin und nahm eine Spange aus ihrem Korb. "Lass mich dir eine Spange anlegen, mein Kind. Das wird dich sehr schön machen."
+
+Schneewittchen ließ sich nicht aufhalten, und die Krämerin band die Spange so fest, dass Schneewittchen ohnmächtig wurde. Die Königin ging weg, und dachte: "Jetzt ist sie tot!"
+
+Aber abends kamen die Zwerge nach Hause und fanden Schneewittchen ohnmächtig. Sie banden die Spange los, und Schneewittchen erwachte wieder.
+
+Die Königin aber ging wieder zu ihrem Spiegel und fragte: "Spieglein, Spieglein an der Wand, wer ist die Schönste im ganzen Land?"
+
+Und der Spiegel antwortete wieder: "Frau Königin, Ihr seid schön, es ist wahr, aber Schneewittchen lebt bei den sieben Zwergen, und sie ist tausendmal schöner als Ihr."
+
+Diese Zeit verkleidete die Königin sich als eine alte Alte und brachte einen Giftkamm mit. Als die Zwerge weg waren, klopfte sie an die Tür und rief: "Schöne Ware, schöne Ware!"
+
+Schneewittchen sagte: "Ich darf nicht mehr etwas öffnen."
+
+"Dann schau dir wenigstens diesen schönen Kamm an", antwortete die Alte und hielt ihn in die Höhe. Schneewittchen nahm den Kamm, und die Alte kämmte ihr die Haare. Aber sobald sie den Kamm in das Haar steckte, wurde Schneewittchen ohnmächtig.
+
+Die Königin ging weg, aber die Zwerge kamen nach Hause und fanden Schneewittchen ohnmächtig. Sie zogen den Kamm heraus, und Schneewittchen erwachte wieder.
+
+Die Königin fragte den Spiegel ein drittes Mal: "Spieglein, Spieglein an der Wand, wer ist die Schönste im ganzen Land?"
+
+Und der Spiegel antwortete wieder: "Frau Königin, Ihr seid schön, es ist wahr, aber Schneewittchen lebt bei den sieben Zwergen, und sie ist tausendmal schöner als Ihr."
+
+Die Königin war sehr wütend und dachte: "Jetzt werde ich sie wirklich töten."
+
+Sie kochte einen roten Apfel, der auf der einen Seite rot war und gut schmeckte, auf der anderen Seite aber vergiftet war. Dann verkleidete sie sich als eine Bäuerin und ging zu den Zwergen.
+
+Als die Zwerge weg waren, klopfte sie an die Tür. Schneewittchen sagte: "Ich darf nicht mehr etwas öffnen und nicht mehr etwas nehmen."
+
+"Das macht nichts", antwortete die Bäuerin, "ich will den Apfel teilen. Der rote Teil ist für dich, der weiße für mich."
+
+Schneewittchen wollte nicht, aber die Bäuerin hielt den Apfel in die Höhe und biss von der weißen Seite. Dann wollte Schneewittchen auch probieren. Als sie einen Bissen von der roten Seite aß, fiel sie tot zu Boden.
+
+Die Königin ging weg, und sagte: "Jetzt ist sie endlich tot!"
+
+Als die Zwerge nach Hause kamen, fanden sie Schneewittchen tot. Sie versuchten alles, um sie zu retten, aber es half nichts. Sie weinten sehr und legten sie in einen Sarg aus Glas. Er stand auf einem Berg, und die Zwerge wachten abwechselnd über ihn.
+
+Ein Jahr verging, und ein junger König kam durch den Wald. Er sah den Sarg mit Schneewittchen darin und war so betroffen von ihrer Schönheit, dass er sagte: "Ich will den Sarg mitnehmen. Ich will ihm alles geben, was er will, nur nicht ihn verlassen."
+
+Die Zwerge ließen sich überzeugen und gaben ihm den Sarg. Als die Diener den Sarg trugen, stolperten sie über einen Stein, und der Apfelkern, der im Hals von Schneewittchen steckte, sprang heraus. Plötzlich öffnete Schneewittchen die Augen, reckte sich und sagte: "Wo bin ich?"
+
+Der König war sehr glücklich und sagte: "Du bist bei mir. Willst du meine Frau werden?"
+
+Schneewittchen sagte ja, und sie heirateten in großer Pracht.
+
+Die böse Königin wurde eingeladen, und als sie kam, erkannte sie Schneewittchen. Aber die Königin wurde sehr aufgeregt und starb vor Neid und Zorn.
+
+Und Schneewittchen und der König lebten glücklich bis ans Ende ihrer Tage.
+}
+
+\tr\t\translation{
+白雪公主
+
+从前有一位王后，她坐在黑檀木做的窗户旁。外面正下着雪，王后一边做着针线活，一边望着窗外的雪景。突然，她的手指被针扎了一下，三滴鲜血滴在了雪地上。白雪上的红血看起来非常美丽，王后心想：“啊，如果我能有一个孩子，皮肤像雪一样白，嘴唇像血一样红，头发像黑檀木一样黑，那该多好啊！”
+
+不久之后，王后生下了一个小女孩，她的皮肤像雪一样白，嘴唇像血一样红，头发像黑檀木一样黑，于是王后给她取名叫“白雪公主”。但是白雪公主出生后不久，王后就去世了。
+
+国王很快又娶了一位妻子，她非常美丽，但却是一个虚荣又邪恶的女人。她有一面镜子，每天都要问它：“镜子，镜子，墙上的镜子，谁是全国最美丽的人？”
+
+镜子总是回答：“王后陛下，您是全国最美丽的人。”
+
+王后对此很满意，因为她知道镜子总是说实话。
+
+白雪公主渐渐长大了，变得越来越美丽。当她七岁时，她已经美得连王后都比不上了。有一天，王后又问镜子：“镜子，镜子，墙上的镜子，谁是全国最美丽的人？”
+
+镜子回答说：“王后陛下，您很美，这是真的，但白雪公主比您美丽一千倍。”
+
+王后变得非常生气和嫉妒。她无法平静地入睡，因为她总是想着白雪公主比她美丽这件事。
+
+最后，她叫来了一个猎人，对他说：“把白雪公主带到森林里去，我不想再见到她。杀了她，把她的肺和肝带给我作为证据。”
+
+猎人带着白雪公主走进了森林。当他拔出剑想要杀死她时，可怜的孩子开始哭泣，哀求他：“啊，好心的猎人，放我一条生路吧！我会走进森林，再也不回家了。”
+
+猎人同情这个孩子，让她跑了。他杀死了一只野兽，取出了它的肺和肝，拿给王后看。
+
+白雪公主独自一人在大森林里。她开始哭泣，但她继续向前走，直到她发现了一座小房子。这座房子很小，里面的一切都很小：小椅子、小桌子、七个小盘子、七把小刀和叉子、七个小杯子和七张并排的小床。
+
+白雪公主又饿又渴，于是她从每个盘子里吃了一点面包和黄油，从每个杯子里喝了一小口葡萄酒。然后她累了，躺到了一张床上，但没有一张合适。最后，她找到了一张合适的床，就睡着了。
+
+晚上，七个小矮人回家了。他们个子很小，但很强壮，在山里当矿工。当他们走进房子时，他们发现有人来过。“谁动了我的椅子？”第一个问道。“谁吃了我的盘子里的东西？”第二个问道。“谁吃了我的面包？”第三个问道。“谁吃了我的黄油？”第四个问道。“谁碰了我的刀？”第五个问道。“谁用了我的叉子？”第六个问道。“谁喝了我的杯子里的酒？”第七个问道。
+
+然后他们走进卧室，看到白雪公主在床上睡觉。“这个孩子多么美丽啊！”他们异口同声地喊道。他们让她睡觉，并守着她。
+
+第二天早上，白雪公主醒来了。小矮人们问她是谁，她是怎么到那里的。白雪公主把一切都告诉了他们，小矮人们说：“如果你愿意和我们住在一起，为我们整理房子，做饭、洗衣、缝补和编织，你就可以和我们住在一起。我们会保护你，不让你受到伤害。”
+
+白雪公主同意了，于是她和七个小矮人一起生活。
+
+王后以为白雪公主已经死了。有一天，她又问镜子：“镜子，镜子，墙上的镜子，谁是全国最美丽的人？”
+
+镜子回答说：“王后陛下，您很美，这是真的，但白雪公主和七个小矮人住在一起，她比您美丽一千倍。”
+
+王后很生气，因为她现在知道猎人骗了她。她装扮成一个老妇人，走进森林去找小矮人。
+
+当小矮人们外出时，她敲了敲门，喊道：“漂亮的东西，漂亮的东西！发夹和搭扣！”
+
+白雪公主问道：“你卖什么？”
+
+“漂亮的发夹，”老妇人回答，从她的篮子里拿出一个发夹。“让我给你戴一个发夹，我的孩子。这会让你变得非常美丽。”
+
+白雪公主没有拒绝，老妇人把发夹紧紧地系在她的头上，让她昏了过去。王后离开了，心想：“现在她死了！”
+
+但晚上小矮人们回家了，发现白雪公主昏迷不醒。他们解开了发夹，白雪公主又醒了过来。
+
+王后又去问镜子：“镜子，镜子，墙上的镜子，谁是全国最美丽的人？”
+
+镜子又回答说：“王后陛下，您很美，这是真的，但白雪公主和七个小矮人住在一起，她比您美丽一千倍。”
+
+这次王后装扮成一个老太婆，带来了一把有毒的梳子。当小矮人们外出时，她敲了敲门，喊道：“漂亮的东西，漂亮的东西！”
+
+白雪公主说：“我不能再开门了。”
+
+“那你至少看看这把漂亮的梳子吧，”老太婆回答，把梳子举了起来。白雪公主接过了梳子，老太婆给她梳了头发。但她一把梳子插在头发里，白雪公主就昏了过去。
+
+王后离开了，但小矮人们回家后发现白雪公主昏迷不醒。他们拔出了梳子，白雪公主又醒了过来。
+
+王后第三次问镜子：“镜子，镜子，墙上的镜子，谁是全国最美丽的人？”
+
+镜子又回答说：“王后陛下，您很美，这是真的，但白雪公主和七个小矮人住在一起，她比您美丽一千倍。”
+
+王后非常生气，心想：“现在我要真的杀了她。”
+
+她做了一个红苹果，一边是红色的，味道很好，另一边是有毒的。然后她装扮成一个农妇，去找小矮人。
+
+当小矮人们外出时，她敲了敲门。白雪公主说：“我不能再开门，也不能再拿任何东西了。”
+
+“没关系，”农妇回答说，“我会把苹果分开。红色的部分给你，白色的部分给我。”
+
+白雪公主不想吃，但农妇把苹果举了起来，咬了一口白色的部分。然后白雪公主也想尝一尝。当她咬了一口红色的部分时，她倒在地上死了。
+
+王后离开了，说：“现在她终于死了！”
+
+当小矮人们回家时，他们发现白雪公主死了。他们尝试了一切来救她，但都无济于事。他们非常伤心，把她放在一个玻璃棺材里。棺材放在一座山上，小矮人们轮流守着它。
+
+一年过去了，一位年轻的国王穿过森林。他看到了装有白雪公主的棺材，被她的美丽所打动，说：“我要带走这个棺材。我会给他他想要的一切，只是不要离开他。”
+
+小矮人们被说服了，把棺材给了他。当侍从们抬着棺材时，他们被一块石头绊倒了，卡在白雪公主喉咙里的苹果核掉了出来。突然，白雪公主睁开了眼睛，坐了起来，说：“我在哪里？”
+
+国王非常高兴，说：“你在我身边。你愿意成为我的妻子吗？”
+
+白雪公主答应了，他们举行了盛大的婚礼。
+
+邪恶的王后被邀请了，当她来的时候，她认出了白雪公主。但是王后非常激动，嫉妒和愤怒而死。
+
+白雪公主和国王幸福地生活在一起，直到他们生命的尽头。
+}
+
+% 第三篇：灰姑娘
+\chapter{灰姑娘}
+\section{故事内容}
+
+\original{
+Aschenputtel
+
+Es war einmal ein reicher Mann, der hatte eine schöne Frau mit einem treuen Herzen. Die Frau erkrankte und starb. Vor ihrem Tod sagte sie zu ihrer einzigen Tochter: "Sei immer gut und fromm, so wird dir der Himmel behüten."
+
+Nach dem Tod seiner Frau heiratete der Mann eine schöne Frau, die aber eine schlechte und heimtückische Stiefmutter war. Sie hatte zwei Töchter, die nach ihrem Aussehen schön waren, aber ihre Seelen waren boshaft und hässlich.
+
+Die arme Stieftochter musste nun alle Arbeiten im Haus tun: Kochen, waschen, putzen und stricken. Sie trug ein altes graues Kittel und Schuhe voll Löcher, und die Stiefschwestern nannten sie "Aschenputtel", weil sie immer im Aschehof saß.
+
+Eines Tages gab der König ein Fest, das drei Tage dauern sollte, um seine einzige Tochter, die Prinzessin, zu verheiraten. Jede junge Frau im Land wurde eingeladen, auch die Stiefschwestern von Aschenputtel.
+
+Als die Stiefschwestern von dieser Einladung hörten, waren sie sehr froh und baten Aschenputtel, ihre Kleider auszupressen und zu bügeln. "Gut," sagte Aschenputtel, "wenn ich das getan habe, darf ich auch gehen?"
+
+"Aschenputtel gehen zum Fest?" riefen die Stiefschwestern. "Du hast keine Kleider und keine Schuhe, und außerdem weißt du nicht, tanzen!"
+
+Aber Aschenputtel bat weiter, bis die Stiefmutter sagte: "Ich habe eine Schüssel Erbsen auf den Aschenhof geworfen. Wenn du sie in zwei Stunden aufsortieren kannst, darfst du mitkommen."
+
+Aschenputtel ging hinaus auf den Aschenhof und rief: "Kleine Vögel, kleine Vögel, alle die da sind, Spatz und Rabe, Krähe und Kuckuck, Kommt und helft mir, Erbsen aufzusortieren!"
+
+Sofort kamen tausende Vögel, alle kleinen Vögel, und sortierten die Erbsen: die guten in die Schüssel, die schlechten auf den Aschenhof. In einer Stunde hatten sie die Arbeit beendet und flogen wieder davon.
+
+Aschenputtel ging zurück zu ihrer Stiefmutter und zeigte ihr die sortierten Erbsen. Aber die Stiefmutter sagte: "Es ist zu spät. Du hast keine Kleider, und du darfst nicht mitkommen."
+
+Die Stiefmutter und die Stiefschwestern gingen ohne Aschenputtel zum Fest. Aschenputtel weinte sehr, aber dann ging ihr Vater herein und fragte: "Was fehlt dir, mein Kind?"
+
+"Ich möchte auch zum Fest gehen, aber die Stiefmutter lässt mich nicht."
+
+"Du hast keine Kleider, mein Kind, aber wenn du willst, kann ich dir etwas geben."
+
+Aber die Stiefmutter kam herein und sagte: "Sie hat keine Kleider, und sie darf nicht gehen."
+
+Aschenputtel weinte sehr, aber dann ging sie in den Garten und rief: "Vater, Vater, mein Vater, gib mir ein Stämmchen von der Nussbaum, die vor dem Haus steht."
+
+Ihr Vater gab ihr ein Stämmchen, und Aschenputtel ging mit ihm in den Wald, pflanzte es in das Grab ihrer Mutter und weinte so viel, dass ihre Tränen es bewässerten.
+
+Das Stämmchen wuchs schnell zu einem großen Baum, und ein kleiner weißer Vögel saß darauf. Jeden Tag kam Aschenputtel zu dem Baum und fragte: "Nussbaum, Nussbaum, schau mich an, Nussbaum, Nussbaum, wachsen schnell, Gib mir Gold und Silber, dass ich zum Fest gehen kann!"
+
+Und der kleine weiße Vogel warf ihr ein Kleid aus Gold und Silber und Schuhe aus Glas herab.
+
+Eines Tages, als das Fest begann, ging Aschenputtel zu dem Baum, fragte ihn und bekam ein wunderschönes Kleid. Sie zog es an und ging zum Fest. Niemand erkannte sie, nicht einmal ihre Stiefmutter und ihre Stiefschwestern. Sie tanzten mit dem Prinzen, der sie nicht losließ.
+
+Als es spät wurde, wollte Aschenputtel nach Hause gehen. Der Prinz sagte: "Ich will dich begleiten."
+
+Aber Aschenputtel lief weg, und als der Prinz ihr nachlief, verlor sie ein Glas-Schuh. Der Prinz nahm ihn auf und sagte: "Ich werde die Frau finden, die in diesen Schuh passt, und sie wird meine Frau werden."
+
+Am nächsten Tag ging der Prinz mit dem Schuh durch das ganze Land. Jede junge Frau versuchte, den Schuh anzuziehen, aber er passte niemandem. Schließlich kam er zu dem Haus von Aschenputtel.
+
+Die Stiefschwestern waren sehr froh und versuchten, den Schuh anzuziehen. Die erste schnitt ihre Zehen ab, damit er passte, aber der Prinz sah das Blut und wusste, dass es nicht die Richtige war. Die zweite schnitt ihre Ferse ab, aber auch das Blut kam hervor.
+
+Dann sagte Aschenputtel: "Ich möchte es auch versuchen."
+
+Die Stiefmutter und die Stiefschwestern lachten, aber der Prinz sagte: "Jede junge Frau muss es versuchen."
+
+Aschenputtel zog den Schuh an, und er passte perfekt. Dann zog sie den anderen Schuh aus ihrer Tasche, und der Prinz erkannte sie.
+
+"Du bist die Frau, die ich suchte," sagte der Prinz. "Willst du meine Frau werden?"
+
+Aschenputtel sagte ja, und der Prinz nahm sie mit nach Hause.
+
+Am Tag der Hochzeit kamen die Stiefmutter und die Stiefschwestern, um zu feiern. Aber als sie die Treppe hinaufgingen, packten zwei Raben sie an den Haaren und zogen sie runter. Am Ende starben sie an ihrem Leid.
+
+Aschenputtel aber heiratete den Prinzen und lebte glücklich bis ans Ende ihrer Tage.
+}
+
+\tr\t\translation{
+灰姑娘
+
+从前有一个有钱的男人，他有一个美丽善良的妻子。妻子生病了，不久就去世了。临终前，她对唯一的女儿说：“你要永远善良虔诚，这样上帝会保佑你的。”
+
+妻子死后，男人娶了一个美丽的女人，但这个女人是个坏心肠的继母。她有两个女儿，外表看起来很漂亮，但内心却邪恶丑陋。
+
+可怜的继女现在不得不做家里所有的工作：做饭、洗衣、打扫和缝纫。她穿着一件旧的灰色连衣裙和满是破洞的鞋子，继姐妹们叫她“灰姑娘”，因为她总是坐在灰堆里。
+
+有一天，国王举办了一场为期三天的盛宴，为他唯一的女儿——公主找丈夫。全国所有的年轻女孩都被邀请了，包括灰姑娘的继姐妹们。
+
+当继姐妹们听到这个邀请时，她们非常高兴，请求灰姑娘帮她们压平并熨烫衣服。“好的，”灰姑娘说，“如果我做完了，我也可以去吗？”
+
+“灰姑娘去参加盛宴？”继姐妹们喊道。“你没有衣服和鞋子，而且你也不会跳舞！”
+
+但灰姑娘继续请求，直到继母说：“我把一碗豌豆扔到了灰堆上。如果你能在两个小时内把它们分类出来，你就可以一起去。”
+
+灰姑娘走出家门，来到灰堆，喊道：“小鸟，小鸟，所有的小鸟，麻雀和乌鸦，渡鸦和布谷鸟，来帮助我，把豌豆分类！”
+
+立刻来了成千上万只小鸟，所有的小鸟，它们把豌豆分类：好的放进碗里，坏的放回灰堆。一个小时后，它们完成了工作，又飞走了。
+
+灰姑娘回到继母身边，给她看分类好的豌豆。但是继母说：“太晚了。你没有衣服，不能去。”
+
+继母和继姐妹们不带灰姑娘去参加盛宴。灰姑娘哭得很厉害，但这时她的父亲进来了，问道：“我的孩子，你怎么了？”
+
+“我也想去参加盛宴，但继母不让我去。”
+
+“我的孩子，你没有衣服，但如果你愿意，我可以给你一些东西。”
+
+但继母进来了，说：“她没有衣服，不能去。”
+
+灰姑娘哭得很厉害，但后来她走到花园里，喊道：“父亲，父亲，我的父亲，给我一根前院核桃树的树枝。”
+
+她的父亲给了她一根树枝，灰姑娘带着它来到森林里，把它种在母亲的坟墓上，哭得很厉害，眼泪把它淋湿了。
+
+树枝很快长成了一棵大树，一只白色的小鸟坐在上面。灰姑娘每天都来到这棵树前，问道：“核桃树，核桃树，看看我，核桃树，核桃树，快快生长，给我金和银，让我能去参加盛宴！”
+
+白色的小鸟就会扔给她一件金和银的衣服和一双玻璃鞋。
+
+有一天，当盛宴开始时，灰姑娘来到这棵树前，问它，得到了一件美丽的衣服。她穿上它，去参加盛宴。没有人认出她，甚至她的继母和继姐妹们。她和王子跳舞，王子一刻也不放她走。
+
+当夜深了，灰姑娘想回家。王子说：“我送你回去。”
+
+但灰姑娘跑开了，当王子追她时，她掉了一只玻璃鞋。王子捡起它，说：“我会找到适合这只鞋的女人，她将成为我的妻子。”
+
+第二天，王子带着这只鞋走遍了全国。每个年轻女孩都试图穿上这只鞋，但没有人适合。最后，他来到了灰姑娘的家。
+
+继姐妹们非常高兴，试图穿上这只鞋。第一个剪掉了她的脚趾，以便它适合，但王子看到了血，知道她不是正确的人。第二个剪掉了她的脚跟，但血也流了出来。
+
+然后灰姑娘说：“我也想试试。”
+
+继母和继姐妹们笑了，但王子说：“每个年轻女孩都必须试试。”
+
+灰姑娘穿上这只鞋，它完美地适合。然后她从口袋里拿出另一只鞋，王子认出了她。
+
+“你就是我要找的女人，”王子说。“你愿意成为我的妻子吗？”
+
+灰姑娘答应了，王子带她回家。
+
+在婚礼那天，继母和继姐妹们来庆祝。但当她们走上楼梯时，两只乌鸦抓住她们的头发，把她们拉下来。最后，她们在痛苦中死去。
+
+灰姑娘嫁给了王子，幸福地生活到生命的尽头。
+}
+
+% 第四篇：青蛙王子
+\chapter{青蛙王子}
+\section{故事内容}
+
+\original{
+Der Froschkönig oder der eiserne Heinrich
+
+Es war einmal ein König, der hatte mehrere schöne Töchter. Die jüngste war so schön, dass die Sonne sich jedes Mal freute, wenn sie sie ansah.
+
+Nahe dem Königsschloss war ein großer, dunkler Wald, und in der Mitte des Waldes war ein tiefes Wasserloch. Eines heißen Sommertags ging das Königskind hinaus und spielte am Wasserloch.
+
+Es war so heiß, dass das Mädchen sich nach dem Wasser sehnte. Plötzlich fiel ihr goldener Ball ins Wasser und sank bis zum Grund.
+
+Das Mädchen weinte sehr, als es den Ball verloren hatte. Da kam ein Frosch aus dem Wasser und sagte: "Warum weinst du so, schönes Mädchen?"
+
+"Mein goldener Ball ist ins Wasser gefallen", sagte das Mädchen.
+
+"Ich will ihn dir holen", sagte der Frosch, "aber was gibst du mir dafür?"
+
+"Alles, was du willst", sagte das Mädchen, "meine Kleider, meine Perlen und Edelsteine, ja selbst den goldenen Krone, die ich trage."
+
+"Ich will deine Kleider nicht, deine Perlen und Edelsteine nicht, noch weniger deine goldene Krone", sagte der Frosch. "Aber wenn du mich liebst und mich als Freund annimmst, mich sitzen lässt an deinem Tisch, in deinem Bett schlafen lässt und mir alles geben willst, was du hast, dann will ich dir deinen Ball holen."
+
+"Ja, alles, was du willst", sagte das Mädchen, "ich will dir alles geben, wenn du mir meinen Ball holst."
+
+Aber sie dachte: "Was will der dumme Frosch mit allem das? Er sitzt im Wasser und quakt, und kann nicht zu mir kommen."
+
+Der Frosch sprang in das Wasser und tauchte unter. Ein Weilchen später kam er wieder heraus und hatte den goldenen Ball im Mund. Er warf ihn auf den Rand des Wasserlochs, und das Mädchen nahm ihn und war so froh, dass sie den Frosch ganz vergass.
+
+"Warte, wart", rief der Frosch, "nimm mich mit, sonst du wirst es bereuen."
+
+Aber das Mädchen hörte nicht zu, sondern lief so schnell wie sie konnte zurück ins Schloss.
+
+Der Frosch quakte nach ihr, aber sie kam nicht mehr zurück. Am nächsten Morgen, als das Mädchen mit dem König und den Hofleuten zu Tisch saß, klopfte es an die Tür. "Königstochter, königstochter, mach die Tür auf!"
+
+Die Königstochter lief zur Tür, aber als sie durch das Schlüsselloch sah, dass es der Frosch war, machte sie die Tür nicht auf, sondern kehrte zurück und sagte dem König, dass es nur ein ärmerer Bauer sei, der sie besuchte.
+
+Aber der König sagte: "Tu, was du versprochen hast, auch wenn es nur ein Frosch ist. Man muss immer sein Wort halten."
+
+Die Königstochter öffnete die Tür, und der Frosch sprang hinein. Er sprang bis zum Tisch und sagte: "Lift mich auf, dass ich zu dir sitze!"
+
+Die Königstochter machte es widerstrebend, aber der König sagte ihr, sie müsse es tun.
+
+Als der Frosch auf dem Tisch saß, sagte er: "Gib mir ein Stück Brot!"
+
+Die Königstochter tat es, aber sie sah ihn nicht gerne an.
+
+"Jetzt trink ein Glas Wein mit mir", sagte der Frosch.
+
+Die Königstochter tat es, aber sie war so unglücklich, dass sie fast weinte.
+
+"Nun, ich habe gegessen und getrunken," sagte der Frosch, "jetzt will ich schlafen. Hebe mich auf und bring mich in dein Bett."
+
+Da fing die Königstochter an zu weinen, denn sie fürchtete den kalten Frosch und konnte nicht denken, dass er in ihr schönes weiches Bett liegen sollte.
+
+Aber der König sagte: "Du musst tun, was du versprochen hast. Die Treue ist die beste Tugend."
+
+Also hob die Königstochter den Frosch auf und trug ihn in ihr Schlafzimmer. Sie legte ihn in eine Ecke, aber als sie ins Bett ging, quakte er: "Ich bin kalt und will in dein Bett. Hebe mich auf, sonst rufe ich den König!"
+
+Da war die Königstochter so wütend, dass sie ihn mit beiden Händen packte und auf den Boden warf. "Nun wirst du endlich Ruhe haben, du dumme Frosch!"
+
+Aber als er auf den Boden fiel, wurde er zu einem schönen Prinzen, der in einem goldenen Gewand war. Er war so schön, dass die Königstochter ihn liebhaben musste.
+
+Er sagte zu ihr: "Ich war ein König, der von einer bösen Hexe verwandelt wurde. Nur du konntest mich befreien. Willst du meine Frau werden?"
+
+Die Königstochter sagte ja, und am nächsten Tag kamen die Diener des Prinzen in einem prächtigen Wagen, um sie nach seinem Schloss zu bringen.
+
+Auf dem Wagen saß auch ein Mann, der hieß Heinrich. Er war der treue Diener des Prinzen und hatte drei eiserne Bänder ums Herz, weil er so traurig war, als der Prinz zum Frosch verwandelt wurde.
+
+Sie fuhren nach dem Schloss des Prinzen, und Heinrich war so glücklich, dass die eisernen Bänder sprangen und sein Herz wieder frei war.
+
+Und so heirateten der Prinz und die Königstochter und lebten glücklich bis ans Ende ihrer Tage.
+}
+
+\tr\t\translation{
+青蛙王子
+
+从前有一个国王，他有几个美丽的女儿。最小的女儿非常美丽，连太阳每次看到她都会感到高兴。
+
+国王的城堡附近有一片大而黑暗的森林，森林中央有一个深水池。一个炎热的夏天，小公主出去在水池边玩耍。
+
+天气非常炎热，小女孩渴望喝水。突然，她的金球掉进了水里，沉到了水底。
+
+女孩失去了球，哭得很伤心。这时，一只青蛙从水里出来说：“美丽的女孩，你为什么哭得这么伤心？”
+
+“我的金球掉进水里了。”女孩说。
+
+“我可以帮你捡回来，”青蛙说，“但你会给我什么作为回报？”
+
+“你想要什么都行，”女孩说，“我的衣服、我的珍珠和宝石，甚至我戴的金皇冠。”
+
+“我不要你的衣服，不要你的珍珠和宝石，更不要你的金皇冠，”青蛙说，“但如果你爱我，把我当作朋友，让我坐在你的桌子上，让我在你的床上睡觉，愿意给我你所有的东西，那么我就会帮你找回你的球。”
+
+“是的，你想要什么都行，”女孩说，“只要你帮我找回我的球，我什么都给你。”
+
+但她想：“这个愚蠢的青蛙要这些东西做什么？它坐在水里呱呱叫，根本不能来找我。”
+
+青蛙跳进水里，潜了下去。过了一会儿，它又浮了上来，嘴里叼着金球。它把球扔到水池边上，女孩拿起它，高兴得把青蛙完全忘了。
+
+“等等，等等，”青蛙喊道，“带上我，否则你会后悔的。”
+
+但女孩不听，而是尽可能快地跑回城堡。
+
+青蛙在后面呱呱叫，但她再也没有回来。第二天早上，当女孩和国王及宫廷人员一起吃饭时，有人敲门。“公主，公主，开门！”
+
+公主跑到门口，但当她透过钥匙孔看到是青蛙时，她没有开门，而是回到国王身边，说只是一个贫穷的农民来看她。
+
+但国王说：“做你承诺过的事，即使是对一只青蛙。人必须永远信守诺言。”
+
+公主打开门，青蛙跳了进来。它一直跳到桌子旁，说：“把我抱起来，让我坐在你旁边！”
+
+公主不情愿地这样做了，但国王告诉她必须这样做。
+
+青蛙坐在桌子上，说：“给我一块面包！”
+
+公主照做了，但她不太愿意看它。
+
+“现在和我喝一杯葡萄酒。”青蛙说。
+
+公主照做了，但她非常不开心，几乎要哭了。
+
+“现在，我已经吃了喝了，”青蛙说，“现在我想睡觉。把我抱起来，带我去你的床。”
+
+公主开始哭泣，因为她害怕冰冷的青蛙，无法想象它应该躺在她美丽柔软的床上。
+
+但国王说：“你必须做你承诺过的事。忠诚是最好的美德。”
+
+于是公主把青蛙抱起来，带进她的卧室。她把它放在一个角落里，但当她上床时，它呱呱叫着：“我很冷，想进你的床。把我抱起来，否则我就叫国王！”
+
+公主非常生气，用双手抓住它，把它扔到地上。“现在你终于可以安静了，你这只愚蠢的青蛙！”
+
+但当它摔到地上时，它变成了一个美丽的王子，穿着金色的衣服。他是如此美丽，公主不得不爱他。
+
+他对她说：“我是一个国王，被一个邪恶的女巫变成了青蛙。只有你能救我。你愿意成为我的妻子吗？”
+
+公主答应了，第二天，王子的仆人乘着一辆华丽的马车来接她去他的城堡。
+
+马车上还坐着一个叫海因里希的人。他是王子忠实的仆人，当王子变成青蛙时，他非常悲伤，以至于用三条铁带绑住了自己的心。
+
+他们驱车前往王子的城堡，海因里希非常高兴，铁带断了，他的心又自由了。
+
+于是王子和公主结婚了，幸福地生活到生命的尽头。
+}
+
+% 第五篇：睡美人
+\chapter{睡美人}
+\section{故事内容}
+
+\original{
+Dornröschen
+
+Es war einmal ein König und eine Königin, die waren sehr glücklich, aber sie hatten kein Kind. Eines Tages bat die Königin einen Stuhlkreis an, um sich ihrer Sehnsucht nach einem Kind zu befreien.
+
+Eines Tages, als die Königin im Garten spazierte, trafen sie auf eine alte Hexe, die sagte: "Dein Wunsch wird bald erfüllt. Du wirst ein Mädchen bekommen, das so schön sein wird, dass alle es bewundern werden."
+
+Und tatsächlich bekam die Königin bald ein Mädchen. Das Königspaar war so glücklich, dass sie eine große Feier veranstalteten. Sie luden sieben gute Feeen ein, um dem Kind ihre Segnungen zu geben.
+
+Aber es gab acht Feeen im ganzen Land, und sie hatten nur sieben Goldteller mit, also konnte eine Fee nicht eingeladen werden. Sie war sehr böse.
+
+Am Tag der Taufe kamen die sieben guten Feeen. Jede gab dem Mädchen eine Segnung: die erste Segnete es mit Schönheit, die zweite mit Weisheit, die dritte mit Güte, die vierte mit Tanzkunst, die fünfte mit Gesang, die sechste mit Musik und die siebte mit Gesundheit.
+
+Just als die siebte Fee ihre Segnung gegeben hatte, klopfte es an die Tür. Es war die böse Fee. Sie war sehr wütend, weil sie nicht eingeladen worden war. Sie trat herein und rief: "Das Mädchen wird im 15. Jahre an einer Spindel stechen und sterben!"
+
+Die Königstochter weinte, aber die siebte Fee, die ihre Segnung noch nicht gegeben hatte, sagte: "Ich kann den Fluch nicht aufheben, aber ich kann ihn mildern. Das Mädchen wird nicht sterben, sondern nur 100 Jahre schlafen."
+
+Der König war sehr erschrocken. Er befahl, alle Spindeln im ganzen Land zu verbrennen.
+
+Das Mädchen wuchs heran und erhielt alle Segnungen der sieben guten Feeen. Es war sehr schön, weise, gut, konnte tanzen, singen und spielen auf allen Instrumenten.
+
+Am Tag ihrer 15. Geburt war der König und die Königin ausgegangen. Das Mädchen war allein im Schloss. Sie wanderte durch die Räume und kam endlich in einen Turm. Dort saß eine alte Frau, die an einer Spindel spann.
+
+"Was machst du da?" fragte das Mädchen.
+
+"Ich spinne, mein Kind", antwortete die alte Frau.
+
+"Das ist ein schönes Werkzeug", sagte das Mädchen. "Kann ich auch versuchen?"
+
+Die alte Frau gab ihr die Spindel, aber als das Mädchen sie ergriff, stach sie sich an der Spitze. Sofort fiel sie tot zu Boden.
+
+Aber die alte Frau war die böse Fee, die den Fluch verhängt hatte. Und nun war der Fluch in Erfüllung gegangen.
+
+Der König und die Königin kamen zurück und fanden das Mädchen tot. Sie legten es in ein Bett in dem Turm und weinten sehr.
+
+Dann befahl der König, dass alle im Schloss schlafen sollten, bis die 100 Jahre vorbei waren. So schliefen alle: der König, die Königin, die Hofleute, die Tiere, selbst die Fliegen auf der Wand.
+
+Und um das Schloss wuchsen große Dornensträucher, die es ganz umschlossen. Man konnte das Schloss nicht mehr sehen, nur die Spitze des Turms rauchte noch darüber hinaus.
+
+Die Geschichte von dem schlafenden Mädchen verbreitete sich im ganzen Land. Viele Prinzen kamen, um das Mädchen zu retten, aber die Dornensträucher zerrissen ihre Kleider und wundeten sie. Einige starben gar daran.
+
+100 Jahre vergingen. Eines Tages kam ein junger Prinz durch den Wald. Er hörte von der Geschichte und wollte das Mädchen retten.
+
+Als er zum Schloss kam, wuchsen die Dornensträucher zu schönen Rosenblüten auf. Er ging durch sie hindurch, und sie verletzten ihn nicht.
+
+Im Schloss war alles still. Die Hofleute schliefen an ihren Plätzen, die Tiere schliefen im Stall, die Fliegen schliefen auf der Wand.
+
+Der Prinz ging in den Turm und fand das schlafende Mädchen. Sie war so schön, dass er sie sofort liebte. Er küsste sie, und plötzlich erwachte das Mädchen.
+
+Sofort erwachten auch der König, die Königin, die Hofleute, die Tiere und die Fliegen. Alles war wieder lebendig.
+
+Der Prinz heiratete das Mädchen, und sie lebten glücklich bis ans Ende ihrer Tage.
+}
+
+\tr\t\translation{
+睡美人
+
+从前有一位国王和王后，他们非常幸福，但没有孩子。有一天，王后召集了一群女巫，希望实现她想要一个孩子的愿望。
+
+有一天，当王后在花园里散步时，她遇到了一位老女巫，女巫说：“你的愿望很快就会实现。你会有一个女儿，她会非常美丽，所有人都会羡慕她。”
+
+果然，王后不久就生了一个女儿。国王夫妇非常高兴，举行了一场盛大的庆祝活动。他们邀请了七位善良的仙女来给孩子祝福。
+
+但全国共有八位仙女，而他们只有七个金盘子，所以有一位仙女没有被邀请。她非常生气。
+
+在洗礼的那天，七位善良的仙女来了。每个仙女都给了孩子一个祝福：第一个祝福她美丽，第二个祝福她智慧，第三个祝福她善良，第四个祝福她舞蹈，第五个祝福她歌唱，第六个祝福她音乐，第七个祝福她健康。
+
+就在第七位仙女祝福完的时候，有人敲门。那是邪恶的仙女。她非常生气，因为她没有被邀请。她走了进来，喊道：“这个女孩在15岁时会被纺锤刺伤并死去！”
+
+公主哭了，但还没有祝福的第七位仙女说：“我不能解除诅咒，但我可以减轻它。这个女孩不会死，只会睡100年。”
+
+国王非常震惊。他下令烧毁全国所有的纺锤。
+
+女孩长大成人，获得了七位善良仙女的所有祝福。她非常美丽、聪明、善良，会跳舞、唱歌，会演奏所有乐器。
+
+在她15岁生日那天，国王和王后出去了。女孩独自一人在城堡里。她在房间里漫步，最后来到了一座塔。那里坐着一位老妇人，正在纺锤上纺纱。
+
+“你在做什么？”女孩问。
+
+“我在纺纱，我的孩子。”老妇人回答。
+
+“这是一个美丽的工具，”女孩说。“我也可以试试吗？”
+
+老妇人把纺锤给了她，但当女孩抓住它时，她被尖端刺伤了。她立刻倒在地上死了。
+
+但老妇人是施加诅咒的邪恶仙女。现在诅咒已经应验了。
+
+国王和王后回来了，发现女孩死了。他们把她放在塔里的床上，哭得很厉害。
+
+然后国王下令，城堡里的所有人都应该睡觉，直到100年过去。于是所有人都睡着了：国王、王后、宫廷人员、动物，甚至墙上的苍蝇。
+
+城堡周围长出了巨大的荆棘丛，把它完全包围了。人们再也看不到城堡，只有塔尖还露在外面。
+
+关于睡美人的故事传遍了全国。许多王子来救女孩，但荆棘丛撕裂了他们的衣服，弄伤了他们。有些甚至为此而死。
+
+100年过去了。有一天，一位年轻的王子穿过森林。他听说了这个故事，想要救女孩。
+
+当他来到城堡时，荆棘丛变成了美丽的玫瑰花。他穿过它们，它们没有伤害他。
+
+城堡里一片寂静。宫廷人员睡在他们的位置上，动物睡在马厩里，苍蝇睡在墙上。
+
+王子走进塔，发现了睡着的女孩。她非常美丽，他立刻爱上了她。他吻了她，女孩突然醒了过来。
+
+国王、王后、宫廷人员、动物和苍蝇也都立刻醒了过来。一切又恢复了生机。
+
+王子娶了女孩，他们幸福地生活到生命的尽头。
+}
+
+% 第六篇：长发公主
+\chapter{长发公主}
+\section{故事内容}
+
+\original{
+Rapunzel
+
+Es war einmal ein Mann und eine Frau, die hatten schon lange keinen Kindern gewünscht. Endlich bekam die Frau ein Kind.
+
+Nahe ihrem Haus stand ein Garten, der einem Zauberer gehörte. In diesem Garten wuchsen viele Früchte und Gemüse. Die Frau hatte eine große Lust auf den Rapunzel, der im Garten des Zauberers wuchs.
+
+Sie bat ihren Mann, den Rapunzel zu stehlen, sonst würde sie sterben. Der Mann gehorchte ihr und stahl den Rapunzel aus dem Garten des Zauberers.
+
+Als der Zauberer ihn erwischte, bedrohte er: "Du wirst dafür bezahlen. Dein Kind gehört mir, sobald es geboren ist."
+
+Und tatsächlich, als das Kind geboren war, kam der Zauberer und nahm es mit. Er nannte es Rapunzel, weil der Rapunzel der Grund dafür war, dass er es bekommen hatte.
+
+Rapunzel wuchs zu einem sehr schönen Mädchen heran. Wenn sie 12 Jahre alt war, schlossen der Zauberer sie in einen Turm, der in einem Wald stand. Der Turm hatte keine Türen und keine Treppe, nur ein kleines Fenster oben.
+
+Wenn der Zauberer auf den Turm wollte, rief er: "Rapunzel, Rapunzel, lass dein Haar herunter!"
+
+Rapunzel hatte lange, schwarzbraunes Haar, das bis zu den Füßen reichte. Dann warf sie ihr Haar durch das Fenster, und der Zauberer stieg daran hoch.
+
+Einige Jahre vergingen. Eines Tages kam ein Prinz durch den Wald. Er hörte eine Stimme, die sang. Die Stimme war so schön, dass der Prinz stehen blieb und zuzuhören begann. Es war Rapunzel, die sang.
+
+Der Prinz wollte in den Turm, aber er fand keine Tür und keine Treppe. Er saß unten und wartete, bis der Zauberer kam.
+
+Als der Zauberer kam, rief er: "Rapunzel, Rapunzel, lass dein Haar herunter!"
+
+Rapunzel warf ihr Haar durch das Fenster, und der Zauberer stieg hoch.
+
+Am nächsten Tag kam der Prinz und rief: "Rapunzel, Rapunzel, lass dein Haar herunter!"
+
+Rapunzel warf ihr Haar durch das Fenster, und der Prinz stieg hoch.
+
+Als Rapunzel sah, dass es ein Prinz war, erschrak sie sehr. Aber der Prinz sprach zu ihr liebevoll und sagte, dass er sie wegen ihrer Stimme liebte. Rapunzel war so berührt, dass sie ihm erlaubte, jeden Tag zu ihr zu kommen.
+
+So kam der Prinz jeden Tag, und sie verliebten sich ineinander. Schließlich versprach der Prinz Rapunzel, dass er sie befreien und zu seiner Frau machen würde.
+
+Ein Tag, als der Zauberer kam, fragte Rapunzel: "Warum steigst du so langsam? Der Prinz steigt viel schneller."
+
+Der Zauberer war sehr wütend, als er das hörte. Er schnappte Rapunzel und brachte sie in eine Wüste, wo sie einsam leben musste.
+
+Dann ging er zum Turm und wartete auf den Prinzen. Als der Prinz kam und rief: "Rapunzel, Rapunzel, lass dein Haar herunter!", warf der Zauberer das Haar durch das Fenster. Der Prinz stieg hoch, aber als er oben ankam, war der Zauberer da. "Du hast Rapunzel nicht mehr", sagte er, "du wirst sie nie wieder sehen!"
+
+Der Prinz war so betroffen, dass er aus dem Fenster sprang. Er fiel auf die Dornensträucher unten und wurde blind.
+
+Blind und einsam wanderte der Prinz durch den Wald. Er aß Früchte und Trank Wasser aus Bächen. Er suchte Rapunzel, aber er fand sie nicht.
+
+Einige Jahre vergingen. Eines Tages kam er in die Wüste, wo Rapunzel lebte. Rapunzel hörte seine Stimme und erkannte ihn. Sie weinte sehr, und ihre Tränen fielen in seine Augen. Plötzlich konnte er wieder sehen.
+
+Sie waren beide sehr froh und gingen zusammen zurück zum Königreich des Prinzen. Dort heirateten sie und lebten glücklich bis ans Ende ihrer Tage.
+}
+
+\tr\t\translation{
+长发公主
+
+从前有一个男人和一个女人，他们一直想要孩子。最后，女人怀孕了。
+
+在他们家附近有一个花园，属于一个巫师。这个花园里种满了各种水果和蔬菜。女人非常想吃巫师花园里的莴苣。
+
+她恳求丈夫去偷莴苣，否则她会死的。丈夫听从了她的话，从巫师的花园里偷了莴苣。
+
+当巫师抓住他时，威胁说：“你会为此付出代价的。你的孩子一出生就属于我。”
+
+果然，当孩子出生时，巫师来了，把孩子带走了。他给她取名为“长发公主”，因为是莴苣导致他得到了这个孩子。
+
+长发公主长成了一个非常美丽的女孩。当她12岁时，巫师把她关在森林里的一座塔里。这座塔没有门，没有楼梯，只有顶部的一个小窗户。
+
+当巫师想上塔时，他会喊道：“长发公主，长发公主，放下你的头发！”
+
+长发公主有一头长到脚的深棕色头发。然后她把头发从窗户里扔出去，巫师就顺着头发爬上去。
+
+几年过去了。有一天，一位王子穿过森林。他听到一个声音在唱歌。声音如此美妙，王子停了下来，开始倾听。那是长发公主在唱歌。
+
+王子想进入塔，但他找不到门，也找不到楼梯。他坐在下面，等着巫师来。
+
+当巫师来时，他喊道：“长发公主，长发公主，放下你的头发！”
+
+长发公主把头发从窗户里扔出去，巫师爬了上去。
+
+第二天，王子来了，喊道：“长发公主，长发公主，放下你的头发！”
+
+长发公主把头发从窗户里扔出去，王子爬了上去。
+
+当长发公主看到是一位王子时，她非常惊讶。但王子温柔地对她说，他因为她的声音而爱上了她。长发公主非常感动，允许他每天来看她。
+
+于是王子每天都来，他们相爱了。最后，王子向长发公主承诺，他会救她出来，娶她为妻。
+
+有一天，当巫师来时，长发公主问：“你为什么爬得这么慢？王子爬得快多了。”
+
+巫师听到这话，非常生气。他抓住长发公主，把她带到了一个沙漠，让她独自生活。
+
+然后他去了塔，等着王子。当王子来喊：“长发公主，长发公主，放下你的头发！”时，巫师把头发从窗户里扔了出去。王子爬了上去，但当他到达顶部时，巫师在那里。“你再也没有长发公主了，”他说，“你再也见不到她了！”
+
+王子非常伤心，从窗户跳了出去。他落在下面的荆棘丛中，失明了。
+
+失明和孤独的王子在森林里流浪。他吃水果，喝小溪里的水。他寻找长发公主，但找不到她。
+
+几年过去了。有一天，他来到了长发公主居住的沙漠。长发公主听到了他的声音，认出了他。她哭得很厉害，眼泪掉进了他的眼睛里。突然，他又能看见了。
+
+他们都非常高兴，一起回到了王子的王国。在那里，他们结婚了，幸福地生活到生命的尽头。
+}
+
+\chapter{第八章}
+
+\begin{original}
+Hansel und Gretel
+
+Es war einmal ein armer Holzhacker, der hatte einen weiblichen Menschen, der war seine Frau, und zwei Kinder: ein Junge hieß Hansel und ein Mädchen hieß Gretel. Er hatte wenig zu essen, und einmal, als es großes Hungert in der Gegend gab, konnte er selbst nicht mehr genug für seine Familie finden.
+
+Eines Abends, als er sich in sein Bett legte, sagte er zu seiner Frau: "Ich weiß nicht, was wir tun sollen, ich habe keine Kraft mehr, die Kinder zu ernähren.
+
+"Weißt du was," sagte die Frau, "morgen früh gehen wir mit den Kindern in den tiefen Wald, bauen dort ein Feuer auf, geben ihnen ein Stück Brot, und gehen wir dann ans Holz fällen und lassen sie allein sitzen. Sie finden den Weg nicht zurück, und so werden wir uns von ihnen befreien."
+
+"Nein," sagte der Mann, "ich kann das nicht tun. Wie soll ich es wagen, meine eigenen Kinder in den Wald zu lassen, wo die wilden Tiere sie fressen werden?"
+
+"Du dumm Kopf," sagte die Frau, "wenn du sie nicht fortlässt, werden wir alle vier verhungern."
+
+Nach langem Streiten gab der Mann nach, weil er dachte, dass es vielleicht besser wäre, wenn nur die Kinder sterben würden, und er und seine Frau am Leben blieben.
+
+Hansel und Gretel hatten nicht geschlafen, sondern hatten alles gehört, was ihre Eltern gesagt hatten. Gretel weinte sehr, und sagte zu Hansel: "Was soll uns nun geschehen?"
+
+"Sei still, Gretel," sagte Hansel, "ich werde schon einen Weg finden."
+
+Und als die Eltern eingeschlafen waren, stand Hansel auf, zog sich die Jacke an, und ging hinaus, indem er die hintere Tür vorsichtig öffnete. Der Mond schien hell, und die Nüsse, die er sich während des Tages gesammelt hatte, lagen noch auf dem Hof.
+
+Hansel bückte sich und füllte seine Taschen voller Nüsse. Dann kehrte er zurück und sagte zu Gretel: "Sei still und schlafe ruhig, Gretel, der Himmel wird uns nicht verlassen."
+
+Und dann legte er sich nieder und schlief.
+
+Am nächsten Morgen, als es noch dunkel war, weckten sie die Kinder. Die Frau gab jedem ein kleines Stück Brot und sagte: "Das soll euch den ganzen Tag halten."
+
+Hansel nahm seine Taschen mit den Nüssen, und Gretel nahm ihr Stück Brot. Dann gingen sie alle zusammen in den Wald.
+
+Als sie mitten im Wald waren, sagte der Mann: "Jetzt bauen wir ein Feuer, damit ihr euch wärmen könnt."
+
+Hansel und Gretel setzten sich neben das Feuer, und die Eltern gingen weg, als ob sie ans Holz fällen wollten. Aber sie ließen die Kinder allein.
+
+Hansel hatte während des Weges kleine Steine aus seiner Tasche genommen und sie hinter sich auf den Weg geworfen. So wusste er den Weg zurück.
+
+Nach einiger Zeit, als es Mittag wurde, aßen die Kinder ihr Stück Brot. Dann saßen sie da und warteten auf ihre Eltern, aber sie kamen nicht zurück.
+
+Als die Sonne unterging, sagte Hansel zu Gretel: "Jetzt werden wir nach Hause gehen."
+
+Und sie folgten den Steinen zurück, die Hansel hinter sich geworfen hatte. Am Abend erreichten sie das Haus.
+
+Die Eltern waren überrascht, aber die Frau sagte: "Du dummer Hansel, warum bist du nicht bleibend? Wir haben dich gesucht."
+
+Und so vergingen einige Tage. Aber bald wurde das Brot wieder knapp, und die Frau sagte wieder zum Mann: "Morgen früh müssen wir die Kinder wieder in den Wald bringen, aber diesmal weiter hinein, damit sie nicht wiederfinden können."
+
+Der Mann widerstrebte, aber die Frau war hart und drohte ihm, so dass er wieder zustimmte.
+
+Hansel und Gretel hörten es wieder, und Gretel weinte. Aber Hansel sagte: "Sei still, Gretel, ich werde schon einen Weg finden."
+
+Und als die Eltern eingeschlafen waren, stand Hansel auf, um Steine zu sammeln. Aber die Frau hatte die Tür verschlossen, so dass er nicht hinaus konnte.
+
+"Nicht schlecht," sagte Hansel, "ich habe ja noch meine Nüsse, und morgen werde ich Brotkrümel hinter mir werfen."
+
+Am nächsten Morgen gab die Frau jedem ein kleines Stück Brot, das war noch kleiner als das erste Mal.
+
+Hansel nahm sein Brot und sagte zu sich: "Ich werde dieses Brot in Krümeln brechen und sie hinter mir werfen, so dass ich den Weg zurückfinden kann."
+
+Und so taten sie. Der Mann führte die Kinder tiefer in den Wald, so tief, dass sie die letzte Spur von Haus nicht mehr sehen konnten.
+
+Dann baute er wieder ein Feuer, und die Eltern gingen weg, als ob sie ans Holz fällen wollten.
+
+Hansel zerbrach sein Brot in Krümeln und warf sie hinter sich. "Das ist besser als Steine," sagte er zu Gretel, "die Vögel können es nicht wegfressen."
+
+Aber die Vögel kamen und fraßen die Krümel auf, so dass bald keine Spur mehr davon war.
+
+Als die Sonne unterging, wollten Hansel und Gretel nach Hause gehen, aber sie konnten keine Krümel finden. Sie waren verloren.
+
+Sie wanderten den ganzen Abend und die ganze Nacht über, aber sie konnten den Weg nicht finden. Am nächsten Morgen waren sie müde und hungrig.
+
+Sie fanden einen kleinen Bach und tranken etwas Wasser. Dann gingen sie weiter, und nach einigen Stunden kamen sie zu einem großen Haus. Das Haus war aus Brot gemacht, das Dach war aus Kuchen, und die Fenster waren aus Zucker.
+
+"Oh," rief Gretel, "wie schön! Das Haus ist aus Essen gemacht!"
+
+Und sie rannten zu dem Haus und fingen an, von dem Dach zu essen.
+
+"Gretel," sagte Hansel, "warte, ich will dir von dem Dach etwas geben."
+
+Und er kletterte auf das Dach und nahm ein Stück Kuchen ab.
+
+Plötzlich hörten sie eine Stimme, die rief: "Knusper, knasper, knaus, wer knabbert an meinem Haus?"
+
+Hansel und Gretel erschraken, aber die Stimme kam von innen, und sie gingen hinein.
+
+In dem Haus saß eine alte Frau, die war eine Hexe. Sie hatte große, rote Augen, die starrten, und eine Nase, die bis auf den Mund reichte.
+
+"Ach, du kleine Kinder," sagte die Hexe freundlich, "was führt euch hierher? Kommt herein, ich werde euch etwas zu essen geben."
+
+Aber die Hexe wollte die Kinder fressen. Sie hatte das Haus aus Essen gebaut, um Kinder anzulocken.
+
+Sie nahm Hansel und setzte ihn in ein Käfig, und Gretel musste für sie arbeiten.
+
+Jeden Tag kochte die Hexe Grießbrei für Hansel, um ihn dick zu machen, damit sie ihn fressen konnte. Aber Hansel hielt immer einen kleinen Knochen vor die Hexe, wenn sie ihn fühlen wollte, so dass sie dachte, er wäre noch dünn.
+
+Nach einiger Zeit, als die Hexe gedachte, dass Hansel nun dick genug sei, sagte sie zu Gretel: "Heute wird Hansel geschlachtet und gekocht. Gib mir den Kessel und fülle ihn mit Wasser."
+
+Gretel weinte, aber sie musste tun, was die Hexe sagte.
+
+Als der Kessel voll war, sagte die Hexe: "Jetzt muss ich die Temperatur prüfen. Steig in den Kessel und sag mir, ob das Wasser heiß genug ist."
+
+Aber Gretel war klug, und sagte: "Ich weiß nicht, wie das geht. Du musst mir zeigen."
+
+Die Hexe stieg auf einen Stuhl und beugte sich über den Kessel, um die Temperatur zu prüfen. Plötzlich schob Gretel den Stuhl weg, und die Hexe fiel in den Kessel. Gretel schloss den Deckel zu, und die Hexe verbrannte.
+
+Dann öffnete Gretel den Käfig und befreite Hansel. Sie waren beide sehr froh, dass sie die Hexe los waren.
+
+Hansel suchte das Haus durch, und fand Schätze und Gold. Sie füllten ihre Taschen mit Gold, und gingen dann fort.
+
+Nach einigen Tagen erreichten sie einen Bach, der zum Haus führte. Da saßen die Vögel und sangen: "Hansel und Gretel, geht heim, eure Eltern warten."
+
+Und so fanden sie den Weg zurück nach Hause.
+
+Die Eltern waren sehr froh, als sie die Kinder wiedersahen, und sie waren alle froh, dass die Hexe tot war.
+
+Hansel und Gretel gaben den Eltern das Gold, und so hatten sie genug zu essen und zu trinken, und lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\tr\t\translation{
+汉塞尔与格莱特
+
+从前有一个贫穷的樵夫，他有一个妻子和两个孩子：一个男孩名叫汉塞尔，一个女孩名叫格莱特。他的食物很少，有一次，当这个地区发生了严重的饥荒时，他甚至无法为家人找到足够的食物。
+
+一天晚上，当他躺在床上时，他对妻子说：“我不知道我们该怎么办，我已经没有力量养活孩子们了。
+
+”“你知道吗，”妻子说，“明天早上我们带着孩子们到森林深处，在那里生一堆火，给他们一块面包，然后我们去砍柴，让他们独自坐着。他们找不到回来的路，这样我们就能摆脱他们了。
+
+”“不，”男人说，“我不能那样做。我怎么能忍心把自己的孩子留在森林里，让野兽吃掉他们呢？”
+
+“你这个笨蛋，”妻子说，“如果你不把他们送走，我们四个都会饿死的。”
+
+经过长时间的争论，男人让步了，因为他认为如果只有孩子们死了，而他和妻子还活着，可能会更好。
+
+汉塞尔和格莱特没有睡着，而是听到了父母所说的一切。格莱特哭得很厉害，对汉塞尔说：“我们现在该怎么办？”
+
+“安静，格莱特，”汉塞尔说，“我会找到办法的。”
+
+当父母睡着后，汉塞尔起床，穿上外套，小心翼翼地打开后门走了出去。月亮明亮地照耀着，他白天收集的坚果还躺在院子里。
+
+汉塞尔弯下腰，把口袋装满了坚果。然后他回来对格莱特说：“安静，安心睡觉吧，格莱特，上帝不会抛弃我们的。”
+
+然后他躺下睡着了。
+
+第二天早上，天还没亮，他们就叫醒了孩子们。女人给了每个孩子一小块面包，说：“这够你们吃一整天了。”
+
+汉塞尔拿着装满坚果的口袋，格莱特拿着她的面包。然后他们一起走进了森林。
+
+当他们在森林深处时，男人说：“现在我们生火，让你们取暖。”
+
+汉塞尔和格莱特坐在火边，父母走开了，好像要去砍柴。但他们把孩子们单独留下了。
+
+汉塞尔在路上从口袋里拿出小石子，扔在身后的路上。这样他就知道回来的路了。
+
+过了一段时间，到了中午，孩子们吃了他们的面包。然后他们坐在那里等父母，但他们没有回来。
+
+当太阳落山时，汉塞尔对格莱特说：“现在我们回家吧。”
+
+他们跟着汉塞尔扔在身后的石头走回去。晚上，他们到达了家。
+
+父母很惊讶，但妻子说：“你这个笨汉塞尔，你为什么不留下？我们找过你。”
+
+就这样过了几天。但很快面包又不够了，妻子又对男人说：“明天早上我们必须把孩子们再带到森林里去，但这次要更深入，这样他们就找不到回来的路了。”
+
+男人反对，但妻子很坚决，威胁他，所以他再次同意了。
+
+汉塞尔和格莱特又听到了，格莱特哭了。但汉塞尔说：“安静，格莱特，我会找到办法的。”
+
+当父母睡着后，汉塞尔起床去捡石头。但妻子把门锁上了，所以他不能出去。
+
+“没关系，”汉塞尔说，“我还有我的坚果，明天我会把面包屑扔在身后。”
+
+第二天早上，女人给了每个孩子一小块面包，比第一次更小。
+
+汉塞尔接过面包，心里想：“我会把这块面包掰成碎屑，扔在身后，这样我就能找到回来的路了。”
+
+他们就这样做了。男人把孩子们带到森林深处，深到他们再也看不到家的最后一丝痕迹。
+
+然后他又生了一堆火，父母走开了，好像要去砍柴。
+
+汉塞尔把面包掰成碎屑，扔在身后。“这比石头好，”他对格莱特说，“鸟不会把它吃掉。”
+
+但是鸟儿来了，把碎屑吃掉了，很快就没有痕迹了。
+
+当太阳落山时，汉塞尔和格莱特想回家，但他们找不到碎屑。他们迷路了。
+
+他们走了一整夜，还是找不到路。第二天早上，他们又累又饿。
+
+他们找到了一条小溪，喝了点水。然后他们继续走，几个小时后，他们来到了一座大房子前。这所房子是用面包做的，屋顶是用蛋糕做的，窗户是用糖做的。
+
+“哦，”格莱特喊道，“多美啊！这房子是用食物做的！”
+
+他们跑到房子前，开始吃屋顶。
+
+“格莱特，”汉塞尔说，“等一下，我给你从屋顶上拿点东西。”
+
+他爬上屋顶，取下一块蛋糕。
+
+突然，他们听到一个声音喊道：“噼啪，噼啪，噼啪，是谁在啃我的房子？”
+
+汉塞尔和格莱特吓了一跳，但声音是从里面传来的，他们走了进去。
+
+房子里坐着一个老妇人，她是一个女巫。她有一双又大又红的眼睛，直直地盯着，还有一个长到下巴的鼻子。
+
+“哦，你们这些小孩子，”女巫友好地说，“是什么把你们带到这里来的？进来吧，我给你们吃点东西。”
+
+但女巫想把孩子们吃掉。她把房子建成食物的样子，是为了引诱孩子。
+
+她把汉塞尔放进一个笼子里，格莱特不得不为她工作。
+
+女巫每天都给汉塞尔煮麦片粥，让他变胖，这样她就可以吃他了。但每次女巫想摸他的时候，汉塞尔总是把一根小骨头放在她面前，让她以为他还很瘦。
+
+过了一段时间，当女巫认为汉塞尔现在已经够胖了，她对格莱特说：“今天汉塞尔要被宰杀和烹饪。把锅给我，装满水。”
+
+格莱特哭了，但她不得不按照女巫的话去做。
+
+当锅装满后，女巫说：“现在我必须检查温度。爬到锅里，告诉我水是否足够热。”
+
+但格莱特很聪明，她说：“我不知道怎么做。你必须给我示范。”
+
+女巫爬上椅子，俯身在锅上检查温度。突然，格莱特把椅子推开，女巫掉进了锅里。格莱特盖上了盖子，女巫被烧死了。
+
+然后格莱特打开笼子，释放了汉塞尔。他们都很高兴摆脱了女巫。
+
+汉塞尔搜查了房子，找到了宝藏和金子。他们把口袋装满了金子，然后离开了。
+
+几天后，他们到达了一条通向家的小溪。鸟儿坐在那里唱道：“汉塞尔和格莱特，回家吧，你们的父母在等你们。”
+
+就这样，他们找到了回家的路。
+
+当父母再次见到孩子们时，非常高兴，他们都很高兴女巫死了。
+
+汉塞尔和格莱特把金子给了父母，这样他们就有足够的食物和水了，幸福地生活到了生命的尽头。
+}
+
+\chapter{第九章}
+
+\begin{original}
+Die Bremer Stadtmusikanten
+
+Es war einmal ein Mann, der hatte einen Esel, der jahrelang ihm treu gedient hatte, aber jetzt alt war und nicht mehr arbeiten konnte. Der Mann dachte: "Ich will den Esel wegbringen und ihn im Wald lassen, damit er dort stirbt."
+
+Aber der Esel hörte es, und als es dunkel wurde, lief er fort. Er wollte nach Bremen gehen, um dort Stadtmusikant zu werden.
+
+Auf dem Weg traf er einen Hund an, der an einem Baum lag und krächzte. "Warum krächzt du so, Hund?" fragte der Esel.
+
+"Ach," sagte der Hund, "ich bin alt und kann nicht mehr jagen. Mein Herr will mich töten." "Komm mit mir nach Bremen," sagte der Esel, "wir werden dort Stadtmusikanten. Du kannst Trommel spielen."
+
+Der Hund war einverstanden, und sie gingen weiter.
+
+Später trafen sie eine Katze an, die auf einem Zaun saß und miauete. "Warum miaust du so, Katze?" fragte der Esel.
+
+"Ach," sagte die Katze, "ich bin alt und kann nicht mehr jagen. Mein Herr will mich töten." "Komm mit mir nach Bremen," sagte der Esel, "wir werden dort Stadtmusikanten. Du kannst Violine spielen."
+
+Die Katze war einverstanden, und sie gingen weiter.
+
+Schließlich trafen sie einen Hahn an, der auf einem Dache saß und krähte. "Warum krächzt du so früh, Hahn?" fragte der Esel.
+
+"Ach," sagte der Hahn, "mein Herr will mich morgen töten und in der Suppe kochen." "Komm mit mir nach Bremen," sagte der Esel, "wir werden dort Stadtmusikanten. Du kannst Singen."
+
+Der Hahn war einverstanden, und sie gingen weiter.
+
+Als es dunkel wurde, kamen sie zu einem Wald und suchten ein Plätzchen zum Schlafen. Da erblickten sie ein Licht und gingen darauf zu. Es war ein Räuberhaus.
+
+Die Tiere sahen durch das Fenster hinein und sahen Räuber, die da aßen und tranken.
+
+"Wir wollen das Haus besetzen," sagte der Esel, "und die Räuber hinausjagen."
+
+Da taten sie folgendes: Der Esel stellte sich mit den Vorderbeinen auf das Fensterbrett, die Katze kletterte auf den Rücken des Esels, der Hund kletterte auf den Rücken der Katze, und der Hahn setzte sich auf den Kopf des Hundes.
+
+Dann begannen sie alle gleichzeitig zu machen: Der Esel brüllte, der Hund bellte, die Katze miaute, und der Hahn krähte.
+
+Da stießen sie gemeinsam durch das Fenster in die Stube. Die Räuber fürchteten sich sehr, als sie das seltsame Wesen sahen, und rannten hinaus.
+
+Die Tiere setzten sich an den Tisch und aßen und tranken, was die Räuber zurückgelassen hatten.
+
+Nachdem sie satt waren, legten sie sich schlafen. Der Esel lag auf dem Stroh, der Hund lag auf der Türmatte, die Katze lag auf der Herdplatte, und der Hahn setzte sich auf den Balken.
+
+Mitternacht kamen die Räuber wieder. Einer von ihnen ging hinein, um zu sehen, ob es sicher war.
+
+Er wollte ein Licht anzünden, und als er die Augen der Katze sah, die in der Dunkelheit glänzten, dachte er, es wäre ein Kohlefeuer, und hielt ein Streichholz an. Die Katze sprang auf ihn, kratzte und biss ihn.
+
+Der Räuber lief zur Tür, aber der Hund sprang auf ihn und biss ihn.
+
+Der Räuber rannte weiter, aber der Esel traf ihn mit den Hufen.
+
+Und der Hahn flog herunter und kratzte ihn am Kopf.
+
+"Gott sei Dank, dass ich entkommen bin," rief der Räuber, als er draußen war. "Im Hause war ein Monster, das mir die Augen rauskratzt, ein Wolf, der mich biss, ein Bär, der mich mit den Klauen schlug, und ein Henker, der mich am Kopf schlug."
+
+Die Räuber wagten es nie wieder, ins Haus zu gehen, und die Bremer Stadtmusikanten blieben dort für immer.
+\end{original}
+
+	r\t\translation{
+不莱梅的城市乐手
+
+从前有一个人，他有一头驴，这头驴多年来一直忠心耿耿地为他工作，但现在它老了，不能再工作了。这个人想：“我要把这头驴赶走，把它留在森林里，让它在那里死去。”
+
+但驴听到了，当夜幕降临时，它逃跑了。它想去不莱梅，在那里成为一名城市乐手。
+
+在路上，它遇到了一只狗，这只狗躺在一棵树上，发出呜咽声。“你为什么这样呜咽，狗？”驴问道。
+
+“唉，”狗说，“我老了，不能再打猎了。我的主人想杀了我。”“跟我去不莱梅吧，”驴说，“我们会在那里成为城市乐手。你可以打鼓。”
+
+狗同意了，他们继续走。
+
+后来，他们遇到了一只猫，这只猫坐在篱笆上，喵喵叫着。“你为什么这样喵喵叫，猫？”驴问道。
+
+“唉，”猫说，“我老了，不能再打猎了。我的主人想杀了我。”“跟我去不莱梅吧，”驴说，“我们会在那里成为城市乐手。你可以拉小提琴。”
+
+猫同意了，他们继续走。
+
+最后，他们遇到了一只公鸡，这只公鸡坐在屋顶上，啼叫着。“你为什么这么早啼叫，公鸡？”驴问道。
+
+“唉，”公鸡说，“我的主人明天要杀了我，把我放在汤里煮。”“跟我去不莱梅吧，”驴说，“我们会在那里成为城市乐手。你可以唱歌。”
+
+公鸡同意了，他们继续走。
+
+当夜幕降临时，他们来到了一片森林，寻找一个睡觉的地方。他们看到了一盏灯，便朝它走去。那是一个强盗的房子。
+
+动物们透过窗户往里看，看到强盗们在那里吃喝。
+
+“我们要占领这所房子，”驴说，“把强盗们赶出去。”
+
+于是他们做了以下的事情：驴把前腿放在窗台上，猫爬上驴的背，狗爬上猫的背，公鸡坐在狗的头上。
+
+然后它们同时开始做：驴叫，狗吠，猫喵喵叫，公鸡啼叫。
+
+他们一起冲进了房间的窗户。强盗们看到这个奇怪的生物时，非常害怕，跑了出去。
+
+动物们坐在桌子旁，吃着喝着强盗们留下的东西。
+
+他们吃饱后，就去睡觉了。驴躺在稻草上，狗躺在门垫上，猫躺在炉台上，公鸡坐在横梁上。
+
+午夜时分，强盗们回来了。其中一个人进去看看是否安全。
+
+他想点一盏灯，当他看到猫的眼睛在黑暗中发光时，他以为那是一堆炭火，就把火柴凑了上去。猫跳到他身上，抓他咬他。
+
+强盗跑到门口，但狗跳到他身上咬他。
+
+强盗继续跑，但驴用蹄子踢他。
+
+公鸡飞下来，啄他的头。
+
+“谢天谢地，我逃脱了，”强盗跑到外面时喊道。“房子里有一个怪物，它抓我的眼睛，一只狼咬我，一只熊用爪子打我，还有一个刽子手打我的头。”
+
+强盗们再也不敢走进那所房子，而不莱梅的城市乐手们永远留在了那里。
+}
+
+\chapter{第十章}
+
+\begin{original}
+Rumpelstilzchen
+
+Es war einmal ein Müller, der hatte eine schöne Tochter. Er war sehr arm, aber er gab sich vor, reich zu sein.
+
+Eines Tages traf er den König und sagte: "Meine Tochter kann Stroh zu Gold spinnen."
+
+Der König war sehr erstaunt und sagte: "Bring deine Tochter morgen zu mir. Ich werde ihr ein Zimmer voll Stroh geben, und wenn sie es in einer Nacht zu Gold spinnt, soll sie meine Königin werden."
+
+Die Müllerstochter weinte sehr, als sie das hörte, denn sie konnte Stroh nicht zu Gold spinnen.
+
+Aber als sie allein im Zimmer war, kam ein kleiner Mann und fragte: "Warum weinst du, Mädel?"
+
+"Ich muss Stroh zu Gold spinnen," sagte sie, "sonst sterbe ich."
+
+"Ich werde dir helfen," sagte der Mann, "wenn du mir etwas gibst."
+
+"Was willst du?" fragte die Mädchen.
+
+"Dein kleines Ring," sagte der Mann.
+
+Die Mädchen gab ihm den Ring, und der Mann spann das Stroh in einer Nacht zu Gold.
+
+Der König war sehr erstaunt, als er das Gold sah. Aber er war gierig und wollte mehr. Er gab der Mädchen ein größeres Zimmer voll Stroh und sagte: "Wenn du dies in einer Nacht zu Gold spinnst, sollst du meine Königin werden."
+
+Die Mädchen weinte wieder, und wieder kam der kleine Mann. "Was willst du diesmal?" fragte er.
+
+"Meine Kette," sagte die Mädchen.
+
+Die Mädchen gab ihm die Kette, und der Mann spann das Stroh wieder zu Gold.
+
+Der König war noch gieriger und sagte: "Heute Nacht sollst du in einem größeren Zimmer spinnen, das bis zum Rand mit Stroh gefüllt ist. Wenn du dies zu Gold spinnst, wirst du meine Königin, sonst wirst du hingerichtet."
+
+Die Mädchen weinte sehr, und wieder kam der kleine Mann. "Was willst du diesmal?" fragte er.
+
+"Ich habe nichts mehr zu geben," sagte die Mädchen.
+
+"Dann sollst du mir dein erstes Kind geben, wenn du Königin bist," sagte der Mann.
+
+Die Mädchen versprach es ihm, denn sie dachte, er werde es nicht einfordern, und der Mann spann das Stroh zu Gold.
+
+Der König heiratete die Mädchen, und sie wurde Königin. Nach einiger Zeit hatte sie ein Kind.
+
+Da kam der kleine Mann und verlangte das Kind. Die Königin weinte sehr und bat ihn, es zu lassen.
+
+"Ich will dir ein Jahr Zeit geben," sagte der Mann, "um meinen Namen zu erraten. Wenn du ihn in dieser Zeit errätst, sollst du das Kind behalten."
+
+Die Königin schickte Boten aus, um den Namen des Mannes herauszufinden. Sie fragten alle Menschen, die sie trafen, nach ihrem Namen.
+
+Am letzten Tag des Jahres kam der kleine Mann wieder. "Hast du meinen Namen erraten?" fragte er.
+
+"Ist dein Name Hans?" fragte die Königin.
+
+"Nein," sagte der Mann.
+
+"Ist dein Name Fritz?" fragte die Königin.
+
+"Nein," sagte der Mann.
+
+"Ist dein Name Rumpelstilzchen?" fragte die Königin.
+
+Da wurde der kleine Mann sehr wütend und schrie: "Du hast meinen Namen erraten!" Und dann stieß er mit dem Füß auf den Boden, dass er bis zum Leib hinein sank. Und das war das Ende von Rumpelstilzchen.
+\end{original}
+
+	r\t\translation{
+侏儒妖
+
+从前有一个磨坊主，他有一个美丽的女儿。他很穷，但他假装自己很富有。
+
+有一天，他遇到了国王，说：“我的女儿可以把稻草纺成金子。”
+
+国王非常惊讶，说：“明天把你的女儿带来见我。我会给她一个装满稻草的房间，如果她能在一夜之间把它纺成金子，她将成为我的王后。”
+
+磨坊主的女儿听到这话后哭得很厉害，因为她不能把稻草纺成金子。
+
+但当她一个人在房间里时，来了一个小矮人，问：“你为什么哭，小姑娘？”
+
+“我必须把稻草纺成金子，”她说，“否则我就会死。”
+
+“我会帮你，”小矮人说，“如果你给我一些东西。”
+
+“你想要什么？”女孩问。
+
+“你的小戒指，”小矮人说。
+
+女孩给了他戒指，小矮人在一夜之间把稻草纺成了金子。
+
+国王看到金子时非常惊讶。但他很贪婪，想要更多。他给了女孩一个更大的装满稻草的房间，说：“如果你能在一夜之间把它纺成金子，你将成为我的王后。”
+
+女孩又哭了，小矮人又出现了。“这次你想要什么？”他问。
+
+“我的项链，”女孩说。
+
+女孩给了他项链，小矮人又把稻草纺成了金子。
+
+国王更加贪婪，说：“今晚你要在一个更大的房间里纺，这个房间装满了稻草，直到边缘。如果你把它纺成金子，你将成为我的王后，否则你将被处决。”
+
+女孩哭得很厉害，小矮人又出现了。“这次你想要什么？”他问。
+
+“我没有什么可给的了，”女孩说。
+
+“那么当你成为王后时，你要把你的第一个孩子给我，”小矮人说。
+
+女孩答应了他，因为她认为他不会要求的，小矮人把稻草纺成了金子。
+
+国王娶了女孩，她成为了王后。过了一段时间，她有了一个孩子。
+
+这时小矮人来了，要求得到孩子。王后哭得很厉害，恳求他不要拿走。
+
+“我给你一年的时间，”小矮人说，“来猜我的名字。如果你在这段时间内猜对了，你可以留下孩子。”
+
+王后派出使者去找出小矮人的名字。他们问所有遇到的人，他们的名字是什么。
+
+在一年的最后一天，小矮人又来了。“你猜出我的名字了吗？”他问。
+
+“你的名字是汉斯吗？”王后问。
+
+“不，”小矮人说。
+
+“你的名字是弗里茨吗？”王后问。
+
+“不，”小矮人说。
+
+“你的名字是侏儒妖吗？”王后问。
+
+小矮人非常生气，喊道：“你猜对了我的名字！”然后他用脚踩在地上，一直陷到腰部。侏儒妖就这样结束了。
+}
+
+\chapter{第十一章}
+
+\begin{original}
+Rotkäppchen
+
+Es war einmal ein kleines Mädchen, das hatte eine rotes Käppchen, das ihr Großmutter geschenkt hatte. Deshalb hießen sie alle Rotkäppchen.
+
+Eines Tages sagte ihre Mutter: "Bring diesem Kuchen und diese Flasche Wein deiner Großmutter, sie ist krank und schwach. Bleib auf dem richtigen Weg, und sprich nicht mit Fremden."
+
+Rotkäppchen versprach es, und ging auf den Weg.
+
+Auf dem Weg durch den Wald traf sie einen Wolf. "Guten Tag, Rotkäppchen," sagte der Wolf. "Wohin gehst du so früh?"
+
+"Zu meiner Großmutter," sagte Rotkäppchen. "Ich bring ihr einen Kuchen und Wein, weil sie krank ist."
+
+"Und wo wohnt deine Großmutter?" fragte der Wolf.
+
+"Einen kleinen Weg weiter im Wald, hinter drei großen Eichen," sagte Rotkäppchen.
+
+"Du siehst, wie schön die Blumen im Wald sind," sagte der Wolf. "Warum gehst du nicht ein bisschen spazieren und sammelst Blumen für deine Großmutter?"
+
+Rotkäppchen dachte, das wäre eine gute Idee, und verließ den Weg, um Blumen zu sammeln.
+
+Der Wolf lief aber schnell zum Haus der Großmutter, klopfte an die Tür und sagte: "Es ist mir, Rotkäppchen. Ich bring dir Kuchen und Wein."
+
+"Drehe am Knauf und komm herein," rief die Großmutter. "Ich bin zu schwach, um aufzustehen."
+
+Der Wolf drehte am Knauf, ging herein und fraß die alte Frau.
+
+Dann zog er ihre Kleider an, legte sich in ihr Bett und zog die Decke über sich.
+
+Rotkäppchen sammelte viele Blumen und dann ging es weiter zu der Großmutter.
+
+Es klopfte an die Tür, aber niemand antwortete. Dann drehte es am Knauf und ging herein.
+
+"Großmutter, warum hast du so große Ohren?" fragte Rotkäppchen.
+
+"Damit ich dich besser hören kann, mein Kind," antwortete der Wolf.
+
+"Warum hast du so große Augen?" fragte Rotkäppchen.
+
+"Damit ich dich besser sehen kann, mein Kind," antwortete der Wolf.
+
+"Warum hast du so große Zähne?" fragte Rotkäppchen.
+
+"Damit ich dich besser fressen kann!" rief der Wolf und wollte Rotkäppchen fressen.
+
+Aber gerade in diesem Moment kam ein Jäger vorbei, der die Störung hörte. Er stieß die Tür auf und schoss den Wolf tot.
+
+Dann schnitt er den Wolf auf, und da kam die Großmutter lebendig heraus. Rotkäppchen war sehr froh, und alle gingen glücklich nach Hause.
+\end{original}
+
+	r\t\translation{
+小红帽
+
+从前有一个小女孩，她有一顶红色的小帽子，是她的祖母送给她的。因此，大家都叫她小红帽。
+
+有一天，她的妈妈说：“把这个蛋糕和这瓶酒带给你的祖母，她生病了，身体很虚弱。要走正确的路，不要和陌生人说话。”
+
+小红帽答应了，然后出发了。
+
+在穿过森林的路上，她遇到了一只狼。“你好，小红帽，”狼说。“你这么早要去哪里？”
+
+“去我祖母家，”小红帽说。“我给她带了蛋糕和酒，因为她生病了。”
+
+“你的祖母住在哪里？”狼问。
+
+“在森林里再走一小段路，在三棵大橡树后面，”小红帽说。
+
+“你看，森林里的花多美啊，”狼说。“你为什么不散步一会儿，为你的祖母采些花呢？”
+
+小红帽觉得这是个好主意，于是离开小路去采花。
+
+但狼迅速跑到了祖母家，敲门说：“是我，小红帽。我给你带来了蛋糕和酒。”
+
+“转动门把手进来，”祖母喊道。“我太虚弱了，起不来。”
+
+狼转动门把手，走了进去，吃掉了老太太。
+
+然后他穿上她的衣服，躺在床上，用被子盖住自己。
+
+小红帽采了许多花，然后继续前往祖母家。
+
+她敲门，但没有人回答。然后她转动门把手，走了进去。
+
+“祖母，你为什么有这么大的耳朵？”小红帽问。
+
+“这样我就能更好地听到你说话，我的孩子，”狼回答。
+
+“你为什么有这么大的眼睛？”小红帽问。
+
+“这样我就能更好地看到你，我的孩子，”狼回答。
+
+“你为什么有这么大的牙齿？”小红帽问。
+
+“这样我就能更好地吃掉你！”狼喊道，想要吃掉小红帽。
+
+但就在这时，一个猎人经过，听到了骚乱。他推开了门，开枪打死了狼。
+
+然后他剖开了狼的肚子，祖母活着走了出来。小红帽非常高兴，大家都高兴地回家了。
+}
+
+\chapter{第十二章}
+
+\begin{original}
+Schneewittchen und die sieben Zwerge
+
+Es war einmal ein König und eine Königin, die hatten keine Kinder. Eines Tages sagte die Königin: "Ich wünsche mir ein Kind, so weiß wie Schnee, so rot wie Blut und so schwarz wie Ebenholz."
+
+Und tatsächlich, bald hatte sie ein Mädchen, das so weiß wie Schnee, so rot wie Blut und so schwarz wie Ebenholz war. Sie nannten es Schneewittchen.
+
+Aber als das Mädchen geboren war, starb die Königin.
+
+Nach einiger Zeit heiratete der König eine andere Frau. Sie war sehr schön, aber auch sehr eitel. Sie hatte einen Spiegel, zu dem sie jeden Tag sagte:
+
+"Spiegel, Spiegel an der Wand, wer ist die Schönste im ganzen Land?"
+
+Und der Spiegel antwortete immer:
+
+"Du bist die Schönste im ganzen Land, Königin."
+
+Aber als Schneewittchen sieben Jahre alt war, wurde sie so schön, dass der Spiegel sagte:
+
+"Schneewittchen ist schöner als du, Königin."
+
+Die Königin wurde sehr wütend und verlangte, dass ihr Jäger Schneewittchen in den Wald bringen und töten soll.
+
+Der Jäger brachte Schneewittchen in den Wald, aber er konnte es nicht töten. Er ließ es laufen, und sagte der Königin, dass es von wilden Tieren gefressen worden sei.
+
+Schneewittchen lief durch den Wald, bis es zu einem kleinen Haus kam. Das Haus gehörte sieben Zwergen.
+
+Sie gingen hinein, und fanden sieben Teller, sieben Gläser und sieben Betten.
+
+Schneewittchen aß etwas von jedem Teller, trank etwas aus jedem Glas und legte sich in das siebte Bett, wo es einschlief.
+
+Abends kamen die Zwerge nach Hause. Sie waren sehr erstaunt, als sie Schneewittchen sahen, aber sie liebten es sofort.
+
+"Du kannst bei uns bleiben," sagten sie zu ihm, "solange du uns hilfst, das Haus sauber zu halten."
+
+Schneewittchen war einverstanden.
+
+Die Königin fragte wieder den Spiegel:
+
+"Spiegel, Spiegel an der Wand, wer ist die Schönste im ganzen Land?"
+
+Und der Spiegel antwortete:
+
+"Schneewittchen ist schöner als du, Königin, er lebt bei den sieben Zwergen."
+
+Die Königin war noch wütender und verkleidete sich als eine alte Krämerin. Sie ging zum Haus der Zwerge und rief:
+
+"Schöne Spindeln, feine Spindeln!"
+
+Schneewittchen öffnete die Tür, und die Alte sagte: "Lass mich dir eine Spindel zeigen."
+
+Als Schneewittchen die Spindel berührte, sank es ins Koma.
+
+Die Zwerge fanden es und waren sehr traurig. Sie legten es in ein Glasbett und setzten es vor ihre Tür.
+
+Die Königin fragte wieder den Spiegel, und er antwortete wieder, dass Schneewittchen die Schönste sei.
+
+Diesmal verkleidete sie sich als eine alte Großmutter und brachte einen vergifteten Apfel mit.
+
+Schneewittchen wollte nicht den Apfel essen, aber die Alte trug es an, und schließlich biss es einen Bissen von dem Apfel. Sofort sank es ins Koma.
+
+Die Zwerge waren sehr traurig und legten es wieder in das Glasbett.
+
+Eines Tages kam ein Prinz vorbei und sah Schneewittchen im Glasbett. Er war so verliebt in es, dass er die Zwerge bat, ihm das Glasbett zu geben.
+
+Die Zwerge stimmten zu, und als die Diener das Glasbett trugen, stolperten sie über einen Stein. Der Apfelbissen flog aus dem Mund von Schneewittchen, und es erwachte.
+
+Der Prinz heiratete Schneewittchen, und sie lebten glücklich bis ans Ende ihrer Tage.
+
+Die Königin wurde eingeladen zur Hochzeit. Als sie sah, dass Schneewittchen am Leben war, starb sie vor Wut.
+\end{original}
+
+	r\t\translation{
+白雪公主与七个小矮人
+
+从前有一位国王和王后，他们没有孩子。有一天，王后说：“我希望有一个孩子，像雪一样白，像血一样红，像乌木一样黑。”
+
+果然，不久她就有了一个女孩，她像雪一样白，像血一样红，像乌木一样黑。他们叫她白雪公主。
+
+但是当女孩出生时，王后去世了。
+
+过了一段时间，国王娶了另一个妻子。她很漂亮，但也很虚荣。她有一面镜子，每天对它说：
+
+“镜子，镜子，墙上的镜子，谁是全国最美丽的人？”
+
+镜子总是回答：
+
+“你是全国最美丽的人，王后。”
+
+但当白雪公主七岁时，她变得如此美丽，以至于镜子说：
+
+“白雪公主比你更美丽，王后。”
+
+王后非常生气，命令她的猎人把白雪公主带到森林里杀死。
+
+猎人把白雪公主带到森林里，但他无法杀死她。他让她跑掉，并告诉王后她被野兽吃掉了。
+
+白雪公主穿过森林，直到她来到一个小房子前。这所房子属于七个小矮人。
+
+她走进去，发现七个盘子，七个杯子和七张床。
+
+白雪公主从每个盘子里吃了一点，从每个杯子里喝了一点，然后躺在第七张床上睡着了。
+
+晚上，小矮人们回到家。当他们看到白雪公主时，他们非常惊讶，但他们立刻就喜欢上了她。
+
+“你可以和我们住在一起，”他们对她说，“只要你帮助我们保持房子干净。”
+
+白雪公主同意了。
+
+王后再次问镜子：
+
+“镜子，镜子，墙上的镜子，谁是全国最美丽的人？”
+
+镜子回答：
+
+“白雪公主比你更美丽，王后，她和七个小矮人住在一起。”
+
+王后更加生气，她装扮成一个老商人。她走到小矮人的房子前，喊道：
+
+“漂亮的纺锤，精致的纺锤！”
+
+白雪公主打开门，老妇人说：“让我给你看一个纺锤。”
+
+当白雪公主触摸纺锤时，她陷入了昏迷。
+
+小矮人们发现了她，非常难过。他们把她放在一个玻璃棺材里，放在他们的门前。
+
+王后再次问镜子，镜子再次回答说白雪公主是最美丽的。
+
+这次她装扮成一位老祖母，带着一个毒苹果。
+
+白雪公主不想吃苹果，但老妇人恳求她，最后她咬了一口苹果。她立刻陷入了昏迷。
+
+小矮人们非常难过，又把她放回玻璃棺材里。
+
+有一天，一位王子经过，看到玻璃棺材里的白雪公主。他非常爱她，请求小矮人们把玻璃棺材给他。
+
+小矮人们同意了，当仆人们抬着玻璃棺材时，他们被一块石头绊倒了。苹果片从白雪公主的嘴里掉了出来，她醒了过来。
+
+王子娶了白雪公主，他们幸福地生活在一起，直到生命的尽头。
+
+王后被邀请参加婚礼。当她看到白雪公主还活着时，她气死了。
+}
+
+\chapter{第十三章}
+
+\begin{original}
+Dornröschen
+
+Es war einmal ein König und eine Königin, die hatten keine Kinder. Eines Tages, als die Königin im Bad war, kam ein Frosch und sagte: "Du wirst bald ein Mädchen haben."
+
+Und tatsächlich, bald hatte sie ein Mädchen. Die Königspaar war sehr glücklich und einlud alle Zwerge und Hexen zum Tauftag.
+
+Es gab dreizehn Hexen in dem Land, aber der König hatte nur zwölf Goldene Teller, also lud er nur zwölf Hexen ein.
+
+Die zwölf Hexen gaben dem Mädchen wundervolle Geschenke: Schönheit, Weisheit, Güte und so weiter.
+
+Aber als die zwölf Hexen ihre Geschenke gegeben hatten, kam die dreizehnte Hexe herein. Sie war sehr wütend, dass sie nicht eingeladen worden war.
+
+"Im sechzehnten Jahr ihres Lebens soll das Mädchen an einer Spindel stechen und sterben," sagte sie.
+
+Die zwölfte Hexe, die noch nicht gesprochen hatte, sagte: "Ich kann den Tod nicht aufheben, aber ich kann ihn in ein hundertjähriges Schlaf verwandeln."
+
+Als das Mädchen sechzehn Jahre alt war, kam sie zu einem Turm, in dem eine alte Hexe mit einer Spindel saß.
+
+"Was ist das?" fragte das Mädchen, und berührte die Spindel. Sofort stach es sich und fiel in einen tiefen Schlaf.
+
+Der Schlaf verbreitete sich über das ganze Schloss. Die Königin, der König, die Diener, die Tiere - alle fielen in einen tiefen Schlaf.
+
+Und um das Schloss wuchsen Dornensträucher, die es bis zum Himmel hinauf umschlossen.
+
+Viele Jahre vergingen. Viele Prinzen versuchten, durch die Dornensträucher zu gelangen, aber sie starben daran.
+
+Eines Tages kam ein junger Prinz vorbei. Er hörte die Geschichte von Dornröschen, und wollte es sehen.
+
+Als er an die Dornensträucher herankam, verwandelten sie sich in Rosen. Der Prinz ging durch die Rosen, bis er zum Schloss kam.
+
+Er ging ins Schloss und fand Dornröschen in einem Bett. Es war so schön, dass er es küsste.
+
+Und sofort erwachte Dornröschen. Und mit ihm erwachten auch der König, die Königin, die Diener und die Tiere.
+
+Der Prinz heiratete Dornröschen, und sie lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+	r\t\translation{
+睡美人
+
+从前有一位国王和王后，他们没有孩子。有一天，当王后在洗澡时，一只青蛙过来对她说：“你很快就会有一个女孩。”
+
+果然，不久她就有了一个女孩。国王和王后非常高兴，邀请了所有的矮人和女巫参加洗礼。
+
+这个国家有十三个女巫，但国王只有十二个金盘子，所以他只邀请了十二个女巫。
+
+十二个女巫给了女孩奇妙的礼物：美丽、智慧、善良等等。
+
+但是当十二个女巫都送完礼物后，第十三个女巫走了进来。她非常生气，因为她没有被邀请。
+
+“在她十六岁生日那天，这个女孩会被纺锤刺伤而死，”她说。
+
+第十二个女巫还没有说话，她说：“我无法解除死亡，但我可以把它变成百年的睡眠。”
+
+当女孩十六岁时，她来到了一座塔，里面坐着一位老女巫，手里拿着一个纺锤。
+
+“那是什么？”女孩问，然后触摸了纺锤。她立刻被刺伤，陷入了深度睡眠。
+
+睡眠传遍了整个城堡。王后、国王、仆人、动物——所有的一切都陷入了深度睡眠。
+
+城堡周围长满了荆棘，把它包围到了天上。
+
+许多年过去了。许多王子试图穿过荆棘丛，但他们都死了。
+
+有一天，一位年轻的王子经过。他听到了睡美人的故事，想看看她。
+
+当他走近荆棘丛时，它们变成了玫瑰。王子穿过玫瑰，来到城堡。
+
+他走进城堡，发现睡美人躺在床上。她是如此美丽，王子吻了她。
+
+睡美人立刻醒了过来。国王、王后、仆人和动物也都醒了过来。
+
+王子娶了睡美人，他们幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第十四章}
+
+\begin{original}
+Der gestiefelte Kater
+
+Es war einmal ein armer Müller, der hatte einen Sohn und eine Katze. Als der Müller starb, hatte er nichts zu hinterlassen, außer einem Mühlstein, eine Assche und die Katze.
+
+Der Sohn verkaufte den Mühlstein und die Assche, aber er wollte die Katze nicht verkaufen, weil er sie liebte.
+
+Aber die Katze sagte zu ihm: "Ich bin kein gewöhnliche Katze. Gib mir ein Paar Stiefel und ein Sack, und ich werde dir helfen."
+
+Der Junge gab ihm ein Paar Stiefel und einen Sack, und die Katze ging los.
+
+Er ging zu einem Felde, füllte seinen Sack mit Haselnüssen, und setzte sich auf den Weg nach dem Königsschloss.
+
+Er bat um eine Audienz mit dem König, und sagte: "Ich bin der Marquis von Carabas, und ich bringe Ihrem Majestät Haselnüssen aus meinem Lande."
+
+Der König war sehr erfreut und nahm die Haselnüsse entgegen.
+
+Am nächsten Tag ging der Kater wieder zu einem Felde, diesmal mit einem größeren Sack, und füllte ihn mit Erdbeeren.
+
+Er brachte sie dem König und sagte wieder: "Ich bin der Marquis von Carabas, und ich bringe Ihrem Majestät Erdbeeren aus meinem Lande."
+
+Der König war noch erfreuter und lud den "Marquis" zum Essen ein.
+
+Der Kater wusste, dass der König den Fluss entlang fahren wollte. Er ging an den Fluss und fand einen Jäger, der Fisch fangen wollte.
+
+"Wenn der König kommt und fragt, wem dieser Fisch gehört, sagst du: 'Dem Marquis von Carabas'," sagte der Kater zum Jäger.
+
+Und so geschah es. Der König fragte den Jäger, wem der Fisch gehörte, und der Jäger antwortete: "Dem Marquis von Carabas."
+
+Der König war sehr erstaunt, und lud den "Marquis" zum Fahren auf dem Fluss ein.
+
+Der Kater ging voraus und sagte allen Bauern am Wegesrand: "Wenn der König kommt und fragt, wem dieses Feld gehört, sagst du: 'Dem Marquis von Carabas', sonst werdet ihr alle hingerichtet."
+
+Und so geschah es. Der König fragte die Bauern, wem die Felder gehörten, und sie antworteten alle: "Dem Marquis von Carabas."
+
+Der König war sehr beeindruckt von dem Reichtum des "Marquis" und gab ihm seine Tochter zur Frau.
+
+Aber der König wollte sehen, wie das Schloss des "Marquis" aussah.
+
+Der Kater ging voraus und fand ein großes Schloss, das einem Räuber gehörte. Er sagte dem Räuber: "Der König kommt mit seinem Heer. Wenn du nicht das Schloss dem Marquis von Carabas gibst, wirst du hingerichtet."
+
+Der Räuber lief weg, und der Kater sagte dem König: "Dies ist das Schloss des Marquis von Carabas."
+
+Der König war sehr erstaunt und freute sich für seine Tochter.
+
+Der Junge heiratete die Königstochter und wurde reich und glücklich. Und die Katze lebte in dem Schloss und hatte ein gutes Leben.
+\end{original}
+
+	r\t\translation{
+穿靴子的猫
+
+从前有一个贫穷的磨坊主，他有一个儿子和一只猫。当磨坊主去世时，他没有留下任何东西，除了一个磨石、一个驴子和那只猫。
+
+儿子卖掉了磨石和驴子，但他不想卖掉猫，因为他爱它。
+
+但是猫对他说：“我不是一只普通的猫。给我一双靴子和一个袋子，我会帮助你的。”
+
+男孩给了他一双靴子和一个袋子，猫就出发了。
+
+他去了一片田野，把袋子装满了榛子，然后前往国王的宫殿。
+
+他请求觐见国王，并说：“我是卡拉巴斯侯爵，我从我的国家给陛下带来了榛子。”
+
+国王非常高兴，接受了榛子。
+
+第二天，猫又去了一片田野，这次带着一个更大的袋子，装满了草莓。
+
+他把它们带给国王，再次说：“我是卡拉巴斯侯爵，我从我的国家给陛下带来了草莓。”
+
+国王更加高兴，邀请“侯爵”共进晚餐。
+
+猫知道国王想沿着河流航行。他来到河边，发现一个猎人想钓鱼。
+
+“当国王来问这条鱼属于谁时，你说：‘属于卡拉巴斯侯爵’，”猫对猎人说。
+
+事情就这样发生了。国王问猎人这条鱼属于谁，猎人回答说：“属于卡拉巴斯侯爵。”
+
+国王非常惊讶，邀请“侯爵”一起在河上航行。
+
+猫走在前面，对路边所有的农民说：“当国王来问这片田地属于谁时，你说：‘属于卡拉巴斯侯爵’，否则你们都会被处死。”
+
+事情就这样发生了。国王问农民这些田地属于谁，他们都回答说：“属于卡拉巴斯侯爵。”
+
+国王对“侯爵”的财富印象深刻，把他的女儿嫁给了他。
+
+但是国王想看看“侯爵”的城堡是什么样子的。
+
+猫走在前面，发现了一座属于强盗的大城堡。他对强盗说：“国王带着他的军队来了。如果你不把城堡给卡拉巴斯侯爵，你就会被处死。”
+
+强盗逃跑了，猫对国王说：“这就是卡拉巴斯侯爵的城堡。”
+
+国王非常惊讶，为他的女儿感到高兴。
+
+男孩娶了公主，变得富有和幸福。而猫则住在城堡里，过着美好的生活。
+}
+
+\chapter{第十五章}
+
+\begin{original}
+Der Fischer und seine Frau
+
+Es war einmal ein armer Fischer, der lebte mit seiner Frau in einem kleinen Fischerhütte am Meer.
+
+Eines Tages, als er angeln ging, fing er einen großen Goldfisch. Der Fisch sprach zu ihm: "Ich bin kein gewöhnlicher Fisch. Ich bin ein verzauberter Prinz. Lass mich frei, und ich werde dir alles geben, was du willst."
+
+Der Fischer war sehr erstaunt, aber er ließ den Fisch frei. "Ich will nichts," sagte er, "ich bin zufrieden."
+
+Als er nach Hause ging, erzählte er seiner Frau, was passiert war. "Du Narr," sagte seine Frau, "du solltest den Fisch bitten, ein besseres Haus zu geben."
+
+Der Fischer ging zurück zum Meer und rief: "Fisch, Fisch, in dem Wasser, komm heraus, ich habe eine Bitte."
+
+Der Fisch kam heraus und fragte: "Was willst du?"
+
+"Meine Frau will ein besseres Haus," sagte der Fischer.
+
+"Geh nach Hause," sagte der Fisch, "deine Frau hat schon ein besseres Haus."
+
+Und so war es. Das kleine Fischerhütte war verschwunden, und an seiner Stelle stand ein schönes Haus.
+
+Aber die Frau war nicht zufrieden. "Ich will ein Schloss," sagte sie. "Geh zum Fisch und bitte ihn um ein Schloss."
+
+Der Fischer ging zurück zum Meer, das war jetzt etwas trüb. Er rief den Fisch, und der Fisch fragte: "Was willst du?"
+
+"Meine Frau will ein Schloss," sagte der Fischer.
+
+"Geh nach Hause," sagte der Fisch, "deine Frau hat schon ein Schloss."
+
+Und so war es. Das schöne Haus war verschwunden, und an seiner Stelle stand ein großes Schloss.
+
+Aber die Frau war noch nicht zufrieden. "Ich will Königin werden," sagte sie. "Geh zum Fisch und bitte ihn um das."
+
+Der Fischer ging zurück zum Meer, das war jetzt sehr trüb. Er rief den Fisch, und der Fisch fragte: "Was willst du?"
+
+"Meine Frau will Königin werden," sagte der Fischer.
+
+"Geh nach Hause," sagte der Fisch, "deine Frau ist schon Königin."
+
+Und so war es. Die Frau saß auf einem Thron und war Königin.
+
+Aber die Frau war noch nicht zufrieden. "Ich will Kaiserin werden," sagte sie. "Geh zum Fisch und bitte ihn um das."
+
+Der Fischer ging zurück zum Meer, das war jetzt wild und stürmisch. Er rief den Fisch, und der Fisch fragte: "Was willst du?"
+
+"Meine Frau will Kaiserin werden," sagte der Fischer.
+
+"Geh nach Hause," sagte der Fisch, "deine Frau ist schon Kaiserin."
+
+Und so war es. Die Frau war jetzt Kaiserin.
+
+Aber die Frau war immer noch nicht zufrieden. "Ich will Gott werden," sagte sie. "Geh zum Fisch und bitte ihn um das."
+
+Der Fischer ging zurück zum Meer, das war jetzt finster und gefährlich. Er rief den Fisch, und der Fisch kam heraus.
+
+"Was willst du?" fragte der Fisch.
+
+"Meine Frau will Gott werden," sagte der Fischer leise.
+
+"Geh nach Hause," sagte der Fisch, "deine Frau sitzt wieder in dem kleinen Fischerhütte."
+
+Und so war es. Alles war verschwunden, und die Frau saß wieder in dem kleinen Fischerhütte.
+
+Und sie blieben dort für immer.
+\end{original}
+
+	\translation{
+渔夫和他的妻子
+
+从前有一个贫穷的渔夫，他和妻子住在海边的一个小渔屋里。
+
+有一天，当他去钓鱼时，钓到了一条大金鱼。金鱼对他说：“我不是普通的鱼。我是一个被施了魔法的王子。放我自由，我会给你想要的一切。”
+
+渔夫非常惊讶，但他还是放了金鱼。“我什么都不想要，”他说，“我很满足。”
+
+当他回家时，他把发生的事情告诉了妻子。“你这个傻瓜，”妻子说，“你应该让金鱼给你一个更好的房子。”
+
+渔夫回到海边，喊道：“鱼，鱼，在水里，出来吧，我有一个请求。”
+
+金鱼出来了，问道：“你想要什么？”
+
+“我的妻子想要一个更好的房子，”渔夫说。
+
+“回家吧，”金鱼说，“你的妻子已经有了一个更好的房子。”
+
+果然如此。小渔屋不见了，取而代之的是一座漂亮的房子。
+
+但妻子并不满足。“我想要一座城堡，”她说。“去跟鱼要一座城堡。”
+
+渔夫回到海边，海水现在有点浑浊。他呼唤金鱼，金鱼问道：“你想要什么？”
+
+“我的妻子想要一座城堡，”渔夫说。
+
+“回家吧，”金鱼说，“你的妻子已经有了一座城堡。”
+
+果然如此。漂亮的房子不见了，取而代之的是一座大城堡。
+
+但妻子仍然不满足。“我想成为王后，”她说。“去跟鱼要这个。”
+
+渔夫回到海边，海水现在非常浑浊。他呼唤金鱼，金鱼问道：“你想要什么？”
+
+“我的妻子想成为王后，”渔夫说。
+
+“回家吧，”金鱼说，“你的妻子已经是王后了。”
+
+果然如此。妻子坐在宝座上，成为了王后。
+
+但妻子还是不满足。“我想成为女皇帝，”她说。“去跟鱼要这个。”
+
+渔夫回到海边，海水现在变得狂野而汹涌。他呼唤金鱼，金鱼问道：“你想要什么？”
+
+“我的妻子想成为女皇帝，”渔夫说。
+
+“回家吧，”金鱼说，“你的妻子已经是女皇帝了。”
+
+果然如此。妻子现在是女皇帝了。
+
+但妻子仍然不满足。“我想成为上帝，”她说。“去跟鱼要这个。”
+
+渔夫回到海边，海水现在变得黑暗而危险。他呼唤金鱼，金鱼出来了。
+
+“你想要什么？”金鱼问道。
+
+“我的妻子想成为上帝，”渔夫轻声说。
+
+“回家吧，”金鱼说，“你的妻子又坐在那个小渔屋里了。”
+
+果然如此。一切都消失了，妻子又坐在那个小渔屋里。
+
+他们永远留在了那里。
+}
+
+\chapter{第十六章}
+
+\begin{original}
+Der tapfere Schneiderlein
+
+Es war einmal ein kleiner Schneider, der lebte in einem kleinen Ort. Er war sehr stolz auf seine Stärke und seine Künste.
+
+Eines Tages, als er arbeitete, hörte er eine Stimme, die sagte: "Der tapfere Schneiderlein, der hat vier mit einem Hieb getötet."
+
+Der Schneider war sehr erfreut, und er nähte sich einen Gürtel, auf dem stand: "Vier mit einem Hieb."
+
+Dann nahm er ein Stück Brot, ein Messer und eine Flasche Wasser, und ging auf Reisen.
+
+Auf dem Weg traf er einen Riesen. Der Riese lachte über den kleinen Schneider und sagte: "Du bist zu klein, um auf Reisen zu gehen."
+
+"Ich bin tapfer," sagte der Schneider, und zeigte ihm den Gürtel. "Ich habe vier mit einem Hieb getötet."
+
+Der Riese wollte den Schneider auf die Probe stellen. Er gab ihm ein Steinhaufen und sagte: "Drück die Wasser aus diesen Steinen."
+
+Der Schneider sagte: "Das ist ein Kinderspiel." Er nahm einen Stein und presste das Wasser aus. Der Riese war sehr erstaunt.
+
+Dann gab der Riese dem Schneider einen Baum und sagte: "Ziehe diesen Baum aus dem Boden."
+
+Der Schneider sagte: "Ich werde das tun, aber du musst mir helfen." Der Riese hielt den Baum, und der Schneider zog ihn aus dem Boden.
+
+Der Riese war noch erstaunter, und er lud den Schneider ein, bei ihm zu wohnen.
+
+Eines Tages, als der Riese und der Schneider zusammen arbeiteten, sagte der Riese: "Ich will dich heute Nacht töten."
+
+Der Schneider hörte das, und er tat folgendes: Er legte einen Gürtel um einen Baumstamm, und setzte eine Mütze darauf. Dann ging er sich verstecken.
+
+In der Nacht kam der Riese und schlug den Baumstamm mit seinem großen Stock. Er dachte, er hätte den Schneider getötet.
+
+Am nächsten Morgen ging der Schneider zu dem Riese und sagte: "Guten Morgen, Riese."
+
+Der Riese war sehr erstaunt, und er lief weg, als ob der Teufel hinter ihm wäre.
+
+Der Schneider ging weiter, und er kam zu einem Königsschloss. Der König hatte gehört von dem tapferen Schneider, und er bat ihn, einen Drachen zu töten, der das Land terrorisierte.
+
+Der Schneider sagte: "Das ist ein Kinderspiel."
+
+Er ging zu dem Drachen, und er trank sein Wasser. Dann spuckte er Feuer auf den Drachen, und der Drachen verbrannte.
+
+Der König war sehr erfreut, und er gab dem Schneider seine Tochter zur Frau und einen großen Teil seines Königreichs.
+
+Der Schneider lebte glücklich bis ans Ende seiner Tage.
+\end{original}
+
+	\translation{
+勇敢的小裁缝
+
+从前有一个小裁缝，他住在一个小镇上。他对自己的力量和技艺非常自豪。
+
+有一天，当他工作时，他听到一个声音说：“勇敢的小裁缝，一下打死了四个。”
+
+裁缝非常高兴，他给自己缝了一条腰带，上面写着：“一下打死四个。”
+
+然后他拿了一块面包、一把刀和一瓶水，出发去旅行。
+
+在路上，他遇到了一个巨人。巨人嘲笑小裁缝，说：“你太小了，不能去旅行。”
+
+“我很勇敢，”裁缝说，并向他展示了腰带。“我一下打死了四个。”
+
+巨人想考验裁缝。他给了他一堆石头，说：“把这些石头里的水挤出来。”
+
+裁缝说：“这是小菜一碟。”他拿起一块石头，把水挤了出来。巨人非常惊讶。
+
+然后巨人给了裁缝一棵树，说：“把这棵树从地里拔出来。”
+
+裁缝说：“我会做到的，但你必须帮助我。”巨人握住树，裁缝把它从地里拔了出来。
+
+巨人更加惊讶，他邀请裁缝住在他那里。
+
+有一天，当巨人和裁缝一起工作时，巨人说：“我今晚要杀了你。”
+
+裁缝听到了，他做了以下事情：他在一个树干上系了一条腰带，在上面放了一顶帽子。然后他躲了起来。
+
+晚上，巨人来了，用他的大棍子打树干。他以为他杀了裁缝。
+
+第二天早上，裁缝去见巨人，说：“早上好，巨人。”
+
+巨人非常惊讶，他跑开了，好像魔鬼在他后面。
+
+裁缝继续前进，他来到了一座国王的城堡。国王听说了勇敢的裁缝，他请他去杀死一条恐吓国家的龙。
+
+裁缝说：“这是小菜一碟。”
+
+他去找龙，喝了他的水。然后他向龙喷火，龙被烧死了。
+
+国王非常高兴，他把女儿嫁给了裁缝，并给了他一大块王国。
+
+裁缝幸福地生活到了生命的尽头。
+}
+
+\chapter{第十七章}
+
+\begin{original}
+Die sechs Schwäne
+
+Es war einmal ein König, der hatte sieben Kinder: sechs Söhne und eine Tochter. Die Söhne waren sehr liebevoll zu ihrer Schwester, und sie spielten immer zusammen.
+
+Aber die Königin war sehr eifersüchtig auf die Kinder, und sie verwandelte die sechs Söhne in Schwäne. Nur die Tochter blieb unverwandelt, weil die Königin nicht gewusst hatte, dass sie existierte.
+
+Die Tochter war sehr traurig, und sie wollte ihre Brüder befreien. Sie hörte, dass sie ihre Brüder befreien konnte, wenn sie sieben Jahre lang kein Wort sprach, und wenn sie sieben Hemden aus Disteln nähte.
+
+So machte sie es. Sie ging in den Wald, und sie nähte die Hemden aus Disteln. Sie sprach kein Wort, auch nicht, wenn Menschen sie fragten.
+
+Eines Tages, als sie arbeitete, kam ein König vorbei. Er war verliebt in sie auf den ersten Blick, und er nahm sie mit zu seinem Schloss. Er heiratete sie, und sie wurde Königin.
+
+Aber die Stiefmutter der Königin war sehr eifersüchtig, und sie tötete die sechs Schwäne, die die Brüder der Königin waren.
+
+Die Königin war sehr traurig, aber sie sprach kein Wort. Sie nähte weiter die Hemden aus Disteln.
+
+Nach sieben Jahren hatte sie die sieben Hemden fertig. Dann sagte sie: "Meine Brüder sind tot, aber ich habe ihre Seelen gerettet."
+
+Und so geschah es. Die sechs Schwäne wurden wieder zu Prinzen, und die Familie war wieder vereint.
+
+Der König war sehr erstaunt, und er tötete die böse Stiefmutter.
+
+Die Familie lebte glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+	\translation{
+六只天鹅
+
+从前有一位国王，他有七个孩子：六个儿子和一个女儿。儿子们对他们的妹妹非常疼爱，他们总是一起玩耍。
+
+但王后非常嫉妒这些孩子，她把六个儿子变成了天鹅。只有女儿没有被变形，因为王后不知道她的存在。
+
+女儿非常伤心，她想拯救她的兄弟们。她听说，如果她七年不说话，并缝制七件用荨麻做的衬衫，她就可以拯救她的兄弟们。
+
+于是她这样做了。她走进森林，缝制用荨麻做的衬衫。她一句话也不说，即使人们问她。
+
+有一天，当她工作时，一位国王经过。他一见钟情地爱上了她，把她带回了他的城堡。他娶了她，她成为了王后。
+
+但王后的继母非常嫉妒，她杀死了王后兄弟的六只天鹅。
+
+王后非常伤心，但她一句话也不说。她继续缝制用荨麻做的衬衫。
+
+七年后，她完成了七件衬衫。然后她说：“我的兄弟们死了，但我拯救了他们的灵魂。”
+
+果然如此。六只天鹅又变回了王子，一家人又团聚了。
+
+国王非常惊讶，他杀死了邪恶的继母。
+
+一家人幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第十八章}
+
+\begin{original}
+König Drosselbart
+
+Es war einmal ein König, der hatte eine schöne Tochter. Sie war sehr stolz auf ihre Schönheit, und sie verachtete alle Männer.
+
+Eines Tages, als der König eine Party veranstaltete, kam ein hässlicher König, der hatte einen großen, hübschen Schnabel. Er hieß König Drosselbart.
+
+Der König Drosselbart wollte die Königstochter heiraten, aber sie verachtete ihn.
+
+Der König war sehr wütend, und er sagte: "Du sollst den König Drosselbart heiraten, sonst wirst du hingerichtet."
+
+Die Königstochter hatte keine Wahl, und sie heiratete den König Drosselbart.
+
+Nach der Hochzeit gingen sie zusammen in das Königreich des König Drosselbart. Die Königstochter war sehr unglücklich, aber sie hatte keine andere Wahl.
+
+Eines Tages, als der König Drosselbart weg war, kam ein junger Prinz zu ihr und sagte: "Ich bin der wahre König Drosselbart. Ich bin von einer Hexe verzaubert worden. Wenn du mich sieben Jahre lang liebst, wird der Zauber gebrochen."
+
+Die Königstochter war sehr erstaunt, aber sie liebte den Prinzen, und sie verließ den König Drosselbart.
+
+Nach sieben Jahren kam der Prinz wieder, und der Zauber war gebrochen. Er war wieder der schöne Prinz, der er gewesen war.
+
+Die Königstochter heiratete den Prinzen, und sie lebten glücklich bis ans Ende ihrer Tage.
+
+Der König Drosselbart war wieder ein hässlicher König, und er lebte alleine bis ans Ende seiner Tage.
+\end{original}
+
+	\translation{
+画眉嘴国王
+
+从前有一位国王，他有一个美丽的女儿。她对自己的美貌非常自豪，她鄙视所有男人。
+
+有一天，当国王举办派对时，一位丑陋的国王来了，他有一个又大又丑的嘴巴。他叫画眉嘴国王。
+
+画眉嘴国王想娶公主，但她鄙视他。
+
+国王非常生气，他说：“你应该嫁给画眉嘴国王，否则你会被处决。”
+
+公主别无选择，她嫁给了画眉嘴国王。
+
+婚礼后，他们一起去了画眉嘴国王的王国。公主非常不开心，但她别无选择。
+
+有一天，当画眉嘴国王不在时，一位年轻的王子来找她，说：“我是真正的画眉嘴国王。我被女巫施了魔法。如果你爱我七年，魔法就会被打破。”
+
+公主非常惊讶，但她爱王子，她离开了画眉嘴国王。
+
+七年后，王子回来了，魔法被打破了。他又是他曾经的那个美丽的王子。
+
+公主嫁给了王子，他们幸福地生活在一起，直到生命的尽头。
+
+画眉嘴国王又变成了一个丑陋的国王，他独自生活到生命的尽头。
+}
+
+\chapter{第十九章}
+
+\begin{original}
+Aschenputtel
+
+Es war einmal ein reicher Mann, der hatte eine Tochter, die ihm sehr lieb war. Die Mutter starb, und der Mann heiratete wieder. Die neue Frau hatte zwei Töchter von ihrer ersten Ehe. Sie waren schön, aber sehr hübschen und bösen.
+
+Die Stiefmutter hasste die Tochter des Mannes, weil sie viel schöner war als ihre eigenen Töchter. Sie machte sie zur Dienstmagd, und sie mußte alles tun: Kochen, waschen, putzen und spinnen. Sie bekam keine neuen Kleider, und sie mußte in der Asche schlafen. Deshalb hießen sie alle sie Aschenputtel.
+
+Eines Tages gab der König eine große Party, die drei Tage dauerte. Alle Jungfrauen im Land wurden eingeladen, weil der Prinz eine Braut suchen wollte.
+
+Die zwei Stiefschwestern waren sehr glücklich, und sie machten sich schön. Aschenputtel bat ihre Stiefmutter, sie auch mitzunehmen. "Du?" sagte die Stiefmutter, "du hast keine Kleider, und du kannst nicht tanzen. Nein, du bleibst zu Hause."
+
+Aschenputtel war sehr traurig, und sie ging nach draußen in den Garten. Da kam eine Taube und sagte: "Nimm die kleinen Nüsse, die ich dir gebe, und du wirst sehen, was passiert."
+
+Die Taube gab Aschenputtel zwei Nüsse. Als sie sie öffnete, fand sie schöne Kleider und Schuhe aus Gold. Aschenputtel zog sie an, und sie ging zur Party.
+
+Der Prinz war verliebt in sie auf den ersten Blick, und er tanzte nur mit ihr. Als es spät war, wollte Aschenputtel nach Hause gehen. Der Prinz wollte sie begleiten, aber sie lief weg. Bei der Treppe verlor sie einen goldenen Schuh.
+
+Der Prinz nahm den Schuh und sagte: "Ich werde die Frau heiraten, die diesen Schuh tragen kann."
+
+Der König befahl, dass alle Jungfrauen im Land den Schuh ausprobieren sollten. Als die beiden Stiefschwestern es versuchten, passte er nicht. Die erste hatte einen zu großen Fuß, die zweite einen zu kleinen.
+
+Dann sagte Aschenputtel: "Lass mich es auch versuchen." Die Stiefmutter lachte, aber der König erlaubte es. Der Schuh passte perfekt.
+
+Da kam die Taube wieder und brachte Aschenputtel die anderen schönen Kleider. Die Stiefmutter und die Stiefschwestern waren sehr erstaunt, als sie sahen, wie schön Aschenputtel war.
+
+Der Prinz heiratete Aschenputtel, und sie lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+灰姑娘
+
+从前有一个富有的男人，他有一个非常疼爱的女儿。母亲去世后，男人又娶了一个妻子。新妻子带来了她第一次婚姻的两个女儿。她们虽然漂亮，但非常虚荣和邪恶。
+
+继母非常讨厌男人的女儿，因为她比自己的女儿漂亮得多。她让她做女仆，她必须做所有的事情：做饭、洗衣、打扫和纺纱。她没有新衣服，必须睡在灰烬里。所以大家都叫她灰姑娘。
+
+有一天，国王举办了一场盛大的派对，持续三天。全国所有的年轻姑娘都被邀请，因为王子想要寻找一位新娘。
+
+两个继姐妹非常高兴，她们精心打扮自己。灰姑娘请求继母带她一起去。"你？"继母说，"你没有衣服，也不会跳舞。不，你留在家里。"
+
+灰姑娘非常伤心，她走到外面的花园里。这时，一只鸽子飞来说："拿我给你的小坚果，你会看到发生了什么。"
+
+鸽子给了灰姑娘两个坚果。当她打开它们时，发现了漂亮的衣服和金鞋。灰姑娘穿上它们，去参加了派对。
+
+王子对她一见钟情，只和她跳舞。当天晚些时候，灰姑娘想回家。王子想陪她，但她跑开了。在楼梯上，她丢失了一只金鞋。
+
+王子拿起鞋子说："我要娶能穿上这只鞋的女人。"
+
+国王下令，全国所有的年轻姑娘都应该试穿这只鞋。当两个继姐妹尝试时，都不合适。一个脚太大，另一个脚太小。
+
+然后灰姑娘说："让我也试试。"继母笑了，但国王允许了。鞋子正好合适。
+
+这时，鸽子又飞来了，给灰姑娘带来了其他漂亮的衣服。当继母和继姐妹们看到灰姑娘有多漂亮时，她们非常惊讶。
+
+王子娶了灰姑娘，他们幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第二十章}
+
+\begin{original}
+Däumelinchen
+
+Es war einmal ein arme Frau, die hatte keine Kinder. Sie bat die Fee, ihr ein Kind zu geben. Die Fee gab ihr einen samen, den sie im Garten pflanzte. Am nächsten Tag wuchs ein großer Blume auf, und in der Mitte saß ein kleines Mädchen, das nur so groß wie ein Daumen war.
+
+Die Frau nannte das Mädchen Däumelinchen. Sie liebte sie sehr, und sie machte ihr ein kleines Bett aus Blütenblättern und Kleider aus Spinnenweb.
+
+Eines Tages, als Däumelinchen im Garten spielte, kam eine Kröte. Sie wollte Däumelinchen für ihren Sohn haben, also nahm sie sie und trug sie zu ihrem Haus im Teich.
+
+Däumelinchen war sehr traurig, aber ein Fisch sah sie, und er biss die Blatt, auf dem sie saß. Dann trug ein Schmetterling sie weg.
+
+Der Schmetterling flog mit Däumelinchen durch die Luft, bis er in einen großen Wald kam. Dort legte er sie auf eine Blume, und sie schlief dort.
+
+Am nächsten Morgen wachte Däumelinchen auf und sah einen kleinen Elfen, der auf der Blume saß. Er war verliebt in sie, und er machte ihr ein kleines Schloss aus Blumen und Blättern.
+
+Däumelinchen lebte im Schloss und war sehr glücklich. Aber eines Tages kam eine Spinne, die wollte Däumelinchen fressen. Der Elfe hörte das, und er verjagte die Spinne.
+
+Eines Winters, als Däumelinchen im Schloss saß, kam eine Maus. Sie sagte: "Komm mit mir in meinen warmen Haus."
+
+Däumelinchen ging mit der Maus, aber die Maus wollte sie für einen armen Maulwurf heiraten. Däumelinchen wollte nicht, aber die Maus zwang sie.
+
+Am Tag der Hochzeit, als Däumelinchen zum Maulwurf gehen musste, kam ein Schmetterling. Er trug sie weg und flog mit ihr in den Himmel.
+
+Dort traf sie den Elfen wieder, der sie liebte. Sie heirateten, und sie lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+大拇指汤姆
+
+从前有一个贫穷的女人，她没有孩子。她请求仙女给她一个孩子。仙女给了她一粒种子，她把它种在花园里。第二天，长出了一朵大花，中间坐着一个只有拇指大小的小女孩。
+
+女人给这个小女孩取名叫大拇指汤姆。她非常爱她，用花瓣给她做了一张小床，用蜘蛛网给她做了衣服。
+
+有一天，当大拇指汤姆在花园里玩耍时，来了一只青蛙。它想把大拇指汤姆给它的儿子，于是把她带走，带到了池塘里的家。
+
+大拇指汤姆非常伤心，但一条鱼看到了她，咬了她坐的叶子。然后一只蝴蝶把她带走了。
+
+蝴蝶带着大拇指汤姆在空中飞，直到来到一个大森林。在那里，它把她放在一朵花上，她在那里睡着了。
+
+第二天早上，大拇指汤姆醒来，看到一个小矮人坐在花上。他爱上了她，用花和叶子给她做了一座小城堡。
+
+大拇指汤姆住在城堡里，非常幸福。但有一天，来了一只蜘蛛，想把她吃掉。小矮人听到了，把蜘蛛赶走了。
+
+一个冬天，当大拇指汤姆坐在城堡里时，来了一只老鼠。它说："跟我到我温暖的家里来。"
+
+大拇指汤姆跟着老鼠去了，但老鼠想让她嫁给一个贫穷的鼹鼠。大拇指汤姆不愿意，但老鼠强迫她。
+
+在婚礼当天，当大拇指汤姆必须去鼹鼠那里时，来了一只蝴蝶。它把她带走，带着她飞向天空。
+
+在那里，她又遇到了爱她的小矮人。他们结婚了，幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第二十一章}
+
+\begin{original}
+Der Froschkönig
+
+Es war einmal ein König, der hatte eine Tochter, die ihm sehr lieb war. Eines Tages ging sie in den Wald, um Blumen zu pflücken. Sie kam zu einem Brunnen, und sie setzte ihre goldene Kugel auf die Bank, um zu spielen.
+
+Plötzlich fiel die Kugel ins Wasser. Die Königstochter war sehr traurig, und sie weinte.
+
+Da kam ein Frosch aus dem Brunnen und sagte: "Warum weinst du, Königstochter?"
+
+"Meine goldene Kugel ist ins Wasser gefallen," sagte die Königstochter.
+
+"Ich kann dir helfen," sagte der Frosch, "aber du musst mir versprechen, dass du mich zu deinem Freund machst, dass ich mit dir esse, mit dir trinkst und in deinem Bett schlafe."
+
+Die Königstochter war so verzweifelt, dass sie alles versprach. Der Frosch tauchte ins Wasser und holte die Kugel.
+
+Aber als die Königstochter die Kugel hatte, lief sie weg, ohne den Frosch zu beachten.
+
+Am nächsten Tag, als die Königstochter mit dem König zu Tisch saß, hörte sie einen Klopfen an der Tür. Es war der Frosch. "Öffne die Tür, Königstochter, es ist der Frosch, der dir die Kugel gebracht hat."
+
+Die Königstochter war sehr erschrocken, aber der König sagte: "Du musst dein Versprechen halten. Öffne die Tür."
+
+Die Königstochter öffnete die Tür, und der Frosch kam herein. "Lass mich auf deinen Stuhl setzen," sagte er.
+
+Die Königstochter tat es. Dann sagte der Frosch: "Lass mich auf deinen Tisch setzen."
+
+Die Königstochter tat es auch. "Lass mich mit dir essen und trinken," sagte der Frosch.
+
+Die Königstochter war sehr unglücklich, aber sie tat es.
+
+Am Abend sagte der Frosch: "Jetzt muss ich in deinem Bett schlafen."
+
+Die Königstochter war so wütend, dass sie den Frosch auf den Boden warf. Plötzlich verwandelte sich der Frosch in einen schöne Prinz.
+
+"Ich bin von einer Hexe verzaubert worden," sagte der Prinz. "Nur eine Königstochter, die ein Versprechen hält, kann den Zauber brechen."
+
+Der Prinz heiratete die Königstochter, und sie lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+青蛙王子
+
+从前有一位国王，他有一个非常疼爱的女儿。有一天，她去森林里采花。她来到一个喷泉旁，把她的金球放在长凳上玩。
+
+突然，球掉进了水里。公主非常伤心，哭了起来。
+
+这时，一只青蛙从喷泉里出来，说："你为什么哭，公主？"
+
+"我的金球掉进水里了，"公主说。
+
+"我可以帮助你，"青蛙说，"但你必须答应我，让我成为你的朋友，和你一起吃饭，一起喝水，睡在你的床上。"
+
+公主非常绝望，她答应了所有的要求。青蛙潜入水中，取回了球。
+
+但当公主拿到球时，她跑开了，没有注意到青蛙。
+
+第二天，当公主和国王一起吃饭时，她听到有人敲门。是青蛙。"开门，公主，是给你拿球的青蛙。"
+
+公主非常害怕，但国王说："你必须遵守你的诺言。开门。"
+
+公主打开门，青蛙进来了。"让我坐在你的椅子上，"它说。
+
+公主照做了。然后青蛙说："让我坐在你的桌子上。"
+
+公主也照做了。"让我和你一起吃饭喝水，"青蛙说。
+
+公主非常不开心，但她照做了。
+
+晚上，青蛙说："现在我必须睡在你的床上。"
+
+公主非常生气，她把青蛙扔到了地上。突然，青蛙变成了一个英俊的王子。
+
+"我被女巫施了魔法，"王子说。"只有遵守诺言的公主才能打破这个咒语。"
+
+王子娶了公主，他们幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第二十二章}
+
+\begin{original}
+Das Marienkind
+
+Es war einmal ein armer Holzhacker, der hatte eine Frau. Sie waren sehr arm, und sie hatten keine Kinder.
+
+Eines Tages ging die Frau in die Kirche, um zu beten. Da kam eine Frau zu ihr und sagte: "Ich bin die Mutter Gottes. Ich will dir ein Kind geben, aber du musst es mir versprechen, dass du es nie streicheln wirst."
+
+Die Frau war sehr glücklich, und sie versprach es. Bald hatte sie ein schönes Mädchen.
+
+Das Mädchen war sehr schön und gut, aber die Mutter hatte vergessen, was sie versprochen hatte. Eines Tages streichelte sie das Mädchen auf dem Kopf.
+
+Plötzlich verschwand das Mädchen, und die Mutter war sehr traurig. Sie suchte das Mädchen überall, aber sie konnte es nicht finden.
+
+Das Mädchen war in den Himmel gegangen, wo es bei der Mutter Gottes lebte. Sie war sehr glücklich, aber sie vermisste ihre Mutter.
+
+Eines Tages sagte die Mutter Gottes zu ihr: "Du darfst zu deiner Mutter gehen, aber du musst ihr nicht sagen, wo du bist."
+
+Das Mädchen ging zu ihrer Mutter. Die Mutter war sehr glücklich, aber das Mädchen sagte nichts.
+
+Als das Mädchen zurückging, sagte die Mutter Gottes: "Du hast gut gemacht. Jetzt darfst du immer zu deiner Mutter gehen."
+
+Die Mutter und das Mädchen waren wieder vereint, und sie lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+圣母的孩子
+
+从前有一个贫穷的樵夫，他有一个妻子。他们非常贫穷，没有孩子。
+
+有一天，妻子去教堂祈祷。这时，一位女士向她走来，说："我是圣母玛利亚。我会给你一个孩子，但你必须答应我，永远不要抚摸他。"
+
+妻子非常高兴，她答应了。不久，她有了一个漂亮的女孩。
+
+女孩非常漂亮和善良，但母亲忘记了她的诺言。有一天，她抚摸了女孩的头。
+
+突然，女孩消失了，母亲非常伤心。她到处寻找女孩，但找不到。
+
+女孩去了天堂，在那里她和圣母玛利亚住在一起。她非常幸福，但她想念她的母亲。
+
+有一天，圣母玛利亚对她说："你可以去见你的母亲，但你不能告诉她你在哪里。"
+
+女孩去见了她的母亲。母亲非常高兴，但女孩什么也没说。
+
+当女孩回来时，圣母玛利亚说："你做得很好。现在你可以随时去见你的母亲了。"
+
+母亲和女孩又团聚了，他们幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第二十三章}
+
+\begin{original}
+Frau Holle
+
+Es war einmal eine Witwe, die hatte zwei Töchter. Die eine war schön und gut, die andere war hässlich und böse. Die Witwe liebte die böse Tochter mehr, weil sie ihre eigene war, und sie machte die gute Tochter zur Dienstmagd.
+
+Eines Tages musste die gute Tochter Holz holen. Sie kam zu einem Brunnen, und sie setzte sich nieder, um zu trinken. Plötzlich fiel ihr Besen ins Wasser. Sie war sehr traurig, und sie weinte.
+
+Da kam eine alte Frau aus dem Brunnen. Sie war Frau Holle. "Warum weinst du, kleines Mädchen?" fragte sie.
+
+"Mein Besen ist ins Wasser gefallen," sagte die Tochter.
+
+"Ich kann dir helfen," sagte Frau Holle. "Aber du musst bei mir arbeiten."
+
+Die Tochter stimmte zu, und sie ging mit Frau Holle in ihre Hütte. Die Arbeit war hart, aber die Tochter war fleißig und gut.
+
+Nach einer Woche sagte Frau Holle: "Du hast gut gearbeitet. Jetzt darfst du nach Hause gehen. Ich will dir eine Belohnung geben."
+
+Frau Holle führte die Tochter zu einer Tür. Als sie durchging, fiel Gold auf sie. Die Tochter war sehr glücklich, und sie nahm den Besen und ging nach Hause.
+
+Die Witwe und die böse Tochter waren sehr neidisch. Die böse Tochter wollte auch Gold haben, also ging sie zum Brunnen und warf ihren Besen ins Wasser.
+
+Frau Holle kam heraus und fragte: "Warum weinst du, kleines Mädchen?"
+
+"Mein Besen ist ins Wasser gefallen," sagte die böse Tochter.
+
+"Ich kann dir helfen," sagte Frau Holle. "Aber du musst bei mir arbeiten."
+
+Die böse Tochter stimmte zu, aber sie war faul und böse. Sie arbeitete nicht, und sie murmelte immer.
+
+Nach einer Woche sagte Frau Holle: "Du hast schlecht gearbeitet. Jetzt darfst du nach Hause gehen. Ich will dir eine Belohnung geben."
+
+Frau Holle führte die böse Tochter zu einer Tür. Als sie durchging, fiel nicht Gold auf sie, sondern Pitch. Die böse Tochter war sehr wütend, aber sie konnte das Pitch nicht entfernen.
+
+Die Witwe war sehr traurig, aber die gute Tochter lebte glücklich und reich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+霍勒大妈
+
+从前有一个寡妇，她有两个女儿。一个漂亮善良，另一个丑陋邪恶。寡妇更爱邪恶的女儿，因为她是自己亲生的，而她让善良的女儿做女仆。
+
+有一天，善良的女儿必须去砍柴。她来到一个喷泉旁，坐下来喝水。突然，她的扫帚掉进了水里。她非常伤心，哭了起来。
+
+这时，一位老妇人从喷泉里出来。她是霍勒大妈。"你为什么哭，小姑娘？"她问道。
+
+"我的扫帚掉进水里了，"女儿说。
+
+"我可以帮助你，"霍勒大妈说。"但你必须在我这里工作。"
+
+女儿同意了，她和霍勒大妈一起去了她的小屋。工作很辛苦，但女儿很勤奋和善良。
+
+一周后，霍勒大妈说："你工作做得很好。现在你可以回家了。我会给你一个奖励。"
+
+霍勒大妈把女儿带到一扇门前。当她穿过门时，金子落在她身上。女儿非常高兴，她拿起扫帚回家了。
+
+寡妇和邪恶的女儿非常嫉妒。邪恶的女儿也想要金子，所以她去了喷泉，把她的扫帚扔进了水里。
+
+霍勒大妈出来问道："你为什么哭，小姑娘？"
+
+"我的扫帚掉进水里了，"邪恶的女儿说。
+
+"我可以帮助你，"霍勒大妈说。"但你必须在我这里工作。"
+
+邪恶的女儿同意了，但她很懒惰和邪恶。她不工作，总是喃喃自语。
+
+一周后，霍勒大妈说："你工作做得很差。现在你可以回家了。我会给你一个奖励。"
+
+霍勒大妈把邪恶的女儿带到一扇门前。当她穿过门时，落在她身上的不是金子，而是沥青。邪恶的女儿非常生气，但她无法去除沥青。
+
+寡妇非常伤心，但善良的女儿幸福而富有地生活着，直到生命的尽头。
+}
+
+\chapter{第二十四章}
+
+\begin{original}
+Rapunzel
+
+Es war einmal ein Mann und eine Frau, die hatten keine Kinder. Sie wohnten neben einem Zaubergarten. In dem Garten wuchs einstrahlendes Rapunzel. Die Frau wollte unbedingt davon essen.
+
+Der Mann ging in den Garten und pflückte Rapunzel. Aber die Zauberin, die den Garten bewachte, fand ihn und verlangte, dass er ihr sein erstes Kind geben würde.
+
+Die Frau gebar ein Mädchen, das die Zauberin Rapunzel nannte. Sie nahm das Mädchen und sperrte es in einen Turm, der keinen Eingang hatte. Nur eine kleine Öffnung oben war vorhanden.
+
+Wenn die Zauberin hineinkommen wollte, rief sie: "Rapunzel, Rapunzel, lass dein Haar herunter!"
+
+Rapunzel war sehr schön, und sie hatte langes, goldenes Haar. Eines Tages kam ein Prinz vorbei. Er hörte Rapunzel singen und war verliebt in sie.
+
+Er wartete, bis die Zauberin gegangen war, dann rief er: "Rapunzel, Rapunzel, lass dein Haar herunter!"
+
+Rapunzel ließ ihr Haar herunter, und der Prinz stieg hoch.
+
+Sie verliebten sich ineinander, und der Prinz versprach, sie zu befreien.
+
+Aber die Zauberin fand es heraus. Sie schnitt Rapunzels Haar ab und warf sie in die Wüste.
+
+Als der Prinz kam, stieg er hoch, aber die Zauberin war da. Er sprang hinunter und wurde blind.
+
+Er irrte lange in der Wüste herum, bis er Rapunzel fand. Ihre Tränen heilten seine Augen.
+
+Sie heirateten und lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+长发姑娘
+
+从前有一对夫妻，他们没有孩子。他们住在一个魔法花园旁边。花园里长着一种闪闪发光的长发姑娘。妻子非常想吃它。
+
+丈夫走进花园，摘了长发姑娘。但是守护花园的女巫发现了他，要求他把第一个孩子给她。
+
+妻子生了一个女孩，女巫给她取名叫长发姑娘。她把女孩关在一座没有入口的塔里。只有上面有一个小开口。
+
+当女巫想进去时，她喊道："长发姑娘，长发姑娘，放下你的头发！"
+
+长发姑娘非常美丽，她有一头长长的金发。有一天，一位王子经过。他听到长发姑娘唱歌，爱上了她。
+
+他等到女巫走了，然后喊道："长发姑娘，长发姑娘，放下你的头发！"
+
+长发姑娘放下头发，王子爬了上去。
+
+他们相爱了，王子答应要救她。
+
+但是女巫发现了。她剪掉了长发姑娘的头发，把她扔到了沙漠里。
+
+当王子来的时候，他爬了上去，但是女巫在那里。他跳下去，失明了。
+
+他在沙漠里徘徊了很久，直到找到长发姑娘。她的眼泪治好了他的眼睛。
+
+他们结婚了，幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第二十五章}
+
+\begin{original}
+Der Fuchs und die Gänse
+
+Es war einmal ein Fuchs, der wollte Gänse fangen. Er dachte sich einen Plan.
+
+Er legte sich auf den Boden und stellte sich tot vor. Die Gänse sahen ihn und gingen näher.
+
+"Der Fuchs ist tot," sagte eine Gans. "Lass uns ihn untersuchen."
+
+Sie kamen näher, aber der Fuchs sprang auf und fing eine Gans.
+
+Die anderen Gänse flogen weg.
+
+Der Fuchs brachte die Gans nach Hause und wollte sie essen. Aber die Gans hatte einen Plan.
+
+"Warum tust du mir das, Fuchs?" sagte sie. "Ich bin viel zu mager. Warte ein paar Tage, dann bin ich fett."
+
+Der Fuchs stimmte zu.
+
+Aber die Gans flog weg und kam nie wieder.
+\end{original}
+
+\translation{
+狐狸和鹅
+
+从前有一只狐狸，它想抓鹅。它想出了一个计划。
+
+它躺在地上，假装死了。鹅们看到它，走得更近了。
+
+"狐狸死了，"一只鹅说。"让我们检查一下。"
+
+它们走近了，但狐狸跳起来，抓住了一只鹅。
+
+其他鹅飞走了。
+
+狐狸把鹅带回家，想把它吃掉。但是鹅有一个计划。
+
+"狐狸，你为什么要这样对我？"它说。"我太瘦了。等几天，我就胖了。"
+
+狐狸同意了。
+
+但是鹅飞走了，再也没有回来。
+}
+
+\chapter{第二十六章}
+
+\begin{original}
+Die Geschichte vom Wolf und den sieben Jungen Geißlingen
+
+Es war einmal eine Geiß, die hatte sieben junge Geißlinge. Sie liebte sie sehr.
+
+Eines Tages musste sie hinausgehen, um Futter zu suchen. Vorher warnte sie ihre Kinder:
+
+"Vergesst nicht, dass ihr die Tür nicht öffnen sollt, wenn jemand klingelt. Nur wenn ich sage: 'Meine lieben Kinder, öffnet die Tür, ich bin eure Mutter,' dürft ihr öffnen."
+
+Die Geißlinge versprachen es.
+
+Als die Geiß weg war, kam der Wolf. Er klopfte an die Tür und sagte:
+
+"Meine lieben Kinder, öffnet die Tür, ich bin eure Mutter."
+
+Aber die Geißlinge hörten, dass es eine raue Stimme war. "Du bist nicht unsere Mutter," sagten sie. "Deine Stimme ist zu rau."
+
+Der Wolf ging weg und aß eine Klosterschülerin, um seine Stimme weich zu machen.
+
+Dann kam er zurück und klopfte an die Tür. Er sagte wieder:
+
+"Meine lieben Kinder, öffnet die Tür, ich bin eure Mutter."
+
+Aber die Geißlinge sahen seine schwarzen Pfoten unter der Tür. "Du bist nicht unsere Mutter," sagten sie. "Deine Pfoten sind zu schwarz."
+
+Der Wolf ging weg und rollte seine Pfoten in Mehl, um sie weiß zu machen.
+
+Dann kam er zurück und klopfte an die Tür. Er sagte wieder:
+
+"Meine lieben Kinder, öffnet die Tür, ich bin eure Mutter."
+
+Die Geißlinge sahen die weißen Pfoten und öffneten die Tür.
+
+Aber es war der Wolf. Er sprang hinein und verschlang alle Geißlinge, außer dem jüngsten, der sich in einem Uhrkasten versteckt hatte.
+
+Als die Geiß zurückkam, fand sie das Haus leer. Sie suchte ihre Kinder und fand den jüngsten in dem Uhrkasten. Er erzählte ihr, was passiert war.
+
+Die Geiß war sehr traurig. Sie ging zum Wolf, der nach dem großen Essen schlief.
+
+Sie schüttelte ihn, und er wachte auf. Die Geiß bat ihn, ihre Kinder wieder zu geben.
+
+Der Wolf sagte: "Ich habe sie verschlungen. Aber wenn du mir ein Fass Milch gibst, gebe ich sie dir wieder."
+
+Die Geiß holte ein Fass Milch. Der Wolf trank es, und er begann zu rülpsen.
+
+Plötzlich sprangen die sieben Geißlinge aus seinem Bauch. Die Geiß hatte sie gerettet!
+
+Die Geiß und ihre Kinder waren wieder vereint, und sie lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+狼和七只小山羊
+
+从前有一只山羊，它有七只小山羊。它非常爱它们。
+
+有一天，它必须出去寻找食物。临走前，它警告孩子们：
+
+"别忘了，当有人敲门时，你们不能开门。只有当我说：'我亲爱的孩子们，开门，我是你们的妈妈'时，你们才能开门。"
+
+小山羊们答应了。
+
+当山羊走后，狼来了。它敲门，说：
+
+"我亲爱的孩子们，开门，我是你们的妈妈。"
+
+但小山羊们听到的是沙哑的声音。"你不是我们的妈妈，"它们说。"你的声音太沙哑了。"
+
+狼走了，吃了一个修道院的学生，使它的声音变得柔和。
+
+然后它回来敲门。它又说：
+
+"我亲爱的孩子们，开门，我是你们的妈妈。"
+
+但小山羊们看到它的黑爪子在门下。"你不是我们的妈妈，"它们说。"你的爪子太黑了。"
+
+狼走了，把它的爪子滚在面粉里，使它们变白。
+
+然后它回来敲门。它又说：
+
+"我亲爱的孩子们，开门，我是你们的妈妈。"
+
+小山羊们看到白色的爪子，打开了门。
+
+但那是狼。它跳进去，吞下了所有的小山羊，除了最小的一只，它躲在一个钟表盒里。
+
+当山羊回来时，发现房子是空的。它寻找它的孩子们，在钟表盒里找到了最小的一只。它告诉了它发生了什么。
+
+山羊非常伤心。它走到狼跟前，狼吃完大餐后正在睡觉。
+
+它摇了摇它，狼醒了。山羊恳求它把孩子们还给它。
+
+狼说："我已经把它们吞下去了。但如果你给我一桶牛奶，我就把它们还给你。"
+
+山羊拿来一桶牛奶。狼喝了它，开始打嗝。
+
+突然，七只小山羊从它的肚子里跳了出来。山羊救了它们！
+
+山羊和它的孩子们又团聚了，它们幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第二十七章}
+
+\begin{original}
+Das kleine Häschen und der Wolf
+
+Es war einmal ein kleines Häschen, das wollte zu seiner Oma gehen. Auf dem Weg traf es einen Wolf.
+
+"Wo gehst du hin, kleines Häschen?" fragte der Wolf.
+
+"Ich gehe zu meiner Oma," antwortete das Häschen.
+
+"Wie kommst du dorthin?" fragte der Wolf.
+
+"Ich gehe den kurzen Weg durch den Wald," sagte das Häschen.
+
+"Ich gehe den langen Weg entlang der Straße," sagte der Wolf. "Ich werde dich dort abholen."
+
+Das Häschen lief den kurzen Weg durch den Wald. Es kam bei der Oma an und erzählte ihr von dem Wolf.
+
+Die Oma war sehr aufgeregt. "Mach die Tür zu und sperr sie ab," sagte sie.
+
+Das Häschen tat es.
+
+Kurz darauf klopfte es an die Tür. "Öffne, Oma, es ist dein kleines Häschen," sagte eine Stimme.
+
+"Ist es wirklich du?" fragte die Oma. "Lass mich deine Pfoten sehen."
+
+Eine große, schwarze Pfote kam durch den Türspalt. "Das sind nicht meine Pfoten," sagte die Oma. "Das ist der Wolf!"
+
+Das Häschen und die Oma versteckten sich unter dem Bett.
+
+Der Wolf sprang hinein und suchte sie. Aber er konnte sie nicht finden.
+
+Endlich gab er auf und ging weg.
+
+Das Häschen und die Oma waren sehr glücklich, dass sie gerettet waren.
+\end{original}
+
+\translation{
+小兔子和狼
+
+从前有一只小兔子，它想去看望它的奶奶。在路上，它遇到了一只狼。
+
+"你要去哪里，小兔子？"狼问。
+
+"我去看望我的奶奶，"小兔子回答。
+
+"你怎么去那里？"狼问。
+
+"我走穿过森林的近路，"小兔子说。
+
+"我走沿着街道的远路，"狼说。"我会在那里接你。"
+
+小兔子跑过森林的近路。它来到奶奶家，告诉她关于狼的事。
+
+奶奶非常担心。"把门关上并锁好，"她说。
+
+小兔子照做了。
+
+不久，有人敲门。"开门，奶奶，是你的小兔子，"一个声音说。
+
+"真的是你吗？"奶奶问。"让我看看你的爪子。"
+
+一只又大又黑的爪子从门缝里伸出来。"这不是我的爪子，"奶奶说。"这是狼！"
+
+小兔子和奶奶躲在床底下。
+
+狼跳进来寻找它们。但它找不到它们。
+
+最后，它放弃了，走了。
+
+小兔子和奶奶非常高兴，它们得救了。
+}
+
+\chapter{第二十八章}
+
+\begin{original}
+Der seltsame Hase
+
+Es war einmal ein seltsamer Hase, der hatte eine goldene Füße.
+
+Er lebte in einem großen Wald und war sehr beliebt bei allen Tieren.
+
+Eines Tages kam ein Jäger in den Wald. Er sah den Hasen mit der goldenen Füße und wollte ihn fangen.
+
+Der Hase lief weg, aber der Jäger verfolgte ihn.
+
+Plötzlich sprang der Hase in einen großen See. Der Jäger konnte ihn nicht fangen.
+
+Aber der Hase war ein ausgezeichneter Schwimmer. Er erreichte das andere Ufer und verschwand in dem Wald.
+
+Der Jäger gab auf und ging weg.
+
+Der seltsame Hase lebte weiterhin glücklich in dem Wald, und niemand wagte ihn wieder anzugreifen.
+\end{original}
+
+\translation{
+奇怪的兔子
+
+从前有一只奇怪的兔子，它有一只金色的脚。
+
+它住在一个大森林里，所有的动物都非常喜欢它。
+
+有一天，一个猎人来到森林里。他看到了那只金色脚的兔子，想抓住它。
+
+兔子跑开了，但猎人追着它。
+
+突然，兔子跳进了一个大湖里。猎人抓不住它。
+
+但兔子是一名出色的游泳运动员。它到达了对岸，消失在森林里。
+
+猎人放弃了，走了。
+
+这只奇怪的兔子继续幸福地生活在森林里，没有人再敢攻击它。
+}
+
+\chapter{第二十九章}
+
+\begin{original}
+Die drei Räuber
+
+Es war einmal drei Räuber, die lebten in einem alten Schloss im Wald. Sie raubten alle, die vorbeikamen.
+
+Eines Tages kamen sie auf eine schöne Prinzessin, die durch den Wald reiste. Sie wollten sie rauben, aber die Prinzessin hatte einen Plan.
+
+"Warum raubt ihr mich?" fragte sie. "Ich bin die Tochter des Königs. Wenn ihr mich freilässt, wird der König euch reich belohnen."
+
+Die Räuber waren neugierig. "Was wird er uns geben?" fragten sie.
+
+"Er wird euch jedes Gold und Silber geben, was ihr wollt," sagte die Prinzessin.
+
+Die Räuber stimmten zu und setzten die Prinzessin frei.
+
+Die Prinzessin ging zum König und erzählte ihm von den Räubern.
+
+Der König war sehr glücklich, dass seine Tochter sicher war. Er ließ die Räuber rufen und gab ihnen viel Gold und Silber.
+
+Die Räuber waren sehr erstaunt und dankbar. Sie gaben den Raub auf und wurden ehrliche Männer.
+
+Sie lebten glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+三个强盗
+
+从前有三个强盗，他们住在森林里的一座旧城堡里。他们抢劫所有经过的人。
+
+有一天，他们遇到了一位美丽的公主，她正在穿过森林旅行。他们想抢劫她，但公主有一个计划。
+
+"你们为什么抢劫我？"她问。"我是国王的女儿。如果你放了我，国王会给你丰厚的报酬。"
+
+强盗们很好奇。"他会给我们什么？"他们问。
+
+"他会给你任何你想要的金银，"公主说。
+
+强盗们同意了，释放了公主。
+
+公主去见国王，告诉他关于强盗的事。
+
+国王非常高兴，他的女儿安然无恙。他派人去叫强盗们，给了他们很多金银。
+
+强盗们非常惊讶和感激。他们停止了抢劫，成为了诚实的人。
+
+他们幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第三十章}
+
+\begin{original}
+Der junge Riese
+
+Es war einmal ein junger Riese, der lebte in einem großen Schloss auf einem Berg. Er war sehr stark, aber auch sehr einfallsreich.
+
+Eines Tages kamen ein König und seine Armee. Sie wollten das Schloss erobern.
+
+Der junge Riese war allein, aber er hatte einen Plan. Er sammelte große Steine und rollte sie von dem Berg herunter.
+
+Die Soldaten waren erschrocken und flohen.
+
+Der König war sehr wütend. Er schickte mehr Soldaten.
+
+Aber der junge Riese hatte einen anderen Plan. Er machte einen großen Kessel und füllte ihn mit Wasser. Dann heizte er ihn an dem Feuer.
+
+Als die Soldaten kamen, goss er das heiße Wasser über sie. Die Soldaten flohen wieder.
+
+Der König gab auf und ging weg. Der junge Riese lebte weiterhin glücklich in seinem Schloss.
+\end{original}
+
+\translation{
+年轻的巨人
+
+从前有一个年轻的巨人，他住在山上的一座大城堡里。他很强壮，但也很有创造力。
+
+有一天，一位国王和他的军队来了。他们想征服这座城堡。
+
+年轻的巨人独自一人，但他有一个计划。他收集了大石头，把它们从山上滚下来。
+
+士兵们吓坏了，逃跑了。
+
+国王非常生气。他派了更多的士兵。
+
+但年轻的巨人有另一个计划。他做了一个大桶，装满了水。然后他在火上加热。
+
+当士兵们来的时候，他把热水倒在他们身上。士兵们又逃跑了。
+
+国王放弃了，走了。年轻的巨人继续幸福地生活在他的城堡里。
+}
+
+\chapter{第三十一章}
+
+\begin{original}
+Das goldene Schlüssel
+
+Es war einmal ein armer Junge, der wollte einen Job finden. Eines Tages fand er einen goldenen Schlüssel.
+
+"Was kann dieser Schlüssel öffnen?" fragte er sich.
+
+Er suchte und suchte, bis er einen kleinen Schatzkästchen fand. Er öffnete es mit dem goldenen Schlüssel.
+
+In dem Schatzkästchen fand er eine Menge Gold und Silber.
+
+Der Junge wurde reich und glücklich. Er heiratete eine schöne Frau und lebte glücklich bis ans Ende seiner Tage.
+\end{original}
+
+\translation{
+金钥匙
+
+从前有一个贫穷的男孩，他想找一份工作。有一天，他找到了一把金钥匙。
+
+"这把钥匙能打开什么？"他问自己。
+
+他找啊找，直到找到一个小首饰盒。他用金钥匙打开了它。
+
+在首饰盒里，他发现了许多金银。
+
+男孩变得富有和幸福。他娶了一位美丽的妻子，幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第三十二章}
+
+\begin{original}
+Die drei Spinnerinnen
+
+Es war einmal ein König, der hatte eine Tochter, die sehr faul war. Sie wollte nicht spinnen.
+
+Der König war sehr wütend. Er sagte: "Du sollst die Frau des ersten Mannes heiraten, der vorbeikommt."
+
+Der erste Mann, der vorbeikam, war ein armer Spinner.
+
+Die Königstochter musste mit ihm heiraten. Sie ging mit ihm in seine kleine Hütte.
+
+Eines Tages kam der König zu Besuch. Er war sehr traurig, als er sah, wie arm seine Tochter lebte.
+
+Die Spinnerin hatte Mitleid mit ihr. Sie sagte: "Ich werde dir helfen. Ich habe zwei Schwestern, die auch spinnt. Sie werden dir helfen."
+
+Am nächsten Tag kamen die zwei Schwestern. Sie waren sehr hässlich: eine hatte eine große Nase, die andere hatte große Füße.
+
+Der König kam wieder. Er sah die drei Spinnerinnen und war sehr erstaunt. "Wie fleißig ihr seid!" sagte er.
+
+Er ließ ihnen ein großes Schloss bauen, und sie lebten alle dort glücklich.
+
+Die Königstochter wurde nicht mehr faul. Sie lernte zu spinnen und wurde eine gute Ehefrau.
+\end{original}
+
+\translation{
+三个纺纱女
+
+从前有一位国王，他有一个非常懒惰的女儿。她不想纺纱。
+
+国王非常生气。他说："你应该嫁给第一个经过的男人。"
+
+第一个经过的男人是一个贫穷的纺纱工。
+
+公主不得不嫁给他。她和他一起去了他的小茅屋。
+
+有一天，国王来拜访。当他看到女儿生活得如此贫穷时，他非常难过。
+
+纺纱工很同情她。她说："我会帮助你。我有两个姐妹，她们也会纺纱。他们会帮助你。"
+
+第二天，两个姐妹来了。她们非常丑陋：一个有一个大鼻子，另一个有一双大脚。
+
+国王又来了。他看到三个纺纱女，非常惊讶。"你们真勤奋！"他说。
+
+他让人为她们建了一座大城堡，他们都幸福地住在那里。
+
+公主不再懒惰。她学会了纺纱，成为了一个好妻子。
+}
+
+\chapter{第三十三章}
+
+\begin{original}
+Die drei Federn
+
+Es war einmal ein König, der hatte drei Söhne. Er liebte sie alle, aber er wollte wissen, wer der klügste war.
+
+Eines Tages sagte er zu seinen Söhnen: "Ich werde euch je eine Feder geben. Ihr müsst sie nach Westen, Süden und Osten werfen. Wo sie landet, müsst ihr hingehen und etwas Besonderes bringen. Der, der das Besonderste bringt, wird mein Erbe bekommen."
+
+Die drei Söhne stimmten zu. Der älteste Sohn warf seine Feder nach Westen. Sie landete in einem großen Wald. Dort fand er einen goldenen Vogel, der singen konnte.
+
+Der zweite Sohn warf seine Feder nach Süden. Sie landete in einem schönen Garten. Dort fand er eine blaue Rose, die nie welkte.
+
+Der jüngste Sohn warf seine Feder nach Osten. Sie landete in einem kleinen Dorf. Dort fand er eine schöne Prinzessin, die sehr klug war.
+
+Die drei Söhne kehrten zurück und zeigten dem König, was sie gefunden hatten.
+
+Der König war sehr erfreut. "Alle drei haben etwas Besonderes gefunden," sagte er. "Aber der jüngste Sohn hat das Besonderste gefunden: eine kluge Prinzessin. Er wird mein Erbe bekommen."
+
+Der jüngste Sohn heiratete die Prinzessin und wurde König. Er regierte das Land mit Weisheit und Gerechtigkeit.
+
+Die drei Brüder blieben gute Freunde, und sie lebten alle glücklich bis ans Ende ihrer Tage.
+\end{original}
+
+\translation{
+三根羽毛
+
+从前有一位国王，他有三个儿子。他爱他们所有人，但他想知道谁是最聪明的。
+
+有一天，他对他的儿子们说："我会给你们每人一根羽毛。你们必须把它们向西、向南和向东扔。它们落在哪里，你们就必须去哪里，带点特别的东西回来。谁带来的东西最特别，谁就会得到我的遗产。"
+
+三个儿子同意了。大儿子把羽毛扔到西边。它落在一个大森林里。在那里，他发现了一只会唱歌的金鸟。
+
+二儿子把羽毛扔到南边。它落在一个美丽的花园里。在那里，他发现了一朵永不凋谢的蓝玫瑰。
+
+小儿子把羽毛扔到东边。它落在一个小村庄里。在那里，他发现了一位非常聪明的美丽公主。
+
+三个儿子回来了，向国王展示了他们找到的东西。
+
+国王非常高兴。"你们三个都找到了特别的东西，"他说。"但小儿子找到了最特别的东西：一位聪明的公主。他将得到我的遗产。"
+
+小儿子娶了公主，成为了国王。他以智慧和正义统治着这个国家。
+
+三兄弟仍然是好朋友，他们都幸福地生活在一起，直到生命的尽头。
+}
+
+\chapter{第三十四章}
+
+\begin{original}
+Die goldene Gans
+
+\end{original}
+
+\translation{金鹅}
+
+\chapter{第三十五章}
+
+\begin{original}
+Die Wichtelmänner
+
+\end{original}
+
+\translation{小精灵与鞋匠}
+
+\chapter{第三十六章}
+
+\begin{original}
+Der Zaubertisch, das goldene Eselchen und der Knüppel im Sack
+
+\end{original}
+
+\translation{魔桌、金驴和袋子里的棍子}
+
+\chapter{第三十七章}
+
+\begin{original}
+Die zwölf Tanzenden Prinzessinnen
+
+\end{original}
+
+\translation{十二个跳舞的公主}
+
+\chapter{第三十八章}
+
+\begin{original}
+Der kleine Bauer
+
+\end{original}
+
+\translation{小农夫}
+
+\chapter{第三十九章}
+
+\begin{original}
+Die Bienenkönigin
+
+\end{original}
+
+\translation{蜂王}
+
+\chapter{第四十章}
+
+\begin{original}
+Das Wasser des Lebens
+
+\end{original}
+
+\translation{生命之水}
+
+\chapter{第四十一章}
+
+\begin{original}
+Der singende Knochen
+
+\end{original}
+
+\translation{会唱歌的骨头}
+
+\chapter{第四十二章}
+
+\begin{original}
+Der Teufel mit den drei goldenen Haaren
+
+\end{original}
+
+\translation{三个金头发的魔鬼}
+
+\chapter{第四十三章}
+
+\begin{original}
+Die weiße Schlange
+
+\end{original}
+
+\translation{白蛇}
+
+\chapter{第四十四章}
+
+\begin{original}
+Die Geschichte vom Rumpelstilzchen
+
+\end{original}
+
+\translation{侏儒怪}
+
+\chapter{第四十五章}
+
+\begin{original}
+Hansel und Gretel
+
+\end{original}
+
+\translation{韩塞尔与葛雷特}
+
+\chapter{第四十六章}
+
+\begin{original}
+Die Bremer Stadtmusikanten
+
+\end{original}
+
+\translation{不来梅的音乐家}
+
+\chapter{第四十七章}
+
+\begin{original}
+Die Geschichte von den sieben Raben
+
+\end{original}
+
+\translation{七只乌鸦}
+
+\chapter{第四十八章}
+
+\begin{original}
+Der Froschkönig oder der eiserne Heinrich
+
+\end{original}
+
+\translation{青蛙王子或铁亨利}
+
+\chapter{第四十九章}
+
+\begin{original}
+Die gute Fee
+
+\end{original}
+
+\translation{好心的仙女}
+
+\chapter{第五十章}
+
+\begin{original}
+Die Prinzessin auf der Erbse
+
+\end{original}
+
+\translation{豌豆公主}
+
+\chapter{第五十一章}
+
+\begin{original}
+Der Zauberer und das Kaninchen
+
+\end{original}
+
+\translation{魔法师与兔子}
+
+\chapter{第五十二章}
+
+\begin{original}
+Die kleine Schlange und die Rose
+
+\end{original}
+
+\translation{小蛇与玫瑰}
+
+\chapter{第五十三章}
+
+\begin{original}
+Der Fuchs und das Ei
+
+\end{original}
+
+\translation{狐狸与蛋}
+
+\chapter{第五十四章}
+
+\begin{original}
+Die goldene Äpfel
+
+\end{original}
+
+\translation{金色苹果}
+
+\chapter{第五十五章}
+
+\begin{original}
+Der Bär und der Hirsch
+
+\end{original}
+
+\translation{熊与鹿}
+
+\chapter{第五十六章}
+
+\begin{original}
+Die Zauberkrone
+
+\end{original}
+
+\translation{魔法王冠}
+
+\chapter{第五十七章}
+
+\begin{original}
+Das singende Wasser
+
+\end{original}
+
+\translation{会唱歌的水}
+
+\chapter{第五十八章}
+
+\begin{original}
+Der junge König und die Bettlerin
+
+\end{original}
+
+\translation{年轻国王与乞丐女}
+
+\chapter{第五十九章}
+
+\begin{original}
+Die sieben Zwerge und die kleine Prinzessin
+
+\end{original}
+
+\translation{七个小矮人与小公主}
+
+\chapter{第六十章}
+
+\begin{original}
+Der Zauberstab
+
+\end{original}
+
+\translation{魔法棒}
+
+\chapter{第六十一章}
+
+\begin{original}
+Die blaue Blume
+
+\end{original}
+
+\translation{蓝色花朵}
+
+\chapter{第六十二章}
+
+\begin{original}
+Der Wolf und die Gänse
+
+\end{original}
+
+\translation{狼与鹅}
+
+\chapter{第六十三章}
+
+\begin{original}
+Die goldene Schale
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第六十四章}
+
+\begin{original}
+Der König und die falsche Fee
+
+\end{original}
+
+\translation{国王与假仙女}
+
+\chapter{第六十五章}
+
+\begin{original}
+Die fliegende Kutsche
+
+\end{original}
+
+\translation{会飞的马车}
+
+\chapter{第六十六章}
+
+\begin{original}
+Der arme Fischer und die Meerjungfrau
+
+\end{original}
+
+\translation{贫穷渔夫与美人鱼}
+
+\chapter{第六十七章}
+
+\begin{original}
+Die goldene Uhr
+
+\end{original}
+
+\translation{金色时钟}
+
+\chapter{第六十八章}
+
+\begin{original}
+Die drei Schwestern und die Bären
+
+\end{original}
+
+\translation{三姐妹与熊}
+
+\chapter{第六十九章}
+
+\begin{original}
+Der Zauberer und die Katze
+
+\end{original}
+
+\translation{魔法师与猫}
+
+\chapter{第七十章}
+
+\begin{original}
+Die singende Brücke
+
+\end{original}
+
+\translation{会唱歌的桥}
+
+\chapter{第七十一章}
+
+\begin{original}
+Der Prinz und die Eule
+
+\end{original}
+
+\translation{王子与猫头鹰}
+
+\chapter{第七十二章}
+
+\begin{original}
+Die goldene Giraffe
+
+\end{original}
+
+\translation{金色长颈鹿}
+
+\chapter{第七十三章}
+
+\begin{original}
+Der König und die treue Dienerin
+
+\end{original}
+
+\translation{国王与忠实女仆}
+
+\chapter{第七十四章}
+
+\begin{original}
+Die fliegende Teekanne
+
+\end{original}
+
+\translation{会飞的茶壶}
+
+\chapter{第七十五章}
+
+\begin{original}
+Der arme Schuster und die Fee
+
+\end{original}
+
+\translation{贫穷鞋匠与仙女}
+
+\chapter{第七十六章}
+
+\begin{original}
+Die goldene Gitarre
+
+\end{original}
+
+\translation{金色吉他}
+
+\chapter{第七十七章}
+
+\begin{original}
+Die drei Brüder und die Drachen
+
+\end{original}
+
+\translation{三兄弟与龙}
+
+\chapter{第七十八章}
+
+\begin{original}
+Der Zauberer und das Schwein
+
+\end{original}
+
+\translation{魔法师与猪}
+
+\chapter{第七十九章}
+
+\begin{original}
+Die singende Wand
+
+\end{original}
+
+\translation{会唱歌的墙}
+
+\chapter{第八十章}
+
+\begin{original}
+Die Prinzessin und der Frosch
+
+\end{original}
+
+\translation{公主与青蛙}
+
+\chapter{第八十一章}
+
+\begin{original}
+Die goldene Schere
+
+\end{original}
+
+\translation{金色剪刀}
+
+\chapter{第八十二章}
+
+\begin{original}
+Der König und die tapfere Jungfrau
+
+\end{original}
+
+\translation{国王与勇敢少女}
+
+\chapter{第八十三章}
+
+\begin{original}
+Die fliegende Mütze
+
+\end{original}
+
+\translation{会飞的帽子}
+
+\chapter{第八十四章}
+
+\begin{original}
+Der arme Bauer und die goldene Kuh
+
+\end{original}
+
+\translation{贫穷农民与金牛}
+
+\chapter{第八十五章}
+
+\begin{original}
+Die goldene Harfe
+
+\end{original}
+
+\translation{金色竖琴}
+
+\chapter{第八十六章}
+
+\begin{original}
+Die drei Schwestern und die Wölfe
+
+\end{original}
+
+\translation{三姐妹与狼}
+
+\chapter{第八十七章}
+
+\begin{original}
+Der Zauberer und das Pferd
+
+\end{original}
+
+\translation{魔法师与马}
+
+\chapter{第八十八章}
+
+\begin{original}
+Die singende Tür
+
+\end{original}
+
+\translation{会唱歌的门}
+
+\chapter{第八十九章}
+
+\begin{original}
+Die Prinzessin und der Rabe
+
+\end{original}
+
+\translation{公主与乌鸦}
+
+\chapter{第九十章}
+
+\begin{original}
+Die goldene Schaufel
+
+\end{original}
+
+\translation{金色铲子}
+
+\chapter{第九十一章}
+
+\begin{original}
+Der König und die kluge Magd
+
+\end{original}
+
+\translation{国王与聪明女仆}
+
+\chapter{第九十二章}
+
+\begin{original}
+Die fliegende Sonne
+
+\end{original}
+
+\translation{会飞的太阳}
+
+\chapter{第九十三章}
+
+\begin{original}
+Der arme Müller und die Fee
+
+\end{original}
+
+\translation{贫穷磨坊主与仙女}
+
+\chapter{第九十四章}
+
+\begin{original}
+Die goldene Trompete
+
+\end{original}
+
+\translation{金色小号}
+
+\chapter{第九十五章}
+
+\begin{original}
+Die drei Brüder und die Geister
+
+\end{original}
+
+\translation{三兄弟与幽灵}
+
+\chapter{第九十六章}
+
+\begin{original}
+Der Zauberer und die Ente
+
+\end{original}
+
+\translation{魔法师与鸭子}
+
+\chapter{第九十七章}
+
+\begin{original}
+Die singende Decke
+
+\end{original}
+
+\translation{会唱歌的毯子}
+
+\chapter{第九十八章}
+
+\begin{original}
+Die Prinzessin und der Hund
+
+\end{original}
+
+\translation{公主与狗}
+
+\chapter{第九十九章}
+
+\begin{original}
+Die goldene Gabel
+
+\end{original}
+
+\translation{金色叉子}
+
+\chapter{第一百章}
+
+\begin{original}
+Der König und die schöne Bäuerin
+
+\end{original}
+
+\translation{国王与美丽农妇}
+
+\chapter{第一百零一章}
+
+\begin{original}
+Die fliegende Mond
+
+\end{original}
+
+\translation{会飞的月亮}
+
+\chapter{第一百零二章}
+
+\begin{original}
+Der arme Weber und die Fee
+
+\end{original}
+
+\translation{贫穷织工与仙女}
+
+\chapter{第一百零三章}
+
+\begin{original}
+Die goldene Orgel
+
+\end{original}
+
+\translation{金色风琴}
+
+\chapter{第一百零四章}
+
+\begin{original}
+Die drei Schwestern und die Elfen
+
+\end{original}
+
+\translation{三姐妹与小精灵}
+
+\chapter{第一百零五章}
+
+\begin{original}
+Der Zauberer und die Maus
+
+\end{original}
+
+\translation{魔法师与老鼠}
+
+\chapter{第一百零六章}
+
+\begin{original}
+Die singende Lampe
+
+\end{original}
+
+\translation{会唱歌的灯}
+
+\chapter{第一百零七章}
+
+\begin{original}
+Die Prinzessin und die Maus
+
+\end{original}
+
+\translation{公主与老鼠}
+
+\chapter{第一百零八章}
+
+\begin{original}
+Die goldene Tasse
+
+\end{original}
+
+\translation{金色杯子}
+
+\chapter{第一百零九章}
+
+\begin{original}
+Der König und die tapfere Jungfrau
+
+\end{original}
+
+\translation{国王与勇敢少女}
+
+\chapter{第一百一十章}
+
+\begin{original}
+Die fliegende Sterne
+
+\end{original}
+
+\translation{会飞的星星}
+
+\chapter{第一百一十一章}
+
+\begin{original}
+Der arme Schmied und die Fee
+
+\end{original}
+
+\translation{贫穷铁匠与仙女}
+
+\chapter{第一百一十二章}
+
+\begin{original}
+Die goldene Posaune
+
+\end{original}
+
+\translation{金色长号}
+
+\chapter{第一百一十三章}
+
+\begin{original}
+Die drei Brüder und die Riesen
+
+\end{original}
+
+\translation{三兄弟与巨人}
+
+\chapter{第一百一十四章}
+
+\begin{original}
+Der Zauberer und die Schildkröte
+
+\end{original}
+
+\translation{魔法师与乌龟}
+
+\chapter{第一百一十五章}
+
+\begin{original}
+Die singende Stuhl
+
+\end{original}
+
+\translation{会唱歌的椅子}
+
+\chapter{第一百一十六章}
+
+\begin{original}
+Die Prinzessin und die Schildkröte
+
+\end{original}
+
+\translation{公主与乌龟}
+
+\chapter{第一百一十七章}
+
+\begin{original}
+Die goldene Löffel
+
+\end{original}
+
+\translation{金色勺子}
+
+\chapter{第一百一十八章}
+
+\begin{original}
+Der König und die kluge Junge
+
+\end{original}
+
+\translation{国王与聪明男孩}
+
+\chapter{第一百一十九章}
+
+\begin{original}
+Die fliegende Wolke
+
+\end{original}
+
+\translation{会飞的云}
+
+\chapter{第一百二十章}
+
+\begin{original}
+Der arme Tischler und die Fee
+
+\end{original}
+
+\translation{贫穷木匠与仙女}
+
+\chapter{第一百二十一章}
+
+\begin{original}
+Die goldene Flöte
+
+\end{original}
+
+\translation{金色长笛}
+
+\chapter{第一百二十二章}
+
+\begin{original}
+Die drei Schwestern und die Raben
+
+\end{original}
+
+\translation{三姐妹与乌鸦}
+
+\chapter{第一百二十三章}
+
+\begin{original}
+Der Zauberer und die Spatzen
+
+\end{original}
+
+\translation{魔法师与麻雀}
+
+\chapter{第一百二十四章}
+
+\begin{original}
+Die singende Schublade
+
+\end{original}
+
+\translation{会唱歌的抽屉}
+
+\chapter{第一百二十五章}
+
+\begin{original}
+Die Prinzessin und die Spatzen
+
+\end{original}
+
+\translation{公主与麻雀}
+
+\chapter{第一百二十六章}
+
+\begin{original}
+Die goldene Teller
+
+\end{original}
+
+\translation{金色盘子}
+
+\chapter{第一百二十七章}
+
+\begin{original}
+Der König und die schöne Jungfrau
+
+\end{original}
+
+\translation{国王与美丽少女}
+
+\chapter{第一百二十八章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百二十九章}
+
+\begin{original}
+Der arme Schlosser und die Fee
+
+\end{original}
+
+\translation{贫穷锁匠与仙女}
+
+\chapter{第一百三十章}
+
+\begin{original}
+Die goldene Violine
+
+\end{original}
+
+\translation{金色小提琴}
+
+\chapter{第一百三十一章}
+
+\begin{original}
+Die drei Brüder und die Hexen
+
+\end{original}
+
+\translation{三兄弟与女巫}
+
+\chapter{第一百三十二章}
+
+\begin{original}
+Der Zauberer und die Libelle
+
+\end{original}
+
+\translation{魔法师与蜻蜓}
+
+\chapter{第一百三十三章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百三十四章}
+
+\begin{original}
+Die Prinzessin und die Libelle
+
+\end{original}
+
+\translation{公主与蜻蜓}
+
+\chapter{第一百三十五章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百三十六章}
+
+\begin{original}
+Der König und die tapfere Knabe
+
+\end{original}
+
+\translation{国王与勇敢男孩}
+
+\chapter{第一百三十七章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百三十八章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第一百三十九章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第一百四十章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第一百四十一章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第一百四十二章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百四十三章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第一百四十四章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百四十五章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第一百四十六章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百四十七章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第一百四十八章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第一百四十九章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第一百五十章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第一百五十一章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百五十二章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第一百五十三章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百五十四章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第一百五十五章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百五十六章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第一百五十七章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第一百五十八章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第一百五十九章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第一百六十章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百六十一章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第一百六十二章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百六十三章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第一百六十四章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百六十五章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第一百六十六章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第一百六十七章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第一百六十八章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第一百六十九章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百七十章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第一百七十一章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百七十二章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第一百七十三章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百七十四章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第一百七十五章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第一百七十六章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第一百七十七章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第一百七十八章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百七十九章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第一百八十章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百八十一章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第一百八十二章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百八十三章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第一百八十四章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第一百八十五章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第一百八十六章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第一百八十七章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百八十八章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第一百八十九章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百九十章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第一百九十一章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第一百九十二章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第一百九十三章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第一百九十四章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第一百九十五章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第一百九十六章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第一百九十七章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第一百九十八章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第一百九十九章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百零一章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百零二章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百零三章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百零四章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百零五章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百零六章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百零七章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百零八章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百零九章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百一十章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百一十一章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百一十二章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百一十三章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百一十四章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百一十五章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百一十六章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百一十七章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百一十八章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百一十九章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百二十章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百二十一章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百二十二章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百二十三章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百二十四章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百二十五章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百二十六章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百二十七章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百二十八章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百二十九章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百三十章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百三十一章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百三十二章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百三十三章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百三十四章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百三十五章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百三十六章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百三十七章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百三十八章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百三十九章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百四十章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百四十一章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百四十二章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百四十三章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百四十四章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百四十五章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百四十六章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百四十七章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百四十八章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百四十九章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百五十章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百五十一章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百五十二章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百五十三章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百五十四章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百五十五章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百五十六章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百五十七章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百五十八章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百五十九章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百六十章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百六十一章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百六十二章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百六十三章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百六十四章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百六十五章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百六十六章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百六十七章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百六十八章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百六十九章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百七十章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百七十一章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百七十二章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百七十三章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百七十四章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百七十五章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百七十六章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百七十七章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百七十八章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百七十九章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百八十章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百八十一章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百八十二章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百八十三章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百八十四章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百八十五章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百八十六章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百八十七章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百八十八章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百八十九章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百九十章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第二百九十一章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\chapter{第二百九十二章}
+
+\begin{original}
+Die goldene Klarinette
+
+\end{original}
+
+\translation{金色单簧管}
+
+\chapter{第二百九十三章}
+
+\begin{original}
+Die drei Schwestern und die Drachen
+
+\end{original}
+
+\translation{三姐妹与龙}
+
+\chapter{第二百九十四章}
+
+\begin{original}
+Der Zauberer und die Motte
+
+\end{original}
+
+\translation{魔法师与飞蛾}
+
+\chapter{第二百九十五章}
+
+\begin{original}
+Die singende Truhe
+
+\end{original}
+
+\translation{会唱歌的箱子}
+
+\chapter{第二百九十六章}
+
+\begin{original}
+Die Prinzessin und die Motte
+
+\end{original}
+
+\translation{公主与飞蛾}
+
+\chapter{第二百九十七章}
+
+\begin{original}
+Die goldene Schüssel
+
+\end{original}
+
+\translation{金色碗}
+
+\chapter{第二百九十八章}
+
+\begin{original}
+Der König und die kluge Jungfrau
+
+\end{original}
+
+\translation{国王与聪明少女}
+
+\chapter{第二百九十九章}
+
+\begin{original}
+Die fliegende Blume
+
+\end{original}
+
+\translation{会飞的花}
+
+\chapter{第三百章}
+
+\begin{original}
+Der arme Maurer und die Fee
+
+\end{original}
+
+\translation{贫穷泥瓦匠与仙女}
+
+\end{document}
