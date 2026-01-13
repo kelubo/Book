@@ -1,0 +1,638 @@
+\documentclass{book}
+\usepackage[UTF8]{ctex}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{indentfirst}
+
+% 页面设置
+\geometry{a4paper, top=1.5in, bottom=1.5in, left=1.5in, right=1.5in}
+
+% 页眉页脚设置
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE,LO]{Z80 CPU 技术详解}
+\fancyfoot[CE,CO]{Z80 CPU 技术详解}
+
+% 章节标题格式
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\center}%
+  {第 \Roman{chapter} 章}%
+  {20pt}%
+  {\Huge}
+\titlespacing*{\chapter}{0pt}{50pt}{40pt}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries}%
+  {\thesection.}%
+  {1em}%
+  {}
+\titlespacing*{\section}{0pt}{30pt}{20pt}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}%
+  {\thesubsection.}%
+  {1em}%
+  {}
+\titlespacing*{\subsection}{0pt}{20pt}{10pt}
+
+% 目录设置
+\renewcommand{\contentsname}{目录}
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchapnumwidth}{2em}
+\renewcommand{\cftchappresnum}{第 \Roman{chapter} 章：}
+\renewcommand{\cftchapaftersnumb}{\hfill}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+% 标题信息
+\title{Z80 CPU 技术详解}
+\author{}
+\date{}
+
+\begin{document}
+
+% 前页
+\frontmatter
+
+\maketitle
+
+\tableofcontents
+
+\mainmatter
+
+\chapter{Z80 CPU 概述}
+
+\section{Z80 的历史背景}
+\begin{itemize}
+    \item Z80 的开发背景
+    \item 与 Intel 8080 的关系
+    \item Z80 的主要应用领域
+\end{itemize}
+
+\subsection{Z80 的基本特性}
+\begin{itemize}
+    \item 时钟频率范围
+    \item 数据总线和地址总线宽度
+    \item 指令集规模
+    \item 寄存器结构
+\end{itemize}
+
+\chapter{Z80 CPU 内部结构}
+
+\section{寄存器组}
+\begin{itemize}
+    \item 通用寄存器（A, B, C, D, E, H, L）
+    \item 索引寄存器（IX, IY）
+    \item 栈指针（SP）
+    \item 程序计数器（PC）
+    \item 标志寄存器（F）
+    \item 特殊寄存器（I, R, IM）
+\end{itemize}
+
+\subsection{算术逻辑单元（ALU）}
+\begin{itemize}
+    \item 支持的运算类型
+    \item 位操作功能
+\end{itemize}
+
+\subsection{控制单元}
+\begin{itemize}
+    \item 指令解码
+    \item 时序控制
+\end{itemize}
+
+\subsection{内存和 I/O 接口}
+\begin{itemize}
+    \item 内存寻址能力
+    \item I/O 寻址方式
+\end{itemize}
+
+\chapter{Z80 指令系统}
+
+\section{指令格式}
+\begin{itemize}
+    \item 单字节指令
+    \item 双字节指令
+    \item 三字节指令
+\end{itemize}
+
+\subsection{指令类型}
+\begin{itemize}
+    \item 数据传送指令
+    \item 算术运算指令
+    \item 逻辑运算指令
+    \item 位操作指令
+    \item 控制转移指令
+    \item 栈操作指令
+    \item 输入输出指令
+\end{itemize}
+
+\subsection{寻址方式}
+\begin{itemize}
+    \item 立即寻址
+    \item 直接寻址
+    \item 寄存器寻址
+    \item 寄存器间接寻址
+    \item 变址寻址
+    \item 相对寻址
+\end{itemize}
+
+\chapter{Z80 汇编语言}
+
+\section{汇编语言基础}
+\begin{itemize}
+    \item 指令格式
+    \item 伪指令
+    \item 宏指令
+\end{itemize}
+
+\subsection{编程示例}
+\begin{itemize}
+    \item 简单程序结构
+    \item 数据处理示例
+    \item 控制结构示例
+\end{itemize}
+
+\chapter{Z80 系统设计}
+
+\section{内存接口}
+\begin{itemize}
+    \item 内存映射
+    \item 内存扩展
+\end{itemize}
+
+\subsection{I/O 接口}
+\begin{itemize}
+    \item 并行 I/O
+    \item 串行 I/O
+\end{itemize}
+
+\subsection{中断系统}
+\begin{itemize}
+    \item 中断类型（IM 0, IM 1, IM 2）
+    \item 中断处理流程
+\end{itemize}
+
+\subsection{时钟和时序}
+\begin{itemize}
+    \item 时钟信号
+    \item 机器周期
+    \item 指令周期
+\end{itemize}
+
+\chapter{Z80 应用实例}
+
+\section{经典计算机系统}
+\begin{itemize}
+    \item ZX Spectrum
+    \item MSX
+    \item TRS-80
+\end{itemize}
+
+\subsection{嵌入式系统应用}
+\begin{itemize}
+    \item 工业控制
+    \item 家用电子设备
+\end{itemize}
+
+\chapter{Z80 开发工具}
+
+\section{汇编器和编译器}
+\begin{itemize}
+    \item Z80ASM
+    \item SDCC
+\end{itemize}
+
+\subsection{仿真器}
+\begin{itemize}
+    \item EightyOne
+    \item MAME
+\end{itemize}
+
+\subsection{开发板}
+\begin{itemize}
+    \item Z80 开发套件
+\end{itemize}
+
+\chapter{Z80 与现代处理器的比较}
+
+\section{架构差异}
+\subsection{性能比较}
+\subsection{学习价值}
+
+\chapter{进阶学习}
+
+\section{Z80 高级编程技术}
+\begin{itemize}
+    \item 中断驱动编程
+    \item 内存管理
+\end{itemize}
+
+\subsection{Z80 硬件设计}
+
+\subsubsection{最小系统设计}
+
+Z80最小系统是指能够使Z80 CPU正常工作的最基本硬件配置，它包含以下核心组件：
+
+\paragraph{核心组件}
+
+\begin{itemize}
+    \item \textbf{Z80 CPU}：系统的核心，负责执行指令和控制整个系统
+    \item \textbf{时钟电路}：提供CPU工作所需的时钟信号
+    \item \textbf{复位电路}：确保CPU在上电或复位时能正确初始化
+    \item \textbf{内存}：包括ROM（存放引导程序和固定程序）和RAM（用于数据存储和程序运行）
+    \item \textbf{电源电路}：为系统提供稳定的电源供应
+    \item \textbf{总线缓冲/驱动}：增强总线驱动能力（可选，取决于系统规模）
+\end{itemize}
+
+\paragraph{电路设计细节}
+
+\subparagraph{时钟电路设计}
+
+Z80 CPU需要一个稳定的时钟信号才能正常工作，时钟频率通常在1MHz到20MHz之间（取决于具体的Z80型号）。时钟电路可以通过以下方式实现：
+
+\begin{itemize}
+    \item \textbf{晶振+反相器}：使用石英晶体振荡器和反相器（如74LS04）生成时钟信号
+    \item \textbf{时钟模块}：使用现成的时钟模块直接提供所需频率的时钟信号
+    \item \textbf{555定时器}：对于低频应用，可以使用555定时器搭建时钟电路
+\end{itemize}
+
+时钟电路的设计需要注意：
+\begin{itemize}
+    \item 时钟信号的占空比应接近50%，以确保CPU的稳定工作
+    \item 时钟信号应尽量减少噪声干扰，可通过添加滤波电容实现
+    \item 对于高频应用，应考虑PCB布局的电磁兼容性问题
+\end{itemize}
+
+\subparagraph{复位电路设计}
+
+Z80 CPU的\overline{RESET}引脚需要一个至少200ns的低电平脉冲来完成复位。复位电路的设计需要确保：
+
+\begin{itemize}
+    \item 在上电时能自动产生复位信号
+    \item 允许手动复位
+    \item 复位信号的持续时间足够长
+\end{itemize}
+
+常用的复位电路设计：
+\begin{itemize}
+    \item \textbf{RC复位电路}：使用电阻和电容构成的充放电电路，在上电时产生复位信号
+    \item \textbf{专用复位芯片}：如MAX813L，提供更可靠的复位功能和看门狗功能
+\end{itemize}
+
+\subparagraph{内存设计}
+
+最小系统的内存设计通常包括：
+
+\begin{itemize}
+    \item \textbf{ROM}：通常使用EPROM或EEPROM，容量为2KB到32KB不等，用于存放引导程序和固定程序
+    \item \textbf{RAM}：通常使用SRAM，容量为1KB到64KB不等，用于数据存储和程序运行
+\end{itemize}
+
+内存地址分配示例：
+\begin{itemize}
+    \item 0x0000-0x07FF：8KB ROM（如2764）
+    \item 0x0800-0x3FFF：14KB 可选ROM扩展
+    \item 0x4000-0x7FFF：16KB RAM（如62256的一部分）
+    \item 0x8000-0xFFFF：32KB RAM（62256的其余部分）
+\end{itemize}
+
+\subparagraph{电源电路设计}
+
+Z80 CPU需要+5V的直流电源，电流需求通常在100mA到500mA之间（取决于时钟频率和外设数量）。电源电路设计需要注意：
+
+\begin{itemize}
+    \item 电源的稳定性：使用稳压芯片（如7805）提供稳定的+5V电压
+    \item 电源滤波：在稳压芯片的输入和输出端添加电解电容和陶瓷电容进行滤波
+    \item 电源保护：添加保险丝和反向保护二极管
+\end{itemize}
+
+\paragraph{硬件连接图描述}
+
+Z80最小系统的硬件连接主要包括：
+
+\begin{itemize}
+    \item \textbf{地址总线（A0-A15）}：连接到ROM和RAM的地址输入端
+    \item \textbf{数据总线（D0-D7）}：连接到ROM、RAM和I/O设备的数据端
+    \item \textbf{控制总线}：
+    \begin{itemize}
+        \item \overline{MREQ}：内存请求信号，连接到ROM和RAM的片选端
+        \item \overline{IORQ}：I/O请求信号，连接到I/O设备
+        \item \overline{RD}：读信号，连接到ROM和RAM的输出使能端
+        \item \overline{WR}：写信号，连接到RAM的写使能端
+        \item \overline{RESET}：复位信号，连接到复位电路
+        \item \textbf{CLK}：时钟信号，连接到时钟电路
+    \end{itemize}
+\end{itemize}
+
+\paragraph{启动流程}
+
+Z80 CPU在上电复位后，程序计数器（PC）会被设置为0x0000，系统开始从ROM的0x0000地址读取并执行指令。启动流程通常包括：
+
+\begin{enumerate}
+    \item CPU复位，PC = 0x0000
+    \item 从ROM 0x0000地址读取第一条指令并执行
+    \item 执行初始化程序（如设置堆栈指针、初始化I/O设备等）
+    \item 进入主程序循环
+\end{enumerate}
+
+\paragraph{调试和测试方法}
+
+最小系统的调试和测试可以通过以下方式进行：
+
+\begin{itemize}
+    \item \textbf{LED指示灯}：连接到数据总线或I/O端口，通过LED的闪烁判断CPU是否正常工作
+    \item \textbf{串口调试}：添加串口模块（如MAX232），通过串口输出调试信息
+    \item \textbf{逻辑分析仪}：使用逻辑分析仪观察总线信号，分析CPU的工作状态
+    \item \textbf{仿真器}：使用Z80仿真器（如Z80 Emulator）进行程序调试
+\end{itemize}
+
+\paragraph{示例引导程序}
+
+以下是一个简单的Z80引导程序示例，用于验证最小系统的基本功能：
+
+\begin{verbatim}
+; Z80 最小系统引导程序
+; 功能：使连接到端口0的LED闪烁
+
+    ORG 0000H       ; 程序起始地址
+
+START:
+    LD SP, 0FFFFH   ; 设置堆栈指针
+    LD A, 80H       ; 初始化A寄存器
+    LD B, 20H       ; 初始化B寄存器
+
+LOOP:
+    OUT (0), A      ; 向端口0输出A寄存器的值
+    CALL DELAY      ; 调用延迟子程序
+    XOR B           ; 翻转A寄存器的位
+    JP LOOP         ; 循环
+
+DELAY:
+    LD C, 0FFH      ; 延迟计数1
+DELAY1:
+    LD D, 0FFH      ; 延迟计数2
+DELAY2:
+    DEC D
+    JP NZ, DELAY2
+    DEC C
+    JP NZ, DELAY1
+    RET             ; 返回主程序
+
+    END
+\end{verbatim}
+
+这个引导程序的功能：
+\begin{itemize}
+    \item 设置堆栈指针
+    \item 通过翻转寄存器A的值，使连接到端口0的LED灯闪烁
+    \item 使用嵌套循环实现延迟功能
+\end{itemize}
+
+\paragraph{故障排除指南}
+
+在构建Z80最小系统时，可能会遇到以下常见问题：
+
+\begin{enumerate}
+    \item \textbf{CPU不工作}
+          \begin{itemize}
+              \item 检查电源电压是否为+5V，极性是否正确
+              \item 检查时钟电路是否正常工作，时钟信号是否正确
+              \item 检查复位电路是否正常，复位信号是否符合要求
+              \item 检查CPU的引脚连接是否正确
+          \end{itemize}
+    \item \textbf{内存访问错误}
+          \begin{itemize}
+              \item 检查ROM和RAM的地址线连接是否正确
+              \item 检查片选信号（\overline{CS}）是否正确连接
+              \item 检查读写信号（\overline{RD}/\overline{WR}）是否正确连接
+              \item 验证ROM中的程序是否正确烧录
+          \end{itemize}
+    \item \textbf{I/O设备不响应}
+          \begin{itemize}
+              \item 检查I/O请求信号（\overline{IORQ}）是否正确连接
+              \item 检查I/O端口地址是否正确
+              \item 检查I/O设备的电源和地线连接
+          \end{itemize}
+    \item \textbf{系统不稳定}
+          \begin{itemize}
+              \item 检查电源滤波电容是否足够
+              \item 检查时钟信号是否有噪声
+              \item 检查PCB布局是否合理，避免信号线过长
+              \item 检查各芯片的散热情况
+          \end{itemize}
+\end{enumerate}
+
+\subsubsection{总线扩展}
+
+当最小系统需要增加更多的内存、I/O设备或其他外设时，就需要对Z80的总线进行扩展。总线扩展的主要目标是在保持系统稳定性的同时，增加系统的功能和可扩展性。
+
+\paragraph{总线扩展的必要性}
+
+最小系统通常只能满足基本需求，当需要以下功能时，就需要进行总线扩展：
+
+\begin{itemize}
+    \item 增加内存容量（超过最小系统的16KB或32KB）
+    \item 添加多种I/O设备（如键盘、显示器、串口等）
+    \item 连接外部扩展卡或模块
+    \item 实现多处理器系统
+    \item 提高总线的驱动能力，支持更多设备
+\end{itemize}
+
+\paragraph{总线扩展的基本原理}
+
+Z80 CPU的总线包括：
+\begin{itemize}
+    \item \textbf{地址总线（A0-A15）}：16位，可寻址64KB内存空间
+    \item \textbf{数据总线（D0-D7）}：8位，用于数据传输
+    \item \textbf{控制总线}：包括内存请求（\overline{MREQ}）、I/O请求（\overline{IORQ}）、读写信号（\overline{RD}/\overline{WR}）等
+\end{itemize}
+
+总线扩展的基本原理是通过总线缓冲器、地址译码器等电路，将CPU的总线信号扩展到更多的设备上，同时确保信号的完整性和稳定性。
+
+\paragraph{总线缓冲与驱动}
+
+Z80 CPU的总线驱动能力有限，通常只能直接驱动几个TTL设备。当连接更多设备时，需要使用总线缓冲器或驱动器来增强驱动能力。
+
+常用的总线缓冲/驱动IC：
+\begin{itemize}
+    \item \textbf{74LS244}：8位三态缓冲器，用于单向总线（如地址总线）
+    \item \textbf{74LS245}：8位三态双向总线收发器，用于双向总线（如数据总线）
+    \item \textbf{74LS373}：8位锁存器，用于地址总线锁存
+    \item \textbf{74LS374}：8位D触发器，用于数据总线锁存
+\end{itemize}
+
+缓冲器的使用需要注意：
+\begin{itemize}
+    \item 地址总线通常使用单向缓冲器或锁存器
+    \item 数据总线必须使用双向总线收发器
+    \item 控制总线需要根据信号方向选择合适的缓冲器
+    \item 缓冲器的使能信号必须正确连接，避免总线冲突
+\end{itemize}
+
+\paragraph{地址译码}
+
+地址译码是总线扩展的关键技术，用于将CPU的16位地址总线映射到不同的设备或内存区域。常见的地址译码方法包括：
+
+\begin{enumerate}
+    \item \textbf{线选法}
+          \begin{itemize}
+              \item 简单直接，使用高位地址线直接作为设备的片选信号
+              \item 适用于设备数量较少的系统
+              \item 地址空间利用率低，存在地址重叠
+          \end{itemize}
+    \item \textbf{全译码法}
+          \begin{itemize}
+              \item 使用所有高位地址线进行译码
+              \item 地址空间利用充分，无地址重叠
+              \item 电路复杂，需要较多的译码门电路
+          \end{itemize}
+    \item \textbf{部分译码法}
+          \begin{itemize}
+              \item 使用部分高位地址线进行译码
+              \item 兼顾了线选法的简单性和全译码法的地址空间利用率
+              \item 仍存在一定的地址重叠
+          \end{itemize}
+    \item \textbf{译码器IC法}
+          \begin{itemize}
+              \item 使用专用的译码器IC（如74LS138、74LS139等）
+              \item 电路简单，可靠性高
+              \item 适用于各种规模的系统
+          \end{itemize}
+\end{enumerate}
+
+常用的地址译码器IC：
+\begin{itemize}
+    \item \textbf{74LS138}：3-8线译码器，可产生8个片选信号
+    \item \textbf{74LS139}：双2-4线译码器，可产生8个片选信号
+    \item \textbf{74LS154}：4-16线译码器，可产生16个片选信号
+    \item \textbf{PAL/GAL}：可编程逻辑器件，可实现复杂的地址译码逻辑
+\end{itemize}
+
+\paragraph{内存扩展}
+
+Z80 CPU的地址总线为16位，理论上可寻址64KB内存空间。内存扩展通常包括：
+
+\begin{enumerate}
+    \item \textbf{ROM扩展}
+          \begin{itemize}
+              \item 使用更大容量的ROM芯片（如27128、27256等）
+              \item 通过地址译码器将ROM映射到合适的地址空间
+              \item 常用于存放更大的程序或多个程序
+          \end{itemize}
+    \item \textbf{RAM扩展}
+          \begin{itemize}
+              \item 使用更大容量的RAM芯片（如62256、6264等）
+              \item 注意RAM的读写控制和片选信号的连接
+              \item 常用于数据存储和程序运行
+          \end{itemize}
+    \item \textbf{内存分页}
+          \begin{itemize}
+              \item 当需要超过64KB的内存时，可采用内存分页技术
+              \item 通过页面寄存器或MMU（内存管理单元）实现
+              \item 常见的分页方式包括 bank switching 等
+          \end{itemize}
+\end{enumerate}
+
+内存扩展的地址映射示例：
+\begin{itemize}
+    \item 0x0000-0x7FFF：32KB ROM（27256）
+    \item 0x8000-0xBFFF：16KB RAM（6264）
+    \item 0xC000-0xFFFF：16KB RAM（6264）
+\end{itemize}
+
+\paragraph{I/O扩展}
+
+Z80 CPU支持64KB的I/O空间（0x0000-0xFFFF），但实际上通常只使用低8位地址（0x00-0xFF），可寻址256个I/O端口。I/O扩展主要包括：
+
+\begin{enumerate}
+    \item \textbf{并行I/O扩展}
+          \begin{itemize}
+              \item 使用并行I/O芯片（如8255A、6821等）
+              \item 可扩展多个并行I/O端口
+              \item 常用于连接键盘、显示器、打印机等
+          \end{itemize}
+    \item \textbf{串行I/O扩展}
+          \begin{itemize}
+              \item 使用串行通信芯片（如8251A、6850等）
+              \item 实现RS-232、RS-485等串行通信
+              \item 常用于与其他设备或计算机通信
+          \end{itemize}
+    \item \textbf{定时/计数扩展}
+          \begin{itemize}
+              \item 使用定时/计数芯片（如8253、6840等）
+              \item 实现定时、计数、脉冲生成等功能
+              \item 常用于精确控制和测量
+          \end{itemize}
+    \item \textbf{中断控制器扩展}
+          \begin{itemize}
+              \item 使用中断控制器芯片（如8259A等）
+              \item 扩展中断源，实现优先级管理
+              \item 常用于多中断源系统
+          \end{itemize}
+\end{enumerate}
+
+\paragraph{总线扩展的时序考虑}
+
+总线扩展时需要注意时序问题，确保所有设备都能在正确的时间内响应总线操作。主要的时序参数包括：
+
+\begin{itemize}
+    \item \textbf{访问时间}：CPU从发出地址到读取数据所需的时间
+    \item \textbf{建立时间}：地址和控制信号需要在数据有效前保持稳定的时间
+    \item \textbf{保持时间}：数据需要在地址和控制信号无效后保持稳定的时间
+    \item \textbf{总线周期}：完成一次总线操作所需的时钟周期数
+\end{itemize}
+
+对于慢速设备，可以通过插入等待状态（WAIT）来延长总线周期，确保设备有足够的时间响应。
+
+\paragraph{总线扩展的示例电路}
+
+以下是一个简单的Z80总线扩展示例，用于扩展内存和I/O：
+
+\begin{enumerate}
+    \item \textbf{内存扩展}
+          \begin{itemize}
+              \item 使用74LS138译码器将32KB ROM（0x0000-0x7FFF）和32KB RAM（0x8000-0xFFFF）映射到地址空间
+              \item 使用74LS245作为数据总线缓冲器
+              \item 使用74LS244作为地址总线缓冲器
+          \end{itemize}
+    \item \textbf{I/O扩展}
+          \begin{itemize}
+              \item 使用8255A并行I/O芯片扩展3个8位并行端口
+              \item 使用74LS139译码器将8255A映射到端口地址0x80-0x83
+              \item 8255A的PA口连接LED显示，PB口连接键盘，PC口作为控制端口
+          \end{itemize}
+\end{enumerate}
+
+\paragraph{总线扩展的注意事项}
+
+在进行总线扩展时，需要注意以下事项：
+
+\begin{itemize}
+    \item \textbf{总线冲突}：确保同一时间只有一个设备在总线上发送数据
+    \item \textbf{信号完整性}：使用合适的缓冲器和驱动器，确保信号的完整性
+    \item \textbf{电磁兼容性}：注意PCB布局和布线，减少电磁干扰
+    \item \textbf{时序匹配}：确保所有设备的时序参数匹配，避免时序冲突
+    \item \textbf{电源稳定性}：提供稳定的电源，特别是对于扩展的设备
+    \item \textbf{接地处理}：良好的接地系统可以减少噪声和干扰
+    \item \textbf{可维护性}：设计时考虑系统的可维护性和可扩展性
+\end{itemize}
+
+通过合理的总线扩展设计，可以构建功能丰富、性能稳定的Z80系统，满足各种应用需求。
+
+\chapter{资源推荐}
+
+\section{书籍}
+\subsection{网站和论坛}
+\subsection{开源项目}
+
+\vspace{1cm}
+\hrule
+\vspace{0.5cm}
+\begin{center}
+    \textit{注：此提纲仅作为学习 Z80 CPU 的框架，具体内容将在后续逐步补充。}
+\end{center}
+
+\end{document}
