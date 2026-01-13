@@ -1,0 +1,231 @@
+% 中文书籍LaTeX模板
+% 使用xelatex编译
+
+\documentclass[12pt,a4paper,twoside]{ctexbook}
+
+% 页面设置
+\input{../common/page}
+
+% 字体设置
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{microtype}
+
+% 设置中文字体
+\setCJKmainfont{SimSun}[  % 正文宋体
+    BoldFont=SimHei,        % 粗体黑体
+    ItalicFont=KaiTi        % 斜体楷体
+]
+\setCJKsansfont{SimHei}    % 无衬线字体黑体
+\setCJKmonofont{SimSun}    % 等宽字体宋体
+\setCJKfamilyfont{kai}[    % 楷体
+    BoldFont=KaiTi
+]{KaiTi}
+\setCJKfamilyfont{fs}[     % 仿宋
+    BoldFont=FangSong
+]{FangSong}
+
+% 常用字体命令
+\newcommand{\song}{\CJKfamily{zhsong}}
+\newcommand{\hei}{\CJKfamily{zhhei}}
+\newcommand{\kai}{\CJKfamily{kai}}
+\newcommand{\fs}{\CJKfamily{fs}}
+
+% 标题格式设置
+\ctexset{
+    part/name={第,卷},
+    part/number={\chinese{part}},
+    chapter/name={第,章},
+    chapter/number={\chinese{chapter}},
+    section/name={第,节},
+    section/number={\arabic{section}},
+    subsection/number={\arabic{section}.\arabic{subsection}},
+    chapter/format={\centering\hei\zihao{2}},
+    section/format={\hei\zihao{4}},
+    subsection/format={\hei\zihao{5}}
+}
+
+% 目录设置
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{10pt}\bfseries\zihao{-4}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{section}[2.5em]{\vspace{5pt}\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{subsection}[5em]{\vspace{3pt}\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 页眉页脚设置
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\zihao{5}\thepage}
+\fancyhead[LO]{\zihao{5}\leftmark}
+\fancyhead[RE]{\zihao{5}\rightmark}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyfoot[C]{\zihao{5} \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 插图设置
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfigure}
+\graphicspath{{images/}}
+\floatstyle{plaintop}
+\restylefloat{figure}
+
+% 表格设置
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+% 数学公式设置
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathrsfs}
+
+% 定理环境
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{corollary}{推论}[chapter]
+\newtheorem{example}{例}[chapter]
+
+% 目录、摘要等设置
+\usepackage{makeidx}
+\makeindex
+
+% 摘要设置
+\newenvironment{abstract}{
+    \cleardoublepage
+    \thispagestyle{empty}
+    \begin{center}
+        \textbf{\zihao{1} 摘要}
+    \end{center}
+    \vspace{1cm}
+    \itshape
+}{
+    \normalfont
+}
+
+% 关键词设置
+\newcommand{\keywords}[1]{
+    \vspace{1cm}
+    \noindent\textbf{关键词：} #1
+}
+
+% 引用设置
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={中文书籍模板},
+    pdfauthor={作者名},
+    pdfsubject={主题},
+    pdfkeywords={关键词1, 关键词2}
+}
+
+% 目录深度
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+% 标题页设置
+\usepackage{titling}
+
+% 封面信息
+\title{\hei\zihao{0} 中文书籍模板}
+\author{\song\zihao{2} 作者名}
+\date{\song\zihao{4} \today}
+
+\begin{document}
+
+% 封面
+\begin{titlepage}
+    \begin{center}
+        \vspace*{6cm}
+        \hei\zihao{0} 中文书籍模板
+        \vspace*{3cm}
+        \song\zihao{2} 作者名
+        \vspace*{3cm}
+        \song\zihao{4} \today
+    \end{center}
+\end{titlepage}
+
+% 版权页
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{8cm}
+    \song\zihao{5} 版权所有 \textcopyright\ 2026 作者名
+    \vspace*{1cm}
+    \song\zihao{5} 出版社名称
+\end{center}
+
+% 摘要
+\begin{abstract}
+    这是一本中文书籍的LaTeX模板，使用xelatex编译，支持完整的中文排版功能，包括章节设置、插图、表格、数学公式、引用等。
+    
+    \keywords{中文书籍 \quad LaTeX模板 \quad xelatex}
+\end{abstract}
+
+% 目录
+\newpage
+\tableofcontents
+
+% 正文开始
+\mainmatter
+
+% 示例章节
+\chapter{第一章 引言}
+这是第一章的内容，使用宋体排版。\par
+\hei 这是黑体文字。\par
+\kai 这是楷体文字。\par
+\fs 这是仿宋文字。
+
+\section{第一节 研究背景}
+这是第一节的内容。
+
+\subsection{第一小节 问题提出}
+这是第一小节的内容。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{example-image}
+    \caption{示例图片}
+    \label{fig:example}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \caption{示例表格}
+    \label{tab:example}
+    \begin{tabular}{ccc}
+        \toprule
+        列1 & 列2 & 列3 \\ 
+        \midrule
+        数据1 & 数据2 & 数据3 \\ 
+        数据4 & 数据5 & 数据6 \\ 
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{theorem}[勾股定理]
+    直角三角形的两条直角边的平方和等于斜边的平方。
+    \[a^2 + b^2 = c^2\]
+\end{theorem}
+
+\chapter{第二章 相关工作}
+这是第二章的内容。
+
+% 参考文献
+\backmatter
+
+\begin{thebibliography}{99}
+    \bibitem{ref1} 作者1, 作者2. 书名[M]. 出版社, 出版年份.
+    \bibitem{ref2} 作者3. 文章标题[J]. 期刊名称, 卷号(期号): 页码范围, 出版年份.
+    \bibitem{ref3} 作者4. 网页标题[EB/OL]. URL, 访问日期.
+\end{thebibliography}
+
+% 索引
+\printindex
+
+\end{document}
