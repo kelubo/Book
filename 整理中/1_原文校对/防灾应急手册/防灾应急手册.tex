@@ -1,0 +1,322 @@
+% 防灾应急手册
+% 使用xelatex编译
+
+\documentclass[12pt,a4paper,twoside]{ctexbook}
+
+% 页面设置
+\usepackage{geometry}
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+
+% 字体设置
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{microtype}
+
+% 设置中文字体
+\setCJKmainfont{SimSun}[  % 正文宋体
+    BoldFont=SimHei,        % 粗体黑体
+    ItalicFont=KaiTi        % 斜体楷体
+]
+\setCJKsansfont{SimHei}    % 无衬线字体黑体
+\setCJKmonofont{SimSun}    % 等宽字体宋体
+
+% 标题格式设置
+\ctexset{
+    part/name={\hei 第},        % 卷名
+    part/number={\hei \chinese{part}卷}, % 卷号
+    chapter/name={\hei 第},     % 章名
+    chapter/number={\hei \chinese{chapter}章}, % 章号
+    section/name={\hei 第},     % 节名
+    section/number={\hei \arabic{section}节},  % 节号
+    subsection/name={\hei },    % 小节名
+    subsection/number={\hei \arabic{section}.\arabic{subsection} }, % 小节号
+    chapter/format={\centering\hei\zihao{1}},% 章标题格式
+    section/format={\hei\zihao{3}},% 节标题格式
+    subsection/format={\hei\zihao{4}}% 小节标题格式
+}
+
+% 页眉页脚设置
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\zihao{5}\thepage}
+\fancyhead[LO]{\zihao{5}\leftmark}
+\fancyhead[RE]{\zihao{5}\rightmark}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyfoot[C]{\zihao{5} 防灾应急手册}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 目录设置
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{10pt}\bfseries\zihao{-4}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{section}[2.5em]{\vspace{5pt}\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{subsection}[5em]{\vspace{3pt}\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 目录深度
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+
+% 封面信息
+\title{\hei\zihao{0} 防灾应急手册}
+\author{\song\zihao{2} 防灾应急手册编写组}
+\date{\song\zihao{4} \today}
+
+\begin{document}
+
+% 封面
+\begin{titlepage}
+    \begin{center}
+        \vspace*{6cm}
+        \hei\zihao{0} 防灾应急手册
+        \vspace*{3cm}
+        \song\zihao{2} 防灾应急手册编写组
+        \vspace*{3cm}
+        \song\zihao{4} \today
+    \end{center}
+\end{titlepage}
+
+% 版权页
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{8cm}
+    \song\zihao{5} 版权所有\textcopyright\ 2026 防灾应急手册编写组
+    \vspace*{1cm}
+    \song\zihao{5} 仅供学习和参考使用
+\end{center}
+
+% 目录
+\newpage
+\tableofcontents
+
+% 正文开始
+\mainmatter
+
+\chapter{防灾应急基础知识}
+
+\section{灾难的定义与分类}
+\subsection{自然灾害}
+\subsection{人为灾难}
+\subsection{复合灾难}
+
+\section{防灾应急的基本原则}
+\subsection{预防为主，防救结合}
+\subsection{以人为本，生命至上}
+\subsection{统一指挥，协同作战}
+\subsection{快速反应，科学处置}
+
+\section{应急准备的基本要素}
+\subsection{应急知识与技能}
+\subsection{应急物资准备}
+\subsection{应急通信保障}
+\subsection{应急疏散计划}
+
+\chapter{自然灾害应急处置}
+
+\section{地震应急处置}
+\subsection{地震前兆识别}
+\subsection{地震发生时的避险}
+\subsection{地震发生后的自救互救}
+\subsection{地震后重建与恢复}
+
+\section{洪水应急处置}
+\subsection{洪水预警与监测}
+\subsection{洪水发生时的避险}
+\subsection{洪水后的卫生防疫}
+\subsection{洪水灾害的预防}
+
+\section{台风与暴雨应急处置}
+\subsection{台风预警信号识别}
+\subsection{台风来临前的准备}
+\subsection{台风期间的避险}
+\subsection{暴雨引发的次生灾害防范}
+
+\section{泥石流与滑坡应急处置}
+\subsection{泥石流与滑坡的前兆}
+\subsection{发生时的避险逃生}
+\subsection{灾后的搜救与处置}
+\subsection{地质灾害的预防措施}
+
+\section{雷电应急处置}
+\subsection{雷电的危害与防护}
+\subsection{雷电天气的避险}
+\subsection{雷电灾害的预防}
+
+\section{高温与低温灾害应急处置}
+\subsection{高温中暑的预防与急救}
+\subsection{低温冻伤的预防与急救}
+\subsection{极端温度的应对措施}
+
+\chapter{人为灾难应急处置}
+
+\section{火灾应急处置}
+\subsection{火灾的分类与危害}
+\subsection{火灾发生时的逃生}
+\subsection{初期火灾的扑救}
+\subsection{火灾的预防措施}
+
+\section{燃气泄漏应急处置}
+\subsection{燃气泄漏的识别}
+\subsection{燃气泄漏时的应急措施}
+\subsection{燃气爆炸的预防}
+
+\section{化学品泄漏应急处置}
+\subsection{化学品的危害识别}
+\subsection{化学品泄漏的应急处理}
+\subsection{个人防护装备的使用}
+
+\section{交通事故应急处置}
+\subsection{道路交通事故应急}
+\subsection{铁路交通事故应急}
+\subsection{水上交通事故应急}
+\subsection{航空事故应急}
+
+\section{公共卫生事件应急处置}
+\subsection{传染病疫情应急}
+\subsection{食物中毒应急}
+\subsection{职业中毒应急}
+\subsection{突发公共卫生事件的预防}
+
+\chapter{家庭与社区防灾}
+
+\section{家庭防灾准备}
+\subsection{家庭应急物资清单}
+
+家庭应急包是应对各种灾难的重要准备，应根据家庭人数和具体需求进行定制。以下是一个全面的应急包物品清单：
+
+\begin{itemize}
+    \item \textbf{一、生存基本需求}
+    \begin{itemize}
+        \item 饮用水：每人每天至少3升，储备3-7天的量
+        \item 应急食品：高能量、易储存的食品，如压缩饼干、罐头食品、能量棒、坚果等，储备3-7天的量
+        \item 餐具：一次性餐具、多功能刀、开罐器、防水火柴或打火机
+        \item 衣物：每人至少两套换洗衣物，包括内衣、袜子、外套、帽子、手套等
+        \item 保暖用品：毛毯、睡袋、保暖内衣、热水袋等
+        \item 个人卫生用品：毛巾、牙刷、牙膏、香皂、卫生纸、女性卫生用品等
+    \end{itemize}
+
+    \item \textbf{二、医疗急救用品}
+    \begin{itemize}
+        \item 急救包：消毒棉球、纱布、绷带、创可贴、止血带、剪刀、镊子等
+        \item 常用药品：退烧药、止痛药、消炎药、腹泻药、抗过敏药、晕车药等
+        \item 特殊药品：根据家庭成员的健康状况，准备所需的特殊药品，如高血压药、糖尿病药等
+        \item 急救手册：详细的急救知识和操作指南
+        \item 医用口罩、手套、消毒水等防疫用品
+    \end{itemize}
+
+    \item \textbf{三、应急工具与设备}
+    \begin{itemize}
+        \item 手电筒：最好是手摇式或太阳能手电筒，配备充足的电池
+        \item 应急灯：可充电的应急灯，用于长时间照明
+        \item 多功能工具：瑞士军刀、多功能钳等
+        \item 绳索：至少10米长的结实绳索
+        \item 灭火器：小型家用灭火器
+        \item 防护眼镜、手套、安全帽等安全防护装备
+        \item 防水布、帐篷等临时 shelter 用品
+    \end{itemize}
+
+    \item \textbf{四、通信与照明}
+    \begin{itemize}
+        \item 手机：确保充电，并准备备用电池或移动电源
+        \item 收音机：手摇式或太阳能收音机，用于接收应急广播
+        \item 充电设备：移动电源、充电器、太阳能充电板等
+        \item 信号灯：荧光棒、信号镜、反光背心等，用于求救
+    \end{itemize}
+
+    \item \textbf{五、文档与重要物品}
+    \begin{itemize}
+        \item 身份证明：身份证、护照、户口本等
+        \item 医疗记录：病历、医保卡、疫苗接种证明等
+        \item 财务文档：银行卡、存折、保险单、房产证等的复印件
+        \item 应急联系信息：家庭成员、亲戚朋友、医疗机构、应急部门的联系方式
+        \item 现金：适量的现金，以备不时之需
+    \end{itemize}
+
+    \item \textbf{六、特殊人群需求}
+    \begin{itemize}
+        \item 儿童用品：奶粉、奶瓶、尿布、玩具、儿童药品等
+        \item 老年人用品：拐杖、轮椅、特殊护理用品等
+        \item 残疾人用品：辅助器具、特殊药品等
+        \item 宠物用品：宠物食品、水、牵引绳、宠物药品等
+    \end{itemize}
+
+    \item \textbf{七、其他应急用品}
+    \begin{itemize}
+        \item 地图：本地地图、避难场所分布图等
+        \item 应急计划：家庭应急疏散计划、联系清单等
+        \item 多功能哨子：用于求救和信号传递
+        \item 防水袋：用于保护重要物品和电子设备
+        \item 笔和笔记本：用于记录信息和需求
+    \end{itemize}
+\end{itemize}
+
+应急包应定期检查和更新，确保食品、药品等物品在保质期内，电池等设备能正常工作。同时，应将应急包存放在容易取用的位置，确保家庭成员都知道应急包的存放位置和使用方法。
+\subsection{家庭应急疏散计划}
+\subsection{家庭火灾防范}
+\subsection{家庭地震安全}
+
+\section{社区防灾组织与管理}
+\subsection{社区防灾组织架构}
+\subsection{社区应急演练}
+\subsection{社区避难场所建设}
+\subsection{社区防灾宣传与教育}
+
+\chapter{学校与工作场所防灾}
+
+\section{学校防灾应急}
+\subsection{学校防灾教育}
+\subsection{学校应急演练}
+\subsection{学校避难场所设置}
+\subsection{校园安全管理}
+
+\section{工作场所防灾应急}
+\subsection{企业防灾管理}
+\subsection{工作场所应急演练}
+\subsection{职业安全防护}
+\subsection{突发事故应急处置}
+
+\chapter{应急救援与医疗救护}
+
+\section{应急救援基本知识}
+\subsection{救援队伍与装备}
+\subsection{救援原则与方法}
+\subsection{现场指挥与协调}
+
+\section{医疗救护基础}
+\subsection{心肺复苏术}
+\subsection{创伤止血与包扎}
+\subsection{骨折固定与搬运}
+\subsection{常见急症的急救}
+
+\section{心理应急与危机干预}
+\subsection{灾难心理反应}
+\subsection{心理急救方法}
+\subsection{长期心理康复}
+
+\chapter{防灾应急法律与政策}
+
+\section{防灾应急相关法律法规}
+\subsection{国家防灾减灾法律法规}
+\subsection{地方防灾减灾规定}
+\subsection{应急预案体系}
+
+\section{防灾减灾政策与规划}
+\subsection{国家防灾减灾规划}
+\subsection{地方防灾减灾政策}
+\subsection{国际防灾减灾合作}
+
+\chapter{防灾技术与创新}
+
+\section{防灾技术发展}
+\subsection{灾害监测技术}
+\subsection{预警预报系统}
+\subsection{应急通信技术}
+
+\section{防灾创新应用}
+\subsection{大数据与人工智能在防灾中的应用}
+\subsection{无人机在灾害救援中的应用}
+\subsection{区块链在防灾物资管理中的应用}
+
+\end{document}

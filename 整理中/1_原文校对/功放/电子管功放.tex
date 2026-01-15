@@ -1,0 +1,226 @@
+% 电子管功放
+% 使用xelatex编译
+
+\documentclass[12pt,a4paper,twoside]{ctexbook}
+
+% 页面设置
+\usepackage{geometry}
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=3cm}
+
+% 字体设置
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{microtype}
+
+% 设置中文字体
+\setCJKmainfont{SimSun}[  % 正文宋体
+    BoldFont=SimHei,        % 粗体黑体
+    ItalicFont=KaiTi        % 斜体楷体
+]
+\setCJKsansfont{SimHei}    % 无衬线字体黑体
+\setCJKmonofont{SimSun}    % 等宽字体宋体
+
+% 标题格式设置
+\ctexset{
+    part/name={\hei 第},        % 卷名
+    part/number={\hei \chinese{part}卷}, % 卷号
+    chapter/name={\hei 第},     % 章名
+    chapter/number={\hei \chinese{chapter}章}, % 章号
+    section/name={\hei 第},     % 节名
+    section/number={\hei \arabic{section}节},  % 节号
+    subsection/name={\hei },    % 小节名
+    subsection/number={\hei \arabic{section}.\arabic{subsection} }, % 小节号
+    chapter/format={\centering\hei\zihao{1}},% 章标题格式
+    section/format={\hei\zihao{3}},% 节标题格式
+    subsection/format={\hei\zihao{4}}% 小节标题格式
+}
+
+% 页眉页脚设置
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\zihao{5}\thepage}
+\fancyhead[LO]{\zihao{5}\leftmark}
+\fancyhead[RE]{\zihao{5}\rightmark}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyfoot[C]{\zihao{5} 电子管功放}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 目录设置
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{10pt}\bfseries\zihao{-4}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{section}[2.5em]{\vspace{5pt}\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{subsection}[5em]{\vspace{3pt}\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 目录深度
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+
+% 封面信息
+\title{\hei\zihao{0} 电子管功放}
+\author{\song\zihao{2} 电子管功放编写组}
+\date{\song\zihao{4} \today}
+
+\begin{document}
+
+% 封面
+\begin{titlepage}
+    \begin{center}
+        \vspace*{6cm}
+        \hei\zihao{0} 电子管功放
+        \vspace*{3cm}
+        \song\zihao{2} 电子管功放编写组
+        \vspace*{3cm}
+        \song\zihao{4} \today
+    \end{center}
+\end{titlepage}
+
+% 版权页
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{8cm}
+    \song\zihao{5} 版权所有\textcopyright\ 2026 电子管功放编写组
+    \vspace*{1cm}
+    \song\zihao{5} 仅供学习和参考使用
+\end{center}
+
+% 目录
+\newpage
+\tableofcontents
+
+% 正文开始
+\mainmatter
+
+\chapter{电子管功放概述}
+
+\section{电子管功放的定义与发展历程}
+\subsection{电子管功放的基本概念}
+\subsection{电子管功放的发展历史}
+\subsection{电子管功放的现状与趋势}
+
+\section{电子管功放的特点与优势}
+\subsection{电子管与晶体管的比较}
+\subsection{电子管功放的音质特点}
+\subsection{电子管功放的应用领域}
+
+\chapter{电子管基础知识}
+
+\section{电子管的基本结构与工作原理}
+\subsection{电子管的基本组成}
+\subsection{电子管的工作原理}
+\subsection{电子管的主要参数}
+
+\section{常见电子管类型与特性}
+\subsection{二极管}
+\subsection{三极管}
+\subsection{四极管与五极管}
+\subsection{束射管与束射四极管}
+\subsection{功率电子管}
+
+\section{电子管的选择与使用}
+\subsection{电子管的型号标识}
+\subsection{电子管的选择原则}
+\subsection{电子管的安装与更换}
+\subsection{电子管的使用寿命}
+
+\chapter{电子管功放电路原理}
+
+\section{放大电路基础}
+\subsection{放大电路的基本概念}
+\subsection{放大电路的主要性能指标}
+\subsection{负反馈的原理与应用}
+
+\section{电子管功放的基本电路结构}
+\subsection{前置放大电路}
+\subsection{电压放大电路}
+\subsection{功率放大电路}
+\subsection{电源电路}
+
+\section{常见电子管功放电路拓扑}
+\subsection{A类放大电路}
+\subsection{AB类放大电路}
+\subsection{B类放大电路}
+\subsection{单端放大电路}
+\subsection{推挽放大电路}
+\subsection{超线性放大电路}
+
+\chapter{电子管功放的分类}
+
+\section{按功率输出分类}
+\subsection{小功率电子管功放}
+\subsection{中功率电子管功放}
+\subsection{大功率电子管功放}
+
+\section{按电路结构分类}
+\subsection{单声道电子管功放}
+\subsection{立体声电子管功放}
+\subsection{合并式电子管功放}
+\subsection{前后级分离式电子管功放}
+
+\section{按应用场景分类}
+\subsection{家用电子管功放}
+\subsection{专业电子管功放}
+\subsection{发烧级电子管功放}
+\subsection{便携式电子管功放}
+
+\chapter{电子管功放的设计与制作}
+
+\section{设计基础与原则}
+\subsection{设计目标与需求分析}
+\subsection{电路设计的基本原则}
+\subsection{元器件的选择}
+
+\section{具体电路设计}
+\subsection{前置放大电路设计}
+\subsection{功率放大电路设计}
+\subsection{电源电路设计}
+\subsection{保护电路设计}
+
+\section{制作工艺与调试}
+\subsection{PCB设计与制作}
+\subsection{机箱设计与加工}
+\subsection{元器件的安装与焊接}
+\subsection{电路的调试与测试}
+
+\chapter{电子管功放的调试与维护}
+
+\section{电子管功放的调试}
+\subsection{调试前的准备工作}
+\subsection{静态工作点的调整}
+\subsection{动态性能的测试}
+\subsection{音质的调整与优化}
+
+\section{电子管功放的维护}
+\subsection{日常维护与保养}
+\subsection{常见故障的排查与修复}
+\subsection{电子管的老化与更换}
+\subsection{安全注意事项}
+
+\chapter{电子管功放的音质特点}
+
+\section{电子管功放的音质评价}
+\subsection{音质评价的基本要素}
+\subsection{电子管功放的音质特点分析}
+\subsection{影响音质的主要因素}
+
+\section{音质调整与优化}
+\subsection{电路参数的调整}
+\subsection{元器件的搭配与选择}
+\subsection{听音环境的影响与优化}
+
+\chapter{电子管功放的应用与发展}
+
+\section{电子管功放的应用场景}
+\subsection{家用音响系统}
+\subsection{专业音频领域}
+\subsection{音乐制作与录音}
+
+\section{电子管功放的发展趋势}
+\subsection{技术创新与发展方向}
+\subsection{市场需求与发展前景}
+\subsection{电子管功放与现代音频技术的融合}
+
+\end{document}
