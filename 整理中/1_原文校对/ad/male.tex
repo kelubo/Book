@@ -1,0 +1,494 @@
+% 男性生殖系统指南。
+% 使用xelatex编译
+
+\documentclass[12pt,a4paper,twoside]{ctexbook}
+
+% 页面设置
+\input{../../../common/page}
+
+% 字体设置
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{microtype}
+
+% 设置中文字体
+\setCJKmainfont{SimSun}[  % 正文宋体
+    BoldFont=SimHei,        % 粗体黑体
+    ItalicFont=KaiTi        % 斜体楷体
+]
+\setCJKsansfont{SimHei}    % 无衬线字体黑。
+\setCJKmonofont{SimSun}    % 等宽字体宋体
+\setCJKfamilyfont{kai}[    % 楷体
+    BoldFont=KaiTi
+]{KaiTi}
+\setCJKfamilyfont{fs}[     % 仿宋
+    BoldFont=FangSong
+]{FangSong}
+
+% 常用字体命令
+\newcommand{\song}{\CJKfamily{zhsong}}
+\newcommand{\hei}{\CJKfamily{zhhei}}
+\newcommand{\kai}{\CJKfamily{kai}}
+\newcommand{\fs}{\CJKfamily{fs}}
+
+% 标题格式设置
+\ctexset{
+    part/name={。卷},
+    part/number={\chinese{part}},
+    chapter/name={。章},
+    chapter/number={\chinese{chapter}},
+    section/name={。节},
+    section/number={\arabic{section}},
+    subsection/number={\arabic{section}.\arabic{subsection}},
+    chapter/format={\centering\hei\zihao{2}},
+    section/format={\hei\zihao{4}},
+    subsection/format={\hei\zihao{5}}
+}
+
+% 目录设置
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{10pt}\bfseries\zihao{-4}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{section}[2.3em]{\vspace{5pt}\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+\titlecontents{subsection}[5em]{\zihao{5}}{\contentspush{\thecontentslabel\hspace{1em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 图表目录设置
+\usepackage[titles]{tocloft}
+\renewcommand{\cftfigpresnum}{图}
+\renewcommand{\cftfigaftersnum}{、}
+\settowidth{\cftfignumwidth}{图100、}
+\renewcommand{\cfttabpresnum}{表}
+\renewcommand{\cfttabaftersnum}{、}
+\settowidth{\cfttabnumwidth}{表100、}
+
+% 章节标题页
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+    {\bfseries\centering\zihao{-2}}{\chaptertitlename\ \thechapter}{20pt}{\zihao{-2}}
+\titlespacing*{\chapter}{0pt}{-50pt}{30pt}
+
+% 段落设置
+\usepackage{indentfirst}    % 首段缩进
+\setlength{\parindent}{2em} % 首行缩进2字符
+\setlength{\parskip}{0pt}   % 段落间距为0
+
+% 间距设置
+\usepackage{setspace}
+\onehalfspacing             % 1.5倍行距
+
+% 列表设置
+\usepackage{enumitem}
+\setlist{leftmargin=2em, labelsep=0.5em} % 列表缩进
+
+% 图表设置
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfig}
+\graphicspath{{../../../common/images/}}
+\floatstyle{plaintop}
+\restylefloat{table}
+\floatstyle{plain}
+\restylefloat{figure}
+
+% 表格设置
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{makecell}
+
+% 数学公式
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+% 引用设置
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    bookmarksopen=false,
+    pdftitle={夫妻性生活1000问 - 男性篇},
+    pdfauthor={陈亦洋},
+    pdfsubject={夫妻性生活},
+    pdfkeywords={夫妻性生活, 男性}
+}
+\usepackage{bookmark}
+
+% 页眉页脚设置
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\song\leftmark}
+\fancyhead[RE]{\song\rightmark}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 特殊符号
+\usepackage{wasysym}
+
+% 日期时间
+\usepackage{datetime}
+
+% 其他设置
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage{afterpage}
+\usepackage{pdfpages}
+
+% 开始文档
+\title{\hei\zihao{0} 夫妻性生活1000问 - 男性篇}
+\author{陈亦洋}
+\date{\today}
+
+\begin{document}
+
+% 标题页
+\maketitle
+
+% 版权页
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{8cm}
+    \song\zihao{5} 图书在版编目（CIP）数据\par
+    \vspace{0.5em}
+    \song\zihao{5} 夫妻性生活1000问／陈亦洋编著．—长春：吉林科学技术出版社，2011.10\par
+    \vspace{0.5em}
+    \song\zihao{5} ISBN 978-7-5384-5494-9\par
+    \vspace{0.5em}
+    \song\zihao{5} Ⅰ．①夫…　Ⅱ．①陈…　Ⅲ．①性知识—问题解答　Ⅳ．①R167-44\par
+    \vspace{0.5em}
+    \song\zihao{5} 中国版本图书馆CIP数据核字（2011）第204046号\par
+    \vspace{2em}
+    \song\zihao{5} 版权所有。\textcopyright\ 2011 陈亦洋。\par
+    \vspace{0.5em}
+    \song\zihao{5} 出版社名：吉林科学技术出版社\par
+\end{center}
+
+% 作者简介
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{5cm}
+    \hei\zihao{2} ——作者简介——
+\end{center}
+
+\begin{center}
+    \hei\zihao{3} 陈亦洋
+\end{center}
+
+\vspace{1cm}
+\begin{center}
+    \song\zihao{4} 毕业于长春中医学院，主任医师。长期从事临床诊疗工作，擅长结合中西医治疗男科、妇科疾病，尤其对性传播疾病，梅毒、尖锐湿疣、生殖器疱疹等诊治有独特之处。
+\end{center}
+
+\vspace{2cm}
+
+% 目录
+\tableofcontents
+\listoffigures
+\listoftables
+
+% 正文内容
+
+\chapter{男性生殖系统}
+
+\section{男性生殖系统解剖与生理}
+
+男性生殖系统包括外生殖器和内生殖器两部分。外生殖器包括阴茎和阴囊，内生殖器包括睾丸、附睾、输精管、精囊腺、前列腺、尿道球腺等。这些器官协同工作，完成精子的产生、储存、运输以及精液的分泌和排出。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\linewidth]{male_reproductive_system.jpg}
+    \caption{男性生殖系统解剖图}
+    \label{fig:male_reproductive_system}
+\end{figure}
+
+\subsection{阴茎}
+
+阴茎是男性最重要的外生殖器官，具有性交、排尿和射精三大功能。阴茎位于耻骨联合前下方，阴囊的上方，呈圆柱状，由三个海绵体、皮肤和筋膜组成。阴茎的大小和形态存在个体差异，但正常情况下能够完成勃起、性交和射精等功能。
+
+\paragraph{解剖结构}
+
+\subparagraph{海绵体}
+阴茎由三个平行的海绵体组成，它们是阴茎的主要结构：
+
+1. \textbf{阴茎海绵体}：
+   - 位于阴茎背侧，左右各一，呈圆柱形，前端变细嵌入阴茎头底面的凹陷内，后端分离形成阴茎脚，附着于耻骨下支和坐骨支。
+   - 每个阴茎海绵体内有许多螺旋状的血管窦（血窦），血窦之间有结缔组织隔（小梁）。当受到性刺激时，血窦扩张，血液大量流入，使阴茎海绵体充血膨胀，形成勃起。
+
+2. \textbf{尿道海绵体}：
+   - 位于阴茎腹侧中央，呈圆柱形，前端膨大形成阴茎头（龟头），后端膨大形成尿道球，附着于尿生殖膈。
+   - 尿道海绵体内有尿道通过，贯穿整个阴茎，前端开口于阴茎头的尿道外口，后端与前列腺部尿道相连。
+   - 尿道海绵体的血窦也参与勃起过程，但膨胀程度不如阴茎海绵体明显。
+
+\subparagraph{白膜}
+- 白膜是包裹在海绵体外面的一层致密结缔组织膜，质地坚韧，具有很强的弹性和韧性。
+- 白膜在阴茎勃起时起到限制海绵体过度膨胀的作用，维持阴茎的硬度和形态。
+- 三个海绵体的白膜在阴茎背侧融合形成阴茎隔，将两个阴茎海绵体分开。
+
+\subparagraph{阴茎头和包皮}
+- \textbf{阴茎头}：又称龟头，是尿道海绵体前端的膨大结构，呈圆锥状，表面光滑，富含神经末梢，对性刺激非常敏感。
+- \textbf{尿道外口}：位于阴茎头顶端，是尿液和精液的共同出口。
+- \textbf{包皮}：是覆盖在阴茎头表面的一层皱襞皮肤，具有保护阴茎头的作用。
+  - 包皮与阴茎头之间的间隙称为包皮腔，容易积存包皮垢，需要经常清洗。
+  - 包皮口狭窄或包皮过长可能导致包皮炎、龟头炎等疾病，需要进行包皮环切手术。
+
+\subparagraph{皮肤和筋膜}
+- \textbf{皮肤}：阴茎的皮肤薄而柔软，富有弹性，容易伸展，适应阴茎勃起时的体积变化。
+  - 阴茎皮肤在阴茎颈处游离，向前反折形成包皮。
+  - 阴茎皮肤无皮下脂肪，与深层组织连接紧密。
+
+- \textbf{浅筋膜}：位于皮肤下方，由疏松结缔组织组成，内含少量平滑肌纤维（肉膜）。
+- \textbf{深筋膜}：又称Buck筋膜，包裹在三个海绵体外面，与白膜紧密相连。
+
+\subparagraph{血管和神经供应}
+
+- \textbf{血液供应}：
+  - 主要来自阴茎背动脉和阴茎深动脉，它们是阴部内动脉的分支。
+  - 阴茎背动脉：沿阴茎背侧行走，供应阴茎头和包皮的血液。
+  - 阴茎深动脉：进入阴茎海绵体，分支形成螺旋动脉，供应血窦的血液，是阴茎勃起的主要血管。
+
+- \textbf{静脉回流}：
+  - 阴茎背浅静脉：收集阴茎皮肤和浅筋膜的静脉血，汇入大隐静脉。
+  - 阴茎背深静脉：收集阴茎海绵体和尿道海绵体的静脉血，汇入前列腺静脉丛。
+
+- \textbf{神经支配}：
+  - 感觉神经：主要来自阴茎背神经，是阴部神经的分支，分布于阴茎头、包皮和阴茎皮肤，传递性感觉。
+  - 自主神经：包括交感神经和副交感神经，控制阴茎的勃起和疲软。
+    - 交感神经：来自腹主动脉丛，控制阴茎的疲软，使阴茎恢复非勃起状态。
+    - 副交感神经：来自盆神经丛，控制阴茎的勃起，使阴茎充血膨胀。
+
+\paragraph{发育与变化}
+
+阴茎的发育和变化贯穿男性的整个生命周期：
+
+- \textbf{胎儿期}：
+  - 阴茎在胎儿第7周开始发育，起源于生殖结节。
+  - 胎儿第9周，生殖结节迅速生长，形成阴茎的雏形。
+  - 胎儿第12周，阴茎已具雏形，可区分阴茎头、阴茎体和阴茎根。
+  - 胎儿第20周，阴茎长度约为2-3厘米，包皮已覆盖阴茎头。
+
+- \textbf{新生儿期}：
+  - 新生儿阴茎长度约为2.5-3.5厘米，包皮与阴茎头粘连，无法上翻。
+  - 阴茎外观短小，但比例与成人相似。
+
+- \textbf{儿童期}：
+  - 阴茎生长缓慢，长度和直径变化不大。
+  - 3-4岁后，包皮与阴茎头逐渐分离，包皮可部分上翻。
+  - 儿童期阴茎处于相对静止状态，无明显的性反应。
+
+- \textbf{青春期}：
+  - 青春期开始，在雄激素的作用下，阴茎迅速发育，长度和直径显著增加。
+  - 12-14岁：阴茎开始加速生长，长度增加1-2厘米。
+  - 14-16岁：阴茎生长最快，长度增加2-3厘米，直径也明显增加。
+  - 16-18岁：阴茎发育基本完成，接近成人大小。
+  - 青春期后，阴茎头完全暴露，或包皮仍部分覆盖，但可自由上翻。
+
+- \textbf{性成熟期}：
+  - 性成熟期是阴茎功能最活跃的时期，也是男性的生育期。
+  - 阴茎大小和形态达到成人水平，能够完成勃起、性交和射精等功能。
+  - 阴茎的勃起频率和硬度处于最佳状态。
+
+- \textbf{中年期}：
+  - 40岁以后，阴茎的勃起功能逐渐下降，勃起频率和硬度有所降低。
+  - 阴茎的长度和直径可能略有减小，皮肤弹性下降。
+
+- \textbf{老年期}：
+  - 60岁以后，阴茎进一步萎缩，长度和直径明显减小。
+  - 勃起功能显著下降，勃起需要更长的时间，硬度也明显降低。
+  - 阴茎皮肤松弛，皱纹增加，颜色变深。
+\paragraph{生理功能}
+
+阴茎具有三种主要生理功能：
+
+\subparagraph{排尿功能}
+- 阴茎是尿液排出体外的通道，尿道贯穿整个阴茎，连接膀胱和尿道外口。
+- 排尿时，膀胱逼尿肌收缩，尿道括约肌松弛，尿液通过尿道从尿道外口排出。
+- 阴茎的位置和形态有利于尿液的排出，避免尿液污染身体。
+
+\subparagraph{性交功能}
+- 阴茎是男性的性交器官，通过勃起插入阴道，进行抽送动作，完成性交过程。
+- 勃起时阴茎的硬度和角度适合插入阴道，阴茎头的刺激有助于女性达到性高潮。
+- 性交过程中，阴茎的抽送动作可以刺激女性的阴道和阴蒂，促进性快感的产生。
+
+\subparagraph{射精功能}
+- 射精是男性性高潮的表现，也是将精子排出体外的过程。
+- 性高潮时，输精管、精囊腺、前列腺等器官的平滑肌收缩，将精液排入尿道。
+- 同时，尿道海绵体和阴茎海绵体的肌肉收缩，将精液从尿道外口射出。
+- 射精过程分为两个阶段：泄精（精液排入尿道）和射精（精液射出体外）。
+
+\paragraph{性反应机制}
+
+阴茎的性反应主要包括勃起、射精和疲软三个阶段：
+
+1. \textbf{勃起阶段}：
+   - 当受到性刺激（视觉、听觉、触觉等）时，副交感神经兴奋，释放乙酰胆碱等神经递质。
+   - 这些神经递质作用于阴茎海绵体的血管内皮细胞，释放一氧化氮（NO）。
+   - 一氧化氮激活鸟苷酸环化酶，使环磷酸鸟苷（cGMP）水平升高。
+   - cGMP使阴茎海绵体的平滑肌松弛，血管窦扩张，血液大量流入海绵体。
+   - 同时，白膜下的静脉受压关闭，血液无法流出，使阴茎体积增大、硬度增加，形成勃起。
+
+2. \textbf{射精阶段}：
+   - 当性刺激达到阈值时，脊髓的射精中枢兴奋，发出神经冲动。
+   - 交感神经兴奋，导致输精管、精囊腺、前列腺等器官的平滑肌收缩，将精液排入尿道。
+   - 随后，尿道海绵体和阴茎海绵体的肌肉发生节律性收缩，将精液从尿道外口射出。
+   - 射精时会产生强烈的性快感，称为性高潮。
+
+3. \textbf{疲软阶段}：
+   - 射精后，交感神经兴奋，释放去甲肾上腺素等神经递质。
+   - 这些神经递质使阴茎海绵体的平滑肌收缩，血管窦关闭，血液流出海绵体。
+   - 阴茎体积减小、硬度降低，恢复到非勃起状态。
+   - 疲软阶段通常持续几分钟到几小时，期间阴茎对性刺激的反应减弱。
+
+\paragraph{健康护理}
+
+阴茎的健康护理对于男性的生殖健康和性健康至关重要：
+
+- \textbf{保持清洁卫生}：
+  - 每天用温水清洗阴茎和阴囊，清除包皮垢，避免细菌滋生和感染。
+  - 清洗时应将包皮上翻，彻底清洗包皮腔，然后将包皮复位，避免发生包皮嵌顿。
+  - 避免使用刺激性的肥皂或清洁剂，以免损伤阴茎皮肤。
+
+- \textbf{注意性生活卫生}：
+  - 在性生活前后注意清洗阴茎和外阴，使用安全套，避免性传播疾病的感染。
+  - 避免多个性伴侣，减少性传播疾病的风险。
+  - 性生活不宜过于频繁，避免阴茎过度疲劳和损伤。
+
+- \textbf{避免损伤}：
+  - 避免过度手淫或粗暴的性生活，以免损伤阴茎海绵体或包皮。
+  - 避免长时间骑自行车或骑马，减少对阴茎的压迫和摩擦。
+  - 避免使用刺激性的药物或润滑剂，以免引起过敏反应。
+
+- \textbf{定期检查}：
+  - 定期检查阴茎的大小、形态和功能，注意是否有异常肿块、溃疡、分泌物等。
+  - 如果发现阴茎有异常情况，应及时就医，进行诊断和治疗。
+
+- \textbf{保持健康的生活方式}：
+  - 戒烟限酒，避免滥用药物。
+  - 保持充足的睡眠，避免熬夜。
+  - 适当运动，增强体质，提高免疫力。
+  - 均衡饮食，多吃富含维生素和矿物质的食物，避免过度节食或暴饮暴食。
+
+\paragraph{常见问题及处理}
+
+\subparagraph{包皮过长和包茎}
+- \textbf{定义}：
+  - 包皮过长：包皮覆盖阴茎头，但能自由上翻露出阴茎头。
+  - 包茎：包皮口狭窄，包皮不能上翻露出阴茎头。
+
+- \textbf{症状}：
+  - 包皮垢积存，容易引起包皮炎、龟头炎等感染。
+  - 可能导致排尿困难、尿流缓慢等症状。
+  - 长期刺激可能增加阴茎癌的风险。
+
+- \textbf{处理}：
+  - 包皮过长：注意清洁卫生，定期清洗包皮腔；如果经常发生感染，可考虑行包皮环切手术。
+  - 包茎：必须行包皮环切手术，以避免并发症的发生。
+
+\subparagraph{勃起功能障碍}
+- \textbf{定义}：又称阳痿，是指男性持续或反复不能达到或维持足够的勃起硬度，以完成满意的性生活。
+
+- \textbf{原因}：
+  - 心理因素：焦虑、抑郁、压力、夫妻关系不和谐等。
+  - 生理因素：血管疾病（如高血压、动脉硬化）、神经疾病（如糖尿病神经病变）、内分泌疾病（如睾酮缺乏）、药物影响（如抗高血压药、抗抑郁药）等。
+
+- \textbf{处理}：
+  - 心理治疗：如性心理治疗、认知行为治疗等，帮助患者消除焦虑和压力。
+  - 药物治疗：口服磷酸二酯酶-5（PDE-5）抑制剂，如西地那非（伟哥）、他达拉非（希爱力）等，改善勃起功能。
+  - 物理治疗：如真空勃起装置、阴茎海绵体注射等。
+  - 手术治疗：如阴茎假体植入手术，适用于严重的勃起功能障碍患者。
+
+\subparagraph{早泄}
+- \textbf{定义}：是指男性在性交时射精过快，无法控制射精时间，导致性伴侣不能获得满意的性生活。
+
+- \textbf{原因}：
+  - 心理因素：焦虑、紧张、压力等。
+  - 生理因素：龟头敏感度高、神经反射过快、内分泌失调等。
+
+- \textbf{处理}：
+  - 心理治疗：帮助患者消除焦虑和紧张情绪。
+  - 行为治疗：如挤压法、停-动法等，训练患者控制射精的能力。
+  - 药物治疗：口服选择性5-羟色胺再摄取抑制剂（SSRIs），如达泊西汀，或局部使用麻醉剂，降低龟头敏感度。
+
+\subparagraph{阴茎异常勃起}
+- \textbf{定义}：是指阴茎持续勃起超过4小时，且与性刺激无关，是一种急症。
+
+- \textbf{原因}：
+  - 血液疾病（如镰状细胞贫血）、神经系统疾病、药物影响（如壮阳药、抗抑郁药）、肿瘤等。
+
+- \textbf{处理}：
+  - 立即就医，进行紧急处理，如阴茎海绵体穿刺放血、药物治疗（如注射去甲肾上腺素）等。
+  - 延误治疗可能导致阴茎海绵体纤维化，永久性勃起功能障碍。
+
+\subparagraph{阴茎癌}
+- \textbf{定义}：是发生在阴茎头、包皮或阴茎体的恶性肿瘤，多与包茎、包皮过长、HPV感染等因素有关。
+
+- \textbf{症状}：
+  - 阴茎头或包皮出现溃疡、肿块、分泌物等，久治不愈。
+  - 可能伴有疼痛、出血、腹股沟淋巴结肿大等症状。
+
+- \textbf{处理}：
+  - 手术治疗：如阴茎部分切除术、阴茎全切术等，是主要的治疗方法。
+  - 放射治疗：适用于早期阴茎癌患者。
+  - 化学治疗：作为辅助治疗，用于晚期阴茎癌患者。
+
+\subparagraph{龟头炎}
+- \textbf{定义}：是龟头和包皮的炎症，多由细菌、真菌等感染引起。
+
+- \textbf{症状}：
+  - 龟头和包皮红肿、瘙痒、疼痛。
+  - 可能伴有分泌物增多、异味等。
+
+- \textbf{处理}：
+  - 保持清洁卫生，用温水清洗。
+  - 根据病因使用抗生素或抗真菌药物治疗。
+  - 如果是包皮过长或包茎引起的，可考虑行包皮环切手术。
+
+\subsection{阴囊}
+
+阴囊是位于阴茎下方的袋状结构，由多层组织构成，是男性重要的外生殖器官之一。阴囊内含有睾丸、附睾和输精管的起始段，其独特的结构和功能对于精子的生成和发育至关重要。
+
+\subsection{男性内生殖器官}
+
+发育正常的成熟男性性器官分为内外两部分：外生殖器和内生殖器。内生殖器官由睾丸、附睾、输精管、射精管、尿道以及精囊腺、前列腺、尿道球腺等组成。
+
+\paragraph{睾丸}
+
+睾丸是男性生殖腺，为卵圆形腺体，左右各一，表面光滑，分别由精索悬吊于阴囊之中。每个睾丸重10～15克，平均长3.34厘米，宽2.32厘米，厚1.74厘米。右侧略大。若睾丸体积过小，会引起生精不良，影响生育。睾丸共有200多个小叶，每个小叶有2～4条曲细精管，管壁内有生精上皮，其中的精原细胞可发育生成精子。曲细精管之间为间质细胞组成的间叶，分泌雄激素。睾丸的功能包括产生精子、分泌雄激素等。
+
+\paragraph{附睾}
+
+附睾紧贴睾丸的上端和后缘，为半月形小体，左右各一，分头、体、尾三部分。附睾头较膨大，体和尾逐渐变细。附睾的主要功能是储存精子。精子的成熟过程需在附睾内环境中进行，精子在附睾内通常停留10～25天，以获得运动和受精能力，才能成熟。附睾尾部是精子的储存场所。排精时，由于附睾及输精管的收缩，精子随同精液通过射精管和尿道排出体外。
+
+\paragraph{输精管}
+
+输精管为平滑肌组成的成对管道，呈白色，长约40厘米，宽约3毫米，分为睾丸段、精索段和盆段。
+
+\paragraph{射精管}
+
+输精管沿睾丸后缘上升，进入盆腔与精囊腺排泄管会合，形成射精管。射精管长约2厘米，被前列腺包围，开口于尿道前列腺部后壁的精阜，射精管只在性兴奋达到一定阈值时才开放，使精液射出。
+
+\paragraph{尿道}
+
+男性尿道既有排尿功能，又有排精的功能。长12～20厘米，分为前列腺部、膜部和海绵体部三段。尿道前列腺部是尿道穿过前列腺的部分，开口于精阜，是射精管和前列腺排泄管的开口处。尿道膜部是尿道穿过尿生殖膈的部分，是尿道最狭窄的部分。尿道海绵体部是尿道穿过尿道海绵体的部分，终止于尿道外口。
+
+\paragraph{精囊腺}
+
+精囊腺是输精管末端发出的盲囊，为成对梭形体，附着于膀胱底部。管道一端封闭，另一端开放，与输精管联合构成射精管。其功能是分泌精囊液，参与精液的合成。精囊液中含有果糖、前列腺素等物质，为精子提供能量和营养。
+
+\paragraph{前列腺}
+
+前列腺位于盆腔内的膀胱底部、膀胱颈附近，围绕尿道，呈扁平栗子状。前列腺宽约4厘米，长约3厘米，厚约2厘米，重约20克。前列腺是最大的男性附属性腺，主要功能是分泌前列腺液。前列腺液含有大量的钠、钾、锌等元素，对精子的生理功能有重要的影响。这种液体由腺体细胞不停地制造和分泌，在性兴奋时可以大量产生，平时有部分渗入润滑尿道。
+
+\paragraph{尿道球腺}
+
+尿道球腺在前列腺下方，尿道两旁，为一对豌豆大小的圆形小体。在性兴奋和射精之前有少量分泌液进入尿道，分泌液呈碱性，可中和酸性的尿液，有利于精子生存。尿道球腺的分泌液还有润滑作用。
+
+% 结束文档
+\end{document}
