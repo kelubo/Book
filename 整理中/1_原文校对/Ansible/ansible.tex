@@ -498,6 +498,9 @@ ansible-navigator exec "ansible localhost -m setup" --execution-environment-imag
 ansible-navigator run test_localhost.yml --execution-environment-image ghcr.io/ansible-community/community-ee-minimal:latest --mode stdout
 \end{verbatim}
 
+\subsubsection{在容器中安装 Ansible}
+您可以简单地构建一个执行环境容器镜像或使用可用的社区镜像作为控制节点，而不是手动安装 Ansible 内容。\par
+
 \subsubsection{执行环境入门}
 您可以像运行任何其他现代软件应用程序一样，在容器中运行 Ansible 自动化。Ansible 使用称为执行环境（Execution Environment，EE）的容器镜像作为控制节点。执行环境消除了复杂性，以扩展自动化项目并使部署操作等事情更加简单明了。\par
 
@@ -633,36 +636,104 @@ Ansible 执行具体任务的单元。\\
 \section{安装 Ansible}
 Ansible 是一种无代理自动化工具，您可以将其安装在单个主机（称为控制节点）上。从控制节点，Ansible 可以通过 SSH、Powershell 远程管理以及许多其他传输方式远程管理整个机器和其他设备集群（称为被管理节点），所有操作都通过简单的命令行界面完成，无需数据库或守护进程。\par
 
+\subsection{选择要安装的 Ansible 包和版本}
+Ansible 的社区包有两种分发方式：\par
+- \textbf{ansible-core}：一个极简的语言和运行时包，包含一组内置模块和插件。\par
+- \textbf{ansible}：一个更大的“包含电池”的包，添加了社区策划的 Ansible 集合选择，用于自动化各种设备。\par
+
+选择适合您需求的包。以下说明使用 ansible 作为包名，但如果您更喜欢从最小包开始并单独安装仅所需的 Ansible 集合，则可以替换为 ansible-core。\par
+
+ansible 或 ansible-core 包可能在您的操作系统包管理器中可用，您可以自由使用首选方法安装这些包。有关更多信息，请参阅特定操作系统上安装 Ansible 的指南。这些安装说明仅涵盖使用 pip 安装 Python 包的官方支持方法。\par
+
 Ansible 可以在多种操作系统上安装，以下是常见的安装方法：\par
 
-\subsection{在 Linux 上安装}
+\subsection{使用 pip 安装和升级 Ansible}
+\paragraph{定位 Python}
+定位并记住您希望用来运行 Ansible 的 Python 解释器的路径。以下说明将此 Python 称为 python3。例如，如果您确定要在 /usr/bin/python3.9 下的 Python 上安装 Ansible，请指定该路径而不是 python3。\par
 
-**在 CentOS/RHEL 上安装：**\par
+\paragraph{确保 pip 可用}
+要验证您首选的 Python 是否已安装 pip：\par
 \begin{verbatim}
-# 安装 EPEL 仓库
-sudo yum install epel-release -y
-
-# 安装 Ansible
-sudo yum install ansible -y
+python3 -m pip -V
 \end{verbatim}
 
-**在 Ubuntu/Debian 上安装：**\par
+如果一切正常，您应该看到类似以下内容：\par
 \begin{verbatim}
-# 更新包列表
-sudo apt update
-
-# 安装 Ansible
-sudo apt install ansible -y
+python3 -m pip -V
+pip 21.0.1 from /usr/lib/python3.9/site-packages/pip (python 3.9)
 \end{verbatim}
 
-**使用 pip 安装（跨平台）：**\par
-\begin{verbatim}
-# 安装 pip
-sudo apt install python3-pip -y  # Ubuntu/Debian
-sudo yum install python3-pip -y  # CentOS/RHEL
+如果是这样，pip 可用，您可以继续下一步。\par
 
-# 安装 Ansible
-sudo pip3 install ansible
+如果您看到类似 "No module named pip" 的错误，则需要在继续之前在您选择的 Python 解释器下安装 pip。这可能意味着安装额外的 OS 包（例如 python3-pip），或通过运行以下命令直接从 Python Packaging Authority 安装最新的 pip：\par
+\begin{verbatim}
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py --user
+\end{verbatim}
+
+在能够运行 Ansible 之前，您可能需要执行一些额外的配置。有关更多信息，请参阅 Python 文档中关于安装到用户站点的部分。\par
+
+\paragraph{安装 Ansible}
+在您选择的 Python 环境中使用 pip 为当前用户安装完整的 Ansible 包：\par
+\begin{verbatim}
+python3 -m pip install --user ansible
+\end{verbatim}
+
+您可以为当前用户安装最小的 ansible-core 包：\par
+\begin{verbatim}
+python3 -m pip install --user ansible-core
+\end{verbatim}
+
+或者，您可以安装特定版本的 ansible-core：\par
+\begin{verbatim}
+python3 -m pip install --user ansible-core==2.12.3
+\end{verbatim}
+
+\paragraph{升级 Ansible}
+要将此 Python 环境中现有的 Ansible 安装升级到最新发布版本，只需在上面的命令中添加 --upgrade：\par
+\begin{verbatim}
+python3 -m pip install --upgrade --user ansible
+\end{verbatim}
+
+\subsection{使用 pipx 安装和升级 Ansible}
+在某些系统上，由于操作系统开发人员的决定，可能无法使用 pip 安装 Ansible。在这种情况下，pipx 是一个广泛可用的替代方案。\par
+
+**安装 Ansible：**\par
+在您的环境中使用 pipx 安装完整的 Ansible 包：\par
+\begin{verbatim}
+pipx install --include-deps ansible
+\end{verbatim}
+
+您可以安装最小的 ansible-core 包：\par
+\begin{verbatim}
+pipx install ansible-core
+\end{verbatim}
+
+或者，您可以安装特定版本的 ansible-core：\par
+\begin{verbatim}
+pipx install ansible-core==2.12.3
+\end{verbatim}
+
+**升级 Ansible：**\par
+要将现有的 Ansible 安装升级到最新发布版本：\par
+\begin{verbatim}
+pipx upgrade --include-injected ansible
+\end{verbatim}
+
+**安装额外的 Python 依赖项：**\par
+要安装可能需要的其他 Python 依赖项，例如安装下面描述的 argcomplete Python 包：\par
+\begin{verbatim}
+pipx inject ansible argcomplete
+\end{verbatim}
+
+包含 --include-apps 选项，使其他 Python 依赖项中的应用程序在您的 PATH 上可用。这允许您从 shell 执行这些应用程序的命令。\par
+\begin{verbatim}
+pipx inject --include-apps ansible argcomplete
+\end{verbatim}
+
+如果您需要从 requirements 文件安装依赖项，例如在安装 Azure 集合时，您可以使用 runpip。\par
+\begin{verbatim}
+pipx runpip ansible install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
 \end{verbatim}
 
 \subsection{在 macOS 上安装}
@@ -679,6 +750,283 @@ Windows 系统需要安装 Windows Subsystem for Linux (WSL)，然后在 WSL 中
 # 检查 Ansible 版本
 ansible --version
 \end{verbatim}
+
+\subsection{在特定操作系统上安装 Ansible}
+\textbf{注意：}\par
+这些说明来自各自的社区。如果您遇到错误或问题，请向该社区提交，以更新这些说明。Ansible 仅维护 pip 安装说明。\par
+
+在大多数系统上，您始终可以使用 pip 从 PyPI 安装 ansible 包。社区还为各种 Linux 发行版打包和维护 Ansible。\par
+
+本指南向您展示如何从不同的发行版包存储库安装 Ansible。\par
+
+\subsubsection{添加新发行版的要求}
+希望向本指南添加另一个发行版说明的包维护者必须满足以下要求：\par
+- 确保发行版提供合理更新的 ansible 版本。\par
+- 在构建系统允许的范围内保持 ansible-core 和 ansible 版本同步。\par
+- 提供一种在说明中联系发行版维护者的方式。\par
+- 还鼓励发行版维护者加入并监控 Ansible 打包 Matrix 聊天室。\par
+
+\subsubsection{在 Fedora Linux 上安装 Ansible}
+Fedora Linux 通过标准存储库提供完整的 Ansible 包和最小的 ansible-core 包。\par
+
+安装完整的 ansible 包：\par
+\begin{verbatim}
+sudo dnf install ansible
+\end{verbatim}
+
+安装最小的 ansible-core 包：\par
+\begin{verbatim}
+sudo dnf install ansible-core
+\end{verbatim}
+
+Fedora 存储库包含几个作为独立包的 Ansible 集合，您可以与 ansible-core 一起安装。例如，安装 community.general 集合：\par
+\begin{verbatim}
+sudo dnf install ansible-collection-community-general
+\end{verbatim}
+
+请参阅 Fedora 包索引以获取 Fedora 中打包的 Ansible 集合的完整列表。\par
+
+通过在 Red Hat Bugzilla 中针对 Fedora 产品提交错误来联系包维护者。\par
+
+\subsubsection{从 EPEL 安装 Ansible}
+如果您使用 CentOS Stream、Almalinux、Rocky Linux 或相关发行版，您可以从社区维护的 EPEL（Enterprise Linux 额外包）存储库安装 ansible 或 Ansible 集合：\par
+1. 启用 EPEL 存储库。\par
+2. 使用与 Fedora Linux 相同的 dnf 命令。\par
+
+通过在 Red Hat Bugzilla 中针对 Fedora EPEL 产品提交错误来联系包维护者。\par
+
+\subsubsection{在 OpenSUSE Tumbleweed/Leap 上安装 Ansible}
+OpenSUSE 通过标准包管理器提供 Ansible 包。\par
+\begin{verbatim}
+sudo zypper install ansible
+\end{verbatim}
+
+请参阅 OpenSUSE 支持门户以获取有关在 OpenSUSE 上使用 Ansible 的额外帮助。\par
+
+\subsubsection{在 Ubuntu 上安装 Ansible}
+Ubuntu 通过个人包存档 (PPA) 提供 Ansible 包，其中包含比标准存储库更新的版本。\par
+
+Ubuntu 构建可在此处的 PPA 中获得。\par
+
+在您的系统上配置 PPA 并安装 Ansible：\par
+\begin{verbatim}
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible
+\end{verbatim}
+
+\textbf{注意：}\par
+在较旧的 Ubuntu 发行版上，"software-properties-common" 称为 "python-software-properties"。在较旧版本中，您可能希望使用 apt-get 而不是 apt。此外，只有较新的发行版（18.04、18.10 及更高版本）有 -u 或 --update 标志。根据需要调整您的脚本。\par
+
+在 PPA 的问题跟踪器中提交任何问题。\par
+
+\subsubsection{在 Debian 上安装 Ansible}
+Debian 用户可以在标准存储库或 Ubuntu PPA 之间选择，以获取更新的版本。\par
+
+虽然 Ansible 可从 Debian 主存储库获得，但此版本可能已过时。\par
+
+对于更新的版本，Debian 用户可以根据下表使用 Ubuntu PPA：\par
+\begin{table}[H]
+    \centering
+    \caption{Debian 与 Ubuntu 版本对应关系}
+    \label{tab:debian-ubuntu}
+    \begin{tabular}{ccc}
+        \toprule
+        Debian & Ubuntu & UBUNTUCODENAME \\
+        \midrule
+        Debian 13 (Trixie) & Ubuntu 24.04 (Noble) & noble \\
+        Debian 12 (Bookworm) & Ubuntu 22.04 (Jammy) & jammy \\
+        Debian 11 (Bullseye) & Ubuntu 20.04 (Focal) & focal \\
+        Debian 10 (Buster) & Ubuntu 18.04 (Bionic) & bionic \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+以下示例假设您已经安装了 wget 和 gpg。\par
+
+添加存储库并安装 Ansible。根据上面的表格设置 UBUNTUCODENAME=...（在此示例中我们使用 jammy）：\par
+\begin{verbatim}
+UBUNTU_CODENAME=jammy
+wget -O- "https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367" | sudo gpg --dearmour -o /usr/share/keyrings/ansible-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/ansible-archive-keyring.gpg] http://ppa.launchpad.net/ansible/ansible/ubuntu $UBUNTU_CODENAME main" | sudo tee /etc/apt/sources.list.d/ansible.list
+sudo apt update && sudo apt install ansible
+\end{verbatim}
+
+\textbf{注意：}\par
+像上面的示例一样，在 keyserver URL 和 "echo deb" 命令周围使用双引号。\par
+
+这些命令下载签名密钥并向 apt 的源添加一个条目，指向 PPA。\par
+
+以前，您可能使用过 apt-key add。出于安全原因，apt-key add 方法现在已被弃用（在 Debian、Ubuntu 和其他地方）。\par
+
+因此，我们不会将密钥添加到 /etc/apt/trusted.gpg.d/ 或 /etc/apt/trusted.gpg，在那里密钥将被允许签署来自任何存储库的版本。\par
+
+\subsubsection{在 Arch Linux 上安装 Ansible}
+Arch Linux 通过标准包存储库提供完整的 Ansible 包和 ansible-core。\par
+
+安装完整的 ansible 包：\par
+\begin{verbatim}
+sudo pacman -S ansible
+\end{verbatim}
+
+安装最小的 ansible-core 包：\par
+\begin{verbatim}
+sudo pacman -S ansible-core
+\end{verbatim}
+
+Arch Linux 存储库包含几个作为独立包的 Ansible 生态系统包，您可以与 ansible-core 一起安装。请参阅 Arch Linux 包索引以获取 Arch Linux 中 Ansible 包的完整列表。\par
+
+通过在相关包的 GitLab 存储库中打开问题来联系包维护者。\par
+
+\subsubsection{在 Windows 上安装 Ansible}
+您不能将 Windows 系统用作 Ansible 控制节点。\par
+
+\subsection{为开发目的安装 Ansible}
+如果您正在测试新功能、修复错误或与开发团队合作修改核心代码，您可以从 GitHub 安装并运行源代码。\par
+
+\textbf{注意：}\par
+只有在修改 ansible-core 或尝试开发中的功能时，才应该安装并运行 devel 分支。这是一个快速变化的代码源，随时可能变得不稳定。\par
+
+\subsubsection{使用 pip 从 GitHub 安装 devel 分支}
+您可以使用 pip 直接从 GitHub 安装 ansible-core 的 devel 分支：\par
+\begin{verbatim}
+python3 -m pip install --user https://github.com/ansible/ansible/archive/devel.tar.gz
+\end{verbatim}
+
+您可以将上面 URL 中的 devel 替换为 GitHub 上的任何其他分支或标签，以安装旧版本的 Ansible、标记为 alpha 或 beta 的版本以及候选版本。\par
+
+\subsubsection{从克隆运行 devel 分支}
+ansible-core 很容易从源代码运行。您不需要 root 权限来使用它，也不需要实际安装任何软件。不需要守护进程或数据库设置。\par
+
+1. 克隆 ansible-core 仓库\par
+\begin{verbatim}
+git clone https://github.com/ansible/ansible.git
+cd ./ansible
+\end{verbatim}
+
+2. 设置 Ansible 环境\par
+
+使用 Bash：\par
+\begin{verbatim}
+source ./hacking/env-setup
+\end{verbatim}
+
+使用 Fish：\par
+\begin{verbatim}
+source ./hacking/env-setup.fish
+\end{verbatim}
+
+要抑制杂散的警告/错误，请使用 -q：\par
+\begin{verbatim}
+source ./hacking/env-setup -q
+\end{verbatim}
+
+3. 安装 Python 依赖项\par
+\begin{verbatim}
+python3 -m pip install --user -r ./requirements.txt
+\end{verbatim}
+
+4. 在本地机器上更新 ansible-core 的 devel 分支\par
+使用 pull-with-rebase 以便重放任何本地更改。\par
+\begin{verbatim}
+git pull --rebase
+\end{verbatim}
+
+\subsubsection{确认安装}
+您可以通过检查版本来测试 Ansible 是否已正确安装：\par
+\begin{verbatim}
+ansible --version
+\end{verbatim}
+
+此命令显示的版本是已安装的关联 ansible-core 包的版本。\par
+
+要检查已安装的 ansible 包的版本：\par
+\begin{verbatim}
+ansible-community --version
+\end{verbatim}
+
+\subsection{添加 Ansible 命令的 shell 补全}
+您可以通过安装一个名为 argcomplete 的可选依赖项来添加 Ansible 命令行工具的 shell 补全。它支持 bash，并对 zsh 和 tcsh 有有限的支持。\par
+
+\subsubsection{安装 argcomplete}\par
+如果您选择了 pipx 安装说明：\par
+\begin{verbatim}
+pipx inject --include-apps ansible argcomplete
+\end{verbatim}
+
+如果您选择了 pip 安装说明：\par
+\begin{verbatim}
+python3 -m pip install --user argcomplete
+\end{verbatim}
+
+\subsubsection{配置 argcomplete}\par
+有两种方法可以配置 argcomplete 以允许 Ansible 命令行工具的 shell 补全：全局或按命令。\par
+
+\paragraph{全局配置}\par
+全局补全需要 bash 4.2。\par
+\begin{verbatim}
+activate-global-python-argcomplete --user
+\end{verbatim}
+
+这将把 bash 补全文件写入用户位置。使用 --dest 更改位置或使用 sudo 全局设置补全。\par
+
+\paragraph{按命令配置}\par
+如果您没有 bash 4.2，则必须独立注册每个脚本。\par
+\begin{verbatim}
+eval $(register-python-argcomplete ansible)
+eval $(register-python-argcomplete ansible-config)
+eval $(register-python-argcomplete ansible-console)
+eval $(register-python-argcomplete ansible-doc)
+eval $(register-python-argcomplete ansible-galaxy)
+eval $(register-python-argcomplete ansible-inventory)
+eval $(register-python-argcomplete ansible-playbook)
+eval $(register-python-argcomplete ansible-pull)
+eval $(register-python-argcomplete ansible-vault)
+\end{verbatim}
+
+您应该将上述命令放入 shell 的配置文件中，例如 ~/.profile 或 ~/.bash_profile。\par
+
+\paragraph{在 zsh 或 tcsh 中使用 argcomplete}
+
+\section{配置 Ansible}
+\subsection{配置文件}
+Ansible 中的某些设置可以通过配置文件 (ansible.cfg) 进行调整。默认配置应该对大多数用户来说已经足够，但可能有一些原因需要更改它们。\par
+
+配置文件搜索的路径在参考文档中列出。\par
+
+\subsubsection{获取最新配置}
+如果从包管理器安装 Ansible，最新的 ansible.cfg 文件应该存在于 /etc/ansible 中，在更新的情况下可能作为 .rpmnew 文件（或其他）存在。\par
+
+如果您从 pip 或源代码安装 Ansible，您可能需要创建此文件以覆盖 Ansible 中的默认设置。\par
+
+您可以生成一个 Ansible 配置文件 ansible.cfg，列出所有默认设置，如下所示：\par
+\begin{verbatim}
+ansible-config init --disabled > ansible.cfg
+\end{verbatim}
+
+包含可用插件以创建更完整的 Ansible 配置，如下所示：\par
+\begin{verbatim}
+ansible-config init --disabled -t all > ansible.cfg
+\end{verbatim}
+
+有关更多详细信息和可用配置的完整列表，请访问 configuration_settings。\par
+
+您可以使用 ansible-config 命令行实用程序列出可用选项并检查当前值。\par
+
+有关深入详细信息，请参阅 Ansible 配置设置。\par
+
+\subsection{环境配置}
+Ansible 还允许使用环境变量配置设置。\par
+
+如果设置了这些环境变量，它们将覆盖从配置文件加载的任何相关设置。您可以从以下位置获取可用环境变量的完整列表：\par
+- Ansible 配置设置：用于配置核心功能\par
+- 所有集合环境变量索引：用于配置集合中的插件\par
+
+\subsection{命令行选项}
+并非所有配置选项都存在于命令行中，只有那些被认为最有用或最常见的选项。命令行中的设置将覆盖通过配置文件和环境传递的设置。\par
+
+可用选项的完整列表在 ansible-playbook 和 ansible 中。\par
 
 \section{Ansible 快速入门}
 
