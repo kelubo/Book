@@ -247,6 +247,325 @@ Ansible 的灵活性使其能够适应从小型应用到大型企业级部署的
 
 % 第二章 基础概念与安装
 \chapter{基础概念与安装}
+\section{Ansible 核心概念}
+这些概念适用于 Ansible 的所有使用场景。在使用 Ansible 或阅读文档之前，应该理解它们。\par
+
+- 控制节点\par
+- 被管理节点\par
+- 清单\par
+- Playbooks\par
+\quad - Plays\par
+\quad \quad - Roles\par
+\quad \quad - Tasks\par
+\quad \quad - Handlers\par
+- 模块\par
+- 插件\par
+- 集合\par
+
+\subsection{控制节点}
+您运行 Ansible CLI 工具（ansible-playbook、ansible、ansible-vault 等）的机器。您可以使用任何满足软件要求的计算机作为控制节点 - 笔记本电脑、共享桌面和服务器都可以运行 Ansible。您还可以在称为执行环境的容器中运行 Ansible。\par
+
+\textbf{控制节点要求：}\par
+对于控制节点（运行 Ansible 的机器），您可以使用几乎任何安装了 Python 的类 UNIX 机器。这包括 Red Hat、Debian、Ubuntu、macOS、BSD 以及 Windows Subsystem for Linux (WSL) 发行版下的 Windows。没有 WSL 的 Windows 本身不支持作为控制节点。\par
+
+可以使用多个控制节点，但 Ansible 本身不会在它们之间进行协调。\par
+
+\subsubsection{执行环境简介}
+Ansible 执行环境旨在解决复杂性问题并提供容器化带来的所有好处。\par
+
+\paragraph{降低复杂性}
+执行环境可以在三个主要方面降低复杂性：\par
+- 软件依赖项\par
+- 可移植性\par
+- 内容分离\par
+
+\paragraph{依赖项}
+软件应用程序通常有依赖项，Ansible 也不例外。这些依赖项可以包括软件库、配置文件或其他服务等。\par
+
+传统上，管理员使用 RPM 或 Python-pip 等包管理工具在操作系统上安装应用程序依赖项。这种方法的主要缺点是应用程序可能需要与默认提供的不同版本的依赖项。对于 Ansible，典型的安装包括 ansible-core 和一组 Ansible 集合。其中许多集合对它们提供的插件、模块、角色和 playbooks 有依赖项。\par
+
+Ansible 集合可能依赖于以下软件及其版本：\par
+- ansible-core\par
+- Python\par
+- Python 包\par
+- 系统包\par
+- 其他 Ansible 集合\par
+
+这些依赖项必须安装，有时可能会相互冲突。\par
+
+部分解决依赖项问题的一种方法是在 Ansible 控制节点上使用 Python 虚拟环境。然而，应用于 Ansible 的虚拟环境有缺点和自然限制。\par
+
+\paragraph{可移植性}
+Ansible 用户在本地为 Ansible 编写内容，并希望利用容器技术使其自动化运行时可移植、可共享且易于部署到测试和生产环境。\par
+
+\paragraph{内容分离}
+在有多个用户使用 Ansible 控制节点或 Ansible AWX/Controller 等工具的情况下，他们可能希望分离其内容以避免配置和依赖项冲突。\par
+
+\paragraph{执行环境的 Ansible 工具}
+Ansible 生态系统中的项目还提供了几个可以与执行环境一起使用的工具，例如：\par
+- Ansible Builder\par
+- Ansible Navigator\par
+- Ansible AWX\par
+- Ansible Runner\par
+- VS Code Ansible\par
+- Dev Containers 扩展\par
+
+\subsubsection{设置环境}
+完成以下步骤，为您的第一个执行环境设置本地环境：\par
+
+1. 确保系统上安装了以下包：\par
+- podman 或 docker\par
+- python3\par
+- python3-pip\par
+
+如果使用 DNF 包管理器，按以下方式安装这些先决条件：\par
+\begin{verbatim}
+sudo dnf install -y podman python3 python3-pip
+\end{verbatim}
+
+2. 安装 ansible-navigator：\par
+\begin{verbatim}
+pip3 install ansible-navigator
+\end{verbatim}
+
+安装 ansible-navigator 可以让您在命令行上运行 EE。它包含 ansible-builder 包来构建 EE。\par
+
+如果您想构建 EE 而不测试，只需安装 ansible-builder：\par
+\begin{verbatim}
+pip3 install ansible-builder
+\end{verbatim}
+
+3. 使用以下命令验证您的环境：\par
+\begin{verbatim}
+ansible-navigator --version
+ansible-builder --version
+\end{verbatim}
+
+准备好通过几个简单的步骤构建 EE 了吗？继续阅读构建您的第一个执行环境。\par
+
+\subsubsection{构建您的第一个执行环境}
+我们将构建一个 EE，它代表一个 Ansible 控制节点，包含标准包（如 ansible-core 和 Python）以及 Ansible 集合（community.postgresql）及其依赖项（psycopg2-binary Python 连接器）。\par
+
+要构建您的第一个 EE：\par
+
+1. 在文件系统上创建一个项目文件夹。\par
+\begin{verbatim}
+mkdir my_first_ee && cd my_first_ee
+\end{verbatim}
+
+2. 创建一个 execution-environment.yml 文件，指定要包含在镜像中的依赖项。\par
+\begin{verbatim}
+version: 3
+
+images:
+  base_image:
+    name: registry.fedoraproject.org/fedora:42
+
+dependencies:
+  python_interpreter:
+    package_system: python3
+  ansible_core:
+    package_pip: ansible-core
+  ansible_runner:
+    package_pip: ansible-runner
+  system:
+  - openssh-clients
+  - sshpass
+  galaxy:
+    collections:
+    - name: community.postgresql
+\end{verbatim}
+
+\textbf{注意：}psycopg2-binary Python 包包含在集合的 requirements.txt 文件中。对于不包含 requirements.txt 文件的集合，您需要显式指定 Python 依赖项。\par
+
+3. 构建一个名为 postgresql_ee 的 EE 容器镜像。\par
+
+如果使用 docker，请添加 --container-runtime docker 参数。\par
+\begin{verbatim}
+ansible-builder build --tag postgresql_ee
+\end{verbatim}
+
+4. 列出容器镜像以验证构建成功。\par
+\begin{verbatim}
+podman image list
+
+localhost/postgresql_ee          latest      2e866777269b  6 minutes ago  1.11 GB
+\end{verbatim}
+
+您可以通过查看上下文目录中的 Containerfile 或 Dockerfile 来验证您创建的镜像，以查看其配置。\par
+\begin{verbatim}
+less context/Containerfile
+\end{verbatim}
+
+您还可以使用 Ansible Navigator 查看有关镜像的详细信息。\par
+
+运行 ansible-navigator 命令，在 TUI 中输入 :images，然后选择 postgresql_ee。\par
+
+继续阅读运行您的 EE 并测试您刚刚构建的 EE。\par
+
+\subsubsection{运行您的执行环境}
+您可以使用 ansible-navigator 在命令行上针对 localhost 或远程目标运行您的 EE。\par
+
+\textbf{注意：}除了 ansible-navigator 之外，还有其他工具可以运行 EE。\par
+
+\paragraph{针对 localhost 运行}
+1. 创建一个 test_localhost.yml playbook。\par
+\begin{verbatim}
+- name: Gather and print local facts
+  hosts: localhost
+  become: true
+  gather_facts: true
+  tasks:
+
+    - name: Print facts
+      ansible.builtin.debug:
+        var: ansible_facts
+\end{verbatim}
+
+2. 在 postgresql_ee EE 中运行 playbook。\par
+\begin{verbatim}
+ansible-navigator run test_localhost.yml --execution-environment-image postgresql_ee --mode stdout --pull-policy missing --container-options='--user=0'
+\end{verbatim}
+
+您可能会注意到收集的事实是关于容器的，而不是开发机器的。这是因为 ansible playbook 是在容器内部运行的。\par
+
+\paragraph{针对远程目标运行}
+在开始之前，确保您有以下内容：\par
+- 至少一个远程目标的 IP 地址或可解析的主机名。\par
+- 远程主机的有效凭据。\par
+- 在远程主机上具有 sudo 权限的用户。\par
+
+在 postgresql_ee EE 中针对远程主机执行 playbook，如下例所示：\par
+
+1. 为清单文件创建一个目录。\par
+\begin{verbatim}
+mkdir inventory
+\end{verbatim}
+
+2. 在 inventory 目录中创建 hosts.yml 清单文件。\par
+\begin{verbatim}
+all:
+  hosts:
+    192.168.0.2  # Replace with the IP of your target host
+\end{verbatim}
+
+3. 创建一个 test_remote.yml playbook。\par
+\begin{verbatim}
+- name: Gather and print facts
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+
+    - name: Print facts
+      ansible.builtin.debug:
+        var: ansible_facts
+\end{verbatim}
+
+4. 在 postgresql_ee EE 中运行 playbook。\par
+
+将 student 替换为适当的用户名。根据目标主机的身份验证方法，命令中的某些参数可能是可选的。\par
+\begin{verbatim}
+ansible-navigator run test_remote.yml -i inventory --execution-environment-image postgresql_ee:latest --mode stdout --pull-policy missing --enable-prompts -u student -k -K
+\end{verbatim}
+
+\subsubsection{使用社区 EE 镜像运行 Ansible}
+您可以使用社区镜像运行 Ansible，而无需构建自定义 EE。\par
+
+使用仅包含 ansible-core 的 community-ee-minimal 镜像或还包含几个基础集合的 community-ee-base 镜像。运行以下命令查看 community-ee-base 镜像中包含的集合：\par
+\begin{verbatim}
+ansible-navigator collections --execution-environment-image ghcr.io/ansible-community/community-ee-base:latest
+\end{verbatim}
+
+在 community-ee-minimal 容器中针对 localhost 运行以下 Ansible 临时命令：\par
+\begin{verbatim}
+ansible-navigator exec "ansible localhost -m setup" --execution-environment-image ghcr.io/ansible-community/community-ee-minimal:latest --mode stdout
+\end{verbatim}
+
+现在，创建一个简单的测试 playbook 并在容器中针对 localhost 运行它：\par
+\begin{verbatim}
+- name: Gather and print local facts
+  hosts: localhost
+  become: true
+  gather_facts: true
+  tasks:
+
+    - name: Print facts
+      ansible.builtin.debug:
+        var: ansible_facts
+\end{verbatim}
+\begin{verbatim}
+ansible-navigator run test_localhost.yml --execution-environment-image ghcr.io/ansible-community/community-ee-minimal:latest --mode stdout
+\end{verbatim}
+
+\subsubsection{执行环境入门}
+您可以像运行任何其他现代软件应用程序一样，在容器中运行 Ansible 自动化。Ansible 使用称为执行环境（Execution Environment，EE）的容器镜像作为控制节点。执行环境消除了复杂性，以扩展自动化项目并使部署操作等事情更加简单明了。\par
+
+执行环境镜像标准包含以下包：\par
+- ansible-core\par
+- ansible-runner\par
+- Python\par
+- Ansible 内容依赖项\par
+
+除了标准包外，执行环境还可以包含：\par
+- 一个或多个 Ansible 集合及其依赖项\par
+- 其他自定义组件\par
+
+本入门指南向您展示如何构建和测试简单的执行环境。生成的容器镜像代表一个 Ansible 控制节点，包含：\par
+- 标准执行环境包\par
+- community.postgresql 集合\par
+- psycopg2-binary Python 包\par
+
+\subsection{被管理节点}
+也称为“主机”，这些是您旨在使用 Ansible 管理的目标设备（服务器、网络设备或任何计算机）。\par
+
+\textbf{被管理节点要求：}\par
+被管理节点（Ansible 正在管理的机器）不需要安装 Ansible，但需要 Python 来运行 Ansible 生成的 Python 代码。被管理节点还需要一个用户账户，该账户可以通过 SSH 连接到节点并具有交互式 POSIX shell。\par
+
+\textbf{注意：}\par
+模块要求可能有例外。例如，网络模块不需要在被管理设备上安装 Python。请参阅您使用的模块的文档。\par
+
+Ansible 通常不会安装在被管理节点上，除非您使用 ansible-pull，但这很少见且不是推荐的设置。\par
+
+\subsection{清单}
+由一个或多个“清单源”提供的被管理节点列表。您的清单可以指定每个节点的特定信息，如 IP 地址。它还用于分配组，既允许在 Play 中选择节点，也允许批量变量分配。\par
+
+有时清单源文件也称为“主机文件”。\par
+
+\subsection{Playbooks}
+它们包含 Plays（Ansible 执行的基本单位）。这既是一个“执行概念”，也是我们如何描述 ansible-playbook 操作的文件。\par
+
+Playbooks 用 YAML 编写，易于阅读、编写、共享和理解。\par
+
+\subsubsection{Plays}
+Ansible 执行的主要上下文，此 playbook 对象将被管理节点（主机）映射到任务。Play 包含变量、角色和有序的任务列表，可以重复运行。它基本上由映射主机和任务的隐式循环组成，并定义了如何迭代它们。\par
+
+\subsubsection{Roles}
+可重用 Ansible 内容（任务、处理器、变量、插件、模板和文件）的有限分发，用于 Play 内部。\par
+
+要使用任何 Role 资源，Role 本身必须导入到 Play 中。\par
+
+\subsubsection{Tasks}
+要应用于被管理主机的“操作”的定义。您可以使用 ansible 或 ansible-console（两者都创建虚拟 Play）通过临时命令执行单个任务一次。\par
+
+\subsubsection{Handlers}
+Task 的一种特殊形式，仅在由之前导致“changed”状态的任务通知时执行。\par
+
+\subsection{模块}
+Ansible 复制到每个被管理节点并在其上执行（必要时）以完成每个 Task 中定义的操作的代码或二进制文件。\par
+
+每个模块都有特定用途，从管理特定类型数据库上的用户到管理特定类型网络设备上的 VLAN 接口。\par
+
+您可以使用任务调用单个模块，或在 playbook 中调用多个不同的模块。Ansible 模块按集合分组。\par
+
+\subsection{插件}
+扩展 Ansible 核心功能的代码片段。插件可以控制您如何连接到被管理节点（连接插件）、操作数据（过滤插件），甚至控制在控制台中显示的内容（回调插件）。\par
+
+\subsection{集合}
+分发 Ansible 内容的格式，可以包含 playbooks、roles、modules 和 plugins。您可以通过 Ansible Galaxy 安装和使用集合。\par
+
+集合资源可以相互独立和离散地使用。\par
+
 \section{Ansible 的核心组件}
 \subsection{Ansible 架构}
 Ansible 采用无代理架构，主要由控制节点和被管理节点组成。控制节点运行 Ansible 命令，通过 SSH 协议与被管理节点通信，无需在被管理节点上安装额外的软件。
@@ -312,6 +631,8 @@ Ansible 执行具体任务的单元。\\
 \end{enumerate}
 
 \section{安装 Ansible}
+Ansible 是一种无代理自动化工具，您可以将其安装在单个主机（称为控制节点）上。从控制节点，Ansible 可以通过 SSH、Powershell 远程管理以及许多其他传输方式远程管理整个机器和其他设备集群（称为被管理节点），所有操作都通过简单的命令行界面完成，无需数据库或守护进程。\par
+
 Ansible 可以在多种操作系统上安装，以下是常见的安装方法：\par
 
 \subsection{在 Linux 上安装}
@@ -374,6 +695,74 @@ mkdir ansible_quickstart && cd ansible_quickstart
 \end{verbatim}
 
 使用单一目录结构可以更轻松地添加到源代码控制，以及重用和共享自动化内容。\par
+
+\subsection{创建 Playbook}
+Playbooks 是 YAML 格式的自动化蓝图，Ansible 使用它们来部署和配置被管理节点。\par
+
+\textbf{Playbook}：定义 Ansible 执行操作顺序的 play 列表，从上到下，以实现整体目标。\par
+
+\textbf{Play}：映射到清单中被管理节点的有序任务列表。\par
+
+\textbf{Task}：对单个模块的引用，定义 Ansible 执行的操作。\par
+
+\textbf{Module}：Ansible 在被管理节点上运行的代码或二进制单元。Ansible 模块按集合分组，每个模块都有一个完全限定的集合名称 (FQCN)。\par
+
+完成以下步骤创建一个 playbook，用于 ping 您的主机并打印 "Hello world" 消息：\par
+
+1. 在您之前创建的 ansible_quickstart 目录中创建一个名为 playbook.yaml 的文件，内容如下：\par
+\begin{verbatim}
+- name: My first play
+  hosts: myhosts
+  tasks:
+    - name: Ping my hosts
+      ansible.builtin.ping:
+
+    - name: Print message
+      ansible.builtin.debug:
+        msg: Hello world
+\end{verbatim}
+
+2. 运行您的 playbook。\par
+\begin{verbatim}
+ansible-playbook -i inventory.ini playbook.yaml
+\end{verbatim}
+
+Ansible 返回以下输出：\par
+\begin{verbatim}
+PLAY [My first play] ****************************************************************************
+
+TASK [Gathering Facts] **************************************************************************
+ok: [192.0.2.50]
+ok: [192.0.2.51]
+ok: [192.0.2.52]
+
+TASK [Ping my hosts] ****************************************************************************
+ok: [192.0.2.50]
+ok: [192.0.2.51]
+ok: [192.0.2.52]
+
+TASK [Print message] ****************************************************************************
+ok: [192.0.2.50] => {
+    "msg": "Hello world"
+}
+ok: [192.0.2.51] => {
+    "msg": "Hello world"
+}
+ok: [192.0.2.52] => {
+    "msg": "Hello world"
+}
+
+PLAY RECAP **************************************************************************************
+192.0.2.50: ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+192.0.2.51: ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+192.0.2.52: ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+\end{verbatim}
+
+在此输出中，您可以看到：\par
+- 您为 play 和每个任务指定的名称。您应该始终使用描述性名称，以便于验证和排查 playbook 问题。\par
+- "Gathering Facts" 任务隐式运行。默认情况下，Ansible 收集有关清单的信息，可在 playbook 中使用。\par
+- 每个任务的状态。每个任务的状态为 ok，表示运行成功。\par
+- play recap 总结了每个主机上 playbook 中所有任务的结果。在此示例中，有三个任务，因此 ok=3 表示每个任务都运行成功。\par
 
 \subsection{构建清单}
 清单在集中式文件中组织被管理节点，为 Ansible 提供系统信息和网络位置。使用清单文件，Ansible 可以通过单个命令管理大量主机。\par
