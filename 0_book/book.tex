@@ -8,7 +8,11 @@
 
 % 设置字体，并解决显示难检字问题。
 \xeCJKsetup{AutoFallBack=true}
-\setCJKmainfont{SimSun}[BoldFont=SimHei, ItalicFont=KaiTi, FallBack=SimSun-ExtB]
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
 
 % 目录 chapter 级别加点（.）。
 \usepackage{titletoc}
