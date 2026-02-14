@@ -1,0 +1,516 @@
+\documentclass[12pt,a4paper]{book}
+\usepackage[UTF8]{ctex} % 中文支持
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\usepackage{multicol} % 用于多列布局
+
+% 双语文档设置
+\newcommand{\original}[1]{#1}
+\newcommand{\translation}[1]{#1}
+\newenvironment{bilingual}{
+    \begin{minipage}[t]{\textwidth}
+}{\end{minipage}}
+
+% 页面设置
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=3cm
+}
+
+% 超链接设置
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+% 图片设置
+\graphicspath{{images/}}
+
+% 标题设置
+\titleformat{\chapter}[display]
+    {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+
+% 目录设置
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+\title{The Hobbyist's Guide to the RTL-SDR}
+\author{Carl Laufer}
+\date{\today}
+
+\begin{document}
+
+\frontmatter
+\maketitle
+\tableofcontents
+\listoffigures
+\listoftables
+
+\mainmatter
+
+% 内容来自 part0000.tex
+\chapter*{THE HOBBYIST'S GUIDE TO THE RTL-SDR}
+\chapter*{REALLY CHEAP SOFTWARE DEFINED RADIO}
+\chapter*{A GUIDE TO THE RTL-SDR AND CHEAP SOFTWARE DEFINED RADIO BY THE AUTHORS OF THE RTL-SDR.COM BLOG}
+
+% 内容来自 part0002.tex
+\chapter{前言}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{PREFACE}]
+
+\original{In February 2012 the first FM radio signal was received with an RTL2832U RTL-SDR dongle using custom SDR drivers. Since then tens of thousands of hams, security researchers, hackers, makers, tinkerers, students and electronics enthusiasts have purchased RTL-SDR dongles to use as a very cheap software defined radio.}
+
+\translation{2012年2月，使用自定义SDR驱动程序的RTL2832U RTL-SDR加密狗首次接收到FM无线电信号。从那时起，成千上万的业余无线电爱好者、安全研究人员、黑客、创客、DIY爱好者、学生和电子爱好者购买了RTL-SDR加密狗，将其用作非常便宜的软件定义无线电。}
+
+\original{This book is intended to be a comprehensive guide for hobbyists on the use of the RTL-SDR dongle. The book consists mainly of tips to get the best out of your RTL-SDR and tutorials for some of the various interesting projects that can be done using the dongle.}
+
+\translation{本书旨在为爱好者提供有关RTL-SDR加密狗使用的综合指南。本书主要包含如何充分利用RTL-SDR的技巧，以及使用该加密狗可以完成的各种有趣项目的教程。}
+
+\original{The information and tutorials in this book are up to date at the time of writing. Because SDR technology and its supporting software is evolving at such a fast pace, we cannot guarantee that they will work without the need for some tweaking in the future. We will do our best to keep this book updated and will aim for an update schedule of every 3 - 4 months. To receive the updates you will need to manually contact Kindle support by email and request the update. We cannot push updates out automatically as this would disrupt peoples bookmarks, highlights and notes. You can see the edition the book is up to on the Amazon sales page.}
+
+\translation{本书中的信息和教程在撰写时是最新的。由于SDR技术及其支持软件发展速度如此之快，我们不能保证它们在未来不需要一些调整就能正常工作。我们将尽最大努力保持本书的更新，并计划每3-4个月更新一次。要接收更新，您需要通过电子邮件手动联系Kindle支持并请求更新。我们无法自动推送更新，因为这会干扰人们的书签、高亮和笔记。您可以在亚马逊销售页面上查看本书的版本。}
+
+\original{If you discover any mistakes, missing information or just have any feedback on the book please feel free to contact me at rtlsdrblog@gmail.com.}
+
+\translation{如果您发现任何错误、缺失信息或对本书有任何反馈，请随时通过rtlsdrblog@gmail.com联系我。}
+
+\original{If you are unsatisfied with this book in any way, remember that it can always be refunded through Amazon within 7 days of the purchase. But if you enjoy this book we would very much appreciate it if you were to leave us good review on the Amazon store page.}
+
+\translation{如果您对本书有任何不满意，请记住，您可以在购买后7天内通过亚马逊退款。但如果您喜欢这本书，我们将非常感谢您在亚马逊商店页面上给我们留下好评。}
+
+\original{Tips for reading on Kindle: Be sure to adjust the font size settings to your preference as the default font size can be very large. All Kindle readers have this setting in their options or tool bars. It is also recommended to read this book in two column mode if reading on a tablet or larger device.}
+
+\translation{Kindle阅读提示：请务必根据您的喜好调整字体大小设置，因为默认字体大小可能非常大。所有Kindle阅读器都在其选项或工具栏中提供此设置。如果在平板电脑或更大设备上阅读，建议以双列模式阅读本书。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0003.tex
+\chapter{设置和使用}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{SETTING UP AND USING YOUR RTL-SDR}]
+
+\original{\section{SDR# SETUP GUIDE (TESTED ON WINDOWS VISTA/7 + XP)}}
+
+\translation{\section{SDR# 设置指南（在Windows Vista/7 + XP上测试）}}
+
+\original{\begin{enumerate} 
+\item Purchase an RTL-SDR dongle. The cheapest and best for most applications is the R820T2 dongle. See \href{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/} for more information on the best places to buy one. 
+\item SDR# (pronounced SDR Sharp) is the easiest to use and most popular free SDR receiver software that is compatible with the RTL-SDR. Go to \href{http://www.sdrsharp.com}{www.sdrsharp.com} and go to the downloads page to download SDR#. \\
+Note that you must have the Microsoft .NET 3.5 redistributable installed to use SDR#. Modern Windows PCs usually have this installed by default, but older PCs running XP may need this to be installed. It can be downloaded from \href{http://www.microsoft.com/en-gb/download/details.aspx?id=21}{http://www.microsoft.com/en-gb/download/details.aspx?id=21}. 
+\item Extract (unzip) the sdr-install folder from the zip file to a folder on your computer. 
+\item Double click on install.bat from within the extracted folder. This will start a command prompt that will download SDR# and all the files required to make SDR# work with the RTL-SDR. Everything will be placed into a new folder within the sdr-install folder called "sdrsharp". The command prompt will automatically close when it is done. 
+\end{enumerate}}
+
+\translation{\begin{enumerate} 
+\item 购买一个RTL-SDR加密狗。对于大多数应用，最便宜和最好的是R820T2加密狗。有关购买的最佳地点的更多信息，请参见 \href{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}。 
+\item SDR#（发音为SDR Sharp）是最易于使用且最受欢迎的免费SDR接收器软件，与RTL-SDR兼容。前往 \href{http://www.sdrsharp.com}{www.sdrsharp.com} 并进入下载页面下载SDR#。 \\
+请注意，使用SDR#必须安装Microsoft .NET 3.5可再发行组件。现代Windows PC通常默认安装此组件，但运行XP的旧PC可能需要安装。它可以从 \href{http://www.microsoft.com/en-gb/download/details.aspx?id=21}{http://www.microsoft.com/en-gb/download/details.aspx?id=21} 下载。 
+\item 将zip文件中的sdr-install文件夹解压缩到计算机上的文件夹中。 
+\item 双击提取文件夹中的install.bat。这将启动一个命令提示符，下载SDR#和使SDR#与RTL-SDR一起工作所需的所有文件。所有内容将被放置到sdr-install文件夹中名为"sdrsharp"的新文件夹中。命令提示符完成后将自动关闭。 
+\end{enumerate}}
+
+\original{\begin{figure}[H]
+    \centering
+    \includegraphics{00005.gif}
+    \caption{SDR# 安装界面}
+    \label{fig:sdr_install}
+\end{figure}}
+
+\translation{\begin{figure}[H]
+    \centering
+    \includegraphics{00005.gif}
+    \caption{SDR# 安装界面}
+    \label{fig:sdr_install}
+\end{figure}}
+
+\original{\begin{enumerate} 
+\item Plug in your dongle and do not install any of the software that it came with (if any), but ensure you wait for the plug and play popup that tries to install it to finish. If necessary, uninstall any DVB-T software drivers you've installed from the CD that some dongles come with. 
+\item Open the newly created sdrsharp folder and find the
+\end{enumerate}}
+
+\translation{\begin{enumerate} 
+\item 插入您的加密狗，不要安装随附的任何软件（如果有），但确保等待尝试安装它的即插即用弹出窗口完成。如有必要，卸载从某些加密狗随附的CD安装的任何DVB-T软件驱动程序。 
+\item 打开新创建的sdrsharp文件夹并找到
+\end{enumerate}}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0004.tex
+\chapter{RTL-SDR 其他信息}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{RTL-SDR MISC. INFORMATION}]
+
+\original{\section{RTL-SDR CRYSTAL TOLERANCE}}
+
+\translation{\section{RTL-SDR 晶体 tolerance}}
+
+\original{The RTL-SDR is a mass Chinese manufactured device with poor crystal tolerances with up to a +-150 PPM offset. The crystal oscillator in the RTL-SDR is its clock source (the heartbeat of the circuit). The RTL-SDR uses a 28.8 MHz oscillator which may be out by a few kilohertz. The end effect is that known frequencies may not be exactly where you expect them to be. See the Calibrating the RTL-SDR section or the Setting the PPM offset section for information on how to calibrate the RTL-SDR to remove the frequency offset.}
+
+\translation{RTL-SDR是一种大规模中国制造的设备，晶体公差较差，偏移可达+-150 PPM。RTL-SDR中的晶体振荡器是其时钟源（电路的心跳）。RTL-SDR使用28.8 MHz振荡器，可能会有几千赫兹的偏差。最终结果是，已知频率可能不完全在您期望的位置。有关如何校准RTL-SDR以消除频率偏移的信息，请参见校准RTL-SDR部分或设置PPM偏移部分。}
+
+\original{Some RTL-SDRs come with upgraded crystals. Ones that use an SMD crystal will probably have a tolerance of around +-30 PPM, and ones with a TCXO will have a tolerance of +-1 PPM. RTL-SDRs with a TCXO will not need any PPM offset to be set, or will only need an offset of 1 or 2.}
+
+\translation{一些RTL-SDR配备了升级的晶体。使用SMD晶体的可能具有约+-30 PPM的公差，而使用TCXO的将具有+-1 PPM的公差。带有TCXO的RTL-SDR不需要设置任何PPM偏移，或者只需要1或2的偏移。}
+
+\original{\section{RTL-SDR DC SPIKE}}
+
+\translation{\section{RTL-SDR DC尖峰}}
+
+\original{The E4000 dongle (and FC0012/13) will have a large spike in the centre of the spectrum no matter where it is tuned. This is expected as it due to the way the E4000 is designed. To remove the DC spike with the E4000 and FC0012/13 dongles, the "Offset Tuning" option in the SDR# configure menu can be used. Offset tuning will do nothing for the R280T/R820T2.}
+
+\translation{E4000加密狗（和FC0012/13）无论调谐到哪里，在频谱中心都会有一个大尖峰。这是预期的，因为这是E4000设计方式导致的。要消除E4000和FC0012/13加密狗的DC尖峰，可以使用SDR#配置菜单中的"Offset Tuning"选项。Offset tuning对R280T/R820T2无效。}
+
+\original{The R820T/R820T2 also has a small yet noticeable DC spike at the centre, but usually clicking Correct IQ in SDR# is enough to completely remove this.}
+
+\translation{R820T/R820T2在中心也有一个小但明显的DC尖峰，但通常在SDR#中点击Correct IQ就足以完全消除它。}
+
+\original{\section{RTL-SDR SPURS}}
+
+\translation{\section{RTL-SDR 杂散信号}}
+
+\original{Due to the design of the dongle there will always be spurious (unwanted) signal noise spikes at multiples of 28.8 MHz which is the frequency of the internal oscillator. You may also see strong spurs at multiples of the USB clock frequency of 48 MHz and multiples of the USB data rate of 480 MHz.}
+
+\translation{由于加密狗的设计，在内部振荡器频率28.8 MHz的倍数处总会有杂散（不需要的）信号噪声尖峰。您可能还会在USB时钟频率48 MHz的倍数和USB数据速率480 MHz的倍数处看到强杂散信号。}
+
+\original{There is unfortunately not much that can be done to remove these spurs, but they are usually only strong enough to be a problem if you are trying to receive a very weak signal right on top of a spur.}
+
+\translation{不幸的是，没有太多方法可以消除这些杂散信号，但它们通常只有在您尝试接收位于杂散信号正上方的非常弱的信号时才会成为问题。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0005.tex
+\chapter{RTL-SDR 改进和修改}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{RTL-SDR IMPROVEMENTS AND MODIFICATIONS}]
+
+\original{\section{LOW NOISE AMPLIFICATION}}
+
+\translation{\section{低噪声放大}}
+
+\original{The amplifier used in the dongle is while considered poor quality for serious work, still 'low noise' enough for most applications. However there are third party external LNAs (\textbf{L}ow \textbf{N}oise \textbf{A}mplifiers) that can be used to improve the signal quality. A poor amplifier like the one in the RTL-SDR with a noise figure of <4.5dB will introduce noise causing the signal to be degraded, especially as the gain is increased. The term noise figure is used to measure the amount of noise an amplifier will introduce into the signal. By using a high quality LNA with a noise figure <1dB this noise can be reduced.}
+
+\translation{加密狗中使用的放大器虽然被认为质量较差，不适合 serious work，但对于大多数应用来说仍然足够'低噪声'。然而，有第三方外部LNA（\textbf{低} \textbf{噪声} \textbf{放大器}）可以用来改善信号质量。像RTL-SDR中那样噪声系数<4.5dB的劣质放大器会引入噪声，导致信号质量下降，尤其是当增益增加时。噪声系数是用来衡量放大器将引入到信号中的噪声量的术语。通过使用噪声系数<1dB的高质量LNA，可以减少这种噪声。}
+
+\original{One good low cost LNA that we recommend is the LNA4ALL. Its link can be found on our Buy RTL-SDR Dongles page at \href{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}. There are also LNA kits available on Ebay, however these tend to require good surface mount soldering skills. A DIY LNA design for the RTL-SDR can be found here \href{https://github.com/loxodes/rtl-sdr-lna}{https://github.com/loxodes/rtl-sdr-lna}. Habsupplies in the UK also supply high performance filtered LNA's. Their website is \href{http://ava.upuaut.net/store/index.php?route=product/category&path=72_73}{http://ava.upuaut.net/store/index.php?route=product/category&path=72_73}.}
+
+\translation{我们推荐的一款性价比高的LNA是LNA4ALL。其链接可以在我们的购买RTL-SDR加密狗页面上找到：\href{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}。Ebay上也有LNA套件，但这些通常需要良好的表面贴装焊接技能。RTL-SDR的DIY LNA设计可以在这里找到：\href{https://github.com/loxodes/rtl-sdr-lna}{https://github.com/loxodes/rtl-sdr-lna}。英国的Habsupplies也提供高性能滤波LNA。他们的网站是：\href{http://ava.upuaut.net/store/index.php?route=product/category&path=72_73}{http://ava.upuaut.net/store/index.php?route=product/category&path=72_73}。}
+
+\original{When positioning the LNA, you want it to be as close to the antenna as possible. The main goal of the LNA is to amplify the signal at the antenna, in order to help reduce the effects of noise that can enter through the coax transmission cable and to help reduce attenuation over long cable runs. In other words, it makes the received signals bigger at the antenna so that any noise or losses introduced by the coax cable will be negligible.}
+
+\translation{放置LNA时，您希望它尽可能靠近天线。LNA的主要目标是在天线处放大信号，以帮助减少可能通过同轴传输电缆进入的噪声的影响，并帮助减少长电缆运行中的衰减。换句话说，它使天线处的接收信号变大，从而使同轴电缆引入的任何噪声或损耗可以忽略不计。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0006_split_000.tex
+\chapter{RTL-SDR 项目教程}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{RTL-SDR PROJECT TUTORIALS}]
+
+\original{These tutorials are written with the RTL-SDR in mind but most will also be valid for other SDRs and even some hardware radios.}
+
+\translation{这些教程是为RTL-SDR编写的，但大多数也适用于其他SDR甚至一些硬件无线电。}
+
+\original{\section{AUDIO PIPING}}
+
+\translation{\section{音频管道}}
+
+\original{Most of these tutorials performed in Windows require that something called an audio pipe be set up. An audio pipe is simply a program which routes the audio output from your SDR receiver (e.g SDR#, HDSDR, SDR-Radio) to the decoding program. See Appendix A: Audio Piping for information on how to set up audio piping methods like stereo mix, VB Cable or Virtual Audio Cable.}
+
+\translation{这些在Windows中执行的教程大多需要设置一种称为音频管道的东西。音频管道只是一个程序，它将音频输出从您的SDR接收器（如SDR#、HDSDR、SDR-Radio）路由到解码程序。有关如何设置音频管道方法（如立体声混音、VB Cable或Virtual Audio Cable）的信息，请参见附录A：音频管道。}
+
+\original{\section{GENERAL FREQUENCY GUIDE}}
+
+\translation{\section{通用频率指南}}
+
+\original{Here we list some common international radio signals and the frequencies they can be likely be found at. However, note that some of these frequencies could be different for other countries.}
+
+\translation{这里我们列出了一些常见的国际无线电信号及其可能的频率。请注意，这些频率在其他国家可能有所不同。}
+
+\original{\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{Signal} & \textbf{Frequency (MHz)} & \textbf{Type} & \textbf{Description} \\
+        \hline
+        AM Broadcast Radio & 0.535 - 1.605 & AM Voice & International radio broadcasts \\
+        Amateur Radio & 0 - 30 & SSB/Digital Data & Ham radio users use voice and digital data signals \\
+        Shortwave Radio & 3 - 30 & AM Voice/DRM & International radio broadcasts \\
+        Simple Walkie Talkies & 400 - 470 & FM Voice & Short range two-way radios \\
+        \hline
+    \end{tabular}
+    \caption{常见无线电信号频率表}
+    \label{tab:frequency_guide}
+\end{table}}}
+
+\translation{\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{信号} & \textbf{频率 (MHz)} & \textbf{类型} & \textbf{描述} \\
+        \hline
+        AM广播 radio & 0.535 - 1.605 & AM语音 & 国际广播 \\
+        业余无线电 & 0 - 30 & SSB/数字数据 & 业余无线电用户使用语音和数字数据信号 \\
+        短波无线电 & 3 - 30 & AM语音/DRM & 国际广播 \\
+        简单对讲机 & 400 - 470 & FM语音 & 短距离双向无线电 \\
+        \hline
+    \end{tabular}
+    \caption{常见无线电信号频率表}
+    \label{tab:frequency_guide}
+\end{table}}}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0006_split_001.tex
+\chapter{ACARS接收指南}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{ACARS RECEIVING GUIDE}]
+
+\original{\section{INTRODUCTION TO ACARS}}
+
+\translation{\section{ACARS简介}}
+
+\original{ACARS is an acronym for \textbf{A}ircraft \textbf{C}ommunications \textbf{A}ddressing and \textbf{R}eporting \textbf{S}ystem. It is a digital communications system that commercial aircraft use to send and receive short messages to and from ground stations. Some messages you might hear on ACARS are OOOI events (messages reporting changes in major flight phases such as \textbf{O}ut of the gate, \textbf{O}ff the ground, \textbf{O}n the ground and \textbf{I}nto the gate), digital information sent to the aircraft avionics and text messages to the flight crew. Some ACARS messages will also contain aircraft GPS coordinates, but if your goal is aircraft radar, the ADS-B aircraft radar section will be of more interest to you. Each ACARS message also contains the aircraft registration and fight identification number.}
+
+\translation{ACARS是\textbf{航空器} \textbf{通信} \textbf{寻址}和\textbf{报告} \textbf{系统}的首字母缩写。它是一种数字通信系统，商业 aircraft 用于与地面站之间发送和接收短消息。您可能在ACARS上听到的一些消息是OOOI事件（报告主要飞行阶段变化的消息，如\textbf{离开}登机口、\textbf{离开}地面、\textbf{着陆}地面和\textbf{进入}登机口）、发送到 aircraft 航空电子设备的数字信息和发送给飞行 crew 的文本消息。一些ACARS消息还将包含 aircraft GPS坐标，但如果您的目标是 aircraft radar，ADS-B aircraft radar部分将更感兴趣。每条ACARS消息还包含 aircraft 注册号和航班识别号。}
+
+\original{Standard ACARS transmits at a VHF frequency of 131.550 MHz, but there are various other frequencies also in use depending on your location. There are also ACARS messages transmitted via the Inmarsat Satellite network and on the HF bands, but these bands are not as commonly used as the VHF band.}
+
+\translation{标准ACARS在131.550 MHz的VHF频率上传输，但根据您的位置，还有其他各种频率也在使用中。还有通过Inmarsat卫星网络和HF频段传输的ACARS消息，但这些频段不像VHF频段那样常用。}
+
+\original{With the RTL-SDR and some decoding software, the ACARS messages around you can be received and displayed live on your PC. As ACARS transmits in the VHF band, reception is very nearly line of sight. But as aircraft fly high in the sky, with a good antenna you should be able to receive messages from high altitude aircraft that are up to 200 miles away. Because ACARS uses vertically polarized signals we recommend a discone, collinear, quarter wave ground plane or j-pole antenna.}
+
+\translation{使用RTL-SDR和一些解码软件，您可以在PC上实时接收和显示周围的ACARS消息。由于ACARS在VHF频段传输，接收几乎是视线范围。但由于 aircraft 在高空飞行，使用良好的天线，您应该能够接收来自高达200英里外的高空 aircraft 的消息。由于ACARS使用垂直极化信号，我们推荐使用discone、collinear、四分之一波长接地平面或j-pole天线。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0006_split_002.tex
+\chapter{ADS-B接收指南（追踪航空器）}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{ADS-B RECEIVING GUIDE (TRACKING AIRCRAFT)}]
+
+\original{\section{ADS-B INTRODUCTION}}
+
+\translation{\section{ADS-B简介}}
+
+\original{Modern planes carry on board something called an Automatic Dependent Surveillance-Broadcast (ADS-B) Mode-S transponder. This transponder periodically broadcasts location and altitude information to air traffic controllers and other aircraft. The system was put into place to replace traditional RADAR systems which work by bouncing a radio signal off the plane and listening for the echo. Traditional RADAR is not always reliable and so ADS-B was invented. ADS-B uses an accurate onboard GPS receiver and broadcasts the GPS location data to ground controllers and other aircraft via radio giving more accurate and stable data. ADS-B is also used to help aircraft avoid collisions by sending a warning or taking automatic emergency action if the flight computer detects a possible collision from ADS-B data.}
+
+\translation{现代 planes 搭载了一种称为自动相关监视广播（ADS-B）Mode-S应答机的设备。这种应答机定期向空中交通管制员和其他 aircraft 广播位置和高度信息。该系统的实施是为了取代传统的RADAR系统，后者通过向 plane 发射无线电信号并监听回波来工作。传统的RADAR并不总是可靠的，因此ADS-B被发明出来。ADS-B使用精确的机载GPS接收器，并通过无线电向地面管制员和其他 aircraft 广播GPS位置数据，提供更准确和稳定的数据。ADS-B还用于帮助 aircraft 避免碰撞，如果飞行计算机从ADS-B数据中检测到可能的碰撞，则发送警告或采取自动紧急行动。}
+
+\original{Currently, ADS-B data is completely unencrypted so the RTL-SDR can be used to listen to these ADS-B signals, which can then be used to create your very own home aircraft radar system. Compared to dedicated commercial ADS-B receivers which can go for between $200 and $1000, the $20 RTL-SDR is very attractive for the hobbyist in terms of price. ADS-B receive performance with the RTL-SDR is also still quite good. However, note that the RTL-SDR probably shouldn't be relied on for ADS-B navigation in a real aircraft for safety reasons. Also, if you are using a transmit capable SDR, please do not ever transmit on the ADS-B frequency as this could have serious repercussions. ADS-B signals can be found at a frequency of 1090 MHz.}
+
+\translation{目前，ADS-B数据完全未加密，因此RTL-SDR可用于监听这些ADS-B信号，然后可用于创建您自己的家庭 aircraft radar系统。与价格在$200到$1000之间的专用商业ADS-B接收器相比，$20的RTL-SDR在价格方面对爱好者非常有吸引力。使用RTL-SDR的ADS-B接收性能也仍然相当不错。然而，请注意，出于安全原因，RTL-SDR可能不应该被依赖于 real aircraft 中的ADS-B导航。此外，如果您使用的是具有发射能力的SDR，请永远不要在ADS-B频率上发射，因为这可能会产生严重的后果。ADS-B信号可以在1090 MHz的频率上找到。}
+
+\original{ADS-B is based on something called Mode S which provides the location data for ADS-B. There is also Mode A which provides an identification code and Mode C which provides the aircraft's pressure altitude. These other modes are also receivable by some decoding software.}
+
+\translation{ADS-B基于一种称为Mode S的技术，它为ADS-B提供位置数据。还有Mode A，它提供识别代码，以及Mode C，它提供 aircraft 的压力高度。这些其他模式也可以被一些解码软件接收。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0006_split_003.tex
+\chapter{NOAA气象卫星(APT)指南}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{NOAA WEATHER SATELLITE (APT) GUIDE}]
+
+\original{\begin{figure}[H]
+    \centering
+    \includegraphics{00129.jpeg}
+    \caption{NOAA卫星APT图像}
+    \label{fig:nzapt}
+\end{figure}}
+
+\translation{\begin{figure}[H]
+    \centering
+    \includegraphics{00129.jpeg}
+    \caption{NOAA卫星APT图像}
+    \label{fig:nzapt}
+\end{figure}}
+
+\original{\section{INTRODUCTION TO NOAA WEATHER SATELLITES}}
+
+\translation{\section{NOAA气象卫星简介}}
+
+\original{Everyday the American NOAA (National Oceanic and Atmospheric Administration) weather satellites pass over your location multiple times a day. As they pass over each NOAA weather satellite broadcasts an Automatic Picture Transmission (APT) signal which contains a live weather image of your area. The RTL-SDR dongle combined with a good antenna, an SDR program like SDR# and a decoding program can be used to download and display these live images.}
+
+\translation{每天，美国NOAA（国家海洋和大气管理局）气象卫星会多次经过您的位置。当它们经过时，每个NOAA气象卫星都会广播自动图像传输（APT）信号，其中包含您所在地区的实时气象图像。RTL-SDR加密狗结合良好的天线、SDR#等SDR程序和解码程序，可以用于下载和显示这些实时图像。}
+
+\original{There are currently three active NOAA satellites: NOAA 15, NOAA 18 and NOAA 19. Each NOAA satellite transmits at around 137 MHz with a right hand circularly polarized (RHCP) signal. This means that a right hand circularly polarized antenna is required for good reception.}
+
+\translation{目前有三颗活跃的NOAA卫星：NOAA 15、NOAA 18和NOAA 19。每个NOAA卫星以约137 MHz的频率传输，使用右旋圆极化（RHCP）信号。这意味着需要右旋圆极化天线才能获得良好的接收效果。}
+
+\original{The NOAA weather satellites use a transmission protocol known as Automatic Picture Transmission (APT) which was developed specifically for use on weather satellites. It is an analogue transmission that is somewhat similar to the HF Fax mode used on the HF bands. APT is transmitted in grayscale, but software can be used to colorize the image.}
+
+\translation{NOAA气象卫星使用一种称为自动图像传输（APT）的传输协议，该协议是专门为在气象卫星上使用而开发的。它是一种模拟传输，有点类似于HF频段上使用的HF传真模式。APT以灰度传输，但可以使用软件对图像进行着色。}
+
+\original{The NOAA satellites only pass overhead at certain times of the day, broadcasting a signal. These signals appear at around ~137 MHz and only when a satellite is passing overhead. Each satellite uses a different frequency. Their frequencies are shown below.}
+
+\translation{NOAA卫星只在一天中的特定时间经过头顶，广播信号。这些信号出现在约~137 MHz的频率上，并且只有当卫星经过头顶时才会出现。每个卫星使用不同的频率。它们的频率如下所示。}
+
+\original{\begin{itemize} 
+\item NOAA 15 - 137.6200 MHz 
+\item NOAA 18 - 137.9125 MHz 
+\item NOAA 19 - 137.1000 MHz 
+\end{itemize}}
+
+\translation{\begin{itemize} 
+\item NOAA 15 - 137.6200 MHz 
+\item NOAA 18 - 137.9125 MHz 
+\item NOAA 19 - 137.1000 MHz 
+\end{itemize}}
+
+\original{This tutorial will show you how to set up a NOAA weather satellite receiving station, which will allow you to gather several live weather satellite images each day. Other SDRs and even some hardware radio scanners can also be used for this purpose.}
+
+\translation{本教程将向您展示如何设置NOAA气象卫星接收站，这将允许您每天收集几张实时气象卫星图像。其他SDR甚至一些硬件无线电扫描仪也可用于此目的。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0006_split_004.tex
+\chapter{Meteor-M俄罗斯LRPT气象卫星指南}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{METEOR-M RUSSIAN LRPT WEATHER SATELLITE GUIDE}]
+
+\original{\begin{figure}[H]
+    \centering
+    \includegraphics{00150.jpeg}
+    \caption{Meteor-M卫星图像}
+    \label{fig:meteor_image}
+\end{figure}}
+
+\translation{\begin{figure}[H]
+    \centering
+    \includegraphics{00150.jpeg}
+    \caption{Meteor-M卫星图像}
+    \label{fig:meteor_image}
+\end{figure}}
+
+\original{\section{INTRODUCTION TO METEOR-M}}
+
+\translation{\section{Meteor-M简介}}
+
+\original{The Meteor-M N2 is a polar orbiting Russian weather satellite that was launched on July 8, 2014. Its main missions are weather forecasting, climate change monitoring, sea water monitoring/forecasting and space weather analysis/prediction.}
+
+\translation{Meteor-M N2是一颗极地轨道俄罗斯气象卫星，于2014年7月8日发射。其主要任务是天气预报、气候变化监测、海水监测/预报和空间天气分析/预测。}
+
+\original{The satellite is currently active with a Low Resolution Picture Transmission (LRPT) signal which broadcasts live weather satellite images, similar to the APT images produced by the NOAA satellites. LRPT images are however much better as they are transmitted as a digital signal with an image resolution 12 times greater than the aging analogue NOAA APT signals. Compare the image of New Zealand shown at the beginning of this section to the one shown in the NOAA APT tutorial section above this one to see the difference in resolution. Some example Meteor weather images can be found at \href{http://meteor.robonuka.ru/septembers-gallery/}{http://meteor.robonuka.ru/septembers-gallery/} and the satellite can be tracked in Orbitron or online at \href{http://www.satview.org/?sat_id=40069U}{http://www.satview.org/?sat_id=40069U}. During the day the weather image is generated using visible light and at night it is generated using infrared.}
+
+\translation{该卫星目前通过低分辨率图像传输（LRPT）信号活跃，广播实时气象卫星图像，类似于NOAA卫星产生的APT图像。然而，LRPT图像要好得多，因为它们作为数字信号传输，图像分辨率比老化的模拟NOAA APT信号高12倍。比较本节开头显示的新西兰图像和上面NOAA APT教程部分显示的图像，看看分辨率的差异。一些Meteor气象图像示例可以在\href{http://meteor.robonuka.ru/septembers-gallery/}{http://meteor.robonuka.ru/septembers-gallery/}找到，卫星可以在Orbitron中或在线在\href{http://www.satview.org/?sat_id=40069U}{http://www.satview.org/?sat_id=40069U}跟踪。白天，气象图像使用可见光生成，夜间使用红外光生成。}
+
+\original{The RTL-SDR and other SDRs like the Funcube along with some free software can be used to receive and decode these images. LRPT images from the Meteor-M N2 are transmitted with a right hand circularly polarized signal at around 137.1 MHz, so any satellite antenna such as a turnstile or quadrifilar helix which are commonly used with the NOAA weather satellites can be used.}
+
+\translation{RTL-SDR和其他SDR（如Funcube）以及一些免费软件可用于接收和解码这些图像。来自Meteor-M N2的LRPT图像以约137.1 MHz的右旋圆极化信号传输，因此可以使用任何通常与NOAA气象卫星一起使用的卫星天线，如旋转天线或四螺旋天线。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0006_split_005.tex
+\chapter{气象气球（无线电探空仪）指南}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{WEATHER BALLOON (RADIOSONDE) GUIDE}]
+
+\original{Around the world meteorological weather balloons are launched twice daily. Once launched they continuously transmit weather telemetry to a ground station using something called a radiosonde. The RTL-SDR combined with a decoding program can be used to intercept this telemetry and display the weather data on your own computer. You will be able to see real time graphs and data of air temperature, humidity, pressure as well as the location and height of the balloon as it makes its ascent and descent.}
+
+\translation{在世界各地，气象 weather balloons 每天发射两次。一旦发射，它们使用一种称为无线电探空仪的设备连续向地面站传输气象遥测数据。RTL-SDR结合解码程序可用于截获这种遥测数据并在您自己的计算机上显示气象数据。您将能够看到 air temperature、humidity、pressure 的实时图表和数据，以及 balloon 在上升和下降过程中的位置和高度。}
+
+\original{Note that radiosonde decoding may be difficult in many places in the USA. Recently the USA switched to Vaisala radiosondes, some of which are decodable. Unfortunately, they appear to be using the more difficult to receive frequency of 1680 MHz rather than the more common 403 - 406 MHz range used by the rest of the world. It is possible that some stations use the lower frequency band however. SondeMonitor is able to decode Digital RS92SGP, Analogue RS92AGP, Analogue RS80, Analogue 92KL, Graw DFM-06, MeteoModem M2K2/M10 and Meteolabor SRS-C34 radiosonde protocols.}
+
+\translation{请注意，在美国许多地方，无线电探空仪解码可能很困难。最近，美国切换到了Vaisala无线电探空仪，其中一些是可解码的。不幸的是，它们似乎使用更难接收的1680 MHz频率，而不是世界其他地区使用的更常见的403-406 MHz范围。然而，一些站点可能使用较低的频段。SondeMonitor能够解码Digital RS92SGP、Analogue RS92AGP、Analogue RS80、Analogue 92KL、Graw DFM-06、MeteoModem M2K2/M10和Meteolabor SRS-C34无线电探空仪协议。}
+
+\original{This tutorial is also applicable to other software defined radios such as the Funcube dongle, HackRF, BladeRF or even hardware radios with discriminator taps, but the RTL-SDR is the cheapest option that will work.}
+
+\translation{本教程也适用于其他软件定义无线电，如Funcube加密狗、HackRF、BladeRF，甚至带有鉴别器抽头的硬件无线电，但RTL-SDR是可行的最便宜的选择。}
+
+\original{\section{RADIOSONDE RECEIVING TUTORIAL}}
+
+\translation{\section{无线电探空仪接收教程}}
+
+\original{\subsection{RADIOSONDE ANTENNA TUTORIAL}}
+
+\translation{\subsection{无线电探空仪天线教程}}
+
+\original{In Europe and the Pacific, most radiosondes transmit at a frequency that is between 403 and 406 MHz. In the USA and Asia they most commonly transmit in the 1680 MHz band between 1668.4 and 1700 MHz. You will need an antenna capable of receiving those frequencies. Antennas good for the 403 to 406 MHz band could be a quarter wave groundplane, dipole, j-pole, turnstile or a QFH antenna.}
+
+\translation{在欧洲和太平洋地区，大多数无线电探空仪以403至406 MHz之间的频率传输。在美国和亚洲，它们最常以1668.4至1700 MHz之间的1680 MHz频段传输。您需要一个能够接收这些频率的天线。适用于403至406 MHz频段的天线可以是四分之一波长接地平面、偶极子、j-pole、旋转天线或QFH天线。}
+
+\end{multicols}
+\end{bilingual}
+
+% 内容来自 part0006_split_006.tex
+\chapter{船舶自动识别系统（AIS）指南}
+\begin{bilingual}
+\begin{multicols}{2}
+[\section*{MARINE AUTOMATIC IDENTIFICATION SYSTEM (AIS) GUIDE}]
+
+\original{Large ships and passenger boats are required to broadcast an identification signal containing GPS position, course, speed, destination and vessel dimension information. This signal is used to help prevent collisions between boats as it acts as a sort of boat radar system, similar to the ADS-B system used for aircraft. The system is known as the "Automatic Identification System" or AIS for short.}
+
+\translation{大型船舶和客船被要求广播包含GPS位置、航向、速度、目的地和船舶尺寸信息的识别信号。这个信号用于帮助防止船舶之间的碰撞，因为它充当了一种船舶雷达系统，类似于用于 aircraft 的ADS-B系统。该系统被称为“自动识别系统”或简称AIS。}
+
+\original{There are dedicated AIS receivers intended to be used on boats, or by hobbyists, but they can be expensive. A radio scanner or the cheap RTL-SDR can be used to receive these signals and with the help of decoding software, ship positions can be plotted on a map.}
+
+\translation{有专门设计用于船舶或由爱好者使用的AIS接收器，但它们可能很昂贵。无线电扫描仪或便宜的RTL-SDR可用于接收这些信号，并且在解码软件的帮助下，可以在地图上绘制船舶位置。}
+
+\original{This tutorial will show you how to set up an AIS receiver with the RTL-SDR. Most parts of this tutorial are also applicable to other software radios, such as the funcube dongle and HackRF, or even regular hardware scanners if a discriminator tap is used, but the RTL-SDR is the cheapest option.}
+
+\translation{本教程将向您展示如何使用RTL-SDR设置AIS接收器。本教程的大部分内容也适用于其他软件无线电，如funcube加密狗和HackRF，甚至如果使用鉴别器抽头，也适用于常规硬件扫描仪，但RTL-SDR是最便宜的选择。}
+
+\original{\textit{Safety Warning: This probably should not be used a navigational aid on a boat as the field reliability of the RTL-SDR or other software radios is not proven. This guide is intended for land based scanner hobbyists.}}
+
+\translation{\textit{安全警告：这可能不应该用作船舶上的导航辅助工具，因为RTL-SDR或其他软件无线电的现场可靠性尚未得到证明。本指南适用于陆基扫描仪爱好者。}}
+
+\original{\section{AIS TUTORIAL}}
+
+\translation{\section{AIS教程}}
+
+\original{To set up an AIS ship radar on a windows system you will need:}
+
+\translation{要在Windows系统上设置AIS船舶雷达，您需要：}
+
+\original{\begin{itemize} 
+\item An audio piping method. See Appendix A: Audio Piping for more information if you don't have one set up. 
+\item A vertically polarized antenna tuned to 162MHz. 
+\item Software for decoding the AIS signals. 
+\end{itemize}}
+
+\translation{\begin{itemize} 
+\item 一种音频管道方法。如果您尚未设置，请参阅附录A：音频管道以获取更多信息。 
+\item 调谐到162MHz的垂直极化天线。 
+\item 用于解码AIS信号的软件。 
+\end{itemize}}
+
+\original{We will assume you have the RTL-SDR dongle set up and working already. If you have not bought a dongle yet, see our Buy RTL-SDR page at \href{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}{www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/} for more information.}
+
+\translation{我们假设您已经设置好RTL-SDR加密狗并使其正常工作。如果您尚未购买加密狗，请访问我们的Buy RTL-SDR页面\href{http://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}{www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/}以获取更多信息。}
+
+\end{multicols}
+\end{bilingual}
+
+\end{document}

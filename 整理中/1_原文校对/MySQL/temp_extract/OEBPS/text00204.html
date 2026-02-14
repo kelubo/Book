@@ -1,0 +1,17 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">13.7　InnoDB表</h2>
+<h3 class="p3">
+<a id="b1">13.7.1　InnoDB表存储结构</a>
+</h3>
+<p class="ziti">在InnoDB存储引擎中，表都是按照主键的顺序组织存放的，表的这种存储方式称为索引组织表。在InnoDB存储引擎中，每张表都有一个主键，如果没有自定义的主键和唯一索引，则存储引擎会自动创建一个6个字节大小的指针作为表的主键。</p>
+<p class="ziti">图13-14展示了InnoDB表中的数据存储格式，可以看到在主键或者说聚簇索引的叶子节点上就存储了主键列的值，同时也存储了非主键列的值，所以说InnoDB表的表数据都存放在聚簇索引上。</p>
+<div class="pic"><img alt="" src="Image00105.jpg" />
+</div>
+<p class="middle-img">图13-14　InnoDB表结构</p>
+<p class="ziti">图13-15展示了InnoDB的主键索引、二级索引和MyISAM存储引擎的区别：对InnoDB的二级索引来说，虽然也是B+树结构，但叶子节点仅需要存放索引的键值与主键值的对应关系即可，因为完全可以通过此对应关系上的主键值找到主键索引上的其他列值；而MyISAM存储引擎则更像是其他关系型数据库，在所有索引的叶子节点上都存放了对应表数据行的物理存放路径指针。</p>
+</body>
+</html>

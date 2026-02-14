@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">8.3　全量备份与增量备份</h2>
+<h3 class="p3">
+<a id="b1">8.3.1　全量备份的概念</a>
+</h3>
+<p class="ziti">全量数据就是数据库中所有的数据（或某一个库的全部数据）；全量备份就是把数据库中所有的数据进行备份。</p>
+<p class="ziti">下面就以InnoDB引擎数据库为例进行讲解。</p>
+<p class="ziti">备份数据库中所有库的所有数据的命令为：</p>
+<hr/>
+<pre class="ziti1">mysqldump -B --master-data=2 --single-transaction -A |gzip &gt;/opt/all.sql.gz</pre>
+<hr/>
+<p class="ziti">备份oldboy一个库中所有数据的命令为：</p>
+<hr/>
+<pre class="ziti1">mysqldump -B --master-data=2 --single-transaction oldboy|gzip &gt;/opt/oldboy.sql.gz</pre>
+<hr/>
+</body>
+</html>

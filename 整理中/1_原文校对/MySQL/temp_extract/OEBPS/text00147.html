@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">10.2　错误日志的介绍与配置</h2>
+<p class="p6">1.错误日志的介绍</p>
+<p class="ziti">MySQL的错误日志用于记录MySQL服务进程mysqld在启动/关闭或运行过程中遇到的错误信息。</p>
+<p class="p6">2.错误日志的记录配置</p>
+<p class="ziti">MySQL的错误日志通常由mysqld或mysqld_safe程序产生，前文已经讲解过MySQL的启动原理，因此，可利用如下方法配置记录MySQL错误日志。</p>
+<p class="ziti">方法1：在my.cnf配置文件中调整，注意，是在[mysqld_safe]模块的下面进行配置。命令如下：</p>
+<hr/>
+<pre class="ziti1">[mysqld_safe]
+log-error = /application/mysql-5.6.40/data/oldboy.err</pre>
+<hr/>
+<p class="ziti">方法2：在启动MySQL服务的命令里加入记录错误日志的参数。</p>
+<p class="ziti">示例如下：</p>
+<hr/>
+<pre class="ziti1">mysqld_safe --log-error=/application/mysql-5.6.40/data/oldboy.err &amp;</pre>
+<hr/>
+<p class="ziti">查看到的最终结果为：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'log_error%';
++---------------+-------------------------------------------+
+| Variable_name | Value                                     |
++---------------+-------------------------------------------+
+| log_error     | /application/mysql-5.6.40/data/oldboy.err |
++---------------+-------------------------------------------+
+1 row in set (0.00 sec)
+[root@oldboy ~]# tail -4 /application/mysql/data/oldboy.err
+2018-03-03 05:50:09 68261 [Note] InnoDB: 128 rollback segment(s) are active.
+2018-03-03 05:50:09 68261 [Note] InnoDB: Waiting for purge to start
+2018-03-03 05:50:09 68261 [Note] InnoDB: 5.6.40 started; log sequence number 1854308
+2018-03-03 05:50:09 68261 [Note] Server hostname (bind-address): '*'; port: 3306</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 默认的日志文件名部分和系统主机名一致，扩展名为“.err”。</p>
+<p class="p6">3.错误日志轮询</p>
+<p class="ziti">管理员可以使用命令轮询错误日志，例如可以按天轮询，具体方法如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd  /application/mysql/data/         #&lt;==切换到日志目录下。
+[root@oldboy data]# mv oldboy.err oldboy_$(date +%F).err  #&lt;==将错误日志按天
+                                                       移动改名。
+[root@oldboy data]# mysqladmin flush-logs             #&lt;==执行刷新日志命令。
+[root@oldboy data]# ls -l oldboy.err
+-rw-rw----. 1 mysql mysql 0 Mar 19 19:34 oldboy.err   #&lt;==新的错误日志诞生了。</pre>
+<hr/>
+<p class="p6">4.数据库故障排查案例分析</p>
+<p class="ziti">新手安装数据库时，遇到数据库无法启动时的排查方法具体如下。</p>
+<p class="ziti">1）先清空错误日志文件，然后重新启动MySQL服务，再查看日志文件报什么错误，并根据错误日志进行处理。</p>
+<p class="ziti">2）如果无法解决，则删除数据文件，重新初始化数据库。</p>
+<p class="ziti">假设在排查故障时，得到的错误日志提示为：</p>
+<hr/>
+<pre class="ziti1">180321 17:36:26 InnoDB: Completed initialization of buffer pool
+180321 17:36:26  InnoDB: Operating system error number 13 in a file operation.
+InnoDB: The error means mysqld does not have the access rights to
+InnoDB: the directory.
+InnoDB: File name ./ibdata1</pre>
+<hr/>
+<p class="ziti">根据提示可知，该错误是权限问题导致的问题，可对数据目录递归执行权限，然后再重启数据库。命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# chown -R mysql.mysql /application/mysql/data/</pre>
+<hr/>
+</body>
+</html>

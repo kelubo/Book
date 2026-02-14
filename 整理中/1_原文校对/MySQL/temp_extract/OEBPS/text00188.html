@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.3　自适应哈希索引（AHI）</h3>
+<p class="ziti">AHI（Adaptive Hash index）属性使得InnoDB更像是内存数据库。该属性通过innodb_adapitve_hash_index开启，也可以通过“——skip-innodb_adaptive_hash_index”参数关闭。</p>
+<p class="ziti">哈希（hash）是一种非常快的等值查找方法，一般情况下，这种查找的时间复杂度为O(1)，即一般仅需要一次查找就能定位数据。而B+树的查找次数，则取决于B+树的高度，在生产环境中，B+树的高度一般为3～4层，故需要3～4次的查询。</p>
+<p class="ziti">InnoDB会监控对表上个索引页的查询。如果观察到建立哈希索引可以带来速度提升，则自动建立哈希索引，称为自适应哈希索引（Adaptive Hash Index，AHI）。</p>
+<p class="ziti">AHI是MySQL数据库InnoDB存储引擎中用于加速索引查找的一个结构。InnoDB本身不支持hash索引，所有的索引检索都通过B树查询。AHI可以认为是“索引的索引”。当对一个页面的访问次数满足一定的条件之后，存储引擎会自动建立哈希索引，维护InnoDB叶子页记录的索引键值（或键值前缀）到叶子节点记录的Hash映射关系。这样就能够根据索引键值（或前缀）定位到记录的地址。这样就可以不用再搜索B+树从root到叶子页的路径定位过程。</p>
+<p class="ziti">AHI有一个要求，那就是对这个页的连续访问模式必须是一样的。</p>
+<p class="ziti">例如，对于（a，b）访问模式情况：</p>
+<p class="ziti6">where a=xxx</p>
+<p class="ziti6">where a=xxx and b=xxx</p>
+<p class="ziti">根据MySQL官网的文档显示，AHI启动后，读写速度提高2倍时，辅助索引的连接操作性能可以提高5倍。</p>
+<p class="ziti">另外，AHI是数据库自动优化的，DBA只需要指导开发人员去尽量使用符合AHI条件的查询即可，以提高效率。</p>
+</body>
+</html>

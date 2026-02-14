@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_15">2.1.2　Linux内核参数</h3> 
+ <p class="ziti3">Linux系统是通过proc文件系统实现访问内核内部数据结构及改变内核参数的，proc文件系统是一个伪文件系统，通常挂载在/proc目录下，可以通过改变/proc/sys目录下文件中的值对内核参数进行修改。/proc/sys目录下的目录与内核参数类别如表2-1所示。</p> 
+ <p class="middle-img">表2-1　/proc/sys目录下的目录与内核参数类别</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b2-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b2-1.jpg" class="calibre13"/></a> 
+ </div> 
+ <p class="ziti3">Linux系统环境下，所有的设备都被看作文件来进行操作，建立的网络连接数同样受限于操作系统的最大打开文件数。最大打开文件数会是系统内存的10%（以KB来计算），称为系统级限制，可以使用sysctl -a | grep fs.file-max命令查看系统级别的最大打开文件数。同时，内核为了不让某个进程消耗掉所有的文件资源，也会对单个进程最大打开文件数做默认值处理，称之为用户级限制，默认值一般是1024，使用ulimit -n命令可以查看用户级文件描述符的最大打开数。文件相关内核参数可参见Linux相关图书。</p> 
+ <p class="ziti3">Nginx是一款Web服务器软件，通过系统层面的网络优化可以提升HTTP数据传输的效率。HTTP协议是基于TCP/IP通信协议传递数据的，了解TCP建立连接（三次握手）及进行数据传输的机制是优化网络相关内核参数的基础。相关术语说明如下。</p> 
+ <p class="ziti4">·SYN：建立连接标识。</p> 
+ <p class="ziti4">·ACK：确认接收标识。</p> 
+ <p class="ziti4">·FIN：关闭连接标识。</p> 
+ <p class="ziti4">·seq：当前数据包编号，在实际传输过程中，数据会被拆成多个数据包传输给接收端，接收端再通过该编号将多个数据包拼接为完整的数据。</p> 
+ <p class="ziti4">·ack：确认号，为上一个数据包的编号+1。</p> 
+ <p class="ziti3">TCP建立连接并进行数据传输的流程如图2-1所示，具体说明如下。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/2-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/2-1.jpg" class="calibre14"/></a> 
+ </div> 
+ <p class="middle-img">图2-1　TCP建立连接</p> 
+ <p class="ziti3">1）Client（图2-1中①）主动将请求报文（SYN=1，初始编号seq=x）发送给Server，将自己的状态更改为SYN_SENT。</p> 
+ <p class="ziti3">2）Server（图2-1中②）返回确认报文（SYN=1，ACK=1，确认号ack=x+1，初始编号seq=y），将自己的状态更改为SYN_RCVD。</p> 
+ <p class="ziti3">3）Client（图2-1中③）返回确认报文（ACK=1，确认号ack=y+1，编号seq=x+1）给Server，将自己的状态更改为ESTABLISHED。</p> 
+ <p class="ziti3">4）Server（图2-1中③）收到确认报文后，将自己的状态更改为ESTABLISHED，并与Client实现数据传输。</p> 
+ <p class="ziti3">数据传输完毕后，TCP关闭连接流程如图2-2所示，具体说明如下。</p> 
+ <p class="ziti3">1）发起端（图2-2中①）主动将连接关闭报文（FIN=1，编号seq=u）发送给响应端，将自己的状态更改为FIN_WAIT_1。</p> 
+ <p class="ziti3">2）响应端（图2-2中②）返回确认报文（ACK=1，确认号ack=u+1，编号seq=v）给发起端，将自己的状态更改为CLOSE_WAIT。</p> 
+ <p class="ziti3">3）发起端（图2-2中②）收到确认报文后，将自己的状态更改为FIN_WAIT_2，等待响应端发送连接释放报文。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/2-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/2-2.jpg" class="calibre15"/></a> 
+ </div> 
+ <p class="middle-img">图2-2　TCP关闭连接</p> 
+ <p class="ziti3">4）响应端（图2-2中③）发送连接释放报文（FIN=1，ACK=1，编号seq=w，确认号ack=u+1）给发起端，将自己的状态更改为LAST-ACK。</p> 
+ <p class="ziti3">5）发起端（图2-2中④）收到连接释放报文后，发送确认报文（ACK=1，seq=u+1，ack=w+1）给响应端，将自己的状态更改为TIME_WAIT，系统会在等待2倍MSL（Maximum Segment Lifetime）时间后关闭连接，释放资源。</p> 
+ <p class="ziti3">6）响应端（图2-2中④）收到确认报文后，关闭连接，释放资源。</p> 
+ <p class="ziti3">7）关闭连接的动作不限于Client和Server，不同角色都可作为发起端主动发起关闭连接的请求。</p> 
+ <p class="ziti3">8）有时发起端也可以在图2-2中①发送reset报文给响应端，不经过②、③、④步骤立刻关闭连接。</p> 
+ <p class="ziti3">CentOS操作系统支持通过配置sysctl.conf文件中相关内核参数的方式实现对proc/sys目录下文件内容的调整，网络相关内核参数可参见Linux相关图书。</p> 
+</body>
+</html>

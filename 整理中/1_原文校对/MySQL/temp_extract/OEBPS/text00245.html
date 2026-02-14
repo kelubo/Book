@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">16.2.5　在主库Master（51）上执行操作配置</h3>
+<p class="p6">1.设置主主复制的相关参数</p>
+<p class="ziti">1）修改主库1的配置文件。执行vi/etc/my.cnf，编辑MySQL的配置文件，两个参数按如下内容进行修改：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+server_id = 1                #&lt;==用于同步的每台机器或实例的server_id都不能相同。
+log_bin = /application/mysql/logs/oldboy-bin  #&lt;==可省略红色加粗部分，本文是与
+                                              前面的章节保持一致。
+log_slave_updates                       #&lt;==从库记录binlog必备参数。
+expire_logs_days = 7                    #&lt;==自动清除7天前的binlog日志文件。
+auto_increment_increment          = 2   #&lt;==自增ID的间隔,如 1 3 5，间隔为2。
+auto_increment_offset             = 1   #&lt;==ID的初始位置。
+slave-skip-errors = 1032,1062,1007,1008,1146,1049  #&lt;==忽略一些不影响业务的
+                                                 复制错误提示。</pre>
+<hr/>
+<p class="ziti">2）检查参数配置之后的结果：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# egrep "server_id|log|auto" /etc/my.cnf
+log_bin = /application/mysql/logs/oldboy-bin
+expire_logs_days = 7
+server_id = 1
+log_slave_updates
+auto_increment_increment    = 2
+auto_increment_offset   = 1
+log-error = /application/mysql/logs/oldboy.err
+#特别提示：部分参数在前面章节中已经配置过，请注意检查时不要重复。</pre>
+<hr/>
+<p class="ziti">3）重启主库1的MySQL服务，并登录数据库检查参数的生效情况（这里略）：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# /etc/init.d/mysqld restart
+Shutting down MySQL.. SUCCESS!
+Starting MySQL. SUCCESS!</pre>
+<hr/>
+<p class="ziti">到此，主库1的binlog功能和ID的起始及自增配置就配置好了。</p>
+<p class="p6">2.在主库1上建立用于主主复制的账号</p>
+<p class="ziti">该步骤与主从复制的配置一样，如果前文已经配置好了账号，那么本节内容也可以忽略。</p>
+<p class="ziti">1）登录主数据库1（172.16.1.51），命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# mysql #&lt;==为了操作安全方便，密码已经写入my.cnf配置文件。</pre>
+<hr/>
+<p class="ziti">2）建立用于主库2复制的账号及对应的权限：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant replication slave on *.* to 'rep'@'172.16.1.%' identified by 'oldboy123';
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; flush privileges; #&lt;==刷新权限使得授权的权限生效，一般对账号的更改需要应用此
+                           命令，此处是为养成习惯而执行，而不是必须执行的。
+Query OK, 0 rows affected (0.02 sec)</pre>
+<hr/>
+<p class="p6">3.备份导出主库1的数据</p>
+<p class="ziti">1）备份导出主库1的数据，也可以半夜在主库1上通过定时任务执行如下面命令：</p>
+<hr/>
+<pre class="ziti1">mysqldump -A -B -x --master-data=1|gzip &gt;/opt/bak1_$(date +%F).sql.gz
+#&lt;==备份。
+scp -rp /opt/bak1_$(date +%F).sql.gz root@172.16.1.52:/opt/ #&lt;==复制到从库。</pre>
+<hr/>
+<p class="ziti">参数“--master-data=1”会在备份数据库里增加如下语句：</p>
+<hr/>
+<pre class="ziti1">-- Position to start replication or point-in-time recovery from
+CHANGE MASTER TO MASTER_LOG_FILE='oldboy-bin.000024', MASTER_LOG_POS=107;</pre>
+<hr/>
+</body>
+</html>

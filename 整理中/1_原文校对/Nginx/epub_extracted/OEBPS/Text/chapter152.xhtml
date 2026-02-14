@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_165">8.3.5　FastCGI负载均衡配置</h3>
+
+  <p class="ziti3">基于FastCGI协议的负载均衡是通过FastCGI模块（ngx_http_fastcgi_module）及上游模块（ngx_http_upstream_module）实现的，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">upstream php_backend {
+    server 192.168.2.154:8080;
+    server 192.168.2.109:8080;
+    keepalive 32;
+    keepalive_requests 2000;
+}
+
+server {
+    listen 8080;
+    root /opt/nginx-web/phpweb;
+    index index.php;                                        # 默认首页index.php
+    include fscgi.conf;                                     # 引入FastCGI配置
+
+    location ~ \.php(.*)$ {
+        fastcgi_pass   php_backend;                         # FastCGI服务器地址及端口
+        fastcgi_keep_conn on;                               # 启用长连接
+        fastcgi_index  index.php;
+
+        fastcgi_split_path_info    ^(.+\.php)(.*)$; # 获取$fastcgi_path_info变量值
+        fastcgi_param PATH_INFO    $fastcgi_path_info;      # 赋值给参数PATH_INFO
+        include  fastcgi.conf;      # 引入默认参数文件
+    }
+
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_149">7.4.2　模块指令</h3> 
+ <p class="ziti3">ngx_cache_purge模块支持HTTP、FastCGI、SCGI、uWSCGI代理协议缓存的清除，配置指令如表7-9所示。</p> 
+ <p class="middle-img">表7-9　ngx_cache_purge模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-9.jpg" class="calibre269"/></a> 
+ </div> 
+ <p class="ziti3">ngx_cache_purge模块配置指令有两种使用方式。一种是通过该模块自定义的PURGE请求方法，实现缓存的清除功能。在该方式下，指令可以配置在http、server、location指令域下，指令格式如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">proxy_cache_purge on|off|&lt;method&gt; [purge_all] [from all|&lt;ip&gt; [.. &lt;ip&gt;]]
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·指令值on或off，用以设置启用或关闭所在指令域的缓存清除功能。</p> 
+ <p class="ziti4">·指令值method，指定请求方法，默认为PURGE。</p> 
+ <p class="ziti4">·指令值purge_all，清除所在指令域下proxy_cache指定共享内存区域的所有缓存文件。</p> 
+ <p class="ziti4">·指令值from all或ip，设置允许执行清除操作的来源IP。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    proxy_cache_path  /tmp/cache  keys_zone=tmpcache:10m;
+
+    server {
+        location / {
+            proxy_pass         http://127.0.0.1:8000;
+            proxy_cache        tmpcache;
+            proxy_cache_key    $uri$is_args$args;
+            proxy_cache_purge  PURGE from 127.0.0.1;    # 只允许本机执行缓存清除请求
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">使用方法样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">curl -X PURGE /page*
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">另一种配置方式是位于独立的location指令域中，通过指定的访问路径实现缓存的清除功能，该方式下的指令只能配置在location指令域下，指令格式如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">proxy_cache_purge zone_name key
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·指令值zone_name为指定当操作的共享内存名称。</p> 
+ <p class="ziti4">·指令值key为缓存配置指令proxy_cache_key设定的内容。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    proxy_cache_path  /tmp/cache  keys_zone=tmpcache:10m;
+
+    server {
+        location / {
+            proxy_pass         http://127.0.0.1:8000;
+            proxy_cache        tmpcache;
+            proxy_cache_key    $uri$is_args$args;
+        }
+
+        location ~ /purge(/.*) {
+            allow              127.0.0.1;
+            deny               all;
+            proxy_cache_purge  tmpcache $1$is_args$args; # 配置清除的缓存共享内存名称和缓存key
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">使用方法样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">curl /purge/page*
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">ngx_cache_purge模块配置提供了操作响应输出类型指令，可以自定义清除缓存操作后返回结果的数据类型，指令如表7-10所示。</p> 
+ <p class="middle-img">表7-10　操作响应输出类型指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-10.jpg" class="calibre270"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    cache_purge_response_type json;
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

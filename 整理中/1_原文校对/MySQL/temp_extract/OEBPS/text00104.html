@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">7.1.5　利用SQL语句方式对表进行导入导出</h3>
+<p class="p6">1.导出表</p>
+<p class="ziti">（1）导出表SQL语句语法</p>
+<p class="ziti">工作中有时候可能会遇到一些特殊的需求，例如想把表的数据导出到excel里，而不是SQL语句的形式，这时就可能会用到下面的导出表的方法，当然，前文的mysqldump的-T备份结果也可以导入到excel里。</p>
+<p class="ziti">语法如下：</p>
+<hr/>
+<pre class="ziti1">SELECT * FROM 表名 INTO OUTFILE 'file_name' export_options</pre>
+<hr/>
+<p class="ziti">其中，export_options包括如下内容说明。</p>
+<p class="middle-img">表7-2　export_options内容说明</p>
+<div class="pic"><img alt="" src="Image00055.jpg" />
+</div>
+<p class="ziti">（2）导出表实践</p>
+<p class="ziti">准备数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+mysql&gt; select * from test;
++----+--------+
+| id | name   |
++----+--------+
+|  1 | full01 |
+|  2 | full02 |
+|  3 | full03 |
+|  4 | full04 |
+|  5 | full05 |
++----+--------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">将oldboy库里的test表数据导出为纯文本：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test into outfile "/tmp/oldboy_test1.txt";
+Query OK, 9 rows affected (0.00 sec)
+mysql&gt; system cat /tmp/oldboy_test.txt
+1      full01
+2      full02
+3      full03
+4      full04
+5      full05
+#提示：默认情况下导出的数据不同域之间用tab键分隔。</pre>
+<hr/>
+<p class="ziti">导出时设置字符集：</p>
+<hr/>
+<pre class="ziti1">select * from test into outfile "/tmp/oldboy_test2.txt" character set utf8;</pre>
+<hr/>
+<p class="ziti">以指定的分隔符导出，这里指定“-”为不同域之间的分隔符：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test into outfile "/tmp/oldboy_test3.txt" fields terminated by '-';
+Query OK, 5 rows affected, 1 warning (0.01 sec)
+mysql&gt; system cat /tmp/oldboy_test3.txt
+1-full01
+2-full02
+3-full03
+4-full04
+5-full05</pre>
+<hr/>
+<p class="ziti">导出时设置对字段内容进行引用，使用双引号：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test into outfile "/tmp/oldboy_test4.txt" fields enclosed by '"';
+Query OK, 5 rows affected (0.01 sec)
+mysql&gt; system cat /tmp/oldboy_test4.txt
+"1"      "full01"
+"2"      "full02"
+"3"      "full03"
+"4"      "full04"
+"5"      "full05"
+#提示不同域的内容已经加上了双引号。</pre>
+<hr/>
+<p class="ziti">更多参数功能，读者可以自行测试，其实本节内容在工作中用的都不多，读者了解即可。</p>
+<p class="p6">2.导入表</p>
+<p class="ziti">（1）导入表命令语法</p>
+<p class="ziti">使用上述select语句以及用mysqldump导出的纯文本数据，都可以使用如下“load data”方法进行导入，除此之外，还有mysqlimport也可以实现相同的效果，本文以load data语句为例。</p>
+<p class="ziti">语法如下：</p>
+<hr/>
+<pre class="ziti1">LOAD DATA INFILE 'file_name' INTO TABLE tbl_name import option</pre>
+<hr/>
+<p class="ziti">其中，import options也包括和前文导入类似的选项，内容说明如表7-3所示。</p>
+<p class="middle-img">表7-3　import_options内容说明</p>
+<div class="pic"><img alt="" src="Image00056.jpg" />
+</div>
+<p class="ziti">（2）导入表数据实践</p>
+<p class="ziti">准备数据，清空test表：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; delete from test;
+Query OK, 9 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">将前文oldboy_test1.txt格式的数据导入数据库（即默认导出格式）：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; system cat /tmp/oldboy_test1.txt
+1      full01
+2      full02
+3      full03
+4      full04
+5      full05
+mysql&gt; load data infile '/tmp/oldboy_test1.txt' into table test;
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+mysql&gt; select * from test;
++----+--------+
+| id | name   |
++----+--------+
+|  1 | full01 |
+|  2 | full02 |
+|  3 | full03 |
+|  4 | full04 |
+|  5 | full05 |
++----+--------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">将前文oldboy_test3.txt格式的数据导入数据库（指定“-”分隔符导出的格式）：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; system cat /tmp/oldboy_test3.txt
+1-full01
+2-full02
+3-full03
+4-full04
+5-full05
+mysql&gt; load data infile '/tmp/oldboy_test3.txt' into table test fields terminated by '-';
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+mysql&gt; select * from test;
++----+--------+
+| id | name   |
++----+--------+
+|  1 | full01 |
+|  2 | full02 |
+|  3 | full03 |
+|  4 | full04 |
+|  5 | full05 |
++----+--------+
+5 rows in set (0.00 sec)
+mysql&gt; load data infile '/tmp/oldboy_test1.txt' into table test fields terminated by '-';
+ERROR 1265 (01000): Data truncated for column 'id' at row 1
+#提示：数据格式不对就无法导入。</pre>
+<hr/>
+<p class="ziti">将前文oldboy_test4.txt格式的数据导入数据库（使用双引号引用的数据）：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; delete from test;
+Query OK, 5 rows affected (0.00 sec)
+mysql&gt; system cat /tmp/oldboy_test4.txt
+"1"      "full01"
+"2"      "full02"
+"3"      "full03"
+"4"      "full04"
+"5"      "full05"
+mysql&gt; load data infile '/tmp/oldboy_test4.txt' into table test fields enclosed by '"';
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Deleted: 0  Skipped: 0  Warnings: 0
+mysql&gt; select * from test;
++----+--------+
+| id | name   |
++----+--------+
+|  1 | full01 |
+|  2 | full02 |
+|  3 | full03 |
+|  4 | full04 |
+|  5 | full05 |
++----+--------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">更多功能，读者可以自行测试。</p>
+</body>
+</html>

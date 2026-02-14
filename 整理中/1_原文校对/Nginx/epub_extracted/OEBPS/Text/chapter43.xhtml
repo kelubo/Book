@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_50">3.2.4　事件处理</h3> 
+ <p class="ziti3">Nginx是采用事件驱动式架构处理外部请求的，这一架构使得Nginx在现有硬件架构下可以处理数以万计的并发请求。通过事件处理指令的配置可以让Nginx与实际运行的硬件及系统进行有效的适配，从而发挥更加高效的并发处理能力。Nginx的事件处理指令编辑在events指令域中，如表3-15～表3-21所示。</p> 
+ <p class="middle-img">表3-15　工作进程并发数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-15.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-15.jpg" class="calibre46"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">events {
+    worker_connections 65535;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Linux系统下，因为每个网络连接都将打开一个文件描述符，Nginx可处理的并发连接数受限于操作系统的最大打开文件数，同时所有工作进程的并发数也受worker_rlimit_nofile指令值的限制。</p> 
+ <p class="middle-img">表3-16　事件处理机制选择指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-16.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-16.jpg" class="calibre47"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">events {
+    use epoll;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx支持的事件模型有select、poll、kqueue、epoll、/dev/poll、eventport。</p> 
+ <p class="middle-img">表3-17　互斥锁指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-17.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-17.jpg" class="calibre48"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">events {
+    accept_mutex on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在Nginx 1.11.3版本之前，互斥锁指令是默认开启的。</p> 
+ <p class="middle-img">表3-18　互斥锁等待时间指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-18.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-18.jpg" class="calibre49"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">events {
+    accept_mutex_delay 300ms;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-19　多请求支持指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-19.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-19.jpg" class="calibre50"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">events {
+    multi_accept on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-20　未完成异步操作最大数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-20.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-20.jpg" class="calibre51"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">events {
+    worker_aio_requests 128;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-21　调试指定连接指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-21.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-21.jpg" class="calibre52"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">events {
+    debug_connection 127.0.0.1;
+    debug_connection localhost;
+    debug_connection 192.0.2.0/24;
+    debug_connection ::1;
+    debug_connection 2001:0db8::/32;
+    debug_connection unix:;
+    ...
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">该指令需要Nginx在编译时通过--with-debug参数开启。</p> 
+</body>
+</html>

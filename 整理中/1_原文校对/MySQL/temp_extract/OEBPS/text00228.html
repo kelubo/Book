@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">15.3　MySQL主从复制生产场景的常见延迟原因及防范方案</h2>
+<p class="ziti">笔者总结了MySQL主从复制的生产场景，延迟的常见问题、原因及解决方案，具体如下。</p>
+<p class="ziti">
+<span class="yanse">问题一：一个主库的从库太多，易导致复制延迟。</span>
+</p>
+<p class="ziti">建议从库数量在3～5个为宜，要复制的从节点数量过多，会导致主库系统及网络带宽压力过大，从而最终导致从库复制延迟。</p>
+<p class="ziti">
+<span class="yanse">问题二：从库硬件比主库差，易导致复制延迟。</span>
+</p>
+<p class="ziti">master和slave的硬件配置应该保持一致，主从库硬件差异包括磁盘IO、CPU、内存等各方面因素，在高并发大数据量写入的场景下易造成复制的延迟。</p>
+<p class="ziti">
+<span class="yanse">问题三：慢SQL语句过多，易导致复制延迟。</span>
+</p>
+<p class="ziti">假如有一条SQL语句，在主库上执行了20秒完毕，此时到从库上可能也得20秒左右才能查到数据，这样就延迟了20秒。</p>
+<p class="ziti">SQL语句的优化应作为常规工作不断地进行监控和优化，如果是单个SQL的写入时间过长，那么可以在修改后分多次写入。通过查看慢查询日志或“show full processlist”命令找出执行时间长的查询语句或者大的事务，建立索引或者分拆多条小的语句执行。</p>
+<p class="ziti">
+<span class="yanse">问题四：主从复制的设计问题，易导致复制延迟。</span>
+</p>
+<p class="ziti">例如，主从复制单线程中，如果主库写并发太大，来不及传送到从库则会导致延迟。</p>
+<p class="ziti">MySQL 5.6可以支持SQL多线程复制，但其也是针对不同的库级别的，大型门户网站则可能会开发多线程同步功能。</p>
+<p class="ziti">
+<span class="yanse">问题五：主从库之间的网络延迟，易导致复制延迟。</span>
+</p>
+<p class="ziti">主从库的网卡、网线、连接的交换机等网络设备都可能会成为复制的瓶颈，导致复制延迟，另外，跨公网主从复制很容易导致主从复制延迟。</p>
+<p class="ziti">
+<span class="yanse">问题六：主库读写压力太大，导致复制延迟。</span>
+</p>
+<p class="ziti">主库硬件要搞好一点，架构的前端要加buffer以及cache层，以减轻主库的压力。</p>
+</body>
+</html>

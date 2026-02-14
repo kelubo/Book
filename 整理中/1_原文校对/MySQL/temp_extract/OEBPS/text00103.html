@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">7.1.4　生产场景下，不同引擎的mysqldump备份命令</h3>
+<p class="ziti">innodb引擎的备份命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump -A -B --master-data=2 --single-transaction |gzip &gt;/opt/all.sql.gz</pre>
+<hr/>
+<p class="ziti">“--single-transaction”是innodb引擎专有的备份参数，优势就是备份期间数据依然可以执行写操作。“--master-data”的作用具体如下。</p>
+<p class="ziti">适合多引擎混合（例如，myisam与innodb混合）的备份命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump -A -B --master-data=2 |gzip &gt;/opt/alL_$(date +%F).sql.gz</pre>
+<hr/>
+<p class="ziti">这个备份的特点是会锁表，在备份期间会影响数据写入，使用“--master-data”会自动开启-x锁表参数功能。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00024.jpg" />
+ <span class="yanse">说明：</span>
+ 如果数据库用到了存储过程和函数特殊功能，就加上“-R”备份，如果用到了触发器功能则加上“--triggers”备份；如果考虑切割binlog日志也可以加“-F”；如果不想备份所有库，也可以取消“-A”，独立指定多个库名备份。</p>
+</body>
+</html>

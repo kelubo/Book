@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.7　初始化MySQL多实例的数据库文件</h3>
+<p class="ziti">上述步骤全部配置完毕后，就可以初始化数据库文件了，这个步骤其实也可以在编译安装MySQL之后就操作，只不过放到这里更合理一些，注意其中与第3章内容的不同点。</p>
+<p class="ziti">（1）初始化MySQL数据库</p>
+<p class="ziti">初始化命令为：</p>
+<hr/>
+<pre class="ziti1">cd /application/mysql/scripts
+./mysql_install_db  --defaults-file=/data/3306/my.cnf --basedir=/application/mysql --datadir=/data/3306/data --user=mysql
+./mysql_install_db  --defaults-file=/data/3307/my.cnf --basedir=/application/mysql --datadir=/data/3307/data --user=mysql</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ “--basedir=/application/mysql”为MySQL的安装路径，--datadir为不同的实例数据目录，这里多了一个特殊的参数，就是指定配置文件“--defaults-file=/data/3306/my.cnf”，而MySQL 5.6以前的版本在安装多实例时没有，单实例更不需要此参数。</p>
+<p class="ziti">操作过程为：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd /application/mysql/scripts</pre>
+<hr/>
+<p class="ziti">初始化3306实例数据库：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# ./mysql_install_db  --defaults-file=/data/3306/my.cnf --basedir=/application/mysql --datadir=/data/3306/data --user=mysql
+#&lt;==初始化mysql数据库文件，会有很多信息提示，如果没有ERROR级别的错误，只有两个OK的
+    字样，则表示初始化成功，否则就要解决初始化的问题。
+Installing MySQL system tables...2018-05-10 21:50:10 0 [Warning] 'THREAD_CONCURRENCY' is deprecated and will be removed in a future release. #&lt;==如果一不小心，使用了MySQL 5.6已经遗弃的参数就会出现警告信息！
+…省略若干行…
+2018-05-10 21:50:10 7efded714720 InnoDB: Warning: Using innodb_additional_mem_pool_size is DEPRECATED. This option may be removed in future releases, together with the option innodb_use_sys_malloc and with the InnoDB's internal memory allocator.
+#&lt;==如果一不小心，使用了MySQL 5.6已经遗弃的参数就会出现警告信息！
+…省略若干行…
+2018-05-10 21:50:14 48474 [Note] InnoDB: Shutdown completed; log sequence number 1620041
+OK  #&lt;==如果此处有两个OK，就表示初始化成功。
+…省略若干行…
+2018-05-10 21:50:14 48496 [Note] InnoDB: Using atomics to ref count buffer pool pages
+2018-05-10 21:50:14 48496 [Note] InnoDB: The InnoDB memory heap is disabled
+…省略若干行…
+2018-05-10 21:50:16 48496 [Note] InnoDB: Shutdown completed; log sequence number 1620051
+OK  #&lt;==如果此处有两个OK，就表示初始化成功。
+To start mysqld at boot time you have to copy
+…省略若干行…
+WARNING: Found existing config file /application/mysql/my.cnf on the system.
+Because this file might be in use, it was not replaced,
+but was used in bootstrap (unless you used --defaults-file)
+and when you later start the server.
+The new default config file was created as /application/mysql/my-new.cnf,
+please compare it with your file and take the changes you need.</pre>
+<hr/>
+<p class="ziti">初始化3307实例数据库：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# ./mysql_install_db  --defaults-file=/data/3307/my.cnf --basedir=/application/mysql --datadir=/data/3307/data --user=mysql
+Installing MySQL system tables... 2018-05-10 21:51:01 0 [Warning] 'THREAD_CONCURRENCY' is deprecated and will be removed in a future release.
+…省略若干行…
+2018-05-10 21:51:05 48522 [Note] InnoDB: Shutdown completed; log sequence number 1620041
+OK  #&lt;==如果此处有两个OK，就表示初始化成功。
+…省略若干行…
+2018-05-10 21:51:07 48544 [Note] InnoDB: Shutdown completed; log sequence number 1620051
+OK  #&lt;==如果此处有两个OK，就表示初始化成功。
+To start mysqld at boot time you have to copy
+…省略若干行…
+The new default config file was created as /application/mysql/my-new.cnf,
+please compare it with your file and take the changes you need.</pre>
+<hr/>
+<p class="ziti">（2）初始化数据库的原理及结果说明</p>
+<p class="ziti">初始化数据库的实质就是创建基础的数据库系统的库文件，例如，生成MySQL库表等。</p>
+<p class="ziti">初始化数据库之后，查看对应实例的数据目录，可以看到多了如下文件：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# tree /data
+/data
+├── 3306
+│   ├── data
+│   │   ├── ibdata1
+│   │   ├── ib_logfile0
+│   │   ├── ib_logfile1
+│   │   ├── ib_logfile2
+│   │   ├── mysql
+│   │   │   ├── columns_priv.frm
+│   │   │   ├── columns_priv.MYD
+│   │   │   ├── columns_priv.MYI
+│   │   │   ├── db.frm
+│   │   │   ├── db.MYD
+│   │   │   ├── db.MYI
+…省略部分…</pre>
+<hr/>
+<p class="ziti">多实例在安装过程中可能会遇到的问题与单实例是一样的，可参考第3章来解决，这些故障必须要解除，否则，后面会出现登录不了MySQL数据库等各种问题。</p>
+</body>
+</html>

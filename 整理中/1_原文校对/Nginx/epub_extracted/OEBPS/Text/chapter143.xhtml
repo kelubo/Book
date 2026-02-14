@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_155">8.2.1　轮询</h3> 
+ <p class="ziti3">轮询（Round Robin）策略是Nginx配置中默认的负载均衡策略，该策略将客户端的请求依次分配给后端的服务器节点，对后端集群中的服务器实现轮流分配。轮询策略绝对均衡，且实现简单，但也会因后端服务器处理能力的不同而影响整个集群的处理性能。</p> 
+ <p class="ziti3"><span class="yanse">1.加权轮询</span></p> 
+ <p class="ziti3">在Nginx的轮询策略中，为了避免因集群中服务器性能的差异对整个集群性能造成影响，在轮询策略的基础上增加了权重参数，让使用者可以手动根据集群中各服务器的性能将请求数量按照权重比例分配给不同的被代理服务器。</p> 
+ <p class="ziti3"><span class="yanse">2.平滑轮询</span></p> 
+ <p class="ziti3">在加权轮询策略中，会按照权重的高低分配客户端请求，若按照高权重分配完再进行低权重分配的话，可能会出现的情况是高权重的服务器一直处于繁忙状态，压力相对集中。Nginx通过平滑轮询算法，使得上游服务器组中的每台服务器在总权重比例分配不变的情况下，均能参与客户端请求的处理，有效避免了在一段时间内集中将请求都分配给高权重服务器的情况发生。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    upstream backend {
+        server a weight=5;
+        server b weight=1;
+        server c weight=1;
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://backend;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">配置样例中Nginx平滑轮询策略计算过程如下。</p> 
+ <p class="ziti4">·当前配置中a,b,c服务器的配置权重为{5,1,1}。</p> 
+ <p class="ziti4">·配置样例中Nginx平滑轮询计算过程如表8-11所示。</p> 
+ <p class="middle-img">表8-11　平滑轮询计算过程</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-11.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-11.jpg" class="calibre281"/></a> 
+ </div> 
+ <p class="ziti4">·有效权重（effective_weight），初始值为配置文件中权重的值，会因节点的健康状态而变化。</p> 
+ <p class="ziti4">·当前权重（current_weight），节点被选择前的权重值，由上一个选择后权重值及各节点与自己的有效权重值相加而得。</p> 
+ <p class="ziti4">·选择后权重，所有节点中权重最高节点的当前权重值为其初始值与有效总权重相减的值，其他节点的权重值不变。</p> 
+ <p class="ziti4">·有效总权重为所有节点中非备份、非失败状态的服务器的有效权重之和。</p> 
+ <p class="ziti4">·根据上述平滑轮询算法，选择节点顺序为{a,a,b,a,c,a,a}。</p> 
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">11.1.3　常用字符集介绍与选择建议</h3>
+<p class="p6">1.常用字符集介绍</p>
+<p class="ziti">在操作系统以及各类软件中都有字符集，MySQL也不例外，下面通过表11-1介绍一下MySQL常用的字符集。</p>
+<p class="middle-img">表11-1　常用字符集知识</p>
+<div class="pic"><img alt="" src="Image00079.jpg" />
+</div>
+<p class="p6">2.MySQL如何选择合适的字符集</p>
+<p class="ziti6">·如果存储的是各种各样的语言文字，则可以选择UTF8，这是目前国内应用最为广泛的字符集，没有之一。</p>
+<p class="ziti6">·如果只需要支持中文，并且数据量很大，此外，还包含了大量的运算，则可以选择GBK，理论上其可以获得更高的性能，但不推荐使用。</p>
+<p class="ziti6">·对于新型的互联网以及移动互联网的混合业务，推荐使用utf8mb4字符集替代UTF8字符集。总之，如果没有极特别的需求，请选择UTF8或utf8mb4作为数据库的字符集。</p>
+<p class="ziti6">·如果使用开源程序，则可以根据上述说明进行选择，如果是公司开发人员自己开发产品，那么选择权就在开发人员手里，DBA只能提供建议。</p>
+<p class="p6">3.查看MySQL数据库字符集和校对规则</p>
+<p class="ziti">查看当前MySQL系统支持的字符集</p>
+<p class="ziti">MySQL数据库支持的字符集有很多种，通过以下命令可以查看当前MySQL支持的字符集：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show character set;
++----------+-----------------------------+---------------------+--------+
+| Charset  | Description                 | Default collation   | Maxlen |
++----------+-----------------------------+---------------------+--------+
+| big5     | Big5 Traditional Chinese    | big5_chinese_ci     |      2 |
+...省略若干...
+| latin1   | cp1252 West European        | latin1_swedish_ci   |      1 |
+...省略若干...
+| gb2312   | GB2312 Simplified Chinese   | gb2312_chinese_ci   |      2 |
+| greek    | ISO 8859-7 Greek            | greek_general_ci    |      1 |
+| cp1250   | Windows Central European    | cp1250_general_ci   |      1 |
+| gbk      | GBK Simplified Chinese      | gbk_chinese_ci      |      2 |
+| latin5   | ISO 8859-9 Turkish          | latin5_turkish_ci   |      1 |
+| armscii8 | ARMSCII-8 Armenian          | armscii8_general_ci |      1 |
+| utf8     | UTF-8 Unicode               | utf8_general_ci     |      3 |
+...省略若干...
+| utf8mb4  | UTF-8 Unicode               | utf8mb4_general_ci  |      4 |
+| cp1251   | Windows Cyrillic            | cp1251_general_ci   |      1 |
+| utf16    | UTF-16 Unicode              | utf16_general_ci    |      4 |
+...省略若干...
++----------+-----------------------------+---------------------+--------+
+40 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">可以看到，前面提到的最常用的字符集也在其中：</p>
+<hr/>
+<pre class="ziti1">+----------+-----------------------------+---------------------+--------+
+| Charset  | Description                 | Default collation   | Maxlen |
++----------+-----------------------------+---------------------+--------+
+| latin1   | cp1252 West European        | latin1_swedish_ci   |      1 |
+| gb2312   | GB2312 Simplified Chinese   | gb2312_chinese_ci   |      2 |
+| gbk      | GBK Simplified Chinese      | gbk_chinese_ci      |      2 |
+| utf8     | UTF-8 Unicode               | utf8_general_ci     |      3 |
+| utf8mb4  | UTF-8 Unicode               | utf8mb4_general_ci  |      4 |
++----------+-----------------------------+---------------------+--------+</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ 每个字符集至少会有一个校对规则，也可能会有好几个校对规则，查看字符集对应校对规则的命令为：“mysql&gt;SHOW COLLATION LIKE'utf8%'；”。</p>
+</body>
+</html>

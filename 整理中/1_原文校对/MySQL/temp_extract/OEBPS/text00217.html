@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.2.3　在MySQL从库上执行的操作过程</h3>
+<p class="p6">1.设置server_id的值并关闭binlog功能参数</p>
+<p class="ziti">一般来说，数据库的server_id在一套主从复制体系内是唯一的，这里从库的server_id必须与主库及其他的从库不同，并且需要注释掉从库的binlog参数配置。如果不对从库进行级联复制，并且不作为备份使用，就不要开启binlog了，开启了反而会增加从库磁盘I/O的压力。</p>
+<p class="ziti">但是，如下两种情况需要打开从库的binlog记录功能，记录数据库更新的SQL语句：</p>
+<p class="ziti6">·作为形如A→B→C的级联同步，中间的B数据库服务，需要开启binlog记录功能。</p>
+<p class="ziti6">·在从库中做数据库备份时需要开启binlog记录功能。因为数据库备份必须要有全备和binlog日志，才是完整的备份。</p>
+<p class="ziti">1）修改配置文件，配置从库（172.16.1.52）的相关参数。</p>
+<p class="ziti">执行vi/etc/my.cnf，编辑my.cnf配置文件，按如下两个参数对内容进行修改：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+server_id = 2  #&lt;==调整等号后的数值，与任何一个数据库实例都不相同。
+#log_bin = /application/mysql/logs/oldboy-bin  #&lt;==如果有log_bin参数一行就注释掉,如果配置没有此行则可以忽略。</pre>
+<hr/>
+<p class="ziti">2）检查配置参数后的结果，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@db02 ~]# egrep "server_id|log_bin" /etc/my.cnf
+server_id = 2
+log_bin = /application/mysql/logs/oldboy-bin</pre>
+<hr/>
+<p class="ziti">3）重启从数据库：</p>
+<hr/>
+<pre class="ziti1">[root@db02 ~]# /etc/init.d/mysqld restart
+Shutting down MySQL.. SUCCESS!
+Starting MySQL. SUCCESS!</pre>
+<hr/>
+<p class="ziti">4）登录数据库检查参数的改变情况：</p>
+<hr/>
+<pre class="ziti1">[root@db02 ~]# mysql -e "show variables like 'log_bin';" #&lt;==不登入数据库检查，密码已写入配置文件。
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| log_bin       | OFF   |  #&lt;==Binlog功能已关闭。
++---------------+-------+
+[root@db02 ~]# mysql -e "show variables like 'server_id';"
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| server_id     | 2     |  #&lt;==通过检查得知配置的server_id为2。
++---------------+-------+</pre>
+<hr/>
+<p class="p6">2.将从主库mysqldump中导出的数据恢复到从库</p>
+<p class="ziti">在做主从复制之前，我们需要让主库与从库的数据保持一致，因此需要将主库导出的数据全恢复到从库之后再设置主从复制。</p>
+<p class="ziti">操作命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@db02 opt]# zcat /opt/bak_2017-09-12.sql.gz|mysql #&lt;==直接读取压缩包恢复数据，不能有报错。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 如果备份时使用了“-A”参数，则在还原数据到其他从库时，登录的root密码也会与主库一致，因为授权表也被主库数据覆盖了。</p>
+<p class="p6">3.登录从库（52）配置复制参数</p>
+<p class="ziti">1）MySQL从库连接主库的配置信息如下：</p>
+<hr/>
+<pre class="ziti1">CHANGE MASTER TO
+MASTER_HOST='172.16.1.51',  #&lt;==这里是主库的IP。
+MASTER_PORT=3306,           #&lt;==这里是主库的端口,从库的端口可以与主库的不同。
+MASTER_USER='rep',          #&lt;==这里是主库上建立的用于复制的用户rep。
+MASTER_PASSWORD='oldboy123', #&lt;==这里是rep用户的密码。
+MASTER_LOG_FILE='oldboy-bin.000023', #&lt;==这里是show master status时查看到的
+                                      二进制日志文件名称，注意不能多出空格。
+MASTER_LOG_POS=626; #&lt;==这里是show master status时查看到的二进制日志偏移量，注意
+                         不能多出空格。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 字符串用单引号括起来，数值不用引号，注意内容前后不能有空格。</p>
+<p class="ziti">2）登录从数据库后，应去掉上述语句中注释的部分，执行代码如下：</p>
+<hr/>
+<pre class="ziti1">CHANGE MASTER TO
+MASTER_HOST='172.16.1.51',
+MASTER_PORT=3306,
+MASTER_USER='rep',
+MASTER_PASSWORD='oldboy123',
+MASTER_LOG_FILE='oldboy-bin.000023',
+MASTER_LOG_POS=626;</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 这个步骤的参数信息一定不能出错，否则，数据库复制会前功尽弃。</p>
+<p class="ziti">也可以不登录数据库内部的命令行，在Linux命令行快速执行CHANGE MASTER的语句可以实现相应的功能，下面的语句特别适合在脚本中一键配置从库使用，语句如下：</p>
+<hr/>
+<pre class="ziti1">    mysql&lt;&lt; EOF
+CHANGE MASTER TO
+    MASTER_HOST='172.16.1.51',
+    MASTER_PORT=3306,
+    MASTER_USER='rep',
+    MASTER_PASSWORD='oldboy123',
+    MASTER_LOG_FILE='oldboy-bin.000023',
+    MASTER_LOG_POS=626;
+EOF</pre>
+<hr/>
+<p class="ziti">配置MySQL从库连接主库信息操作的整个过程如下：</p>
+<hr/>
+<pre class="ziti1">[root@db02 opt]# mysql&lt;&lt; EOF
+&gt; CHANGE MASTER TO
+&gt; MASTER_HOST='172.16.1.51',
+&gt; MASTER_PORT=3306,
+&gt; MASTER_USER='rep',
+&gt; MASTER_PASSWORD='oldboy123',
+&gt; MASTER_LOG_FILE='oldboy-bin.000023',
+&gt; MASTER_LOG_POS=626;
+&gt; EOF</pre>
+<hr/>
+<p class="ziti">上述操作过程的原理实际上是把用户密码等信息写入从库新的master.info文件中：</p>
+<hr/>
+<pre class="ziti1">[root@db02 opt]# ls -l /application/mysql/data/master.info
+-rw-rw----. 1 mysql mysql 91 9月  12 23:16 /application/mysql/data/master.info
+[root@db02 opt]# cat /application/mysql/data/master.info
+23
+oldboy-bin.000023 #&lt;==这里是show master status时查看到的二进制日志文件名称。
+626               #&lt;==这里是show master status时查看到的二进制日志偏移量。
+172.16.1.51   #&lt;==这里是主库的IP。
+rep           #&lt;==这里是主库上建立的用于复制的用户rep。
+oldboy123     #&lt;==这里是rep用户的密码。
+3306          #&lt;==这里是主库的端口。
+…省略若干…</pre>
+<hr/>
+</body>
+</html>

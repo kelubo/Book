@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.2.3　MySQL半同步复制准备</h3>
+<p class="p6">1.MySQL半同步复制环境准备</p>
+<p class="ziti">MySQL半同步复制实践对环境的要求比较简单，既可以是单机单数据库多实例的环境，也可以是两台服务器，每个机器一个独立数据库的环境。本文以两台服务器，每个服务器均安装本书第3章单机单实例数据库的环境为例进行讲解，单机单数据库多实例的环境讲解请参考《跟老男孩学习Linux运维：Web集群实战》一书第9章的内容。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">特别提示：</span>
+</p>
+<p class="ziti6">1）如果是VMware虚拟环境克隆虚拟机，则会导致网卡启动无法连网的问题，解决方法请参考<a href="http://oldboy.blog.51cto.com/2561410/1363853">http://oldboy.blog.51cto.com/2561410/1363853</a>
+ 。</p>
+<p class="ziti6">2）如果是对安装好的MySQL的虚拟机进行克隆，则需要注意数据目录下文件auto.cnf（本文是/application/mysql/data/auto.cnf）里的UUID需要人为修改一下，使其与原始虚拟机不一致。</p>
+<p class="p6">2.MySQL半同步复制服务器角色说明</p>
+<p class="ziti">主库及从库IP、端口信息如表17-1所示。</p>
+<p class="middle-img">表17-1　主库及从库IP、端口信息</p>
+<div class="pic"><img alt="" src="Image00128.jpg" />
+</div>
+<p class="p6">3.MySQL半同步复制主从库配置文件对比说明</p>
+<p class="ziti">请注意主从库中配置不同的部分，见表17-2半同步主从库配置文件对比说明。</p>
+<p class="ziti">配置完毕后，重启所有的MySQL服务。</p>
+<p class="p6">4.配置MySQL主从复制</p>
+<p class="ziti">半同步复制实现的基础是主从复制环境，因此，请读者参考前面的章节准备好主从复制的环境，当然主主复制环境也可以，此处不再赘述，配置完最好在虚拟机上做好快照，以后进行其他复制时还会用到。</p>
+<p class="middle-img">表17-2　半同步主从库配置文件对比说明表</p>
+<div class="pic"><img alt="" src="Image00129.jpg" />
+</div>
+</body>
+</html>

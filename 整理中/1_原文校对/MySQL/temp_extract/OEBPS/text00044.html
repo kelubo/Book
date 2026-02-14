@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.2.2　创建MySQL数据库配置文件并对数据库目录授权</h3>
+<p class="ziti">MySQL 5.5及老版数据库默认为用户提供了多个配置文件模板，但是MySQL 5.6的support-files目录下已经没有配置文件模板了。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6. 40]# ll support-files/*.cnf
+-rw-r--r--. 1 root root 1126 Feb 26 17:54 support-files/my-default.cnf
+[root@oldboy mysql-5.6. 40]# mv /etc/my.cnf /etc/my.cnf.bak
+#提示：在CentOS 6.9版操作系统最小化安装完成之后，在/etc目录下会存在一个my.cnf，需要将此文件更名为其他的名字，如：/etc/my.cnf.bak，否则，该文件会干扰源码安装的MySQL的正确配置，造成无法启动。
+#在启动MySQL服务时，会按照一定的顺序搜索my.cnf，先在/etc目录下找，若找不到则搜索"$basedir/my.cnf"，本例依旧选择大家熟悉的/etc/路径！
+[root@oldboy mysql-5.6.40]# cp support-files/my-default.cnf /etc/my.cnf
+提示：此行操作可以省略，在下文初始化mysql时会自动生成my.cnf模板文件，如果已经执行了上述命令，则初始化后会生成my-new.cnf文件，my.cnf和my-new.cnf除了注释以外是一致的。
+[root@oldboy mysql-5.6. 40]# chown -R mysql.mysql /application/mysql/
+#&lt;==授权mysql用户管理mysql的安装目录，此步不做会导致启动服务错误。</pre>
+<hr/>
+<p class="ziti">关于mysql的配置文件my.cnf参数的更多说明及调优，请参看本书后面的章节。</p>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">18.6.4　对所有的MySQL节点安装MHA Node软件</h3>
+<p class="ziti">对所有MySQL节点（db01、db02、db03）安装MHA Node软件的详细步骤如下。</p>
+<p class="ziti">1）安装MHA软件需要依赖包（本章开头介绍了MHA是用perl语言编写的，因此需要安装perl语言的环境）：</p>
+<hr/>
+<pre class="ziti1">yum install perl-DBD-MySQL -y</pre>
+<hr/>
+<p class="ziti">2）安装MHA-node包（需要去Google上下载或者加入开篇老男孩读者群来获取）：</p>
+<hr/>
+<pre class="ziti1">rpm -ivh mha4mysql-node-0.56-0.el6.noarch.rpm</pre>
+<hr/>
+<p class="ziti">在任意安装完MHA node包的机器上执行如下命令，可以看到前文提到的MHA node包里包含的工具，这些工具都是perl语言编写的脚本，功能说明前文已述，此处不再累述。</p>
+<hr/>
+<pre class="ziti1">[root@db02 bin]# ls -l /usr/bin/*_*log*
+-rwxr-xr-x. 1 root root 16367 3月  31 2014 /usr/bin/apply_diff_relay_logs
+-rwxr-xr-x. 1 root root  4807 3月  31 2014 /usr/bin/filter_mysqlbinlog
+-rwxr-xr-x. 1 root root  8261 3月  31 2014 /usr/bin/purge_relay_logs
+-rwxr-xr-x. 1 root root  7525 3月  31 2014 /usr/bin/save_binary_logs</pre>
+<hr/>
+<p class="ziti">3）对命令实现软链接，以便于直接使用：</p>
+<hr/>
+<pre class="ziti1">ln -s /application/mysql/bin/mysqlbinlog /usr/bin/mysqlbinlog
+ln -s /application/mysql/bin/mysql /usr/bin/mysql
+#说明：之所以要做这两条命令的软链接，是因为MHA-Manager在做检测的时候会去这两个路径下寻找MySQL的命令。也可以直接把这两条命令复制到/usr/bin目录下，如果在前文安装MySQL时设置好了/application/mysql/bin路径对应的环境变量也可以。</pre>
+<hr/>
+<p class="ziti">4）登录所有MySQL数据库添加MHA管理账号并检查：</p>
+<hr/>
+<pre class="ziti1">grant all privileges on *.* to mha@'10.0.0.%' identified by 'mha';
+select user,host from mysql.user;</pre>
+<hr/>
+<p class="ziti">特别说明：所有MySQL节点全部都要执行本节的操作。</p>
+</body>
+</html>

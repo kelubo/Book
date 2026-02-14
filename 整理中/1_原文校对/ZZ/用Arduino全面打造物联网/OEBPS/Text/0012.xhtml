@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+  <head>
+    <title>CHAPTER 06　爱上云计算</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="bodycontent-title"><span class="xbt"><span class="yhd">CHAPTER 06</span></span><br class="calibre1"/> 爱上云计算</h2> 
+ <div class="calibre1"> 
+  <p class="bodycontent">物联网的最后一千米，数据的整合与应用，才是发挥物联网价值的所在。为山九仞岂能功亏一篑。</p> 
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP11-1">6-1　通往云计算的道路</h3> 
+ <p class="bodycontent">在物联网中，在终端节点的系统设计和网络规划时要考虑让信息不受限制地流动在整个网络中，为其他节点提供运行所必要的信息。在物联网概念中，节点的数量是以千万计的，因此如何有效地管理所有节点并且让网络性能得到优化，分层的概念一定要建立，这里最重要的角色非网关（Gateway）莫属了。网关一词非常贴近物联网中使用的场景。整个网络会按照某种特性分成不同的区域，每个区域会有一个网关作为与其他子网的通信桥梁，或是守卫。这个网关的功能也许是通信接口的转换，例如蓝牙转成Wi-Fi无线网络，或是ZigBee转成移动通信，也有可能是有线接口的转换。同时也需要进行数据的过滤与处理，将不必要的数据先丢弃，再将有用的信息压缩传送。更多的功能与运算能力会被赋予在网关上，因此网关的系统等级会比终端节点高，例如有人就使用树莓派（Raspberry Pi）来作为网关的应用。英特尔公司也将自己的产品定位于面向网关的应用（见图6-1），毕竟不可能所有设备或物品都替换来支持物联网，因此如何连接既有物品来支持物联网的新时代是当前最大的商机。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img327" src="../Images/Figure-P230_28952.jpg"/> 
+  <p class="imgdescript-c">图6-1　英特尔（Intel）与研华（Advantech）所推出的网关方案（图片来源：www.advantech.com）</p> 
+ </div> 
+ <p class="bodycontent">除了整个网络的硬件架构外，数据的传输更是占有无比重要的决定地位，没有数据、没有大数据，就没有物联网存在的意义。以前我们所定义的各种通信协议可能都不适用于物联网的设备与网络架构中，许多人也开始研究新的通信协议和方式来应用在物联网的应用中。</p> 
+ <p class="bodycontent">在网络上搜索一下，大概有几种最常被提及可以实现物联网新时代网络传输的协议。</p> 
+ <p class="bodycontent" id="CHP11-1-1">CoAP（Constrained Application Protocol）</p> 
+ <p class="bodycontent">由于物联网的设备针对网络协议的处理可能没有强大的运算单元，例如Arduino就必须外加网络模块来解析网络数据分组，为了让小型设备也能顺利接上因特网，CoAP就是设计出来解决此问题的。CoAP是一个应用层的协议，基于UDP，架构非常精巧，可以让这些微型设备轻松与网络连接。</p> 
+ <p class="bodycontent" id="CHP11-1-2">XMPP（Extensible Messaging and Presence Protocol）</p> 
+ <p class="bodycontent">XMPP是一种以XML为基础的开放式实时协议。Google Talk使用的就是此协议。XMPP网络是基于服务器的，也就是两端设备并不直接连接。不过目前版本的协议架构还是过于庞大，进而影响带宽。新的版本正在研究以降低网络负载。</p> 
+ <p class="bodycontent" id="CHP11-1-3">MQTT（MQ Telemetry Transport）</p> 
+ <p class="bodycontent">MQTT是1999年由IBM公司所发明的，针对物联网的应用，通信协议预期用于无线和低带宽网络。后面我们有一小节会专门讨论它。</p> 
+ <p class="bodycontent" id="CHP11-1-4">REST（Representational State Transfer）</p> 
+ <p class="bodycontent">REST是一种Web服务的软件架构，并不是一种协议标准，而是一种风格规范，通常基于HTTP、URI、XML以及HTML这些现有的协议和标准。满足REST原则的架构就称为RESTful，因此有时候会看到RESTful的名称。后面也会有一小节介绍RESTful。</p> 
+ <p class="bodycontent">下面用表格比较一下这4种协议的通信方式。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img328" src="../Images/Figure-T232_32666.jpg"/>
+ </div> 
+ <p class="bodycontent">以上4种通信方式都是一个个非常深入的学问与领域，碍于笔者能力有限和本书篇幅的限制，在这里希望给大家一个提示和入门，有兴趣的人可以再分别深入研究每一种的优缺点和实现方式。本书只简单利用前辈们的范例与成果，用Arduino实现其过程，让大家有个基本的认识。</p> 
+ <h3 class="bodycontent-title1" id="CHP11-2">6-2　RESTful</h3> 
+ <p class="bodycontent">RESTful是网页技术下的一个技术演进，在此领域不是笔者的专长，有兴趣的人可以在网络上自行查阅相关知识。那你一定会问，这又和物联网有什么关系呢？</p> 
+ <p class="bodycontent">其实，物联网串起的不只是一个个冰冷的设备，更是自动化与信息化两大领域的融合。以往自动化领域的人玩的是传感器、逻辑控制等，让设备能够自主运行且将数据往上传送至中控系统的数据库。信息化的人则是从数据库的数据转换成分析、网页显示、决策等。这两大领域的人各司其职，也比较不会深入到对方的专业领域中。不过物联网的兴起打破了这个界线，上层的信息系统希望能够直接取得底层传感器感测的数据，但是问题是低层的数据都是数字和模拟的方式，上层系统的开发者无法理解这样的数据，因此就希望以REST的方式来进行数据的交换。REST是一个架构，让网页可以像软件一般进行通信与数据交换。</p> 
+ <p class="bodycontent">大家可能还是有点模糊，该怎么把REST应用于物联网中？这里列举几个例子。</p> 
+ <p class="bodycontent">Arduino所读取到的所有传感器全部都是有意义的，例如温度、湿度、灯光、门窗等。我们可以将一个Arduino定义成一组资源且有名称：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img329" src="../Images/Figure-T233_32668.jpg"/>
+ </div> 
+ <p class="bodycontent">小明家就是一组资源的整合，包含了家里的温度、湿度等信息，利用这样直观的方式，就算不懂传感领域的开发者也可以轻松将系统从上往下连成一气。</p> 
+ <p class="bodycontent">网络上有一份REST的Arduino的函数库（见图6-2），由marcoschwartz所维护，大家可以到网站去下载，支持Arduino的Serial、Ethernet、Wi-Fi等，另外也支持ESP8266、树莓派。</p> 
+ <p class="bodycontent">网站：http://arest.io/</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img330" src="../Images/Figure-P233_22942.jpg"/> 
+  <p class="imgdescript-c">图6-2　aREST介绍网站</p> 
+ </div> 
+ <p class="bodycontent">下载完毕后，按照相同的方式可以在Arduino里看到许多范例程序（见图6-3）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img331" src="../Images/Figure-P234_29034.jpg"/> 
+  <p class="imgdescript-c">图6-3　aREST的范例程序集</p> 
+ </div> 
+ <p class="bodycontent">从网站上的介绍，我们看到在Serial的范例中可以用以下的指令来设置引脚的功能。</p> 
+ <p class="bodycontent">将第13个引脚设置为输出功能：</p> 
+ <p class="bodycontent">/mode/13/o</p> 
+ <p class="bodycontent">将第13个引脚设置输出为1：</p> 
+ <p class="bodycontent">/digital/13/1</p> 
+ <p class="bodycontent">这里我们使用Ethernet的范例来做更进一步的了解，为了简单为主，只需要调整符合使用环境的网络设置与MAC地址：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img332" src="../Images/Figure-P234_29041.jpg"/>
+ </div> 
+ <p class="bodycontent">下载程序完毕后，我们就可以通过浏览器下达相关的指令，如图6-4所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img333" src="../Images/Figure-P235_22951.jpg"/> 
+  <p class="imgdescript-c">图6-4　在Arduino加上Ethernet Shield实现REST指令</p> 
+ </div> 
+ <p class="bodycontent">成功的话，在下方应该会有一串字符串显示出来，这是JSON（JavaScript Object Notation）的格式。说到JSON，它是一种轻量的数据交换语言，以文字为基础让人可以轻易解读。如果大家想要更清楚地了解这个字符串所表示的意义，可以到以下网址查看：</p> 
+ <p class="bodycontent">http://www.jsoneditoronline.org/</p> 
+ <p class="bodycontent">在左边粘贴上这个字符串后，按下往右的箭头即可转换出整个数据架构，如图6-5、图6-6所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img334" src="../Images/Figure-P235_22956.jpg"/> 
+  <p class="imgdescript-c">图6-5　JSON字符串转换</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img335" src="../Images/Figure-P235_22960.jpg"/> 
+  <p class="imgdescript-c">图6-6　转换完成后的架构与数值</p> 
+ </div> 
+ <p class="bodycontent">大家可以按照这样的测试再深入了解REST在Arduino实现的架构与相关规则。</p> 
+ <h3 class="bodycontent-title1" id="CHP11-3">6-3　MQTT</h3> 
+ <p class="bodycontent">MQTT（Message Queuing Telemetry Transport）是一个Machine-to-Machine（M2M）的发布（Publish）／订阅（Subscribe）信息的传输协议，是IBM和Eurotech共同制定出来的协议，有兴趣的人可以看一下官网的介绍：</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent"><i class="calibre3">MQTT is a machine-to-machine（M2M）/"Internet of Things" connectivity protocol. It was designed as an extremely lightweight publish/subscribe messaging transport. It is useful for connections with remote locations where a small code footprint is required and/or network bandwidth is at a premium.</i></p> 
+ </div> 
+ <p class="bodycontent">MQTT的规格版本为V3.1（2015/07），全文内容比起其他的协议不算多，因此可以让有兴趣的人自己完成，也因为如此，MQTT可以轻松地跨平台和不同种类的控制器进行整合。当初的设计是希望此协议简单、开放、数据长度短，能适用于带宽不足、联网质量不确定的网络环境下，也可以轻松整合嵌入式设备。Facebook的Messenger使用的就是MQTT（见图6-7）。在发布与订阅中，还需要一个中间桥梁，即Borker或Topic。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img336" src="../Images/Figure-P236_29059.jpg"/> 
+  <p class="imgdescript-c">图6-7　MQTT架构（图片来源：EUROTECH）</p> 
+ </div> 
+ <p class="bodycontent">MQTT适合在不稳定的情况下，例如带宽受限，通信稳定度不高或是设备解析能力有限。其特点为：</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　提供一对多的信息交换机制，使用发布／订阅的模式</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　以TCP/IP连接</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　提供不同等级的数据传输</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img337" src="../Images/Figure-T237_32673.jpg"/>
+ </div> 
+ <p class="bodycontent">话不多说，我们赶紧使用Arduino来实现MQTT的连接，大家先在网络上搜索“Arduino MQTT”，应该可以找到knolleary.net的Arduino Client for MQTT，目前最新版本是V1.9（2015/07）。下载并导入到Arduino的函数库中后，可以看到几个范例，这里我们要把PubSubClient\mqtt_basic这个范例稍做修改。</p> 
+ <p class="bodycontent">喔～对了，这里我们都是使用Arduino加上Ethernet扩展板来进行，若是Wi-Fi的扩展板则会在网络连接这里有修改，其他大致不变。程序一开始引用必需的函数库，比较重要的是我们需要一个MQTT的Broker，大家可以在网络找到一些免费的Broker，范例使用的是test.mosquitto.org，它的IP地址是85.119.83.194。另外，针对自己使用的网络环境也可以先默认一个IP地址，避免当DHCP失效时，还可以有IP地址的设置，范例的网段只是参考，不是唯一的。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img338" src="../Images/Figure-P238_29067.jpg"/>
+ </div> 
+ <p class="bodycontent">要让Arduino能够使用MQTT，需要靠arduinoClient这个结构变量，里面必须声明要连接的Broker，还有MQTT默认的端口号：1883。这里我们不处理接收的信息，因此看到callback函数里并没有任何程序。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img339" src="../Images/Figure-P238_29071.jpg"/>
+ </div> 
+ <p class="bodycontent">setup()里当然要先建立网络通信的部分，在范例中使用DHCP的方式来取得IP。接着要和MQTT Broker进行连接，连接成功后会在串行端口监视器窗口内显示：Connected to MQTT Server。若无法正常连接，则检查硬件和网络是否都正常，可以使用ping的方式确认Arduino的运行状态。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img340" src="../Images/Figure-P238_29074.jpg"/>
+ </div> 
+ <p class="bodycontent">最后在主程序中可以往Server发布Hello World的信息，这里的Topic是outTopic：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img341" src="../Images/Figure-P239_23031.jpg"/>
+ </div> 
+ <p class="bodycontent">至于要如何确认Arduino的MQTT是否正常运行，这里使用IBM所提供的一个免费MQTT软件，称为WMQTT（ia92，见图6-8）。大家可以到网络搜索ia92下载。它是在Java环境下运行的软件，下载完成后，在文件夹内的J2SE里有一个wmqttSample.jar，单击之后应该就可以执行了。若无法顺利执行，则要确认Java的环境。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img342" src="../Images/Figure-P239_23036.jpg"/> 
+  <p class="imgdescript-c">图6-8　WMQTT测试软件</p> 
+ </div> 
+ <p class="bodycontent">最上面的Broker TCP/IP address就是我们要连接的Broker，这里输入85.119.83.194后单击Connect按钮，当左边灯号变成绿色时表示连接成功。接着在中间Subscribe To Topics中输入Topic的名称：outTopic，再单击Subscribe按钮。这时应该就可以看到窗口内出现HelloWorld的信息，即Arduino通过MQTT所传过来的信息，如图6-9所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img343" src="../Images/Figure-P240_29085.jpg"/> 
+  <p class="imgdescript-c">图6-9　Arduino发布的信息</p> 
+ </div> 
+ <p class="bodycontent">学会了MQTT可以做些什么事情呢？下一节将让大家看看更厉害的。</p> 
+ <h3 class="bodycontent-title1" id="CHP11-4">6-4　MQTT to Cloud</h3> 
+ <p class="bodycontent">物联网的数据最终绝对和云计算脱不了关系，因此这里让大家看一下IBM所示范的如何通过MQTT将数据传送至云端。这里的范例是从IBM的网站上下载的，大家可以到https://internetofthings.ibmcloud.com/#/下载，如图6-10所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img344" src="../Images/Figure-P240_29092.jpg"/> 
+  <p class="imgdescript-c">图6-10　ibmcloud.com</p> 
+ </div> 
+ <p class="bodycontent">单击网页最上方的Quickstart，进入页面后可以看到，IBM已经提供了许多硬件的范例流程，包含Arduino、树莓派、ARM mbed等，大家可以从Arduino里获取范例，如图6-11所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img345" src="../Images/Figure-P241_23045.jpg"/> 
+  <p class="imgdescript-c">图6-11　IBM提供的各种硬件范例</p> 
+ </div> 
+ <p class="bodycontent">注意，这里的范例除了前面MQTT的函数库外，还需要额外下载Paho mqtt library才可以顺利编译，这个范例的特别之处是使用到了Arduino UNO的ATMEGA328P里内建的温度传感。有兴趣的人可以到http://playground.arduino.cc/Main/InternalTemperatureSensor了解，细节就不再多做说明。</p> 
+ <p class="bodycontent">程序下载后，请确认网络状态一切顺利，接着回到网页的最上方，有一个地方可以输入Device ID（见图6-12），这里的ID指的就是范例程序中的MAC，大家可以稍微修改成不同的MAC。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img346" src="../Images/Figure-P241_23055.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img347" src="../Images/Figure-P242_29100.jpg"/> 
+  <p class="imgdescript-c">图6-12　输入设备ID</p> 
+ </div> 
+ <p class="bodycontent">若看到下方出现Device connected就表示Arduino已经顺利连上IBM的Cloud（云），如图6-13所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img348" src="../Images/Figure-P242_29105.jpg"/> 
+  <p class="imgdescript-c">图6-13　设备连接成功</p> 
+ </div> 
+ <p class="bodycontent">在网页下方可以看到一个曲线持续在变化，表示大功告成，如图6-14所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img349" src="../Images/Figure-P243_23061.jpg"/> 
+  <p class="imgdescript-c">图6-14　Arduino上传的温度信息</p> 
+ </div> 
+ <p class="bodycontent">如果这时候开启了监控器窗口，就可以看到上传的格式是JSON，如图6-15所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img350" src="../Images/Figure-P243_23065.jpg"/> 
+  <p class="imgdescript-c">图6-15　上传的格式</p> 
+ </div> 
+ <p class="bodycontent">是不是很简单呀！我们已经可以让数据从Arduino的微控制器中直接上传到IBM的云端实时显示。这就是物联网！看起来很简单，里面却包含了各式各样的技术与知识，也许过一阵子又会有新的技术让我们更方便地完成这样的操作。大家千万要抓紧物联网的趋势，这在未来10年会引领我们的发展并且极大地改变我们的生活。</p> 
+</body>
+</html>

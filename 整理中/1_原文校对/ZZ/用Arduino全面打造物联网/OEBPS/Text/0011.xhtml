@@ -1,0 +1,577 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+  <head>
+    <title>CHAPTER 05　家庭自动化物联系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="bodycontent-title"><span class="xbt"><span class="yhd">CHAPTER 05</span></span><br class="calibre1"/> 家庭自动化物联系统</h2> 
+ <p class="bodycontent">本章以3种无线技术为引子，分别引入不同的应用到家庭自动化的开发中，通过前面学习的传感与控制方式，实现一个完整的解决方案。</p> 
+ <h3 class="bodycontent-title1" id="CHP10-1">5-1　事前准备</h3> 
+ <p class="bodycontent">在家庭自动化中，能够感测温度和照度，就能适当启动家电或是照明来维持居住环境的质量。更高级点，还可以针对湿度、有害气体、PM2.5等进行长期居住环境的监测，这对于家中的小孩或大人都是很有帮助的，因为若能得到居住环境的长时间数据，就可以了解可能造成身体不舒服的原因，说不定还可以因此避免过敏源。此外，家庭安全也是很重要的一环，门窗的监控与门禁的管理都是现在技术可以很轻易实现的。而Arduino的能力可以轻松担当起整个家庭监控的中央控制器，再搭配无线通信的技术，例如ZigBee和蓝牙等，就可以和家中家电成员直接进行数据的传送与命令的下达了。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img246" src="../Images/Figure-T176_32555.jpg"/>
+ </div> 
+ <p class="bodycontent">大家在本章进行实践时，可以自己搭配选择的模块和通信接口，或是手边已经有的模块也可以直接拿来使用。这里为了配线简单，使用Appsduino公司所推出的套件，其扩展板上有内建的温度传感器、光敏电阻（照度）和蓝牙接口等，方便我们直接使用或是扩展。另外，通信部分采用ZigBee。Appsduino所使用的ZigBee模块是TI（德州仪器）公司所推出的无线通信芯片，也是市面上常见的通信芯片之一，称为iArduino-ZB。在此处使用并介绍这种芯片，主要是想让大家可以从书中多了解一些模块的应用。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img247" src="../Images/Figure-P177_32557.jpg"/>
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP10-2">5-2　RFID</h3> 
+ <p class="bodycontent">通过RFID Tag来进行身份识别，当刷卡开门时，可将信息传至手机／平板电脑，并以语音方式将名字自动说出，并根据光线明暗自动开灯，也可用手机控制／查看室内所有电器的开关、实时显示不同空间内的温湿度、光线照度、一氧化碳（CO）浓度、窗户开关状态。</p> 
+ <p class="bodycontent">传感终端与RFID终端系统组合列表如下：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img248" src="../Images/Figure-T178_32559.jpg"/>
+ </div> 
+ <p class="bodycontent">下面分别介绍一下各个模块。</p> 
+ <p class="bodycontent">这里使用了Appsduino所推出的UNO R3修改版（见图5-1），主要新增了两个功能。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Buzzer：由Jumper连接至D8，可以产生声音旋律（请参考Arduino官方范例）及警示告知，出厂时Jumper预设为短路，若想使用D8进行其他控制，则将Jumper开路或拔除。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　电池电量的检测：当Jumper短路时，会将Vin的1/2分压连接至A0，使用Analog IO A0监测电池的电压，所测量的电压值为1/2 Vin，即真正的电压值为A0读取的数值÷1024×5V×2，因此最高可测量10V的电压（1024÷1024×5V×2）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img249" src="../Images/Figure-P179_21954.jpg"/> 
+  <p class="imgdescript-c">图5-1　Appsduino的Arduino UNO R3</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-2-1">Appsduino所推出的Shield V2.1扩展板（见图5-2）</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img250" src="../Images/Figure-P179_21958.jpg"/> 
+  <p class="imgdescript-c">图5-2　Appsduino扩展板</p> 
+ </div> 
+ <p class="bodycontent">Appsduino Shield V2.1扩展板增加了一些常用元件，利用杜邦线连接至适当的IO Pins，便可轻松学习许多实验，详述如下。</p> 
+ <p class="bodycontent-kaiti">（1）蓝牙接口：将蓝牙模块6 Pin排针插入接口（元件面向内侧），即可与手机或平板电脑通信，进而连上因特网实现网络相关应用。</p> 
+ <p class="bodycontent-kaiti">（2）绿、红、蓝LED：绿色（Green）LED已连接至D13，可直接使用。红、蓝LED可通过J17的两个排针用杜邦线连接至适当的Pin引脚。</p> 
+ <p class="bodycontent-kaiti">（3）数字温度计（DS18B20）：将J19的Vdd引脚连接至5V，DQ连接至适当的Digital I/O引脚，即可测量环境的温度（-559℃～+125℃）。</p> 
+ <p class="bodycontent-kaiti">（4）光敏电阻（CDS）：当光敏电阻受光时，电阻值变小，若用手指遮挡光敏电阻（暗），则电阻值变大，可利用此特性来监测环境受光的变化，将J10的CDS引脚连接至适当的Analog I/O引脚（A0～A5），即可测量环境光线的变化。</p> 
+ <p class="bodycontent-kaiti">（5）可变电阻VR（10KΩ）：内建10KΩ的可变电阻，其三支脚分别对应VR/VC/VL引脚，可利用这些引脚旋转旋钮以获得所需的阻值。</p> 
+ <p class="bodycontent-kaiti">（6）电源滑动开关：黑色开关（向右on／向左off），可打开或关闭从外部电源输入接口送至UNO控制板的电源（VIN）。</p> 
+ <p class="bodycontent-kaiti">（7）电源输入引脚：将红黑电源线接头插入此电源母座（红色为正极/+，黑色为负极/-），这里提供的是排针方式的电源输入，不同于Arduino主板上的电源接头，大多使用变压器。</p> 
+ <p class="bodycontent-kaiti">（8）测试按键（Key）：若将J14 Jumper B/C短路，则Key 1(S3)按键自动连接至A1 Pin，无须接线，可将A1设置为Digital I/O或使用Analog I/O (A/D)来检测Key 1按键的状态。Key 2(S4)按键则需使用杜邦线将J14 Jumper A连接至适当的数字或模拟引脚。</p> 
+ <p class="bodycontent-kaiti">（9）I<span class="super1">2</span>C LCD插槽：若有I<span class="super1">2</span>C LCD模块，则可将所附的4根杜邦线一端接到I<span class="super1">2</span>C控制板，另一端直接插入此插槽。</p> 
+ <p class="bodycontent-kaiti">（10）5V/GND引脚：扩展板底部增加5组5V与5组GND引脚，以便5V传感器使用。</p> 
+ <p class="bodycontent">AppsBee Arduino扩展板（ZigBee Shield）</p> 
+ <p class="bodycontent">AppsBee扩展板是一个专为Arduino量身打造的ZigBee扩展板（见图5-3），可将其直接插入Arduino的插槽内，无须任何转接板。此扩展板是基于TI的2.4GHz射频收发芯片CC2530及大功率低噪声射频前端芯片CC2591（ZAHP only）而开发的串行端口传输通信模块，将以往复杂的ZigBee Protocol Stack开发过程简化为UART与简单的I/O控制，让用户能够充分掌控网络性能，实现低功耗、远距离、大规模ZigBee无线传感器组网的能力。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img251" src="../Images/Figure-P181_21966.jpg"/> 
+  <p class="imgdescript-c">图5-3　ZigBee CO/RO扩展板</p> 
+ </div> 
+ <p class="bodycontent">注：AppsBee扩展板的详细用法与设置可参考在线下载文件“AppsBee扩展板使用手册”。</p> 
+ <p class="bodycontent">由于此AppsBee扩展板使用串行端口（TX/RX）与Arduino单片机通信，有两个Jumper可用于选择是使用Arduino的硬件UART D0/D1引脚（1200～115，200bps）还是软件串行端口的D5/D4引脚（1200～57600bps），而AppsBee扩展板使用的Arduino I/O控制引脚如下。</p> 
+ <p class="bodycontent-kaiti">■　D9：Reset Pin。</p> 
+ <p class="bodycontent"><span>■</span>　当D9 = LOW：Reset（重置）AppsBee模块。</p> 
+ <p class="bodycontent-kaiti">■　D6：模式选择／Mode Select。</p> 
+ <p class="bodycontent"><span>■</span>　0：BroadCast（广播）mode。</p> 
+ <p class="bodycontent"><span>■</span>　1：Unicast/Setting（点对点／设置）mode。</p> 
+ <p class="bodycontent-kaiti">■　D0/D5：TX（AppsBee的数据传送）连接UNO的数据接收D0（HW）或D5（Software Serial）。</p> 
+ <p class="bodycontent-kaiti">■　D1/D4：RX（AppsBee的数据接收）连接UNO的数据传送D1（HW）或D4（Software Serial）</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　AppsBee模块Baud Rate：默认为9600bps。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　使用前请先设置RO的地址，其有效地址：1，2，…，2047（11 bits）。其设置方式可参考范例：AppsBee_RO_ID_Setting.ino。</p> 
+  <div class="bodypic-c">
+   <img alt="" class="pic-img252" src="../Images/Figure-P182_27972.jpg"/>
+  </div> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　扩展板上有连接指示灯LED，当正在搜索连接时LED闪烁，已连接时LED恒亮。</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-2-2">I<span class="super1">2</span>C温湿度传感模块（HTU21D）</p> 
+ <p class="bodycontent">HTU21D超小体积的I<span class="super1">2</span>C温湿度数字输出模块，是基于法国Humirel公司高性能的温湿度传感器元件HTU21D设计而成的。HTU21D温湿度传感器的尺寸仅为长宽3×3mm（L×W），高度1.1mm，提供了标准的I<span class="super1">2</span>C数字输出格式，工作电压范围广，功耗极低，并且具有很好的温湿度精度范围。因此HTU21D温湿度数字输出模块是具有良好的质量、响应速度快、抗干扰能力强且性能优良的产品。</p> 
+ <p class="bodycontent">HTU21D同时可以和瑞士的SHT20、SHT21实现完全兼容，即硬件引脚上可以实现Pin to Pin完全兼容，无须修改电路板。软件程序方面也和瑞士的SHT20、SHT21相同，可以实现兼容替换，无须做任何修改。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img253" src="../Images/Figure-P182_27979.jpg"/> 
+  <p class="imgdescript-c">图5-4　HTU21D温湿度模块</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent">传感器重要参数如下。</p> 
+  <p class="bodycontent">供电电压：1.5V～3.6V</p> 
+  <p class="bodycontent">湿度测量范围：0～100%RH</p> 
+  <p class="bodycontent">温度测量范围：-40℃～+125℃</p> 
+  <p class="bodycontent">温度精度范围（5℃～60℃）:±0.3℃</p> 
+  <p class="bodycontent">最大消耗功率：2.7Uw</p> 
+  <p class="bodycontent">通信方式：I<span class="super1">2</span>C</p> 
+  <p class="bodycontent">湿度精度范围（10%RH to 95%RH）：±2%RH</p> 
+  <p class="bodycontent">湿度迟滞：±1%RH</p> 
+  <p class="bodycontent">测量时间：50ms</p> 
+  <p class="bodycontent">年漂移量：-0.5%RH/year</p> 
+  <p class="bodycontent">响应时间：5s</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　HTU21D模块的I<span class="super1">2</span>C的地址（SLAVE ADDRESS）为0x40。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　HTU21D模块每个I<span class="super1">2</span>C地址都相同，且为0x40。因此在同一条总线上只能连接一个HTU21D传感器，传感器只有在收到起始信号且与本身I<span class="super1">2</span>C地址相同时才会响应。</p> 
+ </div> 
+ <p class="bodycontent">程序的部分相当简单，和前面章节的DHT模块类似，只需要设置相关的结构变量，就可以使用不同的API直接读取温湿度的数据。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img254" src="../Images/Figure-P183_21989.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-3">声音传感模块（见图5-5）</p> 
+ <p class="bodycontent">此声音传感器可检测声音大小，内含放大电路（LM386）并可调整增益（Gain），当数值变化很小时可用螺丝刀调整增益／放大倍数，因为模块输出为模拟信号，所以可接至Arduino模拟引脚（A0～A5），使用analogRead指令读取音量大小，并送至LCD Display或计算机的串行端口监视器（Serial Monitor）显示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img255" src="../Images/Figure-P184_27987.jpg"/> 
+  <p class="imgdescript-c">图5-5　声音传感模块</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent">特性</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　电压：+5V。</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　模拟电压信号输出，信号幅度为VCC/2。</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　内置放大电路，增益可调。</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　可通过A/D转换获得声音强度的电压信号。</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-2-4">CO传感模块（见图5-6）</p> 
+ <p class="bodycontent">Q-7气体传感器所使用的气敏材料是在空气中电导率较低的二氧化锡（SnO2）。采用高低温循环检测方式低温（1.5V加热）检测一氧化碳，传感器的电导率随空气中一氧化碳气体浓度增加而增大，高温（5.0V加热）清洗低温时吸附的杂散气体。使用简单的电路即可将电导率的变化转换为与该气体浓度相对应的输出信号。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img256" src="../Images/Figure-P184_27995.jpg"/> 
+  <p class="imgdescript-c">图5-6　气体传感模块</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent">特性</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　输入电压：DC 5V。</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　功耗（电流）：～150mA。</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　DO输出：0和1（TTL Level）。</p> 
+  <p class="bodycontent-kaiti"><span>■</span>　AO输出：0.1-0.3V（相对无污染），最高浓度电压在4V左右。</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　传感器通电后，需要预热20s左右，测量的数据才稳定，传感器发热属于正常现象，因为内部有电热丝。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　板子上方的是PWR-LED红色电源指示灯，下方有DO-LED，当CO太浓就会亮起，DO输出0V。反之，CO浓度较淡时，则DO-LED熄灭，DO输出5V。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　AO（Analog Output）：将当前CO浓度的大小以电压高低的方式输出，可用Analog Pin来判断浓度的高低（数值越高表示浓度越高）。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　板上的可变电阻用来设置D0的阈值，测试结果若是逆时针转到底，阈值设置得很大（1023）→不灵敏。若顺时针转到底，阈值设置得很小（0）→灵敏。</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-2-5">RFID模块（见图5-7）</p> 
+ <p class="bodycontent">RFID-RC522模块采用NXP MF RC522芯片设计读卡电路，使用方便，适用于设备开发、读卡器开发等应用的用户，以及需要进行射频卡终端设计／生产的用户。模块采用的电压为3.3V，通过SPI接口，可以直接与任何具备SPI接口的CPU主板连接并通信。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img257" src="../Images/Figure-P185_22001.jpg"/> 
+  <p class="imgdescript-c">图5-7　RFID模块</p> 
+ </div> 
+ <p class="bodycontent">MF RC522是应用于13.56MHz非接触式通信中高集成的读写卡芯片，是NXP公司推出的一款低电压、体积小的非接触式读写卡芯片，是智能仪表和可携式手持设备研发的理想选择。MF RC522利用了先进的调制和解调概念，集成了在13.56MHz下所有类型的被动非接触式通信方式和协议，支持14443A兼容应答器信号。数字部分处理ISO14443A帧（Frame）和错误检测。此外，还支持快速CRYPTO1加密算法。MFRC522支持MIFARE系列更高速的非接触式通信，双向数据传输速率高达424kbps。作为13.56MHz高集成度读写卡系列芯片家族的成员，MF RC522与MF RC500和MF RC530有不少相似之处，同时也具备许多特点和差异。它与主机间的通信采用SPI模式，有利于减少连接、缩小PCB板体积、降低成本。</p> 
+ <p class="bodycontent">读写器（Reader）向RFID Tag（M1卡）发一组固定频率的电磁波，卡片内有一个LC串联谐振电路，其频率与读写器发射的频率相同，在电磁波的激励下，LC谐振电路产生共振，从而使电容内有了电荷，在这个电容的另一端，接有一个单向导通的二极管（Diode），将电容内的电荷送到另一个电容内存储，当所积累的电荷达到一定电压（～2V）时，此电容可作为MF1S50 IC控制单元的电源，并根据相应区的有效存取位（access bits）来控制将卡内数据发射出去或读取读写器的数据，如图5-8所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img258" src="../Images/Figure-P186_28007.jpg"/> 
+  <p class="imgdescript-c">图5-8　RFID工作原理</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent">模块参数简介</p> 
+  <p class="bodycontent">工作电流：13～26mA／直流3.3V</p> 
+  <p class="bodycontent">空闲电流：10～13mA／直流3.3V</p> 
+  <p class="bodycontent">休眠电流：小于80uA</p> 
+  <p class="bodycontent">峰值电流：小于30mA</p> 
+  <p class="bodycontent">工作频率：13.56MHz</p> 
+  <p class="bodycontent">支持的卡类型：mifare1 S50、mifare1 S70、mifare UltraLight、mifare Pro、mifare Desfire</p> 
+  <p class="bodycontent">产品物理特性：尺寸为40mm×60mm</p> 
+  <p class="bodycontent">环境工作温度：-20℃～80℃</p> 
+  <p class="bodycontent">环境存储温度：-40℃～85℃</p> 
+  <p class="bodycontent">环境相对湿度：相对湿度5%～95%</p> 
+  <p class="bodycontent">数据传输速率：最大10Mbps</p> 
+ </div> 
+ <p class="bodycontent">一张mifare的卡片其实可以存储相当多的数据，有1024×8 bit，里面分成16个区段，每个区段有4个区块，而且都可以有独自的密码（Key）保护（见图5-9）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img259" src="../Images/Figure-P187_22014.jpg"/> 
+  <p class="imgdescript-c">图5-9　mifare卡片的存储容量</p> 
+ </div> 
+ <p class="bodycontent">第一个区段中的第一个区块是制造商信息（Manufacturer Block），包含了卡片的序号与制造商信息，如图5-10所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img260" src="../Images/Figure-P188_28015.jpg"/> 
+  <p class="imgdescript-c">图5-10　RFID内部的卡片信息</p> 
+ </div> 
+ <p class="bodycontent">如果卡片是刚出厂的，那么所有区段的默认密码（6B）都为：0xFF 0xFF 0xFF 0xFF 0xFF 0xFF。</p> 
+ <p class="bodycontent">先用一个很简单的范例来看一下RFID的读取。我们先做序号读取的部分，因为序号不会重复，所以我们可以按照序号来判断持有卡片的人是否正确。</p> 
+ <p class="bodycontent">首先会用到相关的函数库，因此先引用RFID.h。因为使用的RFID模块是通过SPI和Arduino沟通，所以我们只需要额外设置SS和RESET的引脚即可。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img261" src="../Images/Figure-P188_28021.jpg"/>
+ </div> 
+ <p class="bodycontent">在循环中，程序会持续扫描是否读取到卡片rfid.isCard()，如果有，就进入序号读取的部分rfid.readCardSerial()。这部分范例程序会先做一个判断，确认本次读取到的序号和前一次是否相同，如果确认是不同的卡片，就显示出序号的十进制数和十六进制数；如果相同，就只显示出一个点来表示，如图5-11所示。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img262" src="../Images/Figure-P189_1.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img263" src="../Images/Figure-P189_22022.jpg"/> 
+  <p class="imgdescript-c">图5-11　读取到的结果</p> 
+ </div> 
+ <p class="bodycontent">程序的最后有一个rfid.halt()，是要让卡片进入休眠状态。</p> 
+ <p class="bodycontent">至于数据区块的存取流程（见图5-12），必须有机制进行处理，以避免多卡同时存取和确保数据的安全性。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img264" src="../Images/Figure-P190_28027.jpg"/> 
+  <p class="imgdescript-c">图5-12　RFID的工作流程图</p> 
+ </div> 
+ <p class="bodycontent">流程大致分为：</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　请求应答（Answer to Request）</p> 
+ <p class="bodycontent">RFID Tag的通信协议和通信波特率是定义好的，当有卡片进入读写器的操作范围时，读写器会以特定的协议与它通信，从而确定该卡是否为兼容的卡，即验证卡片的类型。而卡片也会按请求代码发送回应ATQA信号。</p> 
+ <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　防冲突循环（Anticollision Loop）</p> 
+ <p class="bodycontent">当有多张卡进入读写器操作范围时，防冲突机制会从其中选择一张进行操作，未选中的则处于准备模式等待下一次选卡，该过程会返回被选卡的序号。</p> 
+ <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　选择卡片（Select Tag）</p> 
+ <p class="bodycontent">读写器使用选择卡命令，选择其中一张卡的序号进行确认和内存的相关操作，此时卡片回传ATS码（Answer To Select =08h），读写器通过ATS可以确定被选中卡的类型，并同时返回卡的容量代码。</p> 
+ <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　三次互相授权认证机制（3 Pass Authentication）</p> 
+ <p class="bodycontent">选定要处理的卡片之后，读写器就会确定要存取的区块号码（Block#），并对该区块密码进行密码校验，在三次相互认证之后就可以通过加密进行通信。</p> 
+ <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　区块（Block）的操作方式</p> 
+ <p class="bodycontent">在执行任何区块操作之前，卡必须先要被选择并经过码验证机制。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img265" src="../Images/Figure-T191_22112.jpg"/>
+ </div> 
+ <p class="bodycontent">内存区块（Block）有以下3种形态。</p> 
+ <p class="bodycontent-kaiti">（1）读、写区块：一般的数据保存，可以进行读、写操作。</p> 
+ <p class="bodycontent-kaiti">（2）数值区块：用作数据值（4B），可以进行加值、减值、读值操作，例如电子钱包的应用。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img266" src="../Images/Figure-P191_22114.jpg"/>
+ </div> 
+ <p class="bodycontent-kaiti">（3）控制区块：每个扇区的区块3为控制区块，包括密码A（6字节）、访问控制（4字节）、密码B（6字节）。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img267" src="../Images/Figure-P192_28036.jpg"/>
+ </div> 
+ <p class="bodycontent">每个扇区（Sector）的密码和访问控制都是独立的，可以根据实际需要设置各自的密码及访问控制。访问控制为4个字节，共32位，区段中的每个区块（包括数据区块和控制区块）的存取条件是由密码和访问控制共同决定的，在访问控制中每个区块都有对应的3个控制位，其结构与对应的操作权限如下所示。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img268" src="../Images/Figure-P192_28039.jpg"/>
+ </div> 
+ <p class="bodycontent">数据区块（0、1、2）的访问控制如下：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img269" src="../Images/Figure-P193_22120.jpg"/>
+ </div> 
+ <p class="bodycontent">注：KeyA|B表示密码A或密码B，Never表示任何条件下都不能实现。</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent">从中可以看出：</p> 
+  <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　C1C2C3=000（出厂默认值）时最宽松，验证密码A或密码B后可以进行任何操作。</p> 
+  <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　C1C2C3=111无论验证哪个密码都不能进行任何操作，相当于把对应的区块冻结了。</p> 
+  <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　C1C2C3=010和C1C2C3=101都是只读，如果对应的数据区块写入的是只能读取（read only）的信息，可设为这两种模式。</p> 
+  <p class="bodycontent"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　C1C2C3=001时只能读和减值。电子钱包一般设为这种模式，比如公交车与地铁用的公交卡或一卡通，用户只能查询或扣钱，不能私下加值，加值的时候需要通过储值设备，先改变控制位使卡片可以充值，充完值后会再改回来。</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-2-6">二路5V继电器模块（见图5-13）</p> 
+ <p class="bodycontent">可用微控制器的5V I/O引脚去控制AC 110/240V的电器设备，此模块具有2CH输出控制能力，采用光电隔离方式，抗干扰能力强，且备有二极管保护，让继电器不会伤害到Arduino的引脚。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img270" src="../Images/Figure-P194_28046.jpg"/> 
+  <p class="imgdescript-c">图5-13　二路5V继电器模块</p> 
+ </div> 
+ <p class="bodycontent">模块的上方有直接的图示方便我们确认继电器的NO和NC引脚，以此模块为例，左边引脚为NC，右边引脚为NO，中间则是COM点。当我们输入高电平给某一个继电器时，会让右边引脚和COM点短路。</p> 
+ <p class="bodycontent">整个应用设计分成两个系统，一个是ZigBee的主控端（Coordinator）和ZigBee的终端（Router），系统组成如下：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img271" src="../Images/Figure-T194_32598.jpg"/>
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img272" src="../Images/Figure-T195_32600.jpg"/>
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img273" src="../Images/Figure-T196_32602.jpg"/>
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img274" src="../Images/Figure-T197_32604.jpg"/>
+ </div> 
+ <p class="bodycontent">我们可以将整个系统细分为四大部分：主控端（CO）、传感端（RO）、RFID管理端（RO）以及手持移动设备APP监控界面，如图5-14所示。传感端（RO）配置有温湿度、照度、CO浓度、声音、开窗等传感器，以及可从远程控制灯光的开关。其上的传感器和开关的最新状况都会实时通过ZigBee无线模块送回到主控端（CO），另一个RFID管理端（RO）则配置RFID Reader，作为门禁进出的管理，并将进出信息传给主机。主控端获得信息后，除了将其显示在LCD屏幕外，信息还会通过蓝牙（Bluetooth）无线模块转送给Android手持设备内建的APP监测程序，因此用户可在无线的场景下通过手持设备查看当前实时的温湿度、光线照度、声音、一氧化碳（CO）浓度，并从远程控制开关启动（或关闭），也可设置警戒值，若超过则可发送警告信息。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img275" src="../Images/Figure-P198_28144.jpg"/> 
+  <p class="imgdescript-c">图5-14　系统示意图</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7">5-2-1　系统组装</p> 
+ <p class="bodycontent">第一步我们先组装传感终端（RO），把需要的传感器固定在亚克力板上，连同Arduino一起以六角脚柱部署完毕（见图5-15）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img276" src="../Images/Figure-P199_22277.jpg"/> 
+  <p class="imgdescript-c">图5-15　各传感器固定示意图</p> 
+ </div> 
+ <p class="bodycontent">因为Arduino控制板的部分有通信模块和扩展模块，所以请按下面的顺序堆叠。</p> 
+ <p class="bodycontent-kaiti">■　最上层：Appsduino扩展实验板＋面包板。</p> 
+ <p class="bodycontent-kaiti">■　中间层：AppsBee（RO）扩展板。</p> 
+ <p class="bodycontent-kaiti">■　最下层：Appsduino UNO控制板。</p> 
+ <p class="bodycontent">另外，还在为每个传感器进行配线（见图5-16），让Arduino与其通信。</p> 
+ <p class="bodycontent" id="CHP10-2-7-1">O端的温湿度传感器</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img277" src="../Images/Figure-T200_32608.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-2">继电器模块</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img278" src="../Images/Figure-T200_32609.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-3">照度传感器（光敏电阻）</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img279" src="../Images/Figure-T200_28448.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-4">一氧化碳（CO）传感器</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img280" src="../Images/Figure-T200_28507.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-5">声音传感器</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img281" src="../Images/Figure-T200_28200.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-6">磁簧开关</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img282" src="../Images/Figure-T200_32610.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-7">LCD显示模块</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img283" src="../Images/Figure-T200_32611.jpg"/>
+ </div> 
+ <p class="bodycontent">第二步则是RFID（见图5-17）。</p> 
+ <p class="bodycontent">Arduino控制板的部分也是按照相同顺序堆叠的。</p> 
+ <p class="bodycontent-kaiti">■　最上层：Appsduino扩展实验板＋面包板。</p> 
+ <p class="bodycontent-kaiti">■　中间层：AppsBee（RO）扩展板。</p> 
+ <p class="bodycontent-kaiti">■　最下层：Appsduino UNO控制板。</p> 
+ <p class="bodycontent" id="CHP10-2-7-8">RFID读写模块</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img284" src="../Images/Figure-T201_22395.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-9">LCD显示模块</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img285" src="../Images/Figure-T201_22454.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img286" src="../Images/Figure-P202_28512.jpg"/> 
+  <p class="imgdescript-c">图5-16　传感终端实际配置</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img287" src="../Images/Figure-P202_28515.jpg"/> 
+  <p class="imgdescript-c">图5-17　RFID终端实际配置</p> 
+ </div> 
+ <p class="bodycontent">最后我们要来完成主控端（CO）。</p> 
+ <p class="bodycontent">Arduino控制板部分唯一的不同是ZigBee的模块要选择主控端（CO）的配置，而不是之前的传感端（RO）。</p> 
+ <p class="bodycontent-kaiti">■　最上层：Appsduino扩展实验板＋面包板。</p> 
+ <p class="bodycontent-kaiti">■　中间层：AppsBee（CO）扩展板。</p> 
+ <p class="bodycontent-kaiti">■　最下层：Appsduino UNO控制板。</p> 
+ <p class="bodycontent" id="CHP10-2-7-10">蓝牙模块</p> 
+ <p class="bodycontent">若使用Appsduino Shield，则上面有一个蓝牙接口的杜邦接头，如图5-18所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img288" src="../Images/Figure-P203_22460.jpg"/> 
+  <p class="imgdescript-c">图5-18　蓝牙模块的安装</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-2-7-11">LCD显示模块</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img289" src="../Images/Figure-P203_22524.jpg"/> 
+  <p class="imgdescript-c">图5-19　主控端实际配置</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img290" src="../Images/Figure-T203_22521.jpg"/>
+ </div> 
+ <p class="bodycontent">主控端的实际配置如图5-19所示。</p> 
+ <p class="bodycontent" id="CHP10-2-8">5-2-2　系统启动</p> 
+ <p class="bodycontent">整个系统要能够开始执行，除了编写程序外，接口设备的设置也是很重要的。首先我们来看看蓝牙的部分（见图5-20）。</p> 
+ <p class="bodycontent">首先接上主控端CO模块的电源，同时会看到蓝牙模块上的红色小灯闪烁，代表等待配对连接。接着单击Android设备的“设置→蓝牙→开启蓝牙功能→选择蓝牙→搜索设备”来完成蓝牙设置。不同Android版本操作界面可能不太相同，但是都大同小异，请自行参考Android设备的原厂说明书完成设置。下面以Android 4.3版本的显示界面为例进行说明。单击“搜索”按钮，过一会应该可以看到Android系统找到的Appsduino（见图5-21）蓝牙设备，请选择Appsduino。（这里的名称Appsduino是预先设置的名称，读者也可以自行修改，以免和他别人重复。）</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img291" src="../Images/Figure-P204_32622.jpg"/> 
+  <p class="imgdescript-c">图5-20　Android手机启动蓝牙的用户界面</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img292" src="../Images/Figure-P204_32624.jpg"/> 
+  <p class="imgdescript-c">图5-21　搜索到自己的蓝牙模块</p> 
+ </div> 
+ <p class="bodycontent">接着出现配对要求输入密码的界面，请输入密码0000，再单击“确定”按钮（见图5-22），就会看到配对成功，蓝牙模块已经加入到Andorid的已配对设备列表之中（见图5-23）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img293" src="../Images/Figure-P205_22532.jpg"/> 
+  <p class="imgdescript-c">图5-22　输入配对密码</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img294" src="../Images/Figure-P205_22535.jpg"/> 
+  <p class="imgdescript-c">图5-23　蓝牙模块配对成功</p> 
+ </div> 
+ <p class="bodycontent">可使用如下的“Config_BT_Name.ino”程序更改蓝牙ID，以便于识别。只要更改AT+NAME后面的名称即可：</p> 
+ <p class="bodycontent">（这里设置的范例名称为Appsduino）</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img295" src="../Images/Figure-P206_28533.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float33" src="../Images/Figure-P206_28537.jpg"/> 
+  <p class="imgdescript-c">图5-24　从Google Play下载IoTWSN互动软件APP</p> 
+ </div> 
+ <p class="bodycontent">手机端的应用程序请从Google Play下载“IoTWSN互动软件”后安装（见图5-24），或从本书提供的范例程序文件夹中找到Apps_IoTWSN.apk软件，并将其复制到手机存储器中，然后在手机中执行安装即可。之后执行该APP并单击“蓝牙设备”、选择想要连接的蓝牙设备。回到程序主界面，可以看到选定的Appsduino蓝牙模块的名称，再单击“连接”按钮即可完成连接。</p> 
+ <p class="bodycontent" id="CHP10-2-9">5-2-3　终端程序</p> 
+ <p class="bodycontent">当所有硬件连接完毕后，就可以将程序载入了。第一个部分我们先完成终端节点（RO）的程序。因为整个系统的通信是以ZigBee为接口，所以使用前必须设置RO的ZigBee节点地址，这里使用AppsBee_RO_ID_Setting范例来完成。</p> 
+ <p class="bodycontent">AppsBee并非直接使用Arduino原来的串行端口（D0，D1），因此我们需要SoftwareSerial.h来产生另一组通信端口让AppsBee来使用，这里D5为TX、D4为RX。同时我们也要让模块知道自己的角色定义，这里是RO。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img296" src="../Images/Figure-P207_22547.jpg"/>
+ </div> 
+ <p class="bodycontent">接着只需要在SettingMode中改变第二个参数的值即可，这里设置为除了1以外的参数。若是小组一起实验，则大家可以讨论一个规则让每个终端都有自己的ID号码。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img297" src="../Images/Figure-P207_22550.jpg"/>
+ </div> 
+ <p class="bodycontent">RO端的整个范例名称为IoT_WSN_RO，因为整个程序集结了许多程序，所以我们只采集精华部分，就不在这里细谈了。若遇到模块间通信或是数据正确性的问题，建议先以单个模块的范例逐个进行测试，以分割的方式找出问题所在。</p> 
+ <p class="bodycontent">整个系统包含了许多传感器，从实际应用来看，每个传感器都有自己的权重。这里的权重指的是数据更新的速率快慢，以室温来说，正常环境中不太可能在一秒内发生大幅的变化，因此可以每1秒读取甚至每10秒再进行测量与更新温度即可。不过声音传感的部分常常发生在短时内，因此我们要以较快的速度进行声音的监控。范例中使用了Time.h这个函数库来协助我们设置不同的时间权重，大家也可以按照自己的想法与实验结果找出最适合的系统安排。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img298" src="../Images/Figure-P208_28545.jpg"/>
+ </div> 
+ <p class="bodycontent">前面的章节提到在物联网系统设计中，电源在终端节点中是一个关键的因素，所以范例中我们也加入了系统电源的监控与警示。因为锂电池都有一段可使用范围，所以我们先设置系统可接受的电压区间：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img299" src="../Images/Figure-P208_28549.jpg"/>
+ </div> 
+ <p class="bodycontent">这里battWarningLevel的单位是百分比，也就是当电池仅存容量低于多少百分比后要发出警报，范例以蜂鸣器作为提醒工具。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img300" src="../Images/Figure-P208_28553.jpg"/>
+ </div> 
+ <p class="bodycontent">当然作为家庭自动化系统时，除了监视整个环境参数与控制家电设备外，异常情况的反应才是我们最重要的事情，比如磁簧开关负责检测的是门窗被意外打开、有毒气体浓度是否超过警戒值。这些参数都可以事先定义极限数值，也许是上限或下限，也许是开或关。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img301" src="../Images/Figure-P208_28557.jpg"/>
+ </div> 
+ <p class="bodycontent">通过设计为整个终端节点分别设置任务后，可以从循环中看到只需要处理两件事情：按照时间权重分别进行任务、确认ZigBee端是否有数据需要处理。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img302" src="../Images/Figure-P209_22559.jpg"/>
+ </div> 
+ <p class="bodycontent">程序运行后，主控端每秒都会接收到RO更新的信息。若有超过警戒值的部分，则会通过GPRS向管理者发送。发送机制在MonitorSensorData()的AZbee.SendString（GPRS_ID,warningMsg）中。</p> 
+ <p class="bodycontent">另外一块是RFID的节点。如同RO传感端一样，先设置ZigBee RO（路由）不同的地址。其有效地址为1，2，…，2047（11 bits）。打开AppsBee RO地址设置程序AppsBee_RO_ID_Setting，更改要设置的地址，并将程序上传，即可设置新的RO地址。</p> 
+ <p class="bodycontent">接着选择RO端RFID程序IoT_RFID_RO.ino，将程序写入Arduino控制板内。写入成功后系统会自动重新启动，接着LCD上就会显示“Wait”或检测到的RFID Tag名称。</p> 
+ <p class="bodycontent">比较特别的是，我们必须先定义好手边有的RFID标签，这里采用序号来识别。另外，针对每个序号我们给它对应一个用户来显示。在实际操作中要先确保程序内的序号与手边RFID Tag相同。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img303" src="../Images/Figure-P210_28563.jpg"/>
+ </div> 
+ <p class="bodycontent">在实际的应用中，这部分会有一个后台的数据库负责管理。这里我们为了方便大家实现，就以手动编辑的方式生成人员对应表格。</p> 
+ <p class="bodycontent">因为没有传感器的加入，所以其他部分的程序只需要专注在RFID标签的读取上。从程序中可以看到，我们每50毫秒就进行一次RFID标签的搜索。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img304" src="../Images/Figure-P211_22569.jpg"/>
+ </div> 
+ <p class="bodycontent">最后是重头戏，即主控端的程序。不同于RO端需先设置不同的地址，CO/主机端的地址固定为0。接着打开CO端程序IoT_WSN_CO.ino，将程序写入Arduino控制板内。写入成功后系统会自动重新启动，接着LCD上就会显示从RO端（传感与RFID）传来的温湿度值及其他的数据（顺序为温度、湿度、照度、CO、声音、磁簧、两个灯的开（1）与关（0））。</p> 
+ <p class="bodycontent">程序内容相对于RO端来说比较简单，就是持续接收数据并进行显示，还有通过蓝牙端与手机APP进行通信。</p> 
+ <h3 class="bodycontent-title1" id="CHP10-3">5-3　NFC</h3> 
+ <p class="bodycontent">除了可以使用RFID作为门禁进出管理之外，也可以通过NFC Tag来进行身份识别。当刷卡开门时，一样可以将信息传至手机／平板电脑，并以语音方式自动说出名字。</p> 
+ <p class="bodycontent">将此NFC无线传感应用模块设置ID后，即可自动加入物联网无线传感应用开发系统，让此系统也具备NFC读写功能，并据此开发与扩展许多NFC相对应的功能。当模块读取到NFC Tag的信息时，都会实时通过ZigBee无线模块将信息送到主控端（CO），主控端获得信息后，除了将其显示在LCD屏幕外，还可以通过蓝牙（Bluetooth）无线模块转送给Android手持设备内建的APP监控程序。</p> 
+ <p class="bodycontent">NFC终端系统组合列表如下。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img305" src="../Images/Figure-T212_28658.jpg"/>
+ </div> 
+ <p class="bodycontent">这里我们使用了不同的无线识别技术：NFC。下面我们针对这个模块做一个简单的介绍。</p> 
+ <p class="bodycontent" id="CHP10-3-1">NFC模块</p> 
+ <p class="bodycontent">NFC读写开发模块基于PN532芯片，用于13.56MHz的近场通信。该模块配备了板载天线，因此没有外部天线的线圈。它支持SPI/IIC/UART通信接口与MCU，便于进行双向通信。随着NFC Library支持Arduino，使得要开发具有NFC功能的产品变得更加容易。</p> 
+ <p class="bodycontent">PN532（见图5-25）是NXP针对NFC推出的一个高度集成的非接触读写芯片，内含80C51微控制器，提供在13.56MHz下的各种主动／被动式非接触通信方法和协议。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img306" src="../Images/Figure-P213_22579.jpg"/> 
+  <p class="imgdescript-c">图5-25　PN532 NFC读取模块</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent">模块参数简介</p> 
+  <p class="bodycontent">电源（V）：3.3V～5.5V</p> 
+  <p class="bodycontent">最大电源电流：150mA</p> 
+  <p class="bodycontent">工作电流（待机模式）：100mA</p> 
+  <p class="bodycontent">工作电流（写入模式）：120mA</p> 
+  <p class="bodycontent">工作电流（读取模式）：120mA</p> 
+  <p class="bodycontent">工作频率：13.56MHz</p> 
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent">PN532传输支持以下6种不同的工作模式。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　读写器模式，支持ISO/IEC 14443A/MIFARE机制。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　读写器模式，支持FeliCa机制。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　读写器模式，支持ISO/IEC 14443B机制。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　卡操作模式，支持ISO 14443A/MIFARE机制。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　卡操作模式，FeliCa机制。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　ISO/IEC18092，ECM340点对点。</p> 
+ </div> 
+ <p class="bodycontent">这里再加一个以NFC为通信接口的终端节点系统，其组成如下。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img307" src="../Images/Figure-T214_32636.jpg"/>
+ </div> 
+ <p class="bodycontent">整个家庭自动化物联网系统新增一个节点（见图5-26）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img308" src="../Images/Figure-P215_22594.jpg"/> 
+  <p class="imgdescript-c">图5-26　系统示意图</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-3-2">5-3-1　系统组装</p> 
+ <p class="bodycontent">基本上就是新增一个NFC模块（见图5-27），虽然有多种通信接口可以使用，但是这里我们选择SPI模式。</p> 
+ <p class="bodycontent" id="CHP10-3-2-1">NFC模块</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img309" src="../Images/Figure-T215_22697.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img310" src="../Images/Figure-P216_28740.jpg"/> 
+  <p class="imgdescript-c">图5-27　NFC终端硬件配置</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-3-3">5-3-2　系统启动</p> 
+ <p class="bodycontent">因为是新增的节点，所以要先进行ZigBee网络节点的设置。打开范例设置程序AppsBee_RO_ID_Setting，更改要设置的地址，并将程序上传即可设置新的RO地址。</p> 
+ <p class="bodycontent">设置RO地址后再打开RO端程序IoT_NFC_RO.ino，将程序上传到Arduino控制板内，写入成功后系统会自动重新启动，接着LCD上就会显示“Wait”或检测到的NFC Tag名称（见图5-28）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img311" src="../Images/Figure-P216_28746.jpg"/> 
+  <p class="imgdescript-c">图5-28　NFC启动后的待命状态</p> 
+ </div> 
+ <p class="bodycontent">硬件都配置完成后，就可以将范例程序IoT_NFC_RO.ino下载到系统上。与RFID的差异主要是函数库的使用以及参数设置。定义NFC的结构变量也只需设置chip select引脚即可。如果NFC没有顺利通信，那么除了SPI的引脚外，这里的设置也要注意一下。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img305" src="../Images/Figure-P217_22703.jpg"/>
+ </div> 
+ <p class="bodycontent">除了检测系统电源外，主循环部分还要读取NFC标签的数据并回传到主控端。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img312" src="../Images/Figure-P217_22707.jpg"/>
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP10-4">5-4　GPRS</h3> 
+ <p class="bodycontent">前面我们已经完成了传感终端（RO）的建立，负责检测室内的温湿度、光线照度、一氧化碳（CO）浓度、窗户开关状态以及可控制的灯光开关，除了可通过手机APP控制室内的灯光开关、实时显示环境内的各项参数外，有时为了安全起见，也会监控一氧化碳浓度或门窗状态，当有异常发生时能实时以短信（SMS）／其他消息通知相关的人员，这时此GPRS/SMS监控与信息模块即可扮演关键角色。</p> 
+ <p class="bodycontent">将此GPRS监控与信息模块设置ID后，即可自动加入物联网无线传感应用开发系统，让此系统具备安全监控与异常时发信息告知的功能，用户可设置警示基准值，当超过此设置值时，即会通知预先指定的人员，也可在远方通过GPRS控制传感器端的灯光或电器，这样即使此时无法连上因特网也无妨。从系统的架构来看，这样的配置也可以提供另外一条信息传送的通道，发挥ZigBee的弹性优势，让用户不只是可以通过蓝牙获取信息，还可以利用GPRS来了解情况。</p> 
+ <p class="bodycontent">GPRS终端系统组合列表：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img313" src="../Images/Figure-T218_28829.jpg"/>
+ </div> 
+ <p class="bodycontent">最后一个无线技术是移动通信中的GPRS，它是第2.5代（2.5G）移动通信技术。下面我们使用SIM900的GPRS模块来进行远距通信的扩展。</p> 
+ <p class="bodycontent" id="CHP10-4-1">Arduino四频GPRS Shield／扩展板（SIM900）</p> 
+ <p class="bodycontent">这个四频（850/900/1800/1900Mhz）GPRS扩展板内建一个SIM900 GPRS模块，并能直接插入Arduino主板的接口，无须任何的接线或转接板，具有即插即用的便利性。该GPRS扩展板可让你使用现有的GSM网络传送SMS、MMS、GPRS Packet以及实现语音通话的目的，所有这些功能都能通过UART Tx/Rx传送AT commands（GSM 07.07,07.05与SIMCOM强化的AT commands）来完成。</p> 
+ <p class="bodycontent">注：完整的AT Commands Set，请查阅本书提供下载的参考电子文件。</p> 
+ <p class="bodycontent">SIM900算是较常使用在扩展板上的通信模块，许多公司都推出了基于SIM900的扩展板，当然不能忘记Arduino.cc也有自己的官方模块（见图5-29），使用的核心是QUECTEL M10。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img314" src="../Images/Figure-P219_22720.jpg"/> 
+  <p class="imgdescript-c">图5-29　Arduino.cc的GSM模块</p> 
+ </div> 
+ <p class="bodycontent">来看一下SIM900的功能：</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Quad-Band 850/900/1800/1900 MHz——全球通用（通过GSM网络）</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　GPRS multi-slot class 10/8</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　GPRS mobile station class B</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Compliant to GSM phase 2/2+</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Class 4 (2 W @ 850/900 MHz)</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Class 1 (1 W @ 1800/1900MHz)</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Control via AT commands—Standard Commands: GSM 07.07 &amp; 07.05 | Enhanced Commands: SIMCOM AT Commands.</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Short Message Service—可传送短（SMS）</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　Embedded TCP/UDP stack—可上传数据至server</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　RTC supported</p> 
+ <p class="bodycontent">整个GPRS终端的组成：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img315" src="../Images/Figure-T220_32646.jpg"/>
+ </div> 
+ <p class="bodycontent">整个家庭自动化物联网系统又新增一个节点，如图5-30所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img316" src="../Images/Figure-P221_22729.jpg"/> 
+  <p class="imgdescript-c">图5-30　系统示意图</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-4-2">5-4-1　系统组装</p> 
+ <p class="bodycontent">这里的系统只有扩展板的连接，不过还是要注意几件事情。首先建议还是按照以下顺序安装扩展板，以便于后续若要接其他模块时还可以使用面包板的部分。</p> 
+ <p class="bodycontent-kaiti">■　最上层：Appsduino扩展实验板＋面包板</p> 
+ <p class="bodycontent-kaiti">■　中上层：GPRS扩展板</p> 
+ <p class="bodycontent-kaiti">■　中间层：AppsBee（RO）扩展板</p> 
+ <p class="bodycontent-kaiti">■　最下层：Appsduino UNO控制板</p> 
+ <p class="bodycontent">另外，因为GPRS也是使用串行通信，一般的GPRS模块都会有一组JUMPER，用来设置要使用原生的Arduino串行端口还是仿真的串行端口（见图5-31、图5-32）。大家不管使用哪家的模块都需要在使用前确认。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img317" src="../Images/Figure-P222_28911.jpg"/> 
+  <p class="imgdescript-c">图5-31　模块和Arduino的接口设置</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img318" src="../Images/Figure-P222_28914.jpg"/> 
+  <p class="imgdescript-c">图5-32　模块和Arduino的接口配置示意图（图片来源：Seeeduino）</p> 
+ </div> 
+ <p class="bodycontent">因此，如果这时候使用Appsduino UNO，记得把蜂鸣器的JUMPER先移除，避免在通信时造成蜂鸣器发出蜂鸣。GPRS终端完成的硬件配置如图5-33所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img319" src="../Images/Figure-P223_22739.jpg"/> 
+  <p class="imgdescript-c">图5-33　GPRS终端完成的硬件配置</p> 
+ </div> 
+ <p class="bodycontent" id="CHP10-4-3">5-4-2　系统启动</p> 
+ <p class="bodycontent">设置完与Arduino的接口后，还要确认SIM卡和天线是否也已经安装上去。GPRS模块有个比较特别的地方，并不是系统电源开启后模块也会跟着开启，而是必须再按下另一个开关约2秒后才会启动模块，大家可以观察LED来确认模块的情况。</p> 
+ <p class="bodycontent">模块有三个LED灯号：Power、Status和Net。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img320" src="../Images/Figure-T223_32652.jpg"/>
+ </div> 
+ <p class="bodycontent">接着我们就可以用范例程序来测试各种功能了，请找到范例GPRS_SMS_Dial_Example.ino，可以进行短信的发送与语音拨号。</p> 
+ <p class="bodycontent">程序会用到仿真的串行通信，硬件是D7和D8两只引脚，范例需要引用SoftwareSertial.h来启动这个功能。另外还要设置电话号码，这里大家按照想要传送的对象来设置，这里范例包含了国家码或地区码（中国：+86），加上后去掉号码的第一个0。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img321" src="../Images/Figure-P224_28924.jpg"/>
+ </div> 
+ <p class="bodycontent">在主程序中只有串行通信的处理，在程序启动后，可以输入t或是d来选择发送短信或是拨打电话。另外，所有在仿真通信端口的数据也会传送到计算机来显示。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img322" src="../Images/Figure-P224_28928.jpg"/>
+ </div> 
+ <p class="bodycontent">再从发送短信的部分详细看一下GPRS模块是怎么工作的。所有GPRS模块的功能都是从Arduino发送AT command来启动。以发送短信为例，需要以下步骤。</p> 
+ <p class="bodycontent">（1）设置短信为文本模式：AT+CMGF=1。</p> 
+ <p class="bodycontent">（2）设置要发送的对象：AT+CMGS="+86123456789"。</p> 
+ <p class="bodycontent">（3）若前面设置正确，SIM900模块则会开始等待要传送的字符串。这时就可以输入想要传送的字符串。</p> 
+ <p class="bodycontent">（4）确定输入完成后，需要输入Ctrl+Z进行传送，Ctrl+Z的ASCII码为26。</p> 
+ <p class="bodycontent">以上四个步骤就可以完成一个短信的传送。我们将其整体完善到程序中：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img323" src="../Images/Figure-P225_22841.jpg"/>
+ </div> 
+ <p class="bodycontent">对了！这是一个新的终端节点，别忘了还要设置ZigBee的ID号码来加入整个网络！</p> 
+ <p class="bodycontent">整个完整的范例程序请参考IoT_GPRS_RO.ino。将程序上传到Arduino控制板内，上传成功后系统会自动重新启动，接着LCD上就会显示传感器的数值，如图5-34所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img324" src="../Images/Figure-P226_28934.jpg"/> 
+  <p class="imgdescript-c">图5-34　利用短信进行控制和警报显示</p> 
+ </div> 
+ <p class="bodycontent">到此我们完成了整个家庭自动化的物联网系统，不仅有传感器的实时检测和异常警报，还有门禁管理，最后再加上移动通信的远距连接。同样的系统架构我们可以扩大运用于户外，例如农业养殖、灾害预防。也可以缩小到设备监控与预防检测。只要调整终端传感器的种类，或是改变整个系统的通信架构，便可以适用于不同的场景，当然还是有很多小细节需要处理的，比如说户外的防水、防高温等系统的耐候性、线材的固定与电力的来源，甚至是整个系统是否有后援或是重启的机制，这些都是我们在实际应用中应该考虑的因素。</p> 
+ <h3 class="bodycontent-title1" id="CHP10-5">5-5　小结</h3> 
+ <p class="bodycontent">完成这样的系统，大家可能会发现一件事情：模块化的重要性。无论是传感器的连接还是通信的整合，在实际的系统应用中都会变得复杂且相互影响。这也就是为什么我们看到某些厂商会推出一系列的模块（见图5-35、图5-36）都有相同的接口，Arduino的扩展板设计理念也是一样的，只是往上堆叠还是有极限的。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img325" src="../Images/Figure-P227_22857.jpg"/> 
+  <p class="imgdescript-c">图5-35　Seeedstudio所推出的Grove系列（http://www.seeedstudio.com/）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img326" src="../Images/Figure-P227_22860.jpg"/> 
+  <p class="imgdescript-c">图5-36　Fayalab所推出的leaf系列（http://www.fayalab.com/）</p> 
+ </div> 
+ <p class="bodycontent">在实际应用中，工业界的RS-485、车内的电子设备采用的CANBUS等也都是这样的道理，借助同一通信总线接口的整合，模块的新增或是移除都可以非常快速地满足不同的需求。</p> 
+</body>
+</html>

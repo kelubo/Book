@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_128">6.2.5　TCP/UDP代理的真实客户端IP</h3> 
+ <p class="ziti3">客户端TCP连接的会话经过Nginx反向代理才会转发到被代理服务器，在HTTP协议中的被代理服务器可以通过X-Forwarded-For头部获得传递的客户端IP，但TCP/UDP则不能使用该方法。对于支持proxy protocol协议的被代理服务器，Nginx通过在传输层header之上添加一层描述客户端IP和端口的proxy protocol来解决客户端IP传递问题。利用Nginx提供的ngx_stream_realip_module模块的配置指令set_real_ip_from，可以手动设置上层反向代理服务器的IP作为授信IP，用于甄别基于proxy protocol协议连到本机的真实客户端IP地址。该模块配置指令如表6-23所示。</p> 
+ <p class="middle-img">表6-23　设置授信的IP</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b6-23.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b6-23.jpg" class="calibre66"/></a> 
+ </div> 
+ <p class="ziti3">（1）proxy_protocol配置样例</p> 
+ <p class="ziti3">在proxy_protocol配置样例场景中，两台作为反向代理的Nginx服务器在客户端访问ldap服务器的链路中，通过proxy_protocol传递真实客户端IP，部署示意如图6-4所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/6-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/6-4.jpg" class="calibre243"/></a> 
+ </div> 
+ <p class="middle-img">图6-4　proxy_protocol传递真实客户端IP</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">stream {
+    server {
+        listen 3891;                        # 设置监听端口为3891 
+        proxy_protocol on;                  # 与被代理服务器间启用proxy protocol支持
+        proxy_pass 192.168.2.159:389;       # 转发TCP会话到被代理服务器
+        access_log logs/ldap_access.log tcp;
+    }
+}
+
+stream {
+    server {
+        listen 389 proxy_protocol;          # 设置监听端口为389，并启用proxy protocol支持
+        set_real_ip_from 192.168.2.145;     # 设置授信IP 
+        proxy_pass 192.168.2.100:389;       # 转发TCP会话到被代理服务器
+        proxy_timeout 5s;
+        proxy_connect_timeout 5s;
+        access_log logs/ldap_access.log tcp;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）TCP透传配置样例</p> 
+ <p class="ziti3">大多数TCP服务并不支持proxy protocol，且Nginx对UDP协议也不支持proxy protocol。为了让被代理服务器获得真实客户端IP，也可以使用proxy_bind指令将客户端IP透传给被代理服务器。当被代理服务器为Linux操作系统时，通过iptables将被代理服务器向客户端发送响应数据并由Nginx返回给客户端。</p> 
+ <p class="ziti3">在TCP透传配置样例场景中，客户端通过反向代理服务器Nginx访问Redis服务器，Nginx通过proxy_bind指令的透传（transparent）参数将客户端IP传递给redis服务器。然后再返回数据，通过被代理服务器的iptables标记路由发送给Nginx服务器，在Nginx服务器上再通过iptables标记路由交由Nginx转发给客户端。Nginx透传如图6-5所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/6-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/6-5.jpg" class="calibre244"/></a> 
+ </div> 
+ <p class="middle-img">图6-5　Nginx透传</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">stream {
+    server {
+        listen 6379 ;                           # 设置监听端口为6379 
+        proxy_bind $remote_addr transparent;    # 启用客户端IP透传
+        proxy_pass 192.168.2.100:6379;          # 转发TCP会话到被代理服务器
+        proxy_connect_timeout 5s;               # 建立连接超时时间为5s
+        access_log logs/redis_access.log tcp;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">被代理服务器的默认网关通常与Nginx不是同一个IP，proxy_bind指令透传参数模式下的被代理服务器接收到客户端TCP连接时，在默认网关的路由下无法找到透传过来的客户端IP地址和端口的路由，所以无法正常响应客户端的连接。为了使被代理服务器可以把连接响应返回给客户端，首先需要将被代理服务器连接响应的路由网关指定为Nginx服务器，其次在Nginx服务器上，通过iptables将目的IP为客户端IP的数据交由Nginx进程处理。在不影响被代理服务器原有网络通信的前提下，只需将被代理服务器中源端口为应用端口的数据默认网关设置为Nginx服务器IP即可。</p> 
+ <p class="ziti3">首先在Redis服务器上配置iptables出包规则。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">## 关闭系统的源地址校验功能
+echo "net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0 " &gt;&gt;/etc/sysctl.conf
+sysctl -p
+
+## 定义Nginx策略路由并设定在路由表中的优先级，数值越小优先级越高
+echo "200 nginx" &gt;&gt; /etc/iproute2/rt_tables
+
+## 使用iptables将源端口为6379的OUTPUT链数据标记值设置为1
+iptables -t mangle -A OUTPUT -p tcp -m tcp --sport 6379 -j MARK --set-mark 1
+
+## 将标记值为1的数据与策略路由表Nginx绑定
+ip rule add fwmark 1 table nginx
+
+## 设置策略路由表Nginx的默认网关为Nginx IP 192.168.2.159
+ip route add default via 192.168.2.159 dev eth0 table nginx<span class="calibre19"><span class="calibre20">
+</span></span></pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">其次在Nginx服务器上配置iptables监听规则。<br class="calibre3"/></p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">## 定义Nginx策略路由并设定在路由表中的优先级，数值越小优先级越高
+echo "200 nginx" &gt;&gt; /etc/iproute2/rt_tables
+
+## 使用iptables将源IP设置为被代理服务器IP且源端口为6379的PREROUTING链数据标记值设置为1
+iptables -t mangle -A PREROUTING -p tcp -s 192.168.2.100 --sport 6379 -j MARK --set-mark 1
+
+## 将标记值为1的数据与策略路由表Nginx绑定
+ip rule add fwmark 1 table nginx
+
+## 设置策略路由表Nginx的所有流量交由本地socket应用Nginx处理
+ip route add local 0.0.0.0/0 dev lo table nginx
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">配置完毕后，当客户端访问Redis服务器时，在Redis服务器上获取的客户端IP就是真实的客户端IP，可以用如下命令验证查看：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">## 在Redis服务器上执行客户端查看命令
+redis-cli client list
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_91">5.2.1　配置指令</h3> 
+ <p class="ziti3">Nginx HTTPS配置指令如表5-2所示。</p> 
+ <p class="middle-img">表5-2　HTTPS配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b5-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b5-2.jpg" class="calibre201"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/138-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/138-i.jpg" class="calibre202"/></a> 
+ </div> 
+ <p class="ziti3">1）上述指令都可编写在http、server指令域中。</p> 
+ <p class="ziti3">2）ssl_ciphers指令值的内容是OpenSSL参数ciphers的内容，可通过如下命令查看。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">openssl ciphers                 # 列出OpenSSL支持的密码套件
+openssl ciphers -v 'ALL:eNULL'  # 列出指定密码套件详情
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">3）密码套件格式及说明可参见OpenSSL相关文档。</p> 
+ <p class="ziti3">4）ssl_session_cache指令值参数如下。</p> 
+ <p class="ziti4">·off：禁用HTTPS会话缓存。</p> 
+ <p class="ziti4">·none：启用伪会话缓存支持，Nginx告知客户端可进行会话重用，但服务端并未存储会话参数。</p> 
+ <p class="ziti4">·builtin：使用内置OpenSSL缓存机制，无法在Nginx的多个工作进程中共享缓存内容。</p> 
+ <p class="ziti4">·shared：使用Nginx的共享缓存机制，会在Nginx的多个工作进程中共享缓存内容，1MB内存可以存储4000个会话。</p> 
+</body>
+</html>

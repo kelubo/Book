@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h1 class="p2" id="sigil_toc_id_1">前言</h1>
+
+  <p class="p1">为什么写这本书</p>
+
+  <p class="ziti3">在互联网与我们生活已密不可分的今天，大规模、高性能的网站架构技术已成为每个互联网技术人员的必备技能。Nginx作为一款开源的Web服务器软件，因其具有性能稳定、高并发、低内存耗用、高性能的处理能力等特点，而被广泛应用到国内外各互联网厂商的实际生产架构中。由于互联网技术迭代非常快，云计算、微服务等新技术层出不穷，Nginx也一直处于活跃开发的状态，并在新版本中增加了很多强大的功能，与这些新技术紧密集成。同时基于其开源版本衍生出来的OpenResty和淘宝的Tengine等软件也根据自身需求提供了优秀的扩展功能，满足了云计算、微服务等各种技术的应用需求，并在实际生产环境中得到了广泛应用。</p>
+
+  <p class="ziti3">作为一款Web服务器软件，Nginx实现了Web服务器的基本功能，用户通过简单的配置指令就可以快速完成Web服务器的搭建。它还是网络通信协议处理软件，支持TCP/UDP、HTTP、HTTP/2、gRPC、FastCGI、SCGI、uWSGI、WebDAV等协议的处理，并实现了相应通信协议的请求解析、长连接、代理转发、负载均衡、会话保持等互联网架构中常见的应用功能。同时，它还是一款高并发服务软件，其采用的固定数量的多进程模型、事件驱动处理机制、工作流处理方式及模块化架构等软件开发设计，已成为高并发服务软件开发的典范。</p>
+
+  <p class="ziti3">Nginx自诞生至今已有十几年时间，虽然相关资料很多，但国内可获得的资料很多是直接翻译自官方文档，这些资料让读者只是停留在知其然而不知其所以然的层面，即便有深入讲解某一功能的资料，也仅能让读者管中窥豹，而无法全面了解Nginx的功能并在实际工作中熟练应用。市面上的图书或偏重于Nginx服务器的搭建，或偏重于Nginx的源码解析，同时Nginx的新版本及云计算、微服务等新技术迭代较快，这就导致市面上介绍Nginx最新技术实际应用及运维管理的资料稀少。而Nginx的用户只有理解了Nginx的各项指令参数的功用，才能熟练对Nginx的各种功能进行灵活组合，以使其发挥最高的性能，进而在实际工作中解决各种问题。鉴于以上原因，本书分别从Nginx介绍、应用实战、运维管理及与Kubernetes和微服务的应用集成4个部分来介绍Nginx的特点及运维管理实战经验，力求给从事互联网技术工作的读者带来帮助。</p>
+
+  <p class="p1">读者对象</p>
+
+  <p class="ziti3">本书的目标群体为具有一定Linux基础的互联网行业运维工程师、系统架构师。因为Nginx可应用于Web服务、负载均衡、微服务等多个方面，所以本书也可作为开发工程师及软件架构师的日常工作参考书。</p>
+
+  <p class="p1">本书特色</p>
+
+  <p class="ziti3">本书对开源版Nginx自有的配置指令进行了全面介绍和配置举例，同时力求对涉及的技术术语及其原理进行阐述，使读者可以深刻理解和掌握Nginx配置指令的配置方法。Nginx是一款网络通信协议处理软件，涉及大量网络通信协议的处理方法，对于本书中每个涉及网络通信协议的配置，笔者都对相关技术特点进行了介绍，使读者可以结合配置案例掌握Nginx在不同应用场景下的使用方法。全书所涉及的软件部署均采用了Docker化的部署方法，不仅充分利用了Docker容器的便捷部署方式，还满足了目前容器化运维管理工作的技术需求。</p>
+
+  <p class="ziti3">Nginx现仍处于活跃开发中，本书基于Nginx最新版本及官方资料撰写，对Nginx开源版本最新功能进行了完整介绍，还介绍了Nginx与目前比较流行的Kubernetes和微服务架构应用的集成。</p>
+
+  <p class="p1">如何阅读本书</p>
+
+  <p class="ziti3">Nginx是一款非常优秀的开源软件，笔者主要基于自身实际使用Nginx的经验来分享Nginx的应用和运维方法。本书在逻辑上可分为4个部分，分别为Nginx介绍、应用实战、运维管理，以及Nginx与Kubernetes、微服务的应用集成。</p>
+
+  <p class="ziti3"><span class="yanse">第一部分　Nginx介绍（第1～4章）</span></p>
+
+  <p class="ziti3">第1章　Nginx概述</p>
+
+  <p class="ziti3">Nginx的第一个版本发布于2004年，经过多年的发展，逐渐演变出Nginx、Nginx Plus、Tengine、OpenResty这4个被广泛应用的版本。本章分别介绍了这4个版本各自的特点，并通过对开源Nginx架构的特点及实现原理的介绍，使读者对Nginx的功能有初步的了解。</p>
+
+  <p class="ziti3">第2章　Nginx编译及部署</p>
+
+  <p class="ziti3">Nginx是用C语言开发的，需要通过对源代码进行编译才能获得可运行的二进制文件。本章介绍了Nginx开源版本的编译配置参数及Tengine、OpenResty两个版本的扩展编译配置参数和所集成的模块，同时介绍了各个开源版本的编译和基于Docker的编译部署方法。</p>
+
+  <p class="ziti3">第3章　Nginx核心配置指令</p>
+
+  <p class="ziti3">Nginx的配置是通过在配置文件中调整不同配置指令的指令值实现的。本章介绍了Nginx配置文件的目录结构及主配置文件nginx.conf的文件结构，并对Nginx的进程及HTTP核心配置的配置指令进行了介绍和配置举例。</p>
+
+  <p class="ziti3">第4章　Nginx HTTP模块详解</p>
+
+  <p class="ziti3">Nginx的HTTP模块配置指令主要负责HTTP请求处理的配置。本章介绍了Nginx在动态赋值、访问控制、数据处理这3个方面的配置指令和配置举例。</p>
+
+  <p class="ziti3"><span class="yanse">第二部分　应用实战（第5～8章）</span></p>
+
+  <p class="ziti3">第5章　Nginx Web服务应用实战</p>
+
+  <p class="ziti3">Nginx的一个基本功能是作为Web服务器提供HTTP服务，它支持对静态页面、动态脚本页面、多媒体等文件的响应和处理。本章通过静态文件服务器、HTTPS安全服务器、PHP网站搭建、Python网站搭建等实战案例，介绍了Nginx作为Web服务的应用实战。</p>
+
+  <p class="ziti3">第6章　Nginx代理服务应用实战</p>
+
+  <p class="ziti3">Nginx支持HTTP、TCP、gRPC等多种协议的代理，通过上述代理功能，后端服务器可实现更灵活安全的部署。本章通过实战案例介绍了Nginx代理相关配置指令的使用方法及需要关注的客户端源IP问题的解决方案。</p>
+
+  <p class="ziti3">第7章　Nginx缓存服务应用实战</p>
+
+  <p class="ziti3">内容缓存是加速用户访问的常用技术。本章介绍了Nginx缓存模块的配置指令，并通过客户端缓存、代理缓存、镜像缓存及Memcached集成等应用场景配置案例，介绍了Nginx作为缓存服务器的应用实战。</p>
+
+  <p class="ziti3">第8章　Nginx负载均衡应用实战</p>
+
+  <p class="ziti3">Nginx通过上游模块与代理模块共同实现了对后端服务器的访问负载功能，Nginx支持HTTP、TCP/UDP、gRPC、FastCGI、uWSGI、SCGI、Memcached等协议的反向代理。本章详细介绍了Nginx负载均衡相关的配置指令和官方自带的负载均衡算法及实现原理。</p>
+
+  <p class="ziti3"><span class="yanse">第三部分　运维管理（第9～11章）</span></p>
+
+  <p class="ziti3">第9章　Nginx日志管理</p>
+
+  <p class="ziti3">Nginx的日志分为访问日志和错误日志两种。日志的收集和分析是日常运维工作的重要内容，日志不仅可以帮助运维工程师排查Nginx的问题及优化Nginx的性能，还可以通过与ELK集成为其代理的网站应用提供安全、性能、可用性及运行的PV/UV等方面的数据，通过对这些数据进行不同维度的分析，可以了解如何提升网站应用的运维能力。</p>
+
+  <p class="ziti3">第10章　Nginx监控配置及管理</p>
+
+  <p class="ziti3">在Nginx的日常运维管理工作中，Nginx的监控管理是一项重要的工作，但开源版本Nginx自带的监控数据采集能力相对较弱。本章介绍了开源Nginx与第三方模块集成的方法，这些方法增强了Nginx的监控数据采集能力。本章还介绍了目前流行的监控工具Prometheus对Nginx服务器的监控、告警方法。另外还举例介绍了监控工具Zabbix获取Prometheus Exporter数据，以便在运维管理工作中实现统一化监控管理的方法。</p>
+
+  <p class="ziti3">第11章　Nginx集群负载与配置管理</p>
+
+  <p class="ziti3">高业务量的互联网应用架构中，通常都是通过多组Nginx集群实现后端不同应用服务集群负载均衡的，本章介绍了基于Keepalived的Nginx集群的多层负载架构搭建，并举例介绍了通过现有的开源软件Jenkins、GitLab和Ansible组合，快速搭建一套Web化的Nginx集群配置管理框架的方法。</p>
+
+  <p class="ziti3"><span class="yanse">第四部分　Nginx与Kubernetes、微服务的应用集成（第12～13章）</span></p>
+
+  <p class="ziti3">第12章　Nginx在Kubernetes中的应用</p>
+
+  <p class="ziti3">Kubernetes是Google开源的分布式容器管理系统，它实现了对容器的部署、网络管理、负载调度、节点集群和资源的扩缩容等自动化管理功能。在该服务对外发布的方案中，Nginx以Nginx Ingress组件的方式为Kubernetes集群的Pod应用提供了访问控制、认证管理、应用层代理、负载均衡等功能，使Kubernetes对集群中运行于容器的应用程序具有更灵活的应用层，以提供对外访问的管理能力。本章介绍了Kubernetes的相关术语及网络通信机制，读者可通过相关网络通信机制根据实际需求选择Nginx Ingress的部署方式，并通过本章介绍的配置映射和注解这两种不同的配置方式实现日常Nginx Ingress的配置管理工作。</p>
+
+  <p class="ziti3">第13章　Nginx在微服务架构中的应用</p>
+
+  <p class="ziti3">近几年，微服务架构技术发展迅猛，已成为目前主流的应用架构技术。在微服务架构中，Nginx也在微服务网关等微服务的核心组件中发挥着重要的作用。本章从软件发展历史的角度介绍了对微服务架构的认识，并举例介绍了基于OpenResty的开源微服务网关软件Kong作为微服务网关的应用配置方法。</p>
+
+  <p class="p1">勘误和支持</p>
+
+  <p class="ziti3">由于笔者的水平有限，书中难免存在不足或疏漏之处，在此恳请读者朋友批评和指正。你可以将异议发布到本书的支持网站<a href="http://www.nginxbar.org" class="pcalibre calibre1">http://www.nginxbar.org</a>，笔者将尽量在线上为你提供满意的答复。如果你有更多的宝贵意见，也欢迎发送邮件至<a href="mailto:yfc@hzbook.com" class="pcalibre calibre1">yfc@hzbook.com</a>。非常感谢你对本书的支持。</p>
+
+  <p class="p1">致谢</p>
+
+  <p class="ziti3">感谢Nginx的作者及其团队，他们提供了一个如此优秀且应用广泛的开源项目，并使该项目一直处于活跃开发状态，且不断创新，拥抱新技术，为我们持续提供日益强大的互联网络通信协议解决方案。</p>
+
+  <p class="ziti3">感谢OpenResty的作者章亦春，他将Lua语言以模块的方式嵌入Nginx中，极大地扩展了Nginx的可编程性，降低了Nginx功能扩展的难度，给Nginx用户的日常使用带来了极大的便利。</p>
+
+  <p class="ziti3">感谢网络中不吝分享知识的众多朋友，大家分享的资料补充了笔者个人技术的短板，矫正了笔者诸多细节上的不妥之处，给本书的写作带来了极大的帮助。</p>
+
+  <p class="ziti3">感谢机械工业出版社华章公司的编辑杨福川，感谢他在笔者创作本书过程中给予的指导和帮助。</p>
+
+  <p class="ziti3">感谢在工作和生活中给予笔者帮助的家人及朋友，是你们的理解和支持让我能够完成本书的写作。</p>
+
+  <p class="you">王小东</p>
+
+  <p class="you">2020年8月</p>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_100">5.3.2　PHP环境安装</h3>
+
+  <p class="ziti3">CentOS 7默认的PHP版本是5.3，可以使用Remi扩展源安装PHP 5.6和PHP-FPM。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">yum install -y epel-release               # 安装EPEL扩展源
+    # 安装Remi扩展源
+rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+yum install -y --nogpgcheck --enablerepo=remi --enablerepo=remi-php56 \
+    php php-opcache php-devel php-mbstring php-mcrypt \
+    php-mysqlnd php-phpunit-PHPUnit php-pecl-xdebug \
+    php-pecl-xhprof php-gd php-ldap php-xml php-fpm \
+    php-pecl-imagick              # 安装基于Remi扩展源的PHP 5.6
+
+systemctl start php-fpm           # 启动PHP-FPM服务
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

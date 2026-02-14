@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">16.2.7　在主库1（51）上执行复制配置</h3>
+<hr/>
+<pre class="ziti1">[root@db01 opt]# mysql &lt;&lt; EOF
+CHANGE MASTER TO
+MASTER_HOST='172.16.1.52',
+MASTER_PORT=3306,
+MASTER_USER='rep',
+MASTER_PASSWORD='oldboy123',
+MASTER_LOG_FILE='oldboy-bin.000027', #&lt;==从上文获得。
+MASTER_LOG_POS=1303324;              #&lt;==从上文获得。
+EOF
+[root@db01 opt]# mysql -e "start slave;"
+[root@db01 opt]# mysql -e "show slave status\G;"
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 172.16.1.52
+                  Master_User: rep
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: oldboy-bin.000027
+          Read_Master_Log_Pos: 1303324
+               Relay_Log_File: db01-relay-bin.000002
+                Relay_Log_Pos: 284
+        Relay_Master_Log_File: oldboy-bin.000027
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              ...省略若干...
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">至此主库1（51）和主库2（52）就实现互相同步了。</p>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="A4a75004f-b98d-4a70-80b8-cc1c93a16ae6" class="calibre13">Chpater 6<br class="calibre8"/> 第六章 Arduino典型传感器使用</h2> 
+ <p class="calibre3">机器人是由计算机控制的复杂机器，它具有与人类似的肢体及感官功能。机器需要传感器提供必要的信息，以正确地执行相关的操作。机器人传感器在机器人的控制中起了非常重要的作用，正因为有了传感器，机器人才具备了智能功能和反应能力。本章介绍一些典型传感器在Arduino中的使用方法。</p> 
+ <h3 id="A4136dd4f-7878-456f-8688-6e2e263d1c4c" class="calibre14">6.1 超声波测距传感器</h3> 
+ <p class="calibre3">在机器人的应用中，避障可以说是各种机器人最基本的功能。超声波传感器是一种最常用的无线测距传感器，而且是一种很重要的传感器，下面介绍它的使用方法。</p> 
+ <h4 class="sigil_not_in_toc" id="Afd8a004f-5de5-46ca-887f-d41a3f8cb16a">6.1.1 工作原理</h4> 
+ <p class="calibre3">超声波是振动频率高于20kHz的机械波。它具有频率高、波长短、绕射现象小的特点，特别是方向性好、能够成为射线而定向传播。超声波对液体、固体的穿透力很强，尤其是在不透光的固体中。超声波碰到杂质或分界面会产生显著的反射形成反射回波，碰到活动的物体能产生多普勒效应。超声波传感器广泛应用在工业、国防、生物医学等方面。</p> 
+ <p class="calibre3">超声波测距的原理是通过测量声波在发射后遇到障碍物反射回来的时间差计算出发射点到障碍物的实际距离。</p> 
+ <p class="calibre3">测距公式为：</p> 
+ <div class="right">
+  <img alt="" class="u136" src="../Images/80_01.jpg" width="1082" height="68"/>
+ </div> 
+ <p class="left">式中，<i class="calibre17">L</i>为距离长度；<i class="calibre17">V</i>为超声波速度（在20℃时为340m/s）；<i class="calibre17">T</i>1为起始时间；<i class="calibre17">T</i>2为结束时间。</p> 
+ <p class="calibre3">速度乘以时间差等于来回的距离，除以2可以得到实际的距离。</p> 
+ <h4 class="sigil_not_in_toc" id="A78ae0050-17e5-4726-8d9f-ac8c8a4f6661">6.1.2 超声波测距传感器</h4> 
+ <p class="calibre3">超声波测距传感器根据不同的测距要求选择传感器，如图6-1所示是典型的超声波测距传感器。</p> 
+ <div class="center"> 
+  <img alt="" class="u137" src="../Images/81_01.jpg" width="1280" height="306"/> 
+  <p class="imgtitle">图6-1 超声波测距传感器</p> 
+ </div> 
+ <p class="calibre3">下面以典型的HC-SR04超声波测距传感器为例进行说明。</p> 
+ <p class="calibre3">HC-SR04超声波测距模块可提供2cm～400cm的非接触式距离感测功能，测距精度可高达3mm。该模块包括超声波发射器、接收器与控制电路。</p> 
+ <p class="calibre3">超声波模块的四个接口端引脚定义。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/81_02.jpg" width="40" height="44"/>Vcc供5V电源。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/81_03.jpg" width="40" height="45"/>GND为地线。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/81_04.jpg" width="40" height="44"/>Trig触发控制信号输入。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/81_05.jpg" width="40" height="44"/>Echo回响信号输出等。</p> 
+ <p class="calibre3">HC-SR04基本工作原理：</p> 
+ <p class="calibre3">（1）采用I/O口Trig触发测距，给最少10us的高电平信呈。</p> 
+ <p class="calibre3">（2）模块自动发送8个40kHz的方波，自动检测是否有信号返回。</p> 
+ <p class="calibre3">（3）有信号返回，通过I/O口ECHO输出一个高电平，高电平持续的时间就是超声波从发射到返回的时间。测试距离=（高电平时间∗声速（340m/s））/2。</p> 
+ <p class="calibre3">HC-SR04工作时序图如图6-2所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u138" src="../Images/81_06.jpg" width="1280" height="585"/> 
+  <p class="imgtitle">图6-2 HC-SR04工作时序图</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A07370051-585b-4300-af2d-d03dd50adfab">6.1.3 编程实现</h4> 
+ <p class="calibre3">Arduino UNO开发板与HC-SR04模块接线对应关系如表6-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-1 Arduino UNO开发板与HC-SR04模块接线对应关系</p>
+  <img alt="" class="u139" src="../Images/82_01.jpg" width="1280" height="206"/>
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与HC-SR04模块接线图如图6-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u140" src="../Images/82_02.jpg" width="1193" height="552"/> 
+  <p class="imgtitle">图6-3 Arduino UNO开发板与HC-SR04模块接线</p> 
+ </div> 
+ <p class="calibre3">启动Arduino IDE，选择“工具”＞“ArduBlock”命令，在弹出的窗口中输入超声波传感器测距并串口输出图形化程序，如图6-4所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u141" src="../Images/82_03.jpg" width="1280" height="415"/> 
+  <p class="imgtitle">图6-4 超声波传感器测距并串口输出图形化程序</p> 
+ </div> 
+ <p class="calibre3">单击“下载到Arduino”按钮将代码下载到Arduino开发板，同时生成Arduino代码，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u142" src="../Images/82_04.jpg" width="1280" height="210"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u143" src="../Images/83_01.jpg" width="1280" height="999"/>
+ </div> 
+ <p class="calibre3">程序运行结果如图6-5所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u144" src="../Images/83_02.jpg" width="1280" height="790"/> 
+  <p class="imgtitle">图6-5 超声波传感器运行结果</p> 
+ </div> 
+ <p class="calibre3">在实际使用过程中，市场上有许多Arduino的扩展板已经包含了超声波传感器的接口，如图6-6所示的是一个Arduino的扩展板，超声波传感器的接口是P5口。</p> 
+ <div class="center"> 
+  <img alt="" class="u145" src="../Images/84_01.jpg" width="959" height="699"/> 
+  <p class="imgtitle">图6-6 Arduino的扩展板</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Ae3c90053-9ff1-4bce-a48c-04cc205432da">6.1.4 实例：超声波避障</h4> 
+ <p class="calibre3">超声波传感器可以检测到前方障碍物的位置，因此利用超声波传感器可以制作超声波避障小车。如图6-7所示的是慧净小车机器人，超声波避障是其中的功能之一。超声波传感器和舵机装配，舵机控制超声波传感器测量左、中和右前方距离，如图6-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u146" src="../Images/84_02.jpg" width="718" height="509"/> 
+  <p class="imgtitle">图6-7 慧净小车机器人</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u147" src="../Images/84_03.jpg" width="614" height="510"/> 
+  <p class="imgtitle">图6-8 舵机控制超声波传感器的测量方向</p> 
+ </div> 
+ <p class="calibre3">超声波避障小车软件程序流程图如图6-9所示。</p> 
+ <p class="calibre3">超声波避障小车接线对应关系如表6-2所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-2 超声波避障小车接线对应关系</p>
+  <img alt="" class="u148" src="../Images/84_04.jpg" width="1280" height="357"/>
+ </div> 
+ <div class="center"> 
+  <p class="imgtitle">（续）</p>
+  <img alt="" class="u149" src="../Images/85_01.jpg" width="1280" height="183"/>
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u150" src="../Images/85_02.jpg" width="767" height="1025"/> 
+  <p class="imgtitle">图6-9 超声波避障小车软件程序流程图</p> 
+ </div> 
+ <p class="calibre3">Arduino Uno超声波避障控制程序中的超声波测距的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u151" src="../Images/85_03.jpg" width="1280" height="717"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u152" src="../Images/86_01.jpg" width="1280" height="1764"/>
+ </div> 
+ <p class="calibre3">详细代码见本书的附带代码“Ultrasonic_Obstacle_Avoidance.ino”。</p> 
+ <p class="calibre3">演示结果如图6-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u153" src="../Images/87_01.jpg" width="1151" height="649"/> 
+  <p class="imgtitle">图6-10 超声波避障演示</p> 
+ </div> 
+ <p class="calibre3">HC-SR04超声波测距模块可提供2cm～400cm的感测距离，如果需要更长的感应距离，可选用RB URF02超声波传感器，如图6-11所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u154" src="../Images/87_02.jpg" width="723" height="645"/> 
+  <p class="imgtitle">图6-11 RB URF02超声波传感器</p> 
+ </div> 
+ <p class="calibre3">RB URF02超声波传感器是RB URF v1.1超声波传感器的升级产品，在保留原有功能的基础上，新增了模式选择功能，有两种模式可选择：单线模式只需要一根信号线，大大减少了I/O口资源；双线模式与原有功能一样，分别需要一根输入和输出信号线。侦测距离和精度也有较大提高，可达1cm～500cm，其在有效探测范围内自动标定，无须任何人工调整就可以获得障碍物的准确位置。使机器人像蝙蝠一样通过声呐来感知周围的环境，只需要在Arduino微控制器中编写一小段程序，就可以根据机器人与障碍物的距离精确地控制机器人的电机运行，从而使机器人轻松地避开障碍物，是机器人领域常用的测距避障模块。</p> 
+ <p class="calibre3">使用超声波测距传感器可以测距，因此除了避障功能，也可以实现超声波目标跟随，实现自动跟随，编程原理与避障相同。</p> 
+ <h3 id="A568ea360-9f6f-46fe-84b3-a882ac9f648a" class="calibre14">6.2 红外光电传感器</h3> 
+ <p class="calibre3">光电传感器是采用光电元件作为检测元件的传感器。它首先把被测量的变化转换成光信号的变化，然后借助光电元件进一步将光信号转换成电信号。</p> 
+ <h4 class="sigil_not_in_toc" id="A96710056-f6c8-4c71-8cb5-254bdafbd872">6.2.1 工作原理</h4> 
+ <p class="calibre3">光电传感器是通过把光强度的变化转换成电信号的变化来实现控制的。光电传感器在一般情况下，由3部分构成，分别为：发送器、接收器和检测电路。</p> 
+ <p class="calibre3">发送器对准目标发射光束，发射的光束一般来源于半导体光源、发光二极管、激光二极管及红外发射二极管，光束不间断地发射或者改变脉冲宽度。接收器由光电二极管、光电三极管、光电池组成。在接收器的前面装有光学元件，如透镜和光圈等。在其后面是检测电路，它能滤出有效信号并应用该信号。此外，光电开关的结构元件中还有发射板和光导纤维。</p> 
+ <p class="calibre3">光电传感器有4种分类。</p> 
+ <p class="calibre3">（1）槽型光电传感器：一个光发射器和一个接收器面对面地装在一个槽的两侧，发光器能发出光，在无阻情况下光接收器能够收到光，从槽中通过被检测物体时，光被遮挡，输出两种不同的值。</p> 
+ <p class="calibre3">（2）对射型光电传感器：若把发光器和收光器之间的距离加大，就可以使检测距离加大。这样的光电开关就称为对射分离式光电开关，简称对射式光电开关。它的检测距离可达几米乃至几十米。使用时把发光器和收光器分别装在两侧，检测物通过时阻挡光路，收光器输出两种不同的值。</p> 
+ <p class="calibre3">（3）反光板型光电开关：把发光器和收光器装入同一个装置内，如果在收光器的前方装有一块挡板，就会发生反射。正常情况下，发光器发出的光被挡板反射回来被接收器收到；有没有挡板收光器会输出两种不同的值。</p> 
+ <p class="calibre3">（4）扩散反射型光电开关：检测头里装有一个发光器和一个收光器。正常情况下，发光器发出的光收光器收不到。当有检测物体时，把光部分反射回来，收光器就收到光信号，输出一个不同的值。如图6-12所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u155" src="../Images/88_01.jpg" width="835" height="658"/> 
+  <p class="imgtitle">图6-12 扩散反射型光电开关</p> 
+ </div> 
+ <p class="calibre3">红外光电传感器是通过把红外光强度的变化转换成电信号的变化来实现控制的。一般情况下，由3部分构成，分别为：发送器、接收器和检测电路。</p> 
+ <p class="calibre3">红外光电传感器不像超声波传感器可以检测前方障碍物与自己的距离，只能在设定后判断前方是否有障碍物，输出的是一个开关型的变量。</p> 
+ <h4 class="sigil_not_in_toc" id="Ab1560057-b309-4250-9017-6e59ce4438eb">6.2.2 编程实现</h4> 
+ <p class="calibre3">下面以常用的E18-D80NK红外光电传感器说明编程实现。</p> 
+ <p class="calibre3">E18-D80NK是一种集发射与接收于一体的光电传感器。检测距离可以根据要求进行调节。该传感器具有探测距离远、受可见光干扰小、价格便宜、易于装配、使用方便等特点，可以广泛应用于机器人避障、流水线计件等众多自动化产品。</p> 
+ <p class="calibre3">E18-D80NK光电开关有3根接线：棕色，VCC正极；蓝色，GND负极；黑色，OUT信号。尾部的电位器旋钮用于调节检测距离，如图6-13所示。</p> 
+ <p class="calibre3">Arduino UNO开发板与两个E18-D80NK模块接线对应关系如表6-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u156" src="../Images/89_01.jpg" width="1280" height="504"/> 
+  <p class="imgtitle">图6-13 E18-D80NK光电开关</p> 
+ </div> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-3 Arduino UNO开发板与E18-D80NK模块接线对应关系</p>
+  <img alt="" class="u119" src="../Images/89_02.jpg" width="1280" height="225"/>
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与两个E18-D80NK模块接线图如图6-14所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u157" src="../Images/89_03.jpg" width="1280" height="528"/> 
+  <p class="imgtitle">图6-14 Arduino UNO开发板与E18-D80NK模块接线</p> 
+ </div> 
+ <p class="calibre3">启动Arduino IDE，在菜单栏中选择“工具”＞“ArduBlock”命令，在弹出的窗口中输入超声波传感器测距并串口输出图形化程序，如图6-15所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u158" src="../Images/89_04.jpg" width="1280" height="289"/> 
+  <p class="imgtitle">图6-15 红外开关值测量并串口输出图形化程序</p> 
+ </div> 
+ <p class="calibre3">单击“下载到Arduino”按钮将代码下载到Arduino开发板，同时生成Arduino代码，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u159" src="../Images/90_01.jpg" width="1280" height="698"/>
+ </div> 
+ <p class="calibre3">在程序运行之前需要调节尾部的电位器旋钮确定检测的距离范围，在测量距离内如果有障碍物，返回0，否则返回1。</p> 
+ <p class="calibre3">程序运行结果如图6-16所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u160" src="../Images/90_02.jpg" width="1280" height="785"/> 
+  <p class="imgtitle">图6-16 E18-D80NK红外光电传感器运行结果</p> 
+ </div> 
+ <p class="calibre3">如果需要检测更远的距离，可使用E18-D80NK-N红外光电传感器，E18-D80NK-N是E18-D80NK的升级版。改动部分主要是内部电路板和外部连线。传感器外部接线，在末端增加了杜邦头，方便用户使用。E18-D80NK-N是一种集发射与接收于一体的光电传感器，发射光经过调制后发出，接收头对反射光进行解调输出，有效地避免了可见光的干扰。透镜的使用，也使得这款传感器最远可以检测80厘米距离的问题（由于红外光的特性，不同颜色的物体，能探测的最大距离也有不同：白色物体最远，黑色物体最近）。</p> 
+ <p class="calibre3">检测障碍物的距离可以根据要求通过尾部的电位器旋钮进行调节。该传感器具有探测距离远、受可见光干扰小、价格便宜、易于装配、使用方便等特点，可以广泛应用于机器人避障、流水线计件等众多场合。</p> 
+ <h4 class="sigil_not_in_toc" id="A50a2005a-9e67-46c1-aece-d81110090e9d">6.2.3 实例：红外循迹和避障</h4> 
+ <p class="calibre3"><b class="calibre6">1．红外循迹</b></p> 
+ <p class="calibre3">小车智能循迹指的是小车在白色地板上循黑线行走，通常采取的方法是红外探测法。红外探测法，即利用红外线在不同颜色的物体表面具有不同的反射强度的特点，在小车行驶过程中不断地向地面发射红外光，当红外光遇到白色地面时发生漫反射，反射光被装在小车上的接收管接收；如果遇到黑线则红外光被吸收，小车上的接收管接收不到红外光，从而提供了用于后期逻辑电路计算的信号。</p> 
+ <p class="calibre3">市场上有很多循迹小车，典型的循迹小车如图6-17所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u161" src="../Images/91_01.jpg" width="1137" height="611"/> 
+  <p class="imgtitle">图6-17 循迹小车</p> 
+ </div> 
+ <p class="calibre3">红外循迹小车接线对应关系如表6-4所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-4 红外循迹小车接线对应关系</p>
+  <img alt="" class="u162" src="../Images/91_02.jpg" width="1280" height="487"/>
+ </div> 
+ <p class="calibre3">代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u163" src="../Images/92_01.jpg" width="1280" height="1813"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u164" src="../Images/93_01.jpg" width="1280" height="1110"/>
+ </div> 
+ <p class="calibre3">在循迹演示之前需要调节尾部的电位器旋钮，确定黑线返回0，白线返回1。具体步骤如下：</p> 
+ <p class="calibre3">（1）将循迹小车前部的红外传感器放置在黑线上，调节尾部的电位器旋钮，使尾部的指示灯灭。</p> 
+ <p class="calibre3">（2）将循迹小车前部的红外传感器放置在白线上，调节尾部的电位器旋钮，使尾部的指示灯亮。</p> 
+ <p class="calibre3">演示结果如图6-18所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u165" src="../Images/93_02.jpg" width="793" height="524"/> 
+  <p class="imgtitle">图6-18 红外循迹</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．红外避障</b></p> 
+ <p class="calibre3">红外光电传感器可用于机器人行走避障，其原理是：发射管发射出一定频率的红外线，当检测方向遇到障碍物（反射面）时，红外线反射回来被接收管接收，判断前方是否有障碍物。可通过电位器设置阀值，设置前方的检测距离。正前方有障碍时指示灯亮起，OUT引脚为低电平，反之为高电平。</p> 
+ <p class="calibre3">市场上有很多红外避障机器人，典型的红外避障机器人如图6-19所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u166" src="../Images/94_01.jpg" width="900" height="633"/> 
+  <p class="imgtitle">图6-19 红外避障机器人</p> 
+ </div> 
+ <p class="calibre3">红外避障机器人的演示如图6-20所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u167" src="../Images/94_02.jpg" width="1154" height="654"/> 
+  <p class="imgtitle">图6-20 红外避障机器人的演示</p> 
+ </div> 
+ <h3 id="A643f0af4-15d8-4b28-8f57-a79ea5a76d5f" class="calibre14">6.3 温度传感器</h3> 
+ <p class="calibre3">温度传感器（Temperature Transducer）是指能感受温度并转换成可用输出信号的传感器。温度传感器是温度测量仪表的核心部分，品种繁多。按测量方式不同，可将温度传感器分为接触式和非接触式两大类；按照传感器材料及电子元件特性不同，可将温度传感器分为热电阻和热电偶两类；按照温度传感器输出信号的模式不同，可将温度传感器大致划分为三大类：数字式温度传感器、逻辑输出温度传感器和模拟式温度传感器。</p> 
+ <h4 class="sigil_not_in_toc" id="Ac714005d-5b78-4f17-80af-5aef0aaee7ae">6.3.1 模拟温度传感器</h4> 
+ <p class="calibre3">常用的模拟温度传感器有热电偶和热电阻两大类。热电偶的工作原理是基于热电效应，将被测温度的大小转变为热电势的大小，热电偶主要测高温度源。热电阻是将被测温度转换成电阻变化的传感器，敏感元件是金属热敏电阻，广泛应用于环境温度监测。</p> 
+ <p class="calibre3">如图6-21所示为常用的热敏电阻传感器模块，分为三线制和四线制。三线制有3个引脚：Vcc（电源）、GND（地）、S（信号）；四线制有4个引脚：Vcc（电源）、GND（地）、DO（数字量输出接口，输出为0或1）、AO（模拟量输出接口）。</p> 
+ <div class="center"> 
+  <img alt="" class="u168" src="../Images/95_01.jpg" width="1280" height="312"/> 
+  <p class="imgtitle">图6-21 热敏电阻温度传感器模块</p> 
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与三线制热敏电阻温度传感器模块接线图如图6-22所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u169" src="../Images/95_02.jpg" width="1280" height="603"/> 
+  <p class="imgtitle">图6-22 Arduino UNO开发板与热敏电阻温度传感器模块接线图</p> 
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与热敏电阻温度传感器的接线关系如表6-5所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-5 Arduino UNO开发板与热敏电阻温度传感器的接线关系</p>
+  <img alt="" class="u170" src="../Images/95_03.jpg" width="1280" height="186"/>
+ </div> 
+ <p class="calibre3">启动Arduino IDE，在菜单栏中选择“工具”＞“ArduBlock”命令，在弹出的窗口中输入模拟温度传感器测量并串口输出图形化程序，如图6-23所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u171" src="../Images/95_04.jpg" width="1199" height="153"/> 
+  <p class="imgtitle">图6-23 模拟温度传感器测量并串口输出图形化程序</p> 
+ </div> 
+ <p class="calibre3">单击“下载到Arduino”按钮将代码下载到Arduino开发板，同时生成Arduino代码，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u172" src="../Images/96_01.jpg" width="1280" height="441"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/96_02.jpg" width="48" height="56"/>和“下载”<img alt="" class="u173" src="../Images/96_03.jpg" width="47" height="56"/>按钮，下载完成后，在Arduino IDE的菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图6-24所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u174" src="../Images/96_04.jpg" width="982" height="714"/> 
+  <p class="imgtitle">图6-24 程序运行结果</p> 
+ </div> 
+ <p class="calibre3">再进一步，将获取的模拟值转换为温度值，修改的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u175" src="../Images/96_05.jpg" width="1280" height="643"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u176" src="../Images/97_01.jpg" width="1280" height="179"/>
+ </div> 
+ <p class="calibre3">运行结果如图6-25所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u177" src="../Images/97_02.jpg" width="1280" height="962"/> 
+  <p class="imgtitle">图6-25 转换后的温度值</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Ade1f0060-9ccd-4cbf-ab66-bb6c0dd852b3">6.3.2 数字温度传感器</h4> 
+ <p class="calibre3">数字温度传感器采用了数字信号输出技术，数字温度传感器与传统的热敏电阻有所不同的是使用集成芯片，采用单总线技术，其能够有效地减小外界的干扰，提高测量的精度，同时它可以直接将被测温度转化成串行数字信号供微机处理，接口简单，使数据传输和处理简单化。</p> 
+ <p class="calibre3">DHT11数字温湿度传感器是一种集温度、湿度于一体的复合传感器，直接输出数字信号，和计算机之间采用串行接口，计算机能够直接读取，输出数据包括5个字节，分别是：湿度整数位、湿度小数位、温度整数位、温度小数位及校验和，其中校验和为湿度与温度之和的最低8位数据。</p> 
+ <p class="calibre3">DHT11是一款有已校准数字信号输出的温湿度传感器。其精度湿度为+-5%RH，温度为+-2℃，量程湿度为20%～90%RH，温度为0～50℃。产品为4针单排引脚封装，连接方便。如图6-26所示。</p> 
+ <p class="calibre3">市场上已经有很多种类封装的DHT11温湿度传感器，如图6-27所示，DHT11数字温湿度传感器模块为3针PH2.0封装，连接方便。</p> 
+ <p class="calibre3">Arduino UNO开发板与DHT11温湿度传感器的接线关系如表6-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u178" src="../Images/98_01.jpg" width="750" height="566"/> 
+  <p class="imgtitle">图6-26 DHT11数字温湿度传感器</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u179" src="../Images/98_02.jpg" width="1206" height="544"/> 
+  <p class="imgtitle">图6-27 DHT11封装</p> 
+ </div> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-6 Arduino UNO开发板与DHT11温湿度传感器的接线关系</p>
+  <img alt="" class="u180" src="../Images/98_03.jpg" width="1280" height="182"/>
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与DHT11温湿度传感器的接线图如图6-28所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u181" src="../Images/98_04.jpg" width="1280" height="450"/> 
+  <p class="imgtitle">图6-28 Arduino UNO开发板与DHT11温湿度传感器的接线图</p> 
+ </div> 
+ <p class="calibre3">启动Arduino IDE，输入下列代码：</p> 
+ <div class="center">
+  <img alt="" class="u182" src="../Images/98_05.jpg" width="1280" height="128"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u183" src="../Images/99_01.jpg" width="1280" height="1858"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u184" src="../Images/100_01.jpg" width="1280" height="439"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/100_02.jpg" width="48" height="56"/>和“下载”<img alt="" class="u103" src="../Images/100_03.jpg" width="48" height="56"/>按钮，将例程上传到Arduino控制器中，下载完成后，在Arduino IDE的菜单栏中选择：“工具”＞“串口监视器”命令，运行结果如图6-29所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u185" src="../Images/100_04.jpg" width="1012" height="609"/> 
+  <p class="imgtitle">图6-29 DHT11输出结果</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Af37b0063-a889-4547-9788-c1d5011bcda1">6.3.3 实例：使用DHT库读取温湿度</h4> 
+ <p class="calibre3">本节调用DHT11库实现温湿度的读取，DHT11库的下载地址：https：//github.com/CainZ/DHT/，如图6-30所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u186" src="../Images/100_05.jpg" width="1023" height="745"/> 
+  <p class="imgtitle">图6-30 DHT11库下载地址</p> 
+ </div> 
+ <p class="calibre3">下载的文件“DHT-master.zip”，解压复制到arduino-1.8.4\ libraries目录下，如图6-31所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u187" src="../Images/101_01.jpg" width="939" height="325"/> 
+  <p class="imgtitle">图6-31 复制DHT11库</p> 
+ </div> 
+ <p class="calibre3">在Arduino IDE输入如下代码：</p> 
+ <div class="center">
+  <img alt="" class="u188" src="../Images/101_02.jpg" width="1280" height="1357"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u189" src="../Images/102_01.jpg" width="1280" height="51"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/102_02.jpg" width="48" height="56"/>和“下载”<img alt="" class="u173" src="../Images/102_03.jpg" width="47" height="56"/>按钮，下载完成后，在Arduino IDE的菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图6-32所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u190" src="../Images/102_04.jpg" width="1217" height="1202"/> 
+  <p class="imgtitle">图6-32 调用DHT11库运行结果</p> 
+ </div> 
+ <p class="calibre3">DHT22数字温湿度传感器是一款含有已校准数字信号输出的温湿度复合传感器。它应用专用的数字模块采集技术和温湿度传感技术，确保产品具有极高的可靠性与卓越的长期稳定性，如图6-33所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u191" src="../Images/102_05.jpg" width="752" height="640"/> 
+  <p class="imgtitle">图6-33 DHT22温湿度传感器</p> 
+ </div> 
+ <p class="calibre3">DHT22库的下载地址：https：//codeload.github.com/nethoncho/Arduino-DHT22/zip/master，使用方法同DHT11库的使用。</p> 
+ <h3 id="Ae875e258-dab5-4d10-88b7-986aa2a6e4e5" class="calibre14">6.4 光敏传感器</h3> 
+ <p class="calibre3">光敏传感器是把光信号变成电信号的一种传感器，它是利用半导体的光电效应制成的一种电阻值随入射光的强弱而改变的电阻器，入射光强，电阻减小，入射光弱，电阻增大。光敏传感器实质是一个光敏电阻，根据光的照射强度会改变其自身的阻值。典型的光敏电阻传感器如图6-34所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u192" src="../Images/103_01.jpg" width="1280" height="370"/> 
+  <p class="imgtitle">图6-34 光敏传感器</p> 
+ </div> 
+ <p class="calibre3">光敏电阻传感器一般有3个引脚：“+”——电源；“-”——地；“S”——信号。S是一个模拟输入口，连接Arduino的一个模拟输入引脚，</p> 
+ <p class="calibre3">Arduino UNO开发板与光敏电阻传感器的接线关系如表6-7所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-7 Arduino UNO开发板与光敏电阻传感器的接线关系</p>
+  <img alt="" class="u193" src="../Images/103_02.jpg" width="1280" height="186"/>
+ </div> 
+ <p class="calibre3">将光敏电阻的S端接在一个模拟输入口A2，光强的变化会改变阻值，从而改变S端的输出电压。将S端的电压读出，使用串口输出到计算机以显示结果。</p> 
+ <p class="calibre3">因为AVR是10位的采样精度，输出值为0～1023。当光照强烈的时候，值减小；当光照减弱的时候，值增加；完全遮挡光线，值最大。</p> 
+ <p class="calibre3">Arduino的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u194" src="../Images/103_03.jpg" width="1280" height="303"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u195" src="../Images/104_01.jpg" width="1280" height="221"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/104_02.jpg" width="48" height="57"/>和“下载”<img alt="" class="u103" src="../Images/104_03.jpg" width="48" height="57"/>按钮，下载完成后，在Arduino IDE的菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图6-35所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u196" src="../Images/104_04.jpg" width="1260" height="1049"/> 
+  <p class="imgtitle">图6-35 光敏传感器运行结果</p> 
+ </div> 
+ <h3 id="Ab9ea5e73-6705-4e9a-bfb5-b47b53e00ce9" class="calibre14">6.5 魔术光杯</h3> 
+ <p class="calibre3">魔术光杯包含两个一样的模块，每个模块由一个LED灯和一个水银开关组成。如图6-36所示，它总共有4个引脚，各引脚意义如下：</p> 
+ <div class="center"> 
+  <img alt="" class="u197" src="../Images/104_05.jpg" width="1211" height="503"/> 
+  <p class="imgtitle">图6-36 魔术光杯</p> 
+ </div> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/105_01.jpg" width="40" height="44"/>-：接GND。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/105_02.jpg" width="40" height="45"/>+：接Vcc。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/105_03.jpg" width="40" height="44"/>S：输出引脚，输出水银开关的状态。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/105_04.jpg" width="40" height="44"/>L：输入引脚，控制LED灯。</p> 
+ <p class="calibre3">实现效果：利用水银开关来检测模块的倾斜状态，用PWM波来控制独立的LED，使其可以有亮暗的不同程度的变化，两者结合，当水银开关检测倾斜时，LED灯会越来越暗，另一个灯会越来越亮，使之像心跳一样。</p> 
+ <p class="calibre3">Arduino UNO开发板与魔术光杯的接线关系如表6-8所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-8 Arduino UNO开发板与魔术光杯的接线关系</p>
+  <img alt="" class="u198" src="../Images/105_05.jpg" width="1280" height="284"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中输入下列代码：</p> 
+ <div class="center">
+  <img alt="" class="u199" src="../Images/105_06.jpg" width="1280" height="1037"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u200" src="../Images/106_01.jpg" width="1280" height="396"/>
+ </div> 
+ <h3 id="Ad5692476-f922-4fe2-902f-0290e8fa65d5" class="calibre14">6.6 手势识别传感器</h3> 
+ <p class="calibre3">什么是3D手势识别传感器？所谓3D，顾名思义就是指三维、三个维度、三个坐标，即有长、宽、高。3D手势识别就是能在立体的空间进行手势识别，采用电近场传感技术，可以把传感器放在塑料盒子里实现手势识别和距离感应。</p> 
+ <p class="calibre3">手势识别模块（Gesture Sensor）使用I<sup class="calibre9">2</sup>C接口，使用相应的Arduino库函数即可对编程控制，手势识别模块返回的信号可作为机器人接收的控制信号，可用于非接触式控制场景，如非接触式鼠标、智能家居、汽车点击设备控制、机器人交互等，可以实现对机器人的控制。内置的识别算法相当智能，能够把双手从生硬的按键中解放出来。</p> 
+ <p class="calibre3">DFRobot 3D手势识别传感器是一款集成3D手势识别和运动跟踪于一体的交互式传感器，传感器可以在有效范围内识别手指的顺时针/逆时针转动方向和手指的运动方向等。传感器基于Microchip专利的GestIC<img alt="" class="u201" src="../Images/106_02.jpg" width="30" height="31"/>技术，采用电近场传感技术，包括开发3D手势输入传感系统所有的块图，具有先进的3D信号处理单元，有效检测距离为0～10cm。如图6-37所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u202" src="../Images/106_03.jpg" width="664" height="452"/> 
+  <p class="imgtitle">图6-37 DFRobot 3D手势识别传感器</p> 
+ </div> 
+ <p class="calibre3">技术规格如下：工作电压：3.3V～5V，接口类型：I<sup class="calibre9">2</sup>C，I<sup class="calibre9">2</sup>C地址：0x42，手势感应：5cm，距离感应：10cm，工作温度范围：-20℃～+85℃，空间分辨率：150dpi。</p> 
+ <p class="calibre3">此传感器可以应用于各类互动交互艺术产品，试想一下，挥一挥手，打开台灯，挥一挥手，打开音乐，一切尽在弹指间。</p> 
+ <p class="calibre3">DFRobot 3D手势识别传感器引脚说明如表6-9所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-9 DFRobot 3D手势识别传感器引脚说明</p>
+  <img alt="" class="u203" src="../Images/106_04.jpg" width="1280" height="305"/>
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与DFRobot 3D手势识别传感器模块接线图如图6-38所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u204" src="../Images/107_01.jpg" width="747" height="997"/> 
+  <p class="imgtitle">图6-38 Arduino UNO开发板与DFRobot 3D手势识别传感器模块接线</p> 
+ </div> 
+ <p class="calibre3">把手势识别传感器库文件“DFRobot_Gesture.zip”从网站上下载下来，将整个压缩包解压到Arduino IDE的libraries文件夹中。详细信息请参考http://wiki.dfrobot.com.cn/。</p> 
+ <p class="calibre3">打开Arduino IDE，可以在Arduino IDE的菜单栏中选择“文件”＞“示例”命令，可以看到新增加的“DFRobot_Gesture”命令，选择“_3_D_Gesture_Test”命令，如图6-39所示，即可打开手势识别传感器的示例程序。</p> 
+ <div class="center"> 
+  <img alt="" class="u205" src="../Images/107_02.jpg" width="1280" height="691"/> 
+  <p class="imgtitle">图6-39 手势识别传感器的示例程序</p> 
+ </div> 
+ <p class="calibre3">示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u206" src="../Images/108_01.jpg" width="1280" height="1815"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u207" src="../Images/109_01.jpg" width="1280" height="179"/>
+ </div> 
+ <p class="calibre3">奥松机器人推出的手势识别传感器（Gesture Sensor）模块是基于APDS-9960传感器的一款能够识别手势移动方向（上、下、左、右）的传感器模块，如图6-40所示。APDS-9960芯片集成了RGB、环境光、接近和手势检测功能。模块使用I<sup class="calibre9">2</sup>C接口，使用相应的Arduino库函数即可对编程进行控制，传感器返回的信号可作为机器人接收的控制信号，从而实现对机器人的控制。内置的识别算法相当智能，能够把双手从生硬的按键中解放出来，使用方法和上面相同。</p> 
+ <div class="center"> 
+  <img alt="" class="u208" src="../Images/109_02.jpg" width="750" height="730"/> 
+  <p class="imgtitle">图6-40 Gesture Sensor模块</p> 
+ </div> 
+ <h3 id="Ac047ee4e-f29a-4b36-9c5b-5f58dc29881b" class="calibre14">6.7 颜色传感器</h3> 
+ <h4 class="sigil_not_in_toc" id="A32de006c-a1b1-4387-82c3-d007f1d222d9">6.7.1 颜色传感器介绍</h4> 
+ <p class="calibre3">颜色传感器是一种传感装置，是将物体颜色同已经设置过的参考颜色进行比较来检测颜色的装置。当两个颜色在一定的误差范围内相吻合时，输出检测结果。</p> 
+ <p class="calibre3">TCS3200颜色传感器是一款全彩的颜色检测器，包括一块TAOS TCS3200RGB感应芯片和4个白色LED灯。TCS3200能在一定的范围内检测和测量几乎所有的可见光。TCS3200有大量的光检测器，每个都有红、绿、蓝和清除4种滤光器。每6种颜色滤光器均匀地按数组分布来清除颜色中偏移位置的颜色分量。内置的振荡器能输出方波，其频率与所选择的光的强度成比例关系。典型的TCS3200颜色传感器如图6-41所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u209" src="../Images/109_03.jpg" width="1280" height="525"/> 
+  <p class="imgtitle">图6-41 TCS3200颜色传感器</p> 
+ </div> 
+ <p class="calibre3">TCS3200颜色传感器引脚如图6-42所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u210" src="../Images/110_01.jpg" width="638" height="381"/> 
+  <p class="imgtitle">图6-42 TCS3200颜色传感器引脚</p> 
+ </div> 
+ <p class="calibre3">TCS3200颜色传感器引脚说明如表6-10所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-10 TCS3200颜色传感器引脚说明</p>
+  <img alt="" class="u211" src="../Images/110_02.jpg" width="1280" height="312"/>
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A2a5d006d-687a-44c5-b8ca-cb0d47921282">6.7.2 颜色识别过程</h4> 
+ <p class="calibre3">TCS3002有4种滤波类型：红、蓝、绿和清除全部光信息，以最大限度地降低入射光幅射的不均匀性，从而增加精确度和简化光学。当入射光投射到TCS3200D上时，通过光电二极管控制引脚S2、S3的不同组合，可以选择不同的滤波器，如表6-11所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-11 引脚S2、S3的不同组合对应不同的滤波器</p>
+  <img alt="" class="u212" src="../Images/110_03.jpg" width="1280" height="232"/>
+ </div> 
+ <p class="calibre3">TCS3200D输出不同频率的方波（占空比50%），不同的颜色和光强对应不同频率的方波，输出频率与光强度呈线性关系。该转换器典型输出频率范围为2Hz～500kHz，用户可通过两个可编程引脚来选择100%、20%或2%的输出比例因子，如表6-12所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-12 引脚S0、S1的不同组合对应不同的频率</p>
+  <img alt="" class="u213" src="../Images/110_04.jpg" width="1280" height="228"/>
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与TCS3200颜色传感器模块的接线关系如表6-13所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-13 Arduino UNO开发板与TCS3200颜色传感器模块的接线关系</p>
+  <img alt="" class="u214" src="../Images/111_01.jpg" width="1280" height="356"/>
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与TCS3200颜色传感器模块的接线图如图6-43所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u215" src="../Images/111_02.jpg" width="1280" height="551"/> 
+  <p class="imgtitle">图6-43 Arduino UNO开发板与TCS3200颜色传感器模块的接线</p> 
+ </div> 
+ <p class="calibre3">在Arduino IDE输入如下代码（详细信息请参考网站http://wiki.dfrobot.com.cn/）：</p> 
+ <div class="center">
+  <img alt="" class="u216" src="../Images/111_03.jpg" width="1280" height="667"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u217" src="../Images/112_01.jpg" width="1280" height="1835"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u218" src="../Images/113_01.jpg" width="1280" height="786"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/113_02.jpg" width="48" height="56"/>和“下载”<img alt="" class="u103" src="../Images/113_03.jpg" width="48" height="56"/>按钮，下载完成后，在Arduino IDE的菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图6-44所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u219" src="../Images/113_04.jpg" width="1041" height="774"/> 
+  <p class="imgtitle">图6-44 TCS3200颜色传感器运行结果</p> 
+ </div> 
+ <p class="calibre3">使用此模块前需要先校准，方法为在高亮白色光源下将255除以得到的RGB数据，得到比例系数后，再在代码输出数据时分别乘以比例系数，以修正RGB输出值，使它们的值相等。</p> 
+ <h3 id="A8d6c1f03-cfcc-4c22-be4e-f7d8e4cb31f2" class="calibre14">6.8 九轴姿态检测传感器</h3> 
+ <p class="calibre3">九轴姿态检测传感器基于MPU-9150开发而成，MPU-9150是世界上第一款集成了三轴陀螺仪、三轴加速度计及三轴磁力计的芯片。MPU-9150主要应用于低功耗、低价格和高性能消费电子产品，包含智能手机、平板电脑和可穿戴设备。MPU-9150包含3个16位ADC用于陀螺仪信号进行数字化输出、3个16位ADC用于加速度计信号数字化输出及3个13位ADC用于磁力计信号数字化输出，如图6-45所示。九轴姿态检测传感器可广泛应用于航模无人机、机器人、天线云台、聚光太阳能、地面及水下设备、虚拟现实、人体运动分析等需要低成本、高动态三维姿态测量的产品设备中。</p> 
+ <div class="center"> 
+  <img alt="" class="u220" src="../Images/114_01.jpg" width="630" height="598"/> 
+  <p class="imgtitle">图6-45 九轴姿态检测传感器</p> 
+ </div> 
+ <p class="calibre3">九轴姿态检测传感器的引脚定义：-——电源地；+——电源正极；SDA——I<sup class="calibre9">2</sup>C数据信号；SCL——I<sup class="calibre9">2</sup>C时钟信号。</p> 
+ <p class="calibre3">Arduino UNO开发板与九轴姿态检测传感器模块的接线关系如表6-14所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表6-14 Arduino UNO开发板与九轴姿态检测传感器模块的接线关系</p>
+  <img alt="" class="u221" src="../Images/114_02.jpg" width="1280" height="229"/>
+ </div> 
+ <p class="calibre3">Arduino UNO开发板与九轴姿态检测传感器模块的接线图如图6-46所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u222" src="../Images/114_03.jpg" width="932" height="1065"/> 
+  <p class="imgtitle">图6-46 Arduino UNO开发板与九轴姿态检测传感器模块的接线图</p> 
+ </div> 
+ <p class="calibre3">下载文件“RB-02S113九轴姿态检测传感器.zip”，将I<sup class="calibre9">2</sup>Cdev和Grove_IMU_9DOF_9250目录复制到arduino-1.8.4\ libraries目录下。</p> 
+ <p class="calibre3">在Arduino IDE输入如下代码（详细信息请参考http://www.alsrobot.cn/）：</p> 
+ <div class="center">
+  <img alt="" class="u223" src="../Images/115_01.jpg" width="1280" height="1705"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u224" src="../Images/116_01.jpg" width="1280" height="1837"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u225" src="../Images/117_01.jpg" width="1280" height="1857"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u226" src="../Images/118_01.jpg" width="1280" height="1844"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u227" src="../Images/119_01.jpg" width="1280" height="1734"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/119_02.jpg" width="48" height="56"/>和“下载”<img alt="" class="u103" src="../Images/119_03.jpg" width="48" height="56"/>按钮，下载完成后，在Arduino IDE的菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图6-47所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u228" src="../Images/120_01.jpg" width="1134" height="847"/> 
+  <p class="imgtitle">图6-47 九轴姿态检测传感器检测结果</p> 
+ </div> 
+ <h3 id="A55156b5d-b9f8-4176-b2e0-8076969e427a" class="calibre14">6.9 本章小结</h3> 
+ <p class="calibre3">本章介绍了一些典型传感器在Arduino中的使用方法。这些传感器包括超声波测距传感器、红外光电传感器、温度传感器、手势识别传感器、姿态检测传感器等，同时介绍了在Arduino中的工作原理、接线方法、编程实现和执行结果。</p> 
+</body>
+</html>

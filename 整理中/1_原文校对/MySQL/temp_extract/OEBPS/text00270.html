@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.5.5　GTID如何跳过事务冲突</h3>
+<p class="ziti">这个功能主要是跳过事务，代替第14章讲解的传统复制错误时使用的“set global sql_slave_skip_counter=1”。</p>
+<p class="ziti">由于在这里GTID必须是连续的，因此正常情况下，同一个服务器产生的GTID是不会存在空缺的，所以不能简单地skip掉一个事务，只能通过注入空事务的方法替换掉一个实际操作的事务。注入空事务的方法如下：</p>
+<hr/>
+<pre class="ziti1">stop slave;
+set gtid_next='xxx:N';
+begin;commit;
+set gtid_next='AUTOMAIC';
+start slave;</pre>
+<hr/>
+<p class="ziti">这里的“xxx：N”就是你的slave sql thread报错的GTID号，也即你想要跳过的GTID号。</p>
+<p class="ziti">案例如下：模拟在从库中先建立数据库inca，在主库中继续创建inca，制造冲突。</p>
+<p class="ziti">从库建立数据库inca的代码如下：</p>
+<hr/>
+<pre class="ziti1">[root@db02 opt]# mysql -e "create database inca;"</pre>
+<hr/>
+<p class="ziti">主库建立数据库inca的代码如下：</p>
+<hr/>
+<pre class="ziti1">[root@db01 opt]# mysql -e "create database inca;"</pre>
+<hr/>
+<p class="ziti">从库：</p>
+<hr/>
+<pre class="ziti1">[root@db02 opt]# mysql -e "show slave status\G;"
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 172.16.1.51
+           ...省略若干...
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: No
+                        ...省略若干...
+                   Last_Errno: 1007
+                   Last_Error: Error 'Can't create database 'inca'; database exists' on query. Default database: 'inca'. Query: 'create database inca'
+                 Skip_Counter: 0
+          Exec_Master_Log_Pos: 831
+              Relay_Log_Space: 1055
+           ...省略若干...
+        Seconds_Behind_Master: NULL
+Master_SSL_Verify_Server_Cert: No
+                Last_IO_Errno: 0
+                Last_IO_Error:
+               Last_SQL_Errno: 1007
+               Last_SQL_Error: Error 'Can't create database 'inca'; database exists' on query. Default database: 'inca'. Query: 'create database inca'
+  Replicate_Ignore_Server_Ids:
+           ...省略若干...
+     Last_SQL_Error_Timestamp: 170918 15:29:39
+               Master_SSL_Crl:
+           Master_SSL_Crlpath:
+           Retrieved_Gtid_Set: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d:3-5
+            Executed_Gtid_Set: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d:1-4,
+4c92bf66-0f0b-11e7-ba4a-000c292ece3f:1
+                Auto_Position: 1</pre>
+<hr/>
+<p class="ziti">故障解决实战：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; stop slave;     #&lt;==停止复制。
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; set gtid_next='4c92bf66-0f0b-11e7-ba4a-000c292ece3d:5';
+#&lt;==这里是上文“Retrieved_Gtid_Set:”里的最大事务号。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; begin;commit;    #&lt;==执行一个空事务。
+Query OK, 0 rows affected (0.00 sec)
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; set gtid_next='AUTOMATIC'; #&lt;==自动比较GTID，使复制继续进行。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; start slave;   #&lt;==开启复制。
+Query OK, 0 rows affected (0.32 sec)
+mysql&gt; show slave status\G   #&lt;==检查修复的结果。
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 172.16.1.51
+                  Master_User: rep
+                  Master_Port: 3306
+                 ...省略若干...
+             Relay_Master_Log_File: oldboy-bin.000002
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+           ...省略若干...
+             Master_UUID: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d
+             Master_Info_File: /application/mysql/data/master.info
+             Retrieved_Gtid_Set: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d:3-5
+            Executed_Gtid_Set: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d:1-5,
+4c92bf66-0f0b-11e7-ba4a-000c292ece3f:1
+                Auto_Position: 1
+1 row in set (0.00 sec)
+#&lt;==提示:有两个Yes，证明复制修复成功。</pre>
+<hr/>
+</body>
+</html>

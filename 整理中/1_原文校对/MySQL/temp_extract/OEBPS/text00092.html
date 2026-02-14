@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">6.2.2　SQL解析流程介绍</h3>
+<p class="ziti">为了让读者清晰地了解SQL解析的流程原理，老男孩特意用一张图来阐述，图6-2所示的即为SQL解析流程图。</p>
+<div class="pic"><img alt="" src="Image00036.jpg" />
+</div>
+<p class="middle-img">图6-2　SQL解析流程图</p>
+<p class="ziti">1）在图6-2中，当接收到SQL语句后，数据库首先会判断SQL语句的正确性、类型（例如DDL、DML、DCL），然后根据不同类型，由命令分发模块投递到相应的模块处理。如果是SELECT语句，则首先会查找SQL高速缓存（query_cache）；如果命中目标数据，则SQL不需要再做相应的解析执行操作，直接将请求的数据返回客户端应用程序即可。</p>
+<p class="ziti">2）如果用户请求的数据未在高速缓存中命中，那么会进入SQL的解析过程。</p>
+<p class="ziti">a）对于SQL层本身来说，其是无法直接读懂SQL语句的，不能直接执行。这时，就要靠SQL层的解析器（Parser）来进行SQL的词法、语法分析，最终得出1个或多个SQL语句的执行计划。</p>
+<p class="ziti">b）得出执行计划之后，还不能直接使用，因为解析器可能给出了一条SQL语句的多种执行方式，需要进行进一步的判断，那么哪条执行计划是最好的呢？这件事情将交由查询优化器（Optimizer）去判断。优化器会根据自身的算法，找到代价最低（一般是有合理索引的那条）的那个执行计划进行下发。（当然有些情况例外，不过其都是由优化器自身的算法来决定的，我们在将来的章节中会再进行分析，另外在不同的MySQL版本里，优化器中的处理又各不相同。）</p>
+<p class="ziti">c）这时我们已经找到合适的执行计划了，是否就可以执行查询了呢？其实SQL层中还有其他相关的模块控制，例如，是否有权限去执行、执行是否需要等待等。</p>
+<p class="ziti">d）经过SQL层的逐层处理，SQL终于被执行，然后将执行后的结果，投递到下层的存储引擎接口，最终经过存储引擎，获取到磁盘数据文件上的数据。</p>
+<p class="ziti">e）SQL执行完成后，会将此次获取的数据更新到查询缓存（若有特定情况则不会更新）。</p>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_208">11.1.1　多层负载均衡架构</h3>
+
+  <p class="ziti3">多层负载均衡架构是将网络数据在传输层与应用层分开进行负载的网络架构，在传输层使用专用的负载均衡设备或软件仅做网络分发，在应用层由Nginx进行流量路由、过滤、转发等操作。这种网络架构极大地发挥了Nginx对HTTP、HTTPS等七层协议请求的处理优势，同时提高了传输层负载均衡的效率，增加了负载集群的横向扩展能力。常见的多层负载均衡网络架构如图11-1所示。</p>
+
+  <p class="ziti4">·通常互联网接入都会考虑高可用的网络结构，按照网络进入的层级可以划分为接入层和负载层。</p>
+
+  <p class="ziti4">·接入层由高可用的主备双路由设备组成。</p>
+
+  <p class="ziti4">·多层负载均衡网络架构的负载层分为传输层负载和应用层负载。</p>
+
+  <p class="ziti4">·传输层负载由处理逻辑较少的传输层负载均衡设备或软件组成，通常传输层负载均衡会使用高性能的硬件F5、Radware等，也可以使用LVS自建服务器实现。在云环境中，传输层负载均衡通常由云服务商自建的负载均衡集群实现。</p>
+
+  <p class="ziti4">·应用层负载由多组Nginx集群组成。</p>
+
+  <p class="ziti4">·外网数据访问传输层负载均衡器的虚拟IP，访问请求被转发到后端的Nginx服务器，以实现网络数据的多层负载转发。</p>
+</body>
+</html>

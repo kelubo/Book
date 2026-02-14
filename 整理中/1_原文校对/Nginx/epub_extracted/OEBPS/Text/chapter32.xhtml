@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_39">2.6.4　Nginx Docker运行</h3> 
+ <p class="ziti3">Docker镜像在AUFS文件系统中是只读的，需要通过docker run命令以容器方式运行，脚本如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">docker run --name nginx -p 80:80 -d nginx:v1.0
+docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED
+STATUS              PORTS               NAMES
+26ffd54950e8        nginx:v1.0          "nginx -g 'daemon of…"  7 seconds ago
+Up 7 seconds        0.0.0.0:80-&gt;80/tcp  nginx
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">通过curl命令访问本地80端口，可以返回OpenResty的提示信息。</p> 
+ <p class="ziti3">Docker容器如果被移除，所有的修改文件同样会被删除，为了把变更的配置保存下来，需要把配置文件目录复制出来进行持久化，所以需要通过卷挂载的方式实现配置的使用和维护，脚本如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">mkdir -p /opt/data/apps/nginx/
+docker cp nginx:/usr/local/nginx/conf /opt/data/apps/nginx/
+docker stop nginx
+docker rm nginx
+docker run --name nginx -h nginx -p 80:80 -v
+/opt/data/apps/nginx/conf:/usr/local/nginx/conf -d nginx:v1.0
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">如图2-4所示，Docker容器已经把本地目录挂载到容器中。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/2-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/2-4.jpg" class="calibre29"/></a> 
+ </div> 
+ <p class="middle-img">图2-4　目录挂载</p> 
+ <p class="ziti3">在使用docker run命令时，每次都需要使用很多参数，为了便于维护，可以用Docker-Compose工具进行容器编排，Docker-Compose是使用基于YAML语法的脚本配置文件来实现容器的运行管理的。Nginx的docker-compose.yaml脚本文件如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">nginx:
+    image: nginx:v1.0
+    restart: always
+    container_name: nginx
+    hostname: 'nginx'
+    ports:
+        - 80:80
+    volumes:
+        - '/opt/data/apps/nginx/conf:/usr/local/nginx/conf'
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

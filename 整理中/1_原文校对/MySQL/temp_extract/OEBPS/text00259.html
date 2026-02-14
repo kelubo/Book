@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.3.2　MySQL主库（db01）半同步插件安装和配置</h3>
+<p class="ziti">登录MySQL主库（db01）安装半同步插件，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; install plugin rpl_semi_sync_master soname 'semisync_master.so';
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">开始配置主库半同步插件。</p>
+<p class="ziti">临时生效方法具体如下。</p>
+<p class="ziti">控制Master是否开启半同步，需要将如下参数设置为ON或OFF（1或者0）：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; set global rpl_semi_sync_master_enabled = ON; #&lt;==此处用1不生效。
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">同时控制Master等待多长时间被告知Slave已收到日志，也就是所谓的超时时间：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; set global rpl_semi_sync_master_timeout = 10000;
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">永久生效方法具体如下。</p>
+<p class="ziti">编辑配置文件调整如下参数到[mysqld]模块下。注意，别放错位置了。参数调整如下：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+rpl_semi_sync_master_enabled = ON
+rpl_semi_sync_master_timeout = 1000</pre>
+<hr/>
+<p class="ziti">以上两种方法如果同时进行配置，则可以不重启数据库，生产库可以同时配置。</p>
+<p class="ziti">检查主库开启及配置的插件生效方法具体如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from mysql.plugin;
++----------------------+--------------------+
+| name                 | dl                 |
++----------------------+--------------------+
+| rpl_semi_sync_master | semisync_master.so |
++----------------------+--------------------+
+1 row in set (0.00 sec)
+mysql&gt; show plugins;#&lt;==也可以查询INFORMATION_SCHEMA.PLUGINS库表。
++----------------------+--------+----------------+--------------------+---------+
+| Name                 | Status | Type           | Library            | License |
++----------------------+--------+----------------+--------------------+---------+
+| binlog               | ACTIVE | STORAGE ENGINE | NULL               | GPL     |
+...省略若干...
+| partition            | ACTIVE | STORAGE ENGINE | NULL               | GPL     |
+| rpl_semi_sync_master | ACTIVE | REPLICATION    | semisync_master.so | GPL     |
++----------------------+--------+----------------+--------------------+---------+
+43 rows in set (0.00 sec)
+mysql&gt; show global status like '%semi%'; #&lt;==查看主库半同步复制的状态参数，细节
+                                          见表17-4的详细说明。
++--------------------------------------------+-------+
+| Variable_name                              | Value |
++--------------------------------------------+-------+
+| Rpl_semi_sync_master_clients               | 0     | #&lt;==默认值几乎都是0。
+| Rpl_semi_sync_master_net_avg_wait_time     | 0     |
+| Rpl_semi_sync_master_net_wait_time         | 0     |
+| Rpl_semi_sync_master_net_waits             | 0     |
+| Rpl_semi_sync_master_no_times              | 0     |
+| Rpl_semi_sync_master_no_tx                 | 0     |
+| Rpl_semi_sync_master_status                | ON    | #&lt;==这个为ON，表示开启
+                                                     半同步复制状态。
+| Rpl_semi_sync_master_timefunc_failures     | 0     |
+| Rpl_semi_sync_master_tx_avg_wait_time      | 0     |
+| Rpl_semi_sync_master_tx_wait_time          | 0     |
+| Rpl_semi_sync_master_tx_waits              | 0     |
+| Rpl_semi_sync_master_wait_pos_backtraverse | 0     |
+| Rpl_semi_sync_master_wait_sessions         | 0     |
+| Rpl_semi_sync_master_yes_tx                | 0     |
++--------------------------------------------+-------+
+14 rows in set (0.00 sec)
+mysql&gt; show global variables like '%semi%'; #&lt;==查看主库半同步复制的相关参数设置，
+                                            细节详见表17-3的说明。
++------------------------------------+-------+
+| Variable_name                      | Value |
++------------------------------------+-------+
+| rpl_semi_sync_master_enabled       | ON    | #&lt;==为ON表示已开启。
+| rpl_semi_sync_master_timeout       | 1000  |
+| rpl_semi_sync_master_trace_level   | 32    |
+| rpl_semi_sync_master_wait_no_slave | ON    |
++------------------------------------+-------+
+4 rows in set (0.00 sec)</pre>
+<hr/>
+</body>
+</html>

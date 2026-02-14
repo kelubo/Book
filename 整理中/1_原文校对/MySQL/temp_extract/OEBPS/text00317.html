@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">20.4.6　RDS for MySQL备份与恢复</h3>
+<p class="ziti">（1）自动备份</p>
+<p class="ziti">RDS提供了多种类型的备份，MySQL支持物理备份和逻辑备份，MySQL支持全量备份和增量备份。备份开始时间可由用户根据自己的业务低峰进行灵活配置，所有备份文件免费保留7天。</p>
+<p class="ziti">（2）手动备份</p>
+<p class="ziti">用户在需要时可以临时性发起备份操作，备份文件免费保留7天。</p>
+<p class="ziti">（3）数据回溯</p>
+<p class="ziti">利用备份文件和日志，RDS可以生成一个7天内任意时刻的克隆实例，用户可在校验数据无误之后，再进行数据恢复操作。创建克隆实例操作不影响用户当前实例的正常运行。</p>
+<p class="ziti">（4）备份文件下载</p>
+<p class="ziti">RDS会将用户备份文件免费保留7天，在此期间用户可登录RDS管理控制台，将备份文件下载至本地。</p>
+<p class="p6">1.RDS for MySQL默认备份策略</p>
+<p class="ziti">RDS备份查询如图20-60所示。</p>
+<div class="pic"><img alt="" src="Image00209.jpg" />
+</div>
+<p class="middle-img">图20-60　RDS备份查询界面</p>
+<p class="ziti">当RDS创建完毕之后，默认会有备份策略设置。</p>
+<div class="pic"><img alt="" src="Image00210.jpg" />
+</div>
+<p class="middle-img">图20-61　RDS默认备份策略设置界面</p>
+<p class="p6">2.RDS for MySQL自动备份策略设置</p>
+<p class="ziti">如图20-62所示，选择好备份周期和备份时间之后，RDS将会根据设置开启自定义备份策略。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ 应尽量避免在业务高峰期备份数据库。</p>
+<div class="pic"><img alt="" src="Image00211.jpg" />
+</div>
+<p class="middle-img">图20-62　RDS根据备份设置开启自动备份策略</p>
+<p class="p6">3.RDS for MySQL手动备份</p>
+<p class="ziti">如图20-63所示，手动备份可以选择物理备份和逻辑备份。</p>
+<div class="pic"><img alt="" src="Image00212.jpg" />
+</div>
+<p class="middle-img">图20-63　手动备份选择备份方式界面</p>
+<p class="ziti">如图20-64所示，逻辑备份可以选择实例备份和单库备份。</p>
+<div class="pic"><img alt="" src="Image00213.jpg" />
+</div>
+<p class="middle-img">图20-64　逻辑备份选择界面</p>
+<p class="ziti">逻辑备份既可以选择备份单个库，也可以选择实例级别的备份，即备份所有的库。</p>
+<p class="ziti">任务执行完毕后可以查看任务的执行状态，如图20-65所示。</p>
+<div class="pic"><img alt="" src="Image00214.jpg" />
+</div>
+<p class="middle-img">图20-65　查看任务的执行状态</p>
+<p class="p6">4.RDS for MySQL物理备份和逻辑备份比较</p>
+<p class="ziti">RDS使用mysqldump对MySQL数据库进逻辑全量备份，使用开源软件Xtrabackup对MySQL数据库进行实例级别的物理全量备份，具体见表20-2。</p>
+<p class="middle-img">表20-2　逻辑备份和物理备份对比表</p>
+<div class="pic"><img alt="" src="Image00215.jpg" />
+</div>
+<div class="pic"><img alt="" src="Image00216.jpg" />
+</div>
+<p class="p6">5.RDS for MySQL下载备份文件</p>
+<p class="ziti">RDS for MySQL下载备份文件如图20-66和图20-67所示。</p>
+<div class="pic"><img alt="" src="Image00217.jpg" />
+</div>
+<p class="middle-img">图20-66　备份恢复界面选择数据备份下载</p>
+<div class="pic"><img alt="" src="Image00218.jpg" />
+</div>
+<p class="middle-img">图20-67　实例备份文件下载确认界面</p>
+<p class="ziti">下载到本地后是一个tar包，可以解压查看，如图20-68所示。</p>
+<div class="pic"><img alt="" src="Image00219.jpg" />
+</div>
+<p class="middle-img">图20-68　下载到本地的压缩包</p>
+<p class="p6">6.RDS for MySQL恢复</p>
+<p class="ziti">什么情况下需要恢复实例？</p>
+<p class="ziti">1）系统上线前，做功能的反复验证时。</p>
+<p class="ziti">2）系统运行中，出现脏数据，无法在线修复时。</p>
+<p class="ziti">云数据库RDS恢复，可以在线完成。</p>
+<p class="p6">7.RDS for MySQL覆盖性恢复</p>
+<p class="ziti">RDS for MySQL覆盖性恢复界面如图20-69和图20-70所示。</p>
+<div class="pic"><img alt="" src="Image00220.jpg" />
+</div>
+<p class="middle-img">图20-69　备份恢复界面选择数据备份恢复</p>
+<div class="pic"><img alt="" src="Image00221.jpg" />
+</div>
+<p class="middle-img">图20-70　覆盖恢复实例备份集确认界面</p>
+<p class="ziti">输入验证码后，开始恢复，如图20-71所示。</p>
+<div class="pic"><img alt="" src="Image00222.jpg" />
+</div>
+<p class="middle-img">图20-71　输入验证码界面</p>
+<p class="ziti">回到RDS主管理界面，可以看到数据库的状态是“备份恢复中”，根据备份量的大小，时间会有所不同，如图20-72所示。</p>
+<div class="pic"><img alt="" src="Image00223.jpg" />
+</div>
+<p class="middle-img">图20-72　实例列表界面查看基本信息</p>
+<p class="p6">8.RDS for MySQL通过克隆实例进行数据恢复</p>
+<p class="ziti">RDS for MySQL通过克隆实例进行数据恢复如图20-73所示。</p>
+<div class="pic"><img alt="" src="Image00224.jpg" />
+</div>
+<p class="middle-img">图20-73　RDS通过克隆实例进行数据恢复的界面</p>
+<p class="ziti">克隆实例可以选择主实例的备份集，或者在备份有效存储时间内的时间点上复制出一个新的实例。克隆实例只支持主实例的克隆，若主实例下挂载有只读实例和灾备实例，那么克隆时只克隆该主实例，不克隆其下的只读实例和灾备实例。具体操作如图20-74和图20-75所示。</p>
+<div class="pic"><img alt="" src="Image00225.jpg" />
+</div>
+<p class="middle-img">图20-74　克隆实例的方式</p>
+<div class="pic"><img alt="" src="Image00226.jpg" />
+</div>
+<p class="middle-img">图20-75　订单确认界面</p>
+<p class="ziti">回到RDS管理控制台，可以看到克隆实例正在创建中，如图20-76所示。</p>
+<p class="ziti">进入主实例界面可以查看到，状态是“克隆实例中”，如图20-77所示。</p>
+<div class="pic"><img alt="" src="Image00227.jpg" />
+</div>
+<p class="middle-img">图20-76　实例列表界面查看基本信息</p>
+<div class="pic"><img alt="" src="Image00228.jpg" />
+</div>
+<p class="middle-img">图20-77　主实例界面查看克隆状态</p>
+<p class="ziti">克隆完毕，如图20-78所示。</p>
+<div class="pic"><img alt="" src="Image00229.jpg" />
+</div>
+<p class="middle-img">图20-78　克隆完毕界面</p>
+<p class="ziti">下面我们手动删除原数据库里面的内容。点击数据库实例的名称，如图20-79所示。</p>
+<div class="pic"><img alt="" src="Image00230.jpg" />
+</div>
+<p class="middle-img">图20-79　选择数据库实例的界面</p>
+<p class="ziti">删除数据库实例里面的数据库，如图20-80所示。</p>
+<div class="pic"><img alt="" src="Image00231.jpg" />
+</div>
+<p class="middle-img">图20-80　确认删除数据库的界面</p>
+<p class="ziti">如图20-81所示，可以看到数据库是“删除中”的状态，此时数据库开始删除。</p>
+<div class="pic"><img alt="" src="Image00232.jpg" />
+</div>
+<p class="middle-img">图20-81　开始删除数据库的界面</p>
+<p class="ziti">回到RDS管理界面，点击新建立的克隆实例名称，如图20-82所示。</p>
+<div class="pic"><img alt="" src="Image00233.jpg" />
+</div>
+<p class="middle-img">图20-82　选择新建立的克隆实例</p>
+<p class="ziti">在克隆实例内，可以看到数据库还存在，如图20-83所示。</p>
+<div class="pic"><img alt="" src="Image00234.jpg" />
+</div>
+<p class="middle-img">图20-83　克隆实例中的数据库还存在</p>
+<p class="ziti">现在我们使用数据传输工具DTS，开始迁移恢复数据库。点击“迁移数据库”，后续步骤如图20-84到图20-87所示。</p>
+<div class="pic"><img alt="" src="Image00235.jpg" />
+</div>
+<p class="middle-img">图20-84　选择迁移数据库界面</p>
+<div class="pic"><img alt="" src="Image00236.jpg" />
+</div>
+<p class="middle-img">图20-85　创建迁移任务界面</p>
+<div class="pic"><img alt="" src="Image00237.jpg" />
+</div>
+<p class="middle-img">图20-86　填写源库及目标库的信息</p>
+<p class="ziti">数据迁移任务开始，如图20-88所示。</p>
+<p class="ziti">数据迁移中，如图20-89所示。</p>
+<div class="pic"><img alt="" src="Image00238.jpg" />
+</div>
+<p class="middle-img">图20-87　选择链路规格启动迁移界面</p>
+<div class="pic"><img alt="" src="Image00239.jpg" />
+</div>
+<p class="middle-img">图20-88　数据迁移任务开始界面</p>
+<div class="pic"><img alt="" src="Image00240.jpg" />
+</div>
+<p class="middle-img">图20-89　数据迁移进行中界面</p>
+<p class="ziti">数据迁移完毕，如图20-90所示。</p>
+<div class="pic"><img alt="" src="Image00241.jpg" />
+</div>
+<p class="middle-img">图20-90　数据迁移完毕界面</p>
+<p class="ziti">回到数据，查看数据，是否从灾备实例内恢复到了源数据库中，如图20-91所示。</p>
+<div class="pic"><img alt="" src="Image00242.jpg" />
+</div>
+<p class="middle-img">图20-91　查看源数据库中是否已恢复</p>
+<p class="ziti">可以看到数据库已经恢复，如图20-92所示。</p>
+<div class="pic"><img alt="" src="Image00243.jpg" />
+</div>
+<p class="middle-img">图20-92　源数据库中已恢复成功</p>
+<p class="p6">9.可维护的时间段</p>
+<p class="ziti">阿里云的后台运维人员将在指定的时间段内进行例行维护。维护期间可能会造成RDS闪断，请确定应用程序有自动重连的功能。可维护时间段一定要选择在业务低峰期。需要根据业务特性进行维护时间段的选择。</p>
+<p class="ziti">可维护时间段的选择如图20-93和图20-94所示。</p>
+<div class="pic"><img alt="" src="Image00244.jpg" />
+</div>
+<p class="middle-img">图20-93　基本信息中选择可维护时间段的配置信息</p>
+<div class="pic"><img alt="" src="Image00245.jpg" />
+</div>
+<p class="middle-img">图20-94　设置可维护时间段</p>
+</body>
+</html>

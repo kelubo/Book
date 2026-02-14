@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.5　配置MySQL多实例的文件权限</h3>
+<p class="ziti">1）通过下面的命令授权mysql用户和组管理整个多实例的根目录/data：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# chown -R mysql.mysql /data
+[root@oldboy ~]# find /data -name mysql|xargs ls -l
+-rw-r--r--. 1 mysql mysql 1192 Feb 26 21:39 /data/3306/mysql
+-rw-r--r--. 1 mysql mysql 1307 Jul 21  2013 /data/3307/mysql</pre>
+<hr/>
+<p class="ziti">2）通过下面的命令授权mysql多实例所有启动文件的mysql可执行，设置700权限最佳，注意不要使用755权限，因为启动文件里有数据库管理员密码，会被读取到：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# find /data -name mysql|xargs chmod 700</pre>
+<hr/>
+<p class="ziti">现在检查下上述命令的处理结果，看看权限是否处理完成：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# find /data -name mysql -exec ls -l {} \;
+-rwx------. 1 mysql mysql 1307 Jul 21  2013 /data/3307/mysql
+-rwx------. 1 mysql mysql 1192 Feb 26 21:39 /data/3306/mysql</pre>
+<hr/>
+<p class="ziti">从输出来看，权限已经调整完毕，这里是引导读者在学习中使用记忆命令，其结果相当于“chmod 700/data/3306/mysql”和“chmod 700/data/3307/mysql”这两个命令的组合。</p>
+</body>
+</html>

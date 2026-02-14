@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">6.3　SQL语句实践</h2>
+<p class="ziti">为了简化读者的学习环境，本章全部使用第3章讲解的单实例环境进行实践，请读者停掉所有多实例数据库，然后通过“/etc/init.d/mysqld start”启动数据库服务。</p>
+<p class="ziti">学习环境准备的操作过程具体如下。</p>
+<p class="ziti">1）停止多实例数据库并确认已停止：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /data/3306/mysql stop
+Stoping MySQL...
+Warning: Using a password on the command line interface can be insecure.
+[root@oldboy ~]# /data/3307/mysql stop
+Stoping MySQL...
+Warning: Using a password on the command line interface can be insecure.
+[root@oldboy ~]# ss -lnt|grep 330 #&lt;==执行后没有任何结果，表示多实例环境都已正确关闭。</pre>
+<hr/>
+<p class="ziti">2）启动单实例数据库，并确认已启动：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld start
+Starting MySQL. SUCCESS!
+[root@oldboy ~]# ss -lnt|grep 330  #&lt;==启动单实例后，执行检查端口命令，若出现下面
+                                    的内容则表示单实例环境准备完毕。
+LISTEN     0      80                       :::3306                    :::*</pre>
+<hr/>
+</body>
+</html>

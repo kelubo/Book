@@ -1,0 +1,354 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="Aedb700d5-f7b6-4a62-bd68-4f0b5bc2b10a" class="calibre13">Chapter 12<br class="calibre8"/> 第十二章 树莓派典型传感器使用</h2> 
+ <p class="calibre3">树莓派由于其通用的架构、标准的接口和丰富的外围设备，吸引了无数硬件和软件工程师的眼球，将其视为投身创客产品必备法宝之一。本章介绍如何将典型传感器集成到树莓派控制器。</p> 
+ <h3 id="A88d4101d-c889-4354-90cf-8da971823014" class="calibre14">12.1 超声波传感器测量距离</h3> 
+ <p class="calibre3">前面在Arduino部分已经对超声波传感器测量距离做过介绍，选用的超声波模块为HC-SR04。HC-SR04模块可以测量3cm～4m的距离，精确度可以达到3mm。它包含超声波发射器、接收器和控制电路3部分，如图12-1所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u491" src="../Images/214_01.jpg" width="1280" height="417"/> 
+  <p class="imgtitle">图12-1 HC-SR04超声波模块及测距方法</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">1．接线方式</b></p> 
+ <p class="calibre3">HC-SR04的VCC和GND分别接树莓派的GPIO引脚5V和GND；Trig引脚用来接收树莓派的控制信号，可以接任意GPIO引脚；Echo引脚用来向树莓派返回测距信息，可以接任意GPIO引脚。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：Echo返回的是5V信号，而树莓派的GPIO接收超过3.3V的信号可能会被烧毁，因此需要加一个电阻分压电路。</p> 
+ <p class="calibre3">Raspberry Pi B+控制器与HC-SR04模块接线对应关系如表12-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-1 Raspberry Pi B+控制器与HC-SR04模块接线对应关系</p>
+  <img alt="" class="u213" src="../Images/215_01.jpg" width="1280" height="228"/>
+ </div> 
+ <p class="calibre3">使用的硬件包括：Raspberry Pi 3控制器；杜邦线若干；超声波传感器；10000欧姆电阻1个。硬件连接如图12-2所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u492" src="../Images/215_02.jpg" width="1143" height="750"/> 
+  <p class="imgtitle">图12-2 硬件连接</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．Python软件编程</b></p> 
+ <p class="calibre3">树莓派访问超声波传感器是通过树莓派的GPIO实现的，所以首先需要安装Python和GPIO库，安装方法详见《树莓派GPIO库安装》。</p> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为ultra-sonic.py：</p> 
+ <div class="center">
+  <img alt="" class="u493" src="../Images/215_03.jpg" width="1280" height="357"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u494" src="../Images/216_01.jpg" width="1280" height="742"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">3．代码运行</b></p> 
+ <p class="calibre3">在启动的树莓派控制器上或者直接通过远程登录到树莓派控制器运行代码，打开终端控制台，执行命令：sudo python ultrasonic.py，运行结果如图12-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u495" src="../Images/216_02.jpg" width="1245" height="804"/> 
+  <p class="imgtitle">图12-3 超声波传感器测量距离运行结果</p> 
+ </div> 
+ <h3 id="A02730cda-689f-4495-9c63-b7481f537a58" class="calibre14">12.2 DHT11数字温湿度传感器测量温湿度</h3> 
+ <p class="calibre3">DHT11是一个温湿度传感器，分为3个接口，分别为VCC、DATA、GND，如图12-4所示。</p> 
+ <p class="calibre3">DHT11温湿度传感器引脚说明：VCC——电源，输入3～5.5V；DATA——数据输出；GND——接地。</p> 
+ <div class="center"> 
+  <img alt="" class="u496" src="../Images/217_01.jpg" width="1199" height="435"/> 
+  <p class="imgtitle">图12-4 DHT11数字温湿度传感器</p> 
+ </div> 
+ <p class="calibre3">Raspberry Pi B+控制器与DHT11模块接线对应关系如表12-2所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-2 Raspberry Pi B+控制器与DHT11模块接线对应关系</p>
+  <img alt="" class="u180" src="../Images/217_02.jpg" width="1280" height="183"/>
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为DHT11.py：</p> 
+ <div class="center">
+  <img alt="" class="u497" src="../Images/217_03.jpg" width="1280" height="996"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u498" src="../Images/218_01.jpg" width="1280" height="1390"/>
+ </div> 
+ <p class="calibre3">在启动的树莓派控制器上或者直接通过远程登录到树莓派控制器运行代码，打开终端控制台，执行命令：sudo python DTH11.py，运行结果如图12-5所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u499" src="../Images/218_02.jpg" width="1280" height="365"/> 
+  <p class="imgtitle">图12-5 DHT11数字温湿度传感器测量温湿度运行结果</p> 
+ </div> 
+ <h3 id="A779b531f-3c26-4d50-a8a0-bfbdc729d1a8" class="calibre14">12.3 红外避障传感器</h3> 
+ <p class="calibre3">E18-D80NK光电开关有3根接线，棕色：VCC正极；蓝色：GND负极；黑色：OUT信号。尾部的电位器旋钮用于调节检测距离，如图12-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u500" src="../Images/219_01.jpg" width="1280" height="473"/> 
+  <p class="imgtitle">图12-6 E18-D80NK光电开关</p> 
+ </div> 
+ <p class="calibre3">Raspberry Pi B+控制器与E18-D80NK模块接线对应关系如表12-3所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-3 Raspberry Pi B+控制器与E18-D80NK模块接线对应关系</p>
+  <img alt="" class="u149" src="../Images/219_02.jpg" width="1280" height="183"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：E18-D80NK模块的OUT引脚加一个1000欧姆左右上拉电阻即可连接到树莓派的GPIO口上。</p> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为Infrared_obstacle_avoidance.py：</p> 
+ <div class="center">
+  <img alt="" class="u501" src="../Images/219_03.jpg" width="1280" height="577"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u502" src="../Images/220_01.jpg" width="1280" height="127"/>
+ </div> 
+ <p class="calibre3">在启动的树莓派控制器上或者直接通过远程登录到树莓派控制器运行代码，打开终端控制台，执行命令：sudo python DTH1Infrared_obstacle_avoidance1.py，运行结果如图12-7所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u503" src="../Images/220_02.jpg" width="1145" height="563"/> 
+  <p class="imgtitle">图12-7 红外避障传感器运行结果</p> 
+ </div> 
+ <h3 id="A7708e868-ed25-41b2-a435-1fe77bd5025f" class="calibre14">12.4 模拟量——ADC测量光线</h3> 
+ <p class="calibre3">因为树莓派没有内置的模数转换器（ADC），所以当需要用树莓派读取模拟量时，需要外接一块模数转换芯片（ADC）。本节选用PCF8591模块，PCF8591模块是一个AD/DA转换模块，PCF8591是一个单片集成、单独供电、低功耗、8-bit CMOS数据获取器件。PCF8591具有4个模拟输入、1个模拟输出和1个串行I<sup class="calibre9">2</sup>C总线接口，如图12-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u504" src="../Images/220_03.jpg" width="1280" height="447"/> 
+  <p class="imgtitle">图12-8 PCF8591 AD/DA转换模块</p> 
+ </div> 
+ <p class="calibre3">模块左边和右边分别外扩2路排针接口，分别说明如下：</p> 
+ <p class="calibre3">（1）左边AOUT芯片DA输出接口，模拟输入接口0～3，对应标识AIN0～AIN3。</p> 
+ <p class="calibre3">（2）右边IIC数字接口：SCL、SDA。</p> 
+ <p class="calibre3">（3）VCC：电源接口，外接3.3～5V；GND：接地。</p> 
+ <p class="calibre3">模块短路帽说明：P4——短路选择接热敏电阻；P5——短路选择接光敏电阻；P6——短路选择接0～5V可调电压接入电路。</p> 
+ <p class="calibre3">光线传感器为模拟传感器，如图12-9所示，接口定义：S——输出信号；+——电源（VCC）3.5～5V；-——地（GND）。</p> 
+ <div class="center"> 
+  <img alt="" class="u505" src="../Images/221_01.jpg" width="933" height="404"/> 
+  <p class="imgtitle">图12-9 光线传感器</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">1．硬件连接</b></p> 
+ <p class="calibre3">Raspberry Pi B+控制器与PCF8591模块接线对应关系如表12-4所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-4 Raspberry Pi B+控制器与PCF8591模块接线对应关系</p>
+  <img alt="" class="u221" src="../Images/221_02.jpg" width="1280" height="229"/>
+ </div> 
+ <p class="calibre3">光线传感器与PCF8591模块接线对应关系如表12-5所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-5 光线传感器与PCF8591模块接线对应关系</p>
+  <img alt="" class="u506" src="../Images/221_03.jpg" width="1280" height="186"/>
+ </div> 
+ <p class="calibre3">将光线传感器、PCF8591模块和树莓派控制板按表12-5连接。</p> 
+ <p class="calibre3"><b class="calibre6">2．树莓派使用I<sup class="calibre9">2</sup>C</b></p> 
+ <p class="calibre3">树莓派已经集成了I<sup class="calibre9">2</sup>C驱动，只需要启动即可。启动方法为修改配置文件，在树莓派主界面选择“首选项”＞“Raspberry Pi Configuration”命令，设置选项“I<sup class="calibre9">2</sup>C”为“Enable”，在/etc/modules文件中可以看到i2c-dev，如图12-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u507" src="../Images/221_04.jpg" width="1280" height="471"/> 
+  <p class="imgtitle">图12-10 启动I<sup class="calibre16">2</sup>C</p> 
+ </div> 
+ <p class="calibre3">还需要安装工具i2c-tools和python-smbus，然后将pi用户添加至i2c组。如果没有安装，命令为：sudo apt-get install i2c-tools python-smbus；将pi用户添加至i2c组：sudo adduser pi i2c，如图12-11所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u508" src="../Images/222_01.jpg" width="1090" height="710"/> 
+  <p class="imgtitle">图12-11 安装工具i2c-tools和python-smbus</p> 
+ </div> 
+ <p class="calibre3">使用i2c-tools工具测试I<sup class="calibre9">2</sup>C，树莓派控制板连接I<sup class="calibre9">2</sup>C设备，运行检测I<sup class="calibre9">2</sup>C设备的命令。</p> 
+ <p class="calibre3">（1）树莓派A型：sudo i2cdetect-y 0。</p> 
+ <p class="calibre3">（2）树莓派B型：sudo i2cdetect-y 1，如图12-12所示，可以看到连接的I<sup class="calibre9">2</sup>C设备地址为48。</p> 
+ <div class="center"> 
+  <img alt="" class="u509" src="../Images/222_02.jpg" width="1145" height="510"/> 
+  <p class="imgtitle">图12-12 检测I<sup class="calibre16">2</sup>C设备</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">3．Python代码</b></p> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为i2c.py：</p> 
+ <div class="center">
+  <img alt="" class="u510" src="../Images/222_03.jpg" width="1280" height="267"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u511" src="../Images/223_01.jpg" width="1280" height="96"/>
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u512" src="../Images/223_02.jpg" width="1280" height="499"/> 
+  <p class="imgtitle">图12-13 Python代码</p> 
+ </div> 
+ <p class="calibre3">在图12-13中选择“Run”＞“Run Module”命令，执行结果如图12-14所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u513" src="../Images/223_03.jpg" width="1280" height="435"/> 
+  <p class="imgtitle">图12-14 光线传感器测试结果</p> 
+ </div> 
+ <p class="calibre3">也可以打开终端控制台，执行命令：sudo python i2c.py，运行结果如图12-15所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u514" src="../Images/223_04.jpg" width="1127" height="726"/> 
+  <p class="imgtitle">图12-15 光线传感器终端控制台测试结果</p> 
+ </div> 
+ <h3 id="A70fc5753-83ae-4dce-aa12-7a273584d1b7" class="calibre14">12.5 使用开关模块</h3> 
+ <p class="calibre3">开关模块可以作为树莓派的输入设备，常用的有按钮和碰撞开关，如图12-16所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u515" src="../Images/224_01.jpg" width="1280" height="524"/> 
+  <p class="imgtitle">图12-16 按钮和碰撞开关</p> 
+ </div> 
+ <p class="calibre3">碰撞开关的工作原理与大按钮模块相似，都是一个开关元件，通过触点的开合，对其他设备进行控制，达到互动的效果。碰撞开关常用语轮式小车自主运动使用，这个碰撞开关前方接触片有个独特的滑轮设计，可以作为导向轮使用。</p> 
+ <p class="calibre3">碰撞开关接口定义：S——输出信号；+——电源（VCC）3.5～5V；-——接地（GND）。</p> 
+ <p class="calibre3">碰撞传感器为数字信号的传感器，碰撞开关被按下时输出信号是低电平，没有按下时输出是高电平，可以通过控制台将输出信号打印出来。</p> 
+ <p class="calibre3">Raspberry Pi B+控制器与碰撞开关模块接线对应关系如表12-6所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-6 Raspberry Pi B+控制器与碰撞开关模块接线对应关系</p>
+  <img alt="" class="u516" src="../Images/224_02.jpg" width="1280" height="188"/>
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为key.py：</p> 
+ <div class="center">
+  <img alt="" class="u517" src="../Images/224_03.jpg" width="1280" height="475"/>
+ </div> 
+ <p class="calibre3">在树莓派的Python 3的IDLE环境中执行结果如图12-17所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u518" src="../Images/225_01.jpg" width="1280" height="603"/> 
+  <p class="imgtitle">图12-17 碰撞开关运行结果</p> 
+ </div> 
+ <h3 id="Aa9e61094-39e0-43bf-9fcb-f5f47028dc4b" class="calibre14">12.6 使用USB接口摄像头</h3> 
+ <p class="calibre3">如果想使用树莓派进行拍照或者录像，可以安装树莓派的专用摄像头板。不过，还有另外一个方法，就是常见的USB摄像头。典型的树莓派使用的USB摄像头如图12-18所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u519" src="../Images/225_02.jpg" width="857" height="416"/> 
+  <p class="imgtitle">图12-18 树莓派使用的USB摄像头</p> 
+ </div> 
+ <p class="calibre3">将USB摄像头插入树莓派控制器的USB接口，在树莓派启动界面打开文件浏览器，打开dev目录，查看是否有video0这个标识，如图12-19所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u520" src="../Images/225_03.jpg" width="1214" height="883"/> 
+  <p class="imgtitle">图12-19 /dev/video0</p> 
+ </div> 
+ <p class="calibre3">在树莓派打开终端控制台，运行命令：lsusb，查看USB摄像头的参数，一般如果能识别出型号，就说明支持该摄像头，如图12-20所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u521" src="../Images/226_01.jpg" width="1091" height="511"/> 
+  <p class="imgtitle">图12-20 查看USB摄像头的参数</p> 
+ </div> 
+ <p class="calibre3">当USB摄像头成功挂载到树莓派上之后，下一步就是拍一些照片来验证它的功能了。要想拍摄照片，要安装fswebcam，这是一款小型摄像头程序。可以直接通过Raspbian的仓库来安装fswebcam，安装命令：$ sudo apt-get install fswebcam，如图12-21所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u522" src="../Images/226_02.jpg" width="954" height="723"/> 
+  <p class="imgtitle">图12-21 安装fswebcam</p> 
+ </div> 
+ <p class="calibre3">fswebcam安装完成后，在终端运行下面的命令来抓拍一张来自摄像头的照片。</p> 
+ <p class="calibre3">使用$fswebcam--no-banner-r640×480image.jpg命令可以抓取一张640×480分辨率的照片，并且用JPG格式保存。它不会在照片的底部留下任何水印，如图12-22所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u523" src="../Images/226_03.jpg" width="1161" height="410"/> 
+  <p class="imgtitle">图12-22 抓拍一张来自摄像头的照片</p> 
+ </div> 
+ <p class="calibre3">这是一张640×480分辨率的图片，抓拍结果如图12-23所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u524" src="../Images/227_01.jpg" width="731" height="551"/> 
+  <p class="imgtitle">图12-23 抓拍结果</p> 
+ </div> 
+ <h3 id="A1350ea0d-25e9-44cd-a819-fe02fd8158c3" class="calibre14">12.7 CSI接口摄像头</h3> 
+ <p class="calibre3">树莓派的相机串行接口（Camera Serial Interface，CSI），就是摄像头接口，就是Pi摄像头，如图12-24所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u525" src="../Images/227_02.jpg" width="1239" height="602"/> 
+  <p class="imgtitle">图12-24 树莓派的CSI</p> 
+ </div> 
+ <p class="calibre3">树莓派的CSI摄像头的安装如图12-25所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u526" src="../Images/227_03.jpg" width="745" height="562"/> 
+  <p class="imgtitle">图12-25 CSI摄像头的安装</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Aa96000e3-0d42-4e9c-99c0-dd2e4a3c2ad9">12.7.1 通过CSI摄像头模块拍照</h4> 
+ <p class="calibre3">安装完成以后，就可以使用Pi Camema了。Raspberry Pi摄像头目前提供了3个应用程序，分别是raspistill、raspivid、raspiyuv。其中raspistill和raspistillyuv非常相似，并且都用于捕捉图像，而raspivid用于捕捉视频。</p> 
+ <p class="calibre3">在树莓派的终端控制窗口输入如下命令：$ raspistill-o keychain.jpg-t 2000，如图12-26所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u527" src="../Images/228_01.jpg" width="1280" height="342"/> 
+  <p class="imgtitle">图12-26 拍照命令</p> 
+ </div> 
+ <p class="calibre3">使用这句命令将在2000ms后拍摄一张照片，然后保存为keychain.jpg，保存在当前目录下，如图12-27所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u528" src="../Images/228_02.jpg" width="1280" height="585"/> 
+  <p class="imgtitle">图12-27 拍摄的照片</p> 
+ </div> 
+ <p class="calibre3">raspiyuv工具的用法差不多，只不过拍摄到的是一张未压缩的YUV图像，如图12-28所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u529" src="../Images/228_03.jpg" width="1280" height="339"/> 
+  <p class="imgtitle">图12-28 raspiyuv拍照</p> 
+ </div> 
+ <p class="calibre3">树莓派摄像头模块可以使用raspistill和raspivid这两个命令行工具控制。但是，一位曼彻斯特的数据库管理员、软件开发者和SQL大师Dave Jones，用Python实现了相同功能，这就是Python的picamera接口，这意味着可以直接使用Python脚本来控制摄像头模块，它是一个非常完美的库，用它来演示Pi Camema模块非常好。</p> 
+ <p class="calibre3">picamera库现在已经升级到了1.13版本，使用apt-get下载使用即可。命令如下：sudo apt-get install python-picamera，如图12-29所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u530" src="../Images/229_01.jpg" width="1237" height="465"/> 
+  <p class="imgtitle">图12-29 安装picamera</p> 
+ </div> 
+ <p class="calibre3">在Python IDLE环境，picamera库的用法如下：</p> 
+ <p class="calibre3">（1）导入相关模块：import picamera。</p> 
+ <p class="calibre3">（2）初始化：camera=picamera.PiCamera()。</p> 
+ <p class="calibre3">（3）捕获图像：camera.capture（'image.jpg'）。</p> 
+ <p class="calibre3">（4）打开预览：camera.start_ preview()。</p> 
+ <p class="calibre3">（5）垂直翻转：camera.vflip=True。</p> 
+ <p class="calibre3">（6）水平翻转：camera.hflip=True。</p> 
+ <p class="calibre3">（7）控制摄像头亮度：camera.brightness=60。</p> 
+ <p class="calibre3">预览摄像头在不同亮度下变化情况的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u531" src="../Images/229_02.jpg" width="1280" height="132"/>
+ </div> 
+ <p class="calibre3">这个库有许多配置，可以改变亮度、对比度、图像效果、曝光模式等，并能实时预览，可以从视频流中捕获一张或者多张图像。</p> 
+ <p class="calibre3">下面这个示例是捕捉一个分辨率为1024×768的图像，并将之输出到test.jpg中。代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u532" src="../Images/229_03.jpg" width="1280" height="348"/>
+ </div> 
+ <p class="calibre3">执行过程如图12-30所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u533" src="../Images/230_01.jpg" width="1280" height="439"/> 
+  <p class="imgtitle">图12-30 使用picamera库捕获图像</p> 
+ </div> 
+ <p class="calibre3">需要注意的是，若目录中有同名文件，picamera将会重置该图片。</p> 
+ <h4 class="sigil_not_in_toc" id="A6f7d00e5-ea57-48a2-b853-0c663812b124">12.7.2 通过CSI摄像头模块拍摄视频</h4> 
+ <p class="calibre3">想要用摄像头模块拍一段视频，可以使用raspivid工具。下面的命令会按照默认配置（长度5秒，分辨率1920×1080，比特率17Mbps）拍摄一段视频。在树莓派的终端控制输入如下命令：$ raspivid-o video.mp4，如图12-31所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u534" src="../Images/230_02.jpg" width="1280" height="236"/> 
+  <p class="imgtitle">图12-31 raspivid拍摄视频</p> 
+ </div> 
+ <p class="calibre3">如果想改变拍摄时长，只要通过"-t"选项来设置想要的长度就行了（单位是毫秒）。命令如下：$ raspivid-o video.mp4-t 10000，如图12-32所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u535" src="../Images/230_03.jpg" width="1150" height="835"/> 
+  <p class="imgtitle">图12-32 raspivid拍摄设置时长的视频</p> 
+ </div> 
+ <p class="calibre3">使用"-w"和"-h"选项将分辨率设为1280x720，命令如下：$ raspivid-o video.mp4-t 10000-w 1280-h 720</p> 
+ <p class="calibre3">也可以使用picamera进行录像，但需要在Python IDLE环境中，命令如下：</p> 
+ <p class="calibre3">（1）控制摄像头录像：camera.start_ recording（'video.h264'）。</p> 
+ <p class="calibre3">（2）停止录像：camera.stop_recording()。</p> 
+ <p class="calibre3">如图12-33所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u536" src="../Images/231_01.jpg" width="1280" height="421"/> 
+  <p class="imgtitle">图12-33 使用picamera进行录像</p> 
+ </div> 
+ <p class="calibre3">picamera的输出是一段未压缩的H.264视频流，而且这段视频不含声音。为了能被通常的视频播放器所播放，这个原始的H.264视频还需要转换。可以使用gpac包中所带有的MP4Box应用。</p> 
+ <p class="calibre3">在Raspbian上安装gpac，输入命令：$ sudo apt-get install gpac，如图12-34所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u537" src="../Images/231_02.jpg" width="1273" height="933"/> 
+  <p class="imgtitle">图12-34 安装gpac</p> 
+ </div> 
+ <p class="calibre3">然后将这段原始的H.264格式的视频流转换为每秒30帧的MP4格式视频，输入命令：$ MP4Box-fps 30-add video.h264 video.mp4，如图12-35所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u538" src="../Images/232_01.jpg" width="1280" height="672"/> 
+  <p class="imgtitle">图12-35 视频格式转换</p> 
+ </div> 
+ <h3 id="A544f3710-8f6a-40f0-bb44-419eb2d0a3a2" class="calibre14">12.8 3D手势识别传感器——I<sup class="calibre16">2</sup>C接口</h3> 
+ <p class="calibre3">有记忆，能交互，已成为当今机器人所具备的最大亮点。手势识别机器人就是典型的代表之一，机器人能够感知其前方物体的特定动作时，机器人也会做出相应的反应。例如，将手掌放在它前面，并且向它靠近，它会自己尝试绕过障碍。</p> 
+ <p class="calibre3">DFRobot 3D手势识别传感器是一款集成3D手势识别和运动跟踪于一体的交互式传感器，传感器可以在有效范围内识别手指的顺时针/逆时针转动方向和手指的运动方向等，如图12-36所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u539" src="../Images/232_02.jpg" width="843" height="576"/> 
+  <p class="imgtitle">图12-36 3D手势识别传感器</p> 
+ </div> 
+ <p class="calibre3">此传感器基于Microchip专利的GestIC<img alt="" class="u540" src="../Images/232_03.jpg" width="43" height="43"/>技术，采用电近场传感技术，包括开发3D手势输入传感系统所有的块图，具有先进的3D信号处理单元，有效检测距离为0～10cm。传感器可以应用于各类互动交互艺术产品，试想一下，挥一挥手，机器人前进，挥一挥手，打开音乐。</p> 
+ <p class="calibre3">DFRobot 3D手势识别传感器引脚说明如表12-7所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-7 DFRobot 3D手势识别传感器引脚说明</p>
+  <img alt="" class="u541" src="../Images/232_04.jpg" width="1280" height="142"/>
+ </div> 
+ <div class="center"> 
+  <p class="imgtitle">（续）</p>
+  <img alt="" class="u221" src="../Images/233_01.jpg" width="1280" height="229"/>
+ </div> 
+ <p class="calibre3">产品的参数如下：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_02.jpg" width="40" height="44"/>传感器地址为0x42。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_03.jpg" width="40" height="44"/>工作电压：3.3V～5V。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_04.jpg" width="40" height="44"/>接口类型：I<sup class="calibre9">2</sup>C。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_05.jpg" width="40" height="44"/>I<sup class="calibre9">2</sup>C地址：0x42。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_06.jpg" width="40" height="44"/>手势感应：5cm。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_07.jpg" width="40" height="44"/>距离感应：10cm。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_08.jpg" width="40" height="44"/>尺寸：72mm×54mm。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_09.jpg" width="40" height="44"/>工作温度范围：-20～+85℃。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/233_10.jpg" width="40" height="44"/>空间分辨率：150dpi。</p> 
+ <p class="calibre3">Raspberry Pi B+控制器与3D手势识别传感器模块接线对应关系如表12-8所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表12-8 Raspberry Pi B+控制器与3D手势识别传感器模块接线对应关系</p>
+  <img alt="" class="u77" src="../Images/233_11.jpg" width="1280" height="268"/>
+ </div> 
+ <p class="calibre3">树莓派控制终端输入命令：sudo i2cdetect-y 1，可以看到连接的I<sup class="calibre9">2</sup>C设备地址为42。如图12-37所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u542" src="../Images/233_12.jpg" width="1249" height="554"/> 
+  <p class="imgtitle">图12-37 检测I<sup class="calibre16">2</sup>C设备</p> 
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为Gesture_ Recognition.py：</p> 
+ <div class="center">
+  <img alt="" class="u543" src="../Images/234_01.jpg" width="1280" height="517"/>
+ </div> 
+ <p class="calibre3">运行结果如图12-38所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u544" src="../Images/234_02.jpg" width="1280" height="841"/> 
+  <p class="imgtitle">图12-38 3D手势识别传感器运行结果</p> 
+ </div> 
+ <h3 id="Ace51c880-0320-4297-a8d2-2d088465dfe0" class="calibre14">12.9 本章小结</h3> 
+ <p class="calibre3">本章介绍了树莓派典型传感器的使用方法，包括模拟量输入传感器、数字量输入传感器、I<sup class="calibre9">2</sup>C接口输入、A/D转换器、开关量输入、摄像头等，介绍了它们的接口说明、硬件连接、软件编程实现等。</p> 
+</body>
+</html>

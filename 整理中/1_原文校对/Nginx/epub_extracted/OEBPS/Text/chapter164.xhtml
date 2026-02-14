@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_177">9.1.4　日志输出到syslog</h3> 
+ <p class="ziti3">Nginx的访问日志和错误日志都支持将日志直接输出到syslog服务端，对于syslog输出配置指令参数如表9-9所示。</p> 
+ <p class="middle-img">表9-9　指令参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-9.jpg" class="calibre296"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">error_log syslog:server=192.168.1.1 debug;
+access_log syslog:server=unix:/var/log/nginx.sock,nohostname;
+access_log syslog:server=[2001:db8::1]:12345,facility=local7,tag=nginx,severity=info combined;
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

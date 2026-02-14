@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_92">5.2.2　HTTPS基本配置</h3> 
+ <p class="ziti3">HTTPS协议数据的传输是基于SSL层加密的数据，其简单模型是服务端获得客户请求后，将用私钥加密的协商数据发送给客户端。客户端先使用服务端提供的公钥解密协商数据并读取真实的内容，再用公钥加密返回协商数据并发送给服务端，完成彼此间的密钥协商。密钥协商完毕后，服务端和客户端通过协商后的密钥进行通信数据的加解密传输。私钥只存放在服务端，公钥则由所有的客户端持有。</p> 
+ <p class="ziti3">在实际使用过程中，为提高公钥的使用安全性、防止公钥被替换，使用第三方CA机构的证书实现对服务器身份的认证和网站公钥的安全传递。HTTPS先通过非对称加密方式交换密钥，建立连接后再通过协商后的密钥与加密算法进行对称加密数据传输。图5-3为HTTPS时序图。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/5-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/5-3.jpg" class="calibre203"/></a> 
+ </div> 
+ <p class="middle-img">图5-3　HTTPS时序图</p> 
+ <p class="ziti3">1）服务端按照自身的域名等身份信息创建网站证书私钥和网站证书申请文件，网站管理员将证书申请文件提交给CA机构并获得网站证书，网站证书和网站证书私钥被部署到服务端。</p> 
+ <p class="ziti3">2）客户端发送包含协议版本号、客户端随机数（Client Random）、支持加密套件列表的请求给服务端。</p> 
+ <p class="ziti3">3）服务端获得客户端HTTPS请求后，将包含网站信息及网站证书公钥的证书、服务端随机数（Server Random）及随机选择的客户端支持加密套件返回给客户端，若需要验证客户端身份，也会在此时发送相关信息给客户端。</p> 
+ <p class="ziti3">4）客户端通过操作系统中的CA公钥解密证书获取网站证书公钥并进行网站证书的合法性、有效期和是否被吊销的验证。</p> 
+ <p class="ziti3">5）客户端用网站证书公钥将新生成的客户端随机数加密后发送给服务端，同时使用3个随机数生成会话密钥。</p> 
+ <p class="ziti3">6）服务端使用网站证书私钥解密客户端数据获取客户端随机数（Pre-master），使用3个随机数生成会话密钥。</p> 
+ <p class="ziti3">7）服务端与客户端使用一致的会话密钥和加密算法完成传输数据的加解密交互。</p> 
+ <p class="ziti3">HTTPS网站证书是由CA机构颁发的，网站管理员只需按照相关流程向CA机构提交请求文件即可，操作步骤如下。</p> 
+ <p class="ziti3">（1）生成请求文件</p> 
+ <p class="ziti3">生成请求文件的脚本如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">## 创建无密码网站证书私钥文件的请求文件
+openssl req -out /etc/nginx/conf/ssl/www_nginxbar_org.csr -new -sha256 -newkey rsa:2048 -nodes -keyout /etc/nginx/conf/ssl/www_nginxbar_org.key -subj "/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=admin/CN=nginxbar.com/emailAddress=admin@nginxbar.com"
+
+## 创建有密码私钥文件的请求文件
+openssl genrsa -aes256 -passout pass:111111 -out /etc/nginx/conf/ssl/www_nginxbar_org.key 2048
+
+openssl req -out /etc/nginx/conf/ssl/www_nginxbar_org.csr -new -sha256 -nodes -passin pass:111111 -key /etc/nginx/conf/ssl/www_nginxbar_org.key -subj "/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=admin/CN=nginxbar.com/emailAddress=admin@nginxbar.com"
+
+## 保存私钥密码
+echo "111111" &gt;&gt;/etc/nginx/conf/ssl/www_nginxbar_org.pass
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·网站证书私钥文件是否需要密码由用户自行选择，只需选择一种方式执行即可。</p> 
+ <p class="ziti3">（2）获取证书文件</p> 
+ <p class="ziti3">将www_nginxbar_org.csr文件提交给CA机构后，即可获得Nginx支持的PEM格式证书文件。</p> 
+ <p class="ziti3">CA机构为方便进行证书管理，通常会以证书链的方式进行网站证书的颁发与验证，证书链通常由网站证书、中间证书与根证书组成。证书链的验证是由网站证书开始、自下而上进行信任验证传递的。根证书通常存放在客户端，吊销根证书的过程非常困难；中间证书只是增加了一个中间验证环节，可以减少CA机构对根证书的管理维护工作，吊销也相对简单。除了向CA机构申请证书外，也可以自签证书在内部使用，自签证书操作如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">## 创建独立站点使用的自签证书
+openssl req -new -x509 -nodes -out /etc/nginx/conf/ssl/www_nginxbar_org.pem -keyout /etc/nginx/conf/ssl/www_nginxbar_org.key -days 3650 -subj "/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=admin/CN=nginxbar.com/emailAddress=admin@nginxbar.com"
+
+## 创建独立站点使用有密码的网站证书私钥文件的自签证书
+openssl genrsa -aes256 -passout pass:111111 -out /etc/nginx/conf/ssl/www_nginxbar_org.key 2048
+
+openssl req -new -x509 -nodes -out /etc/nginx/conf/ssl/www_nginxbar_org.pem -passin pass:111111 -key /etc/nginx/conf/ssl/www_nginxbar_org.key -days 3650 -subj "/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=admin/CN=nginxbar.com/emailAddress=admin@nginxbar.com"
+
+## 保存私钥密码
+echo "111111" &gt;&gt;/etc/nginx/conf/ssl/www_nginxbar_org.pass
+
+## 创建自签客户端证书
+openssl req -new -x509 -nodes -out /etc/nginx/conf/ssl/client.pem -keyout /etc/nginx/conf/ssl/client.key -days 3650 -subj "/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=admin/CN=nginxbar.com/emailAddress=admin@nginxbar.com"
+
+## 转换客户端证书为可被浏览器导入的pkcs12格式
+openssl pkcs12 -export -clcerts -in /etc/nginx/conf/ssl/client.pem -inkey /etc/nginx/conf/ssl/client.key -out /etc/nginx/conf/ssl/client.p12
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">获得网站证书后，可以按照如下方式配置HTTPS站点。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 443 ssl;                                 # 启用HTTPS支持
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;       # HTTPS网站证书
+    ssl_certificate_key ssl/www_nginxbar_org.key;   # HTTPS网站证书私钥
+    ssl_password_file ssl/www_nginxbar_org.pass;    # HTTPS网站证书私钥密码文件
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

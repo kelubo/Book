@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">5.4　设置及修改mysql root用户密码</h2>
+<h3 class="p3">
+<a id="b1">5.4.1　MySQL数据库用户安全策略介绍</a>
+</h3>
+<p class="ziti">安装完MySQL数据库之后，默认的管理员root密码为空，这很不安全。因此需要为root用户设置一个密码。其实前面在安装MySQL数据库之后，我们已经做了一些安全措施，具体如下。</p>
+<p class="ziti6">·数据库不设置外网IP。</p>
+<p class="ziti6">·为root用户设置比较复杂的密码。</p>
+<p class="ziti6">·删除无用的mysql库内的用户账号，只保留root@localhost以及root@127.0.0.1。</p>
+<p class="ziti6">·删除默认的test数据库。</p>
+<p class="ziti6">·增加用户的时候，授权的权限应尽量最小，允许访问的主机范围最小化。</p>
+<p class="ziti6">·登录命令行操作不携带密码，而是回车后输入密码，从MySQL 5.6版本起命令行携带密码会报警告提示。</p>
+<p class="ziti">除了上面的方法之外，针对MySQL数据库的用户处理，还有更严格的做法，下面就来看看。</p>
+<p class="ziti">以下是采用更安全的措施来删除root，添加新的管理员用户。</p>
+<p class="ziti">1）删除所有mysql中的用户，包括root超级用户：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; delete from mysql.user;
+Query OK, 2 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">这里的root可以保留，修改为其他用户也可以。</p>
+<p class="ziti">2）增加system并将该管理员用户提升为超级管理员，即与root等价的管理员用户，只是名字不同而已：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant all privileges on *.* to system@'localhost' identified by 'oldboy123' with grant option;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+提示：flush-privileges      Reload grant tables (same as reload)</pre>
+<hr/>
+<p class="ziti">此外，对于带密码的文件或脚本权限，最好是文件用600，脚本用700，用户和组则用root或mysql。</p>
+</body>
+</html>

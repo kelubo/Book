@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">8.4.2　物理备份方式</h3>
+<p class="p6">1.物理备份</p>
+<p class="ziti">（1）冷备方法</p>
+<p class="ziti">MySQL的物理备份方法之一是使用cp、rsync、tar、scp等复制工具把MySQL数据文件复制成多份，由于在备份期间数据仍然有写入操作，所以，直接复制的备份方式会引起数据丢失。另外在恢复数据库时，对新数据库的路径、配置也有要求，一般要和原库的配置保持一致（版本、路径、配置尽可能一样）。</p>
+<p class="ziti">为了确保备份期间数据的一致性，可以选择人工停库或者锁库后再进行物理复制，而这在生产环境中一般是不允许的，除非是可以申请停机或锁表时间，所以使用传统Linux命令复制工具还是比较粗的冷备份方式，应避免使用，后文还会提及根据MySQL主从复制利用从库进行冷备份的策略。</p>
+<p class="ziti">一般在进行大规模数据库迁移时，先停库，然后物理迁移，这样做是很有效率的方案。</p>
+<p class="ziti">（2）热备方法</p>
+<p class="ziti">除了在Linux命令行通过命令直接复制MySQL数据文件之外，还有一些其他的第三方的开源或商业物理热备份工具，如Xtrabackup。使用这个工具可以实现物理全备及增量备份。</p>
+<p class="p6">2.物理备份的特点</p>
+<p class="ziti">物理备份的优缺点正好与逻辑备份相反，因此在企业里应根据需求，互补使用。</p>
+<p class="ziti6">·优点：速度快，效率高。</p>
+<p class="ziti6">·缺点：不容易跨平台、跨版本、跨软件、跨操作系统，可以实现分库分表备份，但恢复时会麻烦很多，软件的使用也比较复杂一些。</p>
+<p class="p6">3.物理备份的常用工具或方法</p>
+<p class="ziti">Linux下冷备份工具为cp、tar，备份时需要锁表或者停库以确保数据的一致性；开源的热备份（基于InnoDB）工具则是Xtrabackup。</p>
+<p class="p6">4.物理备份的企业应用场景</p>
+<p class="ziti6">·数据库总数据量超过30GB的，可使用Xtrabackup热备工具进行备份，以提升效率。</p>
+<p class="ziti6">·可以选择在数据库的从库上进行备份，备份时停止SQL线程应用数据到数据库，然后通过cp或tar打包备份，这也是一种不错的冷备方案，不会影响数据库的服务。</p>
+</body>
+</html>

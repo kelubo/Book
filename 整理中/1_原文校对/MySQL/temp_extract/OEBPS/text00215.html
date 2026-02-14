@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">14.2　MySQL主从复制实践</h2>
+<h3 class="p3">
+<a id="b1">14.2.1　主从复制实践准备</a>
+</h3>
+<p class="p6">1.主从复制数据库实战环境准备</p>
+<p class="ziti">MySQL主从复制实践对环境的要求比较简单，可以是单机单数据库多实例的环境，也可以是两台服务器，每台机器一个独立数据库的环境。本文以两台服务器，每台服务器上均安装本书第3章所讲的单机单实例数据库的环境为例进行讲解，单机单数据库多实例的环境讲解请参考《跟老男孩学Linux运维：Web集群实战》一书第9章的内容。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">特别提示</span>
+</p>
+<p class="ziti6">1.如果是VMware虚拟环境克隆虚拟机，则会导致网卡启动无法连网的问题，解决方法请参考<a href="http://oldboy.blog.51cto.com/2561410/1363853">http://oldboy.blog.51cto.com/2561410/1363853</a>
+ 。</p>
+<p class="ziti6">2.如果是克隆安装好的MySQL虚拟机，则需要注意数据目录下auto.cnf文件（本文是/application/mysql/data/auto.cnf）里的UUID要人为修改一下，使其与原始虚拟机不一致。</p>
+<p class="p6">2.定义主从复制需要的服务器角色</p>
+<p class="ziti">主库及从库IP、端口信息如表14-1所示。</p>
+<p class="middle-img">表14-1　主库及从库IP和端口信息</p>
+<div class="pic"><img alt="" src="Image00117.jpg" />
+</div>
+<p class="p6">3.数据库中英文名称约定</p>
+<p class="ziti">MySQL主库，也可称为Master，本文所对应服务的端口号为3306！</p>
+<p class="ziti">MySQL从库，也可称为Slave，本文所对应服务的端口号为3306！</p>
+<p class="ziti">下面的内容中，可能把主库称为Master，把从库称为Slave，或者反过来称呼，代表的意思都是一样的。</p>
+<p class="p6">4.检查数据库的当前状态</p>
+<p class="ziti">分别执行命令检查主从数据库的启动状态：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# lsof -i :3306
+COMMAND  PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+mysqld  3044 mysql   11u  IPv6  15565      0t0  TCP *:mysql (LISTEN)
+[root@db02 ~]# lsof -i :3306
+COMMAND  PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+mysqld  3028 mysql   11u  IPv6  15422      0t0  TCP *:mysql (LISTEN)</pre>
+<hr/>
+<p class="ziti">根据结果可以确定数据库已处于正常启动状态。</p>
+</body>
+</html>

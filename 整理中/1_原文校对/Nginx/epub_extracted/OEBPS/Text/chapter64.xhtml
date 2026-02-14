@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_72">4.2.3　连接校验模块</h3> 
+ <p class="ziti3">模块名称：ngx_http_secure_link_module</p> 
+ <p class="ziti3">该模块的功能是与实际HTTP应用程序（PHP或Java等动态应用程序）相结合，实现对用户的访问连接做校验和过期验证的功能。常用于访问及文件下载的防盗链的实现。该模块的内置配置指令如表4-21和表4-22所示。</p> 
+ <p class="middle-img">表4-21　连接校验参数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-21.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-21.jpg" class="calibre128"/></a> 
+ </div> 
+ <p class="middle-img">表4-22　连接校验MD5指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-22.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-22.jpg" class="calibre153"/></a> 
+ </div> 
+ <p class="ziti3">该模块功能的实现原理如下：</p> 
+ <p class="ziti4">·HTTP应用程序计算出唯一的MD5字符串和过期时间。</p> 
+ <p class="ziti4">·HTTP应用程序把计算出的MD5字符串和过期时间以参数的形式与被限制的真实连接组成新的访问连接。</p> 
+ <p class="ziti4">·用户单击有MD5字符串和过期时间参数的连接后，请求Nginx服务器。</p> 
+ <p class="ziti4">·Nginx通过secure_link指令获取用户访问连接中的MD5字符串和过期时间的值。</p> 
+ <p class="ziti4">·Nginx校验过期时间是否过期，当被判断为过期时，设置模块内置参数$secure_link的值为0。</p> 
+ <p class="ziti4">·Nginx把MD5字符串与secure_link_md5指令指定格式生成的MD5值进行比对，在过期时间内，当MD5被判断为一致时，设置模块内置参数$secure_link的值为1。</p> 
+ <p class="ziti4">·模块内置参数$secure_link的值默认为空。</p> 
+ <p class="ziti3">HTTP服务器代码（PHP）配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;?php
+$secret = 'nginxtest';                                         // 定义密钥
+$path   = "/download/test.zip";                                // 被保护的真实连接
+$expire = time()+10;                                          // 访问超时时间是10s
+$md5 = base64_encode(md5($secret . $path . $expire, true));  // 将访问密钥、访问路径、超时时
+                                                             // 间加密
+$md5 = strtr($md5, '+/', '-_');                               // 特殊字符“+”和“/”的处理
+$md5 = str_replace('=', '', $md5);                            // 特殊字符“=”的处理
+$url = "http://".$_SERVER['HTTP_HOST']."$path?valid=$md5&amp;time=$expire"; // 新的访问连接
+echo '&lt;a href="'.$url.'" &gt;test.zip&lt;/a&gt;';
+
+?&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server{
+    listen 8083;
+    root /opt/nginx-web/phpweb;
+
+    location ~ \.php(.*)$ {
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+
+        fastcgi_split_path_info       ^(.+\.php)(.*)$;
+        fastcgi_param PATH_INFO       $fastcgi_path_info;
+        include        fastcgi.conf;
+    }    
+
+    location /download/ {
+        alias /opt/nginx-web/files/;
+        secure_link $arg_valid,$arg_time;       # 设置MD5及过期时间的参数为valid和time
+        secure_link_md5 nginxtest$uri$arg_time; # MD5计算格式
+        if ( $secure_link = "" ) {
+                return 403;
+        }
+        if ( $secure_link = "0" ) {
+                return 405;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_83">4.3.4　数据修改</h3> 
+ <p class="ziti3">模块：ngx_http_addition_module</p> 
+ <p class="ziti3">该模块可以在响应数据的前面或后面添加文本。该模块需要配置编译时，添加编译参数--with-http_addition_module。该模块的内置配置指令如4-68～表4-70所示。</p> 
+ <p class="middle-img">表4-68　响应数据前添加指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-68.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-68.jpg" class="calibre142"/></a> 
+ </div> 
+ <p class="middle-img">表4-69　响应数据后添加指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-69.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-69.jpg" class="calibre185"/></a> 
+ </div> 
+ <p class="middle-img">表4-70　响应数据类型指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-70.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-70.jpg" class="calibre186"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 8081;
+    server_name localhost;
+    charset utf-8;
+    root /opt/nginx-web/html;
+
+    location / {
+        add_before_body /_head.html;    # 在响应数据前添加/_head.html的响应数据
+        add_after_body /_footer.html;   # 在响应数据后添加/_footer.html的响应数据
+        index index.html;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">模块：ngx_http_sub_module</p> 
+ <p class="ziti3">该模块可以通过内建指令将响应数据中的字符串替换成指定的字符串。该模块需要配置编译时，需要添加编译参数--with-http_sub_module。该模型的内置配置指令如表4-71～表4-74所示。</p> 
+ <p class="middle-img">表4-71　字符串替换指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-71.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-71.jpg" class="calibre187"/></a> 
+ </div> 
+ <p class="middle-img">表4-72　保留最后编辑字段指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-72.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-72.jpg" class="calibre188"/></a> 
+ </div> 
+ <p class="middle-img">表4-73　仅替换一次指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-73.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-73.jpg" class="calibre189"/></a> 
+ </div> 
+ <p class="middle-img">表4-74　替换数据类型指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-74.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-74.jpg" class="calibre119"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location / {
+    sub_filter_types text/html;
+    sub_filter_once off;
+    sub_filter '&lt;a href="http://127.0.0.1:8080/'  '&lt;a href="https://$host/'; 
+    sub_filter '&lt;img src="http://127.0.0.1:8080/' '&lt;img src="https://$host/';
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

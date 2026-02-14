@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_189">10.2.2　模块配置指令</h3> 
+ <p class="ziti3">nginx-module-vts模块为主机监控提供了多个配置指令，可实现监控数据html、json等格式的输出，并可以自定义关键字的方式进行连接数据统计，甚至通过统计数据进行限制请求连接数或流量的配置。模块配置指令如表10-3所示。</p> 
+ <p class="ziti4">·指令vhost_traffic_status_zone、vhost_traffic_status_dump、vhost_traffic_status_filter_max_node仅可在http指令域中编写。其他指令均可在http及其所包含的server、location指令域中编写。</p> 
+ <p class="ziti4">·vhost_traffic_status_display指令启用时，将提供主机状态监控数据输出功能，监控数据包括Nginx服务器连接状态（Server Main）、Nginx主机连接状态（Server Zones）、过滤关键字连接状态（Filters）和上游服务器组连接状态（Upstreams）4个部分的内容。</p> 
+ <p class="middle-img">表10-3　模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b10-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b10-3.jpg" class="calibre307"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/284-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/284-i.jpg" class="calibre308"/></a> 
+ </div> 
+ <p class="ziti4">·Nginx服务器连接状态包括了Nginx连接状态模块自带的连接状态统计数据。</p> 
+ <p class="ziti4">·Nginx主机连接状态由配置指令vhost_traffic_status_filter_by_host设置是否启用。启用该功能后，会对当前Nginx服务器配置的每个主机名的请求数（Requests Total）、请求时间（Requests Time）、请求频率（Requests Req/s）、响应（Responses）状态码、响应总数（Responses Total）、流量（Traffic）进行统计。如果所在主机配置了缓存（Cache），还会对缓存的各种状态进行数据统计。</p> 
+ <p class="ziti4">·过滤关键字连接状态模块会按照配置指令vhost_traffic_status_filter_by_set_key设置的关键字进行状态统计，通常会把$uri配置为关键字，这样就会将每条URL的请求数（Requests Total）、请求时间（Requests Time）、请求频率（Requests Req/s）、响应（Responses）状态码、响应总数（Responses Total）、流量（Traffic）的数据统计出来。如果被配置了缓存，则该URL在缓存中的当前状态也会被输出。</p> 
+ <p class="ziti4">·当Nginx服务器是代理服务器时，会按照每个上游服务器组的名称对上游服务器组连接状态包含的每个被代理服务器的IP、端口、状态（State）、响应时间（Response Time，仅被代理服务器返回响应的时间）、权重（Weight）、最大失败次数（Max Fails）、失败超过的时间（Fail Timeout）、请求数（Requests Total）、请求时间（Requests Time）、请求频率（Requests Req/s）、响应（Responses）状态码、响应总数（Responses Total）、流量（Traffic）进行统计。</p> 
+ <p class="ziti4">·vhost_traffic_status_limit_traffic指令的member参数如表10-4所示。</p> 
+ <p class="middle-img">表10-4　member参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b10-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b10-4.jpg" class="calibre309"/></a> 
+ </div> 
+ <p class="ziti3">缓存请求状态及说明参见7.2.1节。</p> 
+ <p class="ziti4">·vhost_traffic_status_limit_traffic_by_set_key的指令参数limitkey的语法格式如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">group@[subgroup@]name
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·limitkey的group特定关键字分别为主机（NO）、独立上游服务器（UA）、上游服务器组（UG）、缓存（CC）、过滤器（FG），配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 设置按照关键字$geoip_country_code进行访问统计
+vhost_traffic_status_filter_by_set_key $geoip_country_code country::$server_name;
+
+# 将过滤器（FG）中标识名称为US的访问请求的最大下载量设置为1024GB
+vhost_traffic_status_limit_traffic_by_set_key FG@country::$server_name@US out:1024G;
+
+# 将上游服务器组（UG）中上游服务器组（upstream）名称为backend的被代理服务器10.10.10.17:80
+  最大请求数设置为1000
+vhost_traffic_status_limit_traffic_by_set_key UG@backend@10.10.10.17:80 request:1000;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·vhost_traffic_status_set_by_filter指令可以获取当前Nginx服务器在共享内存中的统计数据并赋值给指定的变量，配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 将主机名为example.org的请求统计数据赋值给变量$requestCounter
+vhost_traffic_status_set_by_filter $requestCounter server/example.org/requestCounter
+
+# 将过滤区域country中，访问主机example.org且被标识为KR的请求统计数据赋值给变量$requestCounter
+vhost_traffic_status_set_by_filter $requestCounter filter/country::example.org@KR/requestCounter
+
+# 将上游服务器组名为backend的被代理服务器10.10.10.11:80的请求统计数据赋值给变量$requestCounter
+vhost_traffic_status_set_by_filter $requestCounter upstream@group/backend @10.10.10.11:80/requestCounter
+
+# 将独立上游服务器10.10.10.11:80的请求统计数据赋值给变量$requestCounter
+vhost_traffic_status_set_by_filter $requestCounter upstream@alone/10.10.10. 11:80/requestCounter
+
+# 将缓存名称为my_cache_name的命中统计数据赋值给变量$cacheHit
+vhost_traffic_status_set_by_filter $cacheHit cache/my_cache_name/cacheHit
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

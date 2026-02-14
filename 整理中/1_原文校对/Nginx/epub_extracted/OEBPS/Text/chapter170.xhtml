@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="p3" id="sigil_toc_id_183">10.1　Nginx连接状态监控</h2> 
+ <h3 class="p" id="sigil_toc_id_184">10.1.1　Nginx连接状态</h3> 
+ <p class="ziti3">当客户端发送请求给Nginx服务器时，每个连接会被Nginx按照执行情况标记为接受、处理和活跃3个状态。通过对这3个状态数据的监控，可以清晰地了解当前Nginx服务器请求连接的处理状态。Nginx连接状态如图10-1所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-1.jpg" class="calibre304"/></a> 
+ </div> 
+ <p class="middle-img">图10-1　Nginx连接状态</p> 
+ <p class="ziti4">·接受（Accepts）状态，建立并接受客户端的HTTP连接状态。</p> 
+ <p class="ziti4">·处理（Handled）状态，开始处理客户端的HTTP连接状态。</p> 
+ <p class="ziti4">·活跃（Active）状态，对客户端HTTP请求读取请求数据、处理请求数据，以及当启用保持连接（keep-alive）机制时，使当前HTTP连接处于保持连接机制的连接状态。</p> 
+ <p class="ziti4">·请求（Requests），客户端发送的数据请求，当启用保持连接（keep-alive）机制时，客户端请求会在同一HTTP连接内多次使用。</p> 
+ <p class="ziti4">·等待中（Waiting）状态，当启用保持连接机制时，等待下一次客户端请求的状态。</p> 
+ <p class="ziti4">·读取中（Reading）状态，正在被读取请求头的客户端连接状态。</p> 
+ <p class="ziti4">·回写中（Writing）状态，正在向客户端返回响应数据的连接状态。</p> 
+ <p class="ziti3">当有客户端与Nginx新建立连接时，接受状态计数器会加1，处理状态计数器通常与接受状态的计数器统计数值是相等的，在HTTP并发连接数超过worker_connection的限制时，处理状态计数器数值将因受worker_connection指令值的限制而小于接受状态计数器的数值。</p> 
+ <p class="ziti3">客户端连接被处理后将进入活跃状态，Nginx会读取数据请求的请求头数据，当前活动连接标记为读取中状态，请求计数器会加1。当请求处理完毕向客户端返回响应数据时，当前活动连接标记为回写中状态，对启用保持连接的活动连接将标记为等待中状态，直到超过Nginx保持连接相关指令限定值时，关闭连接。</p> 
+</body>
+</html>

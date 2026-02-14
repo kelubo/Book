@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">6.3.1　DDL语句之管理数据库</h3>
+<p class="ziti">DDL的特点是对数据库内部的对象进行创建、修改、删除等操作，不涉及对表中内容的操作和更改。这部分是运维人员或DBA需要熟练掌握的内容，开发人员了解即可。</p>
+<p class="ziti">下面就跟随老男孩一起来了解下DDL的常用操作。</p>
+<p class="p6">1.创建数据库</p>
+<p class="ziti">创建数据库的命令语法为：</p>
+<hr/>
+<pre class="ziti1">create database &lt;数据库名&gt;;</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+</p>
+<p class="ziti6">·注意库名不能以数字开头。</p>
+<p class="ziti6">·所有字母对大小写不敏感。</p>
+<p class="ziti">如果把创建数据库比喻为追求女生，那么就是表6-2中的对应关系。</p>
+<p class="middle-img">表6-2　建库的信息说明</p>
+<div class="pic"><img alt="" src="Image00037.jpg" />
+</div>
+<p class="ziti">在编译环境下，针对MySQL默认字符集建立数据库测试的步骤如下。</p>
+<p class="ziti">1）建立一个名为oldboy的数据库：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create database oldboy;      #&lt;==创建名为oldboy的数据库。
+Query OK, 1 row affected (0.00 sec) #&lt;==执行后的输出结果，“Query OK”表示成功执行，“1 row affected”表示影响了1行，“(0.00 sec)”为执行的时间。
+mysql&gt; show databases;              #&lt;==查看所有的数据库。
++--------------------+
+| Database           |
++--------------------+
+| information_schema | #&lt;==此表为系统表，存储数据库内置对象的信息，如用户，权限等。
+| mysql              | #&lt;==此表为系统表，存储用户授权和权限相关的信息，授权时会用到。
+| oldboy             | #&lt;==这里就是刚才创建的数据库。
+| performance_schema | #&lt;==这是MySQL第二条产品线增加的系统表，存储与性能相关的表数据。
++--------------------+
+4 rows in set (0.00 sec)
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">查看刚刚创建的oldboy库对应的SQL语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help show                      #&lt;==通过show命令查看数据库语句的帮助。
+SHOW CREATE DATABASE db_name
+mysql&gt; show create database oldboy\G  #&lt;==\G是为了调整显示的格式。
+*************************** 1. row ***************************
+       Database: oldboy
+Create Database: CREATE DATABASE `oldboy` /*!40100 DEFAULT CHARACTER SET utf8 */
+#&lt;==当不指定字符集建库时，库的字符集默认和编译时指定的字符集一致。
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">2）建立一个GBK字符集数据库，名为oldboy_gbk，并查看建库语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create database oldboy_gbk CHARACTER SET gbk COLLATE gbk_chinese_ci;
+Query OK, 1 row affected (0.01 sec)
+mysql&gt; show create database oldboy_gbk\G
+*************************** 1. row ***************************
+       Database: oldboy_gbk
+Create Database: CREATE DATABASE `oldboy_gbk` /*!40100 DEFAULT CHARACTER SET gbk */
+#&lt;==字符集确实改为了gbk。
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">3）建立一个名为oldboy_utf8的UTF8数据库：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show create database oldboy_utf8\G
+*************************** 1. row ***************************
+       Database: oldboy_utf8
+Create Database: CREATE DATABASE `oldboy_utf8` /*!40100 DEFAULT CHARACTER SET utf8 */
+#&lt;==字符集确实改为了utf8了。
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">4）创建不同字符集格式的数据库命令集合：</p>
+<hr/>
+<pre class="ziti1">create database oldboy; #&lt;==默认数据库的字符集设置配置。
+create database oldboy_gbk DEFAULT CHARACTER SET gbk COLLATE gbk_chinese_ci;
+                        #&lt;==创建gbk字符集数据库。
+create database oldboy_utf8 DEFAULT CHARACTER SET utf8  COLLATE utf8_general_ci;
+                      #&lt;==创建utf8字符集数据库。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+</p>
+<p class="ziti6">·字符集的不一致是数据库里中文内容出现乱码的罪魁祸首，有关字符集的知识详见后文。</p>
+<p class="ziti6">·查看字符集及校对规则名字（指定字符集建库结尾的语句，例如SET gbk COLLATE gbk_chinese_ci）的方法为“mysql&gt;SHOW CHARACTER SET；”。</p>
+<p class="ziti">到了这里，有必要了解一下有关数据库字符集的知识了。</p>
+<p class="ziti">如果编译的时候指定了特定的字符集，则以后创建对应字符集的数据库时就不需要指定字符集了。示例如下：</p>
+<hr/>
+<pre class="ziti1">cmake . -DCMAKE_INSTALL_PREFIX=/application/mysql-5.6.40 \
+-DMYSQL_DATADIR=/application/mysql-5.6.40/data \
+-DMYSQL_UNIX_ADDR=/application/mysql-5.6.40/tmp/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \              #&lt;==这里就是建库时指定的默认数据库字符集。
+-DDEFAULT_COLLATION=utf8_general_ci \ #&lt;==这里就是建库时指定的默认数据库校对规则。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 使用MySQL二进制包安装的数据库字符集默认为latin1！</p>
+<p class="ziti">
+<span class="yanse">那么，在企业里的不同场景下，要如何创建符合字符集需求的数据库呢？</span>
+</p>
+<p class="ziti">可根据公司开发的程序确定字符集（建议选择UTF8，移动互联网环境下可选utf8mb4）！也可以在编译的时候指定字符集，例如：</p>
+<hr/>
+<pre class="ziti1">-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \</pre>
+<hr/>
+<p class="ziti">此时，建库的时候默认创建即可，例如“create database oldboy；”。</p>
+<p class="ziti">如果编译的时候没有指定字符集或者指定了与网站程序不同的字符集，又该如何解决？</p>
+<p class="ziti">这时指定字符集创建数据库即可，也可以在数据库配置文件里，修改默认的字符集显示，具体见后文说明。</p>
+<p class="p6">2.显示数据库</p>
+<p class="ziti">显示数据库，前文已经出现过，最基本的命令就是：</p>
+<hr/>
+<pre class="ziti1">show databases;</pre>
+<hr/>
+<p class="ziti">可执行help show查看与该命令对应的帮助信息。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help show
+...省略若干...
+SHOW CREATE VIEW view_name
+SHOW DATABASES [like_or_where]  #&lt;==这就是显示数据库的命令帮助信息。
+SHOW ENGINE engine_name {STATUS | MUTEX}
+SHOW [STORAGE] ENGINES
+...省略若干...</pre>
+<hr/>
+<p class="ziti">如果不知道本节所讲的关键命令show，那么可以使用“help contents”命令，然后执行“help Administration”来查看。</p>
+<p class="ziti">下面来看个使用show命令的示例：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show databases like 'oldboy'; #&lt;==匹配oldboy字符串的内容。
++-------------------+
+| Database (oldboy) |
++-------------------+
+| oldboy            |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql&gt; show databases like 'oldboy%'; #&lt;==%为通配符，表示匹配以oldboy开头的所有内容。
++--------------------+
+| Database (oldboy%) |
++--------------------+
+| oldboy             |
+| oldboy_gbk         |
+| oldboy_utf8        |
++--------------------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">3.切换数据库</p>
+<p class="ziti">所谓的切换库，就相当于系统中的切换路径一样，只不过，系统中使用的是类似于“cd/etc”的命令，而数据库里切换库使用的是use命令。</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1"> use  &lt;数据库名&gt;；</pre>
+<hr/>
+<p class="ziti">如果oldboy数据库存在，则可通过如下命令尝试进入oldboy数据库里：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select database(); #&lt;==查看当前管理员所在的库名。
++------------+
+| database() |
++------------+
+| NULL       |            #&lt;==空值，表示没有在任何库里。
++------------+
+1 row in set (0.00 sec)
+
+mysql&gt; use oldboy         #&lt;==切换到oldboy库里。
+Database changed
+mysql&gt; select database(); #&lt;==重新查看。
++------------+
+| database() |
++------------+
+| oldboy     |            #&lt;==表示存在于oldboy库里了。
++------------+
+1 row in set (0.00 sec)
+mysql&gt;</pre>
+<hr/>
+<p class="p6">4.查看数据库包含的表信息</p>
+<p class="ziti">要查看数据库包含的表信息有两种常见的方法，第一种是切到数据库里面去查看，第二种是在外面查看库里的表信息。下面分别来看看。</p>
+<p class="ziti">第一种方法：切到数据库里面去查看表信息。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+mysql&gt; show tables;
+Empty set (0.00 sec)  #&lt;==空表，因为是新库，还没有建立表。</pre>
+<hr/>
+<p class="ziti">第二种方法：在库外面查看库里的表信息。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show tables from oldboy;            #&lt;==查看指定库oldboy中包含的表。
+Empty set (0.00 sec)
+mysql&gt; show tables in oldboy_gbk;
+Empty set (0.00 sec)
+mysql&gt; show tables from mysql like 'db%';  #&lt;==还可以匹配包含指定字符开头的表。
++-----------------------+
+| Tables_in_mysql (db%) |
++-----------------------+
+| db                    |
++-----------------------+
+1 row in set (0.01 sec)</pre>
+<hr/>
+<p class="ziti">如果不知道这里使用的命令show，则可以通过“help contents”命令，进而执行“help Administration”命令来查看。</p>
+<p class="p6">5.删除数据库</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1">drop database &lt;数据库名&gt;；</pre>
+<hr/>
+<p class="ziti">以下示例用于删除名为oldboy_gbk的数据库：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop database oldboy_gbk;
+Query OK, 0 rows affected (0.02 sec)
+mysql&gt; show databases like 'oldboy_gbk';
+Empty set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">学习时遇到忘记命令或命令用法时就可以随时查看帮助和提示，例如，若不知道此题的命令是什么，则可以直接执行下面的命令查看帮助：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help drop database</pre>
+<hr/>
+<p class="ziti">当然如果连drop都不知道的话，就只能执行“help contents”，然后找到“Data Definition”来查看了，“Data Definition”的意思是数据定义，可想而知，“help Data Definition”就是用于查询具体的命令了。</p>
+</body>
+</html>

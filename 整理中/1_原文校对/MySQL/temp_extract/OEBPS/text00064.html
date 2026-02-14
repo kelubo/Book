@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.4　创建MySQL多实例的启动文件</h3>
+<p class="ziti">MySQL多实例启动文件的创建和配置文件几乎一样，也可以通过vim命令来添加，示例如下：</p>
+<hr/>
+<pre class="ziti1">vim /data/3306/mysql
+vim /data/3307/mysql</pre>
+<hr/>
+<p class="ziti">需要添加的MySQL启动文件内容见表4-2。当然，在实际工作中是拿早已配置好的模板来进行修改的，可以通过rz等方式上传配置文件模板mysql文件到相关目录下。</p>
+<p class="middle-img">表4-2　3306与3307 mysql实例启动文件对比</p>
+<div class="pic"><img alt="" src="Image00026.jpg" />
+</div>
+<div class="pic"><img alt="" src="Image00027.jpg" />
+</div>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 这里的MySQL启动Shell脚本知识，请参考《跟老男孩学Linux运维：Shell编程实战》一书，京东售卖地址：<a href="https://item.jd.com/12117874.html">https://item.jd.com/12117874.html</a>
+ 。</p>
+<p class="ziti">最终完成后的多实例根/data目录结果如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# tree /data
+/data
+|-- 3306
+|   |-- my.cnf  #&lt;==3306实例的配置文件。
+|   `-- mysql   #&lt;==3306实例的启动文件。
+`-- 3307
+    |-- my.cnf  #&lt;==3307实例的配置文件。
+    `-- mysql   #&lt;==3307实例的启动文件。
+2 directories, 4 files</pre>
+<hr/>
+<p class="ziti">需要特别说明一下的是，在多实例启动文件中，启动MySQL不同实例服务所执行的命令实质上是有区别的，例如，启动3306实例的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqld_safe --defaults-file=/data/3306/my.cnf &gt; /dev/null  2&gt;&amp;1&amp;</pre>
+<hr/>
+<p class="ziti">启动3307实例的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqld_safe --defaults-file=/data/3307/my.cnf &gt;/dev/null 2&gt;&amp;1 &amp;</pre>
+<hr/>
+<p class="ziti">其中，“--defaults-file=/data/3307/my.cnf”表示指定配置文件启动，“&gt;/dev/null 2&gt;&amp;1”表示将正确输出和错误输出定向到空。</p>
+<p class="ziti">下面看看在多实例启动文件中，如何停止MySQL不同实例服务的命令。</p>
+<p class="ziti">本次多实例脚本，老男孩统一采用了mysql官方推荐的kill的形式：</p>
+<hr/>
+<pre class="ziti1">printf "Stoping MySQL...\n"
+mysqld_pid=`cat "$mysqld_pid_file_path"` #&lt;==获取进程pid。
+if (kill -0 $mysqld_pid 2&gt;/dev/null)     #&lt;==测试pid对应的mysql进程是否存在。
+    then
+        kill $mysqld_pid                 #&lt;==根据进程号杀死进程。
+        sleep 2
+fi</pre>
+<hr/>
+<p class="ziti">而在以往的教学中，老男孩讲解的是使用如下的mysqladmin命令关闭方法，这个命令的缺点是必须要有数据库的root用户密码才能运行</p>
+<p class="ziti">停止3306实例的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqladmin -u root -poldboy123 -S /data/3306/mysql.sock shutdown</pre>
+<hr/>
+<p class="ziti">停止3307实例的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqladmin -u root -poldboy123 -S /data/3307/mysql.sock shutdown</pre>
+<hr/>
+</body>
+</html>

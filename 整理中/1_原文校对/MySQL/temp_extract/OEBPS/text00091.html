@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">6.2　SQL解析原理流程</h2>
+<h3 class="p3">
+<a id="b1">6.2.1　MySQL体系结构简介</a>
+</h3>
+<p class="ziti">为了让读者能够清晰地理解SQL语句的执行原理，本节简单介绍下MySQL的基本内部结构，更详细的介绍请参见后文。MySQL的体系结构由外围应用程序（客户端）、连接层、SQL层、存储引擎层等组成，图6-1所示的即为MySQL的基本体系结构。</p>
+<div class="pic"><img alt="" src="Image00035.jpg" />
+</div>
+<p class="middle-img">图6-1　MySQL基本体系结构</p>
+<p class="ziti">在图6-1中，应用程序在连接MySQL数据库时，首先要经过连接池技术，然后通过连接池进入SQL解析层，经过SQL解析层的一系列处理及解析后，再进入到存储引擎层去查找数据，最后通过内存或磁盘读取到数据，然后再逐级返回，最终将数据返回给应用程序或用户。这里大家需要了解的是SQL层在体系结构中的位置，正是SQL层解析并读懂SQL语句从而得以读取到数据库的数据，那么SQL层的解析流程到底是怎么样的呢？请看6.2.2节。有关MySQL体系结构的细节请参见后文。</p>
+</body>
+</html>

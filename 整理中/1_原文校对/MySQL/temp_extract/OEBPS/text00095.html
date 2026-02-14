@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">6.3.2　DDL&amp;&amp;DCL语句之管理用户</h3>
+<p class="p6">1.查看当前数据库的用户列表</p>
+<p class="ziti">查看数据库用户列表属于DML负责的部分内容，此处为了方便读者理解，提前进行讲解。</p>
+<p class="ziti">查看当前数据库用户列表的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select user,host from mysql.user;
++------+-----------+
+| user | host      |
++------+-----------+
+| root | 127.0.0.1 | #&lt;==数据库核心保留管理员用户。
+| root | localhost | #&lt;==数据库核心保留管理员用户。
++------+-----------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">这里的select关键字表示查询，是DML语句的关键字之一，user和hosts为要查找的mysql表的字段，from表示去哪查，mysql.user是mysql库里的user表，select语句的更多知识请见后文。此外，数据库的标准用户由“用户”@“主机名”共同组成的，两者加起来是数据库用户的唯一标识。</p>
+<p class="ziti">此前我们安装完数据库之后已经做了基础优化，因此，现在看到的数据库用户就只剩下两个了。</p>
+<p class="p6">2.创建数据库用户</p>
+<p class="ziti">创建数据库用户的语法和创建数据库的语法差不多，都使用的是关键字create。表6-3针对该语法进行了说明。</p>
+<hr/>
+<pre class="ziti1">CREATE USER '用户'@'主机' IDENTIFIED BY '密码';</pre>
+<hr/>
+<p class="middle-img">表6-3　创建用户表格</p>
+<div class="pic"><img alt="" src="Image00038.jpg" />
+</div>
+<p class="ziti">现在创建一个blog用户，只允许本地主机登录，密码是blog123。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create user blog@localhost identified by 'blog123'; #&lt;==有时为了方便会省略单引号，建议尽量不要省略。
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; select user,host from mysql.user;
++------+-----------+
+| user | host      |
++------+-----------+
+| root | 127.0.0.1 |
+| blog | localhost | #&lt;==这样blog新用户就建立了。
+| root | localhost |
++------+-----------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">企业里创建用户一般是授权一个内网网段登录，最常见的网段写法有两种。</p>
+<p class="ziti">方法1：172.16.1.%（%为通配符，匹配所有的内容）。</p>
+<p class="ziti">方法2：172.16.1.0/255.255.255.0，但是不能使用172.16.1.0/24，这是个小遗憾。</p>
+<p class="ziti">下面创建一个用户bbs，授权172.16.1.0/24网段内机器访问：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create user bbs@'172.16.1.%' identified by 'bbs123';
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; select user,host from mysql.user where user='bbs';
++------+----------+
+| user | host     |
++------+----------+
+| bbs  | 172.16.1.% | #&lt;==这样bbs新用户就建立了。
++------+----------+
+1 row in set (0.00 sec)
+mysql&gt;quit</pre>
+<hr/>
+<p class="ziti">登录测试：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -ublog -pblog123              #&lt;==数据库服务器本机上登录。
+[root@oldboy ~]# mysql -ubbs -pbbs123 -h 172.16.1.51 #&lt;==异地或本机登录bbs用户
+                                                 必须要指定IP。</pre>
+<hr/>
+<p class="ziti">若授权主机不对，就会无法登录，这是MySQL的重要安全手段之一。</p>
+<p class="ziti">需要特别强调的一点是，使用create创建的用户仅仅是空用户，即除了可以连接数据库之外，其没有任何数据库权限，有关用户授权还必须要使用grant命令。当然，grant命令可以同时完成创建用户和授权两种操作，因此，很多管理员使用grant替代create来创建用户。下面来看个示例：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show grants for bbs@'172.16.1.%'; #&lt;==查看用户对应的授权权限。
++------------------------------------------------------------------------+
+| Grants for bbs@172.16.1.%                                                |
++------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'bbs'@'172.16.1.%' IDENTIFIED BY PASSWORD &lt;secret&gt; |
+#&lt;==USAGE表示连接权限。
++------------------------------------------------------------------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">3.删除数据库用户</p>
+<p class="ziti">删除数据库用户的语法如下：</p>
+<hr/>
+<pre class="ziti1">drop user 'user'@'主机域'；</pre>
+<hr/>
+<p class="ziti">注意这里面的引号，可以是单引号也可以是双引号，不过最好是用单引号，这也是规范中建议的。</p>
+<p class="ziti">这个命令的意思与创建用户极其类似，具体见表6-4。</p>
+<p class="middle-img">表6-4　删除数据库语法信息解释</p>
+<div class="pic"><img alt="" src="Image00039.jpg" />
+</div>
+<p class="ziti">下面使用该命令删除上述例子中的blog用户：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select user,host from mysql.user where user='blog'; #&lt;==删除前检查。
++------+----------+
+| user | host     |
++------+----------+
+| blog |localhost |
++------+----------+
+1 row in set (0.00 sec)
+mysql&gt; drop user 'blog'@'localhost';                        #&lt;==删除命令。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; select user,host from mysql.user where user='blog';  #&lt;==删除后检查。
+Empty set (0.00 sec)     #&lt;==删除了。
+mysql&gt; flush privileges; #&lt;==使得处理用户后，对数据库生效，一般有数据库改动的情况，
+                           最好执行这个固定命令。
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">如果读者使用drop删除不了用户，则很可能是因为用户或主机部分是特殊字符或大写内容等，此时可以使用下面的方式删除，以bbs用户、172.16.1.%主机为例，具体处理命令及操作过程如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select user,host from mysql.user where user='bbs';
++------+----------+
+| user | host     |
++------+----------+
+| bbs  | 172.16.1.% |
++------+----------+
+1 row in set (0.00 sec)
+mysql&gt; delete from mysql.user where  user='bbs' and host='172.16.1.%';
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; select user,host from mysql.user where user='bbs';
+Empty set (0.00 sec)
+mysql&gt;</pre>
+<hr/>
+<p class="p6">4.授权数据库用户</p>
+<p class="ziti">查看grant的命令帮助，可以很容易地找到创建用户并授权的例子！在MySQL中输入“help grant”即可得到如下帮助信息：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help grant
+…省略部分…
+CREATE USER 'jeffrey'@'localhost' IDENTIFIED BY 'mypass';
+GRANT ALL ON db1.* TO 'jeffrey'@'localhost';
+GRANT SELECT ON db2.invoice TO 'jeffrey'@'localhost';
+GRANT USAGE ON *.* TO 'jeffrey'@'localhost' WITH MAX_QUERIES_PER_HOUR 90;
+…省略部分…</pre>
+<hr/>
+<p class="ziti">运维人员比较常用的创建用户的方法是，使用grant命令在创建用户的同时进行权限授权。下面列举一个授权的例子：</p>
+<hr/>
+<pre class="ziti1">GRANT ALL ON  db1.* TO 'jeffrey'@'localhost' IDENTIFIED BY 'mypass ';</pre>
+<hr/>
+<p class="ziti">授权用户的grant命令简单语法为：</p>
+<hr/>
+<pre class="ziti1">grant all privileges on dbname.* to username@localhost identified by 'passwd';</pre>
+<hr/>
+<p class="ziti">上述命令是授权localhost主机上通过用户username管理dbname数据库的所有权限，密码为passwd。其中username、dbname、passwd可根据业务的情况分别修改。表6-5针对语法内容进行了说明。</p>
+<p class="middle-img">表6-5　grant语法解释</p>
+<div class="pic"><img alt="" src="Image00040.jpg" />
+</div>
+<p class="ziti">操作案例1：创建test用户，对oldboy库具备所有权限，允许从localhost主机登录管理数据库，密码是test123。</p>
+<p class="ziti">实现上述操作的具体命令为：</p>
+<hr/>
+<pre class="ziti1">grant all privileges on oldboy.* to 'test'@'localhost' identified by 'test123';</pre>
+<hr/>
+<p class="ziti">操作过程如下。</p>
+<p class="ziti">查看当前数据库的用户情况，然后执行对应命令授权，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant all privileges on oldboy.* to 'test'@'localhost' identified by 'test123';
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; select user,host from mysql.user where user='test';
++------+-----------+
+| user | host      |
++------+-----------+
+| test | localhost |  #&lt;==test用户已经建立了。
++------+-----------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">查看授权用户test的具体权限，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show grants for 'test'@'localhost';
++------------------------------------------------------------------------+
+| Grants for test@localhost                                              |
++------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'test'@'localhost' IDENTIFIED BY PASSWORD '*676243218923905CF94CB52A3C9D3EB30CE8E20D'                                  |
+| GRANT ALL PRIVILEGES ON `oldboy`.* TO 'test'@'localhost'
+  #&lt;==这里就是授权的权限，注意授权与上文中create创建用户的区别。                 |
++------------------------------------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">操作案例2：授权与root同等地位的system用户权限，如果读者有洁癖，创建完成就可以删除root用户了。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show grants for root@localhost;  #&lt;==先查看root用户的权限。
++------------------------------------------------------------------------+
+| Grants for root@localhost                                              |
++------------------------------------------------------------------------+
+| GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY PASSWORD '*FE28814B4A8B3309DAC6ED7D3237ADED6DA1E515' WITH GRANT OPTION                |
+| GRANT PROXY ON ''@'' TO 'root'@'localhost' WITH GRANT OPTION           |
++------------------------------------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">创建一个权限和root一样大的system用户，<span class="yanse">with grant option</span>
+ 是下面命令的重点：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant all on *.* to 'system'@'localhost' identified by 'system123' with grant option;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show grants for system@localhost;
++------------------------------------------------------------------------+
+| Grants for system@localhost                                            |
++------------------------------------------------------------------------+
+| GRANT ALL PRIVILEGES ON *.* TO 'system'@'localhost' IDENTIFIED BY PASSWORD '*B2A09C1B789FF64A8C3C70A4EC1CA78F34C635B7' WITH GRANT OPTION                |
++------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql&gt; GRANT PROXY ON ''@'' TO 'system'@'localhost' WITH GRANT OPTION;
+#&lt;==允许创建代理用户。
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; show grants for system@localhost;
++------------------------------------------------------------------------+
+| Grants for system@localhost                                            |
++------------------------------------------------------------------------+
+| GRANT ALL PRIVILEGES ON *.* TO 'system'@'localhost' IDENTIFIED BY PASSWORD '*B2A09C1B789FF64A8C3C70A4EC1CA78F34C635B7' WITH GRANT OPTION                |
+| GRANT PROXY ON ''@'' TO 'system'@'localhost' WITH GRANT OPTION         |
++------------------------------------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">此外，还可以使用create和grant命令来配合完成授权操作。具体步骤如下。</p>
+<p class="ziti">首先，创建用户username及密码passwd，授权主机localhost：</p>
+<hr/>
+<pre class="ziti1">CREATE USER 'username'@'localhost' IDENTIFIED BY 'passwd';</pre>
+<hr/>
+<p class="ziti">然后，授权localhost主机上通过用户username管理dbname数据库的所有权限，无须密码：</p>
+<hr/>
+<pre class="ziti1">GRANT ALL ON dbname.* TO 'username'@'localhost';</pre>
+<hr/>
+<p class="ziti">若是要授权局域网内的主机远程连接数据库，根据grant命令的语法，我们知道test@'localhost'位置为授权访问数据库的用户和主机，其中localhost可以用域名、IP地址或IP段来替代，因此，要授权局域网内的主机可以通过如下方法来实现。</p>
+<p class="ziti">第一种方法：一条命令+百分号的匹配法，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant all on *.* to test@'172.16.1.%' identified by 'test123';
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">第二种方法：一条命令+子网掩码的配置法，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant all on *.* to test@'172.16.1.0/255.255.255.0' identified by 'test123';
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 不能用test@'172.16.1.0/24'替代test@'172.16.1.0/255.255.255.0'</p>
+<p class="ziti">第三种方法：通过两条命令来实现，具体如下。</p>
+<p class="ziti">首先，创建用户并设置密码：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create user test@'172.16.1.%' identified by 'test123';
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">然后，对用户授权指定权限和管理的库表，这样即可实现：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant all on *.* to test@'172.16.1.0/255.255.255.0';
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">不过，要记得对上述每条grant命令最好都刷新权限（即使添加用户不需要，养成良好的一致性操作习惯也很重要）：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; flush privileges;
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="p6">5.授权的权限列表</p>
+<p class="ziti">可通过实验获得ALL PRIVILEGES都包括哪些权限。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00024.jpg" />
+ <span class="yanse">说明：</span>
+ 自己动手，丰衣足食，比到处问强多了，这是初学者（同学们）需要重点加强提高的地方。</p>
+<p class="ziti">首先，看看前面授权过的test用户的权限，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show grants for 'test'@'localhost';
++------------------------------------------------------------------------+
+| Grants for test@localhost                                              |
++------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'test'@'localhost' IDENTIFIED BY PASSWORD '*676243218923905CF94CB52A3C9D3EB30CE8E20D'                                  |
+| GRANT ALL PRIVILEGES ON `oldboy`.* TO 'test'@'localhost'
+  #&lt;==这里就是授权的权限，注意授权与上文中create创建用户的区别。                 |
++------------------------------------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">此时查看的还是ALL PRIVILEGES权限，但并未细分。</p>
+<p class="ziti">然后，取消test用户的只读权限（SELECT），看看会是什么情况，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; REVOKE SELECT ON oldboy.* FROM 'test'@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; REVOKE SELECT ON oldboy.* FROM 'test'@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show grants for 'test'@'localhost';
++------------------------------------------------------------------------+
+|Grants for test@localhost                                               |
++------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'test'@'localhost' IDENTIFIED BY PASSWORD '*676243218923905CF94CB52A3C9D3EB8'                                          |
+| GRANT INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON `oldboy`.* TO 'test'@'localhost'   |
+#&lt;==看到了吧，权限all被拆分成了更细的权限。
++------------------------------------------------------------------------+
+2 rows in set (0.00 sec)
+mysql&gt; select * from mysql.db where user='test' and host='localhost'\G
+#&lt;==去db表里查看用户权限。
+*************************** 1. row ***************************
+                 Host: localhost
+                   Db: oldboy
+                 User: test
+          Select_priv: N #&lt;==这就是刚刚用revoke命令收回的权限。
+          Insert_priv: Y
+          Update_priv: Y
+          Delete_priv: Y
+          Create_priv: Y
+            Drop_priv: Y
+           Grant_priv: N #&lt;==这个权限是N，为什么？这是因为创建用户all里没有授权
+                             grant权限。
+      References_priv: Y
+           Index_priv: Y
+           Alter_priv: Y
+Create_tmp_table_priv: Y
+     Lock_tables_priv: Y
+     Create_view_priv: Y
+       Show_view_priv: Y
+  Create_routine_priv: Y
+   Alter_routine_priv: Y
+         Execute_priv: Y
+           Event_priv: Y
+         Trigger_priv: Y
+1 row in set (0.01 sec)
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">此时我们再查看test用户权限，ALL PRIVILEGES权限已经被细分，但是没有select权限了。</p>
+<p class="ziti">因此可以说，ALL PRIVILEGES的权限至少包括：SELECT、INSERT、UPDATE、DELETE、CREATE、DROP、REFERENCES、INDEX、ALTER、CREATE TEMPORARY TABLES、LOCK TABLES、EXECUTE、CREATE VIEW、SHOW VIEW、CREATE ROUTINE、ALTER ROUTINE、EVENT、TRIGGER等。</p>
+<p class="ziti">表6-6给出了MySQL的ALL PRIVILEGES的权限情况。</p>
+<p class="middle-img">表6-6　MySQL的ALL PRIVILEGES的权限列表</p>
+<div class="pic"><img alt="" src="Image00041.jpg" />
+</div>
+<p class="ziti">工作中授权时，授权用户应尽量授权为最小的满足业务需求的权限，而不是直接授权为“ALL PRIVILEGES”。</p>
+<p class="p6">6.企业中grant授权权限问题说明</p>
+<p class="ziti">（1）企业里主数据库用户的授权问题说明</p>
+<p class="ziti">在企业生产环境中，如果是以Web形式连接数据库的用户，那么尽量不要授予all权限，最好是分拆授权，比如，授予select、insert、update、delete等适合Web使用的DML语句关键字权限。下面示例中授予的权限就比较规范合理，当然，对于不同的企业，要具体问题具体分析。</p>
+<hr/>
+<pre class="ziti1">grant select,insert,update,delete on oldboy.* to test@'172.16.1.%' identified by 'test123';</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ 授予用户权限时有如下3条安全红线不要轻易跨过。</p>
+<p class="ziti6">·权限不能用all，而应用select、insert、update、delete等具体权限。</p>
+<p class="ziti6">·库不能用“*.*”，而应用“oldboy.*”格式具体到库。</p>
+<p class="ziti6">·主机不能用%，而应用内网IP段，即'172.16.1.%'格式。</p>
+<p class="ziti">PHP程序语言连接MySQL的简易程序代码如下：</p>
+<hr/>
+<pre class="ziti1">&lt;?php
+  //$link_id=mysql_connect('数据库主机名','用户','密码');
+    $link_id=mysql_connect('172.16.1.7','test','test123') or mysql_error();
+    if($link_id){
+        echo "mysql successful by oldboy !";
+    }else{
+        echo mysql_error();
+    }
+?&gt;</pre>
+<hr/>
+<p class="ziti">（2）博客、CMS、BBS等产品的数据库授权</p>
+<p class="ziti">前面说过，采用Web形式连接数据库的用户应尽量采用最小化原则进行授权，但是很多开源软件都是通过Web界面安装的，因此，在安装期间除了<span class="yanse">select、insert、update、delete这4个权限之外，有可能还需要</span>
+ create、drop等比较危险的权限。针对这种情况，需要建库、建表，授权例子如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant select,insert,update,delete,create,drop on blog.* to 'blog '@'172.16.1.%' identified by 'blog123';
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">生成数据库、表后，可以使用revoke命令收回create、drop授权：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; revoke create,drop on blog.* from 'blog'@'172.16.1.%';
+#&lt;==粗体部分一定要对上，否则会收不回来。
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; show grants for 'blog'@'172.16.1.%';
++------------------------------------------------------------------------+
+| Grants for blog@172.16.1.%                                             |
++------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'blog'@'172.16.1.%' IDENTIFIED BY PASSWORD '*D6.B..A'|
+| GRANT SELECT, INSERT, UPDATE, DELETE ON `blog`.* TO 'blog'@'172.16.1.%'|
++------------------------------------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">（3）生产环境针对主库（写为主读为辅）用户的授权策略</p>
+<p class="ziti">如果是单机，即Web或应用程序和数据库在一台电脑上的数据库授权，则可以采用如下命令：</p>
+<hr/>
+<pre class="ziti1">GRANT all privileges ON `blog`.* TO 'blog'@'localhost' identified by 'blog123';</pre>
+<hr/>
+<p class="ziti">如果应用程序服务器和数据库服务器不在一个主机上，则授权命令如下：</p>
+<hr/>
+<pre class="ziti1">GRANT all privileges ON `blog`.* TO 'blog'@'172.16.1.%' identified by 'oldboy456';</pre>
+<hr/>
+<p class="ziti">由于工作中异机环境比较多，因此下面都是针对异机情况进行说明的。</p>
+<p class="ziti">下面的命令为严格授权，使用该命令虽然重视了安全，但却忽略了方便。</p>
+<hr/>
+<pre class="ziti1">GRANT SELECT, INSERT, UPDATE, DELETE ON `blog`.* TO 'blog'@'172.16.1.%' identified by 'blog123';</pre>
+<hr/>
+<p class="ziti">（4）生产环境从库（只读）用户的授权</p>
+<p class="ziti">授权命令如下：</p>
+<hr/>
+<pre class="ziti1">GRANT SELECT ON `blog`.* TO 'blog'@'172.16.1.%' identified by 'blog123';</pre>
+<hr/>
+<p class="ziti">这里表示为172.16.1.0/24的用户blog授予管理blog数据库中所有表（*表示所有表）的只读权限（SELECT），密码为blog123。</p>
+<p class="ziti">（5）生产环境主从库高级授权策略</p>
+<p class="ziti">针对这种情况，有两种授权形式，具体如下。</p>
+<p class="ziti">第一种，使用简单方法，见表6-7。</p>
+<p class="middle-img">表6-7　用户和密码相同，只有IP不同的表格</p>
+<div class="pic"><img alt="" src="Image00042.jpg" />
+</div>
+<p class="ziti">第二种，配置简单方法，见表6-8。</p>
+<p class="middle-img">表6-8　用户不同，IP不同的表格</p>
+<div class="pic"><img alt="" src="Image00043.jpg" />
+</div>
+<p class="ziti">显然，第一种授权方法是最专业的，第二种方法给开发者的感觉是有多个用户，不专业。</p>
+<p class="ziti">（6）生产场景下的具体授权</p>
+<p class="ziti">主库授权的命令为：</p>
+<hr/>
+<pre class="ziti1">GRANT SELECT, INSERT, UPDATE, DELETE ON `blog`.* TO 'blog'@'172.16.1.%' identified by 'blog123';</pre>
+<hr/>
+<p class="ziti">从库授权用户的命令为：</p>
+<hr/>
+<pre class="ziti1">GRANT SELECT ON `blog`.* TO 'blog'@'172.16.1.%' identified by 'blog123';</pre>
+<hr/>
+<p class="ziti">当然，从库除了做SELECT的授权之外，还可以加read-only等只读参数，严格控制Web用户写从库。</p>
+<p class="ziti">（7）生产场景下，主从库读写分离授权难点与解决方案</p>
+<p class="ziti">若主从库的mysql库和表是同步的，则会无法针对同一个用户授权不同的权限。主库授权后会自动同步到从库上，导致从库的授权只读失败。那么这种情况该怎么办呢？</p>
+<p class="ziti">解决方法有如下几点。</p>
+<p class="ziti6">·取消数据库中mysql库的同步功能。</p>
+<p class="ziti6">·授权主库权限后，从库执行收回增删改权限，只保留查的权限。</p>
+<p class="ziti6">·不在授权上控制增删改，而是用read-only参数控制普通用户更新从库。注意，read-only参数对超级用户无效。</p>
+<p class="ziti">这几个解决方法的具体策略在主从复制章节中会有详细讲解。</p>
+<p class="ziti">（8）授权不规范导致的生产血案</p>
+<p class="ziti">以下案例是2007年老男孩群里网友讲述的真实案例。</p>
+<p class="ziti">运维人员授权用户all权限，导致开发人员通过该用户自行修改了表结构（字段），造成服务出问题，最后黑锅甩在了运维人员身上。</p>
+<p class="ziti">运维人员排查了半天也没有结果，终于在对比表结构（对比生产数据和备份的数据）的时候发现了问题，最后告诉开发人员，把字段改回去，服务就好了。</p>
+<p class="ziti6">
+<span class="yanse">启发：</span>
+ 生产场景下尽量不要给开发人员select以外的权限，对于网站的连接账号，不要授予select、insert、delete、update以外的权限。对别人的“仁慈”，就是对自己的岗位和公司最大的“背叛”。</p>
+<p class="p6">7.查看用户及授权</p>
+<p class="ziti">可通过如下命令查看MySQL数据库中的用户和主机信息：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select user,host from mysql.user;
++--------+------------+
+| user   | host       |
++--------+------------+
+| root   | 127.0.0.1  |
+| blog   | 172.16.1.% |
+| root   | localhost  |
+| system | localhost  |
+| test   | localhost  |
++--------+------------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+</p>
+<p class="ziti6">1）由于安全原因，上面的用户是经过处理的。</p>
+<p class="ziti6">2）MySQL的用户由“用户名@主机名”构成，所以在用户列具有相同的用户，不要奇怪。</p>
+<p class="ziti">要查看授权用户blog的具体授权权限，可使用如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show grants for 'blog'@'172.16.1.%';
++------------------------------------------------------------------------+
+| Grants for blog@172.16.1.%                                             |
++------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'blog'@'172.16.1.%' IDENTIFIED BY PASSWORD '*D6.B..A'|
+| GRANT SELECT, INSERT, UPDATE, DELETE ON `blog`.* TO 'blog'@'172.16.1.%'|
++------------------------------------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+</body>
+</html>

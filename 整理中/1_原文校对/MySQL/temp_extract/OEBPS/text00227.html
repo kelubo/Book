@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">15.2　MySQL企业级备份策略方案</h2>
+<p class="ziti">前文讲解过MySQL主从复制的企业应用场景之一，就是作为数据库的一个异地相当于实时性的备份，但是，这个实时性备份有一个无法解决的问题，那就是如果主库存在语句级误操作（例如“drop database oldboy；”），那么从库也会执行“drop database oldboy；”，这样MySQL主从库就都删除了该数据，因此，除了MySQL主从复制备份之外，我们还需要定时的数据库备份方案。</p>
+<p class="p6">1.利用MySQL主从复制的从库进行数据备份策略</p>
+<p class="ziti">根据前面的章节可知，定时备份比较常用的策略是使用mysqldump（逻辑备份）以及Xtrabackup（物理备份）进行备份。</p>
+<p class="ziti">虽然这二者都支持热备功能，但是由于在备份期间消耗了大量的磁盘IO以及内存、CPU等系统资源，导致为用户提供服务的能力大大减弱，哪怕是在访问低谷时进行的备份，还是会影响一部分用户访问，那么有没有更好的备份策略呢？这就是接下来我们要讨论的话题。</p>
+<p class="ziti">高性能高并发业务场景下进行数据库备份时，可以选择MySQL主从复制中的一个不对外服务的从库作为定时数据库备份服务器，备份策略具体如下。</p>
+<p class="ziti">例如15.1节的图15-1所示的是一主多从的数据库集群环境，可以选择在一台从库上进行备份（Slave5），而不参与提供外部用户访问，此时需要在该从库（Slave5）中开启binlog功能，其逻辑如图15-1所示。</p>
+<p class="p6">2.利用MySQL主从复制的从库进行数据备份实战的步骤</p>
+<p class="ziti">1）选择一个不对外提供服务的从库，这样可以确保其与主库更新最接近，专门做数据备份用，从而告别在主库上进行备份但影响主库访问的方案。</p>
+<p class="ziti">2）开启从库的binlog功能，目的是将来数据丢失时可使用binlog进行增量恢复，注意，此处最好开启从库的binlog功能，而不是在数据恢复时拿主库的binlog进行数据恢复。</p>
+<p class="ziti">3）以下提供的是3种常见的备份方案。</p>
+<p class="ziti6">·当数据量低于30GB时，可采用mysqldump逻辑备份，优缺点前文已经讲解过了。</p>
+<p class="ziti6">·当数据量大于30GB时，可采用Xtrabackup物理热备工具，优缺点前文中也已经讲解过了。</p>
+<p class="ziti6">·采用从库备份也可以使用冷备的方案，即备份时可以选择停止从库的SQL线程，停止应用SQL语句到数据库，I/O线程将继续保持工作状态，执行命令为“stop slave sql_thread；”，备份方式可以采取cp、tar（针对“/data/”目录）工具进行备份，最后把全备文件和binlog数据发送到备份服务器上留存即可。</p>
+</body>
+</html>

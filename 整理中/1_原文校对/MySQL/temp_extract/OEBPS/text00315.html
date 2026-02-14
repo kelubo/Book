@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">20.4.4　RDS for MySQL数据库管理</h3>
+<p class="p6">1.数据库创建管理</p>
+<p class="ziti">1）创建数据库的账号，如图20-24和图20-25所示。</p>
+<div class="pic"><img alt="" src="Image00173.jpg" />
+</div>
+<p class="middle-img">图20-24　创建数据库的账号界面</p>
+<div class="pic"><img alt="" src="Image00174.jpg" />
+</div>
+<p class="middle-img">图20-25　填入数据库账号信息界面</p>
+<p class="ziti">2）创建数据库并授权数据库的管理账号，如图20-26和图20-27所示。</p>
+<div class="pic"><img alt="" src="Image00175.jpg" />
+</div>
+<p class="middle-img">图20-26　创建数据库管理的界面</p>
+<div class="pic"><img alt="" src="Image00176.jpg" />
+</div>
+<p class="middle-img">图20-27　授权数据库的管理账号界面</p>
+<p class="p6">2.数据库权限管理</p>
+<p class="ziti">1）数据库账号管理界面，如图20-28所示。</p>
+<div class="pic"><img alt="" src="Image00177.jpg" />
+</div>
+<p class="middle-img">图20-28　数据库账号管理界面</p>
+<p class="ziti">2）重置账号密码，点击“重置密码”标签，如图20-29所示。</p>
+<div class="pic"><img alt="" src="Image00178.jpg" />
+</div>
+<p class="middle-img">图20-29　重置账号密码界面</p>
+<p class="ziti">3）修改账号权限，点击“修改权限”标签，可设置账号，是哪个数据库的读权限或读写权限，以及授权账号到更多数据库，如图20-30所示。</p>
+<div class="pic"><img alt="" src="Image00179.jpg" />
+</div>
+<p class="middle-img">图20-30　修改账号权限界面</p>
+<p class="ziti">4）删除账号，点击“删除”标签，如图20-31所示。</p>
+<div class="pic"><img alt="" src="Image00180.jpg" />
+</div>
+<p class="middle-img">图20-31　删除账号界面</p>
+<p class="ziti">5）查看账号基本信息，如图20-32所示。</p>
+<div class="pic"><img alt="" src="Image00181.jpg" />
+</div>
+<p class="middle-img">图20-32　查看账号基本信息界面</p>
+<p class="ziti">由图20-32可以看到，账号的状态是激活状态，并且可以查询账号管理几个数据库，以及对应数据库的管理权限。</p>
+<p class="p6">3.数据库维护管理</p>
+<p class="ziti">1）重启数据库，如图20-33和图20-34所示。</p>
+<div class="pic"><img alt="" src="Image00182.jpg" />
+</div>
+<p class="middle-img">图20-33　数据库管理界面</p>
+<div class="pic"><img alt="" src="Image00183.jpg" />
+</div>
+<p class="middle-img">图20-34　重启数据库界面</p>
+<p class="ziti">输入验证码后，进行实例重启，重启过程中实例不可用。</p>
+<p class="ziti">从如图20-35所示的RDS管理控制台中可以看到，数据库状态为“重启中”。</p>
+<div class="pic"><img alt="" src="Image00184.jpg" />
+</div>
+<p class="middle-img">图20-35　RDS管理控制台界面</p>
+<p class="ziti">点击“管理”或“实例名称”，进入实例基本信息页面，点击图20-36中的标识1，可以看到重启任务的进度。</p>
+<div class="pic"><img alt="" src="Image00185.jpg" />
+</div>
+<p class="middle-img">图20-36　实例基本信息界面查看重启进度</p>
+<p class="ziti">2）登录数据库，如图20-37所示，进入RDS实例的数据库管理界面，点击“登录数据库”。</p>
+<div class="pic"><img alt="" src="Image00186.jpg" />
+</div>
+<p class="middle-img">图20-37　登录数据库界面</p>
+<p class="ziti">点击“登录数据库”后，进入数据库管理工具DMS管理界面，1）选择正确的数据库，2）输入数据库用户名和密码，3）点击“登录”，如图20-38所示。</p>
+<div class="pic"><img alt="" src="Image00187.jpg" />
+</div>
+<p class="middle-img">图20-38　DMS管理界面</p>
+<p class="ziti">点击“登录”后，因为是第一次管理数据库，因此会提示添加白名单，允许图20-39中的地址段可以管理数据库，这些地址为DMS机器的IP地址。点击“设置所有实例”，如果不设置，DMS将无法管理数据库。</p>
+<div class="pic"><img alt="" src="Image00188.jpg" />
+</div>
+<p class="middle-img">图20-39　添加白名单界面</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">备注：</span>
+ 如果点击“不设置”，则没有添加上述地址到白名单，请手动添加白名单。</p>
+<p class="ziti">通过数据管理DMS登录数据库后，可以通过DMS管理界面，查看当前数据库的IOPS、CPU、连接数、存储空间等信息等，性能信息监控每4秒采集一次，如图20-40所示。</p>
+<div class="pic"><img alt="" src="Image00189.jpg" />
+</div>
+<p class="middle-img">图20-40　DMS管理界面，查看数据库信息</p>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">12.7.2　InnoDB引擎的存储方式</h3>
+<p class="ziti">InnoDB存储引擎将数据存放在一个像黑盒一样的逻辑表空间中，这个表空间分为共享表空间和独立表空间，从MySQL 5.6开始，即默认支持将InnoDB引擎的表数据单独存放到各自独立的ibd文件中（独立表空间）。</p>
+<p class="ziti">
+<span class="yanse">范例12-1</span>
+ ：创建表并查看表空间情况</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select version();
++------------+
+| version()  |
++------------+
+| 5.6.34-log |
++------------+
+1 row in set (0.00 sec)
+mysql&gt; use oldboy
+Database changed
+mysql&gt; create table test1(id int);
+Query OK, 0 rows affected (0.04 sec)
+mysql&gt; show create table test1\G
+*************************** 1. row ***************************
+       Table: test1
+Create Table: CREATE TABLE `test1` (
+  `id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 由输出结果可以看到，只有test1.frm，没有MyISAM对应的数据文件和索引文件了，这是为什么呢？</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd /application/mysql/data
+[root@oldboy data]# ls -l
+总用量 196660
+-rw-r-----. 1 mysql mysql 79691776 3月  26 05:01 ibdata1
+#&lt;==这里是共享表空间存放InnoDB数据的文件，MySQL 5.6以前默认情况下所有的InnoDB数据
+       都存放在这个文件里。
+-rw-r-----. 1 mysql mysql 50331648 3月  26 05:01 ib_logfile0
+-rw-r-----. 1 mysql mysql 50331648 3月  22 10:01 ib_logfile1
+-rw-r-----. 1 mysql mysql 12582912 3月  22 10:26 ibtmp1
+drwxr-x---. 2 mysql mysql     4096 3月  22 10:01 mysql
+drwxr-x---. 2 mysql mysql     4096 3月  26 05:01 oldboy
+-rw-rw----. 1 mysql mysql        6 3月  22 13:10 oldboy.pid
+drwxr-x---. 2 mysql mysql     4096 3月  22 10:01 oldboy_utf8
+drwx------. 2 mysql mysql     4096 3月  22 12:30 oldgirl
+drwxr-x---. 2 mysql mysql     4096 3月  22 10:01 performance_schema
+drwx------. 2 mysql mysql     4096 3月  24 04:02 tingting
+[root@oldboy data]# ls -l oldboy #&lt;==查看oldboy数据库里表的情况。
+总用量 256
+-rw-r-----. 1 mysql mysql    61 3月  24 04:00 db.opt
+-rw-rw----. 1 mysql mysql  8644 3月  24 21:21 student.frm
+-rw-rw----. 1 mysql mysql     0 3月  24 21:21 student.MYD
+-rw-rw----. 1 mysql mysql  1024 3月  24 21:21 student.MYI
+-rw-rw----. 1 mysql mysql  8556 3月  26 05:01 test1.frm
+#&lt;==存放InnoDB引擎test1.表的定义。
+-rw-rw----. 1 mysql mysql 98304 3月  26 05:01 test1.ibd
+#&lt;==这里是独立表空间，test1表数据文件。
+-rw-rw----. 1 mysql mysql  8586 3月  24 21:22 test.frm
+#&lt;==这里存放的是MyISAM引擎test表的定义。
+-rw-rw----. 1 mysql mysql   325 3月  24 21:22 test.MYD
+#&lt;==这里存放的是MyISAM引擎test表的数据。
+-rw-rw----. 1 mysql mysql  3072 3月  24 21:22 test.MYI
+#&lt;==这里存放的是MyISAM引擎test表的索引。
+-rw-rw----. 1 mysql mysql  8556 3月  22 11:30 t.frm
+-rw-rw----. 1 mysql mysql 98304 3月  22 11:31 t.ibd</pre>
+<hr/>
+<p class="ziti">控制InnoDB存储引擎数据文件的参数具体如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'innodb%';
++-----------------------------+------------------------+
+| Variable_name               | Value                  |
++-----------------------------+------------------------+
+| innodb_autoextend_increment | 64                     | #&lt;==数据文件自增参数。
+| innodb_data_file_path       | ibdata1:12M:autoextend | #&lt;==数据文件路径。
+| innodb_data_home_dir        |                        | #&lt;==数据家目录。
+| innodb_file_per_table       | ON                     | #&lt;==独立表空间开关。
+...省略若干...
++-----------------------------+------------------------+
+120 rows in set (0.00 sec) #&lt;==InnoDB相关参数共120个。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00024.jpg" />
+ <span class="yanse">说明：</span>
+ 默认情况下数据库会初始化一个12MB的ibdata1共享表空间文件，并且以64MB为单位自动增长，innodb_file_per_table控制是否开启独立表空间格式，开启之后，所有的表的数据都会以单独的数据文件形式存在。</p>
+</body>
+</html>

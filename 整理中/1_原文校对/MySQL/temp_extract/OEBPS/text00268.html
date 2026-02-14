@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.5.3　GTID的优缺点</h3>
+<p class="p6">1.GTID复制的优点</p>
+<p class="ziti">
+<span class="yanse">GTID复制的优点具体如下。</span>
+</p>
+<p class="ziti6">·根据GTID可以知道事务最初是在哪个数据库上提交的。</p>
+<p class="ziti6">·GTID对于宕机切换有一定的方便性。</p>
+<p class="p6">2.GTID复制的缺点</p>
+<p class="ziti">
+<span class="yanse">GTID复制的缺点具体如下。</span>
+</p>
+<p class="ziti6">·GTID模式实例和非GTID模式实例之间是不能进行复制的，不能混用，要么都是GTID，要么都不是。</p>
+<p class="ziti6">·在同一事务中更新事务表与非事务表将导致多个GTIDs分配给同一事务。</p>
+<p class="ziti">官方指出，GTID包含如下三个限制，当enforce-gtid-consistency=ON时，以下三类SQL语句是不支持的：“CREATE TABLE...SELECT statements”“CREATE TEMPORARY TABLE”和“DROP TEMPORARY TABLE statements inside transactions”</p>
+<p class="ziti6">·同时更新传统事务表和非传统事务表时，有一个例外，如果所有非事务表都是临时表时，非事务的DML被允许在同一事务中或在同一语句中作为传统的DML。</p>
+<p class="ziti">Transactions or statements that update both transactional and nontransactional tables.There is an exception that nontransactional DML is allowed in the same transaction or in the same statement as transactional DML，if all nontransactional tables are temporary.</p>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">9.5.9　使用Xtrabackup物理分库分表备份的恢复</h3>
+<p class="ziti">在实施使用Xtrabackup物理分库分表备份的恢复时，需要使用“--export”来做恢复准备，最终恢复时，不能使用常规的“--copy-back”选项，而是要初始化一个带有mysql库（“mysql_install_db--user=mysql”）的干净的数据文件目录。</p>
+<p class="ziti">1）恢复准备（请选择一个单独的测试环境来执行）：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --export /server/backup/oldboy_test/ #&lt;==恢复oldboy的test表。</pre>
+<hr/>
+<p class="ziti">2）初始化数据库（选择一个单独的测试环境来执行）。</p>
+<p class="ziti">这里为了方便，在当前库演示：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop                  #&lt;==停库。
+Shutting down MySQL.. SUCCESS!
+[root@oldboy ~]# mv /application/mysql/data /tmp/data.ori #&lt;==备份前面的数据。
+[root@oldboy ~]# mkdir /application/mysql/data
+[root@oldboy ~]# /application/mysql/scripts/mysql_install_db --basedir=/application/mysql/ --datadir=/application/mysql/data --user=mysql
+#&lt;==初始化新的mysql数据文件。
+[root@oldboy ~]# cp /server/backup/oldboy_test/* /application/mysql/data/
+#&lt;==将oldboy.test数据回拷贝。
+[root@oldboy ~]# chown -R mysql.mysql /application/mysql/data #&lt;==别忘了授权。
+[root@oldboy ~]# /etc/init.d/mysqld start
+Starting MySQL. SUCCESS!</pre>
+<hr/>
+<p class="ziti">通过以下命令可登录数据库查看还原的数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from oldboy.test;
++----+---------------+
+| id | name          |
++----+---------------+
+|  1 | full01        |
+|  2 | full02        |
+|  3 | full03        |
+|  4 | full04        |
+|  5 | full05        |
+|  6 | new_inc_one_1 |
+|  7 | new_inc_one_2 |
+|  8 | binlog_data_1 |
+|  9 | binlog_data_2 |
++----+---------------+
+9 rows in set (0.01 sec)</pre>
+<hr/>
+<p class="ziti">如果有需要，可以通过mysqldump导出后恢复到正式库。</p>
+<p class="ziti">最后别忘了将当前的环境恢复回来：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop                  #&lt;==停止数据库。
+Shutting down MySQL.. SUCCESS!
+[root@oldboy ~]# mv /application/mysql/data /opt/data.new  #&lt;==移动旧的数据备份。
+[root@oldboy ~]# mv /tmp/data.ori /application/mysql/data  #&lt;==将备份的数据还原。
+[root@oldboy ~]# chown -R mysql.mysql /application/mysql/data  #&lt;==授权。
+[root@oldboy ~]# /etc/init.d/mysqld start                 #&lt;==启动数据库。
+Starting MySQL. SUCCESS!</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_34">2.5.3　注册系统服务</h3>
+
+  <p class="ziti3">CentOS系统环境中使用systemd进行系统和服务管理，可以按需守护进程，并通过systemctl命令进行systemd的监测和控制。为了方便Nginx应用进程的维护和管理，此处把Nginx注册成系统服务，由systemd进行服务管理，命令如下。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">cat &gt;/usr/lib/systemd/system/nginx.service &lt;&lt;EOF
+[Unit]                                                # 记录service文件的通用信息
+Description=The Nginx HTTP and reverse proxy server   # Nginx服务描述信息
+After=network.target remote-fs.target nss-lookup.target  # Nginx服务启动依赖，在指定服务之后启动
+
+[Service]                                         # 记录service文件的service信息
+Type=forking                                    　# 标准UNIX Daemon使用的启动方式
+PIDFile=/run/nginx.pid                            # Nginx服务的pid文件位置
+ExecStartPre=/usr/bin/rm -f /run/nginx.pid       # Nginx服务启动前删除旧的pid文件
+ExecStartPre=/usr/local/nginx/sbin/nginx -t -q    # Nginx服务启动前执行配置文件检测
+ExecStart=/usr/local/nginx/sbin/nginx -g "pid /run/nginx.pid;"  # 启动Nginx服务
+ExecReload=/usr/local/nginx/sbin/nginx -t -q      # Nginx服务重启前执行配置文件检测
+ExecReload=/usr/local/nginx/sbin/nginx -s reload -g "pid /run/nginx.pid;"  
+                                                 # 重启Nginx服务
+ExecStop=/bin/kill -s HUP $MAINPID                # 关闭Nginx服务
+KillSignal=SIGQUIT
+TimeoutStopSec=5
+KillMode=process
+PrivateTmp=true
+
+[Install]                                         # 记录service文件的安装信息
+WantedBy=multi-user.target                        # 多用户环境下启用
+EOF
+
+systemctl enable nginx                            # 将Nginx服务注册为系统启动后自动启动
+systemctl start nginx                             # 启动Nginx服务命令
+systemctl reload nginx                            # reload Nginx服务命令
+systemctl stop nginx                              # stop Nginx服务命令
+systemctl status nginx                            # 查看Nginx服务运行状态命令
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">18.3　MHA的工作原理</h2>
+<p class="ziti">前面已经说过，MHA的两大重要功能，其一是主库宕机切换到新的主库，同时保证其他从库与新主库保持一致的复制状态，其二是保证整个故障切换转移过程中整个集群的数据丢失应尽可能最小，那么MHA是怎么做到的呢？</p>
+<p class="ziti">MHA的工作原理大体可以分为如下三个过程。</p>
+<p class="ziti">（1）选择新主</p>
+<p class="ziti">主动宕机需要在集群中选择适合的从库作为新主库，根据MHA的配置，可选择的方法具体如下。</p>
+<p class="ziti">1）根据其他从库的binlog位置点选择最新的从库作为新的主库。</p>
+<p class="ziti">2）设置半同步从库，直接选择半同步的从库作为新的主库。</p>
+<p class="ziti">（2）数据补全</p>
+<p class="ziti">在进行故障切换和转移之前，必须要进行数据补全操作，否则就算是进行故障切换了，也会面临数据丢失的问题，这是不可接受的，因此数据补全的步骤具体如下。</p>
+<p class="ziti">1）如果主库服务器仍然可以连接，那么MHA会试图通过SSH连接主库，把宕机主库内的所有binlog日志保存下来；如果不可进行SSH连接，则放弃主库的binlog日志数据。</p>
+<p class="ziti">2）以选择好的最新主库的binlog位置点为基准点，通过中继日志（relay log）进行数据补全，使得其他所有从库与新主库的数据保持一致。</p>
+<p class="ziti">3）将宕机时从主库上保存下来的binlog日志（如果有）恢复到所有数据库节点上。</p>
+<p class="ziti">（3）角色切换</p>
+<p class="ziti">1）将选择好的新主库提升为正式主库的角色。</p>
+<p class="ziti">2）让其他的从库重新与新主库保持主从复制状态。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00024.jpg" />
+ <span class="yanse">说明：</span>
+ 这里面还有一个问题那就是主库IP的问题，可以通过Keepalived的VIP漂移功能解决应用程序访问数据库集群的问题，Keepalived高可用软件内容见老男孩的Web集群实战一书的第13章。</p>
+<p class="ziti">图18-1表示的是MHA工作原理基本架构图解。</p>
+<div class="pic"><img alt="" src="Image00143.jpg" />
+</div>
+<p class="middle-img">图18-1　MHA工作原理基本架构图解</p>
+</body>
+</html>

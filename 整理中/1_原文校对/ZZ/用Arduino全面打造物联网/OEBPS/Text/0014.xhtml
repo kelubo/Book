@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+  <head>
+    <title>APPENDIX B　如何进行除错</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="preface-title" id="CHP13">APPENDIX B　如何进行除错</h2> 
+ <p class="preface-text">在物联网系统中，除单个节点的功能运行很重要之外，整个通信网络更是核心，就像我们人体一样，除了手、脚、器官外，整个串联身体的神经系统负担起反应与感觉的传递。以前独立的Arduino系统，我们可以通过在程序区段中使用Serial.print显示出不同的信息来逐步确认程序问题的所在，但是当系统加上通信的部分时，如果我们连Serial.print都看不到信息时，那该怎么办呢？下面列举了几个实际常遇到的情况，并且提出检查的方式，协助大家在最短的时间内找到问题的所在。</p> 
+ <p class="preface-text">当然，工欲善其事必先利其器。基本硬件的质量会是整体运行稳定的关键要素，尤其是Arduino或周边模块生产的厂商不止一家，大家务必确定购买的质量与稳定性能够符合自己的需要，笔者无法推荐哪家是最好的，建议初期小批量的测试绝对是必要的。另外，线材也是一个重要的因素，量产的产品建议大家还是重新规划硬件，将所有元件集中在同一块PCB电路板上会比较好，若非要使用线材，则多芯线是唯一选择。单芯线在面包板上的使用非常方便，如果内部铜线因为长久弯曲或是使用而断裂的话，外观上是看不出来的。现在可以看到有许多头尾加了杜邦端子的连接线，因为使用标准的引脚尺寸也是测试时建议的线材之一。</p> 
+ <p class="preface-text">下面我们看看有哪些实践中会看到的现象。</p> 
+ <p class="preface-text">不通</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float34" src="../Images/Figure-P250_29141.jpg"/> 
+  <p class="imgdescript-c">图B-1　Arduino的电源指示灯</p> 
+ </div> 
+ <p class="preface-text">通信通常指的是两个以上的设备，因此发生不通的情况几乎都是通信有问题，第一个要检查的一定是“电源”，这也是为什么不管小型设备或是大型系统都会配有电源指示灯（见图B-1），一个稳定的电源供应系统才能够确保其他功能的顺利运行，因此若发生不通的情况，请记得确认Arduino以及通信模块的电源。当我们系统乘载了许多传感器与驱动模块时，整体电源功耗是否超出供电器的极限，建议先大致估算一下。</p> 
+ <p class="preface-text">另外，Arduino的外部电源输入最高电压限制在12V。千万别使用高于此电压的供应器或是电池。不然除非换一块Arduino，否则系统永远不会通了。</p> 
+ <p class="preface-text">再来看看通信的部分，有线通信的不通可以轻易地通过检查通信线材的连接来确认问题点，至于无线通信的部分就必须先以最近可通信距离的方式确保两个设备不会因为距离的关系而失去连接，这样可以同时确认不通及下一个不稳的问题。网络的部分还可以通过Ping的方式确认，粗略得到通信的状态。</p> 
+ <p class="preface-text">不稳</p> 
+ <p class="preface-text">不稳通常指的是数据断断续续地传送，如果是在需要长时间连续记录的应用下就很糟糕，因为无法以固定间隔获取数据。数据断断续续的比较容易发生在无线通信的情况下，以前笔者有个实际的应用，将两个无线节点置于马路的左右两边，运行一阵子就发生通信断断续续的情况，结果发现当大型车辆经过时，截断在中间就发生不稳的情况，最后只好再将天线往上架高，避开大型车辆的影响。</p> 
+ <p class="preface-text">不对</p> 
+ <p class="preface-text">不对指的是两个设备间没有设置好相同的参数就进行通信，例如波特率的选择或是数据位的设置，都会影响接收方的数据处理，就像是在大街上遇到外国人，明明他向你说了很多话，你却一个字也没听懂。或是明明是两个人在对话，还多了一个不相关的第三者滔滔不绝，害得两个人无法顺利听清对方的话。这样通信发生“不对”的情况几乎只有串行通信才会发生，尤其是RS-232。因为其他通信机制都有固定的格式方便通信的建立，网络通信更会彼此确认设备可以接受的通信速度和连接，并实时调整。</p> 
+ <p class="preface-text">没有功能</p> 
+ <p class="preface-text">没有功能的问题大多来自于电源，就像前面所说系统电源的设计就是一门很重要的学问，如何让你设计的物联网系统运行的时间能像当初规划的那样长久，事前的实验与模拟以及例外情况的预防都能让系统持续运行。如果在户外也要记得避雷措施的保护，以防下次看到你的设备时只剩一块焦黑的电路板。</p> 
+ <p class="preface-text">以上这些都是实际设计系统及运行时可能会遇到的问题，我们总希望在系统正式运行前发现一切可能会出错的地方再给予加强，但是就像墨菲定律（Murphy's Law）所说的：凡是可能出错的事必定会出错。因此，怎么在最短的时间内将问题找出并且解决就是我们这个章节要讨论的。</p> 
+ <h3 class="bodycontent-title1" id="CHP13-5">B-1　串行通信</h3> 
+ <p class="preface-text">Arduino已经为我们提供了很方便的一个串行通信监视器窗口，只有在早期Windows XP的操作系统中才有所谓的“超级终端”可以做到类似的事情。Windows VISTA以后的版本就没有内置这个应用程序了，因此前面章节我们才会使用SSCOM（见图B-2）这个软件来协助，好处是可以将需要的AT Command整理成表，方便我们测试时重复使用。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img355" src="../Images/Figure-P253_23129.jpg"/> 
+  <p class="imgdescript-c">图B-2　SSCOM的界面</p> 
+ </div> 
+ <p class="preface-text">这里我们则要介绍另一个软件，即AccessPort（见图B-3），目前版本为1.37。大家只需要上网搜索一下就可以找到了。AccessPort不需要安装，解完压缩后就可以使用。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img356" src="../Images/Figure-P253_23134.jpg"/> 
+  <p class="imgdescript-c">图B-3　AccessPort软件的显示界面</p> 
+ </div> 
+ <p class="preface-text">它的接口可以轻松转换成十六进制的数据，方便我们在确认通信协议时可以轻松地看到每一个字符，确定整个协议是否完整。另外，它还可以设置非常规的速率（见图B-4），不过这需要硬件搭配才行。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img357" src="../Images/Figure-P254_29162.jpg"/> 
+  <p class="imgdescript-c">图B-4　设置非常规的速率</p> 
+ </div> 
+ <p class="preface-text">AccessPort还有另一个厉害的地方，就是可以监控计算机和设备间的通信，这里我们用Arduino的ASCII Table范例来示范一下。</p> 
+ <p class="preface-text">首先当然还是要记得设置好通信参数及使用的通信端口（串口），如图B-5所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img358" src="../Images/Figure-P254_29167.jpg"/> 
+  <p class="imgdescript-c">图B-5　参数设置</p> 
+ </div> 
+ <p class="preface-text">设置完成后先不要开启通信端口，如果软件自行开启的话请先将它关闭。接着转到Monitor的分页，如图B-6所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img359" src="../Images/Figure-P254_29171.jpg"/> 
+  <p class="imgdescript-c">图B-6　Monitor分页</p> 
+ </div> 
+ <p class="preface-text">选择要监看的通信端口再单击“开始监控”，完成便可回到Terminal视窗，正式开启通信端口进行数据传送，如图B-7所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img360" src="../Images/Figure-P255_23142.jpg"/> 
+  <p class="imgdescript-c">图B-7　Arduino传输过来的ASCII Table</p> 
+ </div> 
+ <p class="preface-text">在数据传输的过程中，我们可以切到Monitor分页去观察串行端口通信的情况，其中包含了传输的时间长度（Duration）、当前执行的请求操作（Request）以及数据（Data）。以范例来说，你会发现Arduino每次传输的长度并不一定是计算机端每次接收的长度，计算机因为操作系统的关系，可能会分批处理传进来的数据，但是实际显示却看不到这样的变化。</p> 
+ <p class="preface-text">可是有时候我们的设备另外一端不一定是计算机，可能是两个Arduino互传，或是一个Arduino向RFID的读取器去取得数据，这时候该怎么取得中间的通信呢？建议大家到电子器材市场买一捆彩虹线，加上压线式的DB-9接头（见图B-8），大家可以各买几个公口母口的接头后压到彩虹线（因为是RS-232的接线，所以全部共有9条线）上，这样就有一条可以监听两个设备串行通信的监听线了。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img361" src="../Images/Figure-P255_23147.jpg"/> 
+  <p class="imgdescript-c">图B-8　压线式DB-9接头（图片来源：http://china.makepolo.com/product-detail/100435556807.html）</p> 
+ </div> 
+ <p class="preface-text">监听的设备可以找有两个串行端口的计算机（见图B-9），这样就可以分别传送和接收数据了。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img362" src="../Images/Figure-P256_29184.jpg"/> 
+  <p class="imgdescript-c">图B-9　串行端口监听的方式</p> 
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP13-6">B-2　网络通信</h3> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float35" src="../Images/Figure-P256_29189.jpg"/> 
+  <p class="imgdescript-c">图B-10　Wireshark启动屏幕</p> 
+ </div> 
+ <p class="preface-text">网络通信的部分，则要介绍一个开源的网络数据分组分析软件（网络分析器）：Wireshark（见图B-10）。在以前要采集网络上的数据分组并且进行分析是一件不容易且代价不低的事情，但是Wireshark的出现让数据分组的分析变得非常简单，只需要下载这个软件并安装后，就可以得到网络通信上的数据分组，并借此学习到网络通信的架构以及使用到的协议。这套软件只能旁观网络通信数据分组的交换，并无法修改数据分组或是提出异常的警告，也不会自己发出数据分组，因此作为一个旁观者的角色非常适合。</p> 
+ <p class="preface-text">安装完毕，启动这个软件后，会出现如图B-11所示的窗口。我们先要选择想要监听的接口，因为计算机可能有多条网线，另外还可能有无线的部分，因此必须选择想要监听的部分，如图B-12所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img363" src="../Images/Figure-P257_23155.jpg"/> 
+  <p class="imgdescript-c">图B-11　Wireshark</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img364" src="../Images/Figure-P257_23158.jpg"/> 
+  <p class="imgdescript-c">图B-12　选择想要监听的网络接口</p> 
+ </div> 
+ <p class="preface-text">在接口列表中单击Options后，还可以进入高级菜单。有时候为了长时间记录，又不想因为意外情况造成文件损毁时，我们可以使用这里的多次存盘，可以选择是要根据文件大小还是时间间隔进行数据存储（见图B-13）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img365" src="../Images/Figure-P258_29197.jpg"/> 
+  <p class="imgdescript-c">图B-13　存盘方式选择</p> 
+ </div> 
+ <p class="preface-text">都设置完毕后，单击Start按钮就可以开始进行数据分组的采集（见图B-14）。这时窗口应该会跳到另外一个地方分成三个段落，第一段会一直看到很多不同颜色的分组。第二段则是被选择到的单个分组内的细节。最后则是单个分组内的十六进制数据。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img366" src="../Images/Figure-P258_29202.jpg"/> 
+  <p class="imgdescript-c">图B-14　采集中的屏幕显示界面</p> 
+ </div> 
+ <p class="preface-text">我们来看看第一个区段的各个字段，可以清楚地知道每一个分组的来源（Source）和目标（Destination）、分组采用的协议（Protocol）和其中的数据内容等，如图B-15所示。如果我们要仔细研究一个协议内的详细信息，可以在窗口第二个区段看到完整的解析，Wireshark支持非常多的网络协议，包含MQTT也可以解析得出来，因此是学习高级网络知识的好帮手。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img367" src="../Images/Figure-P259_23167.jpg"/> 
+  <p class="imgdescript-c">图B-15　TCP分组的部分细节数据</p> 
+ </div> 
+ <p class="preface-text">和串行通信一样，如果是两个设备直接使用网络进行通信，并没有经过计算机，又该怎么样采集到分组呢？这时候我们需要集线器（Hub）的帮忙。纯粹的集线器目前在市面上几乎见不到了（已经不正式生产和销售了）。这里说的是集线器（Hub），而不是网络交换机（Switch）。两者的差别（见图B-16）是集线器并不会处理任何数据，当一个通信端口有数据进来时，集线器只会将这个数据转发至其他所有通信端口。交换机则会根据每个通信端口的IP和MAC的信息来进行转发，其他通信端口不会收到跟自己没有关系的数据。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img368" src="../Images/Figure-P259_23172.jpg"/> 
+  <p class="imgdescript-c">图B-16　集线器与交换机的差异</p> 
+ </div> 
+ <p class="preface-text">有没有发现秘密？如果在原本的两台网络设备之间加上一个集线器，就可以多出一个通信端口来连接计算机，因为负责监听的计算机并没有任何应用程序来针对收到的信息进行响应，因此便可以完整监听到分组而不造成通信的影响，如图B-17所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img369" src="../Images/Figure-P260_29210.jpg"/> 
+  <p class="imgdescript-c">图B-17　监听计算机的部署</p> 
+ </div> 
+ <p class="preface-text">有兴趣进一步了解的人，可以参考基峰信息公司出版的《实战分组分析——使用Wireshark》（由Chris Sanders编著，里面有许多更详细的资料可以参考）。</p> 
+</body>
+</html>

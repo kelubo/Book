@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_82">4.3.3　响应处理</h3> 
+ <p class="ziti3">模块：ngx_http_headers_module</p> 
+ <p class="ziti3">该模块允许用户在HTTP响应头中添加Expires、Cache-Control及自定义属性字段。该模块的内置配置指令如表4-60～表4-62所示。</p> 
+ <p class="middle-img">表4-60　添加字段指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-60.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-60.jpg" class="calibre88"/></a> 
+ </div> 
+ <p class="middle-img">表4-61　尾添加字段指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-61.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-61.jpg" class="calibre35"/></a> 
+ </div> 
+ <p class="ziti3">指令格式如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">add_trailer name value [always];
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">可以通过HTTP响应体尾部的数据对响应数据做完整性校验、数字签名或请求处理后的状态传递。</p> 
+ <p class="middle-img">表4-62　缓存时间指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-62.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-62.jpg" class="calibre181"/></a> 
+ </div> 
+ <p class="ziti4">·当指令值为时间时，既可以是正值也可以是负值。Expires的值为当前时间与指令值的时间之和。当指令值的时间为正或0时，Cache-Control的值为指令值的时间。当指令值的时间为负时，Cache-Control的值为no-cache。</p> 
+ <p class="ziti4">·当指令值为时间时，可用前缀@指定一个绝对时间，表示在当天的指定时间失效。</p> 
+ <p class="ziti4">·当指令值为epoch时，Expires的值为Thu,01 Jan 1970 00:00:01 GMT，Cache-Control的值为no-cache。</p> 
+ <p class="ziti4">·当指令值为max时，Expires的值为Thu,31 Dec 2037 23:55:55 GMT，Cache-Control的值为10年。</p> 
+ <p class="ziti4">·当指令值为off时，不对响应头中的属性字段Expires和Cache-Control进行任何操作。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $content_type $expires {          # 根据$content_type的值，对变量$expires进行赋值
+    default         off;                # 默认不修改Expires和Cache-Control的值
+    application/pdf 42d;                # application/pdf类型为42天
+    ~image/         max;                # 图片类型为max
+}
+
+server {
+    expires    24h;                     # 设置Expires的值为当前时间之后的24小时，
+                         　　                # Cache-Control的值为24小时
+    expires    modified +24h;           # 编辑Expires的值增加24小时，Cache-Control的值增
+                                        # 加24小时
+    expires    @15h;                    # 设置Expires的值为当前日的15点，Cache-Control的值
+                                        # 为当前时间到当前日15点的时间差
+    expires    $expires;                # 根据变量$expires的内容设置缓存时间
+    add_header Cache-Control no-cache;  
+    add_trailer  X-Always $host always;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">模块：ngx_http_charset_module</p> 
+ <p class="ziti3">该模块在响应头的属性字段“Content-Type”添加指定的字符集，同时还可以进行字符集转换。字符集转换有如下限制：</p> 
+ <p class="ziti4">·只能从服务端到客户端进行单向转换。</p> 
+ <p class="ziti4">·只能单字节字符集进行转换或在单字节字符集与UTF-8之间进行转换。</p> 
+ <p class="ziti3">该模块的内置配置参数如表4-63～表4-67所示。</p> 
+ <p class="middle-img">表4-63　字符集指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-63.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-63.jpg" class="calibre182"/></a> 
+ </div> 
+ <p class="middle-img">表4-64　源字符集指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-64.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-64.jpg" class="calibre39"/></a> 
+ </div> 
+ <p class="middle-img">表4-65　字符集映射指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-65.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-65.jpg" class="calibre56"/></a> 
+ </div> 
+ <p class="middle-img">表4-66　字符集MIME类型指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-66.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-66.jpg" class="calibre183"/></a> 
+ </div> 
+ <p class="middle-img">表4-67　字符集代理转换指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-67.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-67.jpg" class="calibre184"/></a> 
+ </div> 
+</body>
+</html>

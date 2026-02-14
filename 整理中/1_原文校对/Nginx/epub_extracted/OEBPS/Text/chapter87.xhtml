@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_96">5.2.6　HTTPS吊销证书配置</h3>
+
+  <p class="ziti3">HTTPS的证书会因安全原因在正常有效期到期前进行证书变更，为了方便客户端或浏览器及时判断当前使用的网站证书是否已被吊销，通常会采用以下两种方式实现：证书吊销列表（CRL）和在线证书协议（OCSP）。</p>
+
+  <p class="ziti3">（1）证书吊销列表</p>
+
+  <p class="ziti3">证书吊销列表是由CA机构维护的列表，列表中包含已被吊销的证书序列号和时间，通常在CA机构证书中都会包含CRL下载地址。证书吊销列表Nginx配置如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;
+    ssl_certificate_key ssl/www_nginxbar_org.key;
+    ssl_password_file ssl/www_nginxbar_org.pass;
+
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_session_ticket_key ssl/session_ticket.key;
+
+    ssl_crl ssl/ca.crl;                          # 证书吊销列表文件
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti4">·证书吊销列表可通过查看网站证书字段“CRL分发点”的字段值下载获得。</p>
+
+  <p class="ziti3">（2）在线证书协议</p>
+
+  <p class="ziti3">在线证书协议是一个吊销证书在线查询协议，虽然可以实现实时查询，但同时也会因在HTTPS建立连接时查询OCSP接口引发性能问题。为解决OCSP查询造成的性能影响，引入了OCSP Stapling机制，即由HTTPS服务器查询OCSP接口或本地OCSP缓存，并通过证书状态消息返回给客户端。在线证书协议缓存Nginx配置如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">resolver 114.114.114.114 valid=300s;             # DNS服务器地址
+resolver_timeout 1s;                             # DNS解析超时时间为1s
+
+server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;
+    ssl_certificate_key ssl/www_nginxbar_org.key;
+    ssl_password_file ssl/www_nginxbar_org.pass;
+
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_session_ticket_key ssl/session_ticket.key;
+
+    ssl_stapling on;                                 # 启用OCSP缓存
+    ssl_stapling_file ssl/ocsp.pem;                  # OCSP结果缓存文件
+    ssl_stapling_responder http://ocsp.example.com/; # 设置获取OCSP结果的URL
+    ssl_stapling_verify on;                          # 设置OCSP结果缓存证书验证
+    ssl_trusted_certificate ssl/ca.pem;              # 网站证书信任证书链的中间证书文件
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">注意，OCSP结果缓存文件和获取OCSP结果的URL同时设置时，OCSP结果缓存文件的优先级最高。</p>
+
+  <p class="ziti3">OCSP响应结果可通过如下命令获得。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">openssl ocsp -issuer /etc/nginx/conf/ssl/ca.pem -cert
+/etc/nginx/conf/ssl/www_nginxbar_org.pem -no_nonce -text -url
+http://ocsp.example.com -text -respout /etc/nginx/conf/ssl/ocsp.pem
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

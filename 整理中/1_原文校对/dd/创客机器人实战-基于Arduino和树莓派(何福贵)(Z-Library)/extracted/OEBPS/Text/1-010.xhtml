@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="A188c0030-1470-4f56-81d6-07360af7d060" class="calibre13">Chpater 4<br class="calibre8"/> 第四章 Arduino基本函数</h2> 
+ <p class="calibre3">前面介绍了Arduino开发前的准备工作，使用Arduino编程，Arduino提供了很多基础函数，主要有I/O控制、时间函数、中断函数、通信函数、数学函数、读写EPROM函数，以及典型的SPI和I<sup class="calibre9">2</sup>C总线的操作函数，通过这些函数方便对板上的资源进行控制。另外，Arduino提供了许多示例程序，从而大大地降低了开发者的学习难度，缩短了开发周期。</p> 
+ <h3 id="A01a3c4fc-0b1f-4b7c-b89e-d9ba0a862385" class="calibre14">4.1 数字I/O口的操作函数</h3> 
+ <h4 class="sigil_not_in_toc" id="Ad2a00030-02a3-4333-a68a-4d890a9ef17d">4.1.1 pinMode（pin，mode）</h4> 
+ <p class="calibre3">pinMode函数用于配置引脚为输入或输出模式。该函数的两个参数是pin和mode，pin参数表示所要配置的引脚，mode参数表示设置的模式。mode参数可取两个值：INPUT（输入）和OUTPUT（输出）。这个函数无返回值。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：Arduino UNO板上的模拟引脚也可以当作数字引脚使用，编号为14（对应模拟引脚0）到19（对应模拟引脚5）。</p> 
+ <p class="calibre3">例如，配置数字引脚5为输出模式的语句如下：pinMode（5，OUTPUT）。</p> 
+ <h4 class="sigil_not_in_toc" id="A7b3b0030-8b52-42a1-8f3f-347bb04353c0">4.1.2 digitalWrite（pin，value）</h4> 
+ <p class="calibre3">digitalWrite函数用来设置引脚的输出电压为高电平或低电平。该函数的两个参数是pin和value，pin参数表示所要设置的引脚，value参数表示输出的电压。value参数取两个值：HIGH（高电平）或LOW（低电平）。这个函数无返回值。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：在使用digitalWrite（pin，value）函数设置引脚之前，需要将该引脚设置为OUTPUT模式。</p> 
+ <p class="calibre3">例如，配置引脚5的输出为高电平的语句如下：</p> 
+ <div class="center">
+  <img alt="" class="u67" src="../Images/50_01.jpg" width="1280" height="97"/>
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Ad3110031-d626-4adc-bd3b-fb01fbca7a9c">4.1.3 digitalRead（pin）</h4> 
+ <p class="calibre3">digitalRead函数是当引脚为输入的情况下。读取引脚的电压情况。这个函数有返回值，为int型，返回值为HIGH（高电平）或LOW（低电平），参数pin表示所要获取电压值的引脚。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：如果引脚没有接到任何地方，将随机返回HIGH或LOW。</p> 
+ <p class="calibre3">例如，获取引脚3的电压情况的语句如下：</p> 
+ <div class="center">
+  <img alt="" class="u68" src="../Images/50_02.jpg" width="1280" height="88"/>
+ </div> 
+ <h3 id="A1a5690df-3a2e-4a97-bd5e-11489782cf00" class="calibre14">4.2 模拟I/O口的操作函数</h3> 
+ <h4 class="sigil_not_in_toc" id="A7e3c0031-6adf-454a-abfb-a84cbce45d63">4.2.1 analogReference（type）</h4> 
+ <p class="calibre3">analogReference函数的作用是配置模拟引脚输入时的参考电压。在嵌入式应用中，引脚获取模拟电压值之后，将根据参考电压将模拟值转换到0～1023。该函数为无返回值函数，参数为type类型，有3种类型（DEFAULT/INTERNAL/EXTERNAL），具体含义如下：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/50_03.jpg" width="40" height="44"/>DEFAULT：默认值，参考电压为5V。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/50_04.jpg" width="40" height="44"/>INTERNAL：低电压模式，使用片内基准电压源。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/50_05.jpg" width="40" height="44"/>EXTERNAL：扩展模式，通过AREF引脚获取参考电压。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：如果在AREF引脚加载外部参考电压，需要使用一个5kW的上拉电阻，这会避免由于设置不当造成控制芯片的损坏。</p> 
+ <h4 class="sigil_not_in_toc" id="Afed30031-1efd-4754-a5f7-107e53c40e46">4.2.2 analogRead（pin）</h4> 
+ <p class="calibre3">analogRead函数用于读取引脚的模拟量电压值，每读一次需要花100ms的时间。参数pin表示所要获取模拟量电压值的引脚，该函数返回值为int型，表示引脚的模拟量电压值，其范围在0～1023。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：对于Arduino Uno主板，函数的参数pin范围为0～5，表示6个模拟量I/O口中的一个。</p> 
+ <h4 class="sigil_not_in_toc" id="A877f0031-1990-441b-92f8-354608e9d74a">4.2.3 analogWrite（pin，value）</h4> 
+ <p class="calibre3">analogWrite函数为无返回值函数，有两个参数pin和value。其中，参数pin表示设置的引脚，只能选择Arduino Uno主板支持的引脚；参数value表示PWM输出的占空比，范围在0～255，对应的占空比为0～100%。</p> 
+ <p class="calibre3">analogWrite函数通过PWM的方式在引脚上输出一个模拟量，较多的应用在LED亮度控制、电机转速控制等方面。</p> 
+ <p class="calibre3">脉冲宽度调制（Pulse Width Modulation，PWM）通过对一系列脉冲的宽度进行调制，来等效地获得所需要的波形或电压。这是一种模拟控制方式，这种方式能使电源的输出电压在工作条件变化时保持恒定，是利用微处理器的数字输出来对模拟电路进行控制的一种非常有效的技术。如图4-1所示是一个简单的PWM波示意图。</p> 
+ <div class="center"> 
+  <img alt="" class="u69" src="../Images/51_01.jpg" width="1075" height="367"/> 
+  <p class="imgtitle">图4-1 PWM波</p> 
+ </div> 
+ <p class="calibre3">在Arduino中执行该操作之后，需要等待一定时间后才能对该引脚进行下一次操作。该函数在使用Arduino UNO开发板时，支持的引脚：3、5、6、9、10、11。即在Arduino控制板上引脚号旁边标注～的就是可用作PWM的引脚，如图4-2所示。Arduino中的PWM的频率大约为490Hz。</p> 
+ <div class="center"> 
+  <img alt="" class="u70" src="../Images/51_02.jpg" width="810" height="568"/> 
+  <p class="imgtitle">图4-2 Arduino UNO开发板</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：PWM输出位数为8位，范围为0～255。</p> 
+ <p class="calibre3">例如，Arduino开发板的A0引脚接电位器，使用电位器控制板上LED的亮度，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u71" src="../Images/51_03.jpg" width="1280" height="537"/>
+ </div> 
+ <h3 id="Ac881d4b6-1edc-4311-8ff8-e8d62062df22" class="calibre14">4.3 高级I/O</h3> 
+ <h4 class="sigil_not_in_toc" id="Ad2d50032-c063-42e3-be4f-97a734455dba">4.3.1 shiftOut（dataPin，clockPin，bitOrder，val）</h4> 
+ <p class="calibre3">shiftOut函数能够将数据通过串行的方式输出在引脚上，即一般意义上的同步串行通信，是控制器之间、控制器与传感器之间常用的一种通信方式。</p> 
+ <p class="calibre3">shiftOut函数无返回值，有4个参数：dataPin、clockPin、bitOrder、val，下面具体说明。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_01.jpg" width="40" height="44"/>dataPin：数据输出引脚，将逐次输出数据的每一位。引脚模式需要设置成输出。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_02.jpg" width="40" height="45"/>clockPin：时钟输出引脚，提供时钟，引脚模式需要设置成输出。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_03.jpg" width="40" height="44"/>bitOrder：数据位移顺序选择位，该参数为byte类型，有两种类型可选择，分别是高位先入MSBFIRST和低位先入LSBFIRST。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_04.jpg" width="40" height="45"/>val：所要输出的数据值。</p> 
+ <h4 class="sigil_not_in_toc" id="Aecd50033-c503-434c-ac5b-f344090a1d7f">4.3.2 pulseIn（pin，state，timeout）</h4> 
+ <p class="calibre3">pulseIn函数用于引脚脉冲时间长度的读取，脉冲可以是HIGH或LOW。如果是HIGH，函数将先等引脚变为高电平，然后开始计时，一直到变为低电平为止。返回脉冲持续的时间长短，单位为毫秒（ms）。如果超时还没有读到的话，将返回0。</p> 
+ <p class="calibre3">pulseIn函数返回值类型为无符号长整型（unsigned long），有3个参数：pin、state、timeout，下面介绍具体含义。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_05.jpg" width="40" height="45"/>pin：读取脉冲的引脚。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_06.jpg" width="40" height="44"/>value：读取的脉冲类型——HIGH或LOW。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_07.jpg" width="40" height="45"/>timeout（可选）：指定脉冲计数的等待时间，单位为微秒，默认值是1秒。</p> 
+ <p class="calibre3">下面是一个脉冲计数器，Arduino开发板的2引脚接脉冲，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u72" src="../Images/52_08.jpg" width="1280" height="559"/>
+ </div> 
+ <h3 id="Af18d74bb-4530-4f49-96d6-9867a3782608" class="calibre14">4.4 中断函数</h3> 
+ <p class="calibre3">单片机的中断是由于某一随机事件的发生，单片机原程序暂停运行，转去执行另一程序（中断服务程序），执行完毕后又自动返回原程序中断点继续运行，包括中断源、主程序、中断服务程序。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_09.jpg" width="40" height="45"/>中断源：引起中断的软硬件。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_10.jpg" width="40" height="44"/>主程序：现在运行的程序。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/52_11.jpg" width="40" height="45"/>中断服务程序：中断发生后，处理中断事件的程序。</p> 
+ <p class="calibre3"><b class="calibre6">1．interrupts()和noInterrupts()</b></p> 
+ <p class="calibre3">在Arduino中，interrupts函数负责打开中断，noInterrupts函数负责关闭中断，这两个函数均无参数且无返回值函数。</p> 
+ <p class="calibre3"><b class="calibre6">2．attachInterrupt</b>（interrput，function，mode）</p> 
+ <p class="calibre3">attachInterrupt函数用于设置外部中断，包括3个参数，分别为中断源、中断处理函数和触发模式，下面具体说明。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/53_01.jpg" width="40" height="45"/>中断源：值为0或者1，对应2或者3号数字引脚。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/53_02.jpg" width="40" height="45"/>中断处理函数：其参数值为函数的指针，当中断发生时执行该子程序部分，是一段子程序。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/53_03.jpg" width="40" height="45"/>触发模式：4种类型：LOW（低电平触发）、CHANGE（变化时触发）、RISING（低电平变为高电平触发）、FALLING（高电平变为低电平触发）</p> 
+ <p class="calibre3"><b class="calibre6">3．detachInterrupt</b>（interrput）</p> 
+ <p class="calibre3">detachInterrupt：取消中断，参数interrupt表示要取消的中断源。</p> 
+ <h3 id="Ac6743328-69a8-4b57-b837-1c5d9c56322d" class="calibre14">4.5 延时函数</h3> 
+ <p class="calibre3"><b class="calibre6">1．delay</b>（ms）<b class="calibre6">和delayMicroseconds</b>（us）</p> 
+ <p class="calibre3">delay函数是延时函数，函数参数表示延时时长，单位是毫秒（ms）。函数无返回值。</p> 
+ <p class="calibre3">delayMicroseconds函数也是延时函数，所不同的是其参数单位是微秒（us，1ms=1000us）。</p> 
+ <p class="calibre3">下面是一个跑马灯的例子，4个LED灯，其负极接GND（接地），正极分别连接电阻后再连接到Arduino开发板的13、12、11、10引脚。代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u73" src="../Images/53_04.jpg" width="1280" height="662"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．millis()和micros()</b></p> 
+ <p class="calibre3">用于获取从程序开始运行以来的时间，mills()函数返回的时间单位是毫秒，而micros()函数返回的时间单位是微秒。如果计时溢出后会自动从零开始计数，mills()函数大约会在程序运行约50天后溢出，而micros()会在程序大约运行70分钟后溢出。</p> 
+ <h3 id="A3417d72c-c78c-42a2-8274-0a0b78a760e9" class="calibre14">4.6 串口通信函数</h3> 
+ <p class="calibre3">Arduino串口通信函数定义在头文件HardwareSerial.h中。</p> 
+ <p class="calibre3"><b class="calibre6">1．Serial.begin()</b></p> 
+ <p class="calibre3">Serial.begin函数：设置串口的波特率，常用波特率有9600、19200、57600、115200等。</p> 
+ <p class="calibre3"><b class="calibre6">2．Serial.available()</b></p> 
+ <p class="calibre3">Serial.available函数：判断串口是否收到数据，返回值为int型。</p> 
+ <p class="calibre3"><b class="calibre6">3．Serial.read()</b></p> 
+ <p class="calibre3">Serial.read函数：读入串口数据，返回值为int型。</p> 
+ <p class="calibre3"><b class="calibre6">4．Serial.print()</b></p> 
+ <p class="calibre3">Serial.print函数：串口输出数据。</p> 
+ <p class="calibre3"><b class="calibre6">5．Serial.printIn()</b></p> 
+ <p class="calibre3">Serial.printIn函数的功能与Serial.print函数相似，Serial.printIn函数多了回车换行功能。</p> 
+ <h3 id="A6a0f8146-2736-48cc-ba80-14703a766715" class="calibre14">4.7 数学函数</h3> 
+ <p class="calibre3">（1）min（<i class="calibre17">x</i>，<i class="calibre17">y</i>）：返回<i class="calibre17">x</i>、<i class="calibre17">y</i>两者的最小值。</p> 
+ <p class="calibre3">（2）max（<i class="calibre17">x</i>，<i class="calibre17">y</i>）：返回<i class="calibre17">x</i>、<i class="calibre17">y</i>两者的最大值。</p> 
+ <p class="calibre3">（3）abs（<i class="calibre17">x</i>）：返回<i class="calibre17">x</i>的绝对值。</p> 
+ <p class="calibre3">（4）三角函数：三角函数包括sin（<i class="calibre17">x</i>）、cos（<i class="calibre17">x</i>）、tan（<i class="calibre17">x</i>），分别返回<i class="calibre17">x</i>的正弦值、余弦值和正切值，返回值为double型。</p> 
+ <p class="calibre3">（5）random（small，big）：生成一个随机数，随机数的范围由两个参数small和big决定，返回值为long型。</p> 
+ <h3 id="Ad786e2d2-0103-4a28-834d-f2f6374cd862" class="calibre14">4.8 EEPROM函数</h3> 
+ <p class="calibre3">电可擦可编程只读存储器EEPROM（Electrically Erasable Programmable Read-Only Memory），是一种掉电后数据不丢失的存储芯片，如果断电后Arduino需要保存一些参数，就可以就使用EEPROM。</p> 
+ <p class="calibre3">在各型号的Arduino控制器上的AVR芯片均带有EEPROM，也有外接的EEPROM芯片，常见的Arduino控制器的EEPROM大小有以下几种：</p> 
+ <p class="calibre3">（1）Arduino UNO、Arduino duemilanove-m328、Zduino m328均使用ATmega328芯片，EEPROM都为1KB。</p> 
+ <p class="calibre3">（2）Arduino duemilanove-m168的EEPROM为512bytes。</p> 
+ <p class="calibre3">（3）Arduino 2560的EEPROM为4KB。</p> 
+ <p class="calibre3">Arduino的库已经含有EEPROM类库，要使用它得先调用EEPROM.h，使用write和read方法，即可操作EEPROM，使用clear方法变成0。</p> 
+ <p class="calibre3">使用EEPROM的示例：在Arduino IDE的菜单栏中选择“文件”＞“示例”＞“EPROM”命令，如图4-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u74" src="../Images/55_01.jpg" width="1265" height="1082"/> 
+  <p class="imgtitle">图4-3 EEPROM示例</p> 
+ </div> 
+ <p class="calibre3">下面是写EEPROM的例子。</p> 
+ <div class="center">
+  <img alt="" class="u75" src="../Images/55_02.jpg" width="1280" height="636"/>
+ </div> 
+ <h3 id="Ada594955-76aa-4399-8996-a58d4078e37c" class="calibre14">4.9 Arduino SPI</h3> 
+ <p class="calibre3">串行外设接口（Serial Peripheral Interface，SPI）是一种高速的、全双工、同步的通信总线，并且在芯片的管脚上只占用4根线，节约了芯片的管脚，同时为PCB的布局节省空间，提供方便。</p> 
+ <p class="calibre3">SPI的通信原理很简单，它以主从方式工作，这种模式通常有一个主设备和一个或多个从设备，需要至少4根线，事实上3根也可以（单向传输时）。</p> 
+ <p class="calibre3">（1）MOSI（Master In Slave Out）：主器件数据输出，从器件数据输入。</p> 
+ <p class="calibre3">（2）MISO（Master Out Slave In）：主器件数据输入，从器件数据输出。</p> 
+ <p class="calibre3">（3）SCK（Serial Clock）：时钟信号，由主器件产生，最大为fPCLK/2，从模式频率最大为fCPU/2。</p> 
+ <p class="calibre3">（4）SS：从器件使能信号，由主器件控制，有的IC会标注为CS（Chip Select）。</p> 
+ <p class="calibre3">其中，SS是控制芯片是否被选中的，也就是说，只有片选信号为预先规定的使能信号时（高电位或低电位），对此芯片的操作才有效。这就允许在同一总线上连接多个SPI设备成为可能。</p> 
+ <p class="calibre3">Arduino开发板ICSP接口中包含MOSI、MISO、SCK为SPI接口，如图4-4所示，有的开发板D11、D12、D13管脚默认和SPI接口连接（如UNO PLUS）。</p> 
+ <div class="center"> 
+  <img alt="" class="u76" src="../Images/56_01.jpg" width="1122" height="613"/> 
+  <p class="imgtitle">图4-4 Arduino UNO开发板ICSP</p> 
+ </div> 
+ <p class="calibre3">不同的Arduino开发板的SPI引脚如表4-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表4-1 不同的Arduino开发板的SPI引脚</p>
+  <img alt="" class="u77" src="../Images/56_02.jpg" width="1280" height="268"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：MOSI、MISO、SCK的使用必须与ICSP的物理位置一致才有效。</p> 
+ <p class="calibre3">Arduino IDE自带的SPI例程，在Arduino IDE的菜单中选择“文件”＞“示例”＞“SPI”＞“DigitalPotControl”命令，打开工程，如图4-5所示。</p> 
+ <p class="calibre3">这个例程介绍如何使用串行外设接口（SPI）来控制AD5206数字电位器，当需要用电而不是用手来改变电路中的电阻时，数字电位器是有用的。示例应用包括LED调光、音频信号调节和音频生成。在这个例子中，将使用一个6通道的数字电位器来控制6个LED的亮度。</p> 
+ <div class="center"> 
+  <img alt="" class="u78" src="../Images/57_01.jpg" width="778" height="914"/> 
+  <p class="imgtitle">图4-5 Arduino自带的SPI例程</p> 
+ </div> 
+ <p class="calibre3">AD5206是一个6通道数字电位器。这就意味着有6个可变电阻（电位器）内置在个人电子控制。有6个内部可变电阻的三引脚芯片，独特的可变电阻引脚标记为A<i class="calibre17">x</i>，B<i class="calibre17">x</i>和W<i class="calibre17">x</i>，即A1、B1和W1。例如，在本教程中，我们将用每个可变电阻作为一个电压分压器，把一个引脚（引脚B）拉高，另一侧引脚（引脚A）拉低，并采取可变电压输出的中心引脚（Wiper）。在这种情况下，该AD5206提供一个最大值10000欧姆的电阻，分为255个等级（255是最大，0最小）。</p> 
+ <p class="calibre3">例程的接线图如图4-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u79" src="../Images/57_02.jpg" width="1226" height="618"/> 
+  <p class="imgtitle">图4-6 例程的接线图</p> 
+ </div> 
+ <p class="calibre3">例程的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u80" src="../Images/57_03.jpg" width="1280" height="466"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u81" src="../Images/58_01.jpg" width="1280" height="1105"/>
+ </div> 
+ <p class="calibre3">程序先引入SPI头文件SPI.h。SPI接口包含MOSI、MISO、SCK、CS四根线。其中MOSI、MISO、SCK已经固定引脚。而CS为片选引脚，可随意选择某个引脚作为CS。程序中const int slaveSelectPin=10，定义D10作为片选信号。</p> 
+ <p class="calibre3">程序先引入SPI头文件SPI.h。SPI接口包含MOSI、MISO、SCK、CS四根线。其中MOSI、MISO、SCK已经固定引脚。而CS为片选引脚，可随意选择哪个引脚作为CS。程序中const int slaveSelectPin=10，定义D10作为片选信号。</p> 
+ <p class="calibre3">setup()函数调用SPI.begin()初始化SPI接口。此处为默认设置。若要设置具体参数可使用如下语句初始化SPI：</p> 
+ <div class="center">
+  <img alt="" class="u82" src="../Images/58_02.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3">SPISettings()函数设置SPI传输模式，SPI.beginTransaction()函数根据SPISettings()初始化SPI。</p> 
+ <p class="calibre3">此处设置SPI速率为14MHz，高位先传输，模式0。</p> 
+ <p class="calibre3">传输SPI前先拉低片选管脚，使能SPI设备，语句如下：</p> 
+ <div class="center">
+  <img alt="" class="u83" src="../Images/58_03.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3">使用SPI传输函数，参数val为要发送的字节，函数返回值为接收到的数据，语句如下：</p> 
+ <div class="center">
+  <img alt="" class="u84" src="../Images/58_04.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3">SPI传输结束后释放片选管脚，语句如下：</p> 
+ <div class="center">
+  <img alt="" class="u85" src="../Images/59_01.jpg" width="1280" height="43"/>
+ </div> 
+ <p class="calibre3">Arduino开发板也可以通过SPI接口读写存储模块，例如Micro SD卡，读写Micro SD卡模块如图4-7所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u86" src="../Images/59_02.jpg" width="924" height="597"/> 
+  <p class="imgtitle">图4-7 Micro SD卡SPI接口读写模块</p> 
+ </div> 
+ <p class="calibre3">TF卡模块使用SPI总线连接方式实现与Arduino控制器的通信，稳压芯片输出的3.3V为电平转换芯片、Micro SD卡进行供电，电平转换电路往Micro SD卡方向的信号转换成3.3V，Micro SD卡往控制接口方向的MISO信号也转换成了3.3V，一般AVR单片机系统都可以读取该信号，产品使用自弹式卡座，方便卡的插拔。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：Arduino的sd.h库文件目前对2GB及其以下的支持比较好，对2GB以上的支持不好，所以在使用时，建议选用2GB或以下的内存卡。</p> 
+ <p class="calibre3">TF卡模块共引出6个引脚，其中DO、CK、DI是SPI总线接口，“+”为电源正，“-”为电源GND，CS为片选端，实际使用时按照下面的接线图连接即可，使用Arduino IDE自带的例子程序就可以进行测试。</p> 
+ <p class="calibre3">连接示意图如图4-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u87" src="../Images/59_03.jpg" width="1121" height="643"/> 
+  <p class="imgtitle">图4-8 SPI总线读写存储模块Micro SD卡连接示意图</p> 
+ </div> 
+ <h3 id="Ab8654588-6484-4d63-93f4-81667dc6fa72" class="calibre14">4.10 Arduino I<sup class="calibre16">2</sup>C</h3> 
+ <p class="calibre3">I<sup class="calibre9">2</sup>C是Inter-Integrated Circuit的缩写，是一种两线接口。I<sup class="calibre9">2</sup>C只是用两条双向的线，一条Serial Data Line（SDA），另一条Serial Clock（SCL）。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/60_01.jpg" width="40" height="45"/>SCL：上升沿将数据输入到每个EEPROM器件中；下降沿驱动EEPROM器件输出数据（边沿触发）。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/60_02.jpg" width="40" height="45"/>SDA：双向数据线，为OD门，与其他任意数量的OD与OC门成“线与”关系。</p> 
+ <p class="calibre3">I<sup class="calibre9">2</sup>C的一个总线上可以挂多个设备（传感器），设备之间直接通过ID进行区分，同一个总线上只能有一个主设备，可以有多个从设备，通信只能从主设备发起，不能从从设备发起。速率方面常用的有9.6Kbps、1.92Kbps、1.152Kbps。</p> 
+ <p class="calibre3">在某些情况下，设置两个（或更多）Arduino板彼此分享信息是有帮助的。在下面的例子中，两板程序通过I<sup class="calibre9">2</sup>C同步串行协议和对方通信，作为一个主读/从发配置。</p> 
+ <p class="calibre3">I<sup class="calibre9">2</sup>C总线是由数据线SDA和时钟SCL构成的串行总线，可发送和接收数据。在两个设备之间可以进行双向传送。各种被控制设备均并联在这条总线上，总线上的每个设备模块都有唯一的地址，在信息的传输过程中，I<sup class="calibre9">2</sup>C总线上并接的每一模块电路既可以是主设备又可以是从设备，这取决于它所要完成的功能。本例的接线如图4-9所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u88" src="../Images/60_03.jpg" width="1280" height="514"/> 
+  <p class="imgtitle">图4-9 Arduino开发板I<sup class="calibre16">2</sup>C通信接线</p> 
+ </div> 
+ <p class="calibre3">主控板的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u89" src="../Images/60_04.jpg" width="1280" height="400"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u90" src="../Images/61_01.jpg" width="1280" height="225"/>
+ </div> 
+ <p class="calibre3">从控板的代码如下。</p> 
+ <div class="center">
+  <img alt="" class="u91" src="../Images/61_02.jpg" width="1280" height="434"/>
+ </div> 
+ <p class="calibre3">Arduino中的Wire库主要函数说明如下：</p> 
+ <p class="calibre3">（1）Wire.begin()和Wire.begin（address）：初始化Wire库，并且加入到I<sup class="calibre9">2</sup>C网络，前者作为Master，后者作为Slaver，其中参数address为7位的器件地址（可选），如果没有输入，则以Master的形式加入到I<sup class="calibre9">2</sup>C网络。</p> 
+ <p class="calibre3">（2）Wire.requestFrom()：主设备请求从设备一个字节，这个字节可以被主设备用read()或available()接受，有两种形式：Wire.requrstFrom（addtess，quantity）和Wire.requrstFrom（addtess，quantity，stop）。</p> 
+ <p class="calibre3">参数：addtess表示7位的器件地址；quantity表示请求得到的数量。</p> 
+ <p class="calibre3">（3）Wire.beginTransmission（address）：开始一次数据传输，发送一个I<sup class="calibre9">2</sup>C开始字符，参数address表示器件的7位地址。</p> 
+ <p class="calibre3">（4）Wire.endTransmission()和Wire.endTransmission（stop）：结束一个由beginTransmission()开始的并且由write()排列的从机的传输。在Arduino中，endTransmission()接受一个布尔型变量，如果为1，则endTransmission()发送一个停止信息；如果为0，则发送开始信息。</p> 
+ <p class="calibre3">（5）Wire.write()：向从机发送数据，有3种形式。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/61_03.jpg" width="40" height="45"/>Wire.write（value）：value为要发送的数值。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/61_04.jpg" width="40" height="44"/>Wire.write（string）：string为字符组的指针。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/61_05.jpg" width="40" height="45"/>Wire.write（data，length）：data为一个字节数组，length为传输的数量。</p> 
+ <p class="calibre3">（6）Wire.send()：发送数据。</p> 
+ <p class="calibre3">（7）Wire.receive()：接收数据。</p> 
+ <p class="calibre3">（8）Wire.onReceive()：从机接收主机发来的数据。</p> 
+ <p class="calibre3">（9）Wire.onRequest()：从机请求主机发送数据。</p> 
+ <p class="calibre3">要打开Arduino IDE自带的I<sup class="calibre9">2</sup>C的例程，在Arduino IDE的菜单栏中选择“文件”＞“示例”＞“Wire”命令，如图4-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u92" src="../Images/62_01.jpg" width="942" height="810"/> 
+  <p class="imgtitle">图4-10 Arduino IDE自带的I<sup class="calibre16">2</sup>C例程</p> 
+ </div> 
+ <h3 id="Ac7678d38-c215-46f7-8821-5da92c6428b7" class="calibre14">4.11 本章小结</h3> 
+ <p class="calibre3">本章介绍了Arduino IDE中编写程序涉及的Arduino的基本函数，包括I/O控制、时间函数、中断函数、通信函数、数学函数、读写EPROM函数，以及典型的SPI和I<sup class="calibre9">2</sup>C总线的操作。另外，Arduino IDE使用的库是可以扩展的。</p> 
+</body>
+</html>

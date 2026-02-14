@@ -1,0 +1,631 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+  <head>
+    <title>CHAPTER 04　无所不在的连接</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="bodycontent-title"><span class="xbt"><span class="yhd">CHAPTER 04</span></span><br class="calibre1"/> 无所不在的连接</h2> 
+ <p class="bodycontent">在物联网中，无所不在的通信占有大部分的版图，其中无线通信又被视为物联网设备的基本配备。所有感测（或传感）数据要能够不受限制地往上传送，靠的就是部署完善的通信网络，目前在大都市中，移动通信网络（Cellular communication）和Wi-Fi无线网络都是覆盖范围最广的，有许多的应用因此孕育而生。</p> 
+ <p class="bodycontent"><span>本</span>章就来介绍几种常见的与Arduino结合的无线通信方式以及应用。与有线通信相比较，双方各有优缺点，例如通信的弹性、部署的成本以及网络内设备的数量，都是我们实际在应用环境下必须考虑的。在小范围的应用中，无线化是一种趋势，比如有越来越多的家电直接支持无线网络，整个影音环境或是应用场景的掌控都可以通过无线网络来控制。而比较严苛的工业应用中，无线通信才算是萌芽初生的阶段，整个系统有部分重要性较低的已经开始尝试，但是要到全面展开还有一段路要走。由有线和无线通信架构的整个物联网如图4-1所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img140" src="../Images/Figure-P118_26983.jpg"/> 
+  <p class="imgdescript-c">图4-1　有线和无线通信架构的整个物联网</p> 
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP9-1">4-1　初入无线通信</h3> 
+ <p class="bodycontent">无线通信有许多特点，例如：</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　节省布线与区域部署的成本。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　弹性的网络配置。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　拥有较佳的通信距离。</p> 
+ <p class="bodycontent">不过，稳定性与安全性是无线通信最容易让人产生疑虑的。任何事情都有好与坏的两面，只要学习如何适当地应用就能发挥它最大的价值。要能够驾驭无线通信来满足我们的应用需要前，必须能够认识无线通信的一些基础知识。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img-float26" src="../Images/Figure-P119_21228.jpg"/>
+ </div> 
+ <p class="bodycontent">无线信号基本上是利用不同频段的电磁波来进行数据的传输，比如收音机、无线电视、蓝牙（Bluetooth）、移动电话和无线网络等。无线信号根据不同的频率会有不同的使用特性和应用场合。例如，民航机常用的VHF（Very High Frequency，高频）。</p> 
+ <p class="bodycontent">每个频段可使用的范围是受到限制且按分配使用的，就像水管的大小是有限的一样，为了能够传送更多的数据必须拥有更大的带宽。图4-2是一张频段使用的分隔图，被切割的程度已经无法分辨清楚。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img141" src="../Images/Figure-P119_21231.jpg"/> 
+  <p class="imgdescript-c">图4-2　美国已使用的无线频段（数据源：U.S. Department of Commerce, 2003）</p> 
+ </div> 
+ <p class="bodycontent">除了ISM频段外，其余的频段各个国家或地区的当地政府都可以收取一定的授权费用来发放使用执照，因此，同样的一个无线设备在不同国家或地区都必须再向当地发放授权的单位进行申请与认证。所谓的ISM指的是工业（Industrial）、科学（Scientific）和医疗（Medical），三种领域的应用是开放使用的，只需要遵守相关的规定即可。各国或者地区开放的频段多多少少有些差异，不过2.4GHz是全球共同的ISM频段，这也是为什么日常生活常用到的频段都在2.4GHz，例如无线网络（802.11 b/g）、蓝牙、Zigbee等。</p> 
+ <p class="bodycontent">无线技术虽然是利用电磁波来进行数据的传送，但是数据的内容实际上还是0101的数字信号，如何增加无线传输的可靠度，其调制技术（Modulation）便是关键的因素，这里只列举而不详加介绍，目的是让大家知道当前有哪些技术：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img142" src="../Images/Figure-T120_27044.jpg"/>
+ </div> 
+ <p class="bodycontent">另一个比较重要的信息是窄频与展频通信。窄频的特色是高功率但必须精准，如果大家利用天线接收电台的信号，就会发现只要频率稍微偏移了一些，信号就会没那么清楚了，一个无线电台的发射台可以覆盖很大一个范围，唯一的缺点就是如果有人在同频段使用更大功率，就会影响和干扰原本的信号，也就是“盖台”。</p> 
+ <p class="bodycontent">展频通信一开始是由于军事上的需求而发展出来的，它可以将信号隐藏于自然界的噪声当中，使其不易被发现。展频，顾名思义就是将信号分散到一个区段内的频段，而不像窄频这么集中，因此相对来说展频的功率需求也比较小。目前主流的无线通信都是采用展频技术。因此系统所需要的功率不用太大，当频段相同时也不怕别人的信号盖过自己的。由于带宽广，因此同一时间范围内的用户不用担心没有频道可以使用。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img143" src="../Images/Figure-T121_21278.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP9-1-1">天线选择</p> 
+ <p class="bodycontent">无线通信不只是使用的技术会影响数据传输的质与量，在系统规划中还有许多需要考虑的地方，例如信号强度、可视距离和多重路径等（见图4-3）。无线通信不像有线通信那样，只要两个设备彼此确定有实体线路相连接，就可以开始进行数据传送，对于无线设备我们必须考虑到发射和接收信号的强度，两者的范围必须要能重叠才能让彼此有机会进行数据交换。当强度确认没有问题后，信号最好的传输就是通过直线可视的路径（Line of Sight），就像弓箭手在射击时，弓箭飞行的路径就是从弓箭手眼睛到目标物的直线距离。这段距离必须没有任何遮蔽物才可以确保精准命中目标。刚才提到的发射强度，就像弓箭手的最大射程，神射手一定要先确定目标进入射程范围，再进行瞄准，才有机会命中红心。不然弓箭会随距离逐渐衰减直到坠地。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img144" src="../Images/Figure-P121_21280.jpg"/> 
+  <p class="imgdescript-c">图4-3　无线通信的传输考虑</p> 
+ </div> 
+ <p class="bodycontent">通常根据天线的选择，发射端有机会朝多个方向同时发送信号，例如全向天线。这时如果信号路径上有障碍物，就会造成部分信号的反射或是被阻挡，有可能造成多重路径的效应。多重路径因为信号历经的路程比较长，会有时间延迟的现象，在某些需要精准时间进行运算的技术就必须避免多重路径的影响，例如GPS。但是多重路径也提供了另外的路径选择，因此可以提高数据传送成功的百分比。</p> 
+ <p class="bodycontent">物联网的应用绝对脱离不了无线技术的使用，所以也就脱离不了天线的评估与选择。像是智能手机这么成熟的产品，也曾经发生过因为天线设计不良而造成用户不便的情况。</p> 
+ <p class="bodycontent">目前多数的无线通信模块都采用PCB的直接印刷电路天线或是陶瓷天线（见图4-4、图4-5）。这样的好处是直接与模块合而为一，体积小而且不用担心匹配的问题，但是陶瓷天线的效率并不高。这两种类型的天线在硬件设计上需要多加考虑，避免受到周围元件的影响而无法正确发挥作用。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img145" src="../Images/Figure-P122_27054.jpg"/> 
+  <p class="imgdescript-c">图4-4　PCB印刷天线（图片来源：Seeedstudio，ESP8266 Wi-Fi模块）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img146" src="../Images/Figure-P122_27057.jpg"/> 
+  <p class="imgdescript-c">图4-5　陶瓷天线（图片来源：Seeedstudio，RN-171 Wi-Fi模块）</p> 
+ </div> 
+ <p class="bodycontent">另外，物联网的许多应用是以户外为场景，因此系统外一定会有外壳来保护电路及相关设备，若采用的是金属材质，则会完全遮蔽这种天线的感应，折中的办法是使用塑料外壳，但耐磨性就不如金属了。</p> 
+ <p class="bodycontent">所以建议在使用无线通信的模块时，选用有SMA接头（见图4-6）或是有U.FL接头的模块（见图4-7）可以大大提升在天线上的选择性和便利性。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img147" src="../Images/Figure-P123_21288.jpg"/> 
+  <p class="imgdescript-c">图4-6　SMA天线接头</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img148" src="../Images/Figure-P123_21291.jpg"/> 
+  <p class="imgdescript-c">图4-7　U.FL天线接头</p> 
+ </div> 
+ <p class="bodycontent">有了弹性的接口后，我们可以自己选择适当的天线。天线基本上分为全向型（Omni-directional）和定向型（Directional）。这样的分类是由信号覆盖范围的角度来区分的。</p> 
+ <p class="bodycontent">顾名思义，全向型就是将信号以360度发射出去（见图4-8）。如果电磁波可以用肉眼看见，它就会像一个甜甜圈一样围绕在天线四周，当然随着距离的增加信号的强度会逐渐降低。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img149" src="../Images/Figure-P123_21296.jpg"/> 
+  <p class="imgdescript-c">图4-8　全向天线信号的示意图</p> 
+ </div> 
+ <p class="bodycontent">在系统部署的时候，需要按照现场的信号分布来进行最适合的架设（见图4-9），天线尖端方向应该与信号需求方向垂直。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img150" src="../Images/Figure-P124_32287.jpg"/> 
+  <p class="imgdescript-c">图4-9　水平信号发射时天线应该配置的方向</p> 
+ </div> 
+ <div class="calibre1"> 
+  <img alt="" class="pic-h" src="../Images/Figure-P124_32288.jpg"/> 
+  <p class="imgdescript-c">图4-10　定向型天线的信号示意图</p> 
+ </div> 
+ <p class="bodycontent">定向型天线则是将信号集中往固定方向发出（见图4-10），避免不必要的信号浪费。这种类型的天线多半以平板或是碟状的样式出现。定向型天线的背后几乎没有信号的存在，使用上可以明确定义信号发射的方向。通常，定向型天线的另外一端也会是定向型天线，彼此通过固定的方向确保信号的质量，常见于户外长距离通信的使用，尤其是双方必须在可视方向上时，例如楼顶间的传输等。</p> 
+ <p class="bodycontent">在使用上，天线绝对没有所谓的越多越好及越大越强的概念。现在许多网络设备都拥有两到三支天线，可是实际上的使用方式还是必须从内部硬体的设计来看，既有可能是MIMO技术，也有可能是将传送跟接收分开处理，或是真的进行信号强化。天线的大小也一样，必须搭配上整个系统的设计，才会有最佳的通信质量。如果内部没有所谓的功率放大器PA（Power Amplifier），那么天线端再大也没有太好的效果。从系统的角度上来看，天线用于协助调整信号发射出来的范围，让信号能够集中在想要应用的地方。</p> 
+ <h3 class="bodycontent-title1" id="CHP9-2">4-2　RF通信</h3> 
+ <p class="bodycontent">在电子零件商店常常会看到许多应用专题的零件组合包，一定少不了RF无线电波。其中比较常见的是315MHz或是433MHz（见图4-11）的频率，这种模块大都为单向的传输，也就是里面有一对模块，一个负责传送，一个负责接收。这种应用常见于停车场的门禁控制或是一些简单的灯光控制上。这些应用都只需要单向的数据传输，闸门或是灯泡并不需要传送数据给使用者。因此这种类型的通信模块可以用于物联网架构的最终端，用于短距离的单向控制或是数据传输。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img151" src="../Images/Figure-P125_21310.jpg"/> 
+  <p class="imgdescript-c">图4-11　433MHz RF通信模块（图片来源：seeedstudio）</p> 
+ </div> 
+ <p class="bodycontent">这里我们使用这样的模块来进行继电器（Relay）的控制。继电器（见图4-12～图4-14）是一种机械结构的开关，原理是通过接收到的电压变化驱使内部的线圈激磁，进而带动结构的变化。建议使用厂商设计好的模块，避免Arduino直接连接继电器，原因是继电器会有所谓的反应电动势，继电器元件本身有可能会产生一个反向电压向Arduino灌去，造成Arduino的引脚损坏。厂商设计好的模块都会有二极管等元件确保电流方向来保护Arduino。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img152" src="../Images/Figure-P126_27083.jpg"/> 
+  <p class="imgdescript-c">图4-12　继电器的外观（单轴双切型）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img153" src="../Images/Figure-P126_27086.jpg"/> 
+  <p class="imgdescript-c">图4-13　继电器内部构造（激磁左边线圈带动右边开关方向）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img154" src="../Images/Figure-P126_27089.jpg"/> 
+  <p class="imgdescript-c">图4-14　继电器模块（图片来源：seeedstudio）</p> 
+ </div> 
+ <p class="bodycontent">仔细看一下继电器的规格，可以发现除了直流信号以外，还可以控制交流信号。例如，ORMON公司生产的G5LA-14-5VDC继电器就可以承受250VAC最大10A的信号。这样我们就可以进行家电自动化的应用了。</p> 
+ <p class="bodycontent">发射端的部分很简单，RF模块只有电源跟信号共三个引脚。当然还有天线的部分，如果有匹配的天线就会让整个实验效果提升许多。简易的天线设计是以1/4波长为天线长度，使用手边的铜线即可作为天线素材。铜线的长度是：315MHz约23厘米，434MHz约17厘米。当然，还有很多参数会影响通信质量的好坏，大家有兴趣的话可以再深入研究。</p> 
+ <p class="bodycontent">在一对模块中，短小的为发射端，长的为接收端。这种低成本的RF模块常常需要额外一组编译码芯片来协助提升数据的准确性，降低噪声的干扰。例如，HT-12E和HT-12D就是一组编码及译码芯片，要和RF模块的传送与接收端分别配置（见图4-15、图4-16）。它有8位的编码以及4位的数据引脚。从范例接线来看，我们可以利用这个编码IC输出Arduino四个引脚的变化，若分别代表一种状态，就可以有4种信号发送给接收端。若是以二进制来看，则会有2<span class="super1">3</span>共8种信号。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img155" src="../Images/Figure-P127_21319.jpg"/> 
+  <p class="imgdescript-c">图4-15　加入编码芯片于RF模块传送端</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img156" src="../Images/Figure-P128_27098.jpg"/> 
+  <p class="imgdescript-c">图4-16　加入译码芯片于RF模块接收端</p> 
+ </div> 
+ <p class="bodycontent">可以看到编码及译码芯片都有指拨开关，两者必须设置相同的配置才可以正确接收到数据。这样的结构无法传送较为复杂的数据，但是应用于简单的设备控制是可以接受的。</p> 
+ <p class="bodycontent">当然我们希望化简硬件上的复杂度，让我们的系统能够轻易被复制并部署在整个物联网的网络中。因此，这里我们引用一个函数库：VirtualWire。它的好处是不需要编译码芯片，可以直接让Arduino连接RF模块，并且可以直接传送字符串。从这里可以了解到，整个系统的组成是需要硬件和软件（固件）相互搭配的，有些地方可以利用硬件的特性来加强，有些地方则可以通过程序的编辑而补强。碍于篇幅的限制，我们就不深入讨论VirtualWire这个函数库厉害的地方了，而是先学会使用它（见图4-17、图4-18）。Arduino的优点是可以得到许多前辈们的心血，让我们在学习的路途上省下很多不必要的力气，再加上源码开放，深入学习高人的思维，让自己吸收不同的养分。Arduino的开放与完整性造成有些人觉得是学习上的快捷方式，无法有扎实的基础功，但是在现代技术如此快速更迭的情况下，学会如何站在巨人的肩膀上，看得比巨人更远，才是学习的王道。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img157" src="../Images/Figure-P129_21327.jpg"/> 
+  <p class="imgdescript-c">图4-17　使用VirtualWire的传送端接线</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img158" src="../Images/Figure-P129_21330.jpg"/> 
+  <p class="imgdescript-c">图4-18　使用VirtualWire的接收端接线</p> 
+ </div> 
+ <p class="bodycontent">在继电器模块中，有NO（Normal Open）和NC（Normal Close）的引脚，指的是在平常尚未激磁的状态下，这个引脚的特性。NO指的就是断路（或开路），而NC指的是短路，也就是与C点接触在一起了。只要一给继电器信号，NO就会变成短路，NC就会变成开路。大家可以按照这个特性连接不同的设备或是线路。</p> 
+ <p class="bodycontent">程序的部分我们先从发射端看起。第一个当然是要引用VirtualWire这个函数库，别忘了先加入函数库到Arduino IDE中。接下来我们设置一个参数作为RF模块的信号引脚，这里是Pin 12。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img159" src="../Images/Figure-P130_27109.jpg"/>
+ </div> 
+ <p class="bodycontent">在setup()当中，除了启动串行通信作为系统状态检查外，也将Arduino板上的LED作为信号发射确认。最后两行也就是RF模块的设置，分别是引脚及传输速率。接收端除了引脚要改成接收端的引脚外，其余设置相同。</p> 
+ <p class="bodycontent">在循环中，为了让范例能够清楚呈现，我们每五秒改变一次继电器的状态，分别传送“0ON”和“OFF”两个字符串。为什么ON前面要加个数字0呢？原因是为了判断方便，如果启动和停止的两个字符串长度不一样，在接收端的处理上就必须判断两次，以确保长度跟内容正确。因此，我们从发射端就先设计好相同的长度，让接收端只需要识别内容来做出响应即可。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img160" src="../Images/Figure-P131_21337.jpg"/>
+ </div> 
+ <p class="bodycontent">来到接收端，前面设置的部分大同小异，只要改变RF模块的引脚设置即可。重点放在循环中。前半部分我们要处理从RF接收到的字符串，跟串行通信一样，可以用判断语句来降低系统的负担，只有当有信息传送进来时才开始处理。我们将接收到的字符串分别存储到字符数组中，并且在串行端口进行显示。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img161" src="../Images/Figure-P131_21340.jpg"/>
+ </div> 
+ <p class="bodycontent">接收完毕后，程序就会进行字符串内容的判断，并对继电器进行控制。这样应该就可以听到模块每五秒切换的声音了。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img162" src="../Images/Figure-P132_27123.jpg"/>
+ </div> 
+ <p class="bodycontent">实际应用一定不会是这样反复地让继电器重复开关，因为继电器是有寿命限制的，当超过特定切换次数后可能会有故障。可以加入前面学到的RTC进行定时控制，或是加入传感器（例如光线或是温度）来驱动家电的运行。</p> 
+ <h3 class="bodycontent-title1" id="CHP9-3">4-3　2.4G RF通信（nRF24L01）</h3> 
+ <p class="bodycontent">提到低成本的RF通信，就不能忘记nRF24L01这个模块，市场可以找到的基本款价格在20元人民币上下，几乎要比433/315MHz的RF模块还要便宜，而且工作频段还是2.4GHz。</p> 
+ <p class="bodycontent">nRF24L01（见图4-19）是Nordic公司所推出的一款低功耗的2.4GHz通信芯片，市面上最常看到的模块是按照公板设计而成的，大概规格整理如下：</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　使用2.4GHz ISM频段。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　最高可达2Mbps的通信速率。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　最多可支持与其他6个模块进行通信。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　低功耗（11.3mA@0dBm TX，13.5mA@2Mbps RX）。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　高度集成，无须太多周边电路。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　SPI通信模式。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　1.9V～3.6V工作电压。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　输入信号的基准电压可达5V。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　可使用频段为2.4GHz～2.525GHz，共126Ch@1Mbps。</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img163" src="../Images/Figure-T133_21437.jpg"/>
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti">*　以图4-20为例的引脚说明。</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img164" src="../Images/Figure-P133_21442.jpg"/> 
+  <p class="imgdescript-c">图4-19　nRF24L01无线模块</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img165" src="../Images/Figure-P133_21445.jpg"/> 
+  <p class="imgdescript-c">图4-20　nRF24L01引脚定义</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float27" src="../Images/Figure-P133_21449.jpg"/> 
+  <p class="imgdescript-c">图4-21　nRF24L01+PA</p> 
+ </div> 
+ <p class="bodycontent">比较长一点的版本加上了功率放大器（PA）和SMA天线座，这样传输距离可以增加一些，如图4-21所示。</p> 
+ <p class="bodycontent">2.4GHz是全球通用ISM频段，因此这是最拥挤的一个频段，好在展频技术的演进，将各种无线通信通过不同方式切割成多个频道。例如，WLAN就有十几个频道让同一个空间中用户之间的相互干扰降到最低（见图4-22）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img166" src="../Images/Figure-P134_27137.jpg"/> 
+  <p class="imgdescript-c">图4-22　WLAN2.4GHz的频道分布（图片来源：https://en.wikipedia.org/wiki/List_of_WLAN_channels）</p> 
+ </div> 
+ <p class="bodycontent">nRF24L01可以支持一百多个频道供用户选择，用户可以自行设置。</p> 
+ <p class="bodycontent">因为模块采用的是SPI模式，所以使用上与Arduino有特定的引脚（见图4-23）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img167" src="../Images/Figure-P134_27142.jpg"/> 
+  <p class="imgdescript-c">图4-23　nRF24L01引脚说明</p> 
+ </div> 
+ <p class="bodycontent">记住模块是3.3V的基准电压（见图4-24），必须要接到Arduino的3.3V。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img168" src="../Images/Figure-P135_21457.jpg"/> 
+  <p class="imgdescript-c">图4-24　模块的电源为3.3V</p> 
+ </div> 
+ <p class="bodycontent">至于函数库部分，Arduino playground也推荐了几款，笔者早期使用的是Mirf这个函数库，有些参数需要自行设置，使用上也不难，不过后来更新比较少。比较新的则可以使用RF24，最新版本在2014年，可以用于Arduino、ATTiny、Due和Raspberry Pi。</p> 
+ <p class="bodycontent">第一个范例我们就先来看看怎么建立一对一的通信模式，这里使用到的是maniac的RF24，记得先导入到我们的Arduino环境中。因为RF24有些输出用到printf.h这个函数库，所以也需要一并引用进来。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img169" src="../Images/Figure-P135_21462.jpg"/>
+ </div> 
+ <p class="bodycontent">如同其他模块一般，因为nRF24L01采用的是SPI模式，所以只需要在初始变量中设置CE和CSN两个引脚即可，范例中使用了Arduino D7和D8两个引脚。另外，nRF24L01需要设置每个节点的地址，地址大小为5个字节，我们设置为“1Node”和“2Node”，因为RF24函数库会颠倒地址的顺序，所以我们把数字放在前面。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img170" src="../Images/Figure-P135_21466.jpg"/>
+ </div> 
+ <p class="bodycontent">初始化相关功能：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img171" src="../Images/Figure-P136_27150.jpg"/>
+ </div> 
+ <p class="bodycontent">这里模块提供了许多参数可以让用户自行调整，我们以功率大小的范例让大家了解，另外通信频道等也都可以自行设置：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img172" src="../Images/Figure-P136_27153.jpg"/>
+ </div> 
+ <p class="bodycontent">nRF24L01通信很重要的是信道（pipe）的建立，这里识别的方式是设置的地址。以一对一的通信来说，一方的接听要和另一方的传送设置成相同的信道，既可以使用两个信道进行传输和接收，又可以都以同一个信道进行。这样设置的好处是我们可以有特别的信道进行参数设置或是私密的数据交换，而真正的数据传输采用的又是另一个信道，这样可以提高安全性和参数设置的可靠度。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img173" src="../Images/Figure-P136_27156.jpg"/>
+ </div> 
+ <p class="bodycontent">最后默认开启应答模式以及显示出当前通信模块的相关参数（见图4-25）。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img174" src="../Images/Figure-P136_27159.jpg"/>
+ </div> 
+ <p class="bodycontent">接着主循环中由Arduino D4的状态分辨是传送端还是接收端。传送端每秒会发送Hello World的字符串。如果要传送数值数据，在范例的注释中有如何传递模拟信号数值的示范。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img175" src="../Images/Figure-P137_21473.jpg"/>
+ </div> 
+ <p class="bodycontent">另一个部分是接收端，比较特别的是在判断是否有数据时（radio.available），还要另外确认是从哪个节点传输过来的。因此除了数据之外，还显示出节点的号码（见图4-26）。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img89" src="../Images/Figure-P137_21476.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img176" src="../Images/Figure-P138_27164.jpg"/> 
+  <p class="imgdescript-c">图4-25　通信模块的参数</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img177" src="../Images/Figure-P138_27168.jpg"/> 
+  <p class="imgdescript-c">图4-26　显示传送的数据节点与模拟信号的数值</p> 
+ </div> 
+ <p class="bodycontent">大家有没有好奇，刚才的范例为什么要强调节点呢？nRF24L01有一个厉害的地方就是可以支持“一对六”的星形通信，从模块的规格书可以看到此架构为MultiCeiver（见图4-27）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img178" src="../Images/Figure-P139_21481.jpg"/> 
+  <p class="imgdescript-c">图4-27　MultiCeiver的架构</p> 
+ </div> 
+ <p class="bodycontent">在程序中只要把节点的地址设置清楚，即可支持星形架构的通信。不过要注意，此架构还是一次跟一个传送节点（child node）通信，系统会按序跟每个节点进行通信。切记，一定要确保每个地址都是独立的。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img179" src="../Images/Figure-P139_21485.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float28" src="../Images/Figure-P140_27190.jpg"/> 
+  <p class="imgdescript-c">图4-28　Funduino的水位传感器</p> 
+ </div> 
+ <p class="bodycontent">这种星形通信应用可以使用在环境监控上，例如加上水位传感器，我们就可以监测区域环境内水位的高低，例如Funduino的水位传感器（见图4-28）可以轻易地将水位高低转换成模拟信号，再由nRF24L01的通信网络回传数值，我们就可以了解水面高低的变化，针对异常状况做出响应。</p> 
+ <h3 class="bodycontent-title1" id="CHP9-4">4-4　蓝牙通信</h3> 
+ <p class="bodycontent">在2.4GHz频段的通信，当然还有很多会经常用到，蓝牙就是其中一个。它原本就是被定义在短距离（个人局域网，PAN）中设备之间低功耗、低成本的相互通信接口，尤其是在所谓的移动终端。最初的设计是希望解决RS-232的实体线路与数据同步的问题，由爱立信（Ericsson）公司所提出的一种解决方案。在电脑与手机的外围设备连接中被大量采用。</p> 
+ <p class="bodycontent">不过，在物联网的浪潮下，蓝牙一度几乎快被ZigBee等新一代的无线通信所取代，原因是蓝牙通信协议下所被限制的设备数量、支持的网络拓扑结构以及整体耗电并不适用于物联网的应用。好在2010年4.0版的推出重新让蓝牙回到物联网的战场上。</p> 
+ <p class="bodycontent">蓝牙4.0最重要的变革就是在电源效率的提升和网络内支持的节点数量，通过协议的演进可以支持到大量的蓝牙设备进行网络连接。这个部分称为Bluetooth Low Energy，简称BLE，号称可以省下近九成的电力消耗。另外还开发出单模和双模两种模式（Single Mode &amp; Dual Mode，见图4-29）。单模模式为设备提供了能通过简易的设备搜索和可靠的一对多数据传输来达到低成本、低功耗的传输目的。双模模式则是可以与不同蓝牙版本进行通信，适用于与各种类型的蓝牙设备进行数据交换。其标准协会也针对这两种模式推出了不同的标志，让大家可以清楚分辨它们。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img180" src="../Images/Figure-P141_21491.jpg"/> 
+  <p class="imgdescript-c">图4-29　蓝牙单模与双模的标志［Bluetooth SMART READY（上）：双模、Bluetooth SMART（下）：单模］</p> 
+ </div> 
+ <p class="bodycontent">在与Arduino的搭配上，比较常见的模块是HC-05和HC-06两款，其蓝牙符合V2.1+EDR的规范，并且支持SPP（Serial Port Profile）的蓝牙模块，让用户从计算机或是手机上连接时可以视为串行端口的设备。</p> 
+ <p class="bodycontent">HC-05属于主从（Host/Slave）一体的模块，简单来说就是功能比较多，可以设置为主端或是从端，一般来说出厂设置为从端。若是选购其他厂商的蓝牙模块也需要注意主从端的设置，以及是否可以调整。以HC-05（见图4-30）来说，它多了一个Key（有些模块可能是EN）的引脚，当输入高电平时用来启动AT命令模式，让我们可以通过一些ASCII的字符串来改变模块的参数设置。不过要注意有些模块为了省空间可能将此功能删除了，选购上要特别注意。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img181" src="../Images/Figure-P141_21496.jpg"/> 
+  <p class="imgdescript-c">图4-30　HC-05模块示意图</p> 
+ </div> 
+ <p class="bodycontent">HC-06直接被设置为从站模式，引脚上只有电源与传输共4个引脚，如图4-31所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img182" src="../Images/Figure-P142_27202.jpg"/> 
+  <p class="imgdescript-c">图4-31　HC-06模块示意图</p> 
+ </div> 
+ <p class="bodycontent">我们可以先从计算机端来测试蓝牙模块的AT命令。这时候与Arduino的连接只是将Arduino当作USB转TTL RS-232的转换接口，因此要将蓝牙模块的RX与Arduino的RX（D0）对接，蓝牙模块的TX与Arduino的TX（D1）对接，如图4-32所示。另外，因为这时候不需要使用到Arduino上的微控制器，我们将Arduino板子上的reset引脚和GND短路，让微控制器持续处于重置状态。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img183" src="../Images/Figure-T142_27309.jpg"/>
+ </div> 
+ <p class="bodycontent">注：HC-05默认速率为38400bps，HC-06默认为9600bps。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img184" src="../Images/Figure-P143_21503.jpg"/> 
+  <p class="imgdescript-c">图4-32　计算机端通过Arduino连接到蓝牙模块</p> 
+ </div> 
+ <p class="bodycontent">记得要将HC-05的Key引脚也一并接到5V的信号，让蓝牙模块进入设置模式，这时候模块上的LED灯号应该是每两秒一次亮暗变化。打开串口监视器窗口，先调整速率为38400bps以及结尾带NL &amp; CR，如图4-33所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img185" src="../Images/Figure-P143_21507.jpg"/> 
+  <p class="imgdescript-c">图4-33　计算机端的通信设置</p> 
+ </div> 
+ <p class="bodycontent">利用输入“AT”来确认是否正确和模块通信，如果输入的字符串错误，模块会返回ERROR，若正确，则会显示“OK”，如图4-34所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img186" src="../Images/Figure-P144_27319.jpg"/> 
+  <p class="imgdescript-c">图4-34　蓝牙模块回应的信息</p> 
+ </div> 
+ <p class="bodycontent">我们也可以查询模块的相关数据，例如固件版本、名称，分别使用AT+VERSION和AT+NAME来获取，如图4-35所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img187" src="../Images/Figure-P144_27325.jpg"/> 
+  <p class="imgdescript-c">图4-35　模块的信息</p> 
+ </div> 
+ <p class="bodycontent">想要修改成自己专用的模块名称，只需要使用“AT+NAME=”即可。AT命令输入成功后，会显示OK。这时候再确认一次名称应该就可以发现已经调整为自己刚刚输入的名称了。这个名称同时也是HOST端在搜索时会显示出来的！</p> 
+ <p class="bodycontent">一般的计算机或是手机又该怎么连接到模块呢？首先打开计算机的蓝牙界面，它会自动搜索周围的蓝牙设备（见图4-36），这时如果有一个以上的蓝牙模块，建议连接前先修改名称或是先关闭尚未连接的模块。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img188" src="../Images/Figure-P144_27330.jpg"/> 
+  <p class="imgdescript-c">图4-36　计算机搜索到蓝牙模块</p> 
+ </div> 
+ <p class="bodycontent">单击后会要求输入配对码，默认密码为1234或是0000，如图4-37所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img189" src="../Images/Figure-P145_21516.jpg"/> 
+  <p class="imgdescript-c">图4-37　输入默认配对码</p> 
+ </div> 
+ <p class="bodycontent">等到整个驱动流程完成后，应该就可以在设备管理器中看到两个由模块产生出来的COM PORT（见图4-38），在移动设备的通信上，若能采用蓝牙模块就可以避免USB线所造成的牵绊，甚至可以直接进行数据的传输和程序的更新。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img190" src="../Images/Figure-P145_21528.jpg"/> 
+  <p class="imgdescript-c">图4-38　蓝牙模块的串行端口</p> 
+ </div> 
+ <p class="bodycontent">手机端的部分，大家除了可以制作符合自己需求的APP外，也有许多玩家完成的APP让我们可以直接下载使用，例如BT Terminal就可以读取蓝牙发送过来的信息。自己也可以写个APP来读取蓝牙传过来的信息。</p> 
+ <p class="bodycontent">这里给大家推荐一个很好的APP，不过目前只有Android的手机可以使用，名称为RoboRemo（见图4-39）。免费版的功能就足够好了，有兴趣的人也可以安装付费版，多了图片的功能。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img191" src="../Images/Figure-P145_21533.jpg"/> 
+  <p class="imgdescript-c">图4-39　RoboRemo APP</p> 
+ </div> 
+ <p class="bodycontent">RoboRemo支持完全定制化的图形组件设计（见图4-40），大家可以按照自己的应用完成需要的用户界面，通信的部分支持蓝牙、Wi-Fi，因此Arduino可以轻松地通过此APP来与手机进行控制与数据读取。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img192" src="../Images/Figure-P146_27346.jpg"/> 
+  <p class="imgdescript-c">图4-40　RoboRemo的图形组件</p> 
+ </div> 
+ <p class="bodycontent">先别急着进行APP的编辑，而是把Arduino这里的系统设计完成。我们要建立一个场景灯光控制系统。这两年有些厂商把灯泡智能化，可以按照心情需求来进行调整，让你可以随时调整环境灯光的颜色。</p> 
+ <p class="bodycontent">要能够让颜色被控制，单色LED绝对做不到，这里需要要用RGB三色LED。不同于单色LED，RGB LED（见图4-41）共有4个引脚：最长的是共阳或是共阴的引脚，这在购买时可以选择，会影响的是接线与控制的信号。剩下3个按序是R、G、B三原色的控制。RGB LED的光会随R、G、B这3个引脚电压信号的大小而改变，与调色盘的原理一样。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img193" src="../Images/Figure-P146_27352.jpg"/> 
+  <p class="imgdescript-c">图4-41　RGB LED</p> 
+ </div> 
+ <p class="bodycontent">在Arduino的引脚选择上，我们要选择能够支持脉冲宽度调制（Pulse-Width Modulation, PWM），大多简称为PWM引脚。简单来说，它是利用数字输出的引脚来仿真模拟信号的输出。它还算是一种数字信号，是一个一个的方波，不过这个方波的高电平与低电平时间是可以被调整的，如图4-42所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img194" src="../Images/Figure-P147_21541.jpg"/> 
+  <p class="imgdescript-c">图4-42　PWM信号原理</p> 
+ </div> 
+ <p class="bodycontent">Arduino家族中支持PWM的引脚（见图4-43）数量并不一样，以Arduino UNO来说，全部共有6个，也就是：3，5，6，9，10，11。在Arduino上看到引脚数字旁边有个小蚯蚓图案的就是了。Arduino的PWM一共可以分成256等份，信号输入以0～255作为区分。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img195" src="../Images/Figure-P147_21545.jpg"/> 
+  <p class="imgdescript-c">图4-43　Arduino UNO PWM引脚</p> 
+ </div> 
+ <p class="bodycontent">接线就按标准的LED接法：每个信号引脚需要一个限流电阻，如图4-44所示。蓝牙的部分我们按模拟串行端口来进行连接。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img196" src="../Images/Figure-P148_27360.jpg"/> 
+  <p class="imgdescript-c">图4-44　系统接线</p> 
+ </div> 
+ <p class="bodycontent">程序的部分，只需要声明仿真串行端口并指定蓝牙模块使用的D2和D3为RX，TX即可。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img197" src="../Images/Figure-P148_27364.jpg"/>
+ </div> 
+ <p class="bodycontent">由于笔者使用的RGB LED为共阳型，因此除了设置3个PWM引脚为输出外，同时也设置高电平为初始值，表示LED熄灭。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img198" src="../Images/Figure-P149_21553.jpg"/>
+ </div> 
+ <p class="bodycontent">主循环的部分，持续等待蓝牙端的数据传输，RoboRemo的默认结尾字符为'\n'。所以以此为命令接收是否完整的判断。数据收进来之后，我们另外编写了exeCmd()函数来解析并且控制输出。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img199" src="../Images/Figure-P149_21556.jpg"/>
+ </div> 
+ <p class="bodycontent">在execmd()中，要先判断命令字符串的第一个字符是否为r、g、b三者之一，第二个为空格符。程序必须先判断确认命令正确后，再读取后面的数值，这样就可以控制RGB LED的灯光变化了。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img200" src="../Images/Figure-P150_27371.jpg"/>
+ </div> 
+ <p class="bodycontent">接下来是重头戏，即RoboRemo的开发！安装完程序后启动应该是完全空白的界面、只有左上角有Menu的按钮。按下后会调用列表，我们先选择第二的edit ui（编辑用户界面，如图4-45所示）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img201" src="../Images/Figure-P150_27374.jpg"/> 
+  <p class="imgdescript-c">图4-45　RoboRemo - edit ui界面</p> 
+ </div> 
+ <p class="bodycontent">单击后，会发现整个界面变成灰底，这时候再轻触一下灰底的部分会看到所有可以使用的组件（见图4-46）。这里要用的是slider（滑杆）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img202" src="../Images/Figure-P151_21562.jpg"/> 
+  <p class="imgdescript-c">图4-46　RoboRemo - item界面</p> 
+ </div> 
+ <p class="bodycontent">新增的组件可以直接放大、缩小来调整，单击它可以进行参数的设置。这里我们需要设置两个部分：set id和send when moved（见图4-47）。</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　set id：就是刚才程序中的第一个字符，按序设置为r、g、b。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　send when moved：表示当滑杆改变位置时就发出命令字符串。</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img203" src="../Images/Figure-P151_21572.jpg"/> 
+  <p class="imgdescript-c">图4-47　RoboRemo –设置组件</p> 
+ </div> 
+ <p class="bodycontent">这里的set min、set max默认值是0和255，刚好就是我们需要的范围，因此不用调整。</p> 
+ <p class="bodycontent">全部编辑完后，再单击一次menu（见图4-48），选择don't edit ui离开编辑界面，这时候大家可以试着转动手机，你的界面也会随之变化。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img204" src="../Images/Figure-P152_27384.jpg"/> 
+  <p class="imgdescript-c">图4-48　RoboRemo编辑完成界面</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float29" src="../Images/Figure-P152_27388.jpg"/> 
+  <p class="imgdescript-c">图4-49　连接方式的选择</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float30" src="../Images/Figure-P152_27393.jpg"/> 
+  <p class="imgdescript-c">图4-50　询问是否开启蓝牙</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float31" src="../Images/Figure-P152_27399.jpg"/> 
+  <p class="imgdescript-c">图4-51　选择蓝牙设备</p> 
+ </div> 
+ <p class="bodycontent">要进行连接，可单击menu中的第一个选项：connect。之后就可以选择蓝牙或网络，如图4-49所示。</p> 
+ <p class="bodycontent">这里先选择蓝牙，如果你的蓝牙默认是关闭时，RoboRemo会提示你是否要打开，如图4-50所示。</p> 
+ <p class="bodycontent">选择蓝牙设备，如图4-51所示。</p> 
+ <p class="bodycontent">接下来会询问要选择哪一个port，这里请选择第一个。到此即完成了所有的设置，试着滑动滑杆就可以看到RGB LED的颜色也跟着变化了！</p> 
+ <h3 class="bodycontent-title1" id="CHP9-5">4-5　XBee</h3> 
+ <p class="bodycontent">在初期Arduino受到玩家注意而开始进行应用时，最常搭配的无线模块就是Digi公司所推出的XBee。Digi（见图4-52）是一家提供无线解决方案产品的公司，除了硬件以外，顺应物联网的发展，该家公司也开始有自己的上层管理软件，让客户可以从底层设备无缝连接到上层的管理软件层。从首页的图片可以看到，这家公司已经有30年Machine to Machine（M2M）的经验，通过他们设备的连接可以将数据上传并实时进行分析和对异常发出警报。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img205" src="../Images/Figure-P153_21588.jpg"/> 
+  <p class="imgdescript-c">图4-52　Digi首页（图片来源：http://www.digi.com/）</p> 
+ </div> 
+ <p class="bodycontent">这里要谈的XBee其实是Digi公司的嵌入式无线方案的模块，用于为终端节点提供使用无线连接到其他设备或通信网关（Gateway）。因此，实际上Digi公司在XBee模块提供了2.4GHz RF、Wi-Fi和ZigBee/802.15.4这3种方案，如图4-53所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img4" src="../Images/Figure-P154_27407.jpg"/> 
+  <p class="imgdescript-c">图4-53　Digi的3种嵌入式无线模块方案</p> 
+ </div> 
+ <p class="bodycontent">在七八年前，由于方案还没有那么完整，因此大家都是使用ZigBee/802.15.4这款模块和Arduino整合成无线传输方案。那时候很多人只把它作为一对一的传输架构，实在是太大才小用了，尤其是XBee模块单价并不低。所谓的ZigBee/802.15.4是一种无线传感器网络（Wireless Sensor Network, WSN）架构，它作为物联网的新兴架构也越来越受重视。下面我们先简单介绍一下WSN。</p> 
+ <p class="bodycontent" id="CHP9-5-1">无线传感器网络——Wireless Sensor Network</p> 
+ <p class="bodycontent">在电影情节当中，常常会有一个剧情是利用外星人的科技从中取得新的技术，借此发展出更强大的防御，最后用此技术打败敌人。无线传感器网络最开始是来自于战场上的传感器需求，提出了一个智慧灰尘（smart dust）的方案。概念是借助低成本、低功耗的微型节点，其身上带有传感器能感应周围的状态，还能将数据传送至周围的节点，整个微型节点的网络数量可达千万以上，数据能够以最佳路径进行传输，网络的拓扑结构也会随状态而变化，新的节点不需要注册机制，只需要设置成相同区域即可加入运行。因此慢慢地IEEE 802.15.4的标准就这样成型了，不同于无线网络（wireless local area network, WLAN），其标准为LR-WPAN（low rate – wireless personal area network），低速率的无线个人局域网。而ZigBee就是这个标准下其中一个热门的协议，后续像是6LoWPAN（见图4-54）、HomeRF、Zware和ANT+等都是基于此标准发展出来的协议，各协议按照应用场合的不同，其协议架构有细微的差异。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img206" src="../Images/Figure-P155_21596.jpg"/> 
+  <p class="imgdescript-c">图4-54　TI（德州仪器）的6LoWPAN架构范例（图片来源：http://www.ti.com/lsds/ti/wireless_connectivity/6lowpan/overview.page）</p> 
+ </div> 
+ <p class="bodycontent">就芯片大厂来说，TI公司推出了CC25XX系列来满足不同协议的需要（在本书后面的章节中，会使用TI模块进行ZigBee连接）。</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent">WSN（见图4-55、图4-56）的特点如下。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　低成本。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　低传输量：约250kbps。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　通信距离短：约100米以内，有些会增加功率放大器来增长距离。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　低功耗：以“年”作为使用的时间单位。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　节点数量多：64bit寻址方式。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　支持多种网络架构：对等形（Peer to Peer）、星形（Star）、簇树形（Cluster-tree）和网形（Mesh）。</p> 
+ </div> 
+ <p class="bodycontent">网络内的节点分成三种角色：主控端（Coordinator）、路由节点（Router）和终端节点（End device）。由于角色定位不同，功能上也会有所取舍，大致可分为：RFD（Reduced Function Device）和FFD（Full Function Device）。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img207" src="../Images/Figure-T156_32514.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img208" src="../Images/Figure-P156_27437.jpg"/> 
+  <p class="imgdescript-c">图4-55　WSN的簇树形拓扑（Cluster-Tree）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img209" src="../Images/Figure-P156_27440.jpg"/> 
+  <p class="imgdescript-c">图4-56　WSN架构与节点角色</p> 
+ </div> 
+ <p class="bodycontent" id="CHP9-5-2">Digi XBee</p> 
+ <p class="bodycontent">回到XBee，我们要使用的是XBee ZigBee/802.15.4的系列模块，到现在XBee已经算是到了第三代了，几个演进版本如下。</p> 
+ <p class="bodycontent">XBee Series 1：第一代的XBee模块。称之为第一代其实只是为了区分推出的时间，要注意所有不同代次的XBee都不可以相互沟通，若要架设多个节点的网络，则必须采用相通代次的模块，无论两个模块放得多近，都不要花时间去尝试使用不相通的模块。第一代的配置比较简单，适合初学者的应用，但相对功能比较少。</p> 
+ <p class="bodycontent">XBee Series 2：第二代的XBee模块，强化了网络拓扑的能力，还提供了API模式让玩家可以掌握更多模块通信的信息。不过，更多的弹性意味着更难使用，需要花更多时间来了解每个参数的特性。与第一代相同，第二代的模块只能跟第二代的模块建立网络。</p> 
+ <p class="bodycontent">目前Digi还持续推出XBee模块的更新一代的产品，大体上还是不同代次的模块无法相互沟通，但第二代后的功能远远超过第一代的功能。大家在购买前要认清楚自己买到的模块是否正确。</p> 
+ <p class="bodycontent">每种XBee都有不同的天线种类可以选择，大家在购买前要想清楚自己的需求。如同前面提到的，实际应用还是建议选用u.FL和SMA两种，因为可以自己再搭配馈线增加距离，以符合系统外观的设计。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img210" src="../Images/Figure-P157_32517.jpg"/>
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img211" src="../Images/Figure-P158_32519.jpg"/>
+ </div> 
+ <p class="bodycontent">Digi公司专为XBee推出了一套测试与配置设置软件：XCTU（见图4-57）。新版的界面相当“清爽”，因此我们以新版界面来介绍。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img212" src="../Images/Figure-P158_27492.jpg"/> 
+  <p class="imgdescript-c">图4-57　XCTU的起始界面</p> 
+ </div> 
+ <p class="bodycontent">在安装过程中，会一并将当前有的固件版本都下载下来，需要花一点时间。安装完启动程序后可以看到界面分为左、右两个部分，左边是当前有的模块列表，右边则是细部配置设置和测试的界面，如图4-58所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img213" src="../Images/Figure-P159_21645.jpg"/> 
+  <p class="imgdescript-c">图4-58　XCTU软件界面</p> 
+ </div> 
+ <p class="bodycontent">按下左上方的按钮可以针对当前连接到的XBee（见图4-59）进行搜索，注意这里需要的是通过COM PORT，因此可能需要转接板。搜索到的设备会将其支持的协议和当前的角色以图案方式显示出来，另外也会有基本的模块信息。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img214" src="../Images/Figure-P159_21650.jpg"/> 
+  <p class="imgdescript-c">图4-59　XBee模块信息</p> 
+ </div> 
+ <p class="bodycontent">右边的部分则可以进行固件的更新，XBee有一个好处，即不同的WSN节点定义可以利用固件更新（见图4-60）来实现，不用担心有型号不同的问题。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img215" src="../Images/Figure-P160_27500.jpg"/> 
+  <p class="imgdescript-c">图4-60　XBee固件更新列表</p> 
+ </div> 
+ <p class="bodycontent" id="CHP9-5-3">一代XBee的设置</p> 
+ <p class="bodycontent">一代XBee的功能比较简单，设置上的选择相对比较简洁。使用前要设置模块功能为XBEE 802.15.4，如图4-61所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img216" src="../Images/Figure-P160_27505.jpg"/> 
+  <p class="imgdescript-c">图4-61　一代XBee的固件选择清单</p> 
+ </div> 
+ <p class="bodycontent">若是要进行对等式（一对一）的通信，除了确定两个模块的ID（PAN ID）相同之外，只需要DH和DL填入对方的地址即可。地址在每个模块上也有标示，且是唯一的地址。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img217" src="../Images/Figure-P160_27510.jpg"/>
+ </div> 
+ <p class="bodycontent">若要进行星形通信，则每个节点的目标地址要填入主控端。唯一不同的是在主控端的地址要设置成广播模式，CE（Coordinator Enalbe）要设置为启用。</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　广播地址设置</p> 
+  <div class="bodypic-c">
+   <img alt="" class="pic-img218" src="../Images/Figure-P161_21662.jpg"/>
+  </div> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　设置为主控端</p> 
+  <div class="bodypic-c">
+   <img alt="" class="pic-img219" src="../Images/Figure-P161_21666.jpg"/>
+  </div> 
+ </div> 
+ <p class="bodycontent" id="CHP9-5-4">二代XBee</p> 
+ <p class="bodycontent">想要拥有比较复杂的网络拓扑时，最好的选择就是二代XBee之后的版本，如图4-62所示。原因是固件针对WSN的网络拓扑进行了优化，每个节点的角色定义也更清楚，还支持API模式。通信协议上除了Digi自己的ZNet之外，也支持了标准的ZigBee。固件下载完毕后在菜单上也会标示出当前支持的协议是ZN或ZB。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img220" src="../Images/Figure-P161_21670.jpg"/> 
+  <p class="imgdescript-c">图4-62　二代XBee的固件选择清单</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img221" src="../Images/Figure-P161_32524.jpg"/>
+ </div> 
+ <p class="bodycontent">对等式一对一通信的方式跟第一代一样，要设置对方的地址。不过，星形通信时在这里有比较大的区别，主控端要下载的固件为ZNet 2.5 Coordinator AT。终端节点要下载的固件为ZNet 2.5 Router/End Device AT。这里唯一要特别注意的是，终端节点下载完毕后，要将JV（Channel Verification）开启，确保整个网络的节点使用的是同一个频道，不然很有可能会发生找不到其他模块的问题。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img222" src="../Images/Figure-P162_27517.jpg"/>
+ </div> 
+ <p class="bodycontent">这样设置完毕后，将所有设备重新加电，我们应该可以从主控端看到所有连上的节点（见图4-63）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img223" src="../Images/Figure-P162_27521.jpg"/> 
+  <p class="imgdescript-c">图4-63　当前网络上的所有节点（单击红色箭头所指的按钮进行搜索）</p> 
+ </div> 
+ <p class="bodycontent">如果没有将所有模块找出，除了相关设置外，还要注意模块之间的距离或是否有遮蔽物阻挡。</p> 
+ <p class="bodycontent">接着我们将窗口改为通信传输，可以发送信息看看其他节点是否能收到。这里自己发送的字符串会以蓝色显示，接收到的字符串会以红色显示（见图4-64）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img224" src="../Images/Figure-P163_21708.jpg"/> 
+  <p class="imgdescript-c">图4-64　节点间的信息交换</p> 
+ </div> 
+ <p class="bodycontent">这样的形式就是我们常见的串行通信，唯一的问题是数据的字符串必须自己含有节点信息，否则主控端无法识别数据是从哪个节点传输过来的。</p> 
+ <p class="bodycontent">如果是高级玩家，建议选择API的固件，所有设置与AT模式一样，分别下载完毕后，可以得到更多更详细的信息，包含模块地址、信号强度等，如图4-65所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img225" src="../Images/Figure-P163_21715.jpg"/> 
+  <p class="imgdescript-c">图4-65　高级显示界面</p> 
+ </div> 
+ <p class="bodycontent">API模式必须按照对应格式完成整个传输字符串，基本的架构如图4-66所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img226" src="../Images/Figure-P164_27532.jpg"/> 
+  <p class="imgdescript-c">图4-66　API传输格式</p> 
+ </div> 
+ <p class="bodycontent">在Frame Data里包含了Cmd ID和CmdData，CmdData会根据CmdID的不同而有所变化。大家可以在Digi的说明手册中找到更多详细的资料。例如：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img227" src="../Images/Figure-T164_27589.jpg"/>
+ </div> 
+ <p class="bodycontent">这些命令包含了设置、状态确认、数据传输等，我们最常会看到的应该是ZigBee Receive Packet的数据分组（见图4-67），这里要注意0x90是XBee二代的数值。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img228" src="../Images/Figure-P165_21722.jpg"/> 
+  <p class="imgdescript-c">图4-67　XBee Series 2的ZigBee Receive Packet数据分组</p> 
+ </div> 
+ <p class="bodycontent">如果是一代的，就是0x80，以64-bit地址为寻址方式（见图4-68）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img229" src="../Images/Figure-P165_21726.jpg"/> 
+  <p class="imgdescript-c">图4-68　XBee的RX(Receive)Packet数据分组</p> 
+ </div> 
+ <p class="bodycontent">大家也可以从这个XBee API模式中学习一个严谨的数据传送会包含哪些东西，例如起始码（Start Delimiter，有些可能会以2个或4个字节的长度来表示）、数据长度（去掉标头和最后校验码的长度）、数据内容和最后的校验码。“玩”多了各种通信后就可以发现这样的架构是一个标准的方式。在使用这些大厂推出的模块时，不仅仅只是赞叹好用，还要仔细挖掘其价值所在。</p> 
+ <h3 class="bodycontent-title1" id="CHP9-6">4-6　Wi-Fi无线网络</h3> 
+ <p class="bodycontent">第3章后面介绍了Arduino的网络应用，让我们可以轻松将数据以浏览器的方式显示出来，基本上Wi-Fi也是同样的概念，不过这里会发现Wi-Fi模块的价格大多偏高，原因是Arduino本身所搭配的微处理器性能并不高，要同时处理逻辑控制和网络数据分组，负担太大。因此Arduino加上网络通信的部分都是用另一个通信芯片或是模块来进行处理。在市面上就可以看到搭配不同厂家的Wi-Fi扩展模块（见图4-69、图4-70）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img230" src="../Images/Figure-P166_27602.jpg"/> 
+  <p class="imgdescript-c">图4-69　Wi-Fi扩展板（核心：Microchip RN171）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img231" src="../Images/Figure-P166_27605.jpg"/> 
+  <p class="imgdescript-c">图4-70　Wi-Fi扩展板（核心：WIZnet FI250）</p> 
+ </div> 
+ <p class="bodycontent">Ethernet扩展板的规格可以从第3章找到，在网络通信上可以支持不同的协议。无线部分的种类更多，下面以RN171为例，介绍一些相关内容。</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent">RN171规格</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　支持协议：DHCP client，DNS client，ARP，ICMP ping，FTP，TELNET，HTTP，UDP，TCP。</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　支持安全性：WEP-128，WPA-PSK（TKIP），WPA2-PSK（AES）。</p> 
+ </div> 
+ <p class="bodycontent">这里最重要的就是安全性的部分，因为没有加密的保护，通信数据很容易被人截获。这在物联网的应用中是不能被接受的。谁也不希望自己家里的无线网络被别人随便登录后还可以存取重要的数据。</p> 
+ <p class="bodycontent">大部分网络模块与Arduino可以通过SPI或是串行端口进行数据交换，不同的接口会影响通信的速度，以RN171为例，SPI模式可以支持2Mbps，但是串行只能支持1Mbps。SPI模式大致与Ethernet扩展板类似，因此我们这里并不多做介绍。关于无线网络模块的整合，这里要介绍一个性价比非常高的模块：ESP-8266系列（见图4-71）。到2015上半年，就已经有超过10种不同类型的模块可以选择。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img232" src="../Images/Figure-P168_1.jpg"/> 
+  <p class="imgdescript-c">图4-71　ESP-8266系列产品（图片来源：www.esp8266.com）</p> 
+ </div> 
+ <p class="bodycontent">这种模块只需要简单的几个AT-command就可以轻松操控，让你的系统拥有无线通信的能力，更妙的是它还支持3种工作模式：STA（Station）、AP和STA+AP。STA指的是一般的设备，比如笔记本电脑，需要连上一个AP才能和其他设备或因特网交换数据。AP则可以直接与设备建立连接，当连接建立完毕后两者就可以直接交换数据了。ESP模块虽然不起眼，但是直接支持多种模式，便于我们在不同的应用中使用，价格也更便宜，一个模块不到10美元。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float32" src="../Images/Figure-P168_27617.jpg"/> 
+  <p class="imgdescript-c">图4-72　ESP-01引脚说明</p> 
+ </div> 
+ <p class="bodycontent">这里我们使用ESP-01（见图4-72）来做功能的介绍。</p> 
+ <p class="bodycontent">ESP-01整体外观跟nRF24L01非常相近，不过是使用TX和RX进行通信，另外电源是3.3V的基准电压。由于模块的CHPD在使用时也必须输入高电平，因此唯一的缺点是不好与Arduino直接整合，因为Arduino只有一组3.3V的输出。另外，若是希望模块能够有比较长的使用寿命，则建议在RX端使用一个分压电路（EX: 220ohm+470ohm），确保加载到ESP模块的基准电压为3.3V。TX端可以省略是因为Arduino可以识别3.3V的电压为高电平。至于范例接线，为求简单就直接对接了（见图4-73）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img233" src="../Images/Figure-P168_27621.jpg"/> 
+  <p class="imgdescript-c">图4-73　ESP-01接线范例</p> 
+ </div> 
+ <p class="bodycontent">这里我们使用一个计算机端软件SSCOM（见图4-74）来进行测试，网络上的com port测试软件很多，选择这个软件的原因是因为它可以列出多个AT命令便于我们测试。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img234" src="../Images/Figure-P169_21745.jpg"/> 
+  <p class="imgdescript-c">图4-74　SSCOM软件界面</p> 
+ </div> 
+ <p class="bodycontent">ESP-01还算是新出的模块，因此固件版本可能会因为购买的时间点而有所不同，建议使用之前先确认一下。支持的波特率可能是9600、38400或是115200等。笔者这里使用的模块是115200bps。模块启动时显示一些乱码是正常的，不用太担心。开启电源后等待约10秒就可以尝试输入“AT”，若回应“OK”（见图4-75）则表示串行端口设置正确，表示模块开机完成了。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img235" src="../Images/Figure-P169_21750.jpg"/> 
+  <p class="imgdescript-c">图4-75　输入AT后模块回应OK</p> 
+ </div> 
+ <p class="bodycontent">接着我们可以输入下面的命令查询当前的工作模式：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img236" src="../Images/Figure-T170_32538.jpg"/>
+ </div> 
+ <p class="bodycontent">我们可以使用ESP模块建立一个AP搜索器，只需要一个命令就可以将当前周围的无线网络名称及信号强度搜索出来，当然这要在SAT模式下使用。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img237" src="../Images/Figure-T170_32539.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img238" src="../Images/Figure-P171_21757.jpg"/> 
+  <p class="imgdescript-c">图4-76　AT+CWLAP所列出的AP信息（隐私问题，所以将MAC地址从图中隐去）</p> 
+ </div> 
+ <p class="bodycontent">如果是STA模式，则需要选择想要加入的无线网络，之后才可以与同在一个网络的设备交换数据：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img239" src="../Images/Figure-T171_32541.jpg"/>
+ </div> 
+ <p class="bodycontent">反过来，ESP模块是AP模式时，我们就可以设置自己的SSID名称和密码等项了。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img240" src="../Images/Figure-T171_32542.jpg"/>
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img241" src="../Images/Figure-T172_32544.jpg"/>
+ </div> 
+ <p class="bodycontent">无论是STA还是AP模式，选择SSID并连接后，还需要设置通信协议才能够传送数据，在AT+CWJAP后进行以下操作。</p> 
+ <p class="bodycontent">（1）设置连接数量：设置多个连接。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img242" src="../Images/Figure-T172_32545.jpg"/>
+ </div> 
+ <p class="bodycontent">（2）设置欲通信的目标与端口号。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img243" src="../Images/Figure-T172_32546.jpg"/>
+ </div> 
+ <p class="bodycontent">注：因为是多个连接才多了ID的设置，单个连接并不需要。</p> 
+ <p class="bodycontent">（3）准备发送。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img244" src="../Images/Figure-T173_32548.jpg"/>
+ </div> 
+ <p class="bodycontent">到此完成一个信息的发送。有时因为连接状态不稳，发送前还是要确认连接是否还存在。或是采用比较保险的方式，每一次发送完信息后便关闭TCP连接，直到下一次数据传输时再重新建立一次连接。</p> 
+ <p class="bodycontent">若是ESP-01作为SERVER端，则要记得开启SERVER的服务：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img245" src="../Images/Figure-T173_32549.jpg"/>
+ </div> 
+ <p class="bodycontent">ESP-8266系列为无线通信的模块，电力的消耗有时候难以掌握，Arduino板子的整体负载有限，若发现你的系统运行不太正常，网络通信时有时无，则建议额外提供3.3V的电源给无线模块使用，只要确认系统的GND都接在一起即可。</p> 
+ <h3 class="bodycontent-title1" id="CHP9-7">4-7　小结</h3> 
+ <p class="bodycontent">本章在最开始的时候就提到了无线通信的优势，加上物联网的兴起，让无线技术开始扎根于我们的日常生活中。蓝牙耳机、智能手环、智能跑鞋，再加上一台智能手机，串起一个个人传感器网络。这个网络还可以通过Wi-Fi或是移动通信将数据上传至云端，无论是个人记录还是和朋友分享，完全可以在不知不觉中完成。</p> 
+ <p class="bodycontent">在无线通信中，信号强度（Received Signal Strength Indicator, RSSI）和服务品质（Quality of Service, QoS）是一个被量化的数值，可以协助我们在整体无线网络架设时达到一个最好的状态。有些模块内建有支持此参数的计算，直接读取即可，例如XBee。让我们在虽然看不到数据传送的情况下，却可以掌握数据的稳定度。在实际系统部署时，这是一组相当重要的参考指标。</p> 
+ <p class="bodycontent">无线通信还是会被诟病安全性、稳定性不足的问题。功率越强，可以提供的覆盖范围越大，但同时也意味着需要思考如何持续供电。本章介绍了各样通信模块，希望能够结合到你的系统当中。每个技术都有优缺点，如何扩大优势、避免劣势是我们这些“玩家”需要一起努力的目标。</p> 
+</body>
+</html>

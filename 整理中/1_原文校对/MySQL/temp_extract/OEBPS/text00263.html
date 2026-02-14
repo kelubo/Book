@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.3.6　实践2：半同步复制超时等待测试</h3>
+<p class="ziti">1）停止从库的IO线程复制状态，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">Query OK, 0 rows affected (0.02 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ 前文提到过，半同步复制原理是等待数据传输到从库的中继日志，以及向客户返回结果，因此，半同步复制和IO线程直接相关，与SQL线程无关。</p>
+<p class="ziti">2）在从主库中更新数据，操作命令如图17-4所示。</p>
+<div class="pic"><img alt="" src="Image00134.jpg" />
+</div>
+<p class="middle-img">图17-4　更新主从库数据</p>
+<p class="ziti">从如图17-4所示的测试结果可以得出，从库停止IO线程复制之后，第一次执行删除数据库oldboy1的操作时等待了10秒之后才提交完事务，但是，第二次执行删除数据库oldboy2的操作就很快了，这是因为第一次等待从库超时之后，半同步复制状态自动转换为异步了，所以第二次及以后都会很快了。</p>
+<p class="ziti">3）开启从库的IO线程复制状态，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; start slave io_thread;
+Query OK, 0 rows affected (0.02 sec)</pre>
+<hr/>
+<p class="ziti">4）再次查看主库的半同步复制状态，如图17-5所示。</p>
+<div class="pic"><img alt="" src="Image00135.jpg" />
+</div>
+<p class="middle-img">图17-5　查看主库的半同步复制状态</p>
+<p class="ziti">因为监测到从库恢复了，因此半同步复制状态自动又恢复为ON，继续保持半同步复制状态了，至此，半同步的测试完成。</p>
+</body>
+</html>

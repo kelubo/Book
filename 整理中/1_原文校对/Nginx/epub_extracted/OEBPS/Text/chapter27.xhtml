@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_33">2.5.2　命令行参数</h3>
+
+  <p class="ziti3">Nginx执行文件的命令行参数可以通过-h参数获取，Nginx命令行参数如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">Usage: nginx [-?hvVtTq] [-s signal] [-c filename] [-p prefix] [-g directives]
+
+Options:
+-?,-h         : this help
+-v            : show version and exit
+-V            : show version and configure options then exit
+-t            : test configuration and exit
+-T            : test configuration, dump it and exit
+-q            : suppress non-error messages during configuration testing
+-s signal     : send signal to a master process: stop, quit, reopen, reload
+-p prefix     : set prefix path (default: /usr/local/openresty/nginx/)
+-c filename   : set configuration file (default: conf/nginx.conf)
+-g directives : set global directives out of configuration file
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">上述代码中的主要参数解释说明如下。</p>
+
+  <p class="ziti4">·-v参数：显示Nginx执行文件的版本信息。</p>
+
+  <p class="ziti4">·-V参数：显示Nginx执行文件的版本信息和编译配置参数。</p>
+
+  <p class="ziti4">·-t参数：进行配置文件语法检查，测试配置文件的有效性。</p>
+
+  <p class="ziti4">·-T参数：进行配置文件语法检查，测试配置文件的有效性，同时输出所有有效配置内容。</p>
+
+  <p class="ziti4">·-q参数：在测试配置文件有效性时，不输出非错误信息。</p>
+
+  <p class="ziti4">·-s参数：发送信号给Nginx主进程，信号可以为以下4个。</p>
+
+  <p class="ziti4">·stop：快速关闭。</p>
+
+  <p class="ziti4">·quit：正常关闭。</p>
+
+  <p class="ziti4">·reopen：重新打开日志文件。</p>
+
+  <p class="ziti4">·reload：重新加载配置文件，启动一个加载新配置文件的Worker Process，正常关闭一个加载旧配置文件的Worker Process。</p>
+
+  <p class="ziti4">·-p参数：指定Nginx的执行目录，默认为configure时的安装目录，通常为/usr/local/nginx。</p>
+
+  <p class="ziti4">·-c参数：指定nginx.conf文件的位置，默认为conf/nginx.conf。</p>
+
+  <p class="ziti4">·-g参数：外部指定配置文件中的全局指令。</p>
+
+  <p class="ziti3">应用示例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">nginx -t                                        # 执行配置文件检测
+nginx -t -q                             # 执行配置文件检测，且只输出错误信息
+nginx -s stop                           # 快速停止Nginx
+nginx -s quit                           # 正常关闭Nginx
+nginx -s reopen                         # 重新打开日志文件
+nginx -s reload                         # 重新加载配置文件
+nginx -p /usr/local/newnginx            # 指定Nginx的执行目录
+nginx -c /etc/nginx/nginx.conf          # 指定nginx.conf文件的位置
+# 外部指定pid和worker_processes配置指令参数
+nginx -g "pid /var/run/nginx.pid; worker_processes 'sysctl -n hw.ncpu';"
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">Tengine的扩展命令如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">nginx -m                                      # 列出所有的编译模块
+nginx -l                                        # 列出支持的所有指令
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

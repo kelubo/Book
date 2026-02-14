@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_87">5.1.1　静态Web服务器</h3>
+
+  <p class="ziti3">HTML是一种标记语言，提供HTML文件读取是Web服务器最基本的功能，Web服务器的配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 8080;
+    root /opt/nginx-web/www;                # 存放静态文件的文件目录
+    location / {
+        index index.html;
+    }
+    location /js {
+        alias /opt/nginx-web/static/js/;    # 存放JavaScript文件的文件目录
+        index index.html;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">在以上配置中，每个server指令域等同于一个虚拟服务器，每个location指令域等同于一个虚拟目录。</p>
+</body>
+</html>

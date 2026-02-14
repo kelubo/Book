@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_11">1.2.3　模块化</h3> 
+ <p class="ziti3">Nginx一直秉持模块化的理念，其模块化的架构中，除了少量的主流程代码，都是模块。模块化的设计为Nginx提供了高度的可配置、可扩展、可定制特性。模块代码包括核心模块和功能模块两个部分：核心模块负责维护进程的运行、内存及事件的管理；功能模块则负责具体功能应用的实现，包括路由分配、内容过滤、网络及磁盘数据读写、代理转发、负载均衡等操作。Nginx的高度抽象接口使用户很容易根据开发规范进行模块开发，有很多非常实用的第三方模块被广泛使用。</p> 
+ <p class="ziti3">（1）模块分类</p> 
+ <p class="ziti4">·核心模块（core）。该模块提供了Nginx服务运行的基本功能，如Nginx的进程管理、CPU亲缘性、内存管理、配置文件解析、日志等功能。</p> 
+ <p class="ziti4">·事件模块（event）。该模块负责进行连接处理，提供对不同操作系统的I/O网络模型支持和自动根据系统平台选择最有效I/O网络模型的方法。</p> 
+ <p class="ziti4">·HTTP模块（http）。该模块提供HTTP处理的核心功能和部分功能模块，HTTP核心功能维护了HTTP多个阶段的工作流，并实现了对各种HTTP功能模块的管理和调用。</p> 
+ <p class="ziti4">·Mail模块（mail）。该模块实现邮件代理功能，代理IMAP、POP3、SMTP协议。</p> 
+ <p class="ziti4">·Stream模块（stream）。该模块提供TCP/UDP会话的代理和负载相关功能。</p> 
+ <p class="ziti4">·第三方模块。第三方模块即非Nginx官方开发的功能模块，据统计，在开源社区发布的第三方模块已经达到100多个，其中lua-resty、nginx-module-vts等模块的使用度非常高。</p> 
+ <p class="ziti3">（2）动态模块</p> 
+ <p class="ziti3">Nginx早期版本在进行模块编译时，通过编译配置（configure）选项--with_module和--without-module决定要编译哪些模块，被选择的模块代码与Nginx核心代码被编译到同一个Nginx二进制文件中，Nginx文件每次启动时都会加载所有的模块。这是一种静态加载模块的方式。随着第三方模块的增多和Nginx Plus的推出，模块在不重新编译Nginx的情况下被动态加载成为迫切的需求。Nginx从1.9.11版本开始支持动态加载模块的功能，该功能使Nginx可以在运行时有选择地加载Nginx官方或第三方模块。为使动态模块更易于使用，Nginx官方还提供了pkg-oss工具，该工具可为任何动态模块创建可安装的动态模块包。在Nginx开源版本的代码中，编译配置选项中含有“=dynamic”选项，表示支持动态模块加载。例如，模块http_xslt_module的动态模块编译配置选项示例如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">./configure --with-http_xslt_module=dynamic
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">编译后，模块文件以so文件的形式独立存储于Nginx的modules文件夹中。动态模块编译如图1-5所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/1-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/1-5.jpg" class="calibre12"/></a> 
+ </div> 
+ <p class="middle-img">图1-5　动态模块编译</p> 
+ <p class="ziti3">在不同编译配置选项下，Nginx在编译时会因为某些结构字段未被使用而不会将其编译到代码中，因此就会出现不同编译配置选项的动态模块无法加载的问题。为解决这个问题，Nginx在编译配置选项中提供了“--with-compat”选项，在进行Nginx及动态模块编译配置时如果使用了该选项，在相同版本的Nginx代码下，动态模块即使与Nginx执行文件的其他编译配置选项不同，也可以被Nginx执行文件加载。启用兼容参数编译的示例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">./configure --with-compat --with-http_xslt_module=dynamic
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">可以在配置文件中使用load_module指令加载动态模块，示例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">load_module "modules/ngx_http_xslt_filter_module.so";
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

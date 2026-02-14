@@ -1,0 +1,903 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="Ac95900ae-7517-44c5-81a4-e0c6e8c502bf" class="calibre13">Chapter 11<br class="calibre8"/> 第十一章 Python编程</h2> 
+ <p class="calibre3">树莓派是一个非常廉价的、仅有手掌大小的、完全可编程的计算机。虽然树莓派的体积小，但是它的潜力无限。树莓派用Python来进行编程，是树莓派项目的一个核心思想，Py-thon允许树莓派的拥有者灵活地扩展项目的规模。</p> 
+ <h3 id="A8d1ceb19-7dc7-4d7f-b30f-f1243740b2fd" class="calibre14">11.1 Python简介</h3> 
+ <p class="calibre3">Python是一种面向对象的解释型计算机程序设计语言，Python是纯粹的自由软件，源代码和解释器CPython遵循GPL（GNU General Public License）协议。Python语法简洁清晰，特色之一是强制用空白符（white space）作为语句缩进。</p> 
+ <p class="calibre3">Python具有丰富和强大的库，被称为胶水语言，能够把用其他语言制作的各种模块（尤其是C/C++）很轻松地联结在一起。常见的一种应用情形是，使用Python快速生成程序的原型（有时甚至是程序的最终界面），然后对其中有特别要求的部分，用更合适的语言改写。比如3D游戏中的图形渲染模块，性能要求特别高，就可以用C/C++重写，而后封装为Python可以调用的扩展类库。需要注意的是，在使用扩展类库时可能需要考虑平台问题，某些可能不提供跨平台的实现。</p> 
+ <p class="calibre3">Python是一种简单易学、功能强大的编程语言，它有高效率的高层数据结构，简单而有效地实现面向对象编程。Python简洁的语法和对动态输入的支持，再加上解释性语言的本质，使得它在大多数平台上的许多领域都是一个理想的脚本语言，特别适用于快速的应用程序开发，有如下优点：</p> 
+ <p class="calibre3"><img alt="" class="u341" src="../Images/175_01.jpg" width="28" height="32"/>简单：Python是一种代表简单主义思想的语言。</p> 
+ <p class="calibre3"><img alt="" class="u341" src="../Images/175_02.jpg" width="28" height="32"/>易学：Python极其容易上手，有极其简单的语法。</p> 
+ <p class="calibre3"><img alt="" class="u341" src="../Images/175_03.jpg" width="28" height="32"/>可移植性：由于它的开源本质，Python已经被移植在许多平台上，这些平台包括Linux、Windows、FreeBSD、Macintosh、Solaris、OS/2、Amiga、AROS、AS/400、BeOS、OS/390、z/OS、Palm OS、QNX、VMS、Psion、Acom RISC OS、VxWorks、PlayStation、Sharp Zaurus、Windows CE，甚至还有PocketPC和Symbian。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/176_01.jpg" width="40" height="44"/>解释性：使用Python语言编写的程序不需要编译成二进制代码，可以直接从源代码运行程序。在计算机内部，Python解释器把源代码转换成为字节码的中间形式，然后再把它翻译成计算机使用的机器语言并运行。事实上，由于不再需要担心如何编译程序，以及如何确保连接转载正确的库等，所有这一切使得使用Python更加简单。由于只需要把Python程序复制到另外一台计算机上，它就可以工作了，这也使得Python程序更加易于移植。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/176_02.jpg" width="40" height="44"/>面向对象：Python既支持面向过程的编程，也支持面向对象的编程。在“面向过程”的语言中，程序是由过程或仅仅是可重用代码的函数构建起来的。在“面向对象”的语言中，程序是由数据和功能组合而成的对象构建起来的。与其他主要的语言如C++和Java相比，Python以一种非常强大又简单的方式实现面向对象编程。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/176_03.jpg" width="40" height="45"/>可扩展性：如果需要一段关键代码运行得更快或者希望某些算法不公开，可以把部分程序用C或C++编写，然后在Python程序中使用它们。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/176_04.jpg" width="40" height="44"/>可嵌入性：可以把Python嵌入C/C++程序，从而向程序用户提供脚本功能。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/176_05.jpg" width="40" height="45"/>丰富的库：Python标准库确实很庞大。它可以帮助人们处理各种工作，包括正则表达式、文档生成、单元测试、线程、数据库、网页浏览器、CGI、FTP、电子邮件、XML、XML-RPC、HTML、WAV文件、密码系统、GUI（图形用户界面）、Tk和其他与系统有关的操作。只要安装了Python，所有这些功能都是可用的。这被称作Python的“功能齐全”理念。除了标准库以外，还有许多其他高质量的库，如wxPython、Twisted和Python图像库等。</p> 
+ <p class="calibre3">有了树莓派和Python，唯一受到限制就是想象力了。人们既可以用Python编写游戏并将其运行在树莓派控制的游戏机上，也可以编写程序来控制连接到树莓派的机器人。</p> 
+ <h3 id="A6722e41c-4c5f-42cb-a7db-abe7f55c9a6f" class="calibre14">11.2 安装Python</h3> 
+ <p class="calibre3">下载Python的官方网址为：https：//www.python.org/downloads/，如图11-1所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u342" src="../Images/176_06.jpg" width="1181" height="858"/> 
+  <p class="imgtitle">图11-1 下载Python的官方页面</p> 
+ </div> 
+ <p class="calibre3">目前，可以运行Python的平台有：Windows、Linux/UNIX、Mac OS X、Python for IBM i（formerly AS/400、iSeries、System i）、Python for iOS、Python for OS/390 and z/OS、Python for Solaris、Python for VMS、Python for HP-UX。</p> 
+ <p class="calibre3"><b class="calibre6">1．Windows平台的安装</b></p> 
+ <p class="calibre3">下载文件python-3.6.4.exe，并运行该文件，开始安装，如图11-2所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u343" src="../Images/177_01.jpg" width="1280" height="398"/> 
+  <p class="imgtitle">图11-2 在Windows平台安装Python</p> 
+ </div> 
+ <p class="calibre3">安装完成之后，在“开始”菜单，找到Python的IDLE菜单，双击该命令，即启动Python Shell，Python Shell是执行Python的交互区域，可以编辑、调试、运行Python代码，如图11-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u344" src="../Images/177_02.jpg" width="1041" height="275"/> 
+  <p class="imgtitle">图11-3 Python的IDLE</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．树莓派Python</b></p> 
+ <p class="calibre3">各种典型树莓派的发行包，通常都同时提供了Python 2和Python 3两个版本的IDLE Python开发工具，如果使用树莓派的话，在“开始”菜单的“编程”菜单中可以找到Python 2和Python 3两个版本的IDLE的快捷方式，如图11-4所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u345" src="../Images/177_03.jpg" width="1175" height="629"/> 
+  <p class="imgtitle">图11-4 树莓派Python</p> 
+ </div> 
+ <p class="calibre3">虽然Python 2和Python 3有许多类似的功能，但它们不应该被认为是完全可互换的。虽然可以在任一版本中编写出优秀的代码和有用的程序，但是值得了解的是，在代码语法和处理方面两者会有一些相当大的差异。</p> 
+ <p class="calibre3">如果不是特别说明的话，后面Python程序的调试执行均使用Python 3环境。</p> 
+ <h3 id="Aa05936fa-1175-4eb4-bdb8-2e9cc88f5ad1" class="calibre14">11.3 Python程序编辑和运行</h3> 
+ <p class="calibre3">Python程序编辑可以使用编辑器和Python Shell，典型的树莓派编辑器有Vi、Nano等。也可以在Python Shell中编辑Python源代码文件，在Python Shell的菜单栏中选择“File”＞“New File”命令，打开Python程序代码文件编辑窗口，再选择“File”＞“Save”命令，将编写的源代码保存，Python源代码文件的扩展名为.py和.pyw，如图11-5所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u346" src="../Images/178_01.jpg" width="1280" height="438"/> 
+  <p class="imgtitle">图11-5 保存Python源代码文件</p> 
+ </div> 
+ <p class="calibre3">扩展名为.py和.pyw的区别：用python.exe运行.py，用pythonw.exe运行.pyw，.py和.pyw之间的差别就是python.exe和pythonw.exe之间的差别。.pyw格式是被设计来运行开发完成的纯图形界面程序的。纯图形界面程序的用户不需要看到控制台窗口。</p> 
+ <p class="calibre3">运行Python程序有两种方式。</p> 
+ <p class="calibre3">（1）可以在Python Shell中以交互模式执行，需要注意以下几点：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/178_02.jpg" width="40" height="44"/>只能够输入Python命令。在Python交互模式下输入Python代码，而不要输入系统的命令。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/178_03.jpg" width="40" height="45"/>在交互模式下打印语句不是必需的。在交互模式下不需要输入完整的打印语句，解释器自动打印表达式的结果，但是在文件中则需要写print语句来打印结果。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/178_04.jpg" width="40" height="44"/>提示符的变换和复合语句。当在交互模式下输入两行或多行复合语句时，提示符会由＞＞＞变成 …；如果要结束复合语句的输入并执行它，那么必须按下【Enter】键两次，复合语句才会被执行。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/178_05.jpg" width="40" height="45"/>交互提示模式一次运行一条语句。当想测试某一条命令的时候，交互模式是一个很好的测试方法，输入后按【Enter】键即可看到执行结果，非常方便。当然，对于复合语句来说，只要最后按两次【Enter】键即可运行代码，看到执行结果。</p> 
+ <p class="calibre3">（2）使用命令行运行文件，在控制台终端输入命令：python3文件名.py，或者在Python Shell的菜单栏中选择“File”＞“New File”命令，在Python程序代码文件编辑窗口中选择“Run”＞“Run Module”命令，如图11-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u347" src="../Images/179_01.jpg" width="1280" height="374"/> 
+  <p class="imgtitle">图11-6 Python程序执行</p> 
+ </div> 
+ <h3 id="A1ebec1b4-b710-43bb-9e02-1d7f0425b857" class="calibre14">11.4 Python变量和数据类型</h3> 
+ <p class="calibre3"><b class="calibre6">1．Python变量</b></p> 
+ <p class="calibre3">Python中的变量不需要声明。每个变量在使用前都必须赋值，变量被赋值以后该变量才会被创建。在Python中，变量就是变量，它没有类型，我们所说的“类型”是变量所指的内存中对象的类型。</p> 
+ <p class="calibre3">等号（=）用来给变量赋值。等号（=）运算符左边是一个变量名，等号（=）运算符右边是存储在变量中的值。变量在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u348" src="../Images/179_02.jpg" width="1280" height="406"/>
+ </div> 
+ <p class="calibre3">Python允许同时为多个变量赋值。</p> 
+ <p class="calibre3">例如：a=b=c=1。创建一个整型对象，值为1，三个变量被分配到相同的内存空间上。</p> 
+ <p class="calibre3">也可以为多个对象指定多个变量。</p> 
+ <p class="calibre3">例如：a，b，c=1，2，"hellow"。两个整型对象1和2分配给变量a和b，字符串对象"hellow"分配给变量c。</p> 
+ <p class="calibre3">可以使用del语句删除一些对象引用，del语句的语法如下：</p> 
+ <div class="center">
+  <img alt="" class="u349" src="../Images/179_03.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．Python数据类型</b></p> 
+ <p class="calibre3">Python3中有6个标准的数据类型：Number（数字）、String（字符串）、List（列表）、Tuple（元组）、Set（集合）、Dictionary（字典）。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：在Python2中是没有布尔型的，它用数字0表示False，用1表示True。到Py thon3中，把True和False定义成关键字了，但它们的值还是1和0，它们可以和数字相加。</p> 
+ <p class="calibre3">（1）Number（数字）。</p> 
+ <p class="calibre3">Python3支持int、float、bool、complex（复数）。</p> 
+ <div class="center">
+  <img alt="" class="u350" src="../Images/180_01.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3">数字在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u351" src="../Images/180_02.jpg" width="1280" height="129"/>
+ </div> 
+ <p class="calibre3">Python还支持复数，复数由实数部分和虚数部分构成，可以用a+bj，或者complex（a，b）表示，复数的实部a和虚部b都是浮点型。例如：</p> 
+ <div class="center">
+  <img alt="" class="u352" src="../Images/180_03.jpg" width="1280" height="177"/>
+ </div> 
+ <p class="calibre3">（2）String（字符串）。</p> 
+ <p class="calibre3">Python中的字符串用单引号或双引号括起来，同时使用反斜杠（\）转义特殊字符。</p> 
+ <p class="calibre3">截取字符串的语法格式为：变量[头下标：尾下标]。</p> 
+ <p class="calibre3">索引值以0为开始值，-1为从末尾的开始位置。</p> 
+ <p class="calibre3">加号（+）是字符串的连接符，星号（∗）表示复制当前字符串，紧跟的数字为复制的次数。字符串在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u353" src="../Images/180_04.jpg" width="1280" height="400"/>
+ </div> 
+ <p class="calibre3">注意：Python没有单独的字符类型，一个字符就是长度为1的字符串。</p> 
+ <p class="calibre3">（3）List（列表）。</p> 
+ <p class="calibre3">List（列表）是Python中使用最频繁的数据类型。</p> 
+ <p class="calibre3">列表可以完成大多数集合类的数据结构实现。列表中元素的类型可以不相同，它支持数字，字符串甚至可以包含列表（所谓嵌套）。列表是写在方括号之间、用逗号分隔开的元素列表。和字符串一样，列表同样可以被索引和截取，列表被截取后返回一个包含所需元素的新列表。</p> 
+ <p class="calibre3">列表截取的语法格式为：变量[头下标：尾下标]。索引值以0为开始值，-1为从末尾的开始位置。加号（+）是列表连接运算符，星号（∗）是重复操作。列表在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u354" src="../Images/180_05.jpg" width="1280" height="49"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u355" src="../Images/181_01.jpg" width="1280" height="269"/>
+ </div> 
+ <p class="calibre3">与Python字符串不一样的是，列表中的元素是可以改变的，List内置了有很多方法，例如append()、pop()等。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/181_02.jpg" width="40" height="45"/>List写在方括号之间，元素用逗号隔开。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/181_03.jpg" width="40" height="44"/>和字符串一样，list可以被索引和切片。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/181_04.jpg" width="40" height="44"/>List可以使用+操作符进行拼接。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/181_05.jpg" width="40" height="45"/>List中的元素是可以改变的。</p> 
+ <p class="calibre3">（4）Tuple（元组）。</p> 
+ <p class="calibre3">元组（Tuple）与列表类似，不同之处在于元组的元素不能修改。元组写在小括号里，元素之间用逗号隔开，元组中的元素类型也可以不相同。元组在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u356" src="../Images/181_06.jpg" width="1280" height="739"/>
+ </div> 
+ <p class="calibre3">元组与字符串类似，可以被索引，且下标索引从0开始，-1为从末尾开始的位置；也可以进行截取。其实，可以把字符串看作一种特殊的元组。虽然Tuple的元素不可改变，但它可以包含可变的对象，String、List和Tuple都属于Sequence（序列）。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/181_07.jpg" width="40" height="45"/>与字符串一样，元组的元素不能修改。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/181_08.jpg" width="40" height="44"/>元组也可以被索引和切片，方法一样。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/181_09.jpg" width="40" height="45"/>注意构造包含0或1个元素的元组的特殊语法规则。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/182_01.jpg" width="40" height="44"/>元组也可以使用+操作符进行拼接。</p> 
+ <p class="calibre3">（5）Set（集合）。</p> 
+ <p class="calibre3">集合（set）是一个无序不重复元素的序列。基本功能是进行成员关系测试和删除重复元素。</p> 
+ <p class="calibre3">可以使用大括号{}或者set()函数创建集合。注意：创建一个空集合必须用set()而不是{}，因为{}是用来创建一个空字典的。</p> 
+ <p class="calibre3">创建格式：parame={value01，value02，...}或者set（value）。</p> 
+ <p class="calibre3">集合在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u357" src="../Images/182_02.jpg" width="1280" height="651"/>
+ </div> 
+ <p class="calibre3">（6）Dictionary（字典）。</p> 
+ <p class="calibre3">字典（dictionary）是Python中另一个非常有用的内置数据类型。</p> 
+ <p class="calibre3">列表是有序的对象结合，字典是无序的对象集合。两者之间的区别在于：字典当中的元素是通过键来存取的，而不是通过偏移存取的。</p> 
+ <p class="calibre3">字典是一种映射类型，字典用"{}"标识，它是一个无序的键（key）—值（value）对集合。</p> 
+ <p class="calibre3">键（key）必须使用不可变类型。在同一个字典中，键（key）必须是唯一的。</p> 
+ <p class="calibre3">字典在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u358" src="../Images/182_03.jpg" width="1280" height="306"/>
+ </div> 
+ <p class="calibre3">构造函数dict()可以直接从键值对序列中构建字典：</p> 
+ <div class="center">
+  <img alt="" class="u359" src="../Images/182_04.jpg" width="1280" height="97"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u360" src="../Images/183_01.jpg" width="1280" height="91"/>
+ </div> 
+ <p class="calibre3">另外，字典类型也有一些内置的函数，例如clear()、keys()、values()等。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/183_02.jpg" width="40" height="44"/>字典是一种映射类型，它的元素是键值对。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/183_03.jpg" width="40" height="44"/>字典的关键字必须为不可变类型，且不能重复。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/183_04.jpg" width="40" height="45"/>创建空字典使用{}。</p> 
+ <p class="calibre3"><b class="calibre6">3．Python数据类型转换</b></p> 
+ <p class="calibre3">有时候，人们需要对数据内置的类型进行转换。转换数据类型，只需要将数据类型作为函数名即可。</p> 
+ <p class="calibre3">以下几个内置的函数可以执行数据类型之间的转换。这些函数返回一个新的对象，表示转换的值。</p> 
+ <h3 id="A8f975ec1-7395-4b6c-a237-e1de15c09879" class="calibre14">11.5 Python基本语法</h3> 
+ <p class="calibre3"><b class="calibre6">1．标识符</b></p> 
+ <p class="calibre3">第一个字符必须是字母表中的字母或下画线。标识符的其他部分由字母、数字和下画线组成。标识符对大小写敏感。在Python 3中，非ASCII标识符也是允许的。</p> 
+ <p class="calibre3"><b class="calibre6">2．Python保留字</b></p> 
+ <p class="calibre3">保留字即关键字，不能把它们用作任何标识符名称。Python的标准库提供了一个keyword模块，可以输出当前版本的所有关键字。在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u361" src="../Images/183_05.jpg" width="1280" height="259"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">3．注释</b></p> 
+ <p class="calibre3">在Python中单行注释以#开头，在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u362" src="../Images/183_06.jpg" width="1280" height="134"/>
+ </div> 
+ <p class="calibre3">多行注释可以用多个#号，还有'''和"""，在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u363" src="../Images/183_07.jpg" width="1280" height="311"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u364" src="../Images/184_01.jpg" width="1280" height="48"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">4．行与缩进</b></p> 
+ <p class="calibre3">Python最具特色的就是使用缩进来表示代码块，不需要使用大括号{}。缩进的空格数是可变的，但是同一个代码块的语句必须包含相同的缩进空格数。实例如下：</p> 
+ <div class="center">
+  <img alt="" class="u365" src="../Images/184_02.jpg" width="1280" height="175"/>
+ </div> 
+ <p class="calibre3">以下代码最后一行语句缩进数的空格数不一致，会导致运行错误：</p> 
+ <div class="center">
+  <img alt="" class="u366" src="../Images/184_03.jpg" width="1280" height="254"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">5．多行语句</b></p> 
+ <p class="calibre3">Python通常是一行写完一条语句，但如果语句过长，可以使用反斜杠（\）来实现多行语句，例如：</p> 
+ <div class="center">
+  <img alt="" class="u367" src="../Images/184_04.jpg" width="1280" height="132"/>
+ </div> 
+ <p class="calibre3">在[]、{}或（　）中的多行语句，不需要使用反斜杠（\），例如：</p> 
+ <div class="center">
+  <img alt="" class="u368" src="../Images/184_05.jpg" width="1280" height="89"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">6．等待用户输入</b></p> 
+ <p class="calibre3">在Python Shell中执行下面的程序在按【Enter】键后就会等待用户输入：</p> 
+ <div class="center">
+  <img alt="" class="u369" src="../Images/184_06.jpg" width="1280" height="165"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">7．同一行显示多条语句</b></p> 
+ <p class="calibre3">Python可以在同一行中使用多条语句，语句之间使用分号（；）分割，以下是一个简单的在Python Shell中的示例：</p> 
+ <div class="center">
+  <img alt="" class="u370" src="../Images/184_07.jpg" width="1280" height="95"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">8．多个语句构成代码组</b></p> 
+ <p class="calibre3">缩进相同的一组语句构成一个代码块，称为代码组。</p> 
+ <p class="calibre3">像if、while、def和class这样的复合语句，首行以关键字开始，以冒号（：）结束，该行之后的一行或多行代码构成代码组。</p> 
+ <p class="calibre3">我们将首行及后面的代码组称为一个子句（clause）。</p> 
+ <p class="calibre3">如下面的示例：</p> 
+ <div class="center">
+  <img alt="" class="u371" src="../Images/185_01.jpg" width="1280" height="260"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">9．import与from...import</b></p> 
+ <p class="calibre3">在Python中用import或者from...import来导入相应的模块。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_02.jpg" width="40" height="44"/>将整个模块导入，格式为：import somemodule。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_03.jpg" width="40" height="44"/>从某个模块中导入某个函数，格式为：from somemodule import somefunction。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_04.jpg" width="40" height="45"/>从某个模块中导入多个函数，格式为：from somemodule import firstfunc，secondfunc，thirdfunc。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_05.jpg" width="40" height="45"/>将某个模块中的全部函数导入，格式为：from somemodule import ∗。</p> 
+ <p class="calibre3"><b class="calibre6">10．语句结束符</b></p> 
+ <p class="calibre3">Python中没有了C和PHP等语言中所有的语句结束符“；”，如果想要在一个物理行中使用多于一个逻辑行，那么需要使用分号（；）来特别地标明这种用法。</p> 
+ <h3 id="A4194a7cd-b8a2-4c3a-b276-3a18750c8099" class="calibre14">11.6 Python基本控制结构</h3> 
+ <p class="calibre3">Python基本控制结构包括顺序结构、选择结构和循环结构。</p> 
+ <p class="calibre3"><b class="calibre6">1．if语句</b></p> 
+ <p class="calibre3">Python条件语句是通过一条或多条语句的执行结果（True或者False）来决定执行的代码块的。</p> 
+ <p class="calibre3">Python中if语句的一般形式如下所示：</p> 
+ <div class="center">
+  <img alt="" class="u372" src="../Images/185_06.jpg" width="1280" height="263"/>
+ </div> 
+ <p class="calibre3">如果"condition_1"为True将执行"statement_block_1"块语句；如果"condition_1"为False，将判断"condition_2"，如果"condition_2"为True将执行"statement_block_2"块语句；如果"condition_2"为False，将执行"statement_block_3"块语句。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_07.jpg" width="40" height="45"/>Python中用elif代替了else if，所以if语句的关键字为：if-elif-else。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_08.jpg" width="40" height="44"/>每个条件后面要使用冒号（：），表示接下来是满足条件后要执行的语句块。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_09.jpg" width="40" height="45"/>使用缩进来划分语句块，相同缩进数的语句在一起组成一个语句块。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/185_10.jpg" width="40" height="45"/>在Python中没有switch-case语句。</p> 
+ <p class="calibre3">下面是一个简单的if示例。</p> 
+ <div class="center">
+  <img alt="" class="u373" src="../Images/185_11.jpg" width="1280" height="47"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u374" src="../Images/186_01.jpg" width="1280" height="402"/>
+ </div> 
+ <p class="calibre3">if语句中常用的操作运算符有：＜（小于）、＜=（小于或等于）、＞（大于）、＞=（大于或等于）、==（等于，比较对象是否相等）和！=（不等于）。</p> 
+ <p class="calibre3"><b class="calibre6">2．if嵌套</b></p> 
+ <p class="calibre3">在嵌套if语句中，可以把if...elif...else结构放在另外一个if...elif...else结构中。一般形式如下：</p> 
+ <div class="center">
+  <img alt="" class="u375" src="../Images/186_02.jpg" width="1280" height="513"/>
+ </div> 
+ <p class="calibre3">例如，在Python编辑器中输入以下代码，保存到embedded_if.py文件中：</p> 
+ <div class="center">
+  <img alt="" class="u376" src="../Images/186_03.jpg" width="1280" height="513"/>
+ </div> 
+ <p class="calibre3">执行后输出结果为：</p> 
+ <div class="center">
+  <img alt="" class="u377" src="../Images/186_04.jpg" width="1280" height="45"/>
+ </div> 
+ <p class="calibre3">输入一个数字：6</p> 
+ <p class="calibre3">输入的数字可以整除2和3。</p> 
+ <p class="calibre3"><b class="calibre6">3．循环语句while</b></p> 
+ <p class="calibre3">在Python中，while语句的一般形式如下：</p> 
+ <div class="center">
+  <img alt="" class="u378" src="../Images/187_01.jpg" width="1280" height="88"/>
+ </div> 
+ <p class="calibre3">同样需要注意冒号和缩进。另外，在Python中没有do...while循环。</p> 
+ <p class="calibre3">以下示例使用了while来计算1到100的总和。</p> 
+ <div class="center">
+  <img alt="" class="u379" src="../Images/187_02.jpg" width="1280" height="339"/>
+ </div> 
+ <p class="calibre3">执行结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u380" src="../Images/187_03.jpg" width="1280" height="41"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">4．while循环使用else语句</b></p> 
+ <p class="calibre3">在while...else语句中，在条件语句为false时执行else的语句块。</p> 
+ <p class="calibre3">下面是一个简单的示例。</p> 
+ <div class="center">
+  <img alt="" class="u381" src="../Images/187_04.jpg" width="1280" height="300"/>
+ </div> 
+ <p class="calibre3">执行以上脚本，输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u382" src="../Images/187_05.jpg" width="1280" height="256"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">5．循环语句for语句</b></p> 
+ <p class="calibre3">Python中for循环语句可以遍历任何序列的项目，如一个列表或者一个字符串。</p> 
+ <p class="calibre3">for循环的一般格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u383" src="../Images/187_06.jpg" width="1280" height="174"/>
+ </div> 
+ <p class="calibre3">在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u384" src="../Images/188_01.jpg" width="1280" height="296"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">6．range()函数</b></p> 
+ <p class="calibre3">如果需要遍历数字序列，可以使用内置range()函数。它会生成数列，在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u385" src="../Images/188_02.jpg" width="1280" height="131"/>
+ </div> 
+ <p class="calibre3">也可以设置间隔，在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u386" src="../Images/188_03.jpg" width="1280" height="129"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">7．break和continue语句及循环中的else子句</b></p> 
+ <p class="calibre3">break语句可以跳出for和while的循环体。如果从for或while循环中终止，任何对应的循环else块将不执行；continue语句用于告诉Python跳过当前循环块中的剩余语句，然后继续进行下一轮循环。</p> 
+ <p class="calibre3"><b class="calibre6">8．pass语句</b></p> 
+ <p class="calibre3">Python pass是空语句，是为了保持程序结构的完整性。pass不做任何事情，一般用作占位语句，在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u387" src="../Images/188_04.jpg" width="1280" height="85"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">9．使用内置enumerate函数进行遍历</b></p> 
+ <p class="calibre3">enumerate函数的格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u388" src="../Images/188_05.jpg" width="1280" height="90"/>
+ </div> 
+ <p class="calibre3">在Python Shell中的示例执行如下：</p> 
+ <div class="center">
+  <img alt="" class="u389" src="../Images/188_06.jpg" width="1280" height="128"/>
+ </div> 
+ <p class="calibre3">输出结果为：</p> 
+ <div class="center">
+  <img alt="" class="u390" src="../Images/188_07.jpg" width="1280" height="211"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u391" src="../Images/189_01.jpg" width="1280" height="97"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">10．循环嵌套</b></p> 
+ <p class="calibre3">使用while循环嵌套来实现99乘法法则的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u392" src="../Images/189_02.jpg" width="1280" height="551"/>
+ </div> 
+ <p class="calibre3">for循环的嵌套使用示例：</p> 
+ <div class="center">
+  <img alt="" class="u393" src="../Images/189_03.jpg" width="1280" height="215"/>
+ </div> 
+ <p class="calibre3">输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u394" src="../Images/189_04.jpg" width="1280" height="219"/>
+ </div> 
+ <h3 id="A7a988c22-72e3-40a7-98f2-bd51c266b433" class="calibre14">11.7 Python函数</h3> 
+ <p class="calibre3">函数是组织好的，可重复使用的，用来实现单一或相关联功能的代码段。函数能提高应用的模块性和代码的重复利用率。Python提供了许多内建函数，比如print()。但也可以自己创建函数，即用户自定义函数。</p> 
+ <p class="calibre3"><b class="calibre6">1．定义一个函数</b></p> 
+ <p class="calibre3">可以定义一个有自己想要功能的函数，以下是简单的规则：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/189_05.jpg" width="40" height="44"/>函数代码块以def关键词开头，后接函数标识符名称和圆括号（　）。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/189_06.jpg" width="40" height="45"/>任何传入参数和自变量必须放在圆括号中间，圆括号之间可以定义参数。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/189_07.jpg" width="40" height="44"/>函数的第一行语句可以选择性地使用文档字符串——用于存放函数说明。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/189_08.jpg" width="40" height="45"/>函数内容以冒号开始，并且缩进。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/190_01.jpg" width="40" height="44"/>return [表达式]结束函数，选择性地返回一个值给调用方。不带表达式的return相当于返回None。</p> 
+ <p class="calibre3">函数定义语法：Python定义函数使用def关键字，一般格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u395" src="../Images/190_02.jpg" width="1280" height="89"/>
+ </div> 
+ <p class="calibre3">默认情况下，参数值和参数名称是按函数声明中定义的顺序匹配起来的。</p> 
+ <p class="calibre3">函数应用示例：</p> 
+ <div class="center">
+  <img alt="" class="u396" src="../Images/190_03.jpg" width="1280" height="435"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u397" src="../Images/190_04.jpg" width="1280" height="91"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．函数调用</b></p> 
+ <p class="calibre3">定义一个函数：给了函数一个名称，指定了函数里包含的参数和代码块结构。</p> 
+ <p class="calibre3">这个函数的基本结构完成以后，可以通过另一个函数调用执行，也可以直接从Python命令提示符执行。</p> 
+ <p class="calibre3">如下示例调用了printstr()函数：</p> 
+ <div class="center">
+  <img alt="" class="u398" src="../Images/190_05.jpg" width="1280" height="397"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u399" src="../Images/190_06.jpg" width="1280" height="91"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">3．参数传递</b></p> 
+ <p class="calibre3">在Python中，类型属于对象，变量是没有类型的。</p> 
+ <div class="center">
+  <img alt="" class="u400" src="../Images/190_07.jpg" width="1280" height="89"/>
+ </div> 
+ <p class="calibre3">以上代码中，[1，2，3]是List类型，"Hellow"是String类型，而变量a没有类型，仅仅是一个对象的引用（一个指针），可以是List类型对象，也可以指向String类型对象。</p> 
+ <p class="calibre3"><b class="calibre6">4．可更改</b>（mutable）<b class="calibre6">与不可更改</b>（immutable）<b class="calibre6">对象</b></p> 
+ <p class="calibre3">在Python中，strings、tuples和numbers是不可更改的对象，而list、dict等则是可以修改的对象。</p> 
+ <p class="calibre3">（1）不可变类型：给变量赋值<i class="calibre17">a</i>=8后再赋值<i class="calibre17">a</i>=10，这里实际是新生成一个<i class="calibre17">int</i>值对象10，再让<i class="calibre17">a</i>指向它，而8被丢弃，不是改变<i class="calibre17">a</i>的值，相当于新生成了<i class="calibre17">a</i>。</p> 
+ <p class="calibre3">（2）可变类型：给变量赋值<i class="calibre17">pa</i>=[1，2，3，4]后，再赋值<i class="calibre17">pa</i>[2]=5，则是将list<i class="calibre17">pa</i>的第三个元素值更改，本身<i class="calibre17">pa</i>没有动，只是其内部的一部分值被修改了。</p> 
+ <p class="calibre3">Python函数的参数传递：</p> 
+ <p class="calibre3">（1）不可变类型：类似C++的值传递，如整数、字符串、元组。如fun（<i class="calibre17">x</i>），传递的只是<i class="calibre17">x</i>的值，没有影响<i class="calibre17">x</i>对象本身。比如在fun（<i class="calibre17">x</i>）内部修改<i class="calibre17">x</i>的值，只是修改另一个复制的对象，不会影响<i class="calibre17">x</i>本身。</p> 
+ <p class="calibre3">（2）可变类型：类似C++的引用传递，如列表、字典。如fun（<i class="calibre17">pa</i>），则是将<i class="calibre17">pa</i>真正地传过去，修改后fun外部的<i class="calibre17">pa</i>也会受影响</p> 
+ <p class="calibre3">Python中一切都是对象，严格意义上不能说值传递还是引用传递，应该说传递不可变对象和传递可变对象。</p> 
+ <p class="calibre3">Python传递不可变对象示例：</p> 
+ <div class="center">
+  <img alt="" class="u401" src="../Images/191_01.jpg" width="1280" height="266"/>
+ </div> 
+ <p class="calibre3">示例中有整型对象2，指向它的变量是<i class="calibre17">b</i>，在传递给<i class="calibre17">ChangeInt</i>函数时，按传值的方式复制了变量<i class="calibre17">b</i>，<i class="calibre17">x</i>和<i class="calibre17">b</i>都指向了同一个Int对象，在<i class="calibre17">x</i>=10时，则新生成一个Int值对象10，并让<i class="calibre17">x</i>指向它。</p> 
+ <p class="calibre3">传可变对象示例：可变对象在函数里修改了参数，那么在调用这个函数的函数里，原始的参数也被改变了。例如：</p> 
+ <div class="center">
+  <img alt="" class="u402" src="../Images/191_02.jpg" width="1280" height="494"/>
+ </div> 
+ <p class="calibre3">传入函数的和在末尾添加新内容的对象用的是同一个引用。故输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u68" src="../Images/192_01.jpg" width="1280" height="87"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">5．参数</b></p> 
+ <p class="calibre3">以下是调用函数时可使用的正式参数类型：必需参数；关键字参数；默认参数；不定长参数。</p> 
+ <p class="calibre3">（1）必需参数</p> 
+ <p class="calibre3">必需参数须以正确的顺序传入函数。调用时的数量必须和声明时的一样。</p> 
+ <p class="calibre3">调用printstr()函数，必须传入一个参数，否则会出现语法错误。例如：</p> 
+ <div class="center">
+  <img alt="" class="u403" src="../Images/192_02.jpg" width="1280" height="348"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u404" src="../Images/192_03.jpg" width="1280" height="179"/>
+ </div> 
+ <p class="calibre3">（2）关键字参数</p> 
+ <p class="calibre3">关键字参数和函数调用关系紧密，函数调用使用关键字参数来确定传入的参数值。</p> 
+ <p class="calibre3">使用关键字参数允许函数调用时参数的顺序与声明时不一致，因为Python解释器能够用参数名匹配参数值。</p> 
+ <p class="calibre3">以下示例在函数printstr()调用时使用参数名：</p> 
+ <div class="center">
+  <img alt="" class="u405" src="../Images/192_04.jpg" width="1280" height="351"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u406" src="../Images/192_05.jpg" width="1280" height="50"/>
+ </div> 
+ <p class="calibre3">以下示例演示了函数参数的使用，不需要使用指定顺序。</p> 
+ <div class="center">
+  <img alt="" class="u407" src="../Images/192_06.jpg" width="1280" height="138"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u408" src="../Images/193_01.jpg" width="1280" height="273"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u409" src="../Images/193_02.jpg" width="1280" height="92"/>
+ </div> 
+ <p class="calibre3">（3）默认参数</p> 
+ <p class="calibre3">调用函数时，如果没有传递参数，则会使用默认参数。以下示例中如果没有传入age参数，则使用默认值。</p> 
+ <div class="center">
+  <img alt="" class="u410" src="../Images/193_03.jpg" width="1280" height="473"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u411" src="../Images/193_04.jpg" width="1280" height="218"/>
+ </div> 
+ <p class="calibre3">（4）不定长参数</p> 
+ <p class="calibre3">不定长参数是指可能需要一个函数能处理比当初声明时更多的参数。和上述两种参数不同，声明时不会命名。基本语法如下：</p> 
+ <div class="center">
+  <img alt="" class="u412" src="../Images/193_05.jpg" width="1280" height="173"/>
+ </div> 
+ <p class="calibre3">加了星号（∗）的变量名会存放所有未命名的变量参数。如果在函数调用时没有指定参数，那么它就是一个空元组。也可以不向函数传递未命名的变量。如下示例：</p> 
+ <div class="center">
+  <img alt="" class="u413" src="../Images/193_06.jpg" width="1280" height="176"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u414" src="../Images/194_01.jpg" width="1280" height="357"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u415" src="../Images/194_02.jpg" width="1280" height="90"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">6．匿名函数</b></p> 
+ <p class="calibre3">Python使用lambda来创建匿名函数。所谓匿名，即不再使用def语句这样标准的形式定义一个函数。lambda只是一个表达式，函数体比def简单得多。</p> 
+ <p class="calibre3">lambda的主体是一个表达式，而不是一个代码块。仅仅能在lambda表达式中封装有限的逻辑进去。lambda函数拥有自己的命名空间，且不能访问自己参数列表之外或全局命名空间里的参数。</p> 
+ <p class="calibre3">虽然lambda函数看起来只能写一行，却不等同于C或C++的内联函数，后者的目的是调用小函数时不占用栈内存，从而提高运行效率。</p> 
+ <p class="calibre3">lambda函数的语法只包含一个语句，如下：</p> 
+ <div class="center">
+  <img alt="" class="u416" src="../Images/194_03.jpg" width="1280" height="48"/>
+ </div> 
+ <p class="calibre3">如下示例：</p> 
+ <div class="center">
+  <img alt="" class="u417" src="../Images/194_04.jpg" width="1280" height="261"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u418" src="../Images/194_05.jpg" width="1280" height="86"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">7．return语句</b></p> 
+ <p class="calibre3">return [表达式]语句用于退出函数，选择性地向调用方返回一个表达式。不带参数值的return语句返回None。之前的例子都没有示范如何返回数值，以下示例演示了return语句的用法：</p> 
+ <div class="center">
+  <img alt="" class="u419" src="../Images/194_06.jpg" width="1280" height="266"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u420" src="../Images/195_01.jpg" width="1280" height="175"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u421" src="../Images/195_02.jpg" width="1280" height="86"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">8．变量作用域</b></p> 
+ <p class="calibre3">在Python中，程序的变量并不是在哪个位置都可以访问的，访问权限决定于这个变量是在哪里赋值的。变量的作用域决定了在哪一部分程序可以访问哪个特定的变量名称。Python的作用域一共有4种，分别是：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/195_03.jpg" width="40" height="44"/>L（Local）：局部作用域。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/195_04.jpg" width="40" height="45"/>E（Enclosing）：闭包函数外的函数中。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/195_05.jpg" width="40" height="44"/>G（Global）：全局作用域。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/195_06.jpg" width="40" height="45"/>B（Built-in）：内建作用域。</p> 
+ <p class="calibre3">以L-＞E-＞G-＞B的规则查找，即：在局部找不到，便会去局部外的局部找（例如闭包），再找不到就会去全局找，或者再去内建中找。</p> 
+ <div class="center">
+  <img alt="" class="u422" src="../Images/195_07.jpg" width="1280" height="260"/>
+ </div> 
+ <p class="calibre3">在Python中，只有模块（module）、类（class）及函数（def、lambda）才会引入新的作用域，其他的代码块（如if/elif/else/、try/except、for/while等）是不会引入新的作用域的，也就是说这些语句内定义的变量，外部也可以访问，示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u423" src="../Images/195_08.jpg" width="1280" height="173"/>
+ </div> 
+ <p class="calibre3">示例中虽然msg变量是在if语句块中定义的，但外部还是可以访问的。</p> 
+ <p class="calibre3">如果将msg定义在函数中，那么它就是局部变量，外部不能访问：</p> 
+ <div class="center">
+  <img alt="" class="u424" src="../Images/195_09.jpg" width="1280" height="301"/>
+ </div> 
+ <p class="calibre3">从报错的信息看，说明msg_inner未被定义，无法使用，因为它是局部变量，只有在函数内可以使用。</p> 
+ <p class="calibre3"><b class="calibre6">9．全局变量和局部变量</b></p> 
+ <p class="calibre3">定义在函数内部的变量拥有一个局部作用域，定义在函数外的拥有全局作用域。局部变量只能在其被声明的函数内部访问，而全局变量可以在整个程序范围内访问。调用函数时，所有在函数内声明的变量名称都将被加入到作用域中。如下实例：</p> 
+ <div class="center">
+  <img alt="" class="u425" src="../Images/196_01.jpg" width="1280" height="473"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u426" src="../Images/196_02.jpg" width="1280" height="84"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">10．global和nonlocal关键字</b></p> 
+ <p class="calibre3">当内部作用域想修改外部作用域的变量时，就要用到global和nonlocal关键字了。以下示例修改全局变量num：</p> 
+ <div class="center">
+  <img alt="" class="u427" src="../Images/196_03.jpg" width="1280" height="345"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u428" src="../Images/196_04.jpg" width="1280" height="90"/>
+ </div> 
+ <p class="calibre3">如果要修改嵌套作用域（enclosing作用域，外层非全局作用域）中的变量则需要nonlocal关键字了，示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u429" src="../Images/196_05.jpg" width="1280" height="347"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u430" src="../Images/197_01.jpg" width="1280" height="100"/>
+ </div> 
+ <p class="calibre3">以上示例输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u431" src="../Images/197_02.jpg" width="1280" height="93"/>
+ </div> 
+ <p class="calibre3">另外，有一种特殊情况，假设下面这段代码被运行：</p> 
+ <div class="center">
+  <img alt="" class="u432" src="../Images/197_03.jpg" width="1280" height="259"/>
+ </div> 
+ <p class="calibre3">以上程序执行，报错信息如下：</p> 
+ <div class="center">
+  <img alt="" class="u433" src="../Images/197_04.jpg" width="1280" height="260"/>
+ </div> 
+ <p class="calibre3">错误信息为局部作用域引用错误，因为test函数中的a使用的是局部，未被定义，无法修改。</p> 
+ <h3 id="A73e3e518-0a3f-4a06-beed-d66d292fe48b" class="calibre14">11.8 Python异常处理</h3> 
+ <p class="calibre3">异常即一个事件，该事件会在程序执行过程中发生，影响了程序的正常执行。一般情况下，在Python无法正常处理程序时就会发生一个异常。异常是Python对象，表示一个错误。当Python脚本发生异常时，我们需要捕获处理它，否则程序会终止执行。</p> 
+ <p class="calibre3">捕捉异常可以使用try/except语句。try/except语句用来检测try语句块中的错误，从而让except语句捕获异常信息并处理。如果不想在异常发生时结束程序，只需在try里捕获它。</p> 
+ <p class="calibre3">以下为简单的try...except...else的语法：</p> 
+ <div class="center">
+  <img alt="" class="u434" src="../Images/197_05.jpg" width="1280" height="350"/>
+ </div> 
+ <p class="calibre3">try的工作原理是，当开始一个try语句后，Python就在当前程序的上下文中作标记，这样当异常出现时就可以回到这里，try子句先执行，接下来会发生什么依赖于执行时是否出现异常。</p> 
+ <p class="calibre3">如果执行try后的语句发生异常，Python就跳回到try并执行第一个匹配该异常的except子句，异常处理完毕，控制流就通过整个try语句（除非在处理异常时又引发新的异常）。</p> 
+ <p class="calibre3">如果在try后的语句里发生了异常，却没有匹配的except子句，异常将被递交到上层的try，或者到程序的最上层（这样将结束程序，并打印默认的出错信息）。</p> 
+ <p class="calibre3">如果在执行try子句时没有发生异常，Python将执行else语句后的语句（如果有else的话），然后控制流通过整个try语句。</p> 
+ <p class="calibre3">下面是简单的例子，它打开一个文件，在该文件中写入内容，且并未发生异常：</p> 
+ <div class="center">
+  <img alt="" class="u435" src="../Images/198_01.jpg" width="1280" height="390"/>
+ </div> 
+ <p class="calibre3">以上程序输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u436" src="../Images/198_02.jpg" width="1280" height="132"/>
+ </div> 
+ <p class="calibre3">这是一个测试文件，用于测试异常！</p> 
+ <p class="calibre3">下面是简单的例子，它打开一个文件，在该文件中写入内容，但文件没有写入权限，发生了异常：</p> 
+ <div class="center">
+  <img alt="" class="u437" src="../Images/198_03.jpg" width="1280" height="396"/>
+ </div> 
+ <p class="calibre3">在执行代码前为了测试方便，可以先去掉testfile文件的写权限，命令如下：</p> 
+ <div class="center">
+  <img alt="" class="u438" src="../Images/198_04.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3">再执行以上代码，结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u439" src="../Images/198_05.jpg" width="1280" height="83"/>
+ </div> 
+ <p class="calibre3">也可以使用相同的except语句来处理多个异常信息，如下所示：</p> 
+ <div class="center">
+  <img alt="" class="u395" src="../Images/198_06.jpg" width="1280" height="90"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u440" src="../Images/199_01.jpg" width="1280" height="395"/>
+ </div> 
+ <p class="calibre3">例如：</p> 
+ <div class="center">
+  <img alt="" class="u441" src="../Images/199_02.jpg" width="1280" height="447"/>
+ </div> 
+ <p class="calibre3">当在try块中抛出一个异常时，立即执行finally块代码。执行完finally块中的所有语句后，异常被再次触发，并执行except块代码。</p> 
+ <p class="calibre3">可以使用raise语句自己触发异常，raise语法格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u442" src="../Images/199_03.jpg" width="1280" height="45"/>
+ </div> 
+ <p class="calibre3">语句中Exception是异常的类型（例如，NameError），参数是一个异常参数值。该参数是可选的，如果不提供，异常的参数是"None"。最后一个参数是可选的（在实践中很少使用），如果存在，是跟踪异常对象。</p> 
+ <p class="calibre3">一个异常可以是一个字符串、类或对象。Python的内核提供的异常，大多数都是实例化的类，这是一个类的实例的参数。</p> 
+ <p class="calibre3">定义一个异常非常简单，如下所示：</p> 
+ <div class="center">
+  <img alt="" class="u443" src="../Images/199_04.jpg" width="1280" height="175"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：为了能够捕获异常，"except"语句必须有相同的异常来抛出类对象或者字符串。</p> 
+ <p class="calibre3">例如，捕获以上异常，"except"语句如下所示：</p> 
+ <div class="center">
+  <img alt="" class="u444" src="../Images/199_05.jpg" width="1280" height="220"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u445" src="../Images/200_01.jpg" width="1280" height="60"/>
+ </div> 
+ <p class="calibre3">例如：</p> 
+ <div class="center">
+  <img alt="" class="u446" src="../Images/200_02.jpg" width="1280" height="516"/>
+ </div> 
+ <p class="calibre3">执行以上代码，输出结果为：</p> 
+ <div class="center">
+  <img alt="" class="u447" src="../Images/200_03.jpg" width="1280" height="306"/>
+ </div> 
+ <h3 id="A1e8d3bac-7712-4bb5-a5f1-6df88904cd81" class="calibre14">11.9 Python自定义类</h3> 
+ <p class="calibre3">Python从设计之初就已经是一门面向对象的语言，正因为如此，在Python中创建一个类和对象是很容易的。本节介绍Python的面向对象编程。</p> 
+ <p class="calibre3">先来简单了解下面向对象的一些基本特征。</p> 
+ <p class="calibre3">（1）类（Class）：用来描述具有相同的属性和方法的对象的集合。它定义了该集合中每个对象所共有的属性和方法。对象是类的实例。</p> 
+ <p class="calibre3">（2）类变量：类变量在整个实例化的对象中是公用的。类变量定义在类中且在函数体之外。类变量通常不作为实例变量使用。</p> 
+ <p class="calibre3">（3）数据成员：类变量或者实例变量用于处理类及其实例对象的相关数据。</p> 
+ <p class="calibre3">（4）方法重写：如果从父类继承的方法不能满足子类的需求，可以对其进行改写，这个过程叫方法的覆盖（override），也称为方法的重写。</p> 
+ <p class="calibre3">（5）实例变量：定义在方法中的变量，只作用于当前实例的类。</p> 
+ <p class="calibre3">（6）继承：即一个派生类（derived class）继承基类（base class）的字段和方法。继承也允许把一个派生类对象作为一个基类对象对待。例如，有这样一个设计：一个Dog类型的对象派生自Animal类，这是模拟“是一个（is-a）”关系（例如，Dog是一个Animal）。</p> 
+ <p class="calibre3">（7）实例化：创建一个类的实例，类的具体对象。</p> 
+ <p class="calibre3">（8）方法：类中定义的函数。</p> 
+ <p class="calibre3">（9）对象：通过类定义的数据结构实例。对象包括两个数据成员（类变量和实例变量）和方法。</p> 
+ <p class="calibre3">与其他编程语言相比，Python在尽可能不增加新的语法和语义的情况下加入了类机制。Python中的类提供了面向对象编程的所有基本功能：类的继承机制允许多个基类，派生类可以覆盖基类中的任何方法，方法中可以调用基类中的同名方法。对象可以包含任意数量和类型的数据。</p> 
+ <p class="calibre3"><b class="calibre6">1．类定义</b></p> 
+ <p class="calibre3">语法格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u448" src="../Images/201_01.jpg" width="1280" height="168"/>
+ </div> 
+ <p class="calibre3">类实例化后，可以使用其属性。实际上，创建一个类之后，可以通过类名访问其属性。</p> 
+ <p class="calibre3"><b class="calibre6">2．类对象</b></p> 
+ <p class="calibre3">类对象支持两种操作：属性引用和实例化。属性引用使用和Python中所有的属性引用一样的标准语法：obj.name。创建类对象后，类命名空间中所有的命名都是有效属性名。</p> 
+ <p class="calibre3">类定义的简单示例如下：</p> 
+ <div class="center">
+  <img alt="" class="u449" src="../Images/201_02.jpg" width="1280" height="473"/>
+ </div> 
+ <p class="calibre3">以上创建了一个新的类实例并将该对象赋给局部变量x，执行以上程序的输出结果为：</p> 
+ <div class="center">
+  <img alt="" class="u99" src="../Images/201_03.jpg" width="1280" height="87"/>
+ </div> 
+ <p class="calibre3">很多类都倾向于将对象创建为有初始状态的。因此类可能会定义一个名为_init_()的特殊方法（构造方法），格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u450" src="../Images/201_04.jpg" width="1280" height="90"/>
+ </div> 
+ <p class="calibre3">类定义了_init_()方法的话，类的实例化操作会自动调用_init_()方法。所以在下例中，可以这样创建一个新的实例：</p> 
+ <div class="center">
+  <img alt="" class="u451" src="../Images/201_05.jpg" width="1280" height="50"/>
+ </div> 
+ <p class="calibre3">当然，_init_()方法可以有参数，参数通过_init_()传递到类的实例化操作上。例如：</p> 
+ <div class="center">
+  <img alt="" class="u452" src="../Images/201_06.jpg" width="1280" height="47"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u453" src="../Images/202_01.jpg" width="1280" height="259"/>
+ </div> 
+ <p class="calibre3">类的方法与普通的函数只有一个特别的区别，它们必须有一个额外的第一个参数名称，按照惯例它的名称是self。</p> 
+ <div class="center">
+  <img alt="" class="u454" src="../Images/202_02.jpg" width="1280" height="255"/>
+ </div> 
+ <p class="calibre3">以上示例执行结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u455" src="../Images/202_03.jpg" width="1280" height="88"/>
+ </div> 
+ <p class="calibre3">从执行结果可以很明显地看出，self代表的是类的实例，代表当前对象的地址，而self.class则指向类。</p> 
+ <p class="calibre3">self不是Python关键字，把它换成test也是可以正常执行的。</p> 
+ <div class="center">
+  <img alt="" class="u456" src="../Images/202_04.jpg" width="1280" height="255"/>
+ </div> 
+ <p class="calibre3">以上示例执行结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u457" src="../Images/202_05.jpg" width="1280" height="94"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">3．类的方法</b></p> 
+ <p class="calibre3">在类内部，使用def关键字来定义一个方法，与一般函数定义不同，类方法必须包含参数self，且为第一个参数，self代表的是类的实例。</p> 
+ <p class="calibre3">下面举一个简单的示例，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u458" src="../Images/202_06.jpg" width="1280" height="383"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u459" src="../Images/203_01.jpg" width="1280" height="399"/>
+ </div> 
+ <p class="calibre3">执行以上程序，输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u460" src="../Images/203_02.jpg" width="1280" height="45"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">4．继承</b></p> 
+ <p class="calibre3">Python同样支持类的继承，派生类的定义如下：</p> 
+ <div class="center">
+  <img alt="" class="u461" src="../Images/203_03.jpg" width="1280" height="173"/>
+ </div> 
+ <p class="calibre3">需要注意圆括号中基类的顺序，若是基类中有相同的方法名，而在子类使用时未指定，Python从左至右搜索，即在子类中未找到方法时，从左到右查找基类中是否包含方法。</p> 
+ <p class="calibre3">BaseClassName（示例中的基类名）必须与派生类定义在一个作用域内。除了类，还可以用表达式，基类定义在另一个模块中时这一点非常有用，格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u442" src="../Images/203_04.jpg" width="1280" height="45"/>
+ </div> 
+ <p class="calibre3">下面举一个简单的示例，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u462" src="../Images/203_05.jpg" width="1280" height="823"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u463" src="../Images/204_01.jpg" width="1280" height="363"/>
+ </div> 
+ <p class="calibre3">执行以上程序，输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u464" src="../Images/204_02.jpg" width="1280" height="49"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">5．多继承</b></p> 
+ <p class="calibre3">Python同样有限地支持多继承形式。多继承的类定义如下：</p> 
+ <div class="center">
+  <img alt="" class="u465" src="../Images/204_03.jpg" width="1280" height="176"/>
+ </div> 
+ <p class="calibre3">需要注意圆括号中父类的顺序，若是父类中有相同的方法名，而在子类使用时未指定，Python从左至右搜索，即方法在子类中未找到时，从左到右查找父类中是否包含方法。</p> 
+ <p class="calibre3">下面举一个简单的示例，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u466" src="../Images/204_04.jpg" width="1280" height="1010"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u467" src="../Images/205_01.jpg" width="1280" height="855"/>
+ </div> 
+ <p class="calibre3">执行以上程序，输出结果如下：</p> 
+ <p class="calibre3">我叫Tim，我是一个演说家，我演讲的主题是Python</p> 
+ <p class="calibre3"><b class="calibre6">6．方法重写</b></p> 
+ <p class="calibre3">如果父类方法的功能不能满足需求，可以在子类重写父类的方法，示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u468" src="../Images/205_02.jpg" width="1280" height="382"/>
+ </div> 
+ <p class="calibre3">执行以上程序，输出结果如下：</p> 
+ <p class="calibre3">调用子类方法</p> 
+ <p class="calibre3"><b class="calibre6">7．类属性与方法</b></p> 
+ <p class="calibre3">（1）类的私有属性</p> 
+ <p class="calibre3">_private_attrs：两个下划线开头，声明该属性为私有，不能在类的外部被使用或直接访问。在类内部的方法中使用时self._private_attrs。</p> 
+ <p class="calibre3">（2）类的方法</p> 
+ <p class="calibre3">在类的内部，使用def关键字来定义一个方法，与一般函数定义不同，类方法必须包含参数self，且为第一个参数，self代表的是类的实例。</p> 
+ <p class="calibre3">self的名字并不是规定死的，也可以使用this，但是最好还是按照约定使用self。</p> 
+ <p class="calibre3">（3）类的私有方法</p> 
+ <p class="calibre3">_private_method：以两个下划线开头，声明该方法为私有方法，只能在类的内部调用，不能在类的外部调用。</p> 
+ <p class="calibre3">类的私有属性的代码格式如下：</p> 
+ <div class="center">
+  <img alt="" class="u469" src="../Images/206_01.jpg" width="1280" height="52"/>
+ </div> 
+ <p class="calibre3">类的私有属性示例如下：</p> 
+ <div class="center">
+  <img alt="" class="u470" src="../Images/206_02.jpg" width="1280" height="560"/>
+ </div> 
+ <p class="calibre3">执行以上程序，输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u471" src="../Images/206_03.jpg" width="1280" height="301"/>
+ </div> 
+ <p class="calibre3">类的私有方法示例如下：</p> 
+ <div class="center">
+  <img alt="" class="u472" src="../Images/206_04.jpg" width="1280" height="566"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u473" src="../Images/207_01.jpg" width="1280" height="184"/>
+ </div> 
+ <p class="calibre3">执行以上程序，示例结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u474" src="../Images/207_02.jpg" width="1280" height="392"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">8．类的专有方法</b></p> 
+ <p class="calibre3">_init_：构造函数，在生成对象时调用。</p> 
+ <p class="calibre3">_del_：析构函数，释放对象时使用。</p> 
+ <p class="calibre3">_repr_：打印，转换。</p> 
+ <p class="calibre3">_setitem_：按照索引赋值。</p> 
+ <p class="calibre3">_getitem_：按照索引获取值。</p> 
+ <p class="calibre3">_len_：获得长度。</p> 
+ <p class="calibre3">_cmp_：比较运算。</p> 
+ <p class="calibre3">_call_：函数调用。</p> 
+ <p class="calibre3">_add_：加运算。</p> 
+ <p class="calibre3">_sub_：减运算。</p> 
+ <p class="calibre3">_mul_：乘运算。</p> 
+ <p class="calibre3">_div_：除运算。</p> 
+ <p class="calibre3">_mod_：求余运算。</p> 
+ <p class="calibre3">_pow_：乘方。</p> 
+ <p class="calibre3"><b class="calibre6">9．运算符重载</b></p> 
+ <p class="calibre3">Python同样支持运算符重载，可以对类的专有方法进行重载，示例如下：</p> 
+ <div class="center">
+  <img alt="" class="u475" src="../Images/207_03.jpg" width="1280" height="431"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u476" src="../Images/208_01.jpg" width="1280" height="106"/>
+ </div> 
+ <p class="calibre3">以上代码执行结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u477" src="../Images/208_02.jpg" width="1280" height="53"/>
+ </div> 
+ <h3 id="Ab366b586-c8db-44ca-ab23-3fdba05b4738" class="calibre14">11.10 Python操作文件</h3> 
+ <p class="calibre3">file对象使用open函数来创建，下面列出了file对象常用的函数。</p> 
+ <p class="calibre3">（1）file.close()：关闭文件。关闭后文件不能再进行读写操作。</p> 
+ <p class="calibre3">（2）file.flush()：刷新文件内部缓冲，直接把内部缓冲区的数据立刻写入文件。</p> 
+ <p class="calibre3">（3）file.fileno()：返回一个整型的文件描述符，可以用在如OS模块的read方法等一些底层操作上。</p> 
+ <p class="calibre3">（4）file.isatty()：如果文件连接到一个终端设备，返回True，否则返回False。</p> 
+ <p class="calibre3">（5）file.next()：返回文件下一行。</p> 
+ <p class="calibre3">（6）file.read（[size]）：从文件读取指定的字节数，如果未给定或为负则读取所有。</p> 
+ <p class="calibre3">（7）file.readline（[size]）：读取整行，包括"\ n"字符。</p> 
+ <p class="calibre3">（8）file.readlines（[sizeint]）：读取所有行并返回列表，若给定sizeint＞0，返回总和大约为sizeint字节的行，实际读取值可能比sizeint较大，因为需要填充缓冲区。</p> 
+ <p class="calibre3">（9）file.seek（offset [，whence]）：设置文件当前位置。</p> 
+ <p class="calibre3">（10）file.tell()：返回文件当前位置。</p> 
+ <p class="calibre3">（11）file.truncate（[size]）：从文件的首行首字符开始截断，截断文件为size个字符，无size表示从当前位置截断；截断之后V后面的所有字符被删除，其中Windows系统下的换行代表两个字符大小。</p> 
+ <p class="calibre3">（12）file.write（str）：将字符串写入文件，没有返回值。</p> 
+ <p class="calibre3">（13）file.writelines（sequence）：向文件写入一个序列字符串列表，如果需要换行，则要自己加入每行的换行符。</p> 
+ <p class="calibre3">应用file的简单示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u478" src="../Images/208_03.jpg" width="1280" height="224"/>
+ </div> 
+ <p class="calibre3">执行以上代码在当前目录建立file1文件，结果为：11。</p> 
+ <h3 id="A6b2f6725-bef0-44c8-962b-e92c2711d6c8" class="calibre14">11.11 Python多线程</h3> 
+ <p class="calibre3">多线程类似于同时执行多个不同程序，多线程运行有如下优点：</p> 
+ <p class="calibre3">（1）使用线程可以把程序中占据长时间的任务放到后台去处理。</p> 
+ <p class="calibre3">（2）用户界面可以更加吸引人，这样比如用户单击一个按钮去触发某些事件的处理，可以弹出一个进度条来显示处理的进度。</p> 
+ <p class="calibre3">（3）程序的运行速度可能加快。</p> 
+ <p class="calibre3">（4）在一些等待的任务实现上，如用户输入、文件读写和网络收发数据等，线程就比较有用了。在这种情况下，可以释放一些珍贵的资源，如内存占用等。</p> 
+ <p class="calibre3">线程在执行过程中与进程还是有区别的。每个独立的线程有一个程序运行的入口、顺序执行序列和程序的出口。但是线程不能够独立执行，必须依存在应用程序中，由应用程序提供多个线程执行控制。</p> 
+ <p class="calibre3">每个线程都有自己的一组CPU寄存器，称为线程的上下文，该上下文反映了上次运行该线程的CPU寄存器的状态。指令指针和堆栈指针寄存器是线程上下文中两个最重要的寄存器，线程总是在进程中运行的，这些地址都用于标志拥有线程的进程地址空间中的内存。</p> 
+ <p class="calibre3">线程可以分为：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/209_01.jpg" width="40" height="44"/>内核线程：由操作系统内核创建和撤销。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/209_02.jpg" width="40" height="44"/>用户线程：不需要内核支持，而在用户程序中实现的线程。</p> 
+ <p class="calibre3">Python3线程中常用的两个模块为：_thread和threading（推荐使用）。</p> 
+ <p class="calibre3">thread模块已被废弃，用户可以使用threading模块代替。所以，在Python3中不能再使用"thread"模块。为了保持兼容性，Python3将thread重命名为"_thread"。</p> 
+ <p class="calibre3">在Python中，使用线程有两种方式：函数或者用类来包装线程对象。</p> 
+ <p class="calibre3">（1）函数式：调用_thread模块中的start_new_thread()函数来产生新线程。语法如下：</p> 
+ <div class="center">
+  <img alt="" class="u442" src="../Images/209_03.jpg" width="1280" height="45"/>
+ </div> 
+ <p class="calibre3">参数说明：function——线程函数；args——传递给线程函数的参数，必须是Tuple类型；kwargs——可选参数。</p> 
+ <p class="calibre3">下面举一个简单的线程示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u479" src="../Images/209_04.jpg" width="1280" height="714"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u480" src="../Images/210_01.jpg" width="1280" height="90"/>
+ </div> 
+ <p class="calibre3">执行以上程序，输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u481" src="../Images/210_02.jpg" width="1280" height="396"/>
+ </div> 
+ <p class="calibre3">按下快捷键Ctrl-C退出。</p> 
+ <p class="calibre3">（2）通过调用threading模块继承threading.Thread类来包装一个线程对象。</p> 
+ <p class="calibre3">下面举一个简单的示例，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u482" src="../Images/210_03.jpg" width="1280" height="816"/>
+ </div> 
+ <p class="calibre3">执行以上程序，输出结果如下：</p> 
+ <div class="center">
+  <img alt="" class="u483" src="../Images/210_04.jpg" width="1280" height="299"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u484" src="../Images/211_01.jpg" width="1280" height="254"/>
+ </div> 
+ <p class="calibre3">其实thread和threading的模块中还包含如锁、定时器、获得激活线程列表等关于多线程编程的东西。</p> 
+ <h3 id="A8fb86c92-5eca-4c5d-8b6c-31a4307d9b88" class="calibre14">11.12 Python GUI编程</h3> 
+ <p class="calibre3">Python提供了多个图形开发界面的库，几个常用的Python GUI库如下：</p> 
+ <p class="calibre3">（1）Tkinter：Tkinter模块（Tk接口）是Python的标准Tk GUI工具包的接口。Tk和Tkinter可以在大多数的UNIX平台下使用，同样可以应用在Windows和Macintosh系统里。Tk8.0的后续版本可以实现本地窗口风格，并良好地运行在绝大多数平台中。</p> 
+ <p class="calibre3">（2）wxPython：wxPython是一款开源软件，是Python语言的一套优秀的GUI图形库，允许Python程序员很方便地创建完整的、功能键全的GUI用户界面。</p> 
+ <p class="calibre3">（3）Jython：Jython程序可以和Java无缝集成。除了一些标准模块，Jython使用Java的模块。Jython几乎拥有标准的Python中不依赖于C语言的全部模块。比如，Jython的用户界面将使用Swing、AWT或者SWT。Jython可以被动态或静态地编译成Java字节码。</p> 
+ <p class="calibre3">Tkinter是Python的标准GUI库。Python使用Tkinter可以快速地创建GUI应用程序。由于Tkinter是内置到Python的安装包中的，只要安装好Python就能输入Tkinter库。而且IDLE也是用Tkinter编写而成的，对于简单的图形界面Tkinter还是能应付自如的。</p> 
+ <p class="calibre3"><b class="calibre6">注意</b>：Python3.x版本使用的库名为tkinter，即首写字母t为小写。</p> 
+ <p class="calibre3">创建一个GUI程序步骤：</p> 
+ <p class="calibre3">（1）导入tkinter模块。</p> 
+ <p class="calibre3">（2）创建控件。</p> 
+ <p class="calibre3">（3）指定这个控件的master，即这个控件属于哪一个。</p> 
+ <p class="calibre3">（4）告诉GM（geometry manager）有一个控件产生了。</p> 
+ <p class="calibre3">下面举一个简单的示例，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u485" src="../Images/211_02.jpg" width="1280" height="170"/>
+ </div> 
+ <p class="calibre3">以上代码执行结果如图11-7所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u486" src="../Images/211_03.jpg" width="544" height="619"/> 
+  <p class="imgtitle">图11-7 Python简单窗口</p> 
+ </div> 
+ <p class="calibre3">Tkinter提供了各种控件，如按钮、标签和文本框，在GUI应用程序中使用。这些控件通常被称为控件或者部件。Tkinter的常用控件说明如表11-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表11-1 Tkinter的常用控件说明</p>
+  <img alt="" class="u487" src="../Images/212_01.jpg" width="1280" height="698"/>
+ </div> 
+ <p class="calibre3">控件使用的示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u488" src="../Images/212_02.jpg" width="1280" height="1032"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u489" src="../Images/213_01.jpg" width="1280" height="345"/>
+ </div> 
+ <p class="calibre3">以上代码执行结果如图11-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u490" src="../Images/213_02.jpg" width="1280" height="655"/> 
+  <p class="imgtitle">图11-8 Python简单控件</p> 
+ </div> 
+ <h3 id="Ae1bd39c1-67e8-4a8e-988d-22e208e006d1" class="calibre14">11.13 本章小结</h3> 
+ <p class="calibre3">在完成树莓派的硬件设计安装，并完成系统软件的烧写和配置后，就要开始对树莓派的应用程序进行编程了。树莓派采用Python语言为主要开发语言，本章介绍了Python语言编程的相关内容，为后续实现树莓派的应用做好准备。</p> 
+</body>
+</html>

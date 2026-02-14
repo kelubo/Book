@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_75">4.2.6　认证转发模块</h3> 
+ <p class="ziti3">模块名称：ngx_http_auth_request_module</p> 
+ <p class="ziti3">认证转发模块允许将认证请求转发给指定的服务器进行处理。启用认证转发后，会将认证需求以子请求的方式转发给指定的服务器，并通过子请求的返回结果判断客户端的认证授权。如果子请求返回响应码2××，则允许授权访问；若返回响应码401或403，则拒绝访问。该模块的内置配置指令如表4-27和表4-28所示。</p> 
+ <p class="middle-img">表4-27　认证转发指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-27.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-27.jpg" class="calibre157"/></a> 
+ </div> 
+ <p class="ziti3">auth_request启用时，需要指定一个内部子请求的URI。</p> 
+ <p class="middle-img">表4-28　认证请求变量设置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-28.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-28.jpg" class="calibre148"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream member_server {
+    server 172.16.1.13:8080;
+}
+
+server {
+    listen       8080;
+    server_name  localhost;
+
+    location / {
+        root   /opt/nginx-web;
+        index  index.html index.htm;
+    }
+
+    location /member {
+        auth_request /auth;                       # 启用认证转发到/auth
+        error_page 401 = @error401;               # 认证若返回状态码401，则跳转到@error401
+
+    #    auth_request_set $user $upstream_http_x_forwarded_user; # 将用户名赋予变量$user
+    #    proxy_set_header X-Forwarded-User $user; # 将用户名传递给应用服务
+        proxy_pass http://member_server;          # 代理转发到会员服务
+    }
+
+    location /auth {
+        internal;
+        proxy_set_header Host $host;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_pass http://172.16.10.14/auth;      # 将认证信息转发到http://172.16.10.14/auth
+    }
+
+    location @error401 {
+            return 302 http://172.16.10.14/login; # 认证失败跳转到登录页
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">认证请求变量设置指令同样支持基本认证的转发。当客户端发起请求时，Nginx会将具有WWW-Authenticate的子请求头响应信息转发给客户端，提示用户输入账号、密码。用户的用户名和密码信息通过Base64编码后写在子请求的请求头中发送给认证请求的服务器，认证服务器解码后返回相应的响应状态码。配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 8083;
+    server_name localhost;
+    root /opt/nginx-web;
+    auth_request /auth;
+
+    location / {
+        index  index.html index.htm;
+    }
+
+    location /auth {
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header X-Original-URI $request_uri;
+        proxy_pass http://192.168.2.145:8080/HttpBasicAuth.php;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">HttpBasicAuth.php的配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;?php
+
+if(isset($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW'])){
+    $user = $_SERVER['PHP_AUTH_USERv];
+    $passwd = $_SERVER['PHP_AUTH_PW'];
+
+    if ($user == 'admin' &amp;&amp; $passwd == v111111'){
+        return true;
+    }
+}
+
+header('WWW-Authenticate: Basic realm="BasicAuth Test"');
+header('HTTP/1.0 401 Unauthorized');
+
+?&gt;
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

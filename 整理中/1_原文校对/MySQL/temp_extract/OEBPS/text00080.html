@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">5.2.5　MySQL连接提示符说明</h3>
+<p class="p6">1.MySQL提示符设置说明</p>
+<p class="ziti">连接MySQL后的默认提示符是“mysql&gt;”，这个提示符也是可以更改的，就像Linux命令行提示符一样。</p>
+<p class="ziti">为了区分日常的正式环境和测试环境，从而避免操作失误，可以对提示符做一定的标记性修改，并且可将其写在配置里使之永久生效。</p>
+<p class="ziti">更改MySQL数据登录提示符的方法具体如下。</p>
+<p class="ziti">（1）修改登录提示符</p>
+<p class="ziti">命令行修改登录提示符的示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; prompt \u@oldboy \r:\m:\s-&gt;
+PROMPT set to '\u@oldboy \r:\m:\s-&gt;'
+root@oldboy 07:38:04-&gt;
+root@oldboy 07:38:10-&gt;</pre>
+<hr/>
+<p class="ziti">其中，“\u@oldboy\r：\m：\s-&gt;”中的“\u”为登录的数据库用户，“@”为分隔符，后面的oldboy为固定标签，“\r：\m：\s”为时间信息，-&gt;为提示符标识。</p>
+<p class="ziti">（2）配置文件修改登录提示符</p>
+<p class="ziti">在my.cnf配置文件的[mysql]模块下添加如下内容（注意，不是[mysqld]）。保存后，无须重启MySQL，退出当前session，重新登录即可。如果是在my.cnf配置文件中添加的，可以使用“\\”符号，以避免转义带来的问题。</p>
+<hr/>
+<pre class="ziti1">[client]
+prompt=\\u@oldboy \\r:\\m:\\s-&gt;
+3）</pre>
+<hr/>
+<p class="ziti">（3）多实例场景登录提示符说明</p>
+<p class="ziti">在多实例场景下，要想使得提示符配置生效，不仅需要把参数放到my.cnf配置文件里，还需要在连接MySQL时增加“--defaults-extra-file”参数指定修改的配置文件。</p>
+<p class="ziti">可通过如下命令修改MySQL多实例配置文件，增加一行配置：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# head -4 /data/3307/my.cnf
+[client]                            #&lt;==客户端模块标签。
+port            = 3307
+socket          = /data/3307/mysql.sock
+user = root                         #&lt;==为了登录方面，也可以增加用户参数设置。
+Password = oldboy123                #&lt;==为了登录方面，也可以增加用户密码参数设置。
+prompt = \\u@oldboy \\r:\\m:\\s-&gt;   #&lt;==登录后提示。</pre>
+<hr/>
+<p class="ziti">增加密码参数后，请注意配置文件权限。</p>
+<p class="ziti">现在重新登录，仔细看，可以发现增加了一个特殊的指定配置文件的参数：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql --defaults-extra-file=/data/3307/my.cnf -S /data/3307/mysql.sock
+#&lt;==如果要带用户密码参数，则要放在--defaults-extra-file选项后面。
+Warning: Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 3
+Server version: 5.6.40 Source distribution
+...省略若干行...
+root@oldboy 07:53:25-&gt;quit</pre>
+<hr/>
+<p class="p6">2.登录后的显示信息</p>
+<p class="ziti">MySQL 5.6.40登录后的显示信息如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -uroot -poldboy123
+Warning: Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g. #&lt;==mysql命令以分
+                                                      号;或\g结束。
+Your MySQL connection id is 13
+Server version: 5.6.40 Source distribution                #&lt;==版本信息。
+……省略若干行……
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+                                                          #&lt;==帮助提示。
+mysql&gt;</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 很多网友都不注意这些登录信息，其实很多有用的提示内容都包含在登录信息里面。</p>
+</body>
+</html>

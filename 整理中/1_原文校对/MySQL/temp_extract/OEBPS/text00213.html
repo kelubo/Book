@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.1.4　MySQL主从复制原理</h3>
+<p class="ziti">MySQL的主从复制是一个异步的复制过程（虽然一般情况下感觉是实时的），数据将从一个MySQL数据库（我们称之为Master）复制到另一个MySQL数据库（我们称之为Slave），在Master与Slave之间实现整个主从复制的过程是由三个线程参与完成的。其中有两个线程（SQL线程和IO线程）在Slave端，另外一个线程（binlog dump线程）在Master端（MySQL 5及以前是3个线程完成复制，从MySQL 6起SQL线程可以是多个）。</p>
+<p class="ziti">要实现MySQL的主从复制功能，首先必须打开Master端的binlog日志功能。因为整个复制过程实际上就是Slave从Master端获取binlog日志，然后再在Slave上以相同的顺序执行获取的binlog日志中所记录的各种SQL操作，从而实现主从数据一致的功能。</p>
+<p class="ziti">可以通过MySQL的配置文件my.cnf中的mysqld模块（[mysqld]标识后的参数部分）增加“log_bin”参数选项来实现打开MySQL的binlog记录功能，具体信息如下：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+log_bin = /application/mysql/logs/oldboy-bin
+#&lt;==路径/application/mysql/logs/要提前创建，路径非必须，oldboy-bin是binlog日志
+       的前缀。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 有同学因为将log_bin放在了配置文件的结尾（其他模块标识的下面），而不是[mysqld]标识之后，从而导致配置复制不成功。</p>
+</body>
+</html>

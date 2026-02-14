@@ -1,0 +1,15 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.1.1　什么是MySQL多实例</h3>
+<p class="ziti">根据老男孩的经验，简单地说，MySQL多实例就是在一台服务器上同时开启多个不同的服务端口（如3306、3307），同时运行多个MySQL服务进程，这些服务进程通过不同的socket监听不同的服务端口来提供服务。</p>
+<p class="ziti">这些MySQL多实例共用一套MySQL安装程序，使用不同的my.cnf配置文件、启动程序（也可以相同）和数据文件。在提供服务时，多实例MySQL在逻辑上看起来是各自独立的，它们根据配置文件的对应设定值来获得服务器相应数量的硬件资源。</p>
+<p class="ziti">打个比方吧，MySQL多实例就相当于房子的多个卧室，每个实例可以看作是一间卧室，整个服务器就是一套房子，服务器的硬件资源（cpu、mem、disk）、软件资源（CentOS操作系统）可以看作是房子的卫生间、厨房、客厅，是房子的公用资源。若你是北漂的小伙伴，与朋友一起租房，相信对此能有更好地理解，大家蜗居在一起，休息时在自己的卧室，但出来活动肯定是要共用上述公共资源的。图4-1是MySQL多实例形象示意图。</p>
+<div class="pic"><img alt="" src="Image00023.jpg" />
+</div>
+<p class="middle-img">图4-1　MySQL多实例形象示意图</p>
+<p class="ziti">其实很多网络服务都是可以配置多实例的，例如Nginx、Apache、Haproxy、redis、Memcahed等都可以。而且这在门户网站中使用得很广泛，当然，随着虚拟化、云计算的产生和发展，也会通过不同的虚拟机切割资源配置独立的服务，但虚拟化存在一定的缺陷，例如，相比于物理机，其性能会有所下降等。</p>
+</body>
+</html>

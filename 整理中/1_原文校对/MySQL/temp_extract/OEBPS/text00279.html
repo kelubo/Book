@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">18.6.3　配置SSH密钥实现免密码登录</h3>
+<p class="ziti">MHA管理节点在工作时，会通过SSH服务连接到其他节点服务器进行探测或复制数据，因此，在部署MHA方案之前，需要让每套MySQL主从复制集群内的每台机器之间都能做到免密码登录（包括其本身），这个过程相对来说比较简单，步骤如下。</p>
+<p class="ziti">分别在db01、db02、db03上执行如下命令，创建密钥对，并执行复制密钥的命令。</p>
+<hr/>
+<pre class="ziti1">ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa &gt;/dev/null 2&gt;&amp;1  #&lt;==创建密钥对。
+ssh-copy-id -i ~/.ssh/id_dsa.pub 10.0.0.51     #&lt;==复制到不同的机器上，含本身。
+ssh-copy-id -i ~/.ssh/id_dsa.pub 10.0.0.52
+ssh-copy-id -i ~/.ssh/id_dsa.pub 10.0.0.53
+#说明：
+#最终达到的结果就是，每台机器之间都要互相信任，都可以互相免密码登录到任意的其他机器。
+#例：有三台机器db01、db02、db03
+#在db01上执行ssh可以不用输入密码连接到db02、db03（也包括自己）。
+#同样，db02和db03也是一样，可以免密ssh连接到其他两台机器（包括自己）。
+#因为MHA在检测本机的时候，也是通过SSH来进行检测的，必须要做到免密。</pre>
+<hr/>
+<p class="ziti6">
+<span class="yanse">重点强调：</span>
+ 在manager节点安装在MySQL主从复制集群中的一台服务器的前提下，一定要让本机也可以免密ssh登录本机。</p>
+</body>
+</html>

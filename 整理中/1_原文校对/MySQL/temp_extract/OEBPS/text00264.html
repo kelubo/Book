@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.3.7　实践3：主从复制故障时的半同步复制测试</h3>
+<p class="ziti">1）模拟复制故障：先在从库（db02）上创建oldboy10的数据库（create database oldboy10），然后在主库（db01）上再创建oldboy10的同名数据库（create database oldboy10），最后在从库上查看复制状态，如图17-6所示。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ 从库配置文件里不能有“slave-skip-errors=1032，1062，1007，1008，1146，1049”参数行。</p>
+<div class="pic"><img alt="" src="Image00136.jpg" />
+</div>
+<p class="middle-img">图17-6　模拟复制故障</p>
+<p class="ziti">2）此时查看主库的半同步复制状态，发现其依然为ON，如图17-7所示，可见半同步复制和SQL线程没有关系。</p>
+<div class="pic"><img alt="" src="Image00137.jpg" />
+</div>
+<p class="middle-img">图17-7　查看主库的半同步复制状态</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 作者在做这个实验时，出现了一次OFF状态，后来再重试就没有了。</p>
+<p class="ziti">3）处理从库复制故障，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; stop slave;
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; set global sql_slave_skip_counter =1 ;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; start slave;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show slave status\G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+...省略若干...
+             Slave_IO_Running: Yes  #&lt;==确保主从复制是两个Yes。
+            Slave_SQL_Running: Yes
+...省略若干...
+ 1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">4）分别查看主库和从库的半同步复制状态。</p>
+<p class="ziti">主库半同步复制状态依然是ON，如图17-8所示。</p>
+<div class="pic"><img alt="" src="Image00138.jpg" />
+</div>
+<p class="middle-img">图17-8　主库半同步复制状态</p>
+<p class="ziti">从库半同步复制状态业依然是ON，如图17-9所示。</p>
+<div class="pic"><img alt="" src="Image00139.jpg" />
+</div>
+<p class="middle-img">图17-9　从库半同步复制状态</p>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_156">8.2.2　一致性哈希</h3>
+
+  <p class="ziti3">Nginx启用哈希的负载均衡策略，是用hash指令来设置的。哈希策略方法可以针对客户端访问的URL计算哈希值，对相同的URL请求，Nginx可以因相同的哈希值而将其分配到同一后端服务器。当后端服务器为缓存服务器时，将极大提高命中率，提升访问速度。</p>
+
+  <p class="ziti3">一致性哈希的优点是，可以使不同客户端的相似请求发送给同一被代理服务器，当被代理服务器为缓存服务器场景应用时，可以极大提高缓存的命中率。</p>
+
+  <p class="ziti3">一致性哈希的缺点是，当上游服务器组中的节点数量发生变化时，将导致所有绑定被代理服务器的哈希值重新计算，影响整个集群的绑定关系，产生大量回源请求。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">http {
+    upstream backend {
+        hash $request_uri;  # 以客户端请求URI为计算哈希值的key
+        server a weight=5;
+        server b weight=1;
+        server c weight=1;
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://backend;
+        }
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">配置样例中Nginx哈希策略计算过程如下。</p>
+
+  <p class="ziti4">·首先会根据$request_uri计算哈希值。</p>
+
+  <p class="ziti4">·根据哈希值与配置文件中非备份状态服务器的总权重计算出哈希余数。</p>
+
+  <p class="ziti4">·按照轮询策略选出初始被代理服务器，如果哈希余数大于初始被代理服务器的权重，则遍历轮询策略中被代理服务器列表。</p>
+
+  <p class="ziti4">·当遍历轮询策略中被代理服务器列表时，要用哈希余数依次减去轮询策略中的上一个被代理服务器的权重，直到哈希余数小于某个被代理服务器的权重时，该被代理服务器被选出。</p>
+
+  <p class="ziti4">·若循环20次仍无法选出，则使用轮询策略进行选择。</p>
+
+  <p class="ziti3">针对哈希算法的缺点，Nginx提供了consistent参数启用一致性哈希（Consistent Hash）负载均衡策略。Nginx采用的是Ketama一致性哈希算法，使用一致性哈希策略后，当上游服务器组中的服务器数量变化时，只会影响少部分客户端的请求，不会产生大量回源。</p>
+
+  <p class="ziti3">Nginx一致性哈希计算过程如下。</p>
+
+  <p class="ziti3">1）根据配置文件中非备份状态服务器的总权重乘以160计算出总的虚拟节点数量，初始化虚拟节点数组。</p>
+
+  <p class="ziti3">2）遍历轮询策略中的被代理服务器列表，根据每个服务器的权重数乘以160得出该服务器的虚拟节点数量，并根据服务器的HOST和PORT计算出该服务器的基本哈希（base_hash）。</p>
+
+  <p class="ziti3">3）循环每个服务器虚拟节点总数次数，由基本哈希（base_hash）值与上一个虚拟节点的哈希值（PREV_HASH）依次计算出所有属于该服务器的虚拟节点哈希值，并把虚拟节点哈希值与服务器映射关系保存在虚拟节点哈希值数组中。</p>
+
+  <p class="ziti3">4）对虚拟节点哈希值数组进行排序去重处理，得到新的有效虚拟节点哈希值数组。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">http {
+    upstream backend {
+        hash $request_uri consistent;       # 以客户端请求URI为计算哈希值的key，使用一致性
+                                                # 哈希算法
+        server a weight=1;
+        server b weight=1;
+        server c weight=1;
+        server c weight=1;
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://backend;
+        }
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">配置样例中Nginx一致性哈希策略计算过程如下。</p>
+
+  <p class="ziti4">·首先根据$request_uri计算哈希值。</p>
+
+  <p class="ziti4">·通过二分法，快速在虚拟节点列表中选出该哈希值所在范围的最大虚拟节点哈希值。</p>
+
+  <p class="ziti4">·通过虚拟节点哈希值与虚拟节点集合总数取余，获得对应的服务器作为备选服务器。</p>
+
+  <p class="ziti4">·遍历轮询策略中被代理服务器列表，判断备选服务器的有效性，选出服务器。</p>
+
+  <p class="ziti4">·若循环20次仍无法选出，则使用轮询策略进行选择。</p>
+</body>
+</html>

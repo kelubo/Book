@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_24">2.3.3　代码编译</h3>
+
+  <p class="ziti3">代码编译过程如下。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5"># 安装编译依赖
+yum -y install gcc pcre-devel  zlib-devel openssl-devel libxml2-devel \
+    libxslt-devel gd-devel GeoIP-devel yajl-devel jemalloc-devel \
+    libatomic_ops-devel luajit luajit-devel perl-devel perl-ExtUtils-Embed
+
+# 执行编译配置
+./configure 
+
+# 代码编译及安装
+make &amp; make install
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">安装Lua或LuaJIT都可以，LuaJIT是Lua的高效版本，推荐安装LuaJIT。编译完成后，默认安装目录为/usr/local/nginx。</p>
+</body>
+</html>

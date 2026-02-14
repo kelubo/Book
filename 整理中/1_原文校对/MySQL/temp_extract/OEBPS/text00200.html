@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.5.4　InnoDB只读设置</h3>
+<p class="ziti">InnoDB可以通过“——innodb-read-only”参数设置数据表只能读取：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb-read-only=1
+
+mysql&gt; update temp set id2=100;
+ ERROR 1015 (HY000): Can't lock file (errno: 165 - Table is read only)</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.1.2　采用常规方式编译安装MySQL</h3>
+<p class="ziti">采用常规方式编译安装MySQL时，适合使用第一条最正宗的MySQL产品线5.2及以前版本：</p>
+<p class="ziti">所谓常规方式编译安装MySQL就是延续早期MySQL的3部曲安装方式，即“./configure；make；make install”，下面是老男孩在早期的企业生产场景下操作过的具体命令及参数：</p>
+<hr/>
+<pre class="ziti1">tar zxf mysql-5.1.73.tar.gz
+cd mysql-5.1.73
+./configure \
+--prefix=/application/mysql5.1.73 \
+--with-unix-socket-path=/application/mysql5.1.73/tmp/mysql.sock \
+--localstatedir=/application/mysql5.1.73/data \
+--enable-assembler \
+--enable-thread-safe-client \
+--with-mysqld-user=mysql \
+--with-big-tables \
+--without-debug \
+--with-pthread \
+--enable-assembler \
+--with-extra-charsets=complex \
+--with-readline \
+--with-ssl \
+--with-embedded-server \
+--enable-local-infile \
+--with-plugins=partition,innobase \
+--with-mysqld-ldflags=-all-static \
+--with-client-ldflags=-all-static
+make
+make install
+ln -s /application/mysql-5.1.73/ /application/mysql</pre>
+<hr/>
+<p class="ziti">安装到这里，MySQL数据库还不能正常启动使用，还需要进行初始化数据库等工作，具体可以参考后文的安装部分。</p>
+<p class="ziti">此种方式适合所有MySQL 5.2.xx及以前的产品系列，是最常规的编译方式，在当下的互联网企业中，此种编译安装的方法已经很少使用了，原因是第一条产品线的产品（MySQL 5.2.xx及以前的产品系列）用得越来越少了，被第二条产品线（MySQL 5.4.xx及以后的产品系列）的产品逐渐替代了，因此，老男孩也不建议读者再使用第一条产品线的产品作为对外的业务库。</p>
+</body>
+</html>

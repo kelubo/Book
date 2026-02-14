@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.5　重做日志缓存（redo log buffer）</h3>
+<p class="ziti">redo log buffer是一块用来存放写入redo log文件内容的内存区域，内存的大小由innodb_log_buffer_size参数确定。该buffer的内容会定期刷新到磁盘的redo log文件中。</p>
+<p class="ziti">参数innodb_flush_log_at_trx_commit决定了buffer刷新到文件的方式，参数innodb_flush_log_at_timeout决定了buffer刷新的频率。</p>
+<p class="ziti">innodb_flush_log_at_trx_commit的参数取值及说明如下。</p>
+<p class="ziti6">·0：每秒写入并持久化一次（不安全，但性能高，无论是MySQL还是服务器宕机，都会丢数据，丢失最多1秒的数据）。</p>
+<p class="ziti6">·1：每次commit都持久化（安全，但性能低，IO负担重）。</p>
+<p class="ziti6">·2：每次commit都写入内存的缓存中，每秒再刷新到磁盘（安全，性能折中，若中MySQL宕机则数据不会丢失，若是服务器宕机则会丢失最多1秒的数据）。</p>
+<p class="ziti">innodb_flush_log_at_timeout参数决定最多丢失多少秒的数据，默认是1秒。</p>
+<div class="pic"><img alt="" src="Image00096.jpg" />
+</div>
+<p class="middle-img">图13-8　redo log buffer示意图</p>
+<p class="ziti">redo log buffer的示意图如图13-8所示。</p>
+</body>
+</html>

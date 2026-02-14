@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="Ab189011c-4b40-43ef-9e13-87dbf6dcdf1b" class="calibre13">Chapter 16<br class="calibre8"/> 第十六章 树莓派综合应用</h2> 
+ <p class="calibre3">树莓派可以用来开发各种硬件产品，前面介绍了树莓派开发硬件产品的部分内容，本章在此基础上介绍树莓派综合应用——机器人。</p> 
+ <h3 id="A927d51c4-0409-4c55-827e-8c3f1b8991e8" class="calibre14">16.1 概述</h3> 
+ <p class="calibre3">无论是Arduino还是树莓派，这两者目前已经在世界范围内被用于各年龄段的创客教育，树莓派和Arduino都属于创客DIY的两大利器，深受社区创客们的喜爱，广泛使用Arduino和树莓派做小车、无人机、机器人等。</p> 
+ <p class="calibre3">前面介绍利用Arduino可以制作各种功能的机器人，使用树莓派也可以制作机器人，Arduino的功能比较单一，只是为了某种特定意义而设计，而树莓派是有操作系统的PC，功能全且性能强，而且可以实现功能更高级的机器人，例如对视频、语音、人工智能及大数据的处理。</p> 
+ <p class="calibre3">如图16-1所示为机械臂智能小车机器人，如图16-2所示为树莓派机械臂坦克。</p> 
+ <div class="center"> 
+  <img alt="" class="u662" src="../Images/285_01.jpg" width="971" height="595"/> 
+  <p class="imgtitle">图16-1 树莓派机器人</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u663" src="../Images/285_02.jpg" width="631" height="611"/> 
+  <p class="imgtitle">图16-2 树莓派机械臂坦克</p> 
+ </div> 
+ <p class="calibre3">如图16-3所示为树莓派手机Wi-Fi视频遥控智能小车，如图16-4所示为树莓派Wi-Fi智能小车。</p> 
+ <div class="center"> 
+  <img alt="" class="u664" src="../Images/286_01.jpg" width="802" height="648"/> 
+  <p class="imgtitle">图16-3 树莓派手机Wi-Fi视频遥控智能小车</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u665" src="../Images/286_02.jpg" width="547" height="663"/> 
+  <p class="imgtitle">图16-4 树莓派Wi-Fi智能小车</p> 
+ </div> 
+ <p class="calibre3">如图16-5所示为树莓派Wi-Fi视频遥控6自由度机械臂，如图16-6所示为树莓派自动导航避障ROS机器人。</p> 
+ <div class="center"> 
+  <img alt="" class="u666" src="../Images/286_03.jpg" width="839" height="723"/> 
+  <p class="imgtitle">图16-5 树莓派6自由度机械臂</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u667" src="../Images/286_04.jpg" width="565" height="723"/> 
+  <p class="imgtitle">图16-6 树莓派自动导航机器人</p> 
+ </div> 
+ <p class="calibre3">如图16-7所示为树莓派4轴飞行器。</p> 
+ <div class="center"> 
+  <img alt="" class="u668" src="../Images/286_05.jpg" width="1119" height="514"/> 
+  <p class="imgtitle">图16-7 树莓派4轴飞行器</p> 
+ </div> 
+ <p class="calibre3">如图16-8所示为树莓派智能语音助手。</p> 
+ <div class="center"> 
+  <img alt="" class="u669" src="../Images/287_01.jpg" width="951" height="740"/> 
+  <p class="imgtitle">图16-8 树莓派智能语音助手</p> 
+ </div> 
+ <h3 id="A3b1a69b5-e4f9-4b80-ae63-54155b9569e7" class="calibre14">16.2 结构设计分析</h3> 
+ <p class="calibre3">一个机器人包括硬件系统和软件系统，硬件组成部分包括执行机构、传感装置、控制系统、通信系统等；软件系统包括操作系统、应用部分或者控制程序。在树莓派实现设计的机器人的过程中，通过树莓派的GPIO去控制和感知设备，可以使用Python实现应用程序。</p> 
+ <h4 class="sigil_not_in_toc" id="Aa8c5011e-5b36-4429-a81d-62d815f6733d">16.2.1 总体设计</h4> 
+ <p class="calibre3">机器人的总体设计包括硬件系统的总体设计和软件系统的总体设计，具体包括：系统分析、核心控制器的选择、运动部分电机的选择、运动方式的确定、传感检测方式、通信方式选择、软件设计等。如图16-9所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u670" src="../Images/287_02.jpg" width="1220" height="731"/> 
+  <p class="imgtitle">图16-9 机器人的总体设计</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">1．系统分析</b></p> 
+ <p class="calibre3">明确机器人实现的功能，根据机器人的使用场合，明确采用机器人的目的和任务，分析机器人所在系统的工作环境，认真分析系统的工作要求，确定机器人的基本功能和方案，收集国内外的有关技术资料，进行分析。</p> 
+ <p class="calibre3"><b class="calibre6">2．核心控制器的选择</b></p> 
+ <p class="calibre3">首先计算机器人控制、检测、通信等使用的资源的速度，根据这些要求选择控制器。例如，树莓派3代B型拥有40引脚的GPIO数量，而Arduino UNO有14个数字输入/输出引脚和6个模拟输入引脚，共20个I/O数量；树莓派本身携带Wi-Fi、蓝牙、有线网口，有操作系统，可以方便地处理音视频，而Arduino UNO没有操作系统，只能运行一个控制程序。如果是语音机器人，那么树莓派是可以方便实现的，Arduino系列则不能实现。</p> 
+ <p class="calibre3"><b class="calibre6">3．机器人运动形式的选择</b></p> 
+ <p class="calibre3">机器人常用的电机有伺服电机（舵机）、直流减速电机、步进电机等。例如，要实现飞行器，那么就要选择直流减速电机；要实现机械臂的运动，就要选择伺服电机；要实现人形机器人的运动，就要选择伺服电机；要实现小车行走机器人，要选择直流减速电机，要实现定位和计数功能，要选择步进电机。根据控制功能选择扩展板。</p> 
+ <p class="calibre3">另外，目前树莓派有各种类型功能的扩展板，可以选择使用扩展板简化电路搭建过程，更快速地搭建出要求的项目。</p> 
+ <p class="calibre3"><b class="calibre6">4．传感检测的选择</b></p> 
+ <p class="calibre3">传感器种类是非常多的，根据功能选择需要的传感器，可以通过树莓派的GPIO接口或者扩展板将这些传感器接入到树莓派中，而且可以用Python的库控制它们。</p> 
+ <p class="calibre3">常用的机器人传感器有超声波传感器、红外传感器、温湿度传感器、3轴传感器、3D手势姿态传感器、定位传感器及音视频传感器等。</p> 
+ <p class="calibre3">例如，要实现无人机，平衡功能是非常关键的，所以在无人机上加了一个陀螺仪。陀螺仪在很多领域都有应用，如果4个叶片转动速度一样，而且只有在整个无人机不发生倾斜的情况下，无人机才能保持平衡。</p> 
+ <p class="calibre3"><b class="calibre6">5．通信方式选择</b></p> 
+ <p class="calibre3">根据机器人的通信功能要求首先确定是有线还是无线方式，目前常用的有Wi-Fi、蓝牙、Zigbee、DigiMesh等，树莓派都有很好的支持。例如，无人机机器人通信可以选择DigiMesh远距离通信方式。</p> 
+ <p class="calibre3"><b class="calibre6">6．软件系统设计</b></p> 
+ <p class="calibre3">根据机器人的功能和硬件部分的选项确定软件总体结构。然后根据分部分的功能实现软件模块，例如根据控制方式实现控制软件设计、电机驱动软件设计，根据传感检测功能实现传感器的控制和采集，根据通信方式实现数据传输。</p> 
+ <p class="calibre3"><b class="calibre6">7．成本重量及其他要求</b></p> 
+ <p class="calibre3">根据机器人的使用要求和环境，还需要计算机器人的开发成本，控制机器人的重量，选择供电电池等其他要求。</p> 
+ <h4 class="sigil_not_in_toc" id="A9dc7011f-e345-4d4e-9eee-2240173f0ebf">16.2.2 通信方式</h4> 
+ <p class="calibre3">通信方式指移动终端、计算机和树莓派之间的通信方式，由于树莓派直接支持Wi-Fi、蓝牙无线及网络有线，所以要实现它们之间的通信可以根据不同的要求进行选择，主要有4种通信方式。</p> 
+ <p class="calibre3">（1）移动终端、计算机和树莓派通过路由器通信，移动终端、计算机和树莓派通过Wi-Fi连接到路由器，通过路由器进行通信，如图16-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u671" src="../Images/289_01.jpg" width="995" height="788"/> 
+  <p class="imgtitle">图16-10 移动终端、计算机和树莓派通过路由器通信</p> 
+ </div> 
+ <p class="calibre3">（2）树莓派设置Wi-Fi热点，移动终端、计算机和树莓派直接通过Wi-Fi通信，如图16-11所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u672" src="../Images/289_02.jpg" width="1239" height="748"/> 
+  <p class="imgtitle">图16-11 Wi-Fi热点通信</p> 
+ </div> 
+ <p class="calibre3">（3）移动终端、计算机和树莓派通过蓝牙通信，如图16-12所示。</p> 
+ <p class="calibre3">（4）移动终端、计算机和树莓派通过有线通信，移动终端、计算机和树莓派通过有线连接到路由器，通过路由器进行通信，如图16-13所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u673" src="../Images/290_01.jpg" width="1220" height="736"/> 
+  <p class="imgtitle">图16-12 蓝牙通信</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u674" src="../Images/290_02.jpg" width="1053" height="737"/> 
+  <p class="imgtitle">图16-13 有线通信</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A384f0121-bce6-422c-99e3-4998584099a7">16.2.3 控制方式</h4> 
+ <p class="calibre3">移动终端和计算机终端对树莓派的远程控制可以用以下几种方式：</p> 
+ <p class="calibre3">（1）计算机上位机控制。</p> 
+ <p class="calibre3">通过专用的计算机上位机控制软件控制机器人，将计算机上位机和机器人通过有线和无线网络连接，运行上位机控制软件，即可操作机器人，如图16-14所示是操作机械臂机器人的上位机软件。</p> 
+ <p class="calibre3">（2）移动终端APP控制。</p> 
+ <p class="calibre3">目前，机器人通过移动终端控制已经成为机器人的必要组成，如图16-15所示为视频云智能扫地机器人的移动终端APP控制。</p> 
+ <p class="calibre3">（3）VNC远程控制。</p> 
+ <div class="center"> 
+  <img alt="" class="u675" src="../Images/291_01.jpg" width="1201" height="720"/> 
+  <p class="imgtitle">图16-14 计算机上位机控制</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u676" src="../Images/291_02.jpg" width="1280" height="643"/> 
+  <p class="imgtitle">图16-15 扫地机器人移动终端APP控制</p> 
+ </div> 
+ <p class="calibre3">VNC Viewer是基于UNIX和Linux操作系统的免费的开源软件，远程控制能力强大，高效实用，其性能可以和Windows和Mac中的任何远程控制软件媲美。如图16-16所示为VNC远程登录树莓派。</p> 
+ <div class="center"> 
+  <img alt="" class="u677" src="../Images/291_03.jpg" width="894" height="624"/> 
+  <p class="imgtitle">图16-16 VNC远程登录树莓派</p> 
+ </div> 
+ <p class="calibre3">（4）专用机器人遥控器。</p> 
+ <p class="calibre3">根据机器人的功能和环境及使用要求，在某些情况下，需要使用专用的遥控器。如图16-17所示为无人机遥控器。</p> 
+ <div class="center"> 
+  <img alt="" class="u678" src="../Images/292_01.jpg" width="1280" height="611"/> 
+  <p class="imgtitle">图16-17 无人机遥控器</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A3bc60123-5c9b-4b76-80a2-c868ed1f4fd7">16.2.4 树莓派扩展板</h4> 
+ <p class="calibre3">为了能够更迅速地搭建出树莓派的项目，可以选择使用扩展板简化电路搭建过程，目前市场上有各种类型和功能的树莓派扩展板，供用户选用。</p> 
+ <p class="calibre3">如图16-18所示是树莓派3机器人的扩展板，能够同时支持多路电机/步进电机/舵机（Stepper/Motor/Servo），并且可以多板层叠使用，扩展出更多的控制接口，特别适合DIY机器人、智能小车、机械手臂、智能云台等各种应用。</p> 
+ <div class="center"> 
+  <img alt="" class="u679" src="../Images/292_02.jpg" width="1280" height="520"/> 
+  <p class="imgtitle">图16-18 树莓派3机器人扩展板</p> 
+ </div> 
+ <p class="calibre3">扩展板接口说明：</p> 
+ <p class="calibre3">（1）4路舵机接口（#0、#1、#14、#15）。</p> 
+ <p class="calibre3">（2）4路直流电机接口（M1、M2、M3、M4）。</p> 
+ <p class="calibre3">（3）2路步进电机接口（M1+M2、M3+M4）。</p> 
+ <p class="calibre3">（4）I<sup class="calibre9">2</sup>C接口。一路I<sup class="calibre9">2</sup>C接口，兼容5V电平，可接Arduino或者其他开发板控制；一路I<sup class="calibre9">2</sup>C接口，可接各种传感器，扩展各种应用。</p> 
+ <p class="calibre3">（5）支持红外接收功能，方便红外控制。</p> 
+ <p class="calibre3">如图16-19所示也是树莓派3机器人的扩展板，能够同时支持多种电机，以及各种常用传感器，还支持外接蓝牙，适合DIY机器人、智能小车、机械手臂、智能云台等各种应用。</p> 
+ <div class="center"> 
+  <img alt="" class="u680" src="../Images/293_01.jpg" width="1280" height="1164"/> 
+  <p class="imgtitle">图16-19 树莓派3机器人扩展板</p> 
+ </div> 
+ <p class="calibre3">如图16-20所示是树莓派3高精度ADS1256 AD/DA数模/模数转换扩展板，可用于多种模拟量传感器的采集。</p> 
+ <p class="calibre3">如图16-21所示为树莓派3代B型传感器扩展板，支持树莓派通过XBee通信模块与其他支持XBee通信的模块进行无线数据传输，板载USB转串口、RTC和ADC等常用资源；支持Arduino控制板接入，支持多种类型的传感器接入。</p> 
+ <p class="calibre3">此扩展板的特点如下：</p> 
+ <p class="calibre3">（1）兼容Arduino UNO、Leonardo，方便接入各种兼容Arduino扩展板。</p> 
+ <div class="center"> 
+  <img alt="" class="u681" src="../Images/294_01.jpg" width="1280" height="553"/> 
+  <p class="imgtitle">图16-20 高精度ADS1256 AD/DA数模/模数转换树莓派扩展板</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u682" src="../Images/294_02.jpg" width="886" height="781"/> 
+  <p class="imgtitle">图16-21 树莓派3代B型传感器扩展板</p> 
+ </div> 
+ <p class="calibre3">（2）板载XBee接口，方便接入各种XBee模块。</p> 
+ <p class="calibre3">（3）板载USB TO UART，方便进行串口调试，亦可配置为XBee USB适配器。</p> 
+ <p class="calibre3">（4）板载传感器接口，方便接入各种传感器。</p> 
+ <p class="calibre3">（5）板载ADC，10位，38KSPS，11通道（6通道用于兼容Arduino接口，5通道用于接入传感器）。</p> 
+ <p class="calibre3">（6）板载RTC，这是常用的功能之一。</p> 
+ <h3 id="A461a62cf-2a0e-4c41-a0e6-bcb96175998b" class="calibre14">16.3 实现过程</h3> 
+ <p class="calibre3">树莓派可以实现各种功能的机器人，下面介绍一些典型子系统部分的实现。</p> 
+ <h4 class="sigil_not_in_toc" id="A23d90125-5c2f-42c4-b98a-31cef79eebcf">16.3.1 小车机器人行走控制</h4> 
+ <p class="calibre3">小车机器人行走控制包括前进、后退、左转、右转、停止等，小车机器人左轮的两个直流减速电机和右轮的两个直流减速电机分别同步控制。下面是Python代码，将文件命令为Vehicle_move.py：</p> 
+ <div class="center">
+  <img alt="" class="u683" src="../Images/295_01.jpg" width="1280" height="1749"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u684" src="../Images/296_01.jpg" width="1280" height="948"/>
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A682d0127-451f-4c6e-a699-08fec8e1b12b">16.3.2 机械臂控制</h4> 
+ <p class="calibre3">机械臂的控制一般由若干个舵机来控制配合实现，如图16-22所示的机械臂包括4个舵机，分别是底座、上臂、下臂和手抓。</p> 
+ <div class="center"> 
+  <img alt="" class="u685" src="../Images/296_02.jpg" width="1059" height="655"/> 
+  <p class="imgtitle">图16-22 机械臂机器人</p> 
+ </div> 
+ <p class="calibre3">舵机的控制是通过树莓派输出PWM信号控制的，而树莓派能够直接输出PWM信号的引脚只有4个，如表16-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表16-1 树莓派的PWM信号引脚</p>
+  <img alt="" class="u221" src="../Images/297_01.jpg" width="1280" height="229"/>
+ </div> 
+ <p class="calibre3">另外，树莓派（GPIO1、GPIO26）、（GPIO23、GPIO24）是绑定在一起的，调节任意一个，另外一个也会发生变化。也就是说，PWM0、PWM1虽然输出了两路，但可以理解成两路其实都是连在一个输出口上，这样，树莓派可以直接输出两路PWM信号。</p> 
+ <p class="calibre3">图16-22的机械臂包括4个舵机，而树莓派可以直接输出两路PWM信号，且机械臂机器人的左右行走轮直流减速电机也需要两路PWM信号，这样树莓派的PWM引脚就用完了。所以控制机械臂舵机的信号通过I<sup class="calibre9">2</sup>C总线连接PCA685模块来实现，如图16-23所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u686" src="../Images/297_02.jpg" width="1280" height="673"/> 
+  <p class="imgtitle">图16-23 机械臂4个舵机和树莓派的连接</p> 
+ </div> 
+ <p class="calibre3">PCA9685模块可产生16路12位PWM信号，可用于控制舵机、LED、电机等设备，I<sup class="calibre9">2</sup>C通信可以多个模块级联，周期和占空比都可控，节省主机资源。</p> 
+ <p class="calibre3">此模块16路通道的四种工作模式：关、开、PWM、可变PWM，精度是12位。有6个地址控制引脚：A5～A0，通过焊接这些引脚可以设置此模块的I<sup class="calibre9">2</sup>C地址，如果不做任何焊接，默认地址是0x40。另外，用i2cdetect命令检测出还有一个0x70地址一直存在，这是一个通用地址，可以给所有从机下达指令。模块有一个OE反使能脚，这个引脚低电平使能，不接的话模块内部默认已经接地使能了，所以正常使用可以不接。如图16-24所示。</p> 
+ <p class="calibre3">使用方法如下：</p> 
+ <p class="calibre3">（1）确定I<sup class="calibre9">2</sup>C地址。如果焊接A5～A0，确定模块的I<sup class="calibre9">2</sup>C地址，默认地址是0x40。</p> 
+ <p class="calibre3">（2）连接电路电源。</p> 
+ <div class="center"> 
+  <img alt="" class="u687" src="../Images/298_01.jpg" width="1280" height="576"/> 
+  <p class="imgtitle">图16-24 PCA9685模块</p> 
+ </div> 
+ <p class="calibre3">（3）和主控制板连接两根I<sup class="calibre9">2</sup>C线。</p> 
+ <p class="calibre3">（4）连接电源V+引脚，给舵机供电电源。</p> 
+ <p class="calibre3">（5）把驱动合入到工程，即可使用。</p> 
+ <p class="calibre3">在树莓派使用I<sup class="calibre9">2</sup>C总线，需要安装I<sup class="calibre9">2</sup>C工具，安装命令为：sudo apt-get install i2c-tools，如图16-25所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u688" src="../Images/298_02.jpg" width="1280" height="391"/> 
+  <p class="imgtitle">图16-25 树莓派安装I<sup class="calibre16">2</sup>C工具</p> 
+ </div> 
+ <p class="calibre3">运行i2cdetect-y 0或者i2cdetect-y 1（B板），运行效果如图16-26所示，找到两个地址：0x40和0x70。</p> 
+ <div class="center"> 
+  <img alt="" class="u689" src="../Images/298_03.jpg" width="1280" height="447"/> 
+  <p class="imgtitle">图16-26 探测I<sup class="calibre16">2</sup>C地址</p> 
+ </div> 
+ <p class="calibre3">PCA9685模块可以控制16个舵机，共16个通道，每个通道都有4个寄存器：LEDX_ON_L、LEDX_ON_H、LEDX_OFF_L、LEDX_OFF_H，用于控制各个通道的舵机。</p> 
+ <p class="calibre3">例如，控制机器人机械臂的手抓舵机的Python示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u690" src="../Images/299_01.jpg" width="1280" height="1725"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u691" src="../Images/300_01.jpg" width="1280" height="159"/>
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A2aab012b-7381-4e2f-a62c-9993dc7f3dbc">16.3.3 树莓派蓝牙通信</h4> 
+ <p class="calibre3">树莓派与上位机可以通过蓝牙通信，树莓派本身携带蓝牙无线，使用比较复杂，下面介绍一种简便的方法，使用蓝牙模块实现树莓派和上位机的通信，如图16-27所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u692" src="../Images/300_02.jpg" width="1280" height="388"/> 
+  <p class="imgtitle">图16-27 使用蓝牙模块实现树莓派和上位机的通信</p> 
+ </div> 
+ <p class="calibre3">要在树莓派使用蓝牙模块，先在蓝牙模块通过串口与树莓派完成连接，在树莓派使用工具minicom进行配置，安装命令为：sudo apt-get install minicom；启动minicom的命令为：sudo minicom-b 9600-o-D /dev/ttyAMA0，如图16-28所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u693" src="../Images/300_03.jpg" width="1280" height="459"/> 
+  <p class="imgtitle">图16-28 安装启动minicom</p> 
+ </div> 
+ <p class="calibre3">Python若使用串口，安装命令为：sudo apt-get install python-serial，如图16-29所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u694" src="../Images/300_04.jpg" width="1280" height="452"/> 
+  <p class="imgtitle">图16-29 安装Python串口</p> 
+ </div> 
+ <p class="calibre3">例如，树莓派通过蓝牙接收命令小车机器人行走的Python示例代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u695" src="../Images/301_01.jpg" width="1280" height="706"/>
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A8525012c-a282-466c-8f7a-1b9a43d1458f">16.3.4 树莓派Wi-Fi热点设置</h4> 
+ <p class="calibre3">为了便于远程使用树莓派，可以将树莓派设置为Wi-Fi热点，下面介绍一种简便的配置方法。</p> 
+ <p class="calibre3">create_ap是GitHub上的一个开源项目，网址：https：//github.com/oblique/create_ap，首先将代码下载到本地，然后安装，命令如下（如图16-30所示）：</p> 
+ <div class="center">
+  <img alt="" class="u182" src="../Images/301_02.jpg" width="1280" height="128"/>
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u696" src="../Images/301_03.jpg" width="1280" height="587"/> 
+  <p class="imgtitle">图16-30 下载安装create ap</p> 
+ </div> 
+ <p class="calibre3">然后安装依赖库，安装命令如下（如图16-31所示）：</p> 
+ <div class="center">
+  <img alt="" class="u697" src="../Images/301_04.jpg" width="1280" height="45"/>
+ </div> 
+ <p class="calibre3">创建Wi-Fi热点。</p> 
+ <div class="center"> 
+  <img alt="" class="u698" src="../Images/302_01.jpg" width="1280" height="565"/> 
+  <p class="imgtitle">图16-31 安装依赖库</p> 
+ </div> 
+ <p class="calibre3">将下述命令添加到/etc/rc.local文件：</p> 
+ <div class="center">
+  <img alt="" class="u699" src="../Images/302_02.jpg" width="1280" height="87"/>
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Ac5c5012d-9fc2-4356-ae96-316236a02c23">16.3.5VNC Server设置</h4> 
+ <p class="calibre3">早期官方系统没有自带VNC，目前最新版的官方系统已经自带VNC Server，只需要在设置里启用一下，就可以使用，步骤如下：</p> 
+ <p class="calibre3">（1）在树莓派的终端输入命令：sudo raspi-config，在弹出的窗口中选择“Interfacing Options”选项，如图16-32所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u700" src="../Images/302_03.jpg" width="1280" height="772"/> 
+  <p class="imgtitle">图16-32 接口菜单</p> 
+ </div> 
+ <p class="calibre3">（2）按【Enter】键，出现如图16-33所示的窗口，选择其中的“VNC”选项。</p> 
+ <p class="calibre3">（3）按【Enter】键，出现如图16-34所示的窗口，单击“是”按钮，然后会安装需要的软件，安装完成后，VNC服务器就可以使用了。</p> 
+ <div class="center"> 
+  <img alt="" class="u701" src="../Images/303_01.jpg" width="1059" height="681"/> 
+  <p class="imgtitle">图16-33 选择“VNC”选项</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u702" src="../Images/303_02.jpg" width="1061" height="695"/> 
+  <p class="imgtitle">图16-34 单击“是”按钮</p> 
+ </div> 
+ <p class="calibre3">（4）在树莓派的主菜单中选择“首选项”＞“Raspberry Pi Configration”命令，就可以看到VNC是Enable，如图16-35所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u703" src="../Images/303_03.jpg" width="1280" height="634"/> 
+  <p class="imgtitle">图16-35 选择“首选项”＞“Raspberry Pi Configration”命令</p> 
+ </div> 
+ <p class="calibre3">（5）重新启动树莓派，在上部就可以看到VNC Server的工具图标，如图16-36所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u704" src="../Images/304_01.jpg" width="1220" height="745"/> 
+  <p class="imgtitle">图16-36 显示VNC Server工具图标</p> 
+ </div> 
+ <p class="calibre3">（6）在远程桌面就可以使用VNC Viewer启动树莓派，如图16-37所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u705" src="../Images/304_02.jpg" width="1280" height="450"/> 
+  <p class="imgtitle">图16-37 VNC Viewer远程登录树莓派</p> 
+ </div> 
+ <h3 id="A280f6897-1095-4abe-906b-da575cc7a3c3" class="calibre14">16.4 树莓派典型应用：叮当机器人</h3> 
+ <p class="calibre3">叮当是一款可以工作在Raspberry Pi上的开源中文语音对话机器人/智能音箱项目，目的是让中国的Hacker们也能快速打造类似的个性化智能音箱。主页网址为：http://ding-dang.hahack.com/，如图16-38所示。</p> 
+ <p class="calibre3">由于叮当是完全开源的，因此，用户编写插件来满足自己的个性化需求就成了使用叮当的最大乐趣。大家可以自由地接入自己需要的服务，让叮当更好地为自己服务。</p> 
+ <p class="calibre3">叮当的特性如图16-39所示。</p> 
+ <p class="calibre3">下面是一些叮当功能的视频/音频演示。</p> 
+ <p class="calibre3">（1）首页Demo：http://dwz.cn/6ytjKl。</p> 
+ <p class="calibre3">（2）询问时间和未读邮件：http://t.cn/R0JMmuX。</p> 
+ <div class="center"> 
+  <img alt="" class="u706" src="../Images/305_01.jpg" width="1241" height="1014"/> 
+  <p class="imgtitle">图16-38 叮当主页界面</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u707" src="../Images/305_02.jpg" width="1261" height="854"/> 
+  <p class="imgtitle">图16-39 叮当的特性</p> 
+ </div> 
+ <p class="calibre3">（3）接入图灵：http://t.cn/R0JMFr9。</p> 
+ <p class="calibre3">（4）闲聊模式：http://www.miaopai.com/show/t9zVp9rjrOodt～iOxNGzZM1p3cwsT-mNrU-hKeg_.html。</p> 
+ <p class="calibre3">（5）多轮对话：http://t.cn/R0Ja80V。</p> 
+ <p class="calibre3">（6）长内容自动发微信：http://t.cn/R0JMFr9。</p> 
+ <p class="calibre3">（7）音乐播放：http://onmw7y6f4.bkt.clouddn.com/%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90.mp3。</p> 
+ <p class="calibre3">（8）倒计时拍照：http://t.cn/R0JX1cw。</p> 
+ <p class="calibre3">（9）使用微信控制机器人：http://t.cn/R0JaMvr。</p> 
+ <p class="calibre3">（10）控制小米电风扇：http://t.cn/RK05OV8。</p> 
+ <p class="calibre3">（11）语音开关灯：http://t.cn/R0JavLK。</p> 
+ <p class="calibre3">（12）语音开电视：http://t.cn/R0Jazp1。</p> 
+ <p class="calibre3">（13）魔镜：叮当结合魔镜的炫酷展示：http://t.cn/R0Ja27S。</p> 
+ <p class="calibre3">（14）接入微软小冰：http://t.cn/R0JabOV。</p> 
+ <h3 id="A53ec864b-68f7-4d07-a90b-cce09a09ee9c" class="calibre14">16.5 本章小结</h3> 
+ <p class="calibre3">本章通过典型实例介绍了树莓派的综合应用，对此实例的结构设计涉及的各方面的设计方法进行了详细的说明，详细说明了其中典型部分的实现过程。</p> 
+</body>
+</html>

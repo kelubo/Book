@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_135">7.1.1　客户端缓存</h3> 
+ <p class="ziti3">当客户端访问某一网站时，通常会多次访问同一页面，如果每次都到网站服务器获取相同的内容，不仅会造成用户自身网络资源的浪费，也会加重网站服务器的负载。为了提高访问效率，客户端浏览器会将访问的内容在本地生成内容缓存。由于网站的内容经常变化，为了保持缓存的内容与网站服务器的内容一致，客户端会通过内容缓存的有效期及Web服务器提供的访问请求校验机制，快速判断请求的内容是否已经更新。客户端缓存校验流程如图7-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/7-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/7-2.jpg" class="calibre250"/></a> 
+ </div> 
+ <p class="middle-img">图7-2　客户端缓存校验</p> 
+ <p class="ziti3">客户端通过内容缓存有效期的本地校验和由Web服务端提供的服务端校验两种方式共同校验内容缓存是否有效，这两种方式都是通过HTTP消息头中的相应字段进行判断或与服务端交互的。HTTP消息头字段功能说明如表7-1所示。</p> 
+ <p class="middle-img">表7-1　缓存相关HTTP消息头</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-1.jpg" class="calibre251"/></a> 
+ </div> 
+ <p class="ziti3">1）消息头字段Cache-Control由客户端发起缓存控制的相关字段值如表7-2所示。</p> 
+ <p class="middle-img">表7-2　客户端发起Cache-Control的字段值</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-2.jpg" class="calibre252"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/209-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/209-i.jpg" class="calibre76"/></a> 
+ </div> 
+ <p class="ziti4">·当按下F5或者点击刷新时，客户端浏览器会添加请求消息头字段Cache-Control：max-age=0，该请求不进行内容缓存的本地验证，会直接向Web服务端发起请求，服务端将根据消息头字段进行服务端验证。</p> 
+ <p class="ziti4">·当按下Ctrl+F5时，客户端浏览器会添加请求消息头字段Cache-Control：no-cache和Pragma:no-cache，并忽略所有服务端验证的消息头字段，该请求不进行内容缓存的本地验证，它会直接向Web服务端发起请求，因没有服务端验证的消息头字段，所以会直接返回请求内容。</p> 
+ <p class="ziti3">2）消息头字段Cache-Control由服务端发起缓存控制的相关字段值如表7-3所示。</p> 
+ <p class="middle-img">表7-3　服务端发起Cache-Control的字段值</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-3.jpg" class="calibre253"/></a> 
+ </div> 
+ <p class="ziti3">3）Last-Modified与if-modified-since属于HTTP/1.0，是用于服务端对响应数据修改时间进行校验的服务端校验方法。Last-Modified的值是由服务端生成后传递给客户端的，客户端发送请求时，它会将本地内容缓存中的Last-Modified的值由请求消息头的if-modified-since字段传递给服务端，如果服务端被请求的内容在if-modified-since字段值的时间之后被修改了，将返回被修改的内容，否则返回响应状态码304，客户端将使用本地缓存。</p> 
+ <p class="ziti3">4）ETag与If-None-Match属于HTTP/1.1，优先级高于Last-Modified的验证，是用于服务端对响应数据进行实体标签校验的服务端校验方法。ETag类似于身份指纹，是一个可以与Web资源关联的记号（token）。当客户端第一次发起请求时，ETag的值在响应消息头中传递给客户端；当客户端再次发送请求时，如果验证本地内容缓存需要发起服务端验证，Etag的值将由请求消息头的If-None-Match字段传递给服务端。如果验证本地内容缓存与服务端的ETag的匹配不一致，则认为请求的内容已经更新，服务端将返回新的内容，否则返回响应状态码304，客户端将使用本地缓存。</p> 
+ <p class="ziti3">5）客户端会通过HTTP消息头字段对本地内容缓存进行本地校验和服务端校验，内容缓存校验的流程如图7-3所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/7-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/7-3.jpg" class="calibre254"/></a> 
+ </div> 
+ <p class="middle-img">图7-3　客户端内容缓存校验流程图</p> 
+</body>
+</html>

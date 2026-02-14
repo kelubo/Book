@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_242">13.2.4　微服务网关应用</h3> 
+ <p class="ziti3">作为一款微服务网关应用，Kong通过插件功能实现了微服务网关的多种功能，此处分别以访问认证、请求终止、数据整形为例，为了方便读者理解和应用，此处均使用管理接口直接操作，功能参数仍以Konga页面显示的名称进行说明。</p> 
+ <p class="ziti3">（1）访问认证</p> 
+ <p class="ziti3">Kong提供了基本认证、密钥认证、OAuth2认证、HMAC认证、JWT认证、LDAP认证等多种方式的认证插件，此处列举常见的密钥认证方式配置。密钥认证插件参数说明如表13-5所示。</p> 
+ <p class="middle-img">表13-5　密钥认证插件参数说明</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b13-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b13-5.jpg" class="calibre390"/></a> 
+ </div> 
+ <p class="ziti3">接口认证是服务开发中常见的功能，Kong插件的认证功能可以让开发工程师不必单独开发此功能，仅需选择使用Kong的认证机制或通过认证转发使用内部的认证服务器，让所有的接口服务很容易地实现统一认证的功能。在下面的配置样例中，在Konga中按照参数配置添加密钥认证插件，认证密钥名称为apikey。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建服务
+curl -i -X POST \
+--url http://10.10.4.8:8001/services/ \
+--data 'name=baidu' \
+--data 'url=https://www.baidu.com'
+
+# 创建路由
+curl -i -X POST \
+--url http://10.10.4.8:8001/services/baidu/routes \
+--data 'name=baidu' \
+--data 'paths[]=/v1/baidu'
+
+# 访问测试，确认路由规则
+curl -i -X GET \
+    --url http://10.10.4.8:8000/v1/baidu
+
+# 关联插件到路由对象实例baidu
+curl -i -X POST \
+    --url http://10.10.4.8:8001/routes/baidu/plugins \
+    --data "name=key-auth" \
+    --data "config.key_names=apikey" \
+
+# 创建消费者
+curl -d "username=test123" http://10.10.4.8:8001/consumers/
+
+# 创建消费者密钥
+curl -X POST http://10.10.4.8:8001/consumers/test123/key-auth -d ''
+
+# 查看并获得密钥
+curl http://10.10.4.8:8001/consumers/test123/key-auth
+
+# 消费者使用密钥访问
+curl -i -X GET \
+    --url http://10.10.4.8:8000 \
+    --header "apikey: xKgpAM6qBQE3e8nrR51dIrK89ggRdelf"
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）请求终止</p> 
+ <p class="ziti3">请求终止（request-termination）插件原设计场景是进行请求熔断等安全管理，但其同样适用于做依赖该接口的测试桩场景，通过Kong的请求终止插件可以非常快速地实现该功能，而且不需要做任何代码改动，测试桩的创建和撤销也非常简单。插件参数说明如表13-6所示。</p> 
+ <p class="middle-img">表13-6　请求终止插件参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b13-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b13-6.jpg" class="calibre137"/></a> 
+ </div> 
+ <p class="ziti3">下面是一个测试桩的样例，该插件可以对当前接口的请求返回固定格式的JSON数据，该场景可以满足不同团队合作时在真实业务API代码开发完毕前，让合作方、前端及测试人员进行代码升级或测试。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建服务
+curl -i -X POST \
+--url http://10.10.4.8:8001/services/ \
+--data 'name=baidu' \
+--data 'url=https://www.baidu.com'
+
+# 创建路由
+curl -i -X POST \
+--url http://10.10.4.8:8001/services/baidu/routes \
+--data 'name=baidu2' \
+--data 'paths[]=/v2/baidu'
+
+# 访问测试，确认路由规则
+curl -i -X GET \
+    --url http://10.10.4.8:8000/v2/baidu
+
+# 关联插件到路由对象实例baidu
+curl -i -X POST \
+    --url http://10.10.4.8:8001/routes/baidu2/plugins \
+    --data "name=request-termination" \
+    --data "config.status_code=200" \
+    --data "config.content_type=application/json; charset=utf-8" \
+    --data "config.body={\"status\": 200, \"data\": {\"status_code\": 403, \"message\": \"测试数据\"}, \"message\": \"专业测试桩\"}"
+
+# 测试结果
+curl -i -X GET \
+    --url http://10.10.4.8:8000/v2/baidu
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）数据整形</p> 
+ <p class="ziti3">通常一套服务提供的JSON格式数据是固定的，但在多个团队的开发合作中，可能需要对接口数据返回格式有不同的需求，以往大家都希望用一个统一的标准进行规范化的JSON数据格式输出，但执行起来则会遇到诸多现实问题。通过Kong的插件可以让使用方和供给方不必再为这种标准而纠结，开发人员不需要修改代码，仅需要简单进行Lua脚本编写就可以实现现有服务的供给或使用需求，这里使用Kong的第三方插件API转换（API Transformer）插件做样例在中间进行数据整形，大家也可以根据实际需求定制自己的Kong插件。API转换插件功能参数如表13-7所示。</p> 
+ <p class="middle-img">表13-7　API转换插件参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b13-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b13-7.jpg" class="calibre391"/></a> 
+ </div> 
+ <p class="ziti3">此处演示将管理接口返回的JSON数据格式修改为前端jQuery插件DataTables的数据格式。因API转换插件的request_transformer参数为必选项，即便不需要请求阶段数据整形，也要为此参数指定文件，如下样例中将创建一个返回空数据的req.lua文件。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 安装插件
+git clone https://github.com/qnap-dev/kong-plugin-api-transformer.git
+cd kong-plugin-api-transformer
+luarocks make
+
+# 启用插件，需要重启Kong才可生效
+sed -i "/\"session\",/a\  \"api-transformer\"" /usr/local/share/lua/5.1/kong/constants.lua
+
+# 创建服务，代理目标为管理接口
+curl -i -X POST \
+--url http://10.10.4.8:8001/services/ \
+--data 'name=adminapi' \
+--data 'url=http://10.10.4.8:8001'
+
+# 创建路由
+curl -i -X POST \
+--url http://10.10.4.8:8001/services/adminapi/routes \
+--data 'name=adminapi' \
+--data 'paths[]=/adminapi'
+
+# 访问测试，确认路由策略
+curl -i -X GET \
+    --url http://10.10.4.8:8000/adminapi
+
+# 关联插件到路由adminapi
+curl -X POST http://10.10.4.8:8001/routes/adminapi/plugins \
+    --data "name=api-transformer"  \
+    --data "config.request_transformer=/etc/kong/scripts/req.lua" \
+    --data "config.response_transformer=/etc/kong/scripts/datatables.lua" \
+    --data "config.http_200_always=true"
+
+# 创建req.lua，此处需要在Kong系统中进行操作
+mkdir -p /etc/kong/scripts
+echo "return true, \"\"" &gt; /etc/kong/scripts/req.lua
+
+# 创建响应数据整形脚本datatables.lua，此处需要在Kong系统中进行操作
+cat&gt;/etc/kong/scripts/datatables.lua&lt;&lt;EOF
+local return_body = {
+    data = {}
+}
+local _resp_json_body = ngx.ctx.resp_json_body
+return_body.data = _resp_json_body.data
+local i = 0;
+for _, obj in pairs(return_body.data) do
+    # 此处可进行相关字段的变更或过滤
+    i = i + 1;
+end
+return_body["page_size"] = i
+return_body["recordsFiltered"] = i
+return_body["recordsTotal"] = i
+return true, _cjson_encode_(return_body)
+EOF
+
+# 访问测试，确认返回数据
+curl -i -X GET \
+    --url http://10.10.4.8:8000/adminapi/routes
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Kong的插件都是基于Lua脚本实现的，通过Nginx可以实现用户请求过程中各阶段的数据操作，此处不再举例，大家可以根据实际需求灵活使用Kong的功能。</p> 
+</body>
+</html>

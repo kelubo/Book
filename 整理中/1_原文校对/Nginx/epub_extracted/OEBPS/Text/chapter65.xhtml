@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_73">4.2.4　源IP访问控制模块</h3> 
+ <p class="ziti3">模块名称：ngx_http_access_module</p> 
+ <p class="ziti3">该模块可以对客户端的源IP地址进行允许或拒绝访问控制。该模块的内置配置指令如表4-23和表4-24所示。</p> 
+ <p class="middle-img">表4-23　允许访问指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-23.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-23.jpg" class="calibre154"/></a> 
+ </div> 
+ <p class="middle-img">表4-24　拒绝访问指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-24.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-24.jpg" class="calibre155"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location / {
+    deny  192.168.1.1;          # 禁止192.168.1.1
+    allow 192.168.0.0/24;       # 允许192.168.0.0/24的IP访问
+    allow 10.1.1.0/16;          # 允许10.1.1.0/16的IP访问
+    allow 2001:0db8::/32;
+    deny  all;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·Nginx按照自上而下的顺序进行匹配。</p> 
+</body>
+</html>

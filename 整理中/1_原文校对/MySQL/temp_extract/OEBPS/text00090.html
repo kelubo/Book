@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">6.1.2　SQL的分类</h3>
+<p class="ziti">根据百科资料，管理关系型数据库的结构化查询语言包含6个部分，下面就来逐一介绍。</p>
+<p class="p6">1.数据查询语言（DQL）</p>
+<p class="ziti">DQL，全称为Data Query Language，其语句也称为“数据检索语句”，作用是从表中获取数据，确定数据应怎样在应用程序中给出。关键字SELECT是DQL（也是所有SQL）用得最多的，其他DQL常用的保留字有WHERE、ORDER BY、GROUP BY和HAVING。这些DQL保留字常与其他类型的SQL语句一起使用。具体语句示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select user,host from mysql.user order by user;
++------+-----------+
+| user | host      |
++------+-----------+
+| root | localhost |
+| root | 127.0.0.1 |
++------+-----------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">2.数据操作语言（DML）</p>
+<p class="ziti">DML，全称为Data Manipulation Language，中文为数据操作语言。其语句的关键字为INSERT、UPDATE和DELETE。它们分别用于添加、修改和删除表中的行（数据）。具体语句示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; delete from mysql.user where user='oldboy';
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="p6">3.事务处理语言（TPL）</p>
+<p class="ziti">TPL，全称为Transaction Processing Language，TPL语句用于确保被DML语句影响的表的所有行能够及时得到更新。TPL语句包括BEGIN TRANSACTION、COMMIT和ROLLBACK。</p>
+<p class="p6">4.数据控制语言（DCL）</p>
+<p class="ziti">DCL，全称为Data Control Language，这类语句通过GRANT或REVOKE授权用户许可，确定单个用户和用户组对数据库对象的访问。某些RDBMS可用GRANT或REVOKE控制对表中单个列的访问。</p>
+<p class="p6">5.数据定义语言（DDL）</p>
+<p class="ziti">DDL，全称为Data Definition Language，其语句包括动词CREATE、DROP和ALTER。可使用该语言在数据库中创建新库表或删除库表，或者为表添加字段、索引等。</p>
+<p class="p6">6.指针控制语言（CCL）</p>
+<p class="ziti">CCL，全称为CURSOR Control Language，它的语句（像DECLARE CURSOR、FETCH INTO和UPDATE WHERE CURRENT）用于对一个或多个表的单独行进行操作。</p>
+<p class="ziti">而开发人员、DBA以及运维人员常把SQL分为表6-1中所列的三大类。</p>
+<p class="middle-img">表6-1　SQL常见分类</p>
+<div class="pic"><img alt="" src="Image00033.jpg" />
+</div>
+<div class="pic"><img alt="" src="Image00034.jpg" />
+</div>
+</body>
+</html>

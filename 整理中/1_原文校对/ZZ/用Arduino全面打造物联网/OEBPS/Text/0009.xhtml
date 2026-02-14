@@ -1,0 +1,511 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+  <head>
+    <title>CHAPTER 03　物物相连的关键</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="bodycontent-title"><span class="xbt"><span class="yhd">CHAPTER 03</span></span><br class="calibre1"/> 物物相连的关键</h2> 
+ <p class="bodycontent">数以万计的点洒落在空间中，彼此之间有着默契的相连，几个之间组成一个网络。这样的网络连接非常有价值，点与点、网络与网络间共享着信息与数据，带给空间无穷无尽的变化。</p> 
+ <h3 class="bodycontent-title1" id="CHP8-1">3-1　浅谈物联网通信</h3> 
+ <p class="bodycontent">通信在物联网中可以说是相当重要的一环，毕竟物联网三个字中，“联网”指的就是通信。早期的物联网可以是指任何物品或设备能够连接到因特网，后来谈到所谓的机器对机器（Machine to Machine, M2M）的沟通，又把物联网提升到物物相连的境界。云计算机应用的兴起使整个物联网的架构也随之完整。所以要搞懂物联网，首先一定要搞清楚各种通信接口和架构，从通信的角度出发，就能很快理解整个物联网运行和工作的原理。</p> 
+ <p class="bodycontent">通信就像人们在对话一样，要有发话或信息给接收对方的方式，例如嘴巴就是一种发话的接口，或比手画脚，也算是一种。无论采用怎样的方式，重点是要能够让对方（也就是接收信息的人）可以明白你的意思，这就是一种通信。如果两个人同时说话，可能会无法百分之百了解对方的意思，因为接收信息的同时你也在发送信息，所以通信当中会有各种顺序规则，让两个人的对话能够很顺畅地一来一往继续下去。如果同时有很多人呢？例如在会议时，又该怎样让每条信息都顺利地给接收方知道，并且正确地发送给想要的人呢？这就包含更多的学问了。下面我们将逐一介绍通信相关的知识，并通过Arduino逐一演示。</p> 
+ <p class="bodycontent" id="CHP8-1-1">通信架构</p> 
+ <p class="bodycontent">最简单的通信就是两个人直接的对话，也就是两个设备之间能够通过相同的方式来传送信息，什么叫做相同的方式呢？我们晚一点再细说，不过想想如果有一个人只会说中文，另一个人只会说英文，沟通上就困难许多了。我们把这样的两个设备相互交换数据的架构（见图3-1）称为网络。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img69" src="../Images/Figure-P66_26497.jpg"/> 
+  <p class="imgdescript-c">图3-1　一对一的通信架构</p> 
+ </div> 
+ <p class="bodycontent">虽然这样的网络非常简单，但是在许多时候我们都要从这样的基础架构开始来建立起稳定的通信。因为这两个设备既可能只相距1米，也可能相隔100千米，要选择哪种通信方式就要考验我们的系统设计了。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float11" src="../Images/Figure-P67_20342.jpg"/> 
+  <p class="imgdescript-c">图3-2　5个通信节点</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float12" src="../Images/Figure-P67_20347.jpg"/> 
+  <p class="imgdescript-c">图3-3　主从（Master-Slave）架构（红色为主站）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float13" src="../Images/Figure-P67_20352.jpg"/> 
+  <p class="imgdescript-c">图3-4　主从架构的通信总线示意图（红色为主站）</p> 
+ </div> 
+ <p class="bodycontent">接着，我们再加入3个设备。一瞬间通信的架构就变得复杂许多了，如图3-2所示。你会看到一个设备除要跟其他4个设备发送信息外，同时也会接收它们回传的数据。这样就像没有老师在的教室，大家一定是各聊各的，整个教室乱哄哄的。</p> 
+ <p class="bodycontent">这样的混乱情况，我们可以利用主从（Master-Slave）架构来解决，如图3-3所示。主从架构的意思就是网络中同一时间只有一个人可以发号施令，由他进行命令的发布，其他人则必须等待接收到正确信号后才可以有所动作，因此通信网络就会变成如图3-4所示的样子。</p> 
+ <div class="bodypic-c"> 
+  <div class="calibre1"> 
+   <p class="bodycontent-kaiti">*　数据端和客户端为笔者自行使用的名词，这样的说法比较好记。</p> 
+  </div>
+  <img alt="" class="pic-img-float14" src="../Images/Figure-P68_26510.jpg"/> 
+  <p class="imgdescript-c">图3-5　主从（Server-Client）架构（黄色为数据端）</p> 
+ </div> 
+ <p class="bodycontent">这样主站和从站的系统设计通常见于数据比较单一或网络内设备不多的情况下，因为同一时间内只会有一个设备（无论主站或从站）进行信息发送，而其他站都会接收到这个信息。因此主从架构的硬件通常采用总线（Bus）的方式，例如RS-485或SPI等，而每个站也一定会有独立的站号（ID）配置，方便辨识是否需要按照信息来做出响应。</p> 
+ <p class="bodycontent">不过到了现在的因特网时代，数据存取的方式又复杂了许多，很多数据放置在远程的主机内，而用户可以通过各种设备来进行存取，甚至可以同时进行，这种通信方式也算是主从架构的一种，不过我们把它定义为Server-Client（见图3-5）。这里的数据端*（Server）是数据所在的位置。客户端*（Client）则是会连接到数据端发送存取数据的请求的一端。同一时间数据端可以允许多个客户端进行连接与数据存取。例如，我们现在常用的云硬盘或实时软件，可以通过不同设备进行数据读取，甚至还可以分享给好友。因此在物联网时代，服务器主机的机房需求也在持续升温中。</p> 
+ <p class="bodycontent">数据端无法预测随时被客户端请求连接的数量，它是被动等待连接的建立。因此，从系统设计的角度上，数据服务端的硬件需求较高，不过因为数据可以被集中管理，所以拥有较高的安全性。</p> 
+ <p class="bodycontent">你可能会问，如果网络当中突然加入一个设备，或其中一个设备出现了故障，对整个网络会造成什么影响呢？以主从式的架构来说，建议要有重试（Re-try）的架构，这样对于突然少了一个从站的情况，主站能够尝试再与从站联系。如果是多了一个从站，因为主站本来就不知道新增设备的编号，主站不会去跟它进行沟通。但是如果突然加入的设备设置成主站，问题就大了！因为两个主站可能会同时发送命令，造成通信连接的格式混乱，而从站便无法顺利正确地收到预定的数据分组（称为数据包或者分组）。服务架构的网络管理都集中于主机上，因此不管新增还是减少网络中的设备，主机端都可以执行相对应的操作。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float15" src="../Images/Figure-P69_20361.jpg"/> 
+  <p class="imgdescript-c">图3-6　Ad-hoc点对点网络架构示意图</p> 
+ </div> 
+ <p class="bodycontent">当然也有力求平等的架构，比如Ad-hoc网络就是一种点对点的通信模式（见图3-6），整个网络中各个设备并没有地位的区分，所有的设备都可以互相传送数据，网络中也可以随时新增或删除设备，不过整个网络的通信效率和设备的耗能规划反而是这种网络的关键，因为单一设备不只是要负责自己的数据传送，也需要随时帮忙转发其他设备的数据。</p> 
+ <p class="bodycontent">从物联网的系统来看，由于应用不同、网络内的设备数量多寡不同，因此谁也说不准哪种通信架构更合适。不过可以知道的是，大家都在持续为物联网通信的优化而不懈努力。</p> 
+ <p class="bodycontent">前面谈的通信架构不一定都是以硬件来实现的，有的还必须搭配软件才能完整实现整个功能。下面我们单从系统硬件的角度来整理一下常见的网络拓扑结构。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float16" src="../Images/Figure-P69_20368.jpg"/> 
+  <p class="imgdescript-c">图3-7　线性拓扑</p> 
+ </div> 
+ <p class="bodycontent" id="CHP8-1-1-1">线性拓扑（见图3-7）</p> 
+ <p class="bodycontent">每个设备所需要处理的数据源与目标都已固定，网络系统的弹性不大，但是功能实现起来比较简单。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float17" src="../Images/Figure-P69_20373.jpg"/> 
+  <p class="imgdescript-c">图3-8　星形拓扑</p> 
+ </div> 
+ <p class="bodycontent" id="CHP8-1-1-2">星形拓扑（见图3-8）</p> 
+ <p class="bodycontent">整个网络环绕一个核心设备，所有周围的设备都把数据往此中心传送，若此核心突然出现问题，则整个网络将会失去功能。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float18" src="../Images/Figure-P70_26522.jpg"/> 
+  <p class="imgdescript-c">图3-9　树状拓扑</p> 
+ </div> 
+ <p class="bodycontent" id="CHP8-1-1-3">树状拓扑（见图3-9）</p> 
+ <p class="bodycontent">当网络节点数量越来越多时，我们可以将所有设备分成数个小团体和几个层级，这样可以有效管理整个网络内的数据流。不过当层级拉得越多越厚时，数据传送的时间也会越来越长。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float19" src="../Images/Figure-P70_26526.jpg"/> 
+  <p class="imgdescript-c">图3-10　网状拓扑</p> 
+ </div> 
+ <p class="bodycontent" id="CHP8-1-1-4">网状拓扑（见图3-10）</p> 
+ <p class="bodycontent">这大概是物联网中被最多人研究的拓扑之一，点与点之间如何寻找到最佳路径进行数据传送，每个节点如何能在有限的电力来源下保持最长久的运行。有太多太多好玩的主题可以在这里深入、挑战。</p> 
+ <h3 class="bodycontent-title1" id="CHP8-2">3-2　通信种类介绍</h3> 
+ <p class="bodycontent">在介绍各种常见的通信方式之前，我们要先来谈谈通信接口（Interface）和通信协议（Protocol）的不同。通信接口是指所定义好的电缆接线、电器特性和信号等，基于相同的定义让两个以上的设备可以相互连接。而通信协议是基于前述的接口上所共通的数据格式。举例来说，人类负责说话的嘴巴是一种接口，而中文、英文等则是沟通的协议。当我们使用相同的接口和协议时，才能让对方了解我们想传达的意思。</p> 
+ <p class="bodycontent">通信上最熟为人知的架构：OSI（Open System Interconnection）模型，就是由ISO组织提出让计算机间的通信网络能有固定的标准结构。该架构共有7层：应用层（Application Layer）、表示层（Presentation Layer）、会话层（Session Layer）、传输层（Transport Layer）、网络层（Network Layer）、数据链路层（Data link Layer）和物理层（Physical Layer），如图3-11所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img70" src="../Images/Figure-P71_20382.jpg"/> 
+  <p class="imgdescript-c">图3-11　OSI的7层通信架构</p> 
+ </div> 
+ <p class="bodycontent">注：由于OSI架构是由国际机构所定义的，因此中文译名多有差异，建议同时提供英文对应的名词。</p> 
+ <p class="bodycontent">最底层就是我们所谓的实体接口，以计算机间的有线网络来说，就是由铜线组成的实体网络线。每一层都有它特定的功能，用来桥接其下面一层与上面一层的服务。整个OSI带给用户的优点是降低网络的复杂程度、标准化、加速各层的开发、确保通信质量。</p> 
+ <p class="bodycontent">至于本书要提到的通信架构，大约可以简化成应用层、协议层、传输层和物理层。应用层指的是我们系统中产生数据的执行程序所在的层。协议层指的是数据以特定的数据分组整理成固定格式。传输层指的是通信的方式，例如寻址、握手等。最后物理层指的是整个网络的拓扑及使用到的电气信号、接口接头等。后续的介绍中大家可以通过这样的分层，清楚了解每种通信方式的优缺点以及适用的场合与范围。</p> 
+ <p class="bodycontent">本节先介绍物理层中我们常用的通信种类。最简单的分类方式是以有线（wired）和无线（wireless）作为基础进行区分。不过，这里我们谈的是物联网，所以从覆盖范围的大小谈起。</p> 
+ <p class="bodycontent">大家常常听到的局域网（Local Area Network, LAN），其范围定义成数百米内，通常一栋建筑或一间工厂都在同一个局域网的范围内。范围再小的就是个人网络（Personal Area Network, PAN），顾名思义就是以个人为单位的网络架构，像蓝牙网络就是一个非常典型的个人网络。而比局域网更大的则是广域网（Wide Area Network, WAN），这个范围大概是以国家为单位的网络。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float20" src="../Images/Figure-P72_26557.jpg"/> 
+  <p class="imgdescript-c">图3-12　各种网络的大小比较</p> 
+ </div> 
+ <p class="bodycontent">在这3个网络中，由于覆盖的范围不同、应用的差异及其特性条件，因此通信的速度也有所不同，大致上是PAN&lt;WAN&lt;LAN（见图3-12）。</p> 
+ <p class="bodycontent">所以当前常听到的通信技术会根据其属性与其应用，朝通信速度或通信距离两个方向进行发展，目前还没有同时又快又远的通信技术被研发出来，并且这样的技术是不是真的有其应用也还是未知数。</p> 
+ <p class="bodycontent" id="CHP8-2-1">传输方式</p> 
+ <p class="bodycontent">至于传输的方式，可以从方向、方式等进行分类。所谓的方向，指的是两者之间传递的方向性，大致可分为单向（广播）、半双工和全双工（见图3-13）。</p> 
+ <p class="bodycontent">单向传输就像是收音机的广播一样，从一个主要设备进行数据信号的发送，其余设备只要能拥有相同的接收配备就可以接收到信息，但是不能反向将数据传回去。</p> 
+ <p class="bodycontent">半双工则是两个设备双方都可以互相发送数据，但是因为设备能力有限，同一时间内只能作为发送方或接收方，无法同时发送与接收，所以必须通过额外的硬件信号或特定的协议来辨识何时需要作为发送方、何时可以转换为接收方。例如，无线步话机就是一种半双工的通信方式。当按下通话键后，就只有自己可以发出信息，其他人必须轮流等待。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float21" src="../Images/Figure-P73_20398.jpg"/> 
+  <p class="imgdescript-c">图3-13　各种通信技术的比较</p> 
+ </div> 
+ <p class="bodycontent">全双工则是设备硬件在同一时间既可以发送信息，也可以接收数据。这样的方式必须将发送与接收规划成各自独立的信道，比如打电话，麦克风与耳机就是分开的两组硬件，以处理不同的信息。</p> 
+ <p class="bodycontent">另外，信号的传输方式则可以分成并行与串行两种。早期的打印机就是并行传输，想要传送的数据以数条数据线路同时进行传输，传输速度较快，由于需要的硬件线路比较多，因此线路上的成本较高，所占体积也比较大。现在的设备都越做越小，芯片处理能力也越来越强，在这种情况下，并行传输已经比较少见了。串行传输不同于并行传输的地方在于数据是通过固定的引脚按序将数据传送出去的，比如RS-232、USB和网络等，当前主流的通信方式以串行传输为主。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img71" src="../Images/Figure-T73_32199.jpg"/>
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP8-3">3-3　串行通信</h3> 
+ <p class="bodycontent">从前面的介绍可以知道，现今的通信方式以串行通信（Serial Communication）为主流。主要的原因就是硬件越做越小，芯片的能力也越来越强，因此无论芯片间的通信或设备间的数据交换，都以串行通信为主要方式，例如SPI和网络通信都是。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float22" src="../Images/Figure-P74_26575.jpg"/> 
+  <p class="imgdescript-c">图3-14　计算机上RS-232的接口</p> 
+ </div> 
+ <p class="bodycontent">RS-232（见图3-14）则是串行通信的经典之一，被广泛用于计算机与其他设备间的通信，甚至延伸到设备与设备间的数据交换。RS-232对电气特性、逻辑电位和各种信号线功能都做了规定。在标准主板上看到的9个引脚的接头（DB-9）就是RS-232的接口。所谓的RS就是Recommended Standard，即“推荐标准”的意思，其他类似的还有RS-485和RS-422。这些都是EIA联盟所制定出来的，会再标注RS-232-C表示不同版本。</p> 
+ <p class="bodycontent">RS-232接口的主要功能是为数据终端设备（Data Terminal Equipment, DTE）和数据通信设备（Data Communication Equipment, DCE）提供实体连接，也就是我们前面讲的物理层。例如计算机就是DTE，而打印机则是DCE。当初设计RS-232是用来连接调制解调器进行数据传输，也因此它的引脚的定义通常也和调制解调器传输有关。通过硬件引脚的方式来判断数据的流向，称为硬件握手。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img72" src="../Images/Figure-T75_20647.jpg"/>
+ </div> 
+ <p class="bodycontent">从上面的表格可以知道，RS-232的9个引脚的信号方向是固定的，借助这些引脚的顺序变化才可以顺利完成DTE和DCE之间的数据传送。说到这里，大家有没有猜到，RS-232若在半双工的通信模式，两个设备间必须通过其他的硬件引脚来确认现在谁负责传送、谁负责接收。</p> 
+ <p class="bodycontent">RS-232的信号基准电压是以正负15V来作为逻辑电位的变化，其中负电位的部分为逻辑信号1，正电位的部分为逻辑信号0。从图3-15可以清楚看出这样的电位变化与信号的对比。</p> 
+ <p class="bodycontent">从图3-15中可以发现信号的时间长度是固定的，我们称为波特率（Baud rate），单位是bit per second（bps）。常见的所谓9600，也就是1秒内会有9600个二进制位（bit）。从这里还可以看到，RS-232的通信中，会有起始位（START BIT）和停止符（STOP BIT），起始位就是将电位拉到正15V（逻辑0），停止位则是将电位信号拉回负15V（逻辑1）。中间的数据则有8个位，在某些情况下则会有7个位的选择。另外，有校验机制来确保RS-232的通信没有受到干扰，称为奇偶校验（PARITY），方式是如果我们设置成偶校验，表示8个数据位加上奇偶校验位必须要有偶数个逻辑1，反之奇校验就是要有奇数个逻辑1。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img73" src="../Images/Figure-P76_26583.jpg"/> 
+  <p class="imgdescript-c">图3-15　RS-232的信号电位变化</p> 
+ </div> 
+ <p class="bodycontent">整个RS-232通信中的设置整理如下：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img74" src="../Images/Figure-T76_26633.jpg"/>
+ </div> 
+ <p class="bodycontent">在RS-232的通信中，双方必须针对以上参数具有相同的设置，接收方才可以正确判断数据的逻辑信号，正确解析出数据的内容。例如，最常见的“9600，8N1”表示的就是波特率为9600bps，8个数据位，没有奇偶校验，有1个停止位。在使用RS-232跟其他设备通信时，必定要先确认设置。</p> 
+ <p class="bodycontent">RS-232在计算机与其他设备的沟通基准电压是正负15V，但是在微控制器中，因为多半以5V或3.3V来作为系统电源，所以RS-232的基准电压也随之降至5V或3.3V，习惯将其称为TTL（Transistor-Transistor Logic）基准。例如，Arduino的Pin0和Pin1就是RS-232的TTL基准，微控制器的信号还需要通过另一个转换芯片来提升基准电压至正负15V。</p> 
+ <p class="bodycontent">接着我们就来看看Arduino是如何进行串行通信的。首先从RS-232开始。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float23" src="../Images/Figure-P77_20658.jpg"/> 
+  <p class="imgdescript-c">图3-16　Arduino板子上的TX和RX</p> 
+ </div> 
+ <p class="bodycontent">Arduino和计算机都是通过RS-232的信号来进行程序上传与数据传送的，刚才提到Arduino板子上的Pin0和Pin1就是串行通信的引脚，如图3-16所示。</p> 
+ <p class="bodycontent">在板子上也有通信专用的LED指示灯（见图3-17），我们可以利用指示灯清楚地了解当前Arduino是否在进行传输或接收数据。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img75" src="../Images/Figure-P77_20662.jpg"/> 
+  <p class="imgdescript-c">图3-17　Arduino的传送LED指示灯</p> 
+ </div> 
+ <p class="bodycontent">先通过第一个程序了解一下如何启动Arduino的串行通信及如何传送数据。程序3-1很简单，我们只在setup()中放置了两个函数：</p> 
+ <p class="bodycontent">Serial.begin()</p> 
+ <p class="bodycontent">Serial.print()</p> 
+ <p class="bodycontent">第一个函数负责启动Arduino的串行通信，从函数的名称可以很直观地看出它的功能。它需要输入一个参数，也就是我们说的波特率，在范例程序中先以9600作为设置值。第二个函数则是要打印（输出）的字符串，范例中我们是从Arduino发送一串字符给计算机，参数中要输出的字符串必须使用""括起来。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img76" src="../Images/Figure-P78_26642.jpg"/>
+ </div> 
+ <p class="bodycontent">我们将范例程序上传到Arduino后，Arduino的开发软件不止可以用来开发项目，还可以帮忙观察通信数据。请单击右上角的串口监视器窗口，如图3-18所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-h" src="../Images/Figure-P78_26645.jpg"/> 
+  <p class="imgdescript-c">图3-18　串口监视器窗口</p> 
+ </div> 
+ <p class="bodycontent">打开后应该会看到我们刚才想要显示的信息已经显示出来了。这时看一下右下方是否也是9600，如图3-19所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img77" src="../Images/Figure-P79_20670.jpg"/> 
+  <p class="imgdescript-c">图3-19　在计算机显示的字符串</p> 
+ </div> 
+ <p class="bodycontent">前面提到串行通信的前提必须是两边的设备都有同样的设置，因为Arduino默认为8个二进制位，没有奇偶校验，有1个停止位。因此我们只有从设置波特率的不同来观察这个现象。我们将串口监视器窗口右下角的参数改为其他速率，就会发现结果跟刚才完全不一样了（见图3-20）。这是因为此时计算机判定数据的格式与Arduino发出的并不相同。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img78" src="../Images/Figure-P79_20674.jpg"/> 
+  <p class="imgdescript-c">图3-20　范例3-1在计算机显示的字符串（计算机端波特率为38400bps）</p> 
+ </div> 
+ <p class="bodycontent">接着我们把字符串显示的部分移到loop()中，其余完全不做任何修改。上传后会发现每次输出的字符串全部都连在一起了，无法很清楚地分辨出该断行的位置，如图3-21所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img79" src="../Images/Figure-P80_26653.jpg"/> 
+  <p class="imgdescript-c">图3-21　连续输出字符串（没有换行）</p> 
+ </div> 
+ <p class="bodycontent">稍微调整一下程序，在print后面加上ln：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img80" src="../Images/Figure-P80_26657.jpg"/>
+ </div> 
+ <p class="bodycontent">编译后再次上传，得到的结果就会非常清楚易懂，如图3-22所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img79" src="../Images/Figure-P80_26660.jpg"/> 
+  <p class="imgdescript-c">图3-22　连续输出字符串（有换行）</p> 
+ </div> 
+ <p class="bodycontent">会有这样差异的原因是println这个函数会在字符串最后加上回车（carriage return, CR）及换行（line feed, LF）字符。这两个字符属于不可见字符，即为有文字操作功能但是不显示出来。可以参阅附录C的ASCII表了解还有哪些字符也属于不可见字符。回车（CR）符的十进制值为10，十六进制值为0x0A。换行（LF）符的十进制值是13，十六进制值是0x0D。我们可以分别用"\r"和"\n"来表示它们。因此，在print后面加上ln也可以用print("\n\r")来实现相同的功能：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img81" src="../Images/Figure-P81_20682.jpg"/>
+ </div> 
+ <p class="bodycontent">刚才提到十进制和十六进制，在串行通信上是否可以表现出它们的不同呢？在Arduino里，当然可以。只要我们在函数中加上要表示格式的设置即可。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img82" src="../Images/Figure-P81_20685.jpg"/>
+ </div> 
+ <p class="bodycontent">从范例可以看到，只需要在println中加入第二个参数表示想要输出的格式，就可以将原有的数值转换后显示（见图3-23）。也可以知道print默认为十进制的格式。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img83" src="../Images/Figure-P82_26668.jpg"/> 
+  <p class="imgdescript-c">图3-23　不同格式的显示</p> 
+ </div> 
+ <p class="bodycontent">若不确定是否正确，则可以用操作系统内建的计算器来验证。先把计算器设置为“程序员”模式，才可以显示不同的格式，如图3-24所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img84" src="../Images/Figure-P82_26673.jpg"/> 
+  <p class="imgdescript-c">图3-24　利用计算器验算（数值为100）</p> 
+ </div> 
+ <p class="bodycontent">当然英文字母也是可以的，大家也可以利用Arduino內建范例的ASCII Table来观察相同的显示（见图3-25）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img85" src="../Images/Figure-P82_26678.jpg"/> 
+  <p class="imgdescript-c">图3-25　以不同进制格式来显示字母</p> 
+ </div> 
+ <p class="bodycontent">所谓的通信，就是既要有输出也要有输入，这样两个设备才可以相互交换数据，而不止是单向的数据传输而已。Arduino怎么接收电脑发送的信息呢？只需要“读取”而已。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img86" src="../Images/Figure-P83_20691.jpg"/>
+ </div> 
+ <p class="bodycontent">从范例可以看到，只需要一行Serial.read()就可以进行串行的数据读取。电脑端则可以从串口监视器窗口的上方进行数据输出，从图3-26可以看到我们输出了一个字母Q，下方则是Arduino传送回来的数据，可以发现Q再次被传送回来。不过同时也发现了一个问题，为什么除了Q以外，窗口内还显示出许多方框？这些方框其实是用于表示不可见字符的。因为范例程序是每两秒进行一次Arduino数据的读取和输出，而我们并不是随时都在进行数据的传送，但是Arduino还是按照程序的规定定期读取串行端口，所以许多没有意义的不可见字符被显示了出来。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img87" src="../Images/Figure-P83_20694.jpg"/> 
+  <p class="imgdescript-c">图3-26　计算机与Arduino两方进行数据传送</p> 
+ </div> 
+ <p class="bodycontent">数据的传送也算是一种事件的处理，因为无法预测何时会有数据需要Arduino进行接收，因此最好的方式是以中断来触发数据接收的事件。Arduino的串行通信也将通信中断的函数集成好了，使用上非常简单：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img88" src="../Images/Figure-P84_26686.jpg"/>
+ </div> 
+ <p class="bodycontent">可以从范例看到，只需要使用Serial.available()就可以判断是否正在等待接收数据，想象Arduino的串行通信有一个暂存区，微控制器会先将所有外部传来的串行数据放置于此，这个函数就是在统计这个暂存区中数据的多寡，当满足我们设置的条件后，就会通知程序。</p> 
+ <p class="bodycontent">别小看这个函数及其所能带来的功能，一般来说串行通信的数据传送除了前面提到的硬件握手（handshaking）外，还会采用固定格式来确保数据传送的完整性。下面列举一个简单的例子：</p> 
+ <p class="bodycontent">[起始字符][标头字符串][数据长度][数据][校验码][停止字符]</p> 
+ <p class="bodycontent">例：[$] [DATA] [0x05] [HELLO] [0x0D 0x0A]</p> 
+ <p class="bodycontent">这是一个非常标准的串行数据串，例如GPS的接收器就会以类似的字串按固定间隔发出时间和经纬度信息等。数据有多个字段时，可以使用逗号将其隔开。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img89" src="../Images/Figure-P85_20702.jpg"/>
+ </div> 
+ <p class="bodycontent">从范例程序可以看到，使用Serial.available()可以先进行第一次的字符串长度判断，这里我们先只读取到标头字符。因为暂存区的字符满足条件设置后进入if判断语句内，我们要判断第一个字符是否为起始字符。要注意，有些设备的起始字符不止一个！起始字符确认无误后才可以再进到下一个阶段，进行标头字串的确认，如果是则显示Arduino got the data。如果标头字串有误或是有其他类型，则继续执行下一步的判断，一直到信息的结尾。这样我们就可以完整读取到信息字符串。Arduino软件内也内建了很多关于字符串处理的函数及范例，大家可以好好利用。</p> 
+ <p class="bodycontent">了解计算机和Arduino如何以串行通信进行数据交换与沟通后，我们就可以知道两个Arduino之间也可以使用相同的方式来进行数据交换了，唯一要注意的是接线的方式（见图3-27）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img90" src="../Images/Figure-P86_32200.jpg"/> 
+  <p class="imgdescript-c">图3-27　两个Arduino使用串行通信时的连接</p> 
+ </div> 
+ <p class="bodycontent">要注意的是Pin 0(RX)必须和Pin 1(TX)对接，而不是Pin 0(TX)对Pin 0(TX)，Pin 1(RX)对Pin 1(RX)。另外，GND也是非常重要的一条线，因为串行通信的信号利用的是基准电压的变化，所以两个Arduino必须将GND连接起来才会有相同的基准电压的变化。</p> 
+ <p class="bodycontent">两个以上的RS-232设备要进行通信时，接线方式又会变得复杂一些，如图3-28所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img91" src="../Images/Figure-P86_32201.jpg"/> 
+  <p class="imgdescript-c">图3-28　三个设备使用RS-232通信时的连接情况</p> 
+ </div> 
+ <p class="bodycontent">从通信架构图可以看到，虽然才接了三个Arduino，但是连线的复杂度却高了不少。另外，从左边的传送引脚接到右边的两组接收引脚中可以看到，当左边发出信息时，右边两个设备都会收到相同的信息，两个设备都必须处理接收进来的信息，这样系统会花不少时间判断信息的内容，进而决定是否要有对应的操作。反过来说，右边两个设备的发送端同时接到了左边设备的接收端，因此右边的设备绝对不可以在同一时间对左边设备发送信息，从而造成左边系统程序无法顺利解析数据。</p> 
+ <p class="bodycontent">要避免这样的情况，我们必须让这个网络有主从的概念，设置左方为主站，而信息都必须带有可识别的代号，可以是一个ID号码或是一个独立的名称。这样右方的从站收到信息后，要先判断ID是否与自身的相同。若是，则进行信息解析并做出响应。若不是，则直接忽略信息，从而加快系统的响应。从站要进行数据的发送时，也必须先向主站发出请求，得到许可后再进行数据的发送（见图3-29），这样就可以避免两个从站同时发出信息让主站无法判断的情况。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img92" src="../Images/Figure-P87_32202.jpg"/> 
+  <p class="imgdescript-c">图3-29　数据回报流程</p> 
+ </div> 
+ <p class="bodycontent">RS-232常见于两个设备间的通信，甚至后面章节也会看到Arduino和扩展模块之间常常使用RS-232进行数据交换。只是这里要注意芯片的系统电源是5伏特还是3.3伏特。因为芯片制程技术的演进会用更低的电压来确保功耗的降低，借以达到省电的目的。</p> 
+ <p class="bodycontent">但是RS-232在多个设备间除了会造成接线上的困扰外，还有一个致命的缺陷：设备间的通信距离不能超过15米。这个距离的限制在现在的应用当中越来越被凸显出来，因为物联网中多个设备在大范围内的应用是越来越普遍的。因此在工业的实际应用中，会用RS-485来作为主要传输的接口。</p> 
+ <p class="bodycontent">RS-485与RS-232最大的不同在于物理层和电器特性，RS-485为两线式的总线（BUS），利用电压差来表示逻辑0和1的变化，通过这些改变使得RS-485更容易进行多点通信和部署广域网。至于数据端，RS-485与RS-232一样没有定义通信格式或是协议，因此原本是用RS-232的设备可以轻易通过外部硬件来转换成RS-485的信号。</p> 
+ <p class="bodycontent">从图3-30中可以更清楚地看出RS-485的优点：布线的成本可以降低很多，尤其是在多个设备的通信网络中。例如，在工业自动化中，几乎八成以上的仪表设备都采用RS-485来与其他设备连接，以降低成本与需要引脚的数量。这里为什么GND会是虚线呢？原因是RS-485使用两条信号总线的电压差，因此是否在同一个基准电压的重要性就没有那么强烈了，但是在某些特殊场合中因为现场噪声比较大，或是实在距离太远，电源系统是相互独立的，在这些情况会再把第三条GND连接上。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img93" src="../Images/Figure-P88_32203.jpg"/> 
+  <p class="imgdescript-c">图3-30　RS-485通信网络示意图</p> 
+ </div> 
+ <p class="bodycontent">另外，在RS-485中还有一个很特别的地方一定要注意，因为它会影响到整体网络的通信质量，那就是终端电阻（Terminal Resister，见图3-31）。有些品牌知名度较高的仪表设备会内建这个终端电阻在每个设备中，但实际上只需要在整个总线上加上一个即可，通常会给离主站最远的设备配置终端电阻，厂商或是一些参考资料上会建议选配120欧姆的阻值，这个阻值会因为每个现场的不同而进行微调。最好的方式是采用一个可变电阻来进行现场调适，当通信质量达到最好时，就是最适合的阻值。因此没有所谓的“标准值”。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img94" src="../Images/Figure-P89_20734.jpg"/> 
+  <p class="imgdescript-c">图3-31　RS-485的终端电阻配置方式</p> 
+ </div> 
+ <p class="bodycontent">另外，建议使用双绞线进行RS-485的网络连接，因为双绞线的缠绕方式可以有效消除干扰，以加强对噪声的抵抗力。</p> 
+ <p class="bodycontent">Arduino并没有RS-485的引脚，如果需要RS-485的通信则必须搭配另外一个转换芯片，例如MAX485（见图3-32）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img95" src="../Images/Figure-P89_20739.jpg"/> 
+  <p class="imgdescript-c">图3-32　RS-485的转换芯片MAX485（图片来源：MAX485 Datasheet）</p> 
+ </div> 
+ <p class="bodycontent">晶片左边的部分跟Arduino连接（见图3-33），其中RO（Receiver Output）接到Arduino的Pin0（RX），DI（Driver Input）接到Arduino的Pin1（TX）。另外，在RE（Receiver Output Enable）和DE（Driver Output Enable）中，注意到RE上面多了一个横杠吗？它的意思是取反，从内部逻辑电路中也可以看到接线末端有一个小圆圈，表示逻辑判断的NOT，当外部信号输入HIGH到RE时，内部最终信号会转换成LOW。这样的设计刚好让我们可以将RE和DE两个短路，通过同一个信号来转换RS-485的传送或接收。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img96" src="../Images/Figure-P90_26735.jpg"/> 
+  <p class="imgdescript-c">图3-33　MAX485范例电路</p> 
+ </div> 
+ <p class="bodycontent">在程序的部分，RS-485一样会通过主站先发送要求数据的命令，然后由从站进行信息传送。这时要特别注意主站的485模式切换，必须先确保从站完整接收到信息后才可以切回接收模式，不然会造成数据传送的不完整。至于主站要等待多久才切换，会因为参数配置与设备距离长短等原因而有所不同，因此必须实测后才可以得知。大家可以思考一下该怎么样才能做到自动切换，这里称为Auto flow control，或是寻找支持此功能的芯片以让485通信非常有效率，而不会把时间浪费在等待切换操作上。</p> 
+ <p class="bodycontent">总结一下，RS-232和RS-485的特性不太一样。RS-232由于传输和接收是独立分开的引脚，因此可以做到全双工的通信模式，但是由于电器特性的缘故，通信网络的总长度并不会太长，最快的传输速率在115.2kbps（特殊的芯片可以达到921.6kbps）。RS-232主要用于两个设备（DTE和DCE）之间。RS-485则属于总线的形式，因此多半以半双工模式进行通信，485网络上就可以连接多个设备进行数据交换。有些芯片的传输速率可以到达10Mbps。两个设备最长距离可以达到1200米。会不会有个疑问：有没有综合两种特性的通信方式呢？有的，即RS-422。不过因为接线成本比较高，应用上就不及RS-232和RS-485这么普及了。大家有机会还可以查阅相关的资料。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img97" src="../Images/Figure-T91_32204.jpg"/>
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP8-4">3-4　I<span class="super">2</span>C通信</h3> 
+ <p class="bodycontent">这里要介绍的是另一种通信模式，称为I<span class="super1">2</span>C。它的全名是Inter-Integrated Circuit，中文为内部集成电路。从名字就可以知道这种通信模式大多用在系统内芯片间的通信，而较少用在设备与设备之间。例如，计算机获取屏幕分辨率与参数的方式就是通过I<span class="super1">2</span>C，算是CPU跟显示器内部芯片的数据交换。</p> 
+ <p class="bodycontent">I<span class="super1">2</span>C只需要两条线路（见图3-34），分别是SCL（Serial Clock Line，串行时钟线）和SDA（Serial Data Line，串行数据线）。从字面上就可以看出I<span class="super1">2</span>C也是一种串行通信，与RS-232或RS-485不一样的是，两个设备通过I<span class="super1">2</span>C进行通信，并不需要特别设置相同的通信参数，因为在I<span class="super1">2</span>C的两条通信线中，SCL就是负责告诉对方通信速度的。因此I<span class="super1">2</span>C可以很方便地在整个通信网络上新增设备节点。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img98" src="../Images/Figure-P92_26744.jpg"/> 
+  <p class="imgdescript-c">图3-34　I<span class="super1">2</span>C的接线方式</p> 
+ </div> 
+ <div class="calibre1"> 
+  <img alt="" class="pic-img-float24" src="../Images/Figure-P92_26748.jpg"/> 
+  <p class="imgdescript-c">图3-35　Sparkfun的加速度计与陀螺仪模块使用I<span class="super1">2</span>C（图片来源：Sparkfun）</p> 
+ </div> 
+ <p class="bodycontent">咦！不是说只有两条线吗？怎么还是有Vcc和GND呢？因为I<span class="super1">2</span>C多半是芯片间的通信，因此电源应该都是来自于同一组，所以这里只是要提醒I<span class="super1">2</span>C的两条通信线还会加上一个提升电阻确保未导通时能处于高电平的状态。数据读取的方式则是SCL由低电平升为高电平时，读SDA的数据。例如，传感模块（加速度计、陀螺仪，见图3-35）、显示模块（LCD、OLED）和时钟模组（RTC）都可选择使用I<span class="super1">2</span>C接口进行通信。至于通信的速率，标准I<span class="super1">2</span>C可以100kHz进行数据传输，而快速模式可达400kHz。</p> 
+ <p class="bodycontent">在物联网的架构中，有一个关键因素，那就是时间。因为整个物联网络架构散布的区域可能很广，距离也可能很长，从数据采集到的时刻到传送到最后的决策或是存储中心的时间并不能完全掌握，因为造成影响的因素太多了，所以大区域的物联网应用都希望能够除了采集数据之外，同时记录下采集的时间点，以利后续分析时能够清楚勾勒出随着时间变化的信号变动。</p> 
+ <p class="bodycontent">另外，在控制中很重要的就是调度，如何精准地知道当前时间并进行响应，例如建筑物的灯光控制、温室里的洒水系统等，都需要时间参数才能顺利控制输出的时间点与周期的长短。</p> 
+ <p class="bodycontent">所以我们期望系统内的每个设备都能够取得绝对时间，例如年、月、日、时、分、秒。而这样的功能我们会利用所谓的RTC（Real Time Clock，实时时钟）来实现，每台计算机内都有这样的芯片，这种芯片会持续计算当下的时间，只要系统电源持续工作，它就能够稳定地提供正确的时间。但是，系统电源失效时，芯片也就失去了作用。因此，这也是为什么很多计算机内都会有一颗钮扣电池的原因了。RTC的电源电路（见图3-36）会判断何时系统电源失效而转换成钮扣电池继续进行供电。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img99" src="../Images/Figure-P93_20830.jpg"/> 
+  <p class="imgdescript-c">图3-36　RTC芯片DS1307与模块上的电池（图片来源：Adafruit）</p> 
+ </div> 
+ <p class="bodycontent">RTC芯片就可以利用I<span class="super1">2</span>C来跟Arduino进行时间的设置与输出。要进行I<span class="super1">2</span>C通信前，需要先知道I<span class="super1">2</span>C之间通信的方式。I<span class="super1">2</span>C整体通信也是MASTER-SLAVE的架构，因此主站（MASTER）要先知道想要通信的从站的站号，每个从站会有一个ID号码。所有在从站的数据都会有一个固定的地址，因此我们只要能够知道每个站的ID和数据的地址，就可以轻松使用I<span class="super1">2</span>C进行数据交换。我们先从Arduino的范例来了解一下。</p> 
+ <p class="bodycontent">Arduino的I<span class="super1">2</span>C范例可从“文件\范例\Wire”里找到，第一个我们要看的是从站（slave_sender），可以看到因为要使用I<span class="super1">2</span>C通信，所以必须引用Wire.h这个头文件，而在setup()里我们可以看到就像串行通信一样，必须先启动I<span class="super1">2</span>C，也就是Wire.begin()。这里要注意从站必须加入自己的ID号码，此处是2。接着我们设置一个触发事件：当主站来要数据时，直接回应6个二进制位。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img100" src="../Images/Figure-P94_26757.jpg"/>
+ </div> 
+ <p class="bodycontent">在主站的部分，范例master_reader也需要先启动I<span class="super1">2</span>C通信，唯一不同的是不需要先设置ID号码。在循环中，通过requestFrom()来设置想要通信的从站以及想要取得的数据长度。接着就像串行通信一样，利用事件来触发数据接收的动作以降低系统等待的负担：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img101" src="../Images/Figure-P95_20838.jpg"/>
+ </div> 
+ <p class="bodycontent">回过头来看看我们要用的RTC模块。模块上使用的是DS1307（见图3-37）这个RTC芯片，从规格表内可以知道它的ID号码为1101000（二进制），也就是0x68。它的数据地址从0x00开始，分别是秒、分、小时、星期、日、月、年。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img102" src="../Images/Figure-P96_26762.jpg"/> 
+  <p class="imgdescript-c">图3-37　DS1307的数据地址</p> 
+ </div> 
+ <p class="bodycontent">而每个地址里又必须了解换算的方式，才可以将数据转换成时间，如图3-38所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img103" src="../Images/Figure-P96_26766.jpg"/> 
+  <p class="imgdescript-c">图3-38　DS1307的数据格式</p> 
+ </div> 
+ <p class="bodycontent">知道了这些，我们就可以轻松地从Arduino的I<span class="super1">2</span>C获取RTC的时间数据了。但是在Arduino的世界中，总会有更快速的方式可以让你完成项目，专心思考怎么样将其应用于物联网中。</p> 
+ <p class="bodycontent">在Arduino的官网上，也就是Arduino.cc，有很多第三方硬件的各种函数库与教学，链接为http://playground.arduino.cc/。在这里可以找到各种Arduino前辈们留下来的足迹，因为大家都热爱Arduino，所以把辛苦的研究成果都公开出来让其他人学习。这里先利用Time这个函数库教大家如何引用前人的成果，体会一下如何站在其他巨人的肩膀上。</p> 
+ <p class="bodycontent">请先从网页http://playground.arduino.cc/Code/Time下载Time及DS1307RTC两个压缩文件，下载完成后再把这两个文件复制到Arduino软件文件夹内的libraries中，解完压缩后重新启动Arduino软件，应该就可以看到这个新增添的函数（见图3-39）及范例了。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img104" src="../Images/Figure-P97_20848.jpg"/> 
+  <p class="imgdescript-c">图3-39　新增外部函数库</p> 
+ </div> 
+ <p class="bodycontent">或是直接在软件里面引用，也是另一种便捷的方式，如图3-40所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img105" src="../Images/Figure-P98_26774.jpg"/> 
+  <p class="imgdescript-c">图3-40　直接新增函数库</p> 
+ </div> 
+ <p class="bodycontent">大家可以直接运行范例测试看看是否能够读取到时间，范例为TimeRTC。接线的方式如图3-41所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img106" src="../Images/Figure-P98_26786.jpg"/> 
+  <p class="imgdescript-c">图3-41　RTC电路接线</p> 
+ </div> 
+ <p class="bodycontent">有时候可能买回来的RTC模块并没有电池或是电池已经没有电了，因此会无法正确显示时间（见图3-42），范例会要求你再运行另一个范例来设置RTC。设置完成后记得要持续保持RTC模块是有电源的状态或是先换上一颗新的电池后再进行设置。这样范例程序就应该可以正确显示出当前的时间了（见图3-43）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img107" src="../Images/Figure-P99_20857.jpg"/> 
+  <p class="imgdescript-c">图3-42　RTC尚未被设置时无法正确显示</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img108" src="../Images/Figure-P99_20860.jpg"/> 
+  <p class="imgdescript-c">图3-43　正确显示的RTC时间</p> 
+ </div> 
+ <p class="bodycontent">回过头来看看细节部分。读者可以从DS1307RTC这个文件夹内的.CPP文件了解整个数据读取的过程，第一步先设置好RTC的ID并启动I<span class="super1">2</span>C通信：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img109" src="../Images/Figure-P99_20865.jpg"/>
+ </div> 
+ <p class="bodycontent">数据读取的部分就是从00H的地址进行7个字符的收集与解析：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img110" src="../Images/Figure-P100_26794.jpg"/>
+ </div> 
+ <p class="bodycontent">至于设置时间的部分，大家可以再找找程序代码在哪。它其实会先停止计时，再设置新的时间，之后才重新启动。</p> 
+ <p class="bodycontent">如果是网络架构的系统，因特网就已经有很成熟的时间机制了，例如NTP（Network Time Protocol）或是新的IEEE-1588。到后面谈到网络通信时再跟大家聊。</p> 
+ <h3 class="bodycontent-title1" id="CHP8-5">3-5　SPI通信</h3> 
+ <p class="bodycontent">SPI（Serial Peripheral Interface，串行外设接口，见图3-44、图3-45）是一种高速、全双工的通信总线。从前一个章节的I<span class="super1">2</span>C到SPI，可以算是一种进化。目前SPI多半用于高速接口，例如EEPROM、FLASH等。在Arduino中，SD卡存储接口和部分网络通信模块都会采用。它是一个四线式的架构：SCK（Serial Clock）串行时钟信号；MOSI（Master Output, Slave Input）SPI主站输出，从站输入；MISO（Master Input, Slave Output）SPI主站输入，从站输出；以及SS（Selection signal）选择信号。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img111" src="../Images/Figure-P101_32205.jpg"/> 
+  <p class="imgdescript-c">图3-44　两个设备SPI的连接方式</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img112" src="../Images/Figure-P101_20879.jpg"/> 
+  <p class="imgdescript-c">图3-45　SD模块上的SPI接口</p> 
+ </div> 
+ <p class="bodycontent">Arduino针对SPI的部分都已经隐藏在不同的函数库里了，因此在SD卡的读写或是网络通信里都不会实际看到SPI的影子。别因为看不到就觉得不重要。例如，Arduino板子上右侧的六个引脚（见图3-46）就是SPI的接口应用，是通过外部刻录器刻录程序用的。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img113" src="../Images/Figure-P101_20883.jpg"/> 
+  <p class="imgdescript-c">图3-46　Arduino ICSP引脚说明（SPI）</p> 
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP8-6">3-6　网络通信</h3> 
+ <p class="bodycontent">本节是我们有线通信中的最后一节，却也是承先启后相当重要的一个关节点，因为先有了以太网络（Ethernet），才成就了因特网（Internet）的时代。基于这些基础技术的演进，才有了我们今天在这里所谈的物联网。因此我们把网络通信分成两节来讨论：有线和无线。</p> 
+ <p class="bodycontent">因特网的应用之所以能够带给大家这么大的便利，主要是因为它的方便性及覆盖范围。你可以轻易地从家中的计算机通过浏览器浏览世界各地的网站，轻松地从网络上学习到各种知识。能有这样的方便性全是因为网络通信的架构充满弹性以及所具有的独特性。网络通信所需要的知识太多太复杂了，在不同的领域需要了解不同的特性。例如，架设一个购物网站或是利用网络进行影音串流（Video Streaming），背后都有相关知识需要学习。建议大家到网上或是从书籍中去了解这些知识，本书只针对几个特点以及范例所需要用到的部分来进行解说。</p> 
+ <p class="bodycontent" id="CHP8-6-1">3-6-1　定义自己在网络中的地址</p> 
+ <p class="bodycontent">从前面的介绍可以知道，当设备越来越多时，我们会以独立的编号或是名称来定义通信网络上的所有设备，当信息发出时，我们就可以知道是由谁发出和由谁负责接收了。因特网也是这样，其中一个参数就是IP（Internet Protocol，因特网协议）地址。几年前这个IP地址还是以四个字节来表示，也就是32位长的二进制数。为了便于用户识别与使用，每个字节使用“点”作为间隔，例如：</p> 
+ <p class="bodycontent">192.168.1.1</p> 
+ <p class="bodycontent">用点隔开4个十进制的数字，每个数字只会介于0～255之间。这种地址分类方式称为IPv4，是第4版的因特网协议，可以提供超过42亿个地址给设备使用。不过，最近这个地址已经宣告枯竭，因此有了IPv6的出现，希望能为将来物联网的设备提供充足的地址空间。</p> 
+ <p class="bodycontent">IPv4的寻址方式，其实还有所谓专用网络和广播地址也包含在内，因此使用上不可以随便定义一个地址给设备使用，而需要先了解自己所处的网络才可以按规则进行设置。这4个十进制的数字其实表示一个网络和一个设备。根据使用的场景与需求，IPv4定义了不同层级的网络，以A、B、C来分类：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img114" src="../Images/Figure-T103_32206.jpg"/>
+ </div> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti">*　会减2的原因是一个地址用来代表整个网络，另一个则用来广播。</p> 
+ </div> 
+ <p class="bodycontent">举例：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img115" src="../Images/Figure-T103_21021.jpg"/>
+ </div> 
+ <p class="bodycontent">表示在192.168.10.0这个网络中，只有254个设备可以使用IP，地址从1到254。</p> 
+ <p class="bodycontent">子屏蔽在这里的用意就是区分出IPv4的地址中网络的地址和设备可用的地址。</p> 
+ <p class="bodycontent">如果大家自己在家中利用Arduino连上网络，通常会通过网络运营商提供的路由器连到因特网，这样的网络架构下，多半地址会以192.168开头。在学校计算机教室中也会有类似的特定网络会随每个学校有细微的不同，大家在使用前必须先了解整个网络的设备或是请教专家后再开始测试。</p> 
+ <p class="bodycontent" id="CHP8-6-2">3-6-2　因特网通信的方式</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float25" src="../Images/Figure-P104_26827.jpg"/> 
+  <p class="imgdescript-c">图3-47　数据传送的过程</p> 
+ </div> 
+ <p class="bodycontent">因特网能有这么大的规模主要依靠每一层架构之间的相互关系，这里说到的层就是通信七层（OSI），让我们可以将数据经过协议转换，再通过设备传送到整个网络上（见图3-47）。对方也可以再一层层解析还原为原来的数据。因此OSI模型上的七层在如此庞大的网络下缺一不可。</p> 
+ <p class="bodycontent">因特网在不同的应用中会使用不同的通信协议（见图3-48），例如HTTP、HTTPS、FTP等，还会根据不同的OSI层有不同的协议。如果要我们自己一个协议接一个协议慢慢地建立在Arduino中，我想就没有人会拿Arduino来实现网络的应用了，况且Arduino本身的微控制器并没有强大到能够直接处理网络通信。因此我们需要另一块扩展板。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img116" src="../Images/Figure-P104_32207.jpg"/> 
+  <p class="imgdescript-c">图3-48　不同通信层的协定</p> 
+ </div> 
+ <p class="bodycontent">Arduino原厂就有一块网络扩展模块Ethernet Shield（见图3-49），还有一块支持PoE（Power over Ethernet）的扩展板（见图3-50）。所谓PoE，就是利用以太网络的标准网线进行数据传输与电源的供应。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img117" src="../Images/Figure-P105_21034.jpg"/> 
+  <p class="imgdescript-c">图3-49　Arduino Ethernet Shield（图片来源：Arduino.cc）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img118" src="../Images/Figure-P105_21037.jpg"/> 
+  <p class="imgdescript-c">图3-50　Arduino Ethernet Shield with PoE（图片来源：Arduino.cc）</p> 
+ </div> 
+ <p class="bodycontent">标准的网络接口类似RS-422，在RJ-45的8个引脚内共使用了4个引脚进行数据传输，剩下4个暂时没有使用。而这8条线必须是两两一对的对绞线，以颜色区分，1、2一对，3、6一对，4、5一对，7、8一对。这样能够提高线材抗噪声的能力，尤其是当传输距离达到最大（100米）时。线材也有等级的定义，比如CAT 5、CAT 6。CAT 6抗噪能力高于CAT 5。千兆网络（GLAN）或是工业现场就会建议使用CAT 6。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img119" src="../Images/Figure-T105_32208.jpg"/>
+ </div> 
+ <p class="bodycontent">PoE（见图3-51）就是使用网线中没有使用到的另外4个引脚的其中两个来作为电源的接线，这样的好处是可以省去接线的麻烦，只需要一条标准的网线即可作为电源与数据的物理接口。尤其是物联网，设备较多，能省下电源的配线来降低成本。如果觉得Arduino的PoE模块太贵了也没有关系，大家可以去找找图中的转接线，好处是电压的基准位可以自己配置，但是也要注意随着长度的增加，电压有可能会因为阻抗而衰减。一般标准的PoE基于IEEE 802.3af，电压为36～57V，15.4W的功率。PoE在使用上还要注意除了接点的设置外，供电端与接收端一定要有相同的配置来避免设备损毁。</p> 
+ <p class="bodycontent">回到网络通信部分，Arduino标准的Ethernet扩展板采用W5100这个网路控制器，它支持标准TCP/IP的数据协议，包含TCP、UDP、IPv4、ICMP、ARP、IGMP和PPPoE，也集成了MAC和PHY。用户可以很简单地使用它来建立网络相关的应用，唯一美中不足的是，它只支持同一时间下的4个连接（Simultaneous Socket Connections）。当我们拿来做服务器时就会发生连接数量的限制。若有第三方公司使用W5200（见图3-52）则可以支持到8个连接。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img120" src="../Images/Figure-P106_26845.jpg"/> 
+  <p class="imgdescript-c">图3-51　PoE转接线</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img121" src="../Images/Figure-P106_26848.jpg"/> 
+  <p class="imgdescript-c">图3-52　Seeedstudio推出的W5200网络扩展板（图片来源：Seeedstudio）</p> 
+ </div> 
+ <p class="bodycontent">应该怎么使用呢？Arduino已经有内建好的函数库Ethernet library可以直接使用，当然这是以W5100为基础的函数库，若是W5200则需要额外引用自身的函数库。</p> 
+ <p class="bodycontent">W5100 Ethernet扩展板的特点如下。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　支持TCP/IP Protocols TCP，UDP，ICMP，IPv4 ARP，IGMP，PPPoE，Ethernet。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　支持Auto MDI/MDIX，Auto Negotiation。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　支持4个独立的socket。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　支持16KB高速缓存。</p> 
+ <p class="bodycontent">现在来使用DHT11温湿度模块建立我们的第一个网络服务器，这里使用的是Arduino的网络模块，也就是W5100（见图3-53）。范例程序中同时也有W5200的使用方式，先以注释避免使用，大家可用手边的模块进行切换。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img122" src="../Images/Figure-P107_21147.jpg"/> 
+  <p class="imgdescript-c">图3-53　Arduino W5100网络通信扩展模块</p> 
+ </div> 
+ <p class="bodycontent">DHT11（见图3-54）则是采用一线式通信的温湿度模块，大家可以拿到单个组件或是厂商集成好的模块。与Arduino连接的就是基本的三条线：电源（5V）、接地（GND）和信号线。这里我们利用Arduino微控制器的特点之一，A0～A5也是可以当作数字引脚的。若是从引脚编号来看的话，则从A0也就是第14个脚开始，一直到19。从范例程序可以看到，我们是直接使用A0这个变量，不过在这里指的是数字信号而非模拟信号。这个范例让大家知道了可以灵活运用模拟引脚。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img123" src="../Images/Figure-P108_26856.jpg"/> 
+  <p class="imgdescript-c">图3-54　DHT11的接线方式</p> 
+ </div> 
+ <p class="bodycontent">由于Arduino已经将网络函数库纳入基本的支持，因此我们只需要导入DHT11模块的函数库，并在程序前面将两者引用进来。此外，因为是通过SPI接口与W5100进行通信，所以也可以看到SPI.H的头文件：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img124" src="../Images/Figure-P108_26860.jpg"/>
+ </div> 
+ <p class="bodycontent">在前面提到的网络通信中，有一个很重要的参数，即IP地址，通过它我们可以知道网络的规模，也方便定义信息的接收与发送端。对于IP地址，我们可以有所谓的私有IP和公共IP。所谓的私有IP，就是在局域网（LAN）内的设备所拥有的地址，只在局域网内有效，常以192.168开头。例如，家里的网络或是公司内网大多属于这种类型。而因为应用环境的关系，网络内的设备可能常常有变动，所以私有IP会随时间而改变。</p> 
+ <p class="bodycontent">公共IP则是独一无二的地址，它定义在整个因特网的范畴内，类似我们的身份证号码，它会有独立的机构核发，这个地址让我们可以从世界上任何一个地方连接上拥有这个公共IP的设备，因此这种类型的地址通常不会变动。</p> 
+ <p class="bodycontent">有了IP地址还是不够的，因为IP地址是可以自行调整的，网络设备还有一个参数即MAC地址（Media Access Control Address，介质访问控制地址）。它在OSI模型中与IP地址分属不同层。MAC地址共48个二进制位（6个字符），其中前面一半是由IEEE来指定设备生产厂商所拥有的地址，后面一半则由各厂商自行规划。</p> 
+ <p class="bodycontent">如果今天只是简单的网络通信测试，只要将Arduino和计算机连接起来通过网络来交换数据（IP地址可以自己设置），让两者同在一个网络即可。但是，如果将设备数量增多或是同时有很多设备要进行测试，就必须沟通好大家的设置，例如使用大家的班级和学号来规划。</p> 
+ <p class="bodycontent">在Arduino的网络模块中，可以自行设置IP和MAC地址，因此我们必须规划好每个设备的IP地址并确认MAC地址没有重复。MAC是十六进制数，因此我们可以用计算器来进行数值转换，如图3-55所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img125" src="../Images/Figure-P109_21159.jpg"/> 
+  <p class="imgdescript-c">图3-55　计算器的模式转换</p> 
+ </div> 
+ <p class="bodycontent">接下来直接输入你定义的参数，再调整十六进制即可，如图3-56所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img126" src="../Images/Figure-P110_32284.jpg"/> 
+  <p class="imgdescript-c">图3-56　十六进制转换</p> 
+ </div> 
+ <p class="bodycontent">这样就可以在Arduino中设置我们要的MAC地址和IP地址了：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img127" src="../Images/Figure-P110_32218.jpg"/>
+ </div> 
+ <p class="bodycontent">接着我们要让计算机端的浏览器可以观察Arduino上的数据变化，必须让Arduino变身成一个网页服务器主机（Server）：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img128" src="../Images/Figure-P110_32222.jpg"/>
+ </div> 
+ <p class="bodycontent">这里为什么看到一个80的设置参数呢？这其实就是所谓的端口（Port）。因为一台网络上的主机同一时间可能需要身兼数职，例如网页服务器、FTP文件主机等。很像公司内部的分机，对外只会有一个代表号，通过不同的分机转接，可以让你找到不同的部门。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img129" src="../Images/Figure-T110_32285.jpg"/>
+ </div> 
+ <p class="bodycontent">将网络功能应该定义的参数定义完成后，就可以初始化相关的功能了。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img130" src="../Images/Figure-P111_21167.jpg"/>
+ </div> 
+ <p class="bodycontent">就像串行通信一样，只需要一行程序begin就可以启动网络通信，里面的参数就是我们前面预设好的IP和MAC。如果你的应用需要GATEWAY和SUBMASK，也可以参考注释部分的设置方式。</p> 
+ <p class="bodycontent">至于主程序的部分，第一件事情就是先读取DHT11温湿度模块的数据：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img131" src="../Images/Figure-P111_21171.jpg"/>
+ </div> 
+ <p class="bodycontent">接下来因为Arduino是服务器主机，所以只需要随时响应客户端的连接请求即可，就像串行通信的事件一样，也是使用available()函数：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img132" src="../Images/Figure-P111_21174.jpg"/>
+ </div> 
+ <p class="bodycontent">确认客户端已经连接到Arduino后，Arduino必须先发送HTTP的回应标头，内容包含了内容类型及一些设置：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img133" src="../Images/Figure-P112_26943.jpg"/>
+ </div> 
+ <p class="bodycontent">接下来才是网页内容的信息：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img134" src="../Images/Figure-P112_26946.jpg"/>
+ </div> 
+ <p class="bodycontent">完成整个项目的编辑与上传后，我们就要设置计算机与Arduino连接显示的数据了。</p> 
+ <p class="bodycontent">先要确定计算机网络的设置。从控制面板中的网络和因特网里面的网络连接可以看到我们计算机的网络接口。在我们使用的那个接口上右键单击，选中“属性”命令，如图3-57所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img135" src="../Images/Figure-P113_21180.jpg"/> 
+  <p class="imgdescript-c">图3-57　计算机网络接口</p> 
+ </div> 
+ <p class="bodycontent">找到网际网络协议，再单击“属性”按钮，如图3-58所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img136" src="../Images/Figure-P113_21184.jpg"/> 
+  <p class="imgdescript-c">图3-58　网络功能设置</p> 
+ </div> 
+ <p class="bodycontent">用计算机直接跟Arduino的网络模块连线时，可以采用固定IP的做法（见图3-59）；但是使用用整个计算机教室的网络时，建议听从老师的指示。这样才可以顺利连上！</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img137" src="../Images/Figure-P114_26954.jpg"/> 
+  <p class="imgdescript-c">图3-59　网络IP设置</p> 
+ </div> 
+ <p class="bodycontent">最后启动IE浏览器或是Google的Chrome浏览器，输入Arduino的IP地址，应该就可以看到如图3-60显示的数据了，而且网页的标题还是自己设置的呢！</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img138" src="../Images/Figure-P114_26958.jpg"/> 
+  <p class="imgdescript-c">图3-60　浏览器显示的温湿度数据</p> 
+ </div> 
+ <p class="bodycontent">多数局域网使用动态的方式取得IP地址，也就是所谓的DHCP（Dynamic Host Configuration Protocol）。网络内会有一台服务器来分配可用的IP地址给连上网络的设备，比如Wi-Fi热点就是采用的这种方式。</p> 
+ <p class="bodycontent">Arduino也支持DHCP功能，当在Ethernet.begin()里只设置了MAC地址而没有设置IP地址时，Arduino会视为要使用DHCP的方式获取IP。可参考以下范例：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img139" src="../Images/Figure-P115_21197.jpg"/>
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP8-7">3-7　小结</h3> 
+ <p class="bodycontent">有线通信的好处是实体的接线让我们可以清楚地看到两个设备是否对接上了，不过这也是有线通信会受到限制的问题，因为实体的线路连接会有数据碰撞的可能性，网络通信也是一直通过技术的演进来降低数据碰撞造成的影响。网络通信能够有这么大数量的设备相互连接是因为有完善的协议架构，并且各层都有对应的硬件来协助，例如路由器（Router）和交换机（Switch）。但从实际应用的现场考虑，有线通信的可靠性还是受到肯定的，不像日常生活无线通信那么普及，在工业应用中，RS-485、网络都还是主流接口。下一章节将会介绍无线通信的部分，大家可以比较一下有线与无线的差异性。</p> 
+</body>
+</html>

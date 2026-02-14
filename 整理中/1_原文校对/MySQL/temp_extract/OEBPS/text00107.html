@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">7.2.3　利用mysql命令恢复（标准）</h3>
+<p class="p6">1.使用mysql命令恢复基本实践</p>
+<p class="ziti">mysql命令是MySQL数据库自带的重要命令之一，除了日常登录数据库之外，还可以通过mysqldump备份的文件或者人工编辑的SQL语句文件对数据库进行数据恢复：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop database oldboy;
+Query OK, 1 row affected (0.01 sec)
+mysql&gt; quit
+Bye
+[root@oldboy ~]# mysql &lt;/opt/oldboy.sql          #&lt;==这就是恢复命令，简单吧。
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"  #&lt;==使用-e参数，可在命令行查MySQL数据。
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+</pre>
+<hr/>
+<p class="p6">2.使用开发人员提交的SQL语句恢复文件</p>
+<p class="ziti">假定开发人员让运维人员或DBA插入数据到数据库（可能是通过邮件发送的，内容可能是字符串或者SQL文件）。</p>
+<p class="ziti">此时的SQL文件里很可能没有use db这样的字样，此时如果使用mysql命令导入就要指定数据库名了，即：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql oldboy &lt;/opt/oldboy.sql</pre>
+<hr/>
+<p class="ziti">指定库名oldboy的作用就相当于是在数据库里执行use oldboy，因此如果使用mysqldump备份时不使用-B参数，那么在恢复时不但可能会提示没有数据库，还可能会提示没有选择数据库。</p>
+<p class="ziti">并且在SQL语句文件里尽可能地加入字符集设置，以防止乱码。假设开发人员提交了N行插入语句，则需要插入到数据库（这里以一行来代替）：</p>
+<hr/>
+<pre class="ziti1">insert into test(name) values('小陶');</pre>
+<hr/>
+<p class="ziti">放入文件里执行（也可以直接在数据库命令行执行）：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cat /opt/insert.sql
+set names utf8;
+insert into test(name) values('小陶');</pre>
+<hr/>
+<p class="ziti">如果是utf8数据库，人工编辑的SQL文件，建议使用“UTF8没有签名”的格式。</p>
+<p class="ziti">此时恢复数据到数据库，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql &lt;/opt/insert.sql
+ERROR 1046 (3D000) at line 2: No database selected  #&lt;==提示没有数据库可选。
+[root@oldboy ~]# mysql oldboy&lt;/opt/insert.sql       #&lt;==这里oldboy的作用就相当于是在库里执行use oldboy一样。
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
+|  6 | 小陶     | #&lt;==数据已经正常插入。
++----+---------+</pre>
+<hr/>
+<p class="ziti">看到了吧，mysql不仅可以恢复mysqldump的备份文件，只要是sql语句，都可以通过mysql命令执行到数据库中。</p>
+<p class="ziti">如果在使用mysqldump备份时指定了-B参数，那么恢复时就无须指定库名恢复了，为什么？</p>
+<p class="ziti">因为使用-B参数以后，备份结果中会带use oldboy和“create database oldboy”；语句，而恢复时在mysql命令后指定库名就相当于是执行use oldboy。</p>
+<p class="ziti">所以，如果mysqldump备份时指定了-B参数，则恢复时可以用如下方法：</p>
+<hr/>
+<pre class="ziti1">mysql &lt;/opt/oldboy.sql</pre>
+<hr/>
+<p class="ziti">否则只能用如下方法，而且条件是oldboy库必须事先存在，否则需要提前创建：</p>
+<hr/>
+<pre class="ziti1">mysql oldboy&lt;/opt/insert.sql  #&lt;==条件是oldboy库必须事先存在，否则需要提前创建。</pre>
+<hr/>
+<p class="ziti">此处的oldboy库相当于use oldboy。</p>
+<p class="ziti">因此建议使用mysqldump备份库时指定-B参数，效果会更好。</p>
+<p class="p6">3.针对压缩的备份数据进行恢复</p>
+<p class="ziti">方法1：使用gzip解压（会删除压缩文件）。</p>
+<hr/>
+<pre class="ziti1">gzip -d /opt/oldboy.sql.gz
+mysql &lt;/opt/oldboy.sql</pre>
+<hr/>
+<p class="ziti">方法2：使用gzip解压（不会删除压缩文件）。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# !mysqldump          #&lt;==调用最近的mysqldump命令，重复执行备份。
+mysqldump -B --master-data=2 --single-transaction oldboy|gzip &gt;/opt/oldboy.sql.gz
+[root@oldboy ~]# gzip -cd /opt/oldboy.sql.gz &gt;/opt/oldboy1.sql #&lt;==特殊解压方法。
+[root@oldboy ~]# mysql &lt;/opt/oldboy1.sql</pre>
+<hr/>
+<p class="ziti">方法3：使用gunzip解压（不会删除压缩文件）。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# gunzip -cd /opt/oldboy.sql.gz &gt;/opt/oldboy.sql
+[root@oldboy ~]# mysql &lt;/opt/oldboy2.sql</pre>
+<hr/>
+<p class="ziti">或者：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# gunzip&lt;/opt/oldboy.sql.gz|mysql</pre>
+<hr/>
+<p class="ziti">方法4：使用zcat读取压缩包数据。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# zcat /opt/oldboy.sql.gz &gt;/opt/oldboy3.sql
+[root@oldboy ~]# mysql &lt;/opt/oldboy3.sql</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_148">7.4.1　模块编译</h3>
+
+  <p class="ziti3">ngx_cache_purge模块目前版本已经支持编译为动态模块，编译过程如下。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5"># 获取ngx_cache_purge模块代码
+git clone https://github.com/nginx-modules/ngx_cache_purge.git
+
+# 在Nginx代码目录编译ngx_cache_purge为动态模块
+./configure --add-dynamic-module=../third/ngx_cache_purge --with-compat
+make
+
+# 在Nginx配置中加载ngx_cache_purge模块
+sed -i '/^events/i\load_module "modules/ngx_http_cache_purge_module.so";' /etc/nginx/nginx.conf
+
+# 测试并重启
+nginx -t
+systemctl restart nginx
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

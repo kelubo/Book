@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">5.3　查看MySQL命令帮助</h2>
+<p class="ziti">MySQL中的查看帮助命令help与Linux命令行的普通命令帮助工具man类似，与Linux下bash内置命令的帮助工具help相同。要想查看MySQL中命令的使用语法等帮助信息，就需要用到help工具了，可以直接输入help，或者先输入help，然后在后面接要查看的命令及命令组合，例如help create。默认情况下MySQL中的命令是不区分大小写的，这与Linux命令行严格区分大小写是有区别的。</p>
+<p class="ziti">下面直接在MySQL中键入help命令，输出的这部分帮助信息用途不是很大，简单了解即可：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help
+...省略若干行...
+List of all MySQL commands:
+Note that all text commands must be first on line and end with ';'
+?         (\?) Synonym for `help'.
+clear     (\c) Clear the current input statement.
+connect   (\r) Reconnect to the server. Optional arguments are db and host.
+delimiter (\d) Set statement delimiter.
+edit      (\e) Edit command with $EDITOR.
+ego       (\G) Send command to mysql server, display result vertically.
+exit      (\q) Exit mysql. Same as quit.
+go        (\g) Send command to mysql server.
+help      (\h) Display this help.
+nopager   (\n) Disable pager, print to stdout.
+notee     (\t) Don't write into outfile.
+pager     (\P) Set PAGER [to_pager]. Print the query results via PAGER.
+print     (\p) Print current command.
+prompt    (\R) Change your mysql prompt.
+quit      (\q) Quit mysql.
+rehash    (\#) Rebuild completion hash.
+source    (\.) Execute an SQL script file. Takes a file name as an argument.
+status    (\s) Get status information from the server.
+system    (\!) Execute a system shell command.
+tee       (\T) Set outfile [to_outfile]. Append everything into given outfile.
+use       (\u) Use another database. Takes database name as argument.
+charset   (\C) Switch to another charset. Might be needed for processing binlog with multi-byte charsets.
+warnings  (\W) Show warnings after every statement.
+nowarning (\w) Don't show warnings after every statement.
+For server side help, type 'help contents'</pre>
+<hr/>
+<p class="ziti">比较重要的帮助命令是“help contents”，也可以使用“?contents”命令，它可以显示很多重要的帮助信息。示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help contents
+You asked for help about help category: "Contents"
+For more information, type 'help &lt;item&gt;', where &lt;item&gt; is one of the following
+categories:
+    Account Management
+    Administration
+    Compound Statements
+    Data Definition
+    Data Manipulation
+    Data Types
+    Functions
+    Functions and Modifiers for Use with GROUP BY
+    Geographic Features
+    Help Metadata
+    Language Structure
+    Plugins
+    Procedures
+    Storage Engines
+    Table Maintenance
+    Transactions
+    User-Defined Functions
+    Utility</pre>
+<hr/>
+<p class="ziti">为了方便读者辨识这些类别的知识，下面针对上面的输出结果进行了翻译，如表5-1所示。</p>
+<p class="middle-img">表5-1　“help contents”结果信息表</p>
+<div class="pic"><img alt="" src="Image00030.jpg" />
+</div>
+<p class="ziti">在上述“help contents”命令的输出结果中，还可以用help加上感兴趣的信息，继续深入查看帮助，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help Data Definition #&lt;==Data Definition的意思是数据定义分类，即数据库
+                              数据定义命令。
+You asked for help about help category: "Data Definition"
+For more information, type 'help &lt;item&gt;', where &lt;item&gt; is one of the following
+topics:
+    ALTER DATABASE
+    ALTER EVENT
+    ALTER FUNCTION
+    ALTER LOGFILE GROUP
+    ALTER PROCEDURE
+    ALTER SERVER
+    ALTER TABLE
+    ALTER TABLESPACE
+    ALTER VIEW
+    CONSTRAINT
+    CREATE DATABASE
+    CREATE EVENT
+    CREATE FUNCTION
+    CREATE INDEX
+    CREATE LOGFILE GROUP
+    CREATE PROCEDURE
+    CREATE SERVER
+    CREATE TABLE
+    CREATE TABLESPACE
+    CREATE TRIGGER
+    CREATE VIEW
+    DROP DATABASE
+    DROP EVENT
+    DROP FUNCTION
+    DROP INDEX
+    DROP PROCEDURE
+    DROP SERVER
+    DROP TABLE
+    DROP TABLESPACE
+    DROP TRIGGER
+    DROP VIEW
+    RENAME TABLE
+    TRUNCATE TABLE
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">同样为了方便读者辨识这些命令的前缀知识，下面针对上面的输出信息进行了翻译，如表5-2所示。</p>
+<p class="middle-img">表5-2　“help Data Definition”结果信息表</p>
+<div class="pic"><img alt="" src="Image00031.jpg" />
+</div>
+<div class="pic"><img alt="" src="Image00032.jpg" />
+</div>
+<p class="ziti">在上述“help Data Definition”命令的输出中，还可以使用help加上感兴趣的具体管理数据库的命令信息，从而进一步深入查看帮助信息。比如，可以通过如下示例查看创建数据库的帮助信息：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; help CREATE DATABASE
+Name: 'CREATE DATABASE'
+Description:
+Syntax:
+CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name
+    [create_specification] ...
+create_specification:
+    [DEFAULT] CHARACTER SET [=] charset_name
+  | [DEFAULT] COLLATE [=] collation_name
+CREATE DATABASE creates a database with the given name. To use this
+statement, you need the CREATE privilege for the database. CREATE
+SCHEMA is a synonym for CREATE DATABASE.
+URL: http://dev.mysql.com/doc/refman/5.6/en/create-database.html
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">这样就查到了具体的管理数据库的命令帮助信息，查看其他的帮助信息也是如此，这里需要注意一点的是，读者要有一定的阅读英文或者使用工具翻译英文的能力。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ MySQL的help命令帮助就相当于Linux下的man命令一样，很好用，读者要牢记。</p>
+</body>
+</html>

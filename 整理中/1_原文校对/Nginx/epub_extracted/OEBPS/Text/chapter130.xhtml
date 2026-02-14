@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_141">7.2.2　Memcached缓存模块</h3> 
+ <p class="ziti3">Nginx的ngx_http_memcached_module模块本身并没有提供缓存功能，它只是一个将用户请求转发到Memcached服务器的代理模块。在以Memcached服务器为缓存应用的方案中，Memcached作为内容缓存的存储服务器，用户通过URL为Memcached的key将Web请求数据缓存到Memcached服务器中，在客户端发起请求时，Nginx通过一致的URL为key，快速地从Memcached服务器中将缓存的内容作为用户的请求响应数据返回给客户端。</p> 
+ <p class="ziti3">Memcached是一个开源、高性能的内存对象缓存系统，使用Memcached服务器作为缓存存储服务器，充分利用了Memcached的高效缓存功能，减少了Nginx服务器磁盘I/O的操作，也可以通过upstream指令对多台Memcached做分布式集群负载，以便整体提升Nginx缓存服务器的性能。Memcached缓存模块配置指令如表7-8所示。</p> 
+ <p class="middle-img">表7-8　Memcached缓存模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-8.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-8.jpg" class="calibre265"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/219-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/219-i.jpg" class="calibre266"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    location / {
+        set            $memcached_key "$uri?$args";  # 设置Memcached缓存key
+        memcached_pass 127.0.0.1:11211;              # 设置被代理Memcached地址
+        error_page     404 502 504 = @fallback;      # 返回状态码404、502、504时跳入内部请求
+    }
+
+    location @fallback {
+        proxy_pass     http://backend;               # 将请求转发给后端服务器
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

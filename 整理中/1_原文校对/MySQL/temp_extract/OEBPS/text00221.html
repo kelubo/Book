@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.2.7　MySQL主从复制线程状态说明及用途</h3>
+<p class="p6">1.MySQL主从复制主库I/O线程状态说明</p>
+<p class="ziti">1）登录主数据库查看MySQL线程的同步状态：</p>
+<hr/>
+<pre class="ziti1">mysql&gt;  show processlist\G  #&lt;==查看主库所有线程的状态。
+*************************** 1. row ***************************
+     Id: 1
+   User: rep
+   Host: 172.16.1.52:39041
+     db: NULL
+Command: Binlog Dump  #&lt;==用于复制的主库线程。
+   Time: 755
+  State: Master has sent all binlog to slave; waiting for binlog to be updated
+  #&lt;==当前状态
+   Info: NULL
+1 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 上述状态的意思是线程已经从binlog日志中读取到了所有的更新，并已经将更新发送到了从数据库服务器。线程现在为空闲状态，等待主服务器上二进制日志中的新事件更新。</p>
+<p class="ziti">表14-2中列出了主服务器的binlog Dump线程的State列的最常见状态。如果你没有在主服务器上看见任何binlog Dump线程，则说明复制没有运行，二进制binlog日志由各种事件组成，一个事件通常会为一个更新添加一些其他的信息。</p>
+<p class="middle-img">表14-2　主库I/O线程工作状态</p>
+<div class="pic"><img alt="" src="Image00118.jpg" />
+</div>
+<p class="ziti">2）登录从数据库查看MySQL线程的工作状态，从库有两个线程，即I/O和SQL线程。</p>
+<p class="ziti">下面是从库I/O线程的状态。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show processlist\G
+*************************** 1. row ***************************
+     Id: 4
+   User: system user
+   Host:
+     db: NULL
+Command: Connect
+   Time: 2044
+  State: Waiting for master to send event
+   Info: NULL</pre>
+<hr/>
+<p class="ziti">表14-3列出了从服务器的I/O线程的State列的最常见的状态。该状态也出现在Slave_IO_State列，由SHOW SLAVE STATUS显示。</p>
+<p class="middle-img">表14-3　从库I/O线程的工作状态</p>
+<div class="pic"><img alt="" src="Image00119.jpg" />
+</div>
+<p class="ziti">下面是从库SQL线程的状态：</p>
+<hr/>
+<pre class="ziti1">*************************** 2. row ***************************
+     Id: 5
+   User: system user
+   Host:
+     db: NULL
+Command: Connect
+   Time: 1600
+  State: Slave has read all relay log; waiting for the slave I/O thread to update it
+   Info: NULL</pre>
+<hr/>
+<p class="ziti">表14-4列出了从服务器的SQL线程其State列的最常见的状态。</p>
+<p class="middle-img">表14-4　从库SQL线程状态及说明</p>
+<div class="pic"><img alt="" src="Image00120.jpg" />
+</div>
+<p class="ziti">有关MySQL主从复制参与线程状态的更多信息，请参考MySQL官方手册。</p>
+<p class="p6">2.查看MySQL线程同步状态的用途</p>
+<p class="ziti">通过MySQL线程同步状态可以看到同步是否正常进行，故障的位置是什么，另外还可以查看数据库同步是否完成，可用于主库宕机切换数据库或者人工数据库主从切换迁移等。</p>
+<p class="ziti">例如，主库宕机，要选择最快的从库将其提升为主库，就需要查看主从库的线程状态，如果是主从复制在正常情况下进行角色切换，也需要查看主从库的线程状态，根据复制状态确定数据库更新是否完成。</p>
+</body>
+</html>

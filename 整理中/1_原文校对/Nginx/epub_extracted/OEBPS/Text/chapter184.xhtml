@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_198">10.4.3　监控HTTP主机状态</h3> 
+ <p class="ziti3">Prometheus针对被监控主机，是通过轮询Exporter接口的形式获取监控数据的，nginx-module-vts模块虽然也提供Prometheus数据格式输出，但数据并不详细，推荐使用nginx-vts-exporter实现Prometheus数据输出。nginx-vts-exporter是由Go语言开发的，不仅提供了针对信息的监控数据，还提供了配套的Grafana模板。</p> 
+ <p class="ziti3">（1）在Nginx服务器上安装nginx-vts-exporter</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 获取nginx-vts-exporter二进制文件
+wget https://github.com/hnlq715/nginx-vts-exporter/releases/download/v0.10.3/nginx-vts-exporter-0.10.3.linux-amd64.tar.gz
+tar zxmf nginx-vts-exporter-0.10.3.linux-amd64.tar.gz
+cp nginx-vts-exporter-0.10.3.linux-amd64/nginx-vts-exporter /usr/local/nginx/sbin/
+
+# 运行测试
+nginx-vts-exporter -nginx.scrape_timeout 10 -nginx.scrape_uri http://127.0.0.1: 8080/vts/format/json
+
+curl http://127.0.0.1:9913/metrics
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）将nginx-vts-exporter配置为进程服务</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 安装supervisor
+yum install supervisor
+
+# 配置nginx-vts-exporter服务管理配置
+cat&gt;/etc/supervisord.d/nginx-vts-exporter.ini&lt;&lt;EOF
+[program:nginx-vts-exporter]
+;配置进程运行命令
+command=/usr/local/nginx/sbin/nginx-vts-exporter -nginx.scrape_timeout 10 -nginx.scrape_uri http://127.0.0.1:8080/vts/format/json
+directory=/usr/local/nginx/sbin     ;进程运行目录
+startsecs=5                         ;启动5秒后没有异常退出表示进程正常启动，默认为1秒
+autostart=true                      ;在supervisord启动的时候也自动启动
+autorestart=true                    ;程序退出后自动重启
+EOF
+
+# 启动supervisord并配置为开机运行
+systemctl start supervisord
+systemctl enable supervisord
+
+# nginx-vts-exporter进程服务管理
+# 查看nginx-vts-exporter进程服务状态
+supervisorctl status nginx-vts-exporter
+
+# 重启nginx-vts-exporter进程服务
+supervisorctl restart nginx-vts-exporter
+
+# 启动nginx-vts-exporter进程服务
+supervisorctl start nginx-vts-exporter
+
+# 停止nginx-vts-exporter进程服务
+supervisorctl stop nginx-vts-exporter
+
+# 访问测试
+curl http://10.10.4.8:9913/metrics
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）在Prometheus上配置监控job</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cd /opt/data/apps
+cat&gt;&gt;prometheus/prometheus/prometheus.yml&lt;&lt;EOF
+    # nginx-vts-exporter job
+    - job_name: nginx_exporter
+        static_configs:
+        - targets: ['10.10.4.8:9913']
+            labels:
+                instance: nginx-1
+EOF
+
+docker restart prometheus
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）导入Grafana模板实现图表化展示</p> 
+ <p class="ziti3">登录Grafana后，在左侧菜单点击Configuration→Add data source，选择Prometheus图标后进入数据源配置页面，配置如图10-4所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-4.jpg" class="calibre314"/></a> 
+ </div> 
+ <p class="middle-img">图10-4　Grafana数据源配置</p> 
+ <p class="ziti3">在左侧菜单点击Create→Import，在标题为Grafana.com Dashboard的输入框输入模板ID 2949后，点击任意位置进入模板导入页，如图10-5所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-5.jpg" class="calibre315"/></a> 
+ </div> 
+ <p class="middle-img">图10-5　Grafana模板导入</p> 
+</body>
+</html>

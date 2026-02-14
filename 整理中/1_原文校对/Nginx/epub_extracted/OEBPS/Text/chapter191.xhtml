@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_205">10.5.4　Zabbix获取Prometheus数据</h3> 
+ <p class="ziti3">Prometheus是通过定时从部署在被监控主机上的Exporter获取监控数据来实现监控的，Zabbix 4.2版本可利用自身监控组件定时拉取Exporter的监控数据，并对Prometheus数据进行解析从而实现对Prometheus数据的监控处理，实现逻辑如图10-10所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-10.jpg" class="calibre321"/></a> 
+ </div> 
+ <p class="middle-img">图10-10　Zabbix获取Prometheus数据</p> 
+ <p class="ziti3">（1）添加监控模板</p> 
+ <p class="ziti3">1）创建分组（Host groups）：Configure→Host groups，创建分组Nginx-Prometheus。</p> 
+ <p class="ziti3">2）创建模板（Templates）：Configure→Templates，创建模板Nginx-Prometheus。</p> 
+ <p class="ziti3">3）配置模板宏（Macros）：Configure→Templates，点击模板Nginx-Prometheus，点击Macros创建宏变量{$ADDRESS}、{$PORT}，值为空即可。</p> 
+ <p class="ziti3">4）创建应用（Applications）：Configure→Templates，点击模板Nginx-Prometheus中的Applications，创建应用nginx_server_requests。</p> 
+ <p class="ziti3">5）创建HTTP Agent类型监控项（Items）：Configure→Templates，点击模板Nginx-Prometheus中的Items，创建HTTP Agent类型的监控项nginx_server_requests，如图10-11所示。需注意Type of information的选择为Text格式。</p> 
+ <p class="ziti3">6）创建Dependent items类型监控项（Items）：Configure→Templates，点击模板Nginx-Prometheus中的Items，创建Dependent items类型的监控项nginx_server_requests_total，如图10-12所示。</p> 
+ <p class="ziti3">7）创建监控项处理过程（Preprocessing）：Configure→Templates，点击模板Nginx-Prome-theus中的Items，点击监控项nginx_server_requests_total，点击Preprocessing，创建的监控项处理过程如图10-13所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-11.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-11.jpg" class="calibre322"/></a> 
+ </div> 
+ <p class="middle-img">图10-11　创建HTTP Agent类型监控项</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-12.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-12.jpg" class="calibre323"/></a> 
+ </div> 
+ <p class="middle-img">图10-12　创建Dependent items类型监控项</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-13.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-13.jpg" class="calibre324"/></a> 
+ </div> 
+ <p class="middle-img">图10-13　创建监控项处理过程</p> 
+ <p class="ziti3">监控项处理过程支持Prometheus pattern和Prometheus to JSON的两种方式处理Pro-metheus数据，以及以Prometheus pattern为标准的PromQL语法对Metric文本数据进行解析。</p> 
+ <p class="ziti3">8）创建图形（Graphs）：Configure→Templates，点击模板Nginx-Prometheus中的Graphs，选择监控项nginx_server_requests_total，创建图形。</p> 
+ <p class="ziti3">（2）添加监控主机</p> 
+ <p class="ziti3">通过Configure→Hosts，创建主机，Templates关联为Nginx-Prometheus，Macros创建宏变量{$ADDRESS}，对应值为Nginx主机IP；创建{$PORT}，对应值为Exporter的端口。</p> 
+ <p class="ziti3">至此，Zabbix就可以对Prometheus的Exporter进行监控并生成图形了。</p> 
+</body>
+</html>

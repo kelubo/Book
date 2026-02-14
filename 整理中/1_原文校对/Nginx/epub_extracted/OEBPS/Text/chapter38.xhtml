@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_45">3.1.4　配置文件中的哈希表</h3>
+
+  <p class="ziti3">Nginx使用哈希表加速对Nginx配置中常量的处理，如server中的主机名、types中的MIME类型映射表、请求头属性字段等数据集合。哈希表是通过关键码来快速访问常量对应值的数据存储结构，在通过哈希表获取数据的过程中，其内部实现通过相关函数将常量名转换为一个关键码来实现对应值的快速定位和读取。由于数据的复杂性，会出现不同常量名转换的关键码是一样的情况，这就会导致读取对应值时发生冲突。为了解决这个问题，Nginx同时引入了哈希桶机制，就是把相同关键码的哈希键存在一个哈希桶定义的存储空间中，然后再进行二次计算来获取对应的值。</p>
+
+  <p class="ziti3">单个哈希桶的大小等于CPU缓存行大小的倍数。这样就可以通过减少内存访问的数量来加速在CPU中搜索哈希关键码的速度。如果哈希桶的大小等于CPU的缓存行的大小，在Nginx进行哈希关键码搜索期间，内存的访问次数最多是两次，一次是计算哈希桶的地址，另一次是在哈希桶内进行哈希关键码的搜索。</p>
+
+  <p class="ziti3">Linux系统下查看CPU缓存行的指令如下。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">cat /proc/cpuinfo |grep cache_alignment
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">Nginx在每次启动或重新加载配置时会选择合适大小的最小初始化哈希表。哈希表的大小会随哈希桶数量的增加而不断调整，直到哈希桶总的大小达到哈希表设置的最大值。因此，在Nginx提示需要增加哈希表或哈希桶的大小时，要先调整哈希表的大小。</p>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">14.3　MySQL主从复制在企业中的故障案例</h2>
+<p class="ziti">
+<span class="yanse">工作中MySQL从库停止复制的故障案例</span>
+</p>
+<p class="ziti">模拟并重现故障的能力是运维人员最重要的能力。下面就来进行模拟操作。先在从库中创建一个库，然后在主库中创建同名的库来模拟数据冲突，代码如下：</p>
+<hr/>
+<pre class="ziti1">show slave status\G:结果为：
+Slave_IO_Running: Yes
+Slave_SQL_Running: NO
+Seconds_Behind_Master: NULL
+                   Last_Error: Error 'Can't create database 'xiaoliu'; database exists' on query. Default database: 'xiaoliu'. Query: 'create database xiaoliu'</pre>
+<hr/>
+<p class="ziti">对于该冲突，解决方法1为：</p>
+<hr/>
+<pre class="ziti1">stop slave; #&lt;==临时停止同步开关。
+set global sql_slave_skip_counter =1 ; #&lt;==将同步指针向下移动一个，如果多次不同步，
+                                       则可以重复操作。
+start slave; #&lt;==开启同步开关。</pre>
+<hr/>
+<p class="ziti">对于普通的互联网业务，上述移动指针的命令操作所带来的问题不是很大。当然，要在确认不影响公司业务的前提下进行上述操作。</p>
+<p class="ziti">若是在企业场景下，对当前业务来说，解决主从同步问题比主从数据不一致问题更重要，如果主从数据一致也是很重要的，那么就再找个时间来恢复下这个从库。</p>
+<p class="ziti">主从数据不一致更重要还是保持主从同步持续状态更重要，则要根据具体业务进行选择。</p>
+<p class="ziti">这样Slave就会和Master同步了，主要关键点为：</p>
+<hr/>
+<pre class="ziti1">Slave_IO_Running:  Yes
+Slave_SQL_Running: Yes
+Seconds_Behind_Master是否为0，#0表示状态已经同步</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ set global sql_slave_skip_counter=n；#n取值&gt;0，表示忽略执行N个更新。</p>
+<p class="ziti">解决方法2：根据可以忽略的错误号事先在配置文件中进行配置，跳过指定的不影响业务数据的错误，例如：</p>
+<hr/>
+<pre class="ziti1">[root@MySQL ~]# grep slave-skip /data/3306/my.cnf
+slave-skip-errors = 1032,1062,1007</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 类似由于入库重复所导致的失败可以忽略，其他情况下是不是可以忽略则需要根据不同公司的具体业务来进行评估。</p>
+<p class="ziti">其他可能引起复制故障的问题具体如下。</p>
+<p class="ziti6">·MySQL自身的原因及人为重复插入数据。</p>
+<p class="ziti6">·不同的数据库版本会引起不同步，低版本到高版本可以，但是高版本不能往低版本同步。</p>
+<p class="ziti6">·MySQL的运行错误或者程序BUG。</p>
+<p class="ziti6">·binlog记录模式，例如row level模式就比默认的语句模式要好。</p>
+</body>
+</html>

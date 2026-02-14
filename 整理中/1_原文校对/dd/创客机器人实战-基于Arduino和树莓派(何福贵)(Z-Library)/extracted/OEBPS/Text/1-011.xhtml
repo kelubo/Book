@@ -1,0 +1,263 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="A91fb003e-aa8d-4fda-8aea-b84963c42bdb" class="calibre13">Chpater 5<br class="calibre8"/> 第五章 Arduino典型电机控制</h2> 
+ <p class="calibre3">不同机器人根据不同的要求需要执行不同的功能，例如，表演机器人需要各个关节配合运动完成表演、移动机器人需要移动、避障机器人需要避开障碍物行走等，这些都属于机器人的电机控制，电机控制在机器人中应用广泛。下面介绍3种典型的电机：舵机、直流减速电机和步进电机。</p> 
+ <h3 id="A6410b8df-2f3f-4af1-8e1b-baa2942acfab" class="calibre14">5.1 舵机控制</h3> 
+ <h4 class="sigil_not_in_toc" id="A518d003e-b081-4b05-a514-80953c603576">5.1.1 舵机简介</h4> 
+ <p class="calibre3">舵机，又称伺服电机，是一种位置（角度）伺服的驱动器，其工作过程是把所接收到的电信号转换成电动机轴上的角位移或角速度输出，适用于那些需要角度不断变化并可以保持的控制系统。一般的舵机最大转动角度为180°，部分机器人的专用舵机可以达到270°甚至300°，最初在航模中应用，目前已拓展到机器人领域。</p> 
+ <p class="calibre3">舵机分为两种：模拟舵机和数字舵机，它们的区别在于内部有无单片机控制系统。数字舵机具有易于控制、反应速度快、定位精度高及抗干扰能力强等特点，逐渐取代模拟舵机。</p> 
+ <p class="calibre3">舵机主要有转速、转矩、电压、尺寸、重量、材料等参数。在进行舵机选型时要对以上几个方面进行综合考虑。</p> 
+ <p class="calibre3">例如，LDX-218及LDX-227舵机可使用在表演机器人上，扭矩较大。LDX-227为金属齿轮数码/数字舵机双轴270°舵机，扭矩为15kg/cm；LDX-218为180°舵机，如图5-1所示。</p> 
+ <p class="calibre3">力矩小一点的常用舵机例如MG945R和SG90舵机，如图5-2所示。MG945R的扭矩：10.5kg/cm（4.8V）、13kg/cm（6V）；SG90舵机的扭矩为：1.5kg/cm，它们的体积更小。</p> 
+ <p class="calibre3">标准的舵机有3条控制线，分别是电源、地和信号线。例如，S90舵机的针脚定义为：棕色线——GND，红色线——5V，橙色线——信号线，如图5-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u93" src="../Images/64_01.jpg" width="1030" height="618"/> 
+  <p class="imgtitle">图5-1 LDX-218及LDX-227舵机</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u94" src="../Images/64_02.jpg" width="907" height="447"/> 
+  <p class="imgtitle">图5-2 MG945R和SG90舵机</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u95" src="../Images/64_03.jpg" width="573" height="382"/> 
+  <p class="imgtitle">图5-3 SG90舵机的针脚定义</p> 
+ </div> 
+ <p class="calibre3">舵机主要由外壳、电路板、微型直流电机、变速齿轮和可调电位器等构成。舵机的工作原理是：通过信号线发送控制脉冲，控制电路接收；齿轮组将电机的速度按倍数缩小，并将电机的输出扭矩放大相应倍数，然后输出并驱动电机转动；电位器和齿轮组的末级连在一起，用于测量舵机轴转动角度；电路板检测电位器设定舵机转动角度，并控制舵机转动到目标角度或保持在目标角度。</p> 
+ <p class="calibre3">舵机本身是一个位置随动系统，舵轴输出的角度通过给定的控制信号控制，舵机使用开环控制方式。一般舵机的控制脉冲是周期20ms的PPM，脉宽0.5～2.5ms，分别对应-90°～+90°的位置，如图5-4所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u96" src="../Images/64_04.jpg" width="632" height="706"/> 
+  <p class="imgtitle">图5-4 脉冲宽度与角度对应图</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Af7cb003f-cc5b-4354-b56b-69d66b63889c">5.1.2 舵机控制函数库</h4> 
+ <p class="calibre3">Arduino控制舵机，需要使用舵机函数库，在Arduino编写程序时，需要包含头文件Servo.h，然后创建舵机的对象来控制舵机，该库有多个函数。</p> 
+ <p class="calibre3">（1）attach（pin）该函数用于为舵机指定一个Arduino电路板的引脚，例如：</p> 
+ <div class="center">
+  <img alt="" class="u97" src="../Images/64_05.jpg" width="1280" height="47"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u98" src="../Images/65_01.jpg" width="1280" height="89"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：因为Arduino自带函数只能利用数字9、10接口。Arduino的驱动能力有限，所以当需要控制一个以上的舵机时需要外接电源。</p> 
+ <p class="calibre3">（2）attach（pin，min，max）：该函数在指定引脚的同时，还指定最小角度和最大角度的脉宽值，单位为微秒（us），默认最小值为544，对应最小角度为0°；默认最大值为2400，对应最大角度为180°。</p> 
+ <p class="calibre3">例如：myServo1.attch（1，1000，2000）。</p> 
+ <p class="calibre3">（3）write（angle）：该函数可以直接填写需要的角度。例如：myServo1.write（80），该函数精度较低，只能达到1°。</p> 
+ <p class="calibre3">（4）writeMicroseconds（us）：该函数精度较高，直接填写脉冲值，单位是微秒（us）。例如：myServo1.writeMicroseconds（1500）；舵机指向90°。该函数的角度精度为0.097°</p> 
+ <p class="calibre3">（5）detach（pin）：该函数用于释放舵机引脚，例如：myServo1.detach（9），使用该函数之前需先使用attach函数绑定引脚，否则释放无效。</p> 
+ <p class="calibre3">（6）read()：该函数用于返回当前舵机的角度，范围为0～180°，例如：</p> 
+ <div class="center">
+  <img alt="" class="u99" src="../Images/65_02.jpg" width="1280" height="86"/>
+ </div> 
+ <p class="calibre3">（7）readMicroseconds()：该函数用于返回当前舵机的脉冲值，单位为微秒（us），范围在最大脉冲宽度和最小脉冲宽度之间。</p> 
+ <h4 class="sigil_not_in_toc" id="Aa6c20040-c13b-4b35-871a-1790324d7061">5.1.3 实例：实现摇头电扇</h4> 
+ <p class="calibre3">选择常用的S90舵机，将舵机与Arduino UNO控制器连接起来，舵机引脚连接接线如图5-5所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u100" src="../Images/65_03.jpg" width="1280" height="650"/> 
+  <p class="imgtitle">图5-5 舵机与Arduino UNO控制器连接</p> 
+ </div> 
+ <p class="calibre3">启动Arduino IDE，在菜单中选择“文件”＞“示例”＞“Servo”＞“Sweep”命令，如图5-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u101" src="../Images/66_01.jpg" width="1036" height="876"/> 
+  <p class="imgtitle">图5-6 舵机实现摇头示例</p> 
+ </div> 
+ <p class="calibre3">生成的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u102" src="../Images/66_02.jpg" width="1280" height="946"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/66_03.jpg" width="48" height="56"/>和“下载”按钮<img alt="" class="u103" src="../Images/66_04.jpg" width="48" height="56"/>，观察运行效果，效果是舵机从0运动到180°，然后再从180°转到0，循环运动。</p> 
+ <h3 id="A27b99da4-4974-4255-8570-d97870a4a5a3" class="calibre14">5.2 直流减速电机</h3> 
+ <h4 class="sigil_not_in_toc" id="A3be90042-1bd4-4743-97dc-c9380e8bc3e7">5.2.1 直流电机简介</h4> 
+ <p class="calibre3">在机器人的行走机构中多使用直流电机，和舵机不同，直流电机可实现连续的转动，目前直流电机的种类也比较多，如图5-7～图5-9所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u104" src="../Images/67_01.jpg" width="553" height="478"/> 
+  <p class="imgtitle">图5-7 普通直流电机</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u105" src="../Images/67_02.jpg" width="596" height="479"/> 
+  <p class="imgtitle">图5-8 无刷直流电机</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u106" src="../Images/67_03.jpg" width="595" height="474"/> 
+  <p class="imgtitle">图5-9 空心杯电机</p> 
+ </div> 
+ <p class="calibre3">普通直流电机一般以电机直径区分，通常直径越大，电机扭矩也越强。</p> 
+ <p class="calibre3">无刷直流电机由电动机主体和驱动器组成，是一种典型的机电一体化产品。无刷电机是指无电刷和换向器（或集电环）的电机，又称无换向器电机。克服了直流电机的缺陷，是当今最理想的调速电机，广泛应用于汽车、工具加工、工业控制、精密仪器、自动化及航空航天等领域，例如，现在广泛使用的磁盘电机就是无刷电机，具有无级调速、过载能力强、噪声小、无须维护、寿命长等优点。</p> 
+ <p class="calibre3">空心杯电机在结构上突破了传统电机的转子结构形式，采用的是无铁芯转子，具有良好的控制性能，也叫空心杯型转子，它的转速与供电电压成正比。这种新颖的转子结构彻底消除了由于铁芯形成涡流造成的电能损耗，制造高性能机器人多采用空心杯电机。</p> 
+ <p class="calibre3">直流电机用于机器人控制时，为了减小速度，增大力矩，一般附带有减速装置，可在一定的电压范围内工作，广泛使用于智能车、微型机器人等。本书使用的机器人大部分都使用了这种电机。直流减速电机如图5-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u107" src="../Images/67_04.jpg" width="679" height="545"/> 
+  <p class="imgtitle">图5-10 直流减速电机</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A249f0042-2d69-4338-b318-7f3c81739ebd">5.2.2 H桥驱动电路</h4> 
+ <p class="calibre3">H桥是一个典型的直流电机控制电路，因为它的电路形状酷似字母H，故得名“H桥”。4个三极管组成H的4条垂直腿，而电机就是H的横杠。</p> 
+ <p class="calibre3">H桥电路是常用的直流电机驱动电路，H桥式电机驱动电路包括4个三极管和1个电机。要使电机运转，必须导通对角线上的一对三极管。根据不同三极管对的导通情况，电流可能会从左至右或从右至左流过电机，从而控制电机的转向，如图5-11所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u108" src="../Images/68_01.jpg" width="734" height="495"/> 
+  <p class="imgtitle">图5-11 H桥驱动电路</p> 
+ </div> 
+ <p class="calibre3">要使电机运转，必须使对角线上的一对三极管导通。当Q1管和Q4管同时导通时，电流从正级经Q1穿过电机，再经过Q4回到电源负极，驱动电机顺时针转动，如图5-12所示。反之，电机反转，如图5-13所示。</p> 
+ <p class="calibre3">上面H桥电路使用的是三极管，也广泛使用了场效应管，其原理相同。三极管一般控制较小功率的电机，场效应管能控制较大功率的电机。</p> 
+ <div class="center"> 
+  <img alt="" class="u109" src="../Images/68_02.jpg" width="730" height="591"/> 
+  <p class="imgtitle">图5-12 顺时针旋转</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u109" src="../Images/68_03.jpg" width="730" height="591"/> 
+  <p class="imgtitle">图5-13 逆时针旋转</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A20850043-6fa1-4fd2-829d-0e9b22b9718d">5.2.3 PWM信号控制调速</h4> 
+ <p class="calibre3">H桥电路可以控制直流电机正转和反转，但是在实际使用中还需要调速，那么怎么实现呢？答案就是PWM技术。</p> 
+ <p class="calibre3">脉冲宽度调制（Pulse Width Modulation，PWM），简称脉宽调制。它是利用微处理器的数字输出来对模拟电路进行控制的一种技术，广泛应用于测量、通信、功率控制与变换等许多领域。它把恒定的直流电源电压调制成频率一定、宽度可变的脉冲序列，这种脉冲序列表示不同的输出电压，以达到调节电机转速的目的。</p> 
+ <p class="calibre3">由于Arduino Uno控制板具有6路8位的PWM输出，其PWM输出引脚为D3、D5、D6、D9、D10、D11（标号前面有波浪号“～”）。进行电机调速程序设计时，使用的函数是anologWrite，该函数可实现PWM信号输出，实现对电机转速的控制。</p> 
+ <h4 class="sigil_not_in_toc" id="A092a0043-62f0-428a-94a3-f7a41efc9a23">5.2.4 常用直流电机驱动芯片</h4> 
+ <p class="calibre3">电机驱动芯片就是封装好的H桥电路，目前有很多装好的H桥集成电路，使用非常方便、可靠，例如：L293D、L298N、TA7257P、SN754410等，本书将重点介绍常用的L298N和L293D电机驱动芯片。</p> 
+ <p class="calibre3">L298N是ST公司的产品，是典型的双H桥直流电机驱动芯片，可用于驱动直流电机或双极性步进电机，采用15脚Multiwatt封装，内部具有4通道逻辑驱动电路。L298N芯片可以同时驱动两个二相电机，如图5-14所示，直接用Arduino的I/O接口来控制。</p> 
+ <div class="center"> 
+  <img alt="" class="u110" src="../Images/69_01.jpg" width="1280" height="494"/> 
+  <p class="imgtitle">图5-14 L298N驱动电路芯片</p> 
+ </div> 
+ <p class="calibre3">L298N的引脚2、3、13、14可分别接两个直流电动机；引脚5、7、10、12接Arduino UNO控制板，控制电机的正、反转；引脚6、11接Arduino UNO控制板控制使能端，分别控制二路电机的启动与停止。</p> 
+ <p class="calibre3">电机驱动芯片L293D如图5-15所示，它包含4个输出通道，最大输出峰值电流为1.2A，能同时驱动两个直流电机工作；其信号输入端和使能端接收到来自单片机的信号，控制电机的通断，以及正、反转，还可以通过向使能端输入不同占空比的方波信号来调整电机转速（PWM方式），如图5-16所示，IN端口接控制信号，OUT端口接电机的两端，EN端口接使能信号。当一组IN端口输入为高/低或低/高电平时，能实现电机的正/反转；当一组IN端口输入均为高或低电平时，电机将停转；当EN使能端为高电平时，相应端口输入信号有效，反之，输入信号无效。在EN端输入PWM波，通过调整PWM波的占空比，即可实现电机的无级调速。</p> 
+ <div class="center"> 
+  <img alt="" class="u111" src="../Images/69_02.jpg" width="779" height="411"/> 
+  <p class="imgtitle">图5-15 L293D实物图</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u112" src="../Images/69_03.jpg" width="483" height="337"/> 
+  <p class="imgtitle">图5-16 L293D驱动电路</p> 
+ </div> 
+ <p class="calibre3">L298N和L293D可驱动机器人行走的两个电机以不同的转速来实现转弯、圆圈运动、循迹等。</p> 
+ <h4 class="sigil_not_in_toc" id="A26bc0044-2236-414a-bf59-a9e2d2945726">5.2.5 实例：实现圆圈运动</h4> 
+ <p class="calibre3">单独的直流电机驱动芯片使用起来比较烦琐，因此可以把直流电机驱动芯片集成为直流电机驱动板，目前市场上已经有很多这样的产品。</p> 
+ <p class="calibre3">LKV-HM3.0双H桥直流电机驱动板如图5-17所示，是奥松机器人科技股份有限公司设计的产品，采用ST公司的L298N典型双H桥直流电机驱动芯片，可用于驱动直流电机或双极性步进电机，此驱动板适用于智能程控小车、轮式机器人等，可配合各种控制器使用，帮大家实现机器人DIY梦想。</p> 
+ <div class="center"> 
+  <img alt="" class="u113" src="../Images/70_01.jpg" width="1280" height="551"/> 
+  <p class="imgtitle">图5-17 LKV-HM3.0双H桥直流电机驱动板</p> 
+ </div> 
+ <p class="calibre3">Arduino Uno板与LKV-HM3.0双H桥直流电机驱动板接线如表5-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表5-1 Arduino Uno板与LKV-HM3.0双H桥直流电机驱动板接线表</p>
+  <img alt="" class="u114" src="../Images/70_02.jpg" width="1280" height="314"/>
+ </div> 
+ <p class="calibre3">使用上面的电机驱动板组装小车，实现小车沿着圆形运动，其运动原理是双轮差速驱动原理，即两边的电机的运动速度不同。两边电机运动的速度差决定了的运动圆形半径，代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u115" src="../Images/70_03.jpg" width="1280" height="454"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u116" src="../Images/71_01.jpg" width="1280" height="785"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：直流电机A控制输入接口EA和直流电机B控制输入接口EB只能接Arduino Uno的3、5、6、9、10、11引脚，如图5-18所示，因为只有这几个引脚才能输出PWM信号。</p> 
+ <div class="center"> 
+  <img alt="" class="u117" src="../Images/71_02.jpg" width="769" height="539"/> 
+  <p class="imgtitle">图5-18 Arduino Uno</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A0a130046-b6ca-4b48-b438-e5d47bce95a4">5.2.6 实例：实现螺旋运动</h4> 
+ <p class="calibre3">DF-MD V1.3大功率L298N双路直流电机驱动板直流电机驱动模块是DFrobot创客社区为Robot推出的，如图5-19所示，当然用于驱动步进电机也可以。把大部分功能集成化，使得制作机器人更加方便。DF-MD V1.3是续DF-MD V1.0之后的第3次改版，每一次改版其性能方面都有很大的提升。DF-MDV1.3在原来的基础上增加了散热器，可以承受更大的电流；控制端口由原来的6个改为4个，不但可以节约控制器端口，而且控制方式也更为简单。DF-MD V1.3大功率直流电机驱动器采用LGS公司优秀的大功率电机专用驱动芯片L298N，可直接驱动直流电机，驱动电流达2A。该电路线路布线合理，均采用贴元件片，体积小，方便安装，输出端采用高速肖特基二极管作为保护。</p> 
+ <div class="center"> 
+  <img alt="" class="u118" src="../Images/72_01.jpg" width="1280" height="645"/> 
+  <p class="imgtitle">图5-19 DF-MD V1.3大功率H桥L298N双路直流电机驱动</p> 
+ </div> 
+ <p class="calibre3">这个电机控制板的端口为4个，较LKV-HM3.0少了两个，控制电机正/反转使用一个引脚，E1和E2分别为两个电机控制的使能端（可使用PWM调速）。M1和M2正/反转控制信号输入端。</p> 
+ <p class="calibre3">M1=0，M1电机正转。</p> 
+ <p class="calibre3">M1=1，M1电机反转。</p> 
+ <p class="calibre3">M2=0，M2电机正转。</p> 
+ <p class="calibre3">M2=1，M2电机反转。</p> 
+ <p class="calibre3">DF-MD V1.3电机控制板功能定义如表5-2所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表5-2 DF-MD V1.3电机控制板功能定义</p>
+  <img alt="" class="u119" src="../Images/72_02.jpg" width="1280" height="225"/>
+ </div> 
+ <p class="calibre3">连线图如图5-20所示。</p> 
+ <p class="calibre3">实现代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u120" src="../Images/72_03.jpg" width="1280" height="311"/>
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u121" src="../Images/73_01.jpg" width="1280" height="838"/> 
+  <p class="imgtitle">图5-20 连线图</p> 
+ </div> 
+ <div class="center">
+  <img alt="" class="u122" src="../Images/73_02.jpg" width="1280" height="649"/>
+ </div> 
+ <h3 id="A62c25ab3-1191-492b-bc64-fc1c0c897d9a" class="calibre14">5.3 步进电机</h3> 
+ <h4 class="sigil_not_in_toc" id="A1eb60048-4e13-4416-bd9e-de4dcb9b8707">5.3.1 步进电机简介</h4> 
+ <p class="calibre3">步进电机是将电脉冲信号转变为角位移或线位移的开环控制元件。在非超载的情况下，电机的转速、停止的位置只取决于脉冲信号的频率和脉冲数，而不受负载变化的影响，即给电机加一个脉冲信号，电机则转过一个步距角。这一线性关系的存在，加上步进电机只有周期性的误差而无累积误差等特点。使得在速度、位置等控制领域用步进电机来控制变得非常简单。一些典型的步进电机如图5-21所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u123" src="../Images/74_01.jpg" width="1244" height="396"/> 
+  <p class="imgtitle">图5-21 典型的步进电机</p> 
+ </div> 
+ <p class="calibre3">步进电机由定子和转子组成，定子由硅钢片叠成，装上一定相数的控制绕组，由环行分配器送来的电脉冲对多相定子绕组轮流进行励磁，步进电机结构图如图5-22所示。步进电机按电磁转矩产生机理的不同可以分为反应式步进电机、永磁式步进电机和混合式步进电机；按绕组的相数又可以分为单相、两相和多相3种，几相代表内部有几组线圈。</p> 
+ <div class="center"> 
+  <img alt="" class="u124" src="../Images/74_02.jpg" width="826" height="808"/> 
+  <p class="imgtitle">图5-22 步进电机结构原理图</p> 
+ </div> 
+ <p class="calibre3">（1）BG1导通A相线圈通电，此时转子被磁力吸引静止不动。</p> 
+ <p class="calibre3">（2）BG1截止BG2导通，B相线圈通电，磁通按最近的路径闭合，在磁力的拉动下，转子开始向逆时针方向转动，并转动到3°，如果没有控制脉冲，转子将停止在这个角度不动。</p> 
+ <p class="calibre3">（3）如果再来一个控制脉冲，开关晶体管BG2截止BG3导通，C线圈通电，转子在磁拉力作用下开始继续转动，在磁力的拉动下，转子向逆时针方向转动到6°。</p> 
+ <p class="calibre3">（4）如果再来一个控制脉冲，开关晶体管BG3截止BG1导通，A线圈通电，转子在磁拉力作用下开始继续转动；在磁力的拉动下，转子向逆时针方向转动到9°，此时状态与初始位置相同。</p> 
+ <p class="calibre3">如果需要继续转动就继续发控制脉冲，重复上面的过程。不停地发控制脉冲电机就会不停地旋转，一旦脉冲停止电机就停止转动。需要反转就改变三相切换顺序，例如，前面的过程是按A→B→C顺序导通转子逆时针转动的，改为C→B→A顺序导通转子则按顺时针转动。</p> 
+ <h4 class="sigil_not_in_toc" id="A734a0049-685e-40ab-bb04-99bc4fc8261b">5.3.2 常用步进电机驱动芯片</h4> 
+ <p class="calibre3">和直流电机驱动芯片一样，步进电机驱动通常也采用步进电机的集成驱动芯片，常用的有L297、、L6228、A3977、TA8345和ULN2003等，根据需要选择合适的步进电机驱动芯片。</p> 
+ <p class="calibre3">下面以ULN2003APG为例进行说明，ULN2003APG芯片如图5-23所示，ULN2003APG芯片引脚图如图5-24所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u125" src="../Images/75_01.jpg" width="745" height="560"/> 
+  <p class="imgtitle">图5-23 ULN2003APG实物图</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u126" src="../Images/75_02.jpg" width="891" height="435"/> 
+  <p class="imgtitle">图5-24 ULN2003APG引脚图</p> 
+ </div> 
+ <p class="calibre3">ULN2003APG引脚功能说明如表5-3所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表5-3 ULN2003APG引脚功能说明</p>
+  <img alt="" class="u127" src="../Images/75_03.jpg" width="1280" height="459"/>
+ </div> 
+ <p class="calibre3">ULN2003APG属于高耐压、大电流达林顿管IC，与ULN2003是同一系类产品。高耐压、大电流达林顿阵列由7个硅NPN达林顿管组成电路，ULN2003APG的每一对达林顿都串联一个2700欧姆的基极电阻，在5V的工作电压下它能与TTL和CMOS电路直接相连，可以直接处理原先需要标准逻辑缓冲器来处理的数据。ULN2003APG工作电压高，工作电流大，灌电流可达500mA，并且能够在关态时承受50V的电压，输出还可以在高负载电流并行运行。</p> 
+ <h4 class="sigil_not_in_toc" id="A4c7b004a-12f2-47d3-a507-7a3f23768ccf">5.3.3 实例：实现步进正反转运动</h4> 
+ <p class="calibre3">组成硬件包含三部分：Arduino Uno开发板；ULN2003APG电机驱动板；28BYJ-48步进电机。</p> 
+ <p class="calibre3">ULN2003APG驱动芯片构成的电路板如图5-25所示，其中IN1-IN4接Arduino Uno开发板，右面白色的槽接口接步进电机，5--12V的“+”接电源正极，“-”接电源负极，右边4个指示灯显示控制步进电机的脉冲变化。步进电机的型号为28BYJ-48，如图5-26所示。</p> 
+ <p class="calibre3">ULN2003APG电机驱动板和步进电机的连接实物图如图5-27所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u128" src="../Images/76_01.jpg" width="730" height="677"/> 
+  <p class="imgtitle">图5-25 ULN2003APG电机驱动板</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u129" src="../Images/76_02.jpg" width="738" height="674"/> 
+  <p class="imgtitle">图5-26 28BYJ-48步进电机</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u130" src="../Images/76_03.jpg" width="1280" height="632"/> 
+  <p class="imgtitle">图5-27 ULN2003APG电机驱动板和步进电机的连接实物图</p> 
+ </div> 
+ <p class="calibre3">Arduino Uno开发板和ULN2003APG模块引脚接线如表5-4所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表5-4 Arduino Uno开发板和ULN2003A模块引脚接线</p>
+  <img alt="" class="u131" src="../Images/76_04.jpg" width="1280" height="372"/>
+ </div> 
+ <p class="calibre3">整体的连接实物图如图5-28所示。ULN2003APG模块的IN1、IN2、IN3、IN4口分别插入Arduino Uno开发板的5、6、7、8口。</p> 
+ <div class="center"> 
+  <img alt="" class="u132" src="../Images/77_01.jpg" width="1011" height="755"/> 
+  <p class="imgtitle">图5-28 整体连接实物图</p> 
+ </div> 
+ <p class="calibre3">启动Arduino IDE，新建文件，控制代码如下，修改dir值可控制电机旋转方向：</p> 
+ <div class="center">
+  <img alt="" class="u133" src="../Images/77_02.jpg" width="1280" height="1003"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u134" src="../Images/78_01.jpg" width="1280" height="1830"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u103" src="../Images/78_02.jpg" width="48" height="56"/>和“下载”按钮<img alt="" class="u103" src="../Images/78_03.jpg" width="48" height="56"/>，下载完成后，在Arduino IDE的菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图5-29所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u135" src="../Images/79_01.jpg" width="1155" height="924"/> 
+  <p class="imgtitle">图5-29 Arduino IDE实例运行结果</p> 
+ </div> 
+ <h3 id="A9746ddf3-b6dd-4010-932b-adbb0fbef2e2" class="calibre14">5.4 本章小结</h3> 
+ <p class="calibre3">本章详细介绍了机器人常用的3种运动控制的电机舵机、直流减速电机和步进电机，并介绍了它们的工作原理和应用实例，为后面的综合控制打下基础。</p> 
+</body>
+</html>

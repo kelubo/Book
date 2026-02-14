@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_84">4.3.5　gzip压缩</h3> 
+ <p class="ziti3">模块：ngx_http_gzip_module</p> 
+ <p class="ziti3">为提高用户获取响应数据的速度，Nginx服务器可以将响应数据进行gzip压缩，在减小响应数据的大小后再发送给用户端浏览器，相对于使用户浏览Web页面，上述方式显示速度更快。要想启用响应数据gzip压缩功能，需要用户浏览器也支持gzip解压功能，目前大多数浏览器都支持gzip压缩数据的显示。Nginx服务器接收客户端浏览器发送的请求后，通过请求头中的属性字段Accept-Encoding判断浏览器是否支持gzip压缩，对支持gzip压缩的浏览器将发送gzip压缩的响应数据。该模块的内置配置参数如表4-75～表4-83所示。</p> 
+ <p class="middle-img">表4-75　gzip压缩指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-75.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-75.jpg" class="calibre190"/></a> 
+ </div> 
+ <p class="middle-img">表4-76　gzip压缩缓冲区指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-76.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-76.jpg" class="calibre114"/></a> 
+ </div> 
+ <p class="middle-img">表4-77　gzip压缩级别指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-77.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-77.jpg" class="calibre144"/></a> 
+ </div> 
+ <p class="middle-img">表4-78　gzip压缩关闭指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-78.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-78.jpg" class="calibre91"/></a> 
+ </div> 
+ <p class="middle-img">表4-79　gzip压缩HTTP版本指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-79.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-79.jpg" class="calibre116"/></a> 
+ </div> 
+ <p class="middle-img">表4-80　gzip压缩最小长度指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-80.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-80.jpg" class="calibre191"/></a> 
+ </div> 
+ <p class="middle-img">表4-81　gzip压缩代理指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-81.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-81.jpg" class="calibre192"/></a> 
+ </div> 
+ <p class="ziti3">指令值选项说明如下。</p> 
+ <p class="ziti4">·off：关闭该指令功能。</p> 
+ <p class="ziti4">·expired：若HTTP响应头中包含属性字段Expires，则启用压缩。</p> 
+ <p class="ziti4">·no-cache：若HTTP响应头中包含属性字段Cache-Control:no-cache，则启用压缩。</p> 
+ <p class="ziti4">·no-store：若HTTP响应头中包含属性字段Cache-Control:no-store，则启用压缩。</p> 
+ <p class="ziti4">·private：若HTTP响应头中包含属性字段Cache-Control:private，则启用压缩。</p> 
+ <p class="ziti4">·no_last_modified：若HTTP响应头中不包含属性字段Last-Modified，则启用压缩。</p> 
+ <p class="ziti4">·no_etag：若HTTP响应头中不包含属性字段ETag，则启用压缩。</p> 
+ <p class="ziti4">·auth：若HTTP响应头中包含属性字段Authorization，则启用压缩。</p> 
+ <p class="ziti4">·any：对所有响应数据启用压缩。</p> 
+ <p class="middle-img">表4-82　gzip响应数据类型指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-82.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-82.jpg" class="calibre193"/></a> 
+ </div> 
+ <p class="middle-img">表4-83　gzip_vary指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-83.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-83.jpg" class="calibre194"/></a> 
+ </div> 
+ <p class="ziti3">模块：ngx_http_gunzip_module</p> 
+ <p class="ziti3">当客户端浏览器不支持gzip压缩时，该模块将压缩的数据解压后发送给客户端。对支持gzip压缩的浏览器不做处理。该模块的内置配置指令如表4-84和表4-85所示。</p> 
+ <p class="middle-img">表4-84　gzip解压指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-84.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-84.jpg" class="calibre195"/></a> 
+ </div> 
+ <p class="middle-img">表4-85　gzip解压缓冲区指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-85.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-85.jpg" class="calibre196"/></a> 
+ </div> 
+ <p class="ziti3">模块：ngx_http_gzip_static_module</p> 
+ <p class="ziti3">通常gzip压缩指令都是读取未压缩的文本，在进行动态压缩后把响应数据发送给客户端，该模块可以使Nginx把gzip压缩过的以.gz为后缀的文件或已压缩的响应数据直接发送给客户端。</p> 
+ <p class="ziti3">该模块的内置配置指令如表4-86所示。</p> 
+ <p class="middle-img">表4-86　静态压缩指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-86.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-86.jpg" class="calibre197"/></a> 
+ </div> 
+ <p class="ziti4">·on：不检查客户端是否支持gzip压缩数据，始终发送gzip压缩数据。</p> 
+ <p class="ziti4">·always：不检查客户端是否支持gzip压缩数据，始终发送gzip压缩数据。</p> 
+ <p class="ziti4">·该指令的执行优先级高于gzip指令。</p> 
+ <p class="ziti4">·开启该指令后，默认优先查找以.gz为后缀的文件。</p> 
+ <p class="ziti4">·gzip_types指令对gzip_static的设置无效。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">gzip_static always;                  # 始终发送静态的gzip压缩数据
+gunzip on;                           # 若客户端浏览器不支持gzip压缩数据，则解压后发送
+gunzip_buffers 16 8k;                # 解压缓冲区大小为128KB
+gzip_proxied expired no-cache no-store private auth;    # 当被代理的服务器符合条件时，
+                                                        # 对响应数据启用gzip压缩
+
+gzip on;                             # 启用动态gzip压缩功能
+gzip_min_length  1k;                 # 响应数据超过1KB时启用gzip压缩
+gzip_buffers     4 16k;              # 动态压缩的缓冲区大小是64KB
+gzip_comp_level 3;                   # 压缩级别为3
+gzip_types       text/plain application/x-javascript 
+                text/css application/xml text/javascript 
+                application/x-httpd-php image/jpeg 
+                image/gif image/png; # 对指定的MIME类型数据启用动态压缩
+gzip_vary on;                        # 向前端代理或缓存服务器发送添加“Vary: Accept-
+                                     # Encoding”的响应数据
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

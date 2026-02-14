@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">9.5.5　全备与恢复全备实践</h3>
+<p class="p6">1.数据准备</p>
+<p class="ziti">本次实践使用第8章的数据，如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+mysql&gt; select * from test;
++----+----------+
+| id | name     |
++----+----------+
+|  1 | oldboy   |
+|  2 | oldgirl  |
+|  3 | inca     |
+|  4 | zuma     |
+|  5 | kaka     |
+|  6 | bingbing |
+|  7 | xiaoting |
++----+----------+
+7 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">2.开始全备</p>
+<p class="ziti">1）先创建一个规范的备份目录：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mkdir /server/backup -p
+[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password= oldboy123 --socket=/application/mysql-5.6. 40/tmp/mysql.sock --no-timestamp /server/backup/full</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 有关参数的说明，请参照表9-5，注意socket的路径为编译时指定的路径。</p>
+<p class="ziti">执行备份时，屏幕会有非常多的输出信息，其实就是备份的工作流程细节，请读者仔细看，全备份与增量备份每当命令操作成功时，都会在日志的结尾处打印“completed ok！”作为标识：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password= oldboy123 --socket=/application/mysql-5.6.40/tmp/mysql.sock --no-timestamp /server/backup/full
+...省略若干行提醒信息及读取数据库的innodb参数配置等...
+180320 11:31:38 &gt;&gt; log scanned up to (1955436)    #&lt;==开始记录并监控redo日志。
+180320 11:31:38 [01] Copying ./ibdata1 to /server/backup/full/ibdata1
+#&lt;==开始复制innodb文件。
+180320 11:31:39 [01]        ...done
+...省略若干行...
+180320 11:31:39 [01] Copying ./oldboy/test.ibd to /server/backup/full/oldboy/test.ibd
+180320 11:31:39 [01]        ...done
+180320 11:31:39 &gt;&gt; log scanned up to (1955436)
+180320 11:31:39 Executing FLUSH NO_WRITE_TO_BINLOG TABLES...
+180320 11:31:39 Executing FLUSH TABLES WITH READ LOCK...  #&lt;==开始锁表备份非
+                                                       事务引擎表。
+180320 11:31:39 Starting to backup non-InnoDB tables and files
+180320 11:31:39 [01] Copying ./performance_schema/events_statements_summary_by_thread_by_event_name.frm to /server/backup/full/performance_schema/events_statements_summary_by_thread_by_event_name.frm
+180320 11:31:39 [01]        ...done
+...省略若干复制MyISAM表的数据文件行...
+180320 11:31:40 Finished backing up non-InnoDB tables and files
+#&lt;==备份非事务引擎表完成。
+180320 11:31:40 [00] Writing xtrabackup_binlog_info   #&lt;==记录binlog位置。
+180320 11:31:40 [00]        ...done
+180320 11:31:40 Executing FLUSH NO_WRITE_TO_BINLOG ENGINE LOGS...
+xtrabackup: The latest check point (for incremental): '1955436'
+#&lt;==记录最新的checkpoint。
+xtrabackup: Stopping log copying thread.    #&lt;==停止日志监控进程。
+.180320 11:31:40 &gt;&gt; log scanned up to (1955436)
+180320 11:31:41 Executing UNLOCK TABLES     #&lt;==停止锁表。
+180320 11:31:41 All tables unlocked
+...省略备份结果信息提示...
+180320 11:31:41 completed OK!               #&lt;==备份成功标识。</pre>
+<hr/>
+<p class="ziti">最终的备份结果如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ll /server/backup/full/
+total 77860
+-rw-r-----. 1 root root      418 Mar 20 07:35 backup-my.cnf
+#&lt;==配置文件备份。
+-rw-r-----. 1 root root 79691876 Mar 20 07:35 ibdata1
+#&lt;==共享表空间备份。
+drwxr-x---. 2 root root     4096 Mar 20 07:35 mysql
+#&lt;== mysql库的备份。
+drwxr-x---. 2 root root     4096 Mar 20 07:35 oldboy
+#&lt;== 3行oldboy等库的备份。
+drwxr-x---. 2 root root     4096 Mar 20 07:35 oldboy_utf8
+drwxr-x---. 2 root root     4096 Mar 20 07:35 performance_schema
+-rw-r-----. 1 root root       22 Mar 20 07:35 xtrabackup_binlog_info
+#&lt;== binlog位置信息。
+-rw-r-----. 1 root root      113 Mar 20 07:35 xtrabackup_checkpoints
+#&lt;== checkpoints信息。
+-rw-r-----. 1 root root      569 Mar 20 07:35 xtrabackup_info
+#&lt;== xtrabackup信息。
+-rw-r-----. 1 root root     2560 Mar 20 07:35 xtrabackup_logfile
+#&lt;== xtrabackup日志文件。
+[root@oldboy ~]# cd /server/backup/full/
+[root@oldboy full]# cat xtrabackup_binlog_info
+oldboy-bin.000004      120   #&lt;==binlog位置信息。
+[root@oldboy full]# cat xtrabackup_checkpoints #&lt;==存放备份的起始位置和结束位置。
+backup_type = full-backuped    #&lt;==备份类型
+from_lsn = 0                   #&lt;==checkpoints起始点。
+to_lsn = 1955065               #&lt;==checkpoints结束点。
+last_lsn = 1955065
+compact = 0
+recover_binlog_info = 0</pre>
+<hr/>
+<p class="p6">3.利用全备恢复数据</p>
+<p class="ziti">使用Innobackupex备份的数据有可能会处于不一致的状态，因此在恢复数据之前，首先要将数据调成一致性的状态，即需要应用备份过程中记录变化的日志（xtrabackup_logfile），同时回滚未提交的事务日志数据，具体命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy full]# innobackupex --apply-log --use-memory=32M /server/backup/full/</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+</p>
+<p class="ziti6">1）“--apply-log”用于记录变化的日志，并回滚未提交的事务日志数据。</p>
+<p class="ziti6">2）“--use-memory=32M”是分配的使用内存大小。</p>
+<p class="ziti6">该命令同样会有大量的输出，若提示“18032007：57：33 completed OK！”，则表示操作成功。</p>
+<p class="ziti">执行完此命令之后，备份的数据就可以用来恢复了。</p>
+<p class="ziti">使用Xtrabackup备份的本质就是复制物理数据文件，因此，在进行最终恢复时，需要临时关闭数据库，把物理文件复制回去进行恢复，整个恢复过程如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop  #&lt;==停库。
+Shutting down MySQL.. SUCCESS!
+[root@oldboy ~]# ss -lnt|grep 3306        #&lt;==检查端口。
+[root@oldboy ~]# mv /application/mysql/data /application/mysql/data_ori
+#&lt;==模拟删除数据文件。
+[root@oldboy ~]# mkdir -p /application/mysql/data  #&lt;==创建原始数据目录，
+                                                  目录要为空。
+[root@oldboy ~]# mv /server/backup/full/* /application/mysql/data/
+#&lt;==使用mv直接复制会更舒服一些。
+#&lt;==也可以使用下面的命令复制还原数据，和mv命令的功能是一样的，读者2选1即可，如下命令
+    的缺点是要根据MySQL配置文件的路径进行回拷贝，因此配置文件没有指定数据文件路径、数据
+    文件目录不为空等，都会导致无法回拷贝的问题。具体命令为innobackupex --defaults-
+    file=/etc/my.cnf --copy-back --rsync /server/backup/full/
+[root@oldboy ~]# chown -R mysql.mysql /application/mysql/data
+#&lt;==如果权限不对，那么启动数据库可能报“Starting MySQL. ERROR! The server quit
+    without updating PID file”错误。
+[root@oldboy ~]# /etc/init.d/mysqld start
+Starting MySQL. SUCCESS!
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"
++----+----------+
+| id | name     |
++----+----------+
+|  1 | oldboy   |
+|  2 | oldgirl  |
+|  3 | inca     |
+|  4 | zuma     |
+|  5 | kaka     |
+|  6 | bingbing |
+|  7 | xiaoting |
++----+----------+</pre>
+<hr/>
+<p class="ziti">恢复成功。</p>
+</body>
+</html>

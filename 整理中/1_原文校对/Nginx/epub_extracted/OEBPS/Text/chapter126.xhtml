@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_137">7.1.3　内容分发网络</h3> 
+ <p class="ziti3">内容分发网络（CDN）是基于反向代理缓存技术实现的大规模网络应用，其将缓存服务器分布到用户访问相对集中的地区或网络中，当用户访问目标网站时，它会利用全局负载策略，将用户的访问分配到离用户最近的缓存服务器，并由被分配的缓存服务器处理用户的访问请求。国内跨运营商的网络访问会很慢，通过CDN的分配策略，可有效地优化网络路径，并结合CDN缓存服务器节点的缓存，有效提高用户的访问速度，从而提升用户体验。内容分发网络架构如图7-5所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/7-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/7-5.jpg" class="calibre256"/></a> 
+ </div> 
+ <p class="middle-img">图7-5　内容分发网络架构图</p> 
+ <p class="ziti3">CDN将被加速的网站内容缓存在离用户最近的缓存服务器中，通常被缓存的是更新较少的静态资源（如静态页面、CSS、JavaScript、图片、视频等），CDN的各缓存服务器节点是通过HTTP响应头的Cache-Control来控制本地内容缓存有效期的。当客户端的请求被分配到CDN缓存服务器节点时，CDN缓存服务器会先判断内容缓存是否过期，若内容缓存在有效期内，则直接返回客户端，否则将向源站点发出回源请求，并从源站点获取最新的数据，在更新本地缓存后将响应数据返回客户端。CDN的缓存有效期设置会影响内容缓存的回源率。如果缓存有效期设置的较长，回源率较低，则会使缓存服务器的缓存数据与源网站不同步，影响访问；如果缓存有效期设置的较短，回源率较高，则会增加源网站的负载，影响CDN缓存服务器的使用效率。因此，CDN服务商会根据被缓存资源的类型（如文件后缀）、路径等多个维度为使用者提供缓存有效期设置接口，并为用户提供更加细化的缓存时间管理。除了可以设置缓存时间外，也可以通过“缓存刷新”接口对CDN缓存服务器的缓存数据进行强制更新。</p> 
+</body>
+</html>

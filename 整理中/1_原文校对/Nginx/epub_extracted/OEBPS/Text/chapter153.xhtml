@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_166">8.3.6　uWSGI负载均衡配置</h3>
+
+  <p class="ziti3">基于uWSGI协议的负载均衡是通过uWSGI模块（ngx_http_uwsgi_module）及上游模块（ngx_http_upstream_module）实现的，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">upstream uwsgi_backend {
+    server 192.168.2.154:8080;
+    server 192.168.2.109:8080;
+}
+
+server {
+    listen         8083;
+    server_name    localhost
+    charset UTF-8;
+
+    client_max_body_size 75M;
+
+    location / {
+        include uwsgi_params;               # 引入uWSGI默认参数配置
+        uwsgi_pass uwsgi://uwsgi_backend;   # 代理到上游服务器组uwsgi_backend
+        uwsgi_read_timeout 2;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_144">7.3.2　镜像缓存应用</h3> 
+ <p class="ziti3">Nginx服务器在配置proxy_store缓存方式下，可以按照URL的路径将从后端获取的静态文件保存在本地磁盘中，因为其内容缓存永远不会过期且没有自动缓存管理机制，所以从严格意义上讲它只能称为内容镜像。该方式可以十分方便地将后端服务器的静态文件资源在Nginx本地生成镜像，相对静态文件资源变动较少的应用场景可以很快地实现动静分离分布式应用架构，进而提升应用负载性能。应用场景示例如图7-8所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/7-8.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/7-8.jpg" class="calibre267"/></a> 
+ </div> 
+ <p class="middle-img">图7-8　镜像缓存应用</p> 
+ <p class="ziti4">·两台PHP应用服务器做动态应用处理。</p> 
+ <p class="ziti4">·静态文件由3台Nginx配置Store方式实现静态镜像缓存。</p> 
+ <p class="ziti4">·当有静态文件更新时，由PHP服务器代码通过Nginx的Lua脚本接口对Nginx静态镜像上的旧文件进行清除。</p> 
+ <p class="ziti3">（1）静态镜像服务器Nginx配置</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream php_server {
+    server 192.168.2.145:8190;         # PHP服务器IP
+    server 192.168.2.159:8190;         # PHP服务器IP
+}
+
+server {
+    listen 8180;
+    index index.php;
+
+    # 动态请求转发
+    location ~ \.php(.*)$ {
+        proxy_pass   http://php_server;
+    }
+
+    # 清除静态资源文件接口
+    location ~ /purge_store {
+        add_header Content-Type 'application/json; charset=utf-8';
+        set $cache_home /opt/data/cache;
+        content_by_lua_block {
+            local file = string.match(ngx.var.uri,"^/purge_store/(%S+)")
+            path = ngx.var.cache_home
+            os.remove(path.."/"..file)
+            ngx.say('{"code":200,"file":"'..path.."/"..file..'"}')
+        }
+    }
+
+    # 静态资源文件
+    location ~ .*\.(gif|jpg|jpeg|png|bmp|swf|zip|pdf|gz)$ {
+        expires 3d;
+        proxy_set_header Accept-Encoding '';
+        root /opt/data/cache;
+        proxy_store on;
+        proxy_store_access user:rw group:rw all:rw;
+        proxy_temp_path /opt/data/cache;
+        if ( !-e $request_filename) {
+            proxy_pass   http://php_server;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）PHP应用服务器Nginx配置</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 8190;
+    index index.php;
+
+    location ~ \.php(.*)$ {
+        root /opt/nginx-web/phpweb;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_split_path_info       ^(.+\.php)(.*)$;    # 获取$fastcgi_path_info
+                                                          # 变量值
+        fastcgi_param PATH_INFO       $fastcgi_path_info; # 赋值给参数PATH_INFO 
+        include        fastcgi.conf;                      # 引入默认参数文件
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">因为使用Lua脚本，所以需要对开源版本的Nginx增加Lua模块或使用OpenRestry版本的Nginx。</p> 
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">17.4　生产半同步复制建议及其他方案说明</h2>
+<p class="ziti">对于常规的互联网应用，主从复制就够用了，对于主从一致性要求较高的应用可以使用半同步复制方案，这是一个很不错的选择，但是半同步复制方案也会有缺点，那就是半同步复制会导致主库更新性能的下降，尤其是在从库网络不稳定时会对主库更新带来更大的更新性能下降。</p>
+<p class="ziti">解决办法具体如下。</p>
+<p class="ziti">1）将主库半同步超时调短（例如，1～2秒）。</p>
+<p class="ziti">2）半同步复制的从库硬件与主库之间的网络配置要更好一些。</p>
+<p class="ziti">3）半同步从库不用提供任何业务服务（包括读服务）。</p>
+<p class="ziti">除了半同步复制技术之外，还有一些方案可以用于解决数据一致性问题，具体如下。</p>
+<p class="ziti">1）客户端程序实现双写数据库。</p>
+<p class="ziti">2）客户端程序在写数据库的同时，写一段时间数据到磁盘上或内存中（redis）。</p>
+</body>
+</html>

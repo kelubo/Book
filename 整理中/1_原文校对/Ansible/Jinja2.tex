@@ -1,0 +1,771 @@
+﻿% Jinja2 模板引擎详解
+% 使用xelatex编译
+
+\documentclass[12pt,a4paper,twoside]{ctexbook}
+
+% 页面设置
+\usepackage{geometry}
+\geometry{left=3cm, right=2.5cm, top=3cm, bottom=2.5cm}
+
+% 字体设置
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{microtype}
+
+% 设置中文字体
+\setCJKmainfont{SimSun}[  % 正文宋体
+    BoldFont=SimHei,        % 粗体黑体
+    ItalicFont=KaiTi        % 斜体楷体
+]
+\setCJKsansfont{SimHei}    % 无衬线字体黑体
+\setCJKmonofont{SimSun}    % 等宽字体宋体
+\setCJKfamilyfont{kai}[    % 楷体
+    BoldFont=KaiTi
+]{KaiTi}
+\setCJKfamilyfont{fs}[     % 仿宋
+    BoldFont=FangSong
+]{FangSong}
+
+% 常用字体命令
+\newcommand{\song}{\CJKfamily{zhsong}}
+\newcommand{\hei}{\CJKfamily{zhhei}}
+\newcommand{\kai}{\CJKfamily{kai}}
+\newcommand{\fs}{\CJKfamily{fs}}
+
+% 标题格式设置
+\usepackage{titlesec}
+\ctexset{
+    part/name={第,卷},
+    part/number={\chinese{part}},
+    chapter/name={第,章},
+    chapter/number={\chinese{chapter}},
+    section/name={第,节},
+    section/number={\arabic{section}},
+    subsection/number={\arabic{section}.\arabic{subsection}},
+    chapter/format={\centering\hei\zihao{2}},
+    section/format={\hei\zihao{4}},
+    subsection/format={\hei\zihao{5}}
+}
+
+% 页眉页脚设置
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\zihao{5}\thepage}
+\fancyhead[LO]{\zihao{5}\leftmark}
+\fancyhead[RE]{\zihao{5}\rightmark}
+\renewcommand{\chaptermark}[1]{\markboth{\chaptername\ \thechapter\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyfoot[C]{\zihao{5} \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 插图设置
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfigure}
+\graphicspath{{images/}}
+\floatstyle{plaintop}
+\restylefloat{figure}
+
+% 表格设置
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+% 数学公式设置
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathrsfs}
+
+% 定理环境
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{corollary}{推论}[chapter]
+\newtheorem{example}{例}[chapter]
+
+% 目录、摘要等设置
+\usepackage{makeidx}
+\makeindex
+
+% 代码设置
+\usepackage{listings}
+\usepackage{color}
+\usepackage{enumitem}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+% 引用设置
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={Jinja2 模板引擎详解},
+    pdfauthor={Ansible 学习指南},
+    pdfsubject={Jinja2 模板引擎},
+    pdfkeywords={Jinja2 \quad Ansible \quad 模板引擎}
+}
+
+% 目录深度
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+% 封面信息
+\title{\hei\zihao{0} Jinja2 模板引擎详解}
+\author{\song\zihao{2} Ansible 学习指南}
+\date{\song\zihao{4} \today}
+
+\begin{document}
+
+% 封面
+\begin{titlepage}
+    \begin{center}
+        \vspace*{6cm}
+        \hei\zihao{0} Jinja2 模板引擎详解
+        \vspace*{3cm}
+        \song\zihao{2} Ansible 学习指南
+        \vspace*{3cm}
+        \song\zihao{4} \today
+    \end{center}
+\end{titlepage}
+
+% 版权页
+\newpage
+\thispagestyle{empty}
+\begin{center}
+    \vspace*{8cm}
+    \song\zihao{5} 版权所有 \textcopyright\ 2026 Ansible 学习指南
+    \vspace*{1cm}
+    \song\zihao{5} 出版社名称
+\end{center}
+
+% 摘要
+\chapter*{摘要}
+    Jinja2 是一个功能强大的 Python 模板引擎，由 Armin Ronacher 创建。它是 Django 模板系统的一个超集，但提供了更灵活、更强大的功能。在 Ansible 中，Jinja2 被广泛用于模板文件的渲染、Playbook 中的变量替换、条件语句和循环的实现，以及复杂数据结构的处理。
+    
+    本文详细介绍了 Jinja2 的基本语法、控制结构、过滤器、模板继承等特性，以及它在 Ansible 中的具体应用。通过学习本文，读者将能够掌握 Jinja2 的核心概念和使用方法，从而在 Ansible 自动化中更加灵活地使用模板技术。
+    
+    \begin{flushright}
+        \textbf{关键词：}Jinja2 \quad Ansible \quad 模板引擎 \quad 自动化
+    \end{flushright}
+
+% 目录
+\newpage
+\tableofcontents
+
+% 正文开始
+\mainmatter
+
+\chapter{什么是 Jinja2}
+
+Jinja2 是一个功能强大的 Python 模板引擎，由 Armin Ronacher 创建。它是 Django 模板系统的一个超集，但提供了更灵活、更强大的功能。在 Ansible 中，Jinja2 被广泛用于：
+
+\begin{itemize}
+    \item 模板文件（.j2 文件）的渲染
+    \item Playbook 中的变量替换
+    \item 条件语句和循环的实现
+    \item 复杂数据结构的处理
+\end{itemize}
+
+Jinja2 的设计目标是提供一个快速、安全、灵活的模板系统，同时保持代码的清晰和可维护性。
+
+\chapter{Jinja2 的基本语法}
+
+\subsection{变量}
+
+变量是 Jinja2 中最基本的元素，用于在模板中插入动态内容。
+
+\begin{lstlisting}
+# 基本变量使用
+Hello, {{ name }}!
+
+# 访问对象属性
+{{ user.name }}
+{{ user['email'] }}
+
+# 访问列表元素
+{{ items[0] }}
+{{ items[1] }}
+\end{lstlisting}
+
+\subsection{表达式}
+
+Jinja2 支持各种表达式，包括算术运算、比较运算、逻辑运算等。
+
+\begin{lstlisting}
+# 算术运算
+{{ 1 + 2 }}
+{{ 10 - 5 }}
+{{ 2 * 3 }}
+{{ 10 / 2 }}
+{{ 10 // 3 }}  # 整数除法
+{{ 10 % 3 }}   # 取模
+{{ 2 ** 3 }}   # 幂运算
+
+# 比较运算
+{{ 1 == 2 }}
+{{ 1 != 2 }}
+{{ 1 < 2 }}
+{{ 1 <= 2 }}
+{{ 1 > 2 }}
+{{ 1 >= 2 }}
+
+# 逻辑运算
+{{ true and false }}
+{{ true or false }}
+{{ not true }}
+
+# 成员运算
+{{ 'a' in 'abc' }}
+{{ 1 in [1, 2, 3] }}
+
+# 测试运算
+{{ variable is defined }}
+{{ variable is none }}
+{{ variable is string }}
+{{ variable is number }}
+{{ variable is iterable }}
+\end{lstlisting}
+
+\subsection{控制结构}
+
+\subsubsection{条件语句}
+
+条件语句用于根据条件执行不同的代码块。
+
+\begin{lstlisting}
+# 基本 if 语句
+{% if user.is_admin %}
+    <p>Welcome, admin!</p>
+{% endif %}
+
+# if-else 语句
+{% if user.is_logged_in %}
+    <p>Welcome back, {{ user.name }}!</p>
+{% else %}
+    <p>Please log in.</p>
+{% endif %}
+
+# if-elif-else 语句
+{% if score >= 90 %}
+    <p>Excellent!</p>
+{% elif score >= 70 %}
+    <p>Good!</p>
+{% elif score >= 60 %}
+    <p>Pass!</p>
+{% else %}
+    <p>Fail!</p>
+{% endif %}
+\end{lstlisting}
+
+\subsubsection{循环语句}
+
+循环语句用于遍历可迭代对象，如列表、字典等。
+
+\begin{lstlisting}
+# 遍历列表
+{% for item in items %}
+    <p>{{ item }}</p>
+{% endfor %}
+
+# 遍历字典
+{% for key, value in dictionary.items() %}
+    <p>{{ key }}: {{ value }}</p>
+{% endfor %}
+
+# 带索引的循环
+{% for item in items %}
+    <p>{{ loop.index }}. {{ item }}</p>  {# 从 1 开始 #}
+    <p>{{ loop.index0 }}. {{ item }}</p> {# 从 0 开始 #}
+{% endfor %}
+
+# 循环控制
+{% for item in items %}
+    {% if item == 'skip' %}
+        {% continue %}
+    {% endif %}
+    {% if item == 'stop' %}
+        {% break %}
+    {% endif %}
+    <p>{{ item }}</p>
+{% endfor %}
+
+# 空循环处理
+{% for item in items %}
+    <p>{{ item }}</p>
+{% else %}
+    <p>No items found.</p>
+{% endfor %}
+\end{lstlisting}
+
+\subsubsection{宏}
+
+宏类似于函数，用于定义可重用的代码块。
+
+\begin{lstlisting}
+# 定义宏
+{% macro render_user(user) %}
+    <div class="user">
+        <h3>{{ user.name }}</h3>
+        <p>{{ user.email }}</p>
+    </div>
+{% endmacro %}
+
+# 使用宏
+{{ render_user(user1) }}
+{{ render_user(user2) }}
+
+# 带默认参数的宏
+{% macro greet(name, greeting='Hello') %}
+    {{ greeting }}, {{ name }}!
+{% endmacro %}
+
+{{ greet('John') }}
+{{ greet('John', 'Hi') }}
+\end{lstlisting}
+
+\chapter{Jinja2 过滤器}
+
+过滤器用于修改变量的值，格式为 `{{ variable|filter }}`。Jinja2 提供了大量内置过滤器，也支持自定义过滤器。
+
+\subsection{常用内置过滤器}
+
+\begin{lstlisting}
+# 字符串过滤器
+{{ 'hello'|upper }}
+{{ 'HELLO'|lower }}
+{{ 'hello world'|capitalize }}
+{{ 'hello world'|title }}
+{{ '  hello  '|trim }}
+{{ 'hello'|length }}
+{{ 'hello'|replace('h', 'H') }}
+{{ 'hello'|reverse }}
+
+# 数字过滤器
+{{ 42|abs }}
+{{ 42|round }}
+{{ 42.5|int }}
+{{ 42|float }}
+
+# 列表过滤器
+{{ [1, 2, 3]|length }}
+{{ [3, 1, 2]|sort }}
+{{ [1, 2, 3]|reverse }}
+{{ [1, 2, 2, 3]|unique }}
+{{ [1, 2, 3]|join(', ') }}
+
+# 字典过滤器
+{{ {'a': 1, 'b': 2}|length }}
+{{ {'a': 1, 'b': 2}|keys }}
+{{ {'a': 1, 'b': 2}|values }}
+
+# 其他过滤器
+{{ variable|default('default value') }}
+{{ variable|bool }}
+{{ variable|string }}
+{{ variable|safe }}  # 标记为安全内容，不转义
+{{ variable|tojson }}  # 转换为 JSON
+{{ variable|datetimeformat('%Y-%m-%d') }}  # 日期格式化
+\end{lstlisting}
+
+\subsection{链式过滤器}
+
+多个过滤器可以链式使用，前一个过滤器的输出作为后一个过滤器的输入。
+
+\begin{lstlisting}
+{{ '  hello world  '|trim|upper|replace('WORLD', 'ANSIBLE') }}
+{{ [3, 1, 2]|sort|join(', ') }}
+\end{lstlisting}
+
+\subsection{自定义过滤器}
+
+在 Ansible 中，可以通过插件系统创建自定义过滤器。
+
+\chapter{Jinja2 模板继承}
+
+模板继承是 Jinja2 的一个强大特性，允许创建基础模板并在子模板中扩展它。
+
+\subsection{基础模板}
+
+创建一个包含通用结构的基础模板。
+
+\begin{lstlisting}
+{# base.html.j2 #}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Default Title{% endblock %}</title>
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <h1>My Website</h1>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2023 My Website</p>
+    </footer>
+</body>
+</html>
+\end{lstlisting}
+
+\subsection{子模板}
+
+子模板继承基础模板并覆盖特定的块。
+
+\begin{lstlisting}
+{# home.html.j2 #}
+{% extends "base.html.j2" %}
+
+{% block title %}
+    Home Page
+{% endblock %}
+
+{% block head %}
+    {{ super() }}  {# 调用父模板的内容 #}
+    <link rel="stylesheet" href="home.css">
+{% endblock %}
+
+{% block content %}
+    <h2>Welcome to Home Page</h2>
+    <p>This is the home page content.</p>
+{% endblock %}
+\end{lstlisting}
+
+\chapter{Jinja2 在 Ansible 中的应用}
+
+\subsection{模板文件}
+
+使用 `template` 模块渲染 Jinja2 模板文件。
+
+\begin{lstlisting}
+- name: Copy nginx configuration
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart nginx
+\end{lstlisting}
+
+模板文件示例：
+
+\begin{lstlisting}
+{# nginx.conf.j2 #}
+server {
+    listen {{ nginx_port }};
+    server_name {{ server_name }};
+    
+    root {{ web_root }};
+    index index.html index.htm;
+    
+    {% if enable_ssl %}
+    listen 443 ssl;
+    ssl_certificate {{ ssl_cert }};
+    ssl_certificate_key {{ ssl_key }};
+    {% endif %}
+    
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    
+    {% if enable_gzip %}
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    {% endif %}
+}
+\end{lstlisting}
+
+\subsection{Playbook 中的变量替换}
+
+在 Playbook 中直接使用 Jinja2 语法进行变量替换。
+
+\begin{lstlisting}
+- name: Create user
+  user:
+    name: {{ username }}
+    state: present
+    groups: {{ user_groups|join(',') }}
+    home: /home/{{ username }}
+
+- name: Copy configuration file
+  copy:
+    content: |
+      # Configuration for {{ service_name }}
+      port: {{ service_port }}
+      debug: {{ debug_mode|lower }}
+      timeout: {{ timeout_seconds }}
+    dest: /etc/{{ service_name }}/config.conf
+\end{lstlisting}
+
+\subsection{条件和循环}
+
+在 Playbook 中使用 Jinja2 的条件和循环结构。
+
+\begin{lstlisting}
+- name: Install packages
+  package:
+    name: {{ item }}
+    state: present
+  loop: {{ packages }}
+  when: ansible_os_family == 'RedHat'
+
+- name: Configure services
+  template:
+    src: service.conf.j2
+    dest: /etc/{{ item }}/config.conf
+  loop: {{ services }}
+  when: item in enabled_services
+\end{lstlisting}
+
+\chapter{Jinja2 的高级特性}
+
+\subsection{上下文处理器}
+
+上下文处理器用于在模板渲染前向上下文中添加变量。在 Ansible 中，这通常通过 `vars` 或 `set_fact` 模块实现。
+
+\subsection{环境配置}
+
+Jinja2 提供了多种环境配置选项，如自动转义、变量分隔符等。在 Ansible 中，这些配置通常在 `ansible.cfg` 中设置。
+
+\subsection{沙箱模式}
+
+Jinja2 支持沙箱模式，可以限制模板中可执行的操作，提高安全性。
+
+\chapter{Jinja2 最佳实践}
+
+\subsection{代码组织}
+
+\begin{enumerate}
+    \item **模板目录结构**：按照功能或服务组织模板文件
+    \item **命名规范**：使用描述性的文件名，如 `nginx.conf.j2`
+    \item **模块化**：将复杂模板拆分为多个小模板
+    \item **注释**：为复杂的模板逻辑添加注释
+\end{enumerate}
+
+\subsection{性能优化}
+
+\begin{enumerate}
+    \item **缓存**：启用模板缓存以提高性能
+    \item **避免复杂逻辑**：将复杂逻辑移至 Ansible tasks 中
+    \item **变量预处理**：在渲染前预处理变量
+    \item **避免重复计算**：使用 `set` 语句存储计算结果
+\end{enumerate}
+
+\subsection{安全性}
+
+\begin{enumerate}
+    \item **自动转义**：启用 HTML 自动转义以防止 XSS 攻击
+    \item **安全过滤器**：使用 `safe` 过滤器时要谨慎
+    \item **输入验证**：验证模板输入的安全性
+    \item **限制权限**：限制模板文件的权限
+\end{enumerate}
+
+\subsection{调试技巧}
+
+\begin{enumerate}
+    \item **使用 debug 模块**：在 Playbook 中打印变量值
+    \item **模板调试**：使用 `ansible-playbook --check` 检查模板渲染
+    \item **错误处理**：使用 `default` 过滤器处理可能不存在的变量
+    \item **日志记录**：在复杂模板中添加日志记录
+\end{enumerate}
+
+\chapter{Jinja2 示例}
+
+\subsection{基本示例}
+
+\begin{lstlisting}
+{# 基本变量和表达式 #}
+Hello, {{ name }}!
+Your age is {{ age }}.
+Next year you will be {{ age + 1 }}.
+
+{# 条件语句 #}
+{% if age >= 18 %}
+    You are an adult.
+{% else %}
+    You are a minor.
+{% endif %}
+
+{# 循环语句 #}
+{% for item in items %}
+    {{ loop.index }}. {{ item }}
+{% endfor %}
+
+{# 过滤器 #}
+{{ 'hello'|upper }}
+{{ [3, 1, 2]|sort|join(', ') }}
+{{ user|default('Guest') }}
+\end{lstlisting}
+
+\subsection{Ansible 模板示例}
+
+\begin{lstlisting}
+{# Apache 配置模板 #}
+<VirtualHost *:{{ http_port }}>
+    ServerName {{ server_name }}
+    ServerAlias {{ server_aliases|join(' ') }}
+    DocumentRoot {{ document_root }}
+    
+    <Directory {{ document_root }}>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog {{ error_log }}
+    CustomLog {{ access_log }} combined
+    
+    {% if enable_ssl %}
+    SSLEngine on
+    SSLCertificateFile {{ ssl_cert }}
+    SSLCertificateKeyFile {{ ssl_key }}
+    {% endif %}
+    
+    {% for location in protected_locations %}
+    <Location {{ location.path }}>
+        AuthType Basic
+        AuthName "{{ location.name }}"
+        AuthUserFile {{ location.auth_file }}
+        Require valid-user
+    </Location>
+    {% endfor %}
+</VirtualHost>
+\end{lstlisting}
+
+\subsection{复杂数据结构处理}
+
+\begin{lstlisting}
+{# 处理嵌套字典 #}
+{% for service, config in services.items() %}
+Service: {{ service }}
+  Port: {{ config.port }}
+  Enabled: {{ config.enabled }}
+  {% if config.options %}
+  Options:
+    {% for key, value in config.options.items() %}
+    {{ key }}: {{ value }}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+
+{# 处理列表的列表 #}
+{% for group in groups %}
+Group: {{ group.name }}
+Members:
+  {% for member in group.members %}
+  - {{ member }}
+  {% endfor %}
+{% endfor %}
+\end{lstlisting}
+
+\chapter{常见问题与解决方案}
+
+\subsection{变量未定义}
+
+\textbf{问题}：模板渲染时变量未定义导致错误
+
+\textbf{解决方案}：
+\begin{itemize}
+    \item 使用 `default` 过滤器提供默认值
+    \item 使用 `defined` 测试检查变量是否存在
+    \item 在 Playbook 中确保变量被正确定义
+\end{itemize}
+
+\begin{lstlisting}
+{{ variable|default('default value') }}
+{% if variable is defined %}
+    {{ variable }}
+{% else %}
+    Default value
+{% endif %}
+\end{lstlisting}
+
+\subsection{模板语法错误}
+
+\textbf{问题}：模板中存在语法错误导致渲染失败
+
+\textbf{解决方案}：
+\begin{itemize}
+    \item 检查 Jinja2 语法是否正确
+    \item 确保所有的块标签都有对应的结束标签
+    \item 使用 `ansible-playbook --check` 进行测试
+    \item 检查变量名和过滤器名的拼写
+\end{itemize}
+
+\subsection{性能问题}
+
+\textbf{问题}：大型模板渲染速度慢
+
+\textbf{解决方案}：
+\begin{itemize}
+    \item 拆分大型模板为多个小模板
+    \item 减少模板中的复杂逻辑
+    \item 预处理变量以减少模板中的计算
+    \item 启用模板缓存
+\end{itemize}
+
+\subsection{安全问题}
+
+\textbf{问题}：模板中可能存在安全漏洞
+
+\textbf{解决方案}：
+\begin{itemize}
+    \item 启用自动转义
+    \item 谨慎使用 `safe` 过滤器
+    \item 验证所有用户输入
+    \item 限制模板中可执行的操作
+\end{itemize}
+
+\chapter{总结}
+
+Jinja2 是一个功能强大、灵活易用的模板引擎，在 Ansible 中发挥着重要作用。它不仅可以用于生成配置文件，还可以用于控制 Playbook 的执行逻辑。
+
+掌握 Jinja2 的基本语法、过滤器和高级特性，可以大大提高 Ansible 自动化的效率和灵活性。通过合理组织模板文件、优化性能和确保安全性，可以创建出高质量的自动化配置。
+
+Jinja2 的学习曲线相对平缓，但要真正掌握其高级特性和最佳实践，需要不断实践和积累经验。希望本章节的内容能够帮助你快速上手 Jinja2，并在 Ansible 自动化中发挥其强大功能。
+
+\chapter{参考资料}
+
+\begin{thebibliography}{99}
+    \bibitem{jinja2-docs} Jinja2 官方文档：https://jinja.palletsprojects.com/
+    \bibitem{ansible-templating} Ansible 模板文档：https://docs.ansible.com/ansible/latest/user_guide/playbooks_templating.html
+    \bibitem{python-docs} Python 官方文档：https://docs.python.org/
+    \bibitem{jinja2-templates} Jinja2 模板设计指南：https://jinja.palletsprojects.com/en/latest/templates/
+\end{thebibliography}
+
+% 索引
+\printindex
+
+\end{document}

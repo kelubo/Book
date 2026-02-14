@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_57">3.3.5　访问控制</h3> 
+ <p class="ziti3">HTTP核心配置指令中提供了基本的禁止访问、传输限速、内部访问控制等功能配置。配置指令如表3-72～表3-76所示。</p> 
+ <p class="middle-img">表3-72　请求方法排除限制指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-72.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-72.jpg" class="calibre106"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/074-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/074-i.jpg" class="calibre107"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http{ 
+    limit_except GET { 
+        allow 192.168.1.0/24; # 允许192.168.1.0/24范围的IP使用非GET的方法
+        deny all; # 禁止其他所有来源IP的非GET请求
+    } 
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-73　组合授权控制指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-73.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-73.jpg" class="calibre108"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location / {
+    satisfy any;
+
+    allow 192.168.1.0/32;
+    deny  all;
+
+    auth_basic           "closed site";
+    auth_basic_user_file conf/htpasswd;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-74　内部访问指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-74.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-74.jpg" class="calibre86"/></a> 
+ </div> 
+ <p class="ziti3">1）Nginx限定以下几种类型为内部访问。</p> 
+ <p class="ziti4">·由error_page指令、index指令、random_index指令和try_files指令发起的重定向请求。</p> 
+ <p class="ziti4">·响应头中由属性X-Accel-Redirect发起的重定向请求，等同于X-sendfile，常用于下载文件控制的场景中。</p> 
+ <p class="ziti4">·ngx_http_ssi_module模块的include virtual指令、ngx_http_addition_module模块、auth_request和mirror指令的子请求。</p> 
+ <p class="ziti4">·用rewrite指令对URL进行重写的请求。</p> 
+ <p class="ziti3">2）内部请求的最大访问次数是10次，以防错误配置引发内部循环请求，超过限定次数将返回响应状态码500。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">error_page 404 /404.html;
+
+location = /404.html {
+    internal;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-75　响应限速指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-75.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-75.jpg" class="calibre53"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server { 
+    location /flv/ { 
+        flv; limit_rate_after 500k;         # 当传输速率到500KB/s时执行限速
+        limit_rate 50k;                     # 限速速率为50KB/s
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·响应速率也可以在proxy_pass的响应头属性X-Accel-Limit-Rate字段中设定。</p> 
+ <p class="ziti4">·可以通过proxy_ignore_headers、fastcgi_ignore_headers、uwsgi_ignore_headers和scgi_ignore_headers指令禁用此项功能。</p> 
+ <p class="ziti4">·在Nginx 1.17.0以后的版本中，参数值可以是变量。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $slow $rate {
+    1     4k;
+    2     8k;
+}
+
+limit_rate $rate;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-76　响应最大值后限速指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-76.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-76.jpg" class="calibre109"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location /flv/ {
+    flv;
+    limit_rate_after 500k;
+    limit_rate       50k;
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

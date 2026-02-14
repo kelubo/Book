@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_64">4.1.1　根据浏览器动态赋值</h3> 
+ <p class="ziti3">模块名称：ngx_http_browser_module</p> 
+ <p class="ziti3">该模块的功能是根据客户端HTTP请求头中的属性字段User-Agent的值，按照用户的指令配置设置变量$modern_browser和$ancient_browser的值。用户可以根据变量$modern_browser和$ancient_browser的值对客户端浏览器进行区分，并对HTTP请求进行不同的处理。该模块的内置配置指令如表4-1～表4-4所示。</p> 
+ <p class="middle-img">表4-1　旧浏览器标识指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-1.jpg" class="calibre134"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    ancient_browser 'UCWEB';
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">变量$ancient_browser的值默认为1。</p> 
+ <p class="middle-img">表4-2　设置旧浏览器变量值指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-2.jpg" class="calibre135"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    ancient_browser 'UCWEB';
+    ancient_browser_value oldweb;
+    server {
+        if ($ancient_browser) {
+            rewrite ^ /${ancient_browser}.html; # 重定向到oldweb.html 
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表4-3　新浏览器标识指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-3.jpg" class="calibre136"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    modern_browser msie  5.5;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·内置浏览器类型有msie、gecko（由Mozilla基金会维护，Mozilla及Netscape 6后续版本是基于Gecko开发的）、opera、safari、konqueror。</p> 
+ <p class="ziti4">·当指令值为unlisted时，Nginx在HTTP请求头中的属性字段User-Agent的值为空或无法识别浏览器类型时，设置变量$modern_browser的值为1。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    modern_browser msie  5.5;
+    modern_browser unlisted;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表4-4　设置新浏览器变量值指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-4.jpg" class="calibre137"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    modern_browser msie 5.5;
+    modern_browser_value newweb;
+    server {
+        if ($modern_browser) {
+            rewrite ^ /${modern_browser}.html;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">ancient_browser 'UCWEB';         # 必须使用单引号
+ancient_browser_value oldweb;    # 设置$ancient_browser的值为oldweb
+
+modern_browser_value newweb;     # 设置$ancient_browser的值为newweb
+modern_browser unlisted;         # 设置$modern_browser的值为1，$ancient_browser的值为0
+
+root /opt/nginx-web;
+server {
+    listen 8080;
+    if ($ancient_browser) {
+        rewrite ^ /${ancient_browser}.html; # 重定向到oldweb.html
+    }
+    if ($modern_browser) {
+        rewrite ^ /${modern_browser}.html;  # 重定向到newweb.html
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

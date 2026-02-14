@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_157">8.2.3　IP哈希</h3>
+
+  <p class="ziti3">IP哈希（IP Hash）负载均衡策略根据客户端IP计算出哈希值，然后把请求分配给该数值对应的被代理服务器。在哈希值不变且被代理服务器可用的前提下，同一客户端的请求始终会被分配到同一台被代理服务器上。IP哈希负载均衡策略常被应用在会话（Session）保持的场景。</p>
+
+  <p class="ziti3">HTTP客户端在与服务端交互时，因为HTTP协议是无状态的，所以任何需要上下文逻辑的情景都必须使用会话保持机制，会话保持机制是通过客户端存储由唯一的Session ID进行标识的会话信息，每次与服务器交互时都会将会话信息提交给服务端，服务端依照会话信息实现客户端请求上下文的逻辑关联。会话信息通常存储在被代理服务器的内存中，如果负载均衡将客户端的会话请求分配给其他被代理服务器，则该会话逻辑将因为会话信息失效而中断。所以为确保会话不中断，需要负载均衡将同一客户端的会话请求始终都发送到同一台被代理服务器，通过会话保持实现会话信息的有效传递。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">http {
+    upstream backend {
+        ip_hash;            # 启用IP哈希负载均衡策略
+        server a weight=5;
+        server b weight=1;
+        server c weight=1;
+    }
+
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://backend;
+        }
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">配置样例中Nginx的IP哈希策略计算过程如下。</p>
+
+  <p class="ziti4">·在多层代理的场景下，请确保当前Nginx可获得真实的客户端源IP（客户端源IP可参见6.1.5节）。</p>
+
+  <p class="ziti4">·首先会根据客户端的IPv4地址的前三个八位字节或整个IPv6地址作为哈希键计算哈希值。</p>
+
+  <p class="ziti4">·根据哈希值与配置文件中非备份状态服务器的总权重计算出哈希余数。</p>
+
+  <p class="ziti4">·按照轮询策略选出初始被代理服务器，如果哈希余数大于初始被代理服务器的权重，则遍历轮询策略中被代理服务器列表，否则初始被代理服务器将被选出。</p>
+
+  <p class="ziti4">·当遍历轮询策略中被代理服务器列表时，要用哈希余数依次减去轮询策略中的上一个被代理服务器的权重，直到哈希余数小于某个被代理服务器的权重时该被代理服务器被选出。</p>
+
+  <p class="ziti4">·若循环20次仍无法选出，则使用轮询策略进行选择。</p>
+</body>
+</html>

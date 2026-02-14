@@ -1,0 +1,344 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\begin{document}
+\title{创客机器人实战：基于Arduino和树莓派 (何福贵)}
+\author{何福贵}
+\maketitle
+
+\section{前言}
+
+\section{第一章 概述}
+\subsection{1.1 设计的发展}
+\subsection{1.2 机器人创客}
+\subsubsection{1.2.1 中国机器人创客联盟}
+\subsubsection{1.2.2 DFRobot——创客机器人的开源硬件制造商}
+\subsubsection{1.2.3 麻省机器人}
+\subsubsection{1.2.4 创意设计——创客教育网}
+\subsection{1.3 机器人创客DIY部件}
+目前机器人创客是常用的智能产品，一般由控制器、传感器、驱动器和无线通信模块等部分组成。传感器应提供机器人本体或其所处环境的信息；驱动器实现设计的运行；无线通信模块支持中央和终端之间的通信；控制器实现控制逻辑，实现设计的具体功能。
+\subsubsection{1.3.1 常用控制器}
+目前常用的机器人设计的控制器有以下三种：
+（1）Arduino控制器系列。Arduino是一种开源电子原型平台，常用的控制板如Arduino UNO R3控制器、Arduino Mega控制器、Arduino Leonardo控制器等。
+（2）基于Arduino的扩展控制器。例如，Starduino控制器主要用于声控；英特尔Edison for Arduino开发板可以快速方便地将自己有的创意变成现实，灵活的设计与工业还能无缝地将原型变成量产的产品。因此，只要一个小小的英特尔Edison，就能够实现从构想到产品的跨越。
+（3）树莓派系列。树莓派（Raspberry Pi，Pi）是一种基于ARM的小型电脑，外形只有信用卡大小，又称卡片式电脑，却具有电脑的所有基本功能。具体的类型如：A型、A+型、B型、B+型、2代B型及3代B型等。
+\subsubsection{1.3.2 常用传感器}
+机器人的传感器是机器人的输入设备，完成所需信息的采集或环境的感知。常用的机器人传感器有：加速度计、红外传感器、超声波传感器、压力传感器、数字温湿度传感器、颜色传感器、光线传感器、火焰传感器、声音传感器、气体传感器、光敏传感器、振动传感器、火焰传感器、电流检测传感器、电压检测传感器、触摸传感器、液位传感器、条形码扫描传感器、时钟模块传感器及其他传感器等。
+\subsubsection{1.3.3 常用驱动器}
+驱动器用于完成给机器人设计的运动。主要包括机器人驱动器和机器人专用电机。具体的机器人驱动器有：直流电机驱动板、步进电机驱动板、伺服电机驱动板。具体的机器人专用电机有：伺服电机、直流减速电机和步进电机。
+\subsubsection{1.3.4 常用通信模块}
+机器人常用的通信模块有：蓝牙通信模块、无线数据模块、WiFi无线通信模块、ZigBee无线通信模块、Wi-Fi无线通信模块、GSM/GPGS通信模块及GPS定位模块等。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/14_01.jpg}
+\caption{图1-5 创意设计首页}
+\label{fig:creative_design}
+\end{figure}
+\subsubsection{1.3.5 机器人视觉和语音模块}
+机器人视觉和语音模块包括各种类型的摄像头、话筒、显示器、音箱及相应的各种控制板等。
+\subsubsection{1.3.6 Adafruit——开源电子硬件制造商}
+美国的Adafruit是一家成立于2005年的企业，主要业务是设计和制造开源电子硬件等产品。该公司聘请专业工程师和设计使用他们提供的电子元件和配件来设计新产品。他们提供独特而有趣的DIY电子元件和工具，帮助设计者将日常物品制造成适合教育和前沿产品一样的高质量作品。其官网为http://www.adafruit.com/，如图1-6所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/16_01.jpg}
+\caption{图1-6 Adafruit首页}
+\label{fig:adafruit_home}
+\end{figure}
+\subsection{1.4 机器人简介}
+机器人是自动执行工作的机器装置。它既可以接受人类指挥，又可以运行预先编排的程序，也可以根据利用人工智能技术制定的原则纲领行动。它的任务是协助或取代人类的部分工作。机器人按应用分为三类：工业机器人、服务机器人和特种机器人，本书主要讲述的是服务机器人，是目前设计机器人应用的主要领域。
+服务机器人按运动方式一般可分为轮式机器人、足式机器人和飞行机器人。
+\textbf{1．轮式机器人}
+轮式机器人可以简单地理解为以轮子作为运动机构的机器人。可以将轮式机器人分为两轮（平衡车）、三轮、四轮及六轮的形式。
+\textbf{2．足式机器人}
+足式机器人（又称足式移动机器人）是机器人领域中最活跃的一个分子。足式移动机器人具有独特的性能和更高的灵活性，能够灵活地进入人类生活，与人类协同工作。从长远角度看，足式移动机器人在诸如家政服务行业、教育、医疗、无人化工厂、军事侦察等领域都有存在而又广阔的应用前景。
+足式移动机器人按其“足”的数量不同可以分为单足式移动机器人、双足式移动机器人和多足式移动机器人（包括四足式移动机器人、六足式移动机器人和八足式机器人等）。
+2017年，Boston Dynamics发布了最新机器人产品Handle，其最大特点是集轮腿于一体，兼具了轮式机器人和足式机器人的优点。这个机器人弹跳能力非常惊人，能够完成很多复杂的动作，力量也很澎湃，震惊了业界。
+Handle能在多种复杂场景下顺利运行，如雪地、冰面和崎岖的地面。利用轮腿，它可以以每小时9英里（约合14.5公里）的速度移动，并能够跨越4英尺（约合1.2米）高。
+与之前的双足或四足机器人相比，Handle的复杂度也明显降低。它只有10个关节，如果要大规模生产，在设计上和生产上都相对简单。充满一次电，Handle可续航24公里，远高于传统的双足机器人。
+\subsection{1.5 本章小结}
+"放飞想象力，创造未来"，随着数字技术、开源硬件、3D打印的快速发展，一场创客运动勃然兴起，吸引了很多工业设计、硬件制造、互联网及程序编程等方面的爱好者参与其中，随着目前智能硬件产业的分布式增长，可以预见，创客运动将对各个技术领域的创新创业发挥更大的作用。
+
+\section{第二章 设计必备软件}
+\subsection{2.1 Arduino IDE}
+Arduino IDE是Arduino官方提供的集成开发环境，用于编写、编译和上传代码到Arduino开发板。它支持多种操作系统，如Windows、Mac OS和Linux，是Arduino开发的基础工具。
+\subsection{2.2 Processing}
+Processing是一种开源编程语言和开发环境，专为电子艺术和视觉设计领域的人而创建，它也可以与Arduino进行通信，实现数据可视化和交互设计。
+\subsection{2.3 Autodesk Circuits}
+Autodesk Circuits是Autodesk公司提供的在线电路设计工具，支持Arduino电路的设计、模拟和代码编写，是一个一体化的硬件开发平台。
+\subsection{2.4 Fritzing}
+Fritzing是一个电子自动化软件，同样是开源软件。Fritzing将电子产品变成每个人的创意元素。它支持设计师、工程师、研究人员和爱好者参与从物理原型到进一步实际的产品。让每个人设想其产品原型并与他人分享。Fritzing也常作为课堂上学习电子学的工具，甚至还可以制作PCB。Fritzing的首页为http://fritzing.org/home/，如图2-4所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/21_01.jpg}
+\caption{图2-4 Fritzing首页}
+\label{fig:fritzing_home}
+\end{figure}
+\subsection{2.5 Scratch}
+Scratch是由麻省理工学院（MIT）媒体实验室开发的一种面向青少年的图形化编程软件。使用者只需将彩色的指令模块组合，就可以创作出多种程序、互动故事、动画等作品。Scratch将一百多块积木分为十多类，通过预设的相应组合，人们就能够实现各种效果。
+使用Scratch不仅可以创作网页项目，该软件也支持与硬件的互动。官方标准的Scratch支持PicoBoard和LEGO WeDo，但是这远远不能满足广大爱好者的需求。由于Scratch是开源软件，因此越来越多的机器人厂商和设计机构开发出了更具特色的版本。Scratch的首页为https://scratch.mit.edu/，如图2-5所示。
+\subsection{2.6 Scratch for Arduino}
+Scratch for Arduino（简称S4A）打通了Scratch和Arduino之间的通道。人们可以使用S4A编写Arduino程序。S4A基于Scratch开发，是最早将Scratch应用于Arduino的软件之一，首页为http://s4a.cat/，如图2-6所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/22_01.jpg}
+\caption{图2-5 Scratch首页}
+\label{fig:scratch_home}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/22_02.jpg}
+\caption{图2-6 S4A首页}
+\label{fig:s4a_home}
+\end{figure}
+
+运行S4A，首先需要在Arduino控制器中下载一个S4A提供的程序，通过这个程序S4A就可以和Arduino进行通信。
+\subsection{2.7 APP Inventor}
+APP Inventor由MIT开发，实现了安卓应用的快速开发。APP Inventor是基于事件的浏览器应用，国内最新的地址是广州电教馆服务器，首页为http://app.gzjkw.net/login/，如图2-7所示。
+APP Inventor只需将需要的组件拖到界面，调整好参数和基本的属性后进行编程即可。可以使用安卓手机的诸多传感器，如相机（拍照应用）、加速度传感器（类似于水平仪一样的功能）、GPS（获取经度、纬度、高度信息）、方向传感器（指南针）、蓝牙（实现与Arduino通信），甚至还能实现乐高NXT的连接，这意味着APP Inventor程序可以和乐高NXT控制器通信。APP Inventor还实现了很多"云"功能，如条形码扫描、语音识别、网络数据库等。APP Inventor在国内外还有很多赛事，有兴趣的读者可以自行搜索相关资料。
+\subsection{2.8 123D Design}
+123D Design由Autodesk发布，是一款免费的三维CAD建模软件，使用它可以快速将想象成型。123D还有一系列有趣的功能扩展，如123D Catch可以从多张平面照片中生成三维模型（然后使用3D打印机就可以得到模型），123D Make将三维模型转换为平面剪纸图案，123D Sculpt+结合纹理、光影自动生成模型，并可运行在iOS和安卓环境上，Tinkerplay提供了很多3D模型，Tinkercad自称为是最简单的3D建模软件，在网页上运行，并有直观易懂的操作教程。与123D Design类似的软件还有SketchUp。
+\subsection{2.9 Kodu}
+使用Kodu可以创作3D游戏，操作简单，很有吸引力，初学者也能很快上手。它有点类似于《我的世界》（Minecraft），都是由操作者构建整个世界，不同的是Kodu已经内置了很多地形，并且可以进行简单的编程，实现砖块的智能互动。
+\subsection{2.10 Stencyl}
+Stencyl是一款非常专业的2D游戏引擎，其内置了强大效果，定义了各种界面的切换力、组合碰撞检测等功能。它的编程和Scratch类似，也是通过预设块的拖拽实现功能。但是其预设块数量多得多，而且与Scratch的风格不同的是，Stencyl创作的是实例化到场景中的角色模板。虽然是预设式图形化编程，但其编程思想已经和面向对象、组件化非常接近，对于初学者来说，这个软件并不太容易上手。Stencyl的首页为http://www.stencyl.com/。
+\subsection{2.11 机器人调试助手}
+机器人调试助手用于机器人开发调试。下面介绍一款机器人测试助手——MS-4WD Mobile Robot v 2.2。这是一款非常实用的机器人开发调试软件，从常用的单片机器调试助手演变而来，主要适用于各种轮式和履带式移动机器人，软件集成远程目标管理、数据通信查看、监视器窗口、运行日志和自定义功能设置区。通过这款软件用户可以很方便地实现移动机器人的无线控制，可以测试智能小车、Wi-Fi爬虫小车等。
+\subsection{2.12 Python语言}
+Python是一种面向对象的解释型计算机程序设计语言，是胶水的自由软件，其源代码和解释器Python遵循GPL（GNU General Public License）协议。
+Python可以处理图像、声音、视频、动画等，从而为程序增添丰富的视觉效果。动态图表的生成、统计分析图表等都可以通过Python来完成，利用PyOpenGL模块，可以非常迅速地编写出三维动画。Python可以广泛地在科学计算领域发挥独特的作用。有许多模块可以帮助人们在处理数组、矩阵分析、神经网络等方面高效地完成工作，尤其在教育研究方面，更是可以发挥出独特的优势。
+\subsection{2.13 本章小结}
+本章介绍了在机器人设计、开发及测试过程中常用的一些开发环境，能够帮助大家快速地设计和实现创客机器人。
+
+\section{Arduino篇}
+\subsection{第三章 Arduino介绍}
+\subsubsection{3.1 Arduino开发板}
+\subsubsubsection{3.1.1 Arduino UNO}
+Arduino UNO是最常用的Arduino开发板之一，基于ATmega328P微控制器，具有14个数字I/O引脚（其中6个可用于PWM输出）、6个模拟输入、一个16MHz石英晶体、一个USB接口、一个电源插座、一个ICSP接头和一个复位按钮。
+\subsubsubsection{3.1.2 Arduino Leonardo}
+Arduino Leonardo基于ATmega32U4微控制器，与UNO不同的是，它可以直接作为USB设备与计算机通信，不需要额外的USB转串口芯片。Leonardo ETH开发板如图3-6所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{images/30_01.jpg}
+\caption{图3-6 Arduino Leonardo ETH开发板}
+\label{fig:leonardo_eth}
+\end{figure}
+\subsubsubsection{3.1.3 Arduino Mega 2560}
+Arduino Mega 2560适用于更复杂的项目，是基于ATmega2560的单片机器开发板。该开发板有54个数字输入/输出引脚（其中15路可用于PWM输出）、16路模拟输入、4个UART（硬件串口）、16MHz的时钟。1个USB接口、1个电源连接器、ICSP接口及复位按钮。它包含单片机运行所需的所有要素，使用USB连接线将其连接到电脑，使用AC-DC适配器或电池供电即可使用。Arduino Mega能与绝大多数为Arduino UNO设计的Shield兼容。
+Arduino Mega 2560开发板已成为大多数3D打印和机器人项目的选择，如图3-7所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/30_02.jpg}
+\caption{图3-7 Arduino Mega 2560开发板}
+\label{fig:mega_2560}
+\end{figure}
+\subsubsubsection{3.1.4 英特尔®Galileo开发板和爱迪生®Edison开发板}
+英特尔®Galileo是x86架构的Arduino开发板，同时具有英特尔架构的超强性能，以及Arduino软件开发环境的易用性。这一可开发电路板支持Arduino软件库的开源Linux操作系统，可扩展性强，可重复使用现有软件库资源（名为"sketches"）。英特尔®Galileo开发板可以通过Mac OS、标准Windows和Linux主机操作系统进行编程，也可被设计成为非Arduino生产系统的硬件集成的核心组件。
+为了超越Arduino生产系统，扩展其原生应用及能力，英特尔®Galileo电路板以标准化的方式，支持多种计算机行业标准I/O接口，包括PCI、PCI Express插槽、10/100MB以太网、SD、USB 2.0设备，以及EHCI/OHCI USB主机端口。高速UART、RS-232串行端口、可编程8MB NOR闪存，以及可扩展调试的JTAG端口。英特尔®Galileo基于通用开源标准，将Arduino集成开发环境（IDE）的许多优点，与完整的、未经修改的Linux操作系统的强大软件开发生命周期相结合，集成在一个芯片之中。如图3-9所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{images/31_02.jpg}
+\caption{图3-9 英特尔®Galileo开发板}
+\label{fig:galileo_board}
+\end{figure}
+英特尔®Edison是一个小型的超低功耗开发平台，它的体积仅相当于一个SD卡，小到几乎可以被任何东西容纳。经过设计后它可以和大多数设备一起工作，其中包括电脑、手机或平板电脑，甚至还能包括家具、灯泡乃至夹克。其用途的多样性超出了所有企业和发明家的想象。如图3-10所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\linewidth]{images/32_01.jpg}
+\caption{图3-10 英特尔®Edison}
+\label{fig:edison_board}
+\end{figure}
+\subsubsubsection{3.1.5 Arduino Due}
+Arduino Due是一块基于Atmel SAM3X8E CPU的 ARM控制器板。它是第一块基于32位ARM核心的Arduino。它有54个数字I/O口（其中12个可用于PWM输出）、12个模拟输入端口、4个UART硬件串口、84MHz的时钟频率、一个USB OTG接口、两路CAN、两路SPI、一个电源插座、一个JTAG接口、一个RESET按钮和一个擦写按钮，Arduino Due由于使用32位ARM核心的Due相比于以往的使用8位AVR核心的其他Arduino更加强大。
+\subsubsection{3.2 Arduino扩展板}
+Arduino扩展板是为了扩展Arduino的功能而设计的电路板，常见的扩展板包括：
+\textbf{1．传感器扩展板}
+传感器扩展板用于连接各种传感器，例如，DFRobot推出的Arduino多功能传感器扩展板，如图3-15所示。
+\textbf{2．电机驱动板}
+Arduino开发板如果要控制电机，必须使用电机驱动板。例如，DFROBOT生产Arduino四路电机驱动板，如图3-16所示。
+\textbf{3．无线通信扩展板}
+实现与上位机和终端的通信。例如，DFRobot生产的Wi-Fi模块，如图3-17所示。
+\subsubsection{3.3 Arduino开发环境}
+Arduino开发包括两个要素：Arduino开发板和Arduino集成开发环境。目前应用最多的Arduino开发环境为官方的免费Arduino IDE编程环境，官方网站为https://www.arduino.cc，到截稿时最新的版本为1.8.4，支持Windows、MacOS和Linux操作系统。如果喜欢微软的Visual Studio环境，也有Arduino for Microsoft Visual Studio的插件，网址http://www.visualmicro.com/，安装后可以在Visual Studio里面进行Arduino的开发。
+\subsubsubsection{3.3.1 Arduino IDE介绍}
+Arduino IDE的首页为https://www.arduino.cc，支持Windows、Mac OS和Linux操作系统，最新版本为1.8.4。Windows平台又分为Windows安装包和Windows免安装ZIP包，如图3-18所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{images/32_02.jpg}
+\caption{图3-11 选择"开发板管理器"命令}
+\label{fig:board_manager}
+\end{figure}
+\subsubsubsection{3.3.2 ArduBlock-Arduino的图形开发环境}
+ArduBlock是一款为Arduino设计的图形化编程软件，ArduBlock是一个Arduino的扩展库，以图形化积木搭建的方式编程。这样的方式会使编程的可视化和交互性增加，降低编程门槛，即使没有编程经验的人也可以尝试给Arduino控制器编写程序。
+\subsubsubsection{3.3.3 Arduino使用外部库}
+Arduino可以通过导入外部库来扩展功能，例如，传感器库、通信库等。
+\subsubsection{3.4 Processing介绍}
+Processing的最初目标是开发图形的sketchbook和环境，用来辅助教授计算机科学的基础概念。之后，它逐渐演变成为用于创建图形可视化专业项目的一种环境。如今，围绕它已经形成了一个专业的社区，致力于使用这种语言和环境进行动画、可视化、网络编程及很多其他的应用。
+\subsubsection{3.5 Arduino和Processing的互动}
+Arduino和Processing可以通过串口进行通信，实现硬件与软件的互动。
+\subsubsection{3.6 本章小结}
+本章介绍了Arduino开发板的种类、扩展板的使用、开发环境的搭建，以及与Processing的互动，为后续的Arduino项目开发奠定了基础。
+
+\subsection{第四章 Arduino基本函数}
+\subsubsection{4.1 数字I/O口的操作函数}
+\subsubsubsection{4.1.1 pinMode(pin,mode)}
+pinMode函数用于设置数字I/O引脚的模式，参数pin表示引脚号，mode表示模式（INPUT或OUTPUT）。
+\subsubsubsection{4.1.2 digitalWrite(pin,value)}
+digitalWrite函数用于设置数字I/O引脚的输出状态，参数pin表示引脚号，value表示输出状态（HIGH或LOW）。
+\subsubsubsection{4.1.3 digitalRead(pin)}
+digitalRead函数用于读取数字I/O引脚的输入状态，参数pin表示引脚号，返回值为HIGH或LOW。
+\subsubsection{4.2 模拟I/O口的操作函数}
+\subsubsubsection{4.2.1 analogReference(type)}
+analogReference函数用于设置模拟输入的参考电压，参数type表示参考电压类型。
+\subsubsubsection{4.2.2 analogRead(pin)}
+analogRead函数用于读取模拟输入引脚的电压值，参数pin表示引脚号，返回值范围为0-1023。
+\subsubsubsection{4.2.3 analogWrite(pin,value)}
+analogWrite函数无返回值函数，有两个参数pin和value。其中，参数pin表示设置的引脚，只能选择Arduino Uno主板支持的引脚；参数value表示PWM输出的占空比，范围在0-255，对应的占空比为0-100%。
+analogWrite函数通过PWM的方式在引脚上输出一个模拟量，较多的应用在LED亮度控制、电机调速控制等方面。
+\subsubsection{4.3 高级I/O}
+\subsubsubsection{4.3.1 shiftOut(dataPin,clockPin,bitOrder,val)}
+shiftOut函数能够将数据通过串行的方式输出在引脚上，即一般意义上的串行通信，是控制器之间、控制器与传感器之间常用的一种通信方式。
+shiftOut函数无返回值，有4个参数：dataPin、clockPin、bitOrder、val，下面具体说明。
+- dataPin：数据输出引脚，将依次输出数据的每一位。引脚模式需要设置为输出。
+- clockPin：时钟输出引脚，提供时钟，引脚模式需要设置为输出。
+- bitOrder：数据位顺序选择位，该参数为byte类型，有两种类型可选择，分别是高位先入MSBFIRST和低位先入LSBFIRST。
+- val：所要输出的数据值。
+\subsubsubsection{4.3.2 pulseIn(pin,state,timeout)}
+pulseIn函数用于引脚脉冲时间长度的获取，脉冲可以是HIGH或LOW。如果是HIGH，函数将先等引脚变为高电平，然后开始计时，一直到变为低电平为止。返回脉冲持续的时间长短，单位为毫秒（ms）。如果超时还没有读到的话，将返回0。
+pulseIn函数返回值类型为无符号长整型（unsigned long），有3个参数：pin、state、timeout，下面介绍具体含义。
+- pin：读取脉冲的引脚。
+- value：读取的脉冲类型——HIGH或LOW。
+- timeout（可选）：指定脉冲计数的等待时间，单位为微秒，默认值是1秒。
+\subsubsection{4.4 中断函数}
+单片机的中断是由于某一随机事件的触发，单片机主程序暂停执行，转而执行另一程序（中断服务程序），执行完毕后又自动返回主程序中断点继续执行，包括中断源、主程序、中断服务程序。
+\textbf{1．interrupts()和noInterrupts()}
+在Arduino中，interrupts函数用于开启中断，noInterrupts函数用于关闭中断，这两个函数均无参数且无返回值函数。
+\textbf{2．attachInterrupt(interrupt,function,mode)}
+attachInterrupt函数用于设置外部中断，其参数分别为中断源、中断处理函数和触发模式，下面具体说明。
+- 中断源：值为0或1，对应2或3号数字引脚。
+- 中断处理函数：其参数值为函数的指针，当中断发生时执行该子程序部分，是一个子函数。
+- 触发模式：4种类型：LOW（低电平触发）、CHANGE（变化时触发）、RISING（低电平变为高电平触发）、FALLING（高电平变为低电平触发）
+\textbf{3．detachInterrupt(interrupt)}
+detachInterrupt：取消中断，参数interrupt表示要取消的中断源。
+\subsubsection{4.5 定时函数}
+\textbf{1．delay(ms)和delayMicroseconds(us)}
+delay函数是延时函数，函数参数表示延时时间，单位是毫秒（ms）。函数无返回值。
+delayMicroseconds函数也是延时函数，所不同的是其参数单位是微秒（us）（1ms=1000us）。
+\subsubsection{4.6 串口通信函数}
+Arduino的串口通信函数用于实现与计算机或其他设备的串行通信，包括Serial.begin()、Serial.print()、Serial.println()、Serial.read()等。
+\subsubsection{4.7 数学函数}
+Arduino提供了丰富的数学函数，如abs()、sqrt()、sin()、cos()、tan()等，用于各种数学计算。
+\subsubsection{4.8 EEPROM函数}
+EEPROM函数用于读写Arduino的电可擦除可编程只读存储器，包括EEPROM.read()、EEPROM.write()、EEPROM.update()等。
+\subsubsection{4.9 Arduino SPI}
+SPI（Serial Peripheral Interface）是一种串行外设接口，用于Arduino与其他设备的高速通信。
+\subsubsection{4.10 Arduino I²C}
+I²C（Inter-Integrated Circuit）是一种两线式串行总线，用于Arduino与其他设备的通信。
+\subsubsection{4.11 本章小结}
+本章介绍了Arduino的基本函数，包括数字I/O、模拟I/O、高级I/O、中断、定时、串口通信等方面的函数，这些函数是Arduino编程的基础，掌握它们对于Arduino项目的开发非常重要。
+
+\subsection{第五章 Arduino常用电机控制}
+\subsubsection{5.1 舵机控制}
+\subsubsubsection{5.1.1 舵机的基本结构和工作原理}
+舵机主要由外壳、电路板、小型直流电机、减速器和可调电位器等组成。舵机的工作原理是：通过信号线发送控制脉冲，控制电路接收；减速器将电机的速度按比例减小，并将电机的输出扭矩放大相应倍数，然后输出并驱动电机转动；电位器和减速器的齿轮连在一起，用于测量舵机转动角度；电路检测电位器确定舵机转动位置，并控制舵机转动到目标角度或保持在目标角度。
+\subsubsubsection{5.1.2 舵机控制函数库}
+Arduino控制舵机，需要使用舵机函数库，在Arduino编写程序时，需要包含头文件Servo.h，然后创建舵机的对象来控制舵机，该库有多个函数。
+1. attach(pin)：该函数用于为舵机指定一个Arduino电路板的引脚，例如：
+   ```cpp
+   myServo1.attach(9);
+   ```
+   注意：由于Arduino自带函数只能使用数字9、10端口。Arduino的驱动能力有限，所以当需要控制一个以上的舵机时需要外接电源。
+2. attach(pin,min,max)：该函数在指定引脚的同时，还指定最小角度和最大角度的脉冲宽度，单位为微秒（us），默认最小值为544，对应最小角度为0度；默认最大值为2400，对应最大角度为180度。
+   例如：myServo1.attch(9,1000,2000);
+3. write(angle)：该函数可以直接写入需要的角度。例如：myServo1.write(90)，该函数精度较低，只能达到1度。
+4. writeMicroseconds(us)：该函数精度较高，直接写入脉冲值，单位是微秒（us）。例如：myServo1.writeMicroseconds(1500)，舵机指向90度。该函数的角度精度为0.097度
+5. detach(pin)：该函数用于释放舵机引脚，例如：myServo1.detach(9)，使用该函数之前必须先使用attach函数绑定引脚，否则释放无效。
+6. read()：该函数用于返回当前舵机的角度，范围为0-180度，例如：
+   ```cpp
+   int angle = myServo1.read();
+   ```
+7. readMicroseconds()：该函数用于返回当前舵机的脉冲值，单位为微秒（us），范围在最大脉冲宽度和最小脉冲宽度之间。
+\subsubsubsection{5.1.3 实例：实现摇臂风扇}
+选择常用的SG90舵机，将舵机与Arduino UNO控制器连接起来，舵机引脚连线如图5-5所示。
+\subsubsection{5.2 直流减速电机}
+\subsubsubsection{5.2.1 直流电机简介}
+在机器人的行走机构中多使用直流电机，和舵机不同，直流电机可实现连续的转动，目前直流电机的种类也比较多。
+直流电机一般以电机直径划分，通常直径越大，电机扭力也越强。
+无刷直流电机由电动机主体和驱动器组成，是一种典型的机电一体化产品。无刷电机是指无电刷和换向器（或集电环）的电机，又称无换向器电机。它消除了直流电机的缺点，是当今最理想的调速电机，广泛应用于汽车、工业加工、工业控制、安防设备、自动化及航模航天等领域，例如，现在广泛使用的无人机电机就是无刷电机，具有无噪音调速、过载能力强、转矩小、无火花、寿命长等特点。
+空心杯电机在结构上革除了传统电机的铁芯结构，采用的是无铁芯转子，具有良好的控制性能，也叫空心转子电机，它的转速与供电电压成正比。这种新型的转子结构彻底消除了由于铁芯形成涡流而造成的电能损耗，造就高效率电机而多采用空心杯电机。
+直流电机用于机器人控制时，为了减小转速，增加扭力，一般都配有减速箱，可在一定的电压范围内工作，广泛应用于智能车、小型机器人等。本书使用的机器人大部分都使用了这种电机。
+\subsubsubsection{5.2.2 H桥驱动电路}
+H桥是一种常见的直流电机驱动电路，因为它的电路形状恰似字母H，故得名“H桥”。4个三极管构成H的4条垂直腿，而电机就是H中的横杠。
+H桥电路是常用的直流电机驱动电路，H桥式电机驱动电路包括4个三极管和一个电机。要使电机运转，必须导通对角线上的一对三极管。根据不同三极管对的导通情况，电流可能会从左至右或从右至左流过电机，从而控制电机的转向。
+\subsubsection{5.3 步进电机控制}
+步进电机是一种将电脉冲信号转换成相应角位移或线位移的电动机。每输入一个脉冲信号，转子就转动一个角度或前进一步，其输出的角位移或线位移与输入的脉冲数成正比，转速与脉冲频率成正比。
+步进电机具有结构简单、可靠性高、控制方便等特点，广泛应用于各种自动化设备中，如打印机、扫描仪、机器人等。
+\subsubsection{5.4 本章小结}
+本章介绍了Arduino常用的电机控制方法，包括舵机、直流减速电机和步进电机的控制原理和实现方法，这些知识对于机器人的运动控制非常重要。
+
+\subsection{第六章 Arduino常用传感器使用}
+\subsubsection{6.1 超声波测距传感器}
+\subsubsubsection{6.1.1 工作原理}
+超声波是指频率高于20kHz的机械波。它具有频率高、波长短、绕射现象小的特点，特别是方向性好、能够成为射线而定向传播。超声波对液体、固体的穿透能力很强，尤其是在不透明的固体中。超声波碰到杂质或分界面会产生显著的反射形成反射回波，碰到活动的物体能产生多普勒效应。超声波传感器广泛应用于工业、国防、生物医学等方面。
+超声波测距的原理是通过测量声波在发射后遇到障碍物反射回来的时间来计算出发射点到障碍物的实际距离。
+测距公式为：
+L = (V × (T2 - T1)) / 2
+式中，L为距离长度；V为超声波速度（在20℃时为340m/s）；T1为开始时间；T2为结束时间。
+速度乘以时间差等于来回的距离，除以2可以得到实际的距离。
+\subsubsubsection{6.1.2 超声波测距传感器}
+超声波测距传感器根据不同的测距要求选择传感器，如图6-1所示是常见的超声波测距传感器。
+下面以常用的HC-SR04超声波测距传感器为例进行说明。
+HC-SR04超声波测距模块可提供2cm-400cm的非接触式距离感测功能，测距精度可达3mm。该模块包括超声波发射器、接收器与控制电路。
+超声波模块的四个引脚定义如下：
+- Vcc：5V电源。
+- GND：地线。
+- Trig：触发控制信号输入。
+- Echo：回响信号输出等。
+HC-SR04基本工作原理：
+1. 使用I/O口Trig触发测距，给至少10us的高电平信号。
+2. 模块自动发送8个40kHz的方波，自动检测是否有信号返回。
+3. 有信号返回，通过I/O口Echo输出一个高电平，高电平持续的时间就是超声波从发射到返回的时间。测试距离 = （高电平时间 × 声速（340m/s））/ 2。
+\subsubsubsection{6.1.3 编程实现}
+Arduino UNO开发板与HC-SR04模块接线对应关系如表6-1所示。
+\subsubsection{6.2 其他常用传感器}
+\subsubsection{6.3 本章小结}
+本章介绍了Arduino常用传感器的使用方法，包括超声波测距传感器等，这些传感器是机器人感知环境的重要组件，掌握它们的使用方法对于机器人项目的开发非常重要。
+
+\subsection{第七章 Arduino无线通信}
+\subsubsection{7.1 蓝牙传输}
+\subsubsubsection{7.1.1 蓝牙技术简介}
+蓝牙（Bluetooth）是一种无线技术标准，可实现固定设备、移动设备和个人局域网之间的短距离数据交换（使用2.4GHz-2.485GHz的ISM波段的UHF无线电波）。蓝牙技术最初由电信巨头爱立信于1994年创制，当时是作为RS232数据线的替代方案。蓝牙可连接多个设备，克服了数据同步的难题。
+蓝牙能在包括移动电话、PDA、无线耳机、笔记本电脑、相关外设等众多设备之间进行无线信息交换。蓝牙使用分散式网络结构以及快跳频和短包技术，支持点对点及点对多点通信，工作在全球通用的2.4GHz频段，其数据速率为1Mbps。
+2010年7月，以低功耗为特点的蓝牙4.0标准问世，蓝牙可以覆盖更多应用，主要有4个应用场景，分别是智能手表与智能手机等终端市场、消费电子市场、汽车前装市场和医疗运动器材市场。蓝牙4.0是蓝牙3.0+HS规范的补充，专门面向对成本和功耗都有较高要求的无线方案，可广泛应用于卫生保健、运动健身、家庭娱乐、安全保障等诸多领域。它支持两种部署方式：双模式和单模式。在双模式中，低功耗蓝牙功能集成在现有的经典蓝牙控制器中，或在现有传统蓝牙技术（2.1+EDR/3.0+HS）芯片上增加低功耗堆栈，整体架构基本不变，因此成本增加有限。
+\subsubsubsection{7.1.2 蓝牙模块的使用}
+蓝牙模块是指集成蓝牙功能的芯片基本电路集合，用于无线网络通信。常用的蓝牙模块如图7-1至图7-3所示。
+- HC-05和HC-06蓝牙模块支持无线蓝牙串口透传，它有4个引脚：VCC——接电源正极，GND——接电源负极，TXD——发送端，RXD——接收端。
+- HC-06蓝牙模块是专为智能无线数据传输而打造的，采用英国CSR公司的BlueCore4-Ext芯片，兼容V2.0+EDR蓝牙规范。
+- HC-05可以切换主从模式，但HC-06虽然既可以做主机又可以做从机，但是不能切换模式。
+- 蓝牙4.0模块专为低功耗无线数据传输而打造，该模块兼容BT2.1+EDR/3.0/4.0（BLE）蓝牙规格，支持SPP蓝牙串口协议、HID、BLE等。模块集成了MCU和蓝牙芯片，支持UART、SPI、I²C、I2S等接口，包含4路PWM端口和8路12bit ADC通道，具有集成度高、成本低、功耗低、蓝牙发射性能优越等特点。兼容iOS和Android 4.0及以上系统。
+下面以HC-05蓝牙模块为例说明使用过程，HC-05蓝牙模块共有6个引脚，如图7-4所示。蓝牙模块默认的波特率为9600，默认密码为1234，默认名称为HC-05。
+配对成功以后，可以作为全双工串口使用，无需了解任何蓝牙协议，支持8位数据位、1位停止位、无校验位的通信格式。
+HC-05蓝牙模块接线说明如下：
+- VCC：接电源正极。
+- GND：接电源负极。
+- RXD：接收端。蓝牙模块接收从其他设备发来的数据，正常情况下接其他设备的发送端TXD。
+- TXD：发送端。蓝牙模块发送数据给其他设备，正常情况下接其他设备的接收端RXD。
+- EN：使能端。需要进入AT模式时接3.3V。
+为了方便使用蓝牙模块，可以使用提供蓝牙接口的Arduino扩展板，这种扩展板集成了蓝牙模块的插座，如图7-5所示，其中P4口连接蓝牙，P4口的引脚为VCC、GND、RXD、TXD。
+HC-05蓝牙模块与扩展板的连接如图7-6所示，蓝牙模块使用其中的4个引脚VCC、GND、RXD、TXD，其他悬空，注意引脚对应关系。
+\subsubsection{7.2 其他无线通信方式}
+\subsubsection{7.3 本章小结}
+本章介绍了Arduino无线通信的方法，包括蓝牙传输等，这些无线通信技术是实现远程控制机器人的重要手段，掌握它们的使用方法对于机器人项目的开发非常重要。
+
+\end{document}

@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.2　创建MySQL多实例的数据文件目录</h3>
+<p class="ziti">在老男孩的企业中，通常以“/data”目录作为MySQL多实例总的根目录，然后规划不同的数字（即MySQL实例端口号）作为“/data”下面的二级目录；不同的二级目录对应的数字就作为MySQL实例的端口号，以区别不同的实例；数字对应的二级目录下包含MySQL的数据文件、配置文件以及启动文件等。</p>
+<p class="ziti">下面以配置3306、3307两个实例为例进行讲解。创建MySQL多实例的目录如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mkdir -p /data/{3306,3307}/data
+[root@oldboy ~]# tree /data/
+/data/
+|-- 3306       #&lt;==3306实例的目录。
+|   `-- data   #&lt;==3306实例的数据文件目录。
+`-- 3307       #&lt;==3307实例的目录。
+    `-- data   #&lt;==3307实例的数据文件目录。
+4 directories, 0 files</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+</p>
+<p class="ziti6">1）“mkdir-p/data/{3306，3307}/data”相当于“mkdir-p/data/3306/data；mkdir-p/data/3307/data”的两条命令。</p>
+<p class="ziti6">2）如果是创建多个目录，则可以增加如3308、3309这样的目录名，在生产环境中，一般以2~4个实例为佳。</p>
+</body>
+</html>

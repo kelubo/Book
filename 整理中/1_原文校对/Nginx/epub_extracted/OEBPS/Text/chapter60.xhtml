@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_67">4.1.4　比例分配赋值</h3>
+
+  <p class="ziti3">模块名称：ngx_http_split_clients_module</p>
+
+  <p class="ziti3">该模块会按照配置指令将一个0～232之间的数值根据设定的比例分割为多个数值范围，每个数值范围会被设定一个对应的给定值。用户每次请求时，指定的字符串会被计算出一个数值，该模块会将该数值所在范围对应的给定值赋值给配置中定义的变量。该功能常用来按照用户的来源IP进行访问流量分流。该指令语法格式如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">split_clients 字符串 新变量{}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">split_clients "${remote_addr}AAA" $source {   # "${remote_addr}AAA"会被计算出一个数值
+    0.5%             .one;      # 数值在0～21474835之间，$source被赋值".one"
+    80.0%            .two;      # 数值在21474836～3435973836之间，$source被赋值".two"
+    *                 "";       # 数值在3435973837～4294967295，$source被赋值""
+}
+server {
+    location / {
+        index index${source}.html;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti4">·该指令会将一个2的32次幂计算的值（数值范围为0～4294967295）按照指令域中的比例进行分割。</p>
+
+  <p class="ziti4">·客户端每次请求时，会将指定字符串使用MurmurHash2算法计算出一个0～232（0～4 294 967 295）之间的数值，该模块会将该数值所在范围对应的给定值赋值给配置中定义的变量。</p>
+
+  <p class="ziti4">·指定的字符串可以是Nginx内置变量。</p>
+</body>
+</html>

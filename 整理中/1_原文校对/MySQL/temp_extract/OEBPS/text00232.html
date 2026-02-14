@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">15.7　MySQL主从复制读写分离Web用户生产设置方案</h2>
+<p class="ziti">在配置好MySQL主从复制，并实现了读写分离以后，数据库授权程序访问的用户设置方法包含如下几种方案。</p>
+<p class="p6">1.主库和从库使用不同的用户，授权不同的权限。</p>
+<p class="ziti">主库上对web_w用户的授权如下：</p>
+<p class="ziti">用户：web_w密码：oldboy123端口：3306主库VIP：172.16.1.51</p>
+<hr/>
+<pre class="ziti1">权限：SELECT, INSERT, UPDATE, DELETE
+命令：GRANT SELECT, INSERT, UPDATE, DELETE ON `web`.* TO 'web_w'@'172.16.1.%' identified by 'oldboy123';</pre>
+<hr/>
+<p class="ziti">从库上对web_r用户单独授权如下：</p>
+<p class="ziti">用户：web_r密码：oldboy123端口：3306从库VIP：172.16.1.52</p>
+<hr/>
+<pre class="ziti1">权限：SELECT
+命令：GRANT SELECT ON `web`.* TO 'web_r'@'172.16.1.%' identified by 'oldboy123';</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 此方法显得不够专业，而且从库上也会存在web_w用户，一旦被开发等人利用，就可以对从库进行写库，这种授权也会对数据库带来潜在的风险。</p>
+<p class="p6">2.网站程序访问主库和从库时使用一套用户密码</p>
+<p class="ziti">示例如下。</p>
+<p class="ziti">主库：用户为web，密码为oldboy123，端口为3306，写IP为172.16.1.51。</p>
+<p class="ziti">主库：用户为web，密码为oldboy123，端口为3306，读IP为172.16.1.52。</p>
+<p class="ziti">从外表上看，只有读写分配的IP不同，其他都是相同的。运维人员应尽量为开发人员提供方便，如果是数据库前端有DAL层（实现了读写分离），则可以只为开发人员提供一套用户、密码、端口、VIP，这样就更专业了，剩下的都由运维人员未完成即可。</p>
+<p class="ziti">下面是使用同一个Web连接用户授权访问的方案。</p>
+<p class="ziti">方法1：主库和从库使用相同的用户，但授予不同的权限。</p>
+<p class="ziti">主库上对web用户的授权如下：</p>
+<hr/>
+<pre class="ziti1">用户：web 密码：oldboy123  端口：3306  主库VIP：172.16.1.51
+权限：SELECT, INSERT, UPDATE, DELETE
+命令：GRANT SELECT, INSERT, UPDATE, DELETE ON `web`.* TO 'web'@'172.16.1.%' identified by 'oldboy123';</pre>
+<hr/>
+<p class="ziti">从库上对web用户的授权如下：</p>
+<hr/>
+<pre class="ziti1">用户：web 密码：oldboy123  端口：3306  从库VIP：172.16.1.52
+权限：SELECT
+提示：由于主库和从库是同步复制的，所以从库上的web用户会自动与主库的一致，即无法实现只读select的授权。</pre>
+<hr/>
+<p class="ziti">要实现方法1中的授权方案，并且要求操作严谨，应采用如下两个方法。</p>
+<p class="ziti">一是在主库上创建完web用户和权限之后，在从库上revoke收回对应的更新权限（insert、update、delete）。</p>
+<p class="ziti">命令分别如下。</p>
+<hr/>
+<pre class="ziti1">主库执行：
+GRANT SELECT, INSERT, UPDATE, DELETE ON `web`.* TO 'web'@'172.16.1.%' identified by 'oldboy123';
+从库执行：
+REVOKE INSERT,UPDATE,DELETE ON web.* FROM 'web'@'172.16.1.%';</pre>
+<hr/>
+<p class="ziti">二是忽略授权库mysql同步，主库的my.cnf配置参数如下：</p>
+<hr/>
+<pre class="ziti1">binlog-ignore-db = mysql    #&lt;==mysql库不记录Binlog日志。
+replicate-ignore-db = mysql #&lt;==忽略复制MySQL库。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 注意上面参数的等号两边必须要有空格。</p>
+<p class="ziti">三是在从库上设置read-only参数，让从库只读。</p>
+<p class="ziti">主库从库：主库和从库使用相同的用户，授予相同的权限（非ALL权限）。</p>
+<hr/>
+<pre class="ziti1">用户：web 密码：oldboy123  端口：3306  主库VIP：172.16.1.51，从库VIP：172.16.1.52
+权限：SELECT, INSERT, UPDATE, DELETE
+命令：GRANT SELECT, INSERT, UPDATE, DELETE ON web.* TO 'web_w'@'172.16.1.%' identified by 'oldboy123';</pre>
+<hr/>
+<p class="ziti">由于从库设置了read-only，非super权限是无法写入的，因此，通过read-only参数就可以很好地控制用户非法将数据写入从库。</p>
+<p class="ziti">老男孩老师的生产工作场景的设置方案具体如下。</p>
+<p class="ziti">1）忽略授权库mysql同步，主库的配置参数如下：</p>
+<hr/>
+<pre class="ziti1">binlog-ignore-db = mysql
+replicate-ignore-db = mysql</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 注意上面参数等号两边必须要有空格。</p>
+<p class="ziti">2）主库和从库使用相同的用户，但授予不同的权限。</p>
+<p class="ziti">主库上对web用户的授权如下：</p>
+<hr/>
+<pre class="ziti1">用户：web 密码：oldboy123  端口：3306  写库VIP：172.16.1.51
+权限：SELECT, INSERT, UPDATE, DELETE
+命令：GRANT SELECT, INSERT, UPDATE, DELETE ON web.* TO 'web'@'172.16.1.%' identified by 'oldboy123';</pre>
+<hr/>
+<p class="ziti">从库上对web用户的授权如下：</p>
+<hr/>
+<pre class="ziti1">用户：web 密码：oldboy123  端口：3306  读库VIP：172.16.1.52
+权限：SELECT</pre>
+<hr/>
+<p class="ziti">3）在从库上设置read-only，增加第三个保险。</p>
+<p class="ziti">以上三点的共同作用即可达到专业规范的授权Web用户的目的。</p>
+</body>
+</html>

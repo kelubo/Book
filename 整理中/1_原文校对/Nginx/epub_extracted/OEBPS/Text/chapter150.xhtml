@@ -1,0 +1,239 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_163">8.3.3　动态更新upstream</h3>
+
+  <p class="ziti3">Nginx的配置是启动时一次性加载到内存中的，在实际的使用中，对Nginx服务器上游服务器组中节点的添加或移除仍需要重启或热加载Nginx进程。在Nginx的商业版本中，提供了ngx_http_api_module模块，可以通过API动态添加或移除上游服务器组中的节点。对于Nginx开源版本，通过Nginx的扩展版OpenResty及Lua脚本也可以实现上游服务器组中节点的动态操作，这里只使用OpenResty的lua-upstream-nginx-module模块简单演示节点的上下线状态动态修改的操作。该模块提供了set_peer_down指令，该指令可以对upstream的节点实现上下线的控制。由于该指令只支持worker级别的操作，为使得Nginx的所有worker都生效，此处通过编写Lua脚本与lua-resty-upstream-healthcheck模块做了简单的集成，利用lua-resty-upstream-healthcheck模块的共享内存机制将节点状态同步给其他工作进程，实现对upstream的节点状态的控制。</p>
+
+  <p class="ziti3">首先在OpenResty的lualib目录下创建公用函数文件api_func.lua，lualib/api_func.lua内容如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">local _M = { _VERSION = '1.0' }
+local cjson = require "cjson"
+local upstream = require "ngx.upstream"
+local get_servers = upstream.get_servers
+local get_primary_peers = upstream.get_primary_peers
+local set_peer_down = upstream.set_peer_down
+
+# 分割字符串为table
+local function split( str,reps )
+    local resultStrList = {}
+    string.gsub(str,"[^"..reps.."]+",function ( w )
+        table.insert(resultStrList,w)
+    end)
+    return resultStrList
+end
+
+# 获取server列表
+local function get_args_srv( args )
+    if not args["server"] then
+        ngx.say("failed to get post args: ", err)
+        return nil
+    else
+        if type(args["server"]) ~= "table" then
+            server_list=split(args["server"],",")
+        else
+            server_list=args["server"]
+        end
+    end
+    return server_list
+end
+
+# 获取节点在upstream中的顺序
+local function get_peer_id(ups,server_name)
+    local srvs = get_servers(ups)
+    for i, srv in ipairs(srvs) do
+        -- ngx.print(srv["name"])
+        if srv["name"] == server_name then
+            target_srv = srv
+            target_srv["id"] = i-1
+            break
+        end
+    end
+    return target_srv["id"]
+end
+
+# 获取节点共享内存key
+local function gen_peer_key(prefix, u, is_backup, id)
+    if is_backup then
+        return prefix .. u .. ":b" .. id
+    end
+    return prefix .. u .. ":p" .. id
+end
+
+# 设置节点状态
+local function set_peer_down_globally(ups, is_backup, id, value,zone_define)
+    local u = ups
+    local dict = zone_define
+    local ok, err = set_peer_down(u, is_backup, id, value)
+    if not ok then
+        ngx.say(cjson.encode({code = "E002", msg = "failed to set peer down", data = err}))
+    end
+
+    local key = gen_peer_key("d:", u, is_backup, id)
+    local ok, err = dict:set(key, value)
+    if not ok then
+        ngx.say(cjson.encode({code = "E003", msg = "failed to set peer down state", data = err}))
+    end
+end
+
+# 获取指定upstream的节点列表
+function  _M.list_server(ups)
+    local srvs, err = get_servers(ups)
+    ngx.say(cjson.encode(srvs))
+end
+
+# 设置节点状态
+function  _M.set_server(ups,args,status,backup,zone_define)
+    local server_list = get_args_srv(args)
+    if server_list == nil then
+        ngx.say(cjson.encode({code = "E001", msg = "no args",data = server_list}))
+        return nil
+    end
+
+    for _, s in pairs(server_list) do
+        local peer_id = get_peer_id(ups,s)
+        if status then
+            local key = gen_peer_key("nok:", ups, backup, peer_id)
+            local ok, err = zone_define:set(key, 1)
+            set_peer_down_globally(ups, backup, peer_id, true,zone_define)
+        else
+            local key = gen_peer_key("ok:", ups, backup, peer_id)
+            local ok, err = zone_define:set(key, 0)
+            set_peer_down_globally(ups, backup, peer_id, nil,zone_define)
+        end
+    end
+    ngx.say(cjson.encode({code = "D002", msg = "set peer is success",data = server_list}))
+end
+
+return _M
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">Nginx配置文件status.conf的内容如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5"># 关闭socket错误日志
+lua_socket_log_errors off;
+
+# 设置共享内存名称及大小
+lua_shared_dict _healthcheck_zone 10m;
+
+init_worker_by_lua_block {
+    local hc = require "resty.upstream.healthcheck"
+
+    # 设置需要健康监测的upstream
+    local ups = {"foo.com","sslback"}
+
+    # 遍历ups，绑定健康监测策略
+    for k, v in pairs(ups) do
+        local ok, err = hc.spawn_checker{
+            shm = "_healthcheck_zone",      # 绑定lua_shared_dict定义的共享内存
+            upstream = v,                   # 绑定upstream指令域
+            type = "http",
+            http_req = "GET / HTTP/1.0\r\nHost: foo.com\r\n\r\n",
+                                            # 用以检测的raw格式http请求
+
+            interval = 2000,                # 每2s检测一次
+            timeout = 1000,                 # 检测请求超时时间为1s
+            fall = 3,                       # 连续失败3次，被检测节点被置为DOWN状态
+            rise = 2,                       # 连续成功2次，被检测节点被置为UP状态
+                                                # 当健康检测请求返回的响应码为200或302时，被认
+                                                # 为检测通过
+            valid_statuses = {200, 302},
+            concurrency = 10,               # 健康检测请求的并发数为10
+        }
+        if not ok then
+            ngx.log(ngx.ERR, "failed to spawn health checker: ", err)
+            return
+        end
+    end
+}
+
+upstream foo.com {
+    server 192.168.2.145:8080;
+    server 192.168.2.109:8080;
+    server 127.0.0.1:12356 backup;
+}
+
+upstream sslback {
+    server 192.168.2.145:443;
+    server 192.168.2.159:443;
+}
+
+server {
+    listen 18080;
+    access_log  off;
+    error_log off;
+
+    # 健康检测状态页
+    location = /healthcheck {
+        access_log off;
+        allow 127.0.0.1;
+        allow 192.168.2.0/24;
+        allow 192.168.101.0/24;
+        deny all;
+
+        default_type text/plain;
+        content_by_lua_block {
+            local hc = require "resty.upstream.healthcheck"
+            ngx.say("Nginx Worker PID: ", ngx.worker.pid())
+            ngx.print(hc.status_page())
+        }
+    }
+
+    location = /ups_api {
+        default_type  application/json;
+        content_by_lua '
+            # 获取URL参数
+            local ups = ngx.req.get_uri_args()["ups"]
+            local act = ngx.req.get_uri_args()["act"]
+            if act == nil or ups == nil then
+                ngx.say("usage: /ups_api?ups={name}&amp;act=[down,up,list]")
+                return
+            end
+
+            # 引用api_func.lua脚本
+            local api_fun = require "api_func"
+            # 绑定共享内存_healthcheck_zone
+            local zone_define=ngx.shared["_healthcheck_zone"]
+
+            if act == "list" then
+                # 获取指定upstream的节点列表
+                api_fun.list_server(ups)
+            else
+                ngx.req.read_body()
+                local args, err = ngx.req.get_post_args()
+                if act == "up" then
+                    # 节点状态将设置为UP
+                    api_fun.set_server(ups,args,false,false,zone_define)
+                end
+                if act == "down" then
+                    # 节点状态将设置为DOWN
+                    api_fun.set_server(ups,args,true,false,zone_define)
+                end
+            end
+        ';
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">操作命令如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5"># 查看upstream foo.com的服务器列表
+curl "http://127.0.0.1:18080/ups_api?act=list&amp;ups=foo.com"
+
+# 将192.168.2.145:8080这个节点设置为DOWN状态
+curl -X POST -d "server=192.168.2.145:8080" "http://127.0.0.1:18080/ups_api?act= down&amp;ups=foo.com"
+
+# 将192.168.2.145:8080这个节点设置为UP状态
+curl -X POST -d "server=192.168.2.145:8080" "http://127.0.0.1:18080/ups_api?act= up&amp;ups=foo.com"
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

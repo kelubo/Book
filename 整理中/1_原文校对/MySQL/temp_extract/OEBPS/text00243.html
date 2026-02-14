@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">16.2.3　MySQL主主复制的企业级实现方案</h3>
+<p class="ziti">MySQL主主复制的常见实现方案具体如下。</p>
+<p class="p6">1.通过MySQL的参数配置使表主键自增的方案</p>
+<p class="ziti">即通过为MySQL的表主键ID字段增加auto_increment功能，实现主键的自动增长（默认步长为1），ID的增长具体如下。</p>
+<p class="ziti6">·M1库：每张表的主键都为奇数，例如：1、3、5....。</p>
+<p class="ziti6">·M2库：每张表的主键都为偶数，例如：2、4、6....。</p>
+<p class="ziti">该实现的具体参数配置。</p>
+<p class="ziti">解决主键自增长ID冲突，M1库与/M2库的参数配置如下。</p>
+<p class="ziti">Master1的参数配置如下。</p>
+<p class="ziti6">·auto_increment_increment=2#&lt;==自增ID的间隔，如135，间隔为2。</p>
+<p class="ziti6">·auto_increment_offset=1#&lt;==ID的初始位置。</p>
+<p class="ziti">（所有库里表的ID都将形成1、3、5、7...序列）</p>
+<p class="ziti">Master2的参数配置如下。</p>
+<p class="ziti6">·auto_increment_increment=2#&lt;==自增ID的间隔，如246，间隔为2。</p>
+<p class="ziti6">·auto_increment_offset=2#&lt;==ID的初始位置</p>
+<p class="ziti">（所有库里表的ID都将形成2、4、6、8...序列）</p>
+<p class="ziti">
+<span class="yanse">该种方法的优缺点</span>
+</p>
+<p class="ziti">缺点：该方法会导致表的ID号不连续。例如，写数据时ID的特征为：当M1中的数据写入ID号为1、3、5，此时如果数据写入M2，则数据写入ID就会从6开始，而不是从2开始。假设M2写入的连续ID为6、8、10，此时M1开始写，则会从11开始写。结论：总是以当前表里最大的ID值为基础递增开始写ID。</p>
+<p class="ziti">优点：前端网站程序不需要做任何修改，就可以实现双主的架构。</p>
+<p class="ziti">应用：尽量不要双写，而是单写，其作用可以作为主库宕机的备用切换选择（不用更改配置即可进行角色切换），当然要双写也是没有问题的，不会导致数据冲突，但会产生表里数据的ID值不连续的问题。</p>
+<p class="p6">2.使用序列服务实现MySQL双主方案</p>
+<p class="ziti">使用序列（sequence）服务，由序列服务提供ID（就像银行的取号机器发号一样），当用户通过程序写数据库时，由序列服务分配ID，然后按照分发的ID号顺序调度到不同的数据库写入，以确保写入不同双主数据库的ID是不同的，并确保ID是值连续的。</p>
+<p class="ziti">优点：表记录的ID号是连续的。</p>
+<p class="ziti">缺点：增加了序列服务或服务器，引入了单点，同时，程序若要改动，则实现会比较复杂。</p>
+<p class="ziti">总的建议，尽可能不要用双写模式。</p>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">8.7　MySQL生产常用备份架构方案</h2>
+<p class="ziti">在中小公司一般比较常用的做法是，每日0点执行全备任务，先把数据按照日期备份到数据库本地，然后推送到数据库备份服务器，由于本地空间有限，因此本地仅保留3～7日的全备。</p>
+<p class="ziti">如果有备用的服务器资源可用，那么最好通过主从同步的方式进行备份，这样即使物理机损坏了也可以很快地切换到新服务器（还可以HA自动切换），但是主从复制的缺点是不能解决错误执行SQL语句的问题，例如，执行“drop database oldboy”命令之后，所有的从库都会傻傻地执行同样的删除动作（这个问题可以通过在从库上实现延迟复制来缓解）。</p>
+<p class="ziti">因此，我们一般会在某一台不对外提供业务的从库上使用上述的mysqldump或Xtrabackup来进行定时备份。这里有个需要特别注意的地方，用于备份从库的二进制日志记录功能必须打开，关于这点具体会在主从复制章节讲解。</p>
+</body>
+</html>

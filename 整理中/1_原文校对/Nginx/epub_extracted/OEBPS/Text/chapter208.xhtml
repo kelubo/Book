@@ -1,0 +1,211 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_223">12.1.4　Kubernetes网络通信</h3> 
+ <p class="ziti3">计算机间的信息和数据在网络中必须按照数据传输的顺序、数据的格式内容等方面的约定或规则进行传输，这种约定或规则称作协议。各种网络协议分布于不同的网络分层中，网络分层分为OSI七层模型和TCP/IP五层模型两种。TCP/IP五层模型分别是应用层、传输层、网络层、链路层和物理层，其中应用层对应于OSI七层模型中的会话层、表示层、应用层，这也是二者的区别。计算机网络数据是按照协议规范，采用分层的结构由发送端自上而下流动到物理层，再从物理层在网络分层中自下而上流动到接收端的应用层完成数据通信。网络分层中，高层级的应用模块仅利用低层级应用模块提供的接口和功能，低层级应用模块也仅使用高层级应用模块传来的参数响应相关操作，层次间每个应用模块都可能被提供相同功能的应用模块替代。Kubernetes网络通信也遵守TCP/IP五层模型的定义，通过不同的资源对象在相应的层级提供相应的模块功能。Kubernetes资源对象在相应的网络层级与传统网络设备模块的对照表如表12-2所示。</p> 
+ <p class="middle-img">表12-2　设备模块对照表</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-2.jpg" class="calibre348"/></a> 
+ </div> 
+ <p class="ziti3"><span class="yanse">1.Docker网络模式</span></p> 
+ <p class="ziti3">Kubernetes是基于容器的管理系统，其使用的Docker容器版本的Pod由多个Docker容器组成，因此为便于理解Pod的网络通信方式，应首先了解Docker自有的网络模式。Docker容器有如下4种常见的网络模式。</p> 
+ <p class="ziti4">·主机模式（host）。该模式下，因为容器与宿主机共享网络命名空间（network name-space，netns），所以该容器中可以共享使用宿主机的所有网卡设备。使用者可以通过访问宿主机IP，访问容器中运行应用的所有网络端口。主机模式下网络传输效率最高，但宿主机上已经存在的网络端口无法被容器使用。</p> 
+ <p class="ziti4">·无网卡模式（none）。该模式下，容器中只有环回（Lookback，lo）接口，运行在容器内的应用仅能使用环回接口实现网络层的数据传输。</p> 
+ <p class="ziti4">·桥接模式（bridge）。该模式下，容器内会被创建Veth（Virtual ETHernet）设备并接入宿主机的桥接网络，通过宿主机的桥接网络，容器内部应用可与宿主机及宿主机中接入同一桥接设备的其他容器应用进行通信。</p> 
+ <p class="ziti4">·Macvlan网络模式（macvlan），当宿主机的网络存在多个不同的VLAN时，可以通过该模式为容器配置VLAN ID，使该容器与宿主机网络中同一VLAN ID的设备实现网络通信。</p> 
+ <p class="ziti3">Docker容器间可以通过IP网络、容器名解析、joined容器3种方式实现通信。IP网络是在网络联通的基础上通过IP地址实现互访通信。容器名解析是在网络联通的基础上，由Docker内嵌的DNS进行容器名解析实现的互访通信方式，同一主机桥接模式的容器间需要启动时，可使用--link参数启用这一功能。joined容器方式可以使多个容器共享一个网络命名空间，多个容器间通过环回接口直接通信，这种方式容器间传输效率最高。</p> 
+ <p class="ziti3"><span class="yanse">2.Pod内容器间的数据通信</span></p> 
+ <p class="ziti3">Pod是由多个Docker容器以joined容器方式构成的，多个容器共享由名为pause的容器创建的网络命名空间，容器内的进程彼此间通过环回接口实现数据通信。环回接口不依赖链路层和物理层协议，一旦传输层检测到目的端地址是环回接口地址，数据报文离开网络层时会被返回给本机的端口应用。这种模式传输效率较高，非常适用于容器间进程的频繁通信。</p> 
+ <p class="ziti3"><span class="yanse">3.同节点的Pod间数据通信</span></p> 
+ <p class="ziti3">每个Pod拥有唯一的IP和彼此隔离的网络命名空间，在Linux系统中，Pod间跨网络命名空间的数据通信是通过Veth设备实现的。Veth设备工作在链路层，总是成对出现，也被称为Veth-pair设备。在网络插件是Flannel的虚拟网络结构中，Flannel在被Kubernetes触发、接收到相关Pod参数时，会为Pod创建Veth设备并分配IP，Veth设备一端是Pod的eth0接口，一端是Node节点中网络空间名为default的Veth虚拟接口。Flannel在初始安装时，创建了网桥设备cni0，网络空间default中创建的Veth虚拟接口都被加入网桥设备cni0中，相当于所有的Pod都被接入这个虚拟交换机中，在同一虚拟交换机中的Pod实现了链路层的互联并进行网络通信。工作原理如图12-5所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-5.jpg" class="calibre349"/></a> 
+ </div> 
+ <p class="middle-img">图12-5　同节点的Pod间数据通信</p> 
+ <p class="ziti3">可用如下命令查看当前节点服务器的网络命名空间和网桥信息。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 查看系统中的网络命名空间
+ls /var/run/docker/netns
+
+# 查看每个命名空间的网络接口信息
+nsenter --net=/var/run/docker/netns/default ifconfig -a
+
+# 查看网桥信息
+brctl show
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">4.跨主机的Pod间数据通信</span></p> 
+ <p class="ziti3">由CoreOS使用Go语言开发的Flannel实现了一种基于Vxlan（Virtual eXtensible Local Area Network）封装的覆盖网络（Overlay Network），将TCP数据封装在另一种网络包中进行路由转发和通信。</p> 
+ <p class="ziti3">Vxlan协议是一种隧道协议，基于UDP协议传输数据。Flannel的Vxlan虚拟网络比较简单，在每个Kubernetes的Node上只有1个VTEP（Vxlan Tunnel Endpoint）设备（默认为flannel.1）。Kubernetes集群中整个Flannel网络默认配置网段为10.244.0.0/16，每个节点都分配了唯一的24位子网，Flannel在Kubernetes集群中类似于传统网络中的一个三层交换设备，每个Node节点的桥接设备通过VTEP设备接口互联，使运行在不同Node节点中不同子网IP的容器实现跨Node互通。</p> 
+ <p class="ziti3">可用如下命令查看当前节点服务器的arp信息。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 本地桥arp表
+bridge fdb
+
+bridge fdb show dev flannel.1
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">5.Pod应用在Kubernetes集群内发布服务</span></p> 
+ <p class="ziti3">Kubernetes通过副本集控制器能够动态地在集群中任意创建和销毁Node，因为每个Node被分配的子网范围不同，所以Pod IP也会随之变化。Flannel构建的虚拟网络使得集群中的每个Pod在网络上已经实现互联互通，由于Pod IP变化的不确定性，运行在Pod中的应用服务无法被其他应用固定访问。为使动态变化IP的Pod应用可以被其他应用访问，Kubernetes通过标签筛选的形式将具有相同指定标签的一组Pod定义为Service，每个Service的Pod成员信息通过端点控制器在etcd中保存及更新。Service为Pod应用提供了固定的虚拟IP和端口实现固定访问，使得集群内其他Pod应用可以访问这个服务。</p> 
+ <p class="ziti3">Service是四层（TCP/UDP over IP）概念，其构建了一个有固定ClusterIP（集群虚拟IP，Virtual IP）和Port的虚拟集群，每个节点上运行的kube-proxy进程通过主节点的接口服务监听资源对象Service和Endpoint内Pod列表的变化。kube-proxy默认使用iptables代理模式，其通过对每个Service配置对应的iptables规则，在集群中的Node主机上捕获到达该Service的ClusterIP和Port的请求，当捕获到请求时，会将访问请求按比例随机分配给Service中的一个Pod，如果被选择的Pod没有响应（取决于readiness probes的配置），则自动重试另一个Pod。Service访问逻辑如图12-6所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-6.jpg" class="calibre350"/></a> 
+ </div> 
+ <p class="middle-img">图12-6　Service访问逻辑</p> 
+ <p class="ziti3">具体说明如下。</p> 
+ <p class="ziti4">·kube-proxy根据集群中Service和Endpoint资源对象的状态初始化所在节点的iptables规则。</p> 
+ <p class="ziti4">·kube-proxy通过接口服务监听集群中Service和Endpoint资源对象的变化并更新本地的iptables规则。</p> 
+ <p class="ziti4">·iptables规则监听所有请求，将对应ClusterIP和Port的请求使用随机负载均衡算法负载到后端Pod。</p> 
+ <p class="ziti3">kube-proxy在集群中的每个节点都会配置集群中所有Service的iptables规则，iptables规则设置如下。</p> 
+ <p class="ziti4">·kube-proxy首先是建立filter表的INPUT规则链和nat表的PREROUTING规则链，将访问节点的流量全部跳转到KUBE-SERVICES规则链进行处理。</p> 
+ <p class="ziti4">·kube-proxy遍历集群中的Service资源实例，为每个Service资源实例创建两条KUBE-SERVICES规则。</p> 
+ <p class="ziti4">·KUBE-SERVICES中一条规则是将访问Service的非集群Pod IP交由KUBE-MARK-MASQ规则标记为0x4000/0x4000，在执行到POSTROUTING规则链时由KUBE-POSTROUTING规则链对数据流量实现SNAT。</p> 
+ <p class="ziti4">·KUBE-SERVICES中另一条规则将访问目标是Service的请求跳转到对应的KUBE-SVC规则链。</p> 
+ <p class="ziti4">·KUBE-SVC规则链由目标Service端点列表中每个Pod的处理规则组成，这些规则包括随机负载均衡策略及会话保持（Session Affinity）的实现。</p> 
+ <p class="ziti4">·KUBE-SVC每条规则链命名是将服务名+协议名按照SHA256算法生成哈希值后通过base32对该哈希值再编码，取编码的前16位与KUBE-SVC作为前缀组成的字符串。</p> 
+ <p class="ziti4">·KUBE-SEP每个Pod有两条KUBE-SEP规则，一条是将请求数据DNAT到Pod IP，另一条用来将Pod返回数据交由KUBE-POSTROUTING规则链实现SNAT。</p> 
+ <p class="ziti4">·KUBE-SEP每条规则链命名是将服务名+协议名+端口按照SHA256算法生成哈希值后通过base32对该哈希值再编码，取编码的前16位与KUBE-SEP为前缀组成的字符串。</p> 
+ <p class="ziti3">Service的负载均衡是由iptables的statistic模块实现的。statistic模块的random模式可以将被设定目标的请求数在参数probability设定的概率范围内分配，参数设定值在0.0～1.0之间，当参数设定值为0.5时，表示该目标有50%的概率分配到请求。kube-proxy遍历Service中的Pod列表时，按照公式1.0/float64(n-i)为每个Pod计算概率值，n是Pod的总数量，i是当前计数。当有3个Pod时，计算值分别为33%、50%、100%，3个Pod的总流量负载分配分别为33%、35%、32%。</p> 
+ <p class="ziti3">Service也支持会话保持功能，是应用iptables的recent模块实现的。recent允许动态创建源地址列表，并对源地址列表中匹配的来源IP执行相应的iptables动作。recent模块参数如表12-3所示。</p> 
+ <p class="middle-img">表12-3　recent模块参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-3.jpg" class="calibre351"/></a> 
+ </div> 
+ <p class="ziti3">配置Service会话保持，只需在Service中进行如下配置即可。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">spec:
+    sessionAffinity: ClientIP
+    sessionAffinityConfig:
+        clientIP:
+            timeoutSeconds: 10800
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">kube-proxy实现Service的方法有4种，分别是userspace、iptables、IPVS和winuser-space。iptables只是默认配置，因kube-proxy的其他实现方式非本书重点，此处不深入探讨。</p> 
+ <p class="ziti3"><span class="yanse">6.Pod应用在Kubernetes集群外发布服务</span></p> 
+ <p class="ziti3">Service实现了Pod访问的固定IP和端口，但ClusterIP并不是绑定在网络设备上的，它只是kube-proxy进程设定的iptables本地监听转发规则，只能在Kubernetes集群内的节点上进行访问。Kubernetes系统默认提供两种方式实现Pod应用向集群外发布服务，一种是基于资源对象Pod的hostPort和hostNetwork方式，另一种是基于资源对象Service的NodePort、Load-Balancer和ExternalIPs方式。</p> 
+ <p class="ziti3">（1）hostPort方式</p> 
+ <p class="ziti3">hostPort方式相当于创建Docker容器时使用-p参数提供容器的端口映射，只能通过运行容器的Node主机IP进行访问，属于资源对象Pod的运行方式，不支持多个Pod的Service负载均衡等功能。资源配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: v1
+kind: Pod
+metadata:
+    name: apps
+    labels:
+        app: web
+spec:
+    containers:
+    - name: apps
+      image: apache
+      ports:
+        - containerPort: 80
+          hostPort: 8080
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）hostNetwork方式</p> 
+ <p class="ziti3">hostNetwork方式相当于创建Docker容器时以主机模式为网络模式的Pod运行方式，该方式运行的容器与所在Node主机共享网络命名空间，属于资源对象Pod的运行方式，不支持多个Pod的Service负载均衡等功能。资源配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-web
+    namespace: default
+    labels:
+        run: nginx-web
+spec:
+    hostNetwork: true
+    containers:
+    - name: nginx-web
+      image: nginx
+        ports:
+        - containerPort: 80
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）NodePort方式</p> 
+ <p class="ziti3">NodePort方式是在集群中每个节点监听固定端口（NodePort）的访问，外部用户对任意Node主机IP和NodePort的访问，都会被Service负载到后端的Pod，全局NodePort的默认可用范围为30000～32767。NodePort方式访问逻辑如图12-7所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-7.jpg" class="calibre352"/></a> 
+ </div> 
+ <p class="middle-img">图12-7　NodePort方式访问逻辑</p> 
+ <p class="ziti3">具体说明如下。</p> 
+ <p class="ziti4">·kube-proxy初始化时，会对NodePort方式的Service在iptables nat表中创建规则链KUBE-NODEPORTS，用于监听本机NodePort的请求。</p> 
+ <p class="ziti4">·外部请求访问节点IP和端口（NodePort）后，被iptables规则KUBE-NODEPORTS匹配后跳转给对应的KUBE-SVC规则链执行负载均衡等操作。</p> 
+ <p class="ziti4">·选定Pod后，请求被转发到选定的Pod IP和目标端口（targetPod）。</p> 
+ <p class="ziti3">NodePort方式的资源配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: v1
+kind: Service
+metadata:
+    name: nginx-web
+    namespace: default
+    labels:
+        run: nginx-web
+spec:
+    type: NodePort
+    ports:
+    - nodePort: 31804
+      port: 8080
+        protocol: TCP
+        targetPort: 8080
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）LoadBalancer方式</p> 
+ <p class="ziti3">LoadBalancer方式是一种Kubernetes自动对外发布的解决方案，该方案是将外部负载均衡器作为上层负载，在创建Service时自动与外部负载均衡器互动，完成对Kubernetes Service负载均衡创建的操作，将Service按照外部负载均衡器的负载策略对外提供服务。该方案依赖外部负载均衡器的支持，阿里云、腾讯云等的容器云都提供了对这个方案的支持。资源配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: v1
+kind: Service
+metadata:
+    name: nginx-web
+    namespace: default
+    labels:
+        run: nginx-web
+spec:
+    type: LoadBalancer
+    ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">具体说明如下。</p> 
+ <p class="ziti4">·不同的外部负载均衡器需要有对应的负载均衡控制器（Loadbalancer Controller）。</p> 
+ <p class="ziti4">·负载均衡控制器通过接口服务实时监听资源对象Service的变化。</p> 
+ <p class="ziti4">·LoadBalancer类型的Service被创建时，Kubernetes会为该Service自动分配Node-Port。</p> 
+ <p class="ziti4">·当监听到LoadBalancer类型的Service创建时，负载均衡控制器将触发外部负载均衡器（LoadBalancer）创建外部VIP、分配外部IP或将现有节点IP绑定NodePort端口添加到外部负载均衡器的负载均衡池，完成负载均衡的配置。</p> 
+ <p class="ziti4">·当外部用户访问负载均衡器的外部VIP时，外部负载均衡器会将流量负载到Kubernetes节点或Kubernetes集群中的Pod（视外部负载均衡器的功能而定）。</p> 
+ <p class="ziti4">·不能与NodePort方式同时使用。</p> 
+ <p class="ziti3">（5）ExternalIPs方式</p> 
+ <p class="ziti3">ExternalIPs方式提供了一种指定外部IP绑定Service端口的方法，该方法可以指定节点内某几个节点IP地址或绑定外部路由到节点网络的非节点IP对外提供访问。Kubernetes通过ExternalIPs参数将被指定的IP与Service端口通过iptables监听，其使用与Service一致的端口，相较于NodePort方式配置更加简单灵活。由于是直接将Service端口绑定被路由的IP对外暴露服务，用户需要将整个集群对外服务的端口做好相应的规划，避免端口冲突。资源配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">spec:
+    externalIPs:
+    - 192.168.1.101
+    - 192.168.1.102
+    ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 443
+      protocol: TCP
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">具体说明如下。</p> 
+ <p class="ziti4">·ExternalIPs设置的IP可以是集群中现有的节点IP，也可以是上层网络设备路由过来的IP。kube-proxy初始化时，会对ExternalIPs方式的Service在iptables nat表中创建规则链KUBE-SERVICES，用于访问ExternalIPs列表中IP及Service port请求的监听。</p> 
+ <p class="ziti4">·外部或本地访问ExternalIPs列表中IP及port的请求被匹配后，跳转给对应的KUBE-SVC规则链执行负载均衡等操作。</p> 
+ <p class="ziti3"><span class="yanse">7.Service中Pod的调度策略</span></p> 
+ <p class="ziti3">Kubernetes系统中，Pod默认是按照资源策略随机部署的，虽然用户可对调度策略进行一定的调整，但Pod的调度策略同样对Pod通信存在一定的影响，相关调度策略有如下两种。</p> 
+ <p class="ziti3">（1）部署调度策略（Affinity）</p> 
+ <p class="ziti3">Kubernetes集群中的Pod被随机调度并创建在集群中的Node上。在实际使用中，有时需要考虑Node资源的有效利用及不同应用间的访问效率等因素，也需要对这种调度设置相关期望的策略。主要体现在Node与Pod间的关系、同Service下Pod间的关系、不同Service下Pod间的关系这3个方面。Node与Pod间的关系可以使用nodeAffinity在资源配置文件中设置，在设置Pod资源对象时，可以将Pod部署到具有指定标签的集群Node上。Pod间的关系可通过podAntiAffinity的配置尽量把同一Service下的Pod分配到不同的Node上，提高自身的高可用性，也可以把互相影响的不同Service的Pod分散到不同的集群Node上。对于Pod间访问比较频繁的应用，可以使用podAffinity配置，尽量把被配置的Pod部署到同一Node服务器上。</p> 
+ <p class="ziti3">（2）流量调度策略（externalTrafficPolicy）</p> 
+ <p class="ziti3">Service的流量调度策略有两种，分别是Cluster和Local。Cluster是默认调度策略，依据iptables的随机负载算法，将用户请求负载均衡分配给Pod，但该方式会隐藏客户端的源IP。Local策略则会将请求只分配给请求IP主机中该Service的Pod，而不会转发给Service中部署在其他Node中的Pod，这样就保留了最初的源IP地址。但该方式不会对Service的Pod进行负载均衡，同时被访问IP的Node主机上如果没有该Service的Pod，则会报错。Local策略仅适用于NodePort和LoadBalancer类型的Service。</p> 
+ <p class="ziti3">Kubernetes中通过Service实现Pod应用访问，在流量调度策略的Cluster调度策略下，对一个Service的访问请求会被随机分配到Service中的任意Pod，即便该Service与发出请求的Pod在同一Node有可提供服务的Pod，也不一定会被选中。在Kubernetes计划的1.16版本中增加了服务拓扑感知的流量管理功能，设计了新的Pod定位器（PodLocator），实现了服务的拓扑感知服务路由机制，使得Pod总能优先使用本地访问的策略找到最近的服务后端，这种拓扑感知服务使本地访问具有更广泛的意义，包括节点主机、机架、网络、机房等，这样可以有效地减少网络延迟，提高访问效率及安全性，更加节约成本。</p> 
+</body>
+</html>

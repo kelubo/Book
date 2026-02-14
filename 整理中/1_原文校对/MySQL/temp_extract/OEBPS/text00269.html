@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.5.4　MySQL GTID复制的应用及实践</h3>
+<p class="p6">1.环境准备</p>
+<p class="ziti">参考17.2.3节“MySQL半同步复制准备”中1和2的内容，本文GTID复制安装和初始化的步骤与该节环境一致，只是配置文件有区别，具体见下文。</p>
+<p class="p6">2.GTID复制主从库配置文件对比说明</p>
+<p class="ziti">请注意，GTID主从库配置的不同部分，请参考表17-5半同步主从库配置文件的对比说明。</p>
+<p class="middle-img">表17-5　GTID复制主从库配置文件对比说明</p>
+<div class="pic"><img alt="" src="Image00141.jpg" />
+</div>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00024.jpg" />
+ <span class="yanse">说明：</span>
+ 除了server-id之外，其他完全一致。配置完毕后，重启所有的MySQL服务。</p>
+<p class="p6">3.GTID复制特殊配置参数说明</p>
+<p class="ziti">GTID复制特殊配置参数说明具体见表17-6。</p>
+<p class="middle-img">表17-6　GTID复制特殊配置参数说明</p>
+<div class="pic"><img alt="" src="Image00142.jpg" />
+</div>
+<p class="p6">4.配置MySQL GTID主从复制</p>
+<p class="ziti">1）建立用于从库复制的账号及对应权限：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; grant replication slave on *.* to 'rep'@'172.16.1.%' identified by 'oldboy123';
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; flush privileges;
+Query OK, 0 rows affected (0.02 sec)</pre>
+<hr/>
+<p class="ziti">2）导出主库的数据：</p>
+<hr/>
+<pre class="ziti1">mysqldump -A -B -x --set-gtid-purged=OFF|gzip &gt;/opt/bak1_$(date +%F).sql.gz</pre>
+<hr/>
+<p class="ziti">如果不加“--set-gtid-purged=OFF”参数备份，则会在dump文件里看到以下信息：</p>
+<hr/>
+<pre class="ziti1">SET @@GLOBAL.GTID_PURGED='4c92bf66-0f0b-11e7-ba4a-000c292ece3d:1-2';</pre>
+<hr/>
+<p class="ziti">3）将主库导出的MySQL数据迁移到从库。</p>
+<p class="ziti">本文采用scp进行复制，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# scp -rp /opt/bak1_$(date +%F).sql.gz root@172.16.1.52:/opt</pre>
+<hr/>
+<p class="ziti">4）把从主库mysqldump导出的数据恢复到从库。</p>
+<hr/>
+<pre class="ziti1">[root@db02 etc]# cd /opt/
+[root@db02 opt]# gzip -d bak1_$(date +%F).sql.gz
+[root@db02 opt]# mysql &lt; bak1_2017-09-18.sql</pre>
+<hr/>
+<p class="ziti">5）登录从库（52）配置复制参数。</p>
+<p class="ziti">登录从数据库之后，执行去掉上述语句中注释部分的代码如下：</p>
+<hr/>
+<pre class="ziti1">CHANGE MASTER TO
+MASTER_HOST='172.16.1.51',
+ MASTER_PORT=3306,
+MASTER_USER='rep',
+MASTER_PASSWORD='oldboy123',
+MASTER_AUTO_POSITION=1;              #&lt;== GTID复制的参数。
+MASTER_LOG_FILE='oldboy-bin.000023', #&lt;==删除传统复制的binlog文件参数。
+MASTER_LOG_POS=626;                  #&lt;==删除传统复制的binlog文件位置点参数。</pre>
+<hr/>
+<p class="ziti">6）启动从库同步开关并测试主从复制：</p>
+<hr/>
+<pre class="ziti1">mysql&gt;start slave;
+mysql&gt; show slave status\G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 172.16.1.51
+                  Master_User: rep
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: oldboy-bin.000002
+          Read_Master_Log_Pos: 532
+               Relay_Log_File: db02-relay-bin.000002
+                Relay_Log_Pos: 411
+        Relay_Master_Log_File: oldboy-bin.000002
+             Slave_IO_Running: Yes   #&lt;==为Yes就对了。
+            Slave_SQL_Running: Yes   #&lt;==为Yes就对了。
+            ...省略若干...
+          Exec_Master_Log_Pos: 532
+              Relay_Log_Space: 614
+              Until_Condition: None
+              ...省略若干...
+             Master_UUID: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d
+             Master_Info_File: /application/mysql/data/master.info
+                    SQL_Delay: 0
+          SQL_Remaining_Delay: NULL
+Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it
+           Master_Retry_Count: 86400
+           ...省略若干...
+            Executed_Gtid_Set: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d:1-2
+                Auto_Position: 1
+1 row in set (0.00 sec)
+提示：有关show slave status结果的详细说明，请大家查看MySQL手册。</pre>
+<hr/>
+<p class="ziti">主从复制是不是配置成功了，其中最关键的是下面3项的状态参数：</p>
+<hr/>
+<pre class="ziti1">[root@db02 opt]# mysql -e "show slave status\G;"|egrep "IO_Running|SQL_Running: |_Behind_Master"
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+        Seconds_Behind_Master: 0</pre>
+<hr/>
+<p class="ziti">7）测试主从复制结果。在主库上写入数据，然后观察从库的数据状况：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# mysql -e "create database alex_python;"  #&lt;==注意提示符：这是
+                                                     主库建库的操作。
+[root@db02 ~]# mysql -e "show databases like 'alex%';"   #&lt;==这是从库查询检查。
++------------------+
+| Database (alex%) |
++------------------+
+| alex_python      |
++------------------+</pre>
+<hr/>
+<p class="ziti">根据测试可以判断，从库（172.16.1.52）和主库（172.16.1.51）是同步的，到此，GTID主从复制的基本实践就完成了。</p>
+</body>
+</html>

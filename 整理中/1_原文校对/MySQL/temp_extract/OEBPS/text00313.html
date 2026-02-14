@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">20.4.2　RDS for MySQL升级实例</h3>
+<p class="ziti">在业务量持续增大的场景下，RDS实例的性能可能会无法满足需求。此时我们就需要考虑对RDS的性能进行升级，以满足业务对性能的需求。</p>
+<p class="ziti">RDS规格升级的过程，不会影响到业务使用数据库。关于升级规则，如果本地物理机硬件配置足够，那么会直接进行本地升级，此种情况下升级速度较快。如果本地物理机硬件资源不足，那么RDS会在资源充足的物理机上创建新的实例，然后进行升级，此种升级会复制当前数据库的数据到远端的数据库，数据同步过程中，对业务没有影响，升级期间无法管理数据库，例如无法添加数据库账号等。当数据库数据同步完毕后，会进行主备切换，此时会有30秒左右的闪断，需要业务支持数据库断开重连。</p>
+<p class="ziti">1）登录RDS控制台，如图20-17所示。</p>
+<div class="pic"><img alt="" src="Image00164.jpg" />
+</div>
+<p class="middle-img">图20-17　RDS控制台界面</p>
+<p class="ziti">2）选择需要升级的RDS实例，如图20-18所示。</p>
+<div class="pic"><img alt="" src="Image00165.jpg" />
+</div>
+<p class="middle-img">图20-18　选择需要升级的RDS实例</p>
+<p class="ziti">3）确定规格和存储，点击“确认变更”，如图20-19所示。</p>
+<div class="pic"><img alt="" src="Image00166.jpg" />
+</div>
+<p class="middle-img">图20-19　确定规格和存储</p>
+<p class="ziti">以上是按量付费实例升级的操作过程。</p>
+<p class="ziti">包年包月实例升级的操作步骤与此类似，这里我们不再进行演示。</p>
+<p class="ziti">升级中的实例，不允许做迁移管理等操作。需要等待一段时间，才能完成实例的配置升级。</p>
+<p class="ziti">4）点击“管理控制台”，如图20-20所示。</p>
+<p class="ziti">5）数据库运行状态为“升降级中”，等待状态变成“运行中”，升级完毕，如图20-21所示。</p>
+</body>
+</html>

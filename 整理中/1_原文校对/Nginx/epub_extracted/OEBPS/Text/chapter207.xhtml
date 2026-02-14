@@ -1,0 +1,268 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_222">12.1.3　Kubernetes集群部署</h3> 
+ <p class="ziti3">Kubernetes集群支持多种方式部署，kubeadm是Kubernetes官方提供的用于快速部署Kubernetes集群的工具，本节将使用kubeadm实现Kubernetes集群样例的快速部署。部署规划如表12-1所示。</p> 
+ <p class="middle-img">表12-1　Kubernetes部署规划</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-1.jpg" class="calibre346"/></a> 
+ </div> 
+ <p class="ziti3"><span class="yanse">1.系统初始化</span></p> 
+ <p class="ziti3">分别在Master和Node主机进行系统初始化，此处使用的操作系统版本为CentOS 7.2。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 关闭setenforce
+setenforce 0
+sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
+
+# 关闭默认防火墙
+systemctl stop firewalld
+systemctl disable firewalld
+
+# 配置hosts，实现本地主机名解析
+echo "10.10.4.17 vm417centos-master.kube
+10.10.4.26 vm426centos-node01.kube" &gt;&gt; /etc/hosts
+
+# 配置系统内核参数，因网桥工作于数据链路层，数据默认会直接经过网桥转发，为避免iptables的FORWARD
+# 设置失效，需要启用bridge-nf机制
+cat &lt;&lt;EOF &gt;  /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+vm.swappiness=0
+EOF
+
+# 使内核参数配置生效
+sysctl --system
+
+# 关闭交换内存，如果不关闭，kubelet服务将无法启动
+swapoff -a
+
+# 安装docker-ce，Kubernetes与Docker存在版本兼容问题，Kubernetes最新版本v1.15，最高支持
+# Docker 18.09版本，所以需要安装指定的Docker版本
+yum install -y yum-utils
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum install -y docker-ce-18.09.0-3.el7 docker-ce-cli-18.09.0-3.el7 containerd.io-1.2.0-3.el7 ebtables ethtool
+systemctl enable docker
+systemctl start docker
+
+# 优化Docker cgroup驱动，Kubernetes文档指出，使用systemd作为init system的Linux系统中，
+# cgroup driver为systemd模式可以确保服务器节点在资源紧张时的稳定性
+yum install -y systemd
+cat &gt;/etc/docker/daemon.json&lt;&lt;EOF
+{
+    "exec-opts": ["native.cgroupdriver=systemd"]
+}
+EOF
+systemctl restart docker
+
+# 查看确认
+docker info | grep Cgroup
+
+# 配置kubernetes yum源，用以安装Kubernetes基础服务及工具，此处使用阿里云镜像仓库源
+cat &gt; /etc/yum.repos.d/kubernetes.repo &lt;&lt;EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=0
+EOF
+
+# 安装Kubernetes基础服务及工具
+yum install -y kubeadm kubelet kubectl kompose kubernetes-cni
+systemctl enable kubelet.service
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">2.部署Master节点</span></p> 
+ <p class="ziti3">Master节点理论上只需要接口服务、调度服务、控制管理服务、状态存储服务，但kubeadm以Pod形式部署Master组件，所以在Master节点主机上仍需要部署kubelet服务，kubeadm在初始化时会自动对kubelet服务进行配置和管理。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 设置主机名，kubeadm识别主机名时有严格的规范，主机名中需要有“-”或“.”
+hostnamectl --static set-hostname vm417centos-master.kube
+
+# 使用kubeadm初始化Master节点，建议使用阿里云镜像仓库
+kubeadm init  --pod-network-cidr=172.172.0.0/16 \       # 设置Pod网段IP为172.172.0.0/16
+              --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers \                                      　　 # 设置从阿里云镜像仓库下载
+              --kubernetes-version v1.15.1  # 下载Kubernetes的v1.15.1版本
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Master节点初始化成功后，会提示成功并输出token和discovery-token-ca-cert-hash，用于将Node加入所指定Master的Kubernetes集群。Kubernetes本身并没有集成网络功能，需要单独安装网络插件实现Kubernetes集群中Pod的网络功能，此处安装网络组件Flannel。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 初始化kubectl配置，建议在非root或单独的管理机上配置kubectl管理环境
+echo "export KUBECONFIG=/etc/kubernetes/admin.conf" &gt;&gt; ~/.bash_profile
+source ~/.bash_profile
+
+# 获取网络组件Flannel的资源配置文件
+wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# 修改Pod网段IP为自定义的172.172.0.0/16
+sed -i "s#10.244.0.0/16#172.172.0.0/16#g" kube-flannel.yml
+
+# 创建应用
+kubectl apply -f kube-flannel.yml
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">网络组件安装后，可以在网络接口上看到cni0和flannel.1，如图12-4所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-4.jpg" class="calibre347"/></a> 
+ </div> 
+ <p class="middle-img">图12-4　Flannel接口信息</p> 
+ <p class="ziti3">用如下命令可以查看主节点运行Pod的状态。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">kubectl get pods --all-namespaces -o wide
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">3.部署Node</span></p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 设置主机名，kubeadm识别主机名时有严格的规范，主机名中需要有“-”或“.”
+hostnamectl --static set-hostname vm426centos-node01.kube
+
+# 加入Kubernetes集群
+kubeadm join 10.10.4.17:6443 --token rk1zux.esj6fnjz3xlms3rv \
+    --discovery-token-ca-cert-hash sha256:f8371d489b9f67f630199a03754ceffa83d850f06db039a60fc9b170c20e5826
+
+# 在Master节点通过命令查看节点状态
+kubectl get nodes
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">4.部署kubernetes-dashboard</span></p> 
+ <p class="ziti3">kubernetes-dashboard是Kubernetes社区中一个很受欢迎的项目，它为Kubernetes用户提供了一个可视化的Web前端，通过Web前端可以查看当前集群的各种信息，为用户管理维护Kubernetes集群提供帮助。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 获取资源配置文件
+wget https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
+
+# 修改镜像仓库为阿里云仓库
+sed -i "s/k8s.gcr.io/registry.cn-hangzhou.aliyuncs.com\/google_containers/g" kubernetes-dashboard.yaml
+
+# 设置端口映射方式为NodePort，映射端口为31443
+sed -i '/spec:/{N;s/  ports:/  type: NodePort\n&amp;/g}' kubernetes-dashboard.yaml
+sed -i "/targetPort: 8443/a\      nodePort: 31443" kubernetes-dashboard.yaml
+
+# 部署Pod应用
+kubectl apply -f kubernetes-dashboard.yaml
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">kubernetes-dashboard有Kubeconfig和Token两种认证登录方式，此处选择Token方式认证登录。此处Kubernetes的资源类型——服务账户（Service Account）创建admin-user账户并授权为Cluster-Role的管理角色。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建admin-user账户及授权的资源配置文件
+cat&gt;dashboard-adminuser.yml&lt;&lt;EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: admin-user
+    namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+    name: admin-user
+roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kube-system
+EOF
+
+# 创建资源实例
+kubectl create -f dashboard-adminuser.yml
+
+# 获取账户admin-user的Token用于登录
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">kubernetes-dashboard的Pod运行成功后，可以在浏览器上通过集群中的任意Node IP和31443端口访问kubernetes-dashboard，通过Token登录后就可以通过Web界面进行Kubernetes集群的管理和维护。</p> 
+ <p class="ziti3"><span class="yanse">5.部署管理工具Helm</span></p> 
+ <p class="ziti3">Helm客户端程序需要使用Kubernetes管理工具kubectl，所以要先确认安装Helm主机的kubectl可用，如果不可用则需要先安装。</p> 
+ <p class="ziti3">（1）安装kubectl</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 配置Kubernetes安装源
+cat &gt; /etc/yum.repos.d/kubernetes.repo &lt;&lt;EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=0
+EOF
+
+# 安装kubectl
+yum install -y kubectl
+
+# 初始化配置目录
+mkdir -p $HOME/.kube
+
+# 将Master节点主机的文件/etc/kubernetes/admin.conf复制到kubectl控制机
+scp Master:/etc/kubernetes/admin.conf $HOME/.kube/config
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）安装Helm</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 下载Helm客户端
+wget https://get.helm.sh/helm-v2.14.2-linux-amd64.tar.gz
+tar -zxvf helm-v2.14.2-linux-amd64.tar.gz
+mv linux-amd64/helm /usr/sbin/
+mv linux-amd64/tiller /usr/sbin/
+helm help
+
+# 添加阿里云仓库
+helm repo add aliyun-stable https://acs-k8s-ingress.oss-cn-hangzhou.aliyuncs.com/charts
+helm repo update
+
+# 将Tiller应用安装到Kubernetes集群并使用阿里云的charts仓库
+helm init --upgrade -i registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.14.2 --stable-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts
+
+# 添加Tiller授权
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template": {"spec":{"serviceAccount":"tiller"}}}}'
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）安装Helm的Web管理工具Kubeapps</p> 
+ <p class="ziti3">Kubeapps是Helm的Web化管理工具，提供了比命令行更丰富的应用安装说明和更便捷的安装方式。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 添加bitnami的charts仓库
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+# 安装Kubeapps，命名为kubeapps，所属命名空间为kubeapps
+helm install --namespace kubeapps --name kubeapps bitnami/kubeapps
+
+# 创建Kubeapps账号
+kubectl create serviceaccount kubeapps-operator
+kubectl create clusterrolebinding kubeapps-operator --clusterrole=cluster-admin --serviceaccount=default:kubeapps-operator
+
+# 创建服务，提供NodePort类型的访问端口30080
+cat&gt;kubeapps-service.yml&lt;&lt;EOF
+apiVersion: v1
+kind: Service
+metadata:
+    name: kubeapps-svc
+    namespace: kubeapps
+    labels:
+        app: kubeapps
+spec:
+    type: NodePort
+    ports:
+    - port: 8080
+      nodePort: 30080
+    selector:
+        app: kubeapps
+EOF
+
+# 在集群中创建资源实例
+kubectl create -f kubeapps-service.yml
+
+# 获取登录token
+kubectl get secret $(kubectl get serviceaccount kubeapps-operator -o jsonpath= '{.secrets[].name}') -o jsonpath='{.data.token}' | base64 --decode
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在浏览器上通过端口30080就可以访问应用Kubeapps。</p> 
+</body>
+</html>

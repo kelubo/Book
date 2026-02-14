@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.1.3　MySQL主从读写分离实现方案</h3>
+<p class="ziti">（1）通过程序实现读写分离（需要程序支持）</p>
+<p class="ziti">PHP和Java程序都可以通过设置多个连接文件轻松地实现对数据库的读写分离，即当语句关键字为select时，就去连接读库的连接文件，若为update、insert、delete时，则连接写库的连接文件。</p>
+<div class="pic"><img alt="" src="Image00113.jpg" />
+</div>
+<p class="middle-img">图14-7　一主多从读写分离及从库负载均衡架构逻辑图</p>
+<div class="pic"><img alt="" src="Image00114.jpg" />
+</div>
+<p class="middle-img">图14-8　MySQL主从复制根据业务的重要性拆分从库的方案</p>
+<p class="ziti">通过程序实现读写分离的缺点就是需要开发人员对程序进行改造，程序本身无法直接支持读写分离。</p>
+<p class="ziti">（2）通过开源的软件实现读写分离</p>
+<p class="ziti">Maxscale、Atlas、Mycat等代理软件也可以实现读写分离的功能，并且无须对应用程序做任何修改，而且它们还支持负载均衡等功能；缺点是又引入了单点服务，并且稳定性不如程序实现好。</p>
+<p class="ziti">（3）大型门户独立开发DAL层综合软件</p>
+<p class="ziti">百度、阿里等大型门户都有开发牛人，会花大力气开发适合自己业务的读写分离、负载均衡、监控报警、自动扩容、自动收缩等一系列功能的DAL层软件，此部分可以参考老男孩架构师分布式数据库集群的课程内容。</p>
+<p class="ziti">MySQL读写分离的基本逻辑图如图14-9所示。</p>
+<div class="pic"><img alt="" src="Image00115.jpg" />
+</div>
+<p class="middle-img">图14-9　MySQL读写分离的基本逻辑图</p>
+</body>
+</html>

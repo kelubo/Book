@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">3.3　MySQL安装FAQ</h2>
+<p class="ziti">
+<span class="yanse">问题1：在配置mysql时遇到错误。</span>
+</p>
+<p class="ziti">出现的错误如下：</p>
+<hr/>
+<pre class="ziti1">checking for tgetent in -ltinfo... no
+checking for termcap functions library... configure: error: No curses/termcap library found</pre>
+<hr/>
+<p class="ziti">原因：缺少ncurses安装包。</p>
+<p class="ziti">解决方法：执行“yum-y install ncurses-devel”命令。</p>
+<p class="ziti">
+<span class="yanse">问题2：初始化MySQL数据库时出现故障。</span>
+</p>
+<p class="ziti6">·故障1：给出了警告信息“WARNING：The host'oldboy'could not be looked up with resolveip”。</p>
+<p class="ziti">警告是可以忽略的，如果非要解决则需要修改对主机名的解析，使其和“uname-n”命令的结果一样，如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# grep "`uname -n`" /etc/hosts
+127.0.0.1  oldboy #&lt;==也可以使用网卡IP解析。</pre>
+<hr/>
+<p class="ziti6">·故障2：错误提示“ERROR：1004 Can't create file'/tmp/#sql300e_1_0.frm'(errno：13)”。</p>
+<p class="ziti">在执行初始化数据库命令时可能就会遇到这样的错误，错误提示如下：</p>
+<hr/>
+<pre class="ziti1">ERROR: 1004  Can't create file '/tmp/#sql300e_1_0.frm' (errno: 13)
+120406 15:47:02 [ERROR] Aborting
+120406 15:47:02 [Note] /application/mysql/libexec/mysqld: Shutdown complete
+Installation of system tables failed!  Examine the logs in
+/application/mysql/data for more information.</pre>
+<hr/>
+<p class="ziti">根据提示可知，/tmp目录不能创建文件，所以解决办法是对/tmp目录增加权限，具体如下。</p>
+<p class="ziti">解决办法：还原/tmp目录权限。操作命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# chmod 1777 /tmp      #&lt;==1777是/tmp的默认权限，除非曾经改动
+                                        过此目录权限才会报错。
+[root@oldboy ~]# ls -ld /tmp/
+drwsrwxrwt. 8 root root 4096 3月  10 18:07 /tmp/</pre>
+<hr/>
+<p class="ziti">本示例的故障必须要解除，否则，后面会出现登录不了MySQL数据库等各种问题。</p>
+<p class="ziti">
+<span class="yanse">问题3：登录数据库时提示“Access denied for user'root'@'localhost'”。</span>
+</p>
+<p class="ziti">解答：正文里已经给出答案，此处不再赘述。</p>
+<p class="ziti">
+<span class="yanse">问题4：有时使用drop命令删除MySQL用户删不掉。</span>
+</p>
+<p class="ziti">解答：正文里已经给出答案，此处不再赘述。</p>
+</body>
+</html>

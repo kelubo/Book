@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">9.5.6　增量备份与恢复增量数据实践</h3>
+<p class="ziti">使用Xtrabackup程序做增量备份之前，首先要进行一次全备份，第一次增量备份是基于全备进行的，之后的每一次增量备份都会基于上一次增量备份的数据来实现，操作过程如下。</p>
+<p class="ziti">（1）创建基础全备份</p>
+<p class="ziti">该命令与9.5.5节介绍全备时使用的命令一模一样：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password=oldboy123 --socket=/application/mysql-5.6. 40/tmp/mysql.sock --no-timestamp /server/backup/base_full</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 注意全备的路径，后面增量备份时要用到。</p>
+<p class="ziti">（2）模拟增加数据，然后做增量备份</p>
+<p class="ziti">增加如下数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+2 rows in set (0.00 sec)
+mysql&gt; insert into test values(8,'outman');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; insert into test values(9,'outgirl');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; select * from test;
++----+----------+
+| id | name     |
++----+----------+
+|  1 | oldboy   |
+|  2 | oldgirl  |
+|  3 | inca     |
+|  4 | zuma     |
+|  5 | kaka     |
+|  6 | bingbing |
+|  7 | xiaoting |
+|  8 | outman   |  #&lt;==全备以后的模拟增加了如下两行数据。
+|  9 | outgirl  |
++----+----------+
+9 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">开始做第一次增量备份：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password=oldboy123 --socket=/application/mysql-5.6.40/tmp/mysql.sock --no-timestamp --incremental-basedir=/server/backup/base_full --incremental /server/backup/one_inc</pre>
+<hr/>
+<p class="ziti">注意，这里指定的全备路径是--incremental-basedir=/server/backup/base_full。</p>
+<p class="ziti">增量备份的结果在/server/backup/one_inc下，感兴趣的读者可以认真看看，其实就是从全备信息里最后的LSN开始读取redo日志，对改变的数据进行增量备份，所以，我们刚刚增加的增量数据很少，InnoDB数据文件备份得也很少，增量备份的InnoDB数据备份的关键输出如下：</p>
+<hr/>
+<pre class="ziti1">xtrabackup: using the full scan for incremental backup
+180320 12:37:41 [01] Copying ./ibdata1 to /server/backup/one_inc/ibdata1.delta
+180320 12:37:41 [01]        ...done
+180320 12:37:41 [01] Copying ./mysql/innodb_table_stats.ibd to /server/backup/one_inc/mysql/innodb_table_stats.ibd.delta
+180320 12:37:41 [01]        ...done
+180320 12:37:41 [01] Copying ./mysql/innodb_index_stats.ibd to /server/backup/one_inc/mysql/innodb_index_stats.ibd.delta
+180320 12:37:41 [01]        ...done
+180320 12:37:41 &gt;&gt; log scanned up to (1959061)
+...省略无用行...
+180320 12:37:41 [01] Copying ./oldboy/test.ibd to /server/backup/one_inc/oldboy/test.ibd.delta
+180320 12:37:41 [01]        ...done</pre>
+<hr/>
+<p class="ziti">根据输出，我们也大概了解了插入数据到数据库时，对数据库会有什么影响，而对于非事务引擎的备份，则仍是锁表进行全备。</p>
+<p class="ziti">（3）再模拟增加的数据，然后做第二次增量备份</p>
+<p class="ziti">增加如下数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+mysql&gt; insert into test values(10,'two_inc1');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; insert into test values(11,'two_inc2');
+Query OK, 1 row affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">开始做第二次增量备份，注意，这里要用到第一次增量备份的目录，而不是全备目录：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password=oldboy123 --socket=/application/mysql-5.6. 40/tmp/mysql.sock --no-timestamp --parallel=3 --incremental-basedir=/server/backup/one_inc/ --incremental /server/backup/two_inc</pre>
+<hr/>
+<p class="ziti">到此为止，我们就完成了1次全备，以及全备之后的两次增量数据备份。</p>
+<p class="ziti">（4）开始做增量数据恢复</p>
+<p class="ziti">增量恢复的步骤为先恢复全备（base_full目录）数据，然后再恢复第一次增量（one_inc）的数据，以及第二次增量（two_inc）的数据，如果有更多次增量备份就以此类推。</p>
+<p class="ziti">1）应用redo日志恢复全备数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --use-memory=32M --redo-only /server/backup/base_full/</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">特别强调：</span>
+ 非最后一次合并增量数据一定要加--redo-only参数，即只应用redo日志恢复数据，而不执行undo回滚未提交的数据，等到最后一次增量备份合并完成后再进行undo日志回滚数据。</p>
+<p class="ziti">2）合并第一次的增量数据到全备数据目录：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --use-memory=32M --redo-only --incremental-dir=/server/backup/one_inc /server/backup/base_full/</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 这里最关键的就是增量备份的参数和路径了。</p>
+<p class="ziti">3）合并第二次的增量数据到全备数据目录：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --use-memory=32M --incremental-dir=/server/backup/two_inc /server/backup/base_full/</pre>
+<hr/>
+<p class="ziti">需要强调的是，最后一次合并增量数据到全备时，取消了“--redo-only”参数。</p>
+<p class="ziti">4）对最终的全量数据做redo日志应用，并执行undo回滚数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --use-memory=32M /server/backup/base_full/</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 本命令取消了“--redo-only”参数，目的是应用undo日志回滚数据，为最终的恢复数据做准备。</p>
+<p class="ziti">5）开始正式恢复数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop
+Shutting down MySQL.. SUCCESS!
+[root@oldboy ~]# ss -lnt|grep 3306
+[root@oldboy ~]# mv /application/mysql/data /tmp/data_ori1
+[root@oldboy ~]# mkdir -p /application/mysql/data  #&lt;==原始数据目录/application/mysql/data要为空。
+[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --copy-back --rsync /server/backup/base_full/ #&lt;==用innobackupex看看效果和mv是不是一样的，注意MySQL的配置文件要正确。
+[root@oldboy ~]# chown -R mysql.mysql /application/mysql/data
+#&lt;==如果权限不对，那么启动数据库可能会报“Starting MySQL. ERROR! The server quit
+    without updating PID file”错误。
+[root@oldboy ~]# /etc/init.d/mysqld start
+Starting MySQL. SUCCESS!
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"
++----+----------+
+| id | name     |
++----+----------+
+|  1 | oldboy   |
+|  2 | oldgirl  |
+|  3 | inca     |
+|  4 | zuma     |
+|  5 | kaka     |
+|  6 | bingbing |
+|  7 | xiaoting |
+|  8 | outman   |
+|  9 | outgirl  |
+| 10 | two_inc1 |
+| 11 | two_inc2 |
++----+----------+</pre>
+<hr/>
+</body>
+</html>

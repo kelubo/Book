@@ -1,0 +1,10 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">12.8　Memory存储引擎</h2>
+<p class="ziti">Memory就是内存的意思，因此Memory存储引擎（又称为heap引擎）的数据存储是放在内存（注意：由max_heap_table_size参数控制内存占用大小，默认为16MB。）中的，因此存取速度特别快，但是如果数据库宕机或重启，那么所有的数据就都会丢失，因此它比较适合用于存放临时表的数据，例如，discuz论坛数据库中的统计在线人数的session表采用的就是Memory引擎。Memory存储引擎默认采用的是Hash索引，而不像其他引擎（MyISAM和InnoDB）默认的是B-tree索引。</p>
+<p class="ziti">Memory存储引擎在使用上也有一些限制，例如，仅支持表锁，不支持TEXT和BlOB数据类型，还有当存储变长字段（varchar）时是按照定长字段（char）来进行的，这也会浪费一些内存空间。Memory存储引擎在企业工作中应用的不是很多，读者作为知识点了解一下即可。</p>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.3　创建MySQL多实例的配置文件</h3>
+<p class="ziti">MySQL 5.5及以下数据库默认为用户提供了多个配置文件模板，但是MySQL 5.6版本只有一个模板文件。示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.40]# ll support-files/*.cnf
+-rw-r--r--. 1 root root 1126 Feb 26 17:54 support-files/my-default.cnf
+[root@oldboy mysql-5.6.34]# mv /etc/my.cnf /etc/my.cnf.bak</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ 在完成CentOS 6.9版操作系统的最小安装后，在/etc目录下会存在一个my.cnf，需要将此文件更名为其他的名字，如/etc/my.cnf.bak，否则，该文件会干扰源码安装的MySQL的正确配置，造成无法启动。</p>
+<p class="ziti6">在启动MySQL服务时，会按照一定的顺序搜索my.cnf，先在/etc目录下查找，若找不到则会搜索"$basedir/my.cnf"，在本例中就是/application/mysql-5.6.40/my.cnf，这是新版MySQL的配置文件的默认位置！</p>
+<p class="ziti">上面是单实例的默认配置文件模板，如果配置多实例，则其与单实例会有所不同。为了让MySQL多实例之间彼此独立，需要为每一个实例建立一个my.cnf配置文件和一个启动文件mysql，让它们分别对应自己的数据文件目录data。</p>
+<p class="ziti">首先，通过vim命令来添加配置文件内容，命令如下：</p>
+<hr/>
+<pre class="ziti1">vim /data/3306/my.cnf
+vim /data/3307/my.cnf</pre>
+<hr/>
+<p class="ziti">不同的实例需要添加的my.cnf内容也会有区别，具体见表4-1，其中的配置是由官方的配置模板修改而来的，当然，在实际工作中则是拿早已配置好的模板来进行修改的，可以通过rz等方式上传配置文件模板my.cnf文件到相关目录下。</p>
+<p class="middle-img">表4-1　MySQL 3306、3307实例配置文件对比</p>
+<div class="pic"><img alt="" src="Image00025.jpg" />
+</div>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 本多实例的很多参数仅仅是方便学习环境之用，生产环境的配置可以参见本书后文，文中两个实例参数的区别已经标出。</p>
+<p class="ziti">最终完成后的多实例根/data目录结果如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# tree /data
+/data
+|-- 3306
+|   |-- data
+|   `-- my.cnf   #&lt;==这个就是3306实例的配置文件。
+`-- 3307
+    |-- data
+    `-- my.cnf   #&lt;==这个就是3307实例的配置文件。
+4 directories, 2 files</pre>
+<hr/>
+<p class="ziti">有关配置文件的参数说明，可以查看官方手册或者查找相关资料。</p>
+</body>
+</html>

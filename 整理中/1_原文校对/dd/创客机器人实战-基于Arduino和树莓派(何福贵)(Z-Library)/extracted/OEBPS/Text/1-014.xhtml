@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="A9f19008c-e110-4b2c-90b4-8d9a55678ee2" class="calibre13">Chapter 8<br class="calibre8"/> 第八章 Arduino Wi-Fi视频智能小车循迹避障机器人</h2> 
+ <p class="calibre3">前面介绍了Arduino开发的各个方面的内容，本章将在这些知识的基础上，通过实例介绍它们的综合应用。</p> 
+ <h3 id="A18ab680f-a533-42ed-81a8-b1b2c095a7a0" class="calibre14">8.1 概述</h3> 
+ <p class="calibre3">本章综合实例介绍的是Arduino Wi-Fi视频智能小车循迹避障机器人，如图8-1所示。Arduino Wi-Fi视频智能小车循迹避障机器人可实现手机和计算机Wi-Fi无线控制、视频传输、录像保存、图形化编程，可巡线循迹、超声波避障。</p> 
+ <div class="center"> 
+  <img alt="" class="u271" src="../Images/141_01.jpg" width="1280" height="435"/> 
+  <p class="imgtitle">图8-1 Arduino Wi-Fi视频智能小车循迹避障机器人</p> 
+ </div> 
+ <p class="calibre3">Arduino Wi-Fi视频智能小车循迹避障机器人的组成结构如图8-2所示。</p> 
+ <p class="calibre3">其特点如下：</p> 
+ <div class="center"> 
+  <img alt="" class="u272" src="../Images/142_01.jpg" width="1253" height="707"/> 
+  <p class="imgtitle">图8-2 智能小车机器人组成结构</p> 
+ </div> 
+ <p class="calibre3">（1）两个自由度云台，可以随心所欲地控制摄像头角度。</p> 
+ <p class="calibre3">（2）多种控制方式。如手机控制、计算机设备控制、Web页面控制。</p> 
+ <p class="calibre3">（3）高清视频实时传输。高清摄像头支持720P和480P画质，焦距可调节。</p> 
+ <p class="calibre3">（4）多种实现功能。如巡线循迹、超声波避障、云台控制、跟随主人、图像控制等。</p> 
+ <h3 id="A10b47dc3-d235-4321-9c8c-3d33452f2cdd" class="calibre14">8.2 硬件部分的选择</h3> 
+ <p class="calibre3">智能小车循迹避障机器人的组成主要包括：Arduino UNO开发板、Arduino智能小车驱动板、Wi-Fi模块、直流减速电机、伺服电机、红外光电传感器、超声波传感器、多功能机器人底盘及轮胎。</p> 
+ <p class="calibre3">（1）Wi-Fi模块</p> 
+ <p class="calibre3">Wi-Fi模块的选择要求内置固件为OpenWrt，能够实现视频传输及指令双向传输功能。如图8-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u273" src="../Images/142_02.jpg" width="1280" height="424"/> 
+  <p class="imgtitle">图8-3 Wi-Fi模块</p> 
+ </div> 
+ <p class="calibre3">OpenWrt是嵌入式设备上运行的Linux系统。OpenWrt的文件系统是可写的，开发者无须在每一次修改后重新编译，令它更像一个小型的Linux计算机系统，也加快了开发速度。大家会发现，ARM、PowerPC或MIPS的处理器都有很好的支持，并且附带3000左右的软件包，用户可以方便地自定义功能来制作固件，也可以方便地移植各类功能到OpenWrt下。</p> 
+ <p class="calibre3">Wi-Fi模块的作用有两个：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/143_01.jpg" width="40" height="45"/>视频传输：将摄像头的视频传输到手机或计算机控制端。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/143_02.jpg" width="40" height="44"/>指令传输：在Arduino UNO开发板和手机或计算机之间传输指令。如图8-4所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u274" src="../Images/143_03.jpg" width="1097" height="528"/> 
+  <p class="imgtitle">图8-4 Wi-Fi模块的作用</p> 
+ </div> 
+ <p class="calibre3">（2）摄像头</p> 
+ <p class="calibre3">摄像头需要接到Wi-Fi模块，所以必须能被Wi-Fi模块识别，具体要求如下：USB免驱摄像头、支持OpenWrt Linux、MJPEG输出模式、高清芯片，以及大光圈、支持手动调焦等。如图8-5所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u275" src="../Images/143_04.jpg" width="1197" height="502"/> 
+  <p class="imgtitle">图8-5 支持Openwrt Linux的摄像头</p> 
+ </div> 
+ <p class="calibre3">（3）舵机云台</p> 
+ <p class="calibre3">舵机云台由两个舵机组成，作用是控制摄像头和超声波传感器的转动位置，如图8-6所示，其中舵机为SG90舵机。</p> 
+ <div class="center"> 
+  <img alt="" class="u276" src="../Images/143_05.jpg" width="968" height="516"/> 
+  <p class="imgtitle">图8-6 两个自由度云台</p> 
+ </div> 
+ <p class="calibre3">（4）Arduino智能小车驱动板</p> 
+ <p class="calibre3">Arduino智能小车驱动板是Arduino扩展板。为了更好地使用Arduino UNO板的资源，要选择能够满足智能机器人外接器件的扩展板。一定要注意具有直流减速电机接口的扩展板，同时注意控制直流减速电机的数量，如图8-7所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u277" src="../Images/144_01.jpg" width="1280" height="518"/> 
+  <p class="imgtitle">图8-7 Arduino智能小车驱动板</p> 
+ </div> 
+ <p class="calibre3">（5）超声波传感器</p> 
+ <p class="calibre3">超声波传感器要完成避障功能，要根据探测的距离和精度选择，HC-SR04超声波传感器：探测距离为2cm～450cm，精度为3mm；RB URF02超声波传感器：探测距离为1cm～500cm，精度为0.5cm；如图8-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u278" src="../Images/144_02.jpg" width="1280" height="428"/> 
+  <p class="imgtitle">图8-8 超声波传感器</p> 
+ </div> 
+ <p class="calibre3">（6）红外光电传感器</p> 
+ <p class="calibre3">红外光电传感器可以完成巡线和避障的功能，不过红外光电传感器实现避障功能时，智能检测前方有无障碍物，不像超声波传感器能够检测前方的距离是多少。如图8-9所示的红外光电传感器的探测距离为3cm～80cm。</p> 
+ <div class="center"> 
+  <img alt="" class="u279" src="../Images/144_03.jpg" width="1280" height="364"/> 
+  <p class="imgtitle">图8-9 红外光电传感器</p> 
+ </div> 
+ <p class="calibre3">（7）多功能机器人底盘。</p> 
+ <p class="calibre3">可采用多功能机器人底盘完成智能小车各种器件的安装，如图8-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u280" src="../Images/145_01.jpg" width="1280" height="431"/> 
+  <p class="imgtitle">图8-10 多功能机器人底盘</p> 
+ </div> 
+ <p class="calibre3">（8）直流减速电机和轮子。</p> 
+ <p class="calibre3">直流减速电机的选择要注意和Arduino智能小车驱动板的直流减速电机的控制接口匹配。注意直流电机的工作电压，轮子能够安装在直流减速电机的轴上，如图8-11所示的直流减速电机的工作电压为DC3V-6V。</p> 
+ <div class="center"> 
+  <img alt="" class="u281" src="../Images/145_02.jpg" width="1185" height="410"/> 
+  <p class="imgtitle">图8-11 直流减速电机和轮子</p> 
+ </div> 
+ <h3 id="Aaba601ee-ada3-4093-bc3e-5cb1d7a7d800" class="calibre14">8.3 组装</h3> 
+ <p class="calibre3"><b class="calibre6">1．Wi-Fi模块测试</b></p> 
+ <p class="calibre3">Wi-Fi模块测试要根据Wi-Fi模块的使用说明书来进行。Wi-Fi模块是一个服务端，内置了一个流媒体服务器，将摄像头与Wi-Fi模块连接，再将Wi-Fi模块与电源连接，然后通过PC的Wi-Fi无线名称连接Wi-Fi模块，打开浏览器，输入说明书提供的测试地址，就可以看到视频，如图8-12所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u282" src="../Images/145_03.jpg" width="1280" height="420"/> 
+  <p class="imgtitle">图8-12 Wi-Fi模块测试</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．小车组装</b></p> 
+ <p class="calibre3">智能小车要以多功能机器人底盘为中心进行组装，首先确定各器件的安装位置，然后进行安装，一般安装次序如下：</p> 
+ <p class="calibre3">（1）在多功能机器人底盘的底面安装直流减速电机，然后安装轮胎。</p> 
+ <p class="calibre3">（2）安装Arduino UNO开发板。</p> 
+ <p class="calibre3">（3）安装Arduino智能小车驱动板。</p> 
+ <p class="calibre3">（4）安装Wi-Fi模块。</p> 
+ <p class="calibre3">（5）安装云台和摄像机。</p> 
+ <p class="calibre3">（6）安装红外光电传感器。</p> 
+ <p class="calibre3"><b class="calibre6">3．接线</b></p> 
+ <p class="calibre3">安装完成以后，进行接线，把各个外围器件连接到智能小车驱动板上，要注意直流减速电机的正负极、超声波传感器的正负极和信号线、红外光电传感器正负极和信号线，以及Wi-Fi模块和Arduino UNO之间的通信线等。</p> 
+ <h3 id="Aa9098fd9-9569-4e55-bbd6-f76ceb8323aa" class="calibre14">8.4 软件部分的实现</h3> 
+ <p class="calibre3">智能机器人的控制通过桌面PC或手机控制，桌面PC或手机控制Wi-Fi模块，再通过Wi-Fi模块和Arduino的串口发送各种命令，如图8-13所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u283" src="../Images/146_01.jpg" width="1230" height="347"/> 
+  <p class="imgtitle">图8-13 智能机器人的控制方法</p> 
+ </div> 
+ <p class="calibre3">在编写代码之前，需要确定桌面PC或手机控制智能小车的通信协议，如表8-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表8-1 桌面PC或手机控制智能小车的通信协议</p>
+  <img alt="" class="u284" src="../Images/146_02.jpg" width="1280" height="353"/> 
+  <p class="imgdesc">注：串口接收数据缓存定义int buffer [3]。</p> 
+ </div> 
+ <p class="calibre3">桌面PC或手机通过Wi-Fi模块使用串口和Arduino UNO开发板通信，所以Arduino端的程序通过串口终端服务程序接收发送的指令，然后根据通信协议执行相关程序，实现不同的功能。Arduino端程序结构图如图8-14所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u285" src="../Images/147_01.jpg" width="1280" height="741"/> 
+  <p class="imgtitle">图8-14 Arduino端程序结构图</p> 
+ </div> 
+ <p class="calibre3">Arduino IDE的串口中断服务程序的实现代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u286" src="../Images/147_02.jpg" width="1280" height="967"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u287" src="../Images/148_01.jpg" width="1280" height="1899"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u288" src="../Images/149_01.jpg" width="1280" height="1859"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u289" src="../Images/150_01.jpg" width="1280" height="1847"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中实现巡线、避障、舵机控制的方法可参考前面的实现方法。</p> 
+ <p class="calibre3">大部分智能小车机器人产品的厂家都提供了智能小车机器人的手机端和PC端的控制程序，可参照提供的说明书进行操作，如图8-15所示为小R科技提供的PC端和手机端的控制端。</p> 
+ <div class="center"> 
+  <img alt="" class="u290" src="../Images/151_01.jpg" width="1280" height="601"/> 
+  <p class="imgtitle">图8-15 智能小车机器人的手机端和PC端的控制端</p> 
+ </div> 
+ <h3 id="A4ccd6179-fd16-40d5-98e3-6011475bc23a" class="calibre14">8.5 本章小结</h3> 
+ <p class="calibre3">本章介绍了Arduino的综合应用实例，主要包括完成的功能、硬件部分的选择、组装方法、软件部分的实现等。</p> 
+</body>
+</html>

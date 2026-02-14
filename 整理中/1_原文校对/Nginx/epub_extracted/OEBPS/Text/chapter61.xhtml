@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_68">4.1.5　变量映射赋值</h3> 
+ <p class="ziti3">模块名称：ngx_http_map_module</p> 
+ <p class="ziti3">该模块的功能是在客户端每次请求时，Nginx按照map指令域中源变量的当前值把设定的对应值赋值给新变量。该指令语法格式如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map 源变量 新变量{}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">map指令值参数如表4-12所示。</p> 
+ <p class="middle-img">表4-12　map指令值参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-12.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-12.jpg" class="calibre146"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/099-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/099-i.jpg" class="calibre147"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $remote_addr $name {
+    hostnames;
+    default       0;
+    example.com   1;
+    *.example.com 1; # 主机名前缀
+    wap.*         4; # 主机名后缀
+    include hostmap.conf;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·map指令只能编辑在http指令域中。</p> 
+ <p class="ziti4">·map指令域中指定了源变量为不同值时与新变量值的对应关系。</p> 
+ <p class="ziti4">·map指令域中源变量的值可以是字符串或正则表达式的匹配。</p> 
+ <p class="ziti4">·map指令域中对源变量的值进行正则表达式匹配时，以“~”开头表示对源变量值的匹配，区分大小写，以“*”开头表示对源变量值的匹配不区分大小写。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $http_user_agent $mobile  {
+    "~Opera Mini" 1;
+    "*UCWEB" 2;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">map指令域中对源变量的值进行正则表达式匹配时，可以对源变量值进行正则捕获。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $uri $new_uri {
+    ~^/user/(.*) ucenter;         # 若URI为/user/login时,$new_uri被赋值为"ucenter"
+}
+server {
+    listen       8080;
+    location /user {
+        default_type text/plain;
+        rewrite ^ /$new_uri/$1;   # rewrite到/ucenter/login
+    }
+    location /ucenter {
+        index index.html;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">若源变量值中包含特殊字符串“~”，可以用“~”进行转义。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $http_referer $flag {
+    Mozilla    111;
+    \~Mozilla  222;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">新变量的值可以是字符串，也可以是另一个变量。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $http_referer $value {
+    Mozilla    'chrom';
+    \~safity    $http_user_agent;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">map指令域中，当源变量值存在相同匹配项时，匹配顺序如下：</p> 
+ <p class="ziti3">1）完全匹配的字符串。</p> 
+ <p class="ziti3">2）有主机前缀的最长字符串。</p> 
+ <p class="ziti3">3）有主机后缀的最长字符串。</p> 
+ <p class="ziti3">4）在指令域中按自上而下顺序最先匹配到的正则表达式。</p> 
+ <p class="ziti3">5）default参数给定的默认值。</p> 
+ <p class="middle-img">表4-13　map哈希表大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-13.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-13.jpg" class="calibre148"/></a> 
+ </div> 
+ <p class="middle-img">表4-14　map哈希桶大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-14.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-14.jpg" class="calibre135"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $remote_addr $dir {
+    default www;                 # 设置默认目录为www
+    include conf.d/remoteip.list;# 以外部文件形式编写IP及对应新变量赋值列表
+}
+server {
+    listen       8080;
+    root /opt/nginx-web/$dir;
+    index index.html;
+}
+
+remoteip.list文件内容：
+192.168.2.145 blue;              # 源IP为192.168.2.145时，map的新变量值为blue
+192.168.2.100 green;             # 源IP为192.168.2.100时，map的新变量值为green
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

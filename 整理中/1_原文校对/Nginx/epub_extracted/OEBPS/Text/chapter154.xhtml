@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_167">8.3.7　gRPC负载均衡配置</h3>
+
+  <p class="ziti3">基于gRPC协议的负载均衡是通过gRPC模块（ngx_http_grpc_module）及上游模块（ngx_http_upstream_module）实现的，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">upstream grpc_backend {
+    server 192.168.2.154:8080;
+    server 192.168.2.109:8080;
+}
+
+server {
+    listen  80 http2;                       # 设置监听端口为80并启用HTTP/2协议支持
+    access_log /var/log/nginx/grpcs_access.log main;
+    location / {
+        grpc_pass grpc://grpc_backend;      # 代理到gRPC上游服务器组grpc_backend
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

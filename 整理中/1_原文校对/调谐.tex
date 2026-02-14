@@ -1,0 +1,1048 @@
+\documentclass[UTF8]{ctexbook}
+\usepackage{geometry}
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\title{调谐电路}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{磁棒材料汇总表}
+\section{磁棒材料分类与应用}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{波段} & \textbf{频率范围} & \textbf{推荐磁棒材料} & \textbf{初始导磁率} & \textbf{特性}\\
+\hline
+\multirow{10}{*}{中波} & \multirow{10}{*}{530 kHz-1600 kHz} & MX-100 & \textasciitilde 100 & 低导磁率，适合高频段\\
+& & MX-200 & \textasciitilde 200 & 低导磁率，适合高频段\\
+& & MX-300 & \textasciitilde 300 & 中导磁率，适合中频段\\
+& & MX-400 & \textasciitilde 400 & 中导磁率，适合低频段\\
+& & MX-600 & \textasciitilde 600 & 中高导磁率，适合低频段\\
+& & MX-800 & \textasciitilde 800 & 中高导磁率，适合低频段\\
+& & MX-1000 & \textasciitilde 1000 & 高导磁率，适合低频段\\
+& & MX-2000 & \textasciitilde 2000 & 高导磁率，适合低频段\\
+& & MX-4000 & \textasciitilde 4000 & 超高导磁率，适合低频段\\
+& & MX-5000 & \textasciitilde 5000 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{中波} & \multirow{10}{*}{530 kHz-1600 kHz} & NXO-40 & \textasciitilde 40 & 低导磁率，适合高频段\\
+& & NXO-60 & \textasciitilde 60 & 低导磁率，适合高频段\\
+& & NXO-100 & \textasciitilde 100 & 低导磁率，适合高频段\\
+& & NXO-120 & \textasciitilde 120 & 低导磁率，适合高频段\\
+& & NXO-150 & \textasciitilde 150 & 低导磁率，适合高频段\\
+& & NXO-200 & \textasciitilde 200 & 中导磁率，适合中频段\\
+& & NXO-250 & \textasciitilde 250 & 中导磁率，适合中频段\\
+& & NXO-300 & \textasciitilde 300 & 中导磁率，适合中频段\\
+& & NXO-400 & \textasciitilde 400 & 中导磁率，适合低频段\\
+& & NXO-500 & \textasciitilde 500 & 中高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{中波} & \multirow{10}{*}{530 kHz-1600 kHz} & NXO-600 & \textasciitilde 600 & 中高导磁率，适合低频段\\
+& & NXO-800 & \textasciitilde 800 & 高导磁率，适合低频段\\
+& & NXO-1000 & \textasciitilde 1000 & 高导磁率，适合低频段\\
+& & NXO-1200 & \textasciitilde 1200 & 高导磁率，适合低频段\\
+& & NXO-1500 & \textasciitilde 1500 & 高导磁率，适合低频段\\
+& & NXO-2000 & \textasciitilde 2000 & 高导磁率，适合低频段\\
+& & R40C系列 & 40 & 低损耗，Q值高\\
+& & R60C系列 & 60 & 低损耗，Q值高\\
+& & R80C系列 & 80 & 低损耗，Q值高\\
+& & R100C系列 & 100 & 低损耗，Q值高\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & MX-20 & \textasciitilde 20 & 极低导磁率，适合高频段\\
+& & MX-30 & \textasciitilde 30 & 极低导磁率，适合高频段\\
+& & MX-40 & \textasciitilde 40 & 低导磁率，适合高频段\\
+& & MX-50 & \textasciitilde 50 & 极低导磁率，适合高频段\\
+& & MX-60 & \textasciitilde 60 & 低导磁率，适合中频段\\
+& & MX-70 & \textasciitilde 70 & 极低导磁率，适合高频段\\
+& & MX-80 & \textasciitilde 80 & 低导磁率，适合中频段\\
+& & MX-90 & \textasciitilde 90 & 低导磁率，适合高频段\\
+& & MX-100 & \textasciitilde 100 & 低导磁率，适合中频段\\
+& & MX-110 & \textasciitilde 110 & 低导磁率，适合中频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & MX-120 & \textasciitilde 120 & 低导磁率，适合中频段\\
+& & MX-130 & \textasciitilde 130 & 低导磁率，适合中频段\\
+& & MX-170 & \textasciitilde 170 & 低导磁率，适合中频段\\
+& & MX-200 & \textasciitilde 200 & 中导磁率，适合低频段\\
+& & MX-230 & \textasciitilde 230 & 中导磁率，适合低频段\\
+& & MX-270 & \textasciitilde 270 & 中导磁率，适合低频段\\
+& & MX-330 & \textasciitilde 330 & 中导磁率，适合低频段\\
+& & MX-370 & \textasciitilde 370 & 中导磁率，适合低频段\\
+& & MX-400 & \textasciitilde 400 & 中导磁率，适合低频段\\
+& & MX-430 & \textasciitilde 430 & 中导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & MX-470 & \textasciitilde 470 & 中导磁率，适合低频段\\
+& & MX-530 & \textasciitilde 530 & 中高导磁率，适合低频段\\
+& & MX-570 & \textasciitilde 570 & 中高导磁率，适合低频段\\
+& & MX-630 & \textasciitilde 630 & 中高导磁率，适合低频段\\
+& & MX-670 & \textasciitilde 670 & 中高导磁率，适合低频段\\
+& & MX-730 & \textasciitilde 730 & 中高导磁率，适合低频段\\
+& & MX-770 & \textasciitilde 770 & 高导磁率，适合低频段\\
+& & MX-830 & \textasciitilde 830 & 高导磁率，适合低频段\\
+& & MX-870 & \textasciitilde 870 & 高导磁率，适合低频段\\
+& & MX-930 & \textasciitilde 930 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & MX-1000 & \textasciitilde 1000 & 高导磁率，适合低频段\\
+& & MX-1100 & \textasciitilde 1100 & 高导磁率，适合低频段\\
+& & MX-1300 & \textasciitilde 1300 & 高导磁率，适合低频段\\
+& & MX-1600 & \textasciitilde 1600 & 高导磁率，适合低频段\\
+& & MX-1900 & \textasciitilde 1900 & 高导磁率，适合低频段\\
+& & MX-2100 & \textasciitilde 2100 & 高导磁率，适合低频段\\
+& & MX-2400 & \textasciitilde 2400 & 超高导磁率，适合低频段\\
+& & MX-2600 & \textasciitilde 2600 & 超高导磁率，适合低频段\\
+& & MX-2900 & \textasciitilde 2900 & 超高导磁率，适合低频段\\
+& & MX-3100 & \textasciitilde 3100 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-20 & \textasciitilde 20 & 极低导磁率，适合高频段\\
+& & NXO-25 & \textasciitilde 25 & 极低导磁率，适合高频段\\
+& & NXO-30 & \textasciitilde 30 & 极低导磁率，适合高频段\\
+& & NXO-35 & \textasciitilde 35 & 极低导磁率，适合高频段\\
+& & NXO-40 & \textasciitilde 40 & 极低导磁率，适合高频段\\
+& & NXO-45 & \textasciitilde 45 & 极低导磁率，适合高频段\\
+& & NXO-50 & \textasciitilde 50 & 极低导磁率，适合高频段\\
+& & NXO-55 & \textasciitilde 55 & 极低导磁率，适合高频段\\
+& & NXO-60 & \textasciitilde 60 & 低导磁率，适合高频段\\
+& & NXO-65 & \textasciitilde 65 & 低导磁率，适合高频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-70 & \textasciitilde 70 & 低导磁率，适合中频段\\
+& & NXO-75 & \textasciitilde 75 & 低导磁率，适合高频段\\
+& & NXO-80 & \textasciitilde 80 & 低导磁率，适合中频段\\
+& & NXO-85 & \textasciitilde 85 & 低导磁率，适合高频段\\
+& & NXO-90 & \textasciitilde 90 & 低导磁率，适合中频段\\
+& & NXO-95 & \textasciitilde 95 & 低导磁率，适合中频段\\
+& & NXO-100 & \textasciitilde 100 & 低导磁率，适合中频段\\
+& & NXO-105 & \textasciitilde 105 & 低导磁率，适合中频段\\
+& & NXO-110 & \textasciitilde 110 & 低导磁率，适合中频段\\
+& & NXO-115 & \textasciitilde 115 & 低导磁率，适合中频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-120 & \textasciitilde 120 & 低导磁率，适合中频段\\
+& & NXO-125 & \textasciitilde 125 & 低导磁率，适合中频段\\
+& & NXO-130 & \textasciitilde 130 & 低导磁率，适合中频段\\
+& & NXO-135 & \textasciitilde 135 & 低导磁率，适合中频段\\
+& & NXO-140 & \textasciitilde 140 & 低导磁率，适合中频段\\
+& & NXO-145 & \textasciitilde 145 & 低导磁率，适合中频段\\
+& & NXO-150 & \textasciitilde 150 & 低导磁率，适合中频段\\
+& & NXO-155 & \textasciitilde 155 & 低导磁率，适合中频段\\
+& & NXO-160 & \textasciitilde 160 & 低导磁率，适合中频段\\
+& & NXO-165 & \textasciitilde 165 & 低导磁率，适合中频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-170 & \textasciitilde 170 & 低导磁率，适合中频段\\
+& & NXO-175 & \textasciitilde 175 & 低导磁率，适合中频段\\
+& & NXO-180 & \textasciitilde 180 & 低导磁率，适合中频段\\
+& & NXO-185 & \textasciitilde 185 & 低导磁率，适合中频段\\
+& & NXO-190 & \textasciitilde 190 & 低导磁率，适合中频段\\
+& & NXO-195 & \textasciitilde 195 & 低导磁率，适合中频段\\
+& & NXO-200 & \textasciitilde 200 & 中导磁率，适合低频段\\
+& & NXO-205 & \textasciitilde 205 & 中导磁率，适合低频段\\
+& & NXO-210 & \textasciitilde 210 & 中导磁率，适合低频段\\
+& & NXO-215 & \textasciitilde 215 & 中导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-220 & \textasciitilde 220 & 中导磁率，适合低频段\\
+& & NXO-225 & \textasciitilde 225 & 中导磁率，适合低频段\\
+& & NXO-230 & \textasciitilde 230 & 中导磁率，适合低频段\\
+& & NXO-235 & \textasciitilde 235 & 中导磁率，适合低频段\\
+& & NXO-240 & \textasciitilde 240 & 中导磁率，适合低频段\\
+& & NXO-245 & \textasciitilde 245 & 中导磁率，适合低频段\\
+& & NXO-250 & \textasciitilde 250 & 中导磁率，适合低频段\\
+& & NXO-255 & \textasciitilde 255 & 中导磁率，适合低频段\\
+& & NXO-260 & \textasciitilde 260 & 中导磁率，适合低频段\\
+& & NXO-265 & \textasciitilde 265 & 中导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-270 & \textasciitilde 270 & 中导磁率，适合低频段\\
+& & NXO-275 & \textasciitilde 275 & 中导磁率，适合低频段\\
+& & NXO-280 & \textasciitilde 280 & 中导磁率，适合低频段\\
+& & NXO-285 & \textasciitilde 285 & 中导磁率，适合低频段\\
+& & NXO-290 & \textasciitilde 290 & 中导磁率，适合低频段\\
+& & NXO-295 & \textasciitilde 295 & 中导磁率，适合低频段\\
+& & NXO-300 & \textasciitilde 300 & 中导磁率，适合低频段\\
+& & NXO-305 & \textasciitilde 305 & 中导磁率，适合低频段\\
+& & NXO-310 & \textasciitilde 310 & 中导磁率，适合低频段\\
+& & NXO-315 & \textasciitilde 315 & 中导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-320 & \textasciitilde 320 & 中导磁率，适合低频段\\
+& & NXO-325 & \textasciitilde 325 & 中导磁率，适合低频段\\
+& & NXO-330 & \textasciitilde 330 & 中导磁率，适合低频段\\
+& & NXO-335 & \textasciitilde 335 & 中导磁率，适合低频段\\
+& & NXO-340 & \textasciitilde 340 & 中导磁率，适合低频段\\
+& & NXO-345 & \textasciitilde 345 & 中导磁率，适合低频段\\
+& & NXO-350 & \textasciitilde 350 & 中导磁率，适合低频段\\
+& & NXO-355 & \textasciitilde 355 & 中导磁率，适合低频段\\
+& & NXO-360 & \textasciitilde 360 & 中导磁率，适合低频段\\
+& & NXO-365 & \textasciitilde 365 & 中导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-370 & \textasciitilde 370 & 中导磁率，适合低频段\\
+& & NXO-375 & \textasciitilde 375 & 中导磁率，适合低频段\\
+& & NXO-380 & \textasciitilde 380 & 中导磁率，适合低频段\\
+& & NXO-385 & \textasciitilde 385 & 中导磁率，适合低频段\\
+& & NXO-390 & \textasciitilde 390 & 中导磁率，适合低频段\\
+& & NXO-395 & \textasciitilde 395 & 中导磁率，适合低频段\\
+& & NXO-400 & \textasciitilde 400 & 中导磁率，适合低频段\\
+& & NXO-405 & \textasciitilde 405 & 中导磁率，适合低频段\\
+& & NXO-410 & \textasciitilde 410 & 中导磁率，适合低频段\\
+& & NXO-415 & \textasciitilde 415 & 中导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-420 & \textasciitilde 420 & 中导磁率，适合低频段\\
+& & NXO-425 & \textasciitilde 425 & 中导磁率，适合低频段\\
+& & NXO-430 & \textasciitilde 430 & 中导磁率，适合低频段\\
+& & NXO-435 & \textasciitilde 435 & 中导磁率，适合低频段\\
+& & NXO-440 & \textasciitilde 440 & 中导磁率，适合低频段\\
+& & NXO-445 & \textasciitilde 445 & 中导磁率，适合低频段\\
+& & NXO-450 & \textasciitilde 450 & 中导磁率，适合低频段\\
+& & NXO-455 & \textasciitilde 455 & 中导磁率，适合低频段\\
+& & NXO-460 & \textasciitilde 460 & 中导磁率，适合低频段\\
+& & NXO-465 & \textasciitilde 465 & 中导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-470 & \textasciitilde 470 & 中导磁率，适合低频段\\
+& & NXO-475 & \textasciitilde 475 & 中导磁率，适合低频段\\
+& & NXO-480 & \textasciitilde 480 & 中导磁率，适合低频段\\
+& & NXO-485 & \textasciitilde 485 & 中导磁率，适合低频段\\
+& & NXO-490 & \textasciitilde 490 & 中导磁率，适合低频段\\
+& & NXO-495 & \textasciitilde 495 & 中导磁率，适合低频段\\
+& & NXO-500 & \textasciitilde 500 & 中高导磁率，适合低频段\\
+& & NXO-505 & \textasciitilde 505 & 中高导磁率，适合低频段\\
+& & NXO-510 & \textasciitilde 510 & 中高导磁率，适合低频段\\
+& & NXO-515 & \textasciitilde 515 & 中高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-520 & \textasciitilde 520 & 中高导磁率，适合低频段\\
+& & NXO-525 & \textasciitilde 525 & 中高导磁率，适合低频段\\
+& & NXO-530 & \textasciitilde 530 & 中高导磁率，适合低频段\\
+& & NXO-535 & \textasciitilde 535 & 中高导磁率，适合低频段\\
+& & NXO-540 & \textasciitilde 540 & 中高导磁率，适合低频段\\
+& & NXO-545 & \textasciitilde 545 & 中高导磁率，适合低频段\\
+& & NXO-550 & \textasciitilde 550 & 中高导磁率，适合低频段\\
+& & NXO-555 & \textasciitilde 555 & 中高导磁率，适合低频段\\
+& & NXO-560 & \textasciitilde 560 & 中高导磁率，适合低频段\\
+& & NXO-565 & \textasciitilde 565 & 中高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-570 & \textasciitilde 570 & 中高导磁率，适合低频段\\
+& & NXO-575 & \textasciitilde 575 & 中高导磁率，适合低频段\\
+& & NXO-580 & \textasciitilde 580 & 中高导磁率，适合低频段\\
+& & NXO-585 & \textasciitilde 585 & 中高导磁率，适合低频段\\
+& & NXO-590 & \textasciitilde 590 & 中高导磁率，适合低频段\\
+& & NXO-595 & \textasciitilde 595 & 中高导磁率，适合低频段\\
+& & NXO-600 & \textasciitilde 600 & 中高导磁率，适合低频段\\
+& & NXO-605 & \textasciitilde 605 & 中高导磁率，适合低频段\\
+& & NXO-610 & \textasciitilde 610 & 中高导磁率，适合低频段\\
+& & NXO-615 & \textasciitilde 615 & 中高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-620 & \textasciitilde 620 & 中高导磁率，适合低频段\\
+& & NXO-625 & \textasciitilde 625 & 中高导磁率，适合低频段\\
+& & NXO-630 & \textasciitilde 630 & 中高导磁率，适合低频段\\
+& & NXO-635 & \textasciitilde 635 & 中高导磁率，适合低频段\\
+& & NXO-640 & \textasciitilde 640 & 中高导磁率，适合低频段\\
+& & NXO-645 & \textasciitilde 645 & 中高导磁率，适合低频段\\
+& & NXO-650 & \textasciitilde 650 & 中高导磁率，适合低频段\\
+& & NXO-655 & \textasciitilde 655 & 中高导磁率，适合低频段\\
+& & NXO-660 & \textasciitilde 660 & 中高导磁率，适合低频段\\
+& & NXO-665 & \textasciitilde 665 & 中高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-670 & \textasciitilde 670 & 中高导磁率，适合低频段\\
+& & NXO-675 & \textasciitilde 675 & 中高导磁率，适合低频段\\
+& & NXO-680 & \textasciitilde 680 & 中高导磁率，适合低频段\\
+& & NXO-685 & \textasciitilde 685 & 中高导磁率，适合低频段\\
+& & NXO-690 & \textasciitilde 690 & 中高导磁率，适合低频段\\
+& & NXO-695 & \textasciitilde 695 & 中高导磁率，适合低频段\\
+& & NXO-700 & \textasciitilde 700 & 中高导磁率，适合低频段\\
+& & NXO-705 & \textasciitilde 705 & 中高导磁率，适合低频段\\
+& & NXO-710 & \textasciitilde 710 & 中高导磁率，适合低频段\\
+& & NXO-715 & \textasciitilde 715 & 中高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-720 & \textasciitilde 720 & 中高导磁率，适合低频段\\
+& & NXO-725 & \textasciitilde 725 & 中高导磁率，适合低频段\\
+& & NXO-730 & \textasciitilde 730 & 中高导磁率，适合低频段\\
+& & NXO-735 & \textasciitilde 735 & 中高导磁率，适合低频段\\
+& & NXO-740 & \textasciitilde 740 & 中高导磁率，适合低频段\\
+& & NXO-745 & \textasciitilde 745 & 中高导磁率，适合低频段\\
+& & NXO-750 & \textasciitilde 750 & 中高导磁率，适合低频段\\
+& & NXO-755 & \textasciitilde 755 & 中高导磁率，适合低频段\\
+& & NXO-760 & \textasciitilde 760 & 中高导磁率，适合低频段\\
+& & NXO-765 & \textasciitilde 765 & 中高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-770 & \textasciitilde 770 & 中高导磁率，适合低频段\\
+& & NXO-775 & \textasciitilde 775 & 中高导磁率，适合低频段\\
+& & NXO-780 & \textasciitilde 780 & 中高导磁率，适合低频段\\
+& & NXO-785 & \textasciitilde 785 & 中高导磁率，适合低频段\\
+& & NXO-790 & \textasciitilde 790 & 中高导磁率，适合低频段\\
+& & NXO-795 & \textasciitilde 795 & 中高导磁率，适合低频段\\
+& & NXO-800 & \textasciitilde 800 & 高导磁率，适合低频段\\
+& & NXO-805 & \textasciitilde 805 & 高导磁率，适合低频段\\
+& & NXO-810 & \textasciitilde 810 & 高导磁率，适合低频段\\
+& & NXO-815 & \textasciitilde 815 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-820 & \textasciitilde 820 & 高导磁率，适合低频段\\
+& & NXO-825 & \textasciitilde 825 & 高导磁率，适合低频段\\
+& & NXO-830 & \textasciitilde 830 & 高导磁率，适合低频段\\
+& & NXO-835 & \textasciitilde 835 & 高导磁率，适合低频段\\
+& & NXO-840 & \textasciitilde 840 & 高导磁率，适合低频段\\
+& & NXO-845 & \textasciitilde 845 & 高导磁率，适合低频段\\
+& & NXO-850 & \textasciitilde 850 & 高导磁率，适合低频段\\
+& & NXO-855 & \textasciitilde 855 & 高导磁率，适合低频段\\
+& & NXO-860 & \textasciitilde 860 & 高导磁率，适合低频段\\
+& & NXO-865 & \textasciitilde 865 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-870 & \textasciitilde 870 & 高导磁率，适合低频段\\
+& & NXO-875 & \textasciitilde 875 & 高导磁率，适合低频段\\
+& & NXO-880 & \textasciitilde 880 & 高导磁率，适合低频段\\
+& & NXO-885 & \textasciitilde 885 & 高导磁率，适合低频段\\
+& & NXO-890 & \textasciitilde 890 & 高导磁率，适合低频段\\
+& & NXO-895 & \textasciitilde 895 & 高导磁率，适合低频段\\
+& & NXO-900 & \textasciitilde 900 & 高导磁率，适合低频段\\
+& & NXO-905 & \textasciitilde 905 & 高导磁率，适合低频段\\
+& & NXO-910 & \textasciitilde 910 & 高导磁率，适合低频段\\
+& & NXO-915 & \textasciitilde 915 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-920 & \textasciitilde 920 & 高导磁率，适合低频段\\
+& & NXO-925 & \textasciitilde 925 & 高导磁率，适合低频段\\
+& & NXO-930 & \textasciitilde 930 & 高导磁率，适合低频段\\
+& & NXO-935 & \textasciitilde 935 & 高导磁率，适合低频段\\
+& & NXO-940 & \textasciitilde 940 & 高导磁率，适合低频段\\
+& & NXO-945 & \textasciitilde 945 & 高导磁率，适合低频段\\
+& & NXO-950 & \textasciitilde 950 & 高导磁率，适合低频段\\
+& & NXO-955 & \textasciitilde 955 & 高导磁率，适合低频段\\
+& & NXO-960 & \textasciitilde 960 & 高导磁率，适合低频段\\
+& & NXO-965 & \textasciitilde 965 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-970 & \textasciitilde 970 & 高导磁率，适合低频段\\
+& & NXO-975 & \textasciitilde 975 & 高导磁率，适合低频段\\
+& & NXO-980 & \textasciitilde 980 & 高导磁率，适合低频段\\
+& & NXO-985 & \textasciitilde 985 & 高导磁率，适合低频段\\
+& & NXO-990 & \textasciitilde 990 & 高导磁率，适合低频段\\
+& & NXO-995 & \textasciitilde 995 & 高导磁率，适合低频段\\
+& & NXO-1000 & \textasciitilde 1000 & 高导磁率，适合低频段\\
+& & NXO-1050 & \textasciitilde 1050 & 高导磁率，适合低频段\\
+& & NXO-1100 & \textasciitilde 1100 & 高导磁率，适合低频段\\
+& & NXO-1150 & \textasciitilde 1150 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-1200 & \textasciitilde 1200 & 高导磁率，适合低频段\\
+& & NXO-1250 & \textasciitilde 1250 & 高导磁率，适合低频段\\
+& & NXO-1300 & \textasciitilde 1300 & 高导磁率，适合低频段\\
+& & NXO-1350 & \textasciitilde 1350 & 高导磁率，适合低频段\\
+& & NXO-1400 & \textasciitilde 1400 & 高导磁率，适合低频段\\
+& & NXO-1450 & \textasciitilde 1450 & 高导磁率，适合低频段\\
+& & NXO-1500 & \textasciitilde 1500 & 高导磁率，适合低频段\\
+& & NXO-1550 & \textasciitilde 1550 & 高导磁率，适合低频段\\
+& & NXO-1600 & \textasciitilde 1600 & 高导磁率，适合低频段\\
+& & NXO-1650 & \textasciitilde 1650 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-1700 & \textasciitilde 1700 & 高导磁率，适合低频段\\
+& & NXO-1750 & \textasciitilde 1750 & 高导磁率，适合低频段\\
+& & NXO-1800 & \textasciitilde 1800 & 高导磁率，适合低频段\\
+& & NXO-1850 & \textasciitilde 1850 & 高导磁率，适合低频段\\
+& & NXO-1900 & \textasciitilde 1900 & 高导磁率，适合低频段\\
+& & NXO-1950 & \textasciitilde 1950 & 高导磁率，适合低频段\\
+& & NXO-2000 & \textasciitilde 2000 & 高导磁率，适合低频段\\
+& & NXO-2050 & \textasciitilde 2050 & 高导磁率，适合低频段\\
+& & NXO-2100 & \textasciitilde 2100 & 高导磁率，适合低频段\\
+& & NXO-2150 & \textasciitilde 2150 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-2200 & \textasciitilde 2200 & 超高导磁率，适合低频段\\
+& & NXO-2250 & \textasciitilde 2250 & 超高导磁率，适合低频段\\
+& & NXO-2300 & \textasciitilde 2300 & 超高导磁率，适合低频段\\
+& & NXO-2350 & \textasciitilde 2350 & 超高导磁率，适合低频段\\
+& & NXO-2400 & \textasciitilde 2400 & 超高导磁率，适合低频段\\
+& & NXO-2450 & \textasciitilde 2450 & 超高导磁率，适合低频段\\
+& & NXO-2500 & \textasciitilde 2500 & 超高导磁率，适合低频段\\
+& & NXO-2550 & \textasciitilde 2550 & 超高导磁率，适合低频段\\
+& & NXO-2600 & \textasciitilde 2600 & 超高导磁率，适合低频段\\
+& & NXO-2650 & \textasciitilde 2650 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & NXO-2700 & \textasciitilde 2700 & 超高导磁率，适合低频段\\
+& & NXO-2750 & \textasciitilde 2750 & 超高导磁率，适合低频段\\
+& & NXO-2800 & \textasciitilde 2800 & 超高导磁率，适合低频段\\
+& & NXO-2850 & \textasciitilde 2850 & 超高导磁率，适合低频段\\
+& & NXO-2900 & \textasciitilde 2900 & 超高导磁率，适合低频段\\
+& & NXO-2950 & \textasciitilde 2950 & 超高导磁率，适合低频段\\
+& & NXO-3000 & \textasciitilde 3000 & 超高导磁率，适合低频段\\
+& & NXO-3050 & \textasciitilde 3050 & 超高导磁率，适合低频段\\
+& & R40C系列 & 40 & 低损耗，Q值高\\
+& & R60C系列 & 60 & 低损耗，Q值高\\
+\hline
+\multirow{10}{*}{短波} & \multirow{10}{*}{2 MHz-30 MHz} & R80C系列 & 80 & 低损耗，Q值高\\
+& & R100C系列 & 100 & 低损耗，Q值高\\
+& & 空心线圈 & - & 无磁芯，Q值最高\\
+& & & & \\
+& & & & \\
+& & & & \\
+& & & & \\
+& & & & \\
+& & & & \\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & MX-100 & \textasciitilde 100 & 低导磁率，适合高频段\\
+& & MX-200 & \textasciitilde 200 & 中导磁率，适合中频段\\
+& & MX-300 & \textasciitilde 300 & 中导磁率，适合中频段\\
+& & MX-500 & \textasciitilde 500 & 中高导磁率，适合低频段\\
+& & MX-700 & \textasciitilde 700 & 中高导磁率，适合低频段\\
+& & MX-900 & \textasciitilde 900 & 高导磁率，适合低频段\\
+& & MX-1000 & \textasciitilde 1000 & 高导磁率，适合低频段\\
+& & MX-1100 & \textasciitilde 1100 & 高导磁率，适合低频段\\
+& & MX-1300 & \textasciitilde 1300 & 高导磁率，适合低频段\\
+& & MX-1500 & \textasciitilde 1500 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & MX-1700 & \textasciitilde 1700 & 高导磁率，适合低频段\\
+& & MX-2000 & \textasciitilde 2000 & 高导磁率，适合低频段\\
+& & MX-2300 & \textasciitilde 2300 & 超高导磁率，适合低频段\\
+& & MX-2500 & \textasciitilde 2500 & 超高导磁率，适合低频段\\
+& & MX-2700 & \textasciitilde 2700 & 超高导磁率，适合低频段\\
+& & MX-3000 & \textasciitilde 3000 & 超高导磁率，适合低频段\\
+& & MX-3300 & \textasciitilde 3300 & 超高导磁率，适合低频段\\
+& & MX-3500 & \textasciitilde 3500 & 超高导磁率，适合低频段\\
+& & MX-3700 & \textasciitilde 3700 & 超高导磁率，适合低频段\\
+& & MX-4000 & \textasciitilde 4000 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & MX-4100 & \textasciitilde 4100 & 超高导磁率，适合低频段\\
+& & MX-4300 & \textasciitilde 4300 & 超高导磁率，适合低频段\\
+& & MX-4500 & \textasciitilde 4500 & 超高导磁率，适合低频段\\
+& & MX-4700 & \textasciitilde 4700 & 超高导磁率，适合低频段\\
+& & MX-5000 & \textasciitilde 5000 & 超高导磁率，适合低频段\\
+& & MX-5300 & \textasciitilde 5300 & 超高导磁率，适合低频段\\
+& & MX-5500 & \textasciitilde 5500 & 超高导磁率，适合低频段\\
+& & MX-6000 & \textasciitilde 6000 & 超高导磁率，适合低频段\\
+& & NXO-200 & \textasciitilde 200 & 中导磁率，适合中频段\\
+& & NXO-300 & \textasciitilde 300 & 中导磁率，适合中频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & NXO-400 & \textasciitilde 400 & 中导磁率，适合低频段\\
+& & NXO-500 & \textasciitilde 500 & 中高导磁率，适合低频段\\
+& & NXO-600 & \textasciitilde 600 & 中高导磁率，适合低频段\\
+& & NXO-700 & \textasciitilde 700 & 中高导磁率，适合低频段\\
+& & NXO-800 & \textasciitilde 800 & 高导磁率，适合低频段\\
+& & NXO-900 & \textasciitilde 900 & 高导磁率，适合低频段\\
+& & NXO-1000 & \textasciitilde 1000 & 高导磁率，适合低频段\\
+& & NXO-1100 & \textasciitilde 1100 & 高导磁率，适合低频段\\
+& & NXO-1200 & \textasciitilde 1200 & 高导磁率，适合低频段\\
+& & NXO-1300 & \textasciitilde 1300 & 高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & NXO-1400 & \textasciitilde 1400 & 高导磁率，适合低频段\\
+& & NXO-1500 & \textasciitilde 1500 & 高导磁率，适合低频段\\
+& & NXO-1600 & \textasciitilde 1600 & 高导磁率，适合低频段\\
+& & NXO-1700 & \textasciitilde 1700 & 高导磁率，适合低频段\\
+& & NXO-1800 & \textasciitilde 1800 & 高导磁率，适合低频段\\
+& & NXO-1900 & \textasciitilde 1900 & 高导磁率，适合低频段\\
+& & NXO-2000 & \textasciitilde 2000 & 高导磁率，适合低频段\\
+& & NXO-2100 & \textasciitilde 2100 & 高导磁率，适合低频段\\
+& & NXO-2200 & \textasciitilde 2200 & 高导磁率，适合低频段\\
+& & NXO-2300 & \textasciitilde 2300 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & NXO-2400 & \textasciitilde 2400 & 超高导磁率，适合低频段\\
+& & NXO-2500 & \textasciitilde 2500 & 超高导磁率，适合低频段\\
+& & NXO-2600 & \textasciitilde 2600 & 超高导磁率，适合低频段\\
+& & NXO-2700 & \textasciitilde 2700 & 超高导磁率，适合低频段\\
+& & NXO-2800 & \textasciitilde 2800 & 超高导磁率，适合低频段\\
+& & NXO-2900 & \textasciitilde 2900 & 超高导磁率，适合低频段\\
+& & NXO-3000 & \textasciitilde 3000 & 超高导磁率，适合低频段\\
+& & NXO-3100 & \textasciitilde 3100 & 超高导磁率，适合低频段\\
+& & NXO-3200 & \textasciitilde 3200 & 超高导磁率，适合低频段\\
+& & NXO-3300 & \textasciitilde 3300 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & NXO-3400 & \textasciitilde 3400 & 超高导磁率，适合低频段\\
+& & NXO-3500 & \textasciitilde 3500 & 超高导磁率，适合低频段\\
+& & NXO-3600 & \textasciitilde 3600 & 超高导磁率，适合低频段\\
+& & NXO-3700 & \textasciitilde 3700 & 超高导磁率，适合低频段\\
+& & NXO-3800 & \textasciitilde 3800 & 超高导磁率，适合低频段\\
+& & NXO-3900 & \textasciitilde 3900 & 超高导磁率，适合低频段\\
+& & NXO-4000 & \textasciitilde 4000 & 超高导磁率，适合低频段\\
+& & NXO-4100 & \textasciitilde 4100 & 超高导磁率，适合低频段\\
+& & NXO-4200 & \textasciitilde 4200 & 超高导磁率，适合低频段\\
+& & NXO-4300 & \textasciitilde 4300 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & NXO-4400 & \textasciitilde 4400 & 超高导磁率，适合低频段\\
+& & NXO-4500 & \textasciitilde 4500 & 超高导磁率，适合低频段\\
+& & NXO-4600 & \textasciitilde 4600 & 超高导磁率，适合低频段\\
+& & NXO-4700 & \textasciitilde 4700 & 超高导磁率，适合低频段\\
+& & NXO-4800 & \textasciitilde 4800 & 超高导磁率，适合低频段\\
+& & NXO-4900 & \textasciitilde 4900 & 超高导磁率，适合低频段\\
+& & NXO-5000 & \textasciitilde 5000 & 超高导磁率，适合低频段\\
+& & NXO-5100 & \textasciitilde 5100 & 超高导磁率，适合低频段\\
+& & NXO-5200 & \textasciitilde 5200 & 超高导磁率，适合低频段\\
+& & NXO-5300 & \textasciitilde 5300 & 超高导磁率，适合低频段\\
+\hline
+\multirow{10}{*}{长波} & \multirow{10}{*}{150 kHz-530 kHz} & NXO-5400 & \textasciitilde 5400 & 超高导磁率，适合低频段\\
+& & NXO-5500 & \textasciitilde 5500 & 超高导磁率，适合低频段\\
+& & R40C系列 & 40 & 低损耗，Q值高\\
+& & R60C系列 & 60 & 低损耗，Q值高\\
+& & R80C系列 & 80 & 低损耗，Q值高\\
+& & R100C系列 & 100 & 低损耗，Q值高\\
+& & 铁粉芯 & - & 饱和磁通密度高\\
+& & 坡莫合金 & 20000-100000 & 极高导磁率，高性能\\
+& & & & \\
+& & & & \\
+\hline
+\multirow{10}{*}{FM} & \multirow{10}{*}{87.5 MHz-108 MHz} & R30C系列 & 30 & 超低损耗，Q值高\\
+& & R40C系列 & 40 & 低损耗，Q值高\\
+& & R50C系列 & 50 & 低损耗，Q值高\\
+& & R60C系列 & 60 & 低损耗，Q值高\\
+& & R70C系列 & 70 & 低损耗，Q值高\\
+& & R80C系列 & 80 & 低损耗，Q值高\\
+& & R90C系列 & 90 & 低损耗，Q值高\\
+& & R100C系列 & 100 & 低损耗，Q值高\\
+& & MX-20 & \textasciitilde 20 & 极低导磁率，适合高频段\\
+& & MX-30 & \textasciitilde 30 & 极低导磁率，适合高频段\\
+\hline
+\multirow{10}{*}{FM} & \multirow{10}{*}{87.5 MHz-108 MHz} & MX-60 & \textasciitilde 60 & 低导磁率，适合频段\\
+& & MX-80 & \textasciitilde 80 & 低导磁率，适合频段\\
+& & MX-120 & \textasciitilde 120 & 低导磁率，适合频段\\
+& & NXO-10 & \textasciitilde 10 & 极低导磁率，适合高频段\\
+& & NXO-15 & \textasciitilde 15 & 极低导磁率，适合高频段\\
+& & NXO-20 & \textasciitilde 20 & 极低导磁率，适合高频段\\
+& & NXO-25 & \textasciitilde 25 & 极低导磁率，适合高频段\\
+& & NXO-30 & \textasciitilde 30 & 极低导磁率，适合高频段\\
+& & NXO-35 & \textasciitilde 35 & 极低导磁率，适合高频段\\
+& & NXO-40 & \textasciitilde 40 & 极低导磁率，适合频段\\
+\hline
+\multirow{10}{*}{FM} & \multirow{10}{*}{87.5 MHz-108 MHz} & NXO-45 & \textasciitilde 45 & 低导磁率，适合频段\\
+& & NXO-50 & \textasciitilde 50 & 低导磁率，适合频段\\
+& & NXO-55 & \textasciitilde 55 & 低导磁率，适合频段\\
+& & NXO-60 & \textasciitilde 60 & 低导磁率，适合频段\\
+& & NXO-65 & \textasciitilde 65 & 低导磁率，适合频段\\
+& & NXO-70 & \textasciitilde 70 & 低导磁率，适合频段\\
+& & NXO-75 & \textasciitilde 75 & 低导磁率，适合频段\\
+& & NXO-80 & \textasciitilde 80 & 低导磁率，适合频段\\
+& & NXO-85 & \textasciitilde 85 & 低导磁率，适合频段\\
+& & NXO-90 & \textasciitilde 90 & 低导磁率，适合频段\\
+\hline
+\multirow{10}{*}{FM} & \multirow{10}{*}{87.5 MHz-108 MHz} & NXO-95 & \textasciitilde 95 & 低导磁率，适合频段\\
+& & 铁粉芯 & - & 适合FM频段，损耗低\\
+& & 镍锌铁氧体 & - & 适合20-200MHz，损耗较小\\
+& & 空心线圈 & - & 无磁芯，Q值最高\\
+& & & & \\
+& & & & \\
+& & & & \\
+& & & & \\
+& & & & \\
+& & & & \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{磁棒材料特性说明}
+
+\begin{itemize}
+  \item \textbf{导磁率}：表示材料对磁场的传导能力，越高则相同体积下可获得的电感量越大
+  \item \textbf{Q值}：品质因数，反映材料的损耗特性，越高则损耗越小，选择性越好
+  \item \textbf{频率特性}：不同材料适用于不同的频率范围，高频段需要低导磁率材料
+  \item \textbf{温度稳定性}：好的磁棒材料应具有较小的温度系数，以保证电路性能稳定
+  \item \textbf{尺寸规格}：常见磁棒尺寸有8×100mm、10×120mm、10×48mm等
+\end{itemize}
+
+\part{基础理论}
+\chapter{调谐电路基础}
+\section{调谐电路简介}
+\section{谐振的基本概念}
+\section{调谐电路的性能参数}
+\section{调谐电路的应用场景}
+
+\part{传统调谐电路}
+\chapter{LC 调谐电路}
+\section{串联 LC 电路}
+\subsection{电路结构}
+\subsection{谐振特性}
+\subsection{品质因数}
+\subsection{频率响应}
+\section{并联 LC 电路}
+\subsection{电路结构}
+\subsection{谐振特性}
+\subsection{品质因数}
+\subsection{频率响应}
+\section{LC 电路的设计}
+\subsection{元件选择}
+\subsection{参数计算}
+\subsubsection{可变电容器与线圈的匹配关系}
+不同容量的可变电容器需要配合不同电感量的线圈，以实现所需的频率覆盖范围。谐振频率由公式 $ f = \frac{1}{2\pi\sqrt{LC}} $ 决定。
+
+\paragraph{常见可变电容器与配套线圈的关系}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{可变电容器类型} & \textbf{容量范围} & \textbf{适用频率范围} & \textbf{配套线圈电感量} & \textbf{推荐电感值} & \textbf{应用场景} \\
+\hline
+小型薄膜电容器 & 5-30 pF & 87.5-108 MHz & 0.1-0.3 $\mu$H & 0.2 $\mu$H & FM收音机 \\
+中型薄膜电容器 & 30-150 pF & 2-30 MHz & 3-80 $\mu$H & 30 $\mu$H & 短波收音机 \\
+标准空气电容器 & 120-365 pF & 530-1600 kHz & 100-300 $\mu$H & 250 $\mu$H & 中波收音机 \\
+大型空气电容器 & 365-1000 pF & 150-530 kHz & 1-3 mH & 2 mH & 长波收音机 \\
+双联电容器 & 2×120-365 pF & 530-1600 kHz & 2×100-300 $\mu$H & 2×250 $\mu$H & AM收音机 \\
+三联电容器 & 3×120-365 pF & 530-1600 kHz & 3×100-300 $\mu$H & 3×250 $\mu$H & 多波段收音机 \\
+微调电容器 & 3-30 pF & 调整范围 ±5\% & - & - & 频率微调 \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{频率覆盖计算示例}
+以标准空气电容器（120-365 pF）为例：
+\begin{itemize}
+  \item 配合 250 $\mu$H 线圈：
+    \begin{itemize}
+      \item 最小容量（120 pF）：$ f_{max} = \frac{1}{2\pi\sqrt{250\times10^{-6} \times 120\times10^{-12}}} \approx 920 kHz $
+      \item 最大容量（365 pF）：$ f_{min} = \frac{1}{2\pi\sqrt{250\times10^{-6} \times 365\times10^{-12}}} \approx 525 kHz $
+      \item 覆盖范围：525-920 kHz（中波低频段）
+    \end{itemize}
+  \item 配合 100 $\mu$H 线圈：
+    \begin{itemize}
+      \item 最小容量（120 pF）：$ f_{max} \approx 1.45 MHz $
+      \item 最大容量（365 pF）：$ f_{min} \approx 830 kHz $
+      \item 覆盖范围：830-1450 kHz（中波高频段）
+    \end{itemize}
+\end{itemize}
+
+\subsection{调谐范围}
+\subsection{稳定性考虑}
+
+\chapter{晶体调谐电路}
+\section{晶体振荡器原理}
+\section{晶体的特性}
+\section{晶体调谐电路设计}
+\section{晶体振荡器类型}
+
+\part{现代调谐系统}
+\chapter{锁相环调谐系统}
+\section{PLL 基本原理}
+\subsection{鉴相器}
+\subsection{低通滤波器}
+\subsection{压控振荡器}
+\subsection{分频器}
+\section{PLL 调谐系统设计}
+\section{PLL 的锁定特性}
+\section{PLL 的应用}
+
+\chapter{数字调谐系统}
+\section{数字调谐原理}
+\section{频率合成技术}
+\section{直接数字合成 (DDS)}
+\section{数字调谐系统设计}
+
+\part{应用与实践}
+\chapter{收音机调谐电路}
+\section{AM 收音机调谐}
+\subsection{中波 (MW) 调谐}
+中波广播频段通常为 530 kHz 至 1600 kHz，使用 LC 调谐电路进行选频。调谐回路由可变电容器和固定电感组成，通过改变可变电容器的容量来选择不同的广播频率。
+
+\subsubsection{中波线圈的制作方法}
+\paragraph{材料选择}
+\begin{itemize}
+  \item \textbf{导线}：单股或多股漆包线（如 0.1mm 或 7×0.08mm），中波频率下趋肤效应较为明显，采用多股线可有效减小趋肤效应带来的导体损耗。
+  \item \textbf{磁芯}：通常使用铁氧体磁棒，常用材料包括：
+    \begin{itemize}
+      \item MX-100、MX-150、MX-200、MX-300、MX-400、MX-600、MX-800、MX-1000、MX-1200、MX-1500、MX-1800、MX-2000、MX-2500、MX-3000、MX-3500、MX-4000、MX-5000
+      \item NXO-40、NXO-60、NXO-100、NXO-120、NXO-150、NXO-200、NXO-250、NXO-300、NXO-400、NXO-500、NXO-600、NXO-800、NXO-1000、NXO-1200、NXO-1500、NXO-2000
+      \item R40C系列、R60C系列、R80C系列、R100C系列
+      \item MXO-400、MXO-2000
+      \item R400、R800
+    \end{itemize}
+    \begin{itemize}
+      \item \textbf{推荐材料}：MX-400、MX-600、MX-800（中频段）；MX-1000、MX-1200、MX-1500（低频段）；R60C系列、R80C系列（低损耗、高Q值应用）
+    \end{itemize}
+    磁棒长度一般为 100-150mm，直径 8-10mm。
+  \item \textbf{骨架}：塑料或纸质骨架，长度略短于磁芯。
+  \item \textbf{绝缘材料}：绝缘纸或胶带，用于层间绝缘。
+\end{itemize}
+
+\paragraph{绕制参数}
+中波线圈的电感量通常在 100-300 $\mu$H 之间，具体参数：
+- 使用 100mm 长、8mm 直径的铁氧体磁棒
+- 线圈匝数：约 80-120 匝
+- 导线直径：0.1mm 左右
+
+\paragraph{绕制步骤}
+1. \textbf{准备磁芯和骨架}：将磁芯插入骨架中
+2. \textbf{绕制线圈}：从骨架一端开始，紧密均匀地绕制漆包线
+3. \textbf{引出线处理}：两端留出足够长度的引出线，去除漆皮并上锡
+4. \textbf{固定线圈}：使用胶带将线圈固定在骨架上
+
+\paragraph{调谐范围}
+使用 250 $\mu$H 线圈配合 365 pF 可变电容器：
+- 覆盖频率范围：约 530 kHz 至 1600 kHz
+- 适合大多数中波广播频段
+
+\subsection{短波 (SW) 调谐}
+短波广播频段通常为 2 MHz 至 30 MHz，同样使用 LC 调谐电路。由于短波频率范围较宽，通常采用多波段设计，每个波段使用不同的电感线圈，以获得更好的调谐性能。
+
+\subsubsection{短波线圈的制作方法}
+\paragraph{材料选择}
+\begin{itemize}
+  \item \textbf{导线}：单股漆包线（如 0.08-0.1mm），短波中低频段趋肤效应影响较小；对于15MHz以上的高频段，推荐使用多股利兹线以进一步降低趋肤效应损耗。
+  \item \textbf{磁芯}：可使用铁氧体磁棒或空心线圈，常用材料包括：
+    \begin{itemize}
+      \item NXO-40、NXO-60、NXO-80、NXO-100、NXO-120、NXO-150、NXO-180、NXO-200、NXO-250、NXO-300、NXO-350、NXO-400、NXO-450、NXO-500、NXO-600、NXO-700、NXO-800、NXO-900、NXO-1000、NXO-1200、NXO-1500、NXO-1800、NXO-2000
+      \item MX-20、MX-30、MX-40、MX-50、MX-60、MX-70、MX-80、MX-90、MX-100、MX-110、MX-120、MX-130、MX-170、MX-200、MX-230、MX-270、MX-330、MX-370、MX-400、MX-430、MX-470、MX-530、MX-570、MX-600、MX-630、MX-670、MX-730、MX-770、MX-800、MX-830、MX-870、MX-930、MX-1000、MX-1100、MX-1300、MX-1600、MX-1900、MX-2100、MX-2400、MX-2600、MX-2900、MX-3100
+      \item R40C系列、R60C系列、R80C系列、R100C系列
+      \item 空心线圈
+    \end{itemize}
+    \begin{itemize}
+      \item \textbf{推荐材料}：NXO-40、NXO-60、NXO-80（高频段）；MX-20、MX-30、MX-40（高频段）；空心线圈（15MHz以上高频段，Q值最高）；R40C系列（低损耗应用）
+    \end{itemize}
+
+    磁棒长度通常为 50-80mm，直径 6-8mm。
+  \item \textbf{骨架}：塑料或纸质骨架，直径较小。
+  \item \textbf{绝缘材料}：绝缘纸或胶带，用于层间绝缘。
+\end{itemize}
+
+\paragraph{多波段设计}
+短波通常分为多个波段，每个波段使用不同的线圈：
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+波段 & 频率范围 & 电感量 & 匝数 \\
+\hline
+SW1 & 2-4 MHz & 80-120 $\mu$H & 40-60 匝 \\
+SW2 & 4-8 MHz & 30-50 $\mu$H & 20-30 匝 \\
+SW3 & 8-16 MHz & 10-20 $\mu$H & 10-15 匝 \\
+SW4 & 16-30 MHz & 3-8 $\mu$H & 5-8 匝 \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{绕制方法}
+1. \textbf{波段切换}：使用波段开关切换不同的线圈或抽头
+2. \textbf{线圈绕制}：
+   - 每个波段单独绕制线圈
+   - 或在同一骨架上绕制多个线圈，通过抽头切换
+   - 保持绕线紧密均匀
+3. \textbf{屏蔽措施}：短波容易受到干扰，可考虑添加屏蔽罩
+
+\paragraph{调谐范围}
+- 每个波段使用 365 pF 可变电容器
+- 覆盖相应的短波频率范围
+- 多波段设计可覆盖整个 2-30 MHz 短波频段
+
+\subsection{长波 (LW) 调谐}
+长波广播频段通常为 150 kHz 至 530 kHz，是 AM 广播的一部分。长波收音机使用的调谐方式主要是 LC 调谐电路，但与中波和短波相比有以下特点：
+
+\begin{itemize}
+  \item \textbf{电感线圈}：长波频率低，需要更大的电感线圈，通常采用多股线绕制，以减少趋肤效应的影响。
+  \item \textbf{可变电容器}：长波调谐需要较大容量的可变电容器，通常使用空气可变电容器或大容量的薄膜可变电容器。
+  \item \textbf{调谐回路设计}：长波调谐回路的 Q 值通常较低，因为长波信号波长较长，天线效率相对较低，需要更宽的带宽来接收足够的信号能量。
+  \item \textbf{天线设计}：长波收音机通常需要更长的天线，以提高接收效率。有些长波收音机内置 ferrite 棒天线，而高端机型则使用外部长线天线。
+  \item \textbf{调谐精度}：长波频率间隔较大，调谐精度要求相对较低，但需要良好的稳定性以避免频率漂移。
+\end{itemize}
+
+\subsubsection{长波线圈的制作方法}
+\paragraph{材料选择}
+\begin{itemize}
+  \item \textbf{导线}：多股漆包线（如 7×0.1mm 或 10×0.1mm），以减少趋肤效应，提高效率。
+  \item \textbf{磁芯}：对于长波，通常使用高导磁率的磁芯，常用材料包括：
+    \begin{itemize}
+      \item MX-100、MX-200、MX-300、MX-500、MX-700、MX-900、MX-1000、MX-1100、MX-1300、MX-1500、MX-1700、MX-2000、MX-2300、MX-2500、MX-2700、MX-3000、MX-3300、MX-3500、MX-3700、MX-4000、MX-4100、MX-4300、MX-4500、MX-4700、MX-5000、MX-5300、MX-5500、MX-6000
+      \item NXO-200、NXO-300、NXO-400、NXO-500、NXO-600、NXO-700、NXO-800、NXO-900、NXO-1000、NXO-1100、NXO-1200、NXO-1300、NXO-1400、NXO-1600、NXO-1700、NXO-1800、NXO-1900、NXO-2000、NXO-2100、NXO-2200、NXO-2300、NXO-2400、NXO-2500、NXO-2600、NXO-2700、NXO-2800、NXO-2900、NXO-3000、NXO-3100、NXO-3200、NXO-3300、NXO-3400、NXO-3500、NXO-3600、NXO-3700、NXO-3800、NXO-3900、NXO-4000、NXO-4100、NXO-4200、NXO-4300、NXO-4400、NXO-4500、NXO-4600、NXO-4700、NXO-4800、NXO-4900、NXO-5000、NXO-5100、NXO-5200、NXO-5300、NXO-5400、NXO-5500
+      \item R40C系列、R60C系列、R80C系列、R100C系列
+      \item 铁粉芯（Iron Powder Core）、坡莫合金（Permalloy）
+    \end{itemize}
+    \begin{itemize}
+      \item \textbf{推荐材料}：MX-2000、MX-3000、MX-4000、MX-5000（高导磁率，适合低频段）；坡莫合金（极高导磁率，高性能应用）；R80C系列、R100C系列（低损耗应用）
+    \end{itemize}
+    磁棒长度通常为 150-200mm，直径 10-15mm。
+  \item \textbf{骨架}：绝缘材料制成的线圈骨架，如塑料或纸质骨架，用于支撑线圈。
+  \item \textbf{绝缘材料}：用于线圈层间绝缘的材料，如绝缘纸或胶带。
+\end{itemize}
+
+\paragraph{绕制步骤}
+\begin{enumerate}
+  \item \textbf{计算线圈参数}：根据所需的电感量和频率范围，计算线圈的匝数和尺寸。长波线圈的电感量通常在几百微亨到几毫亨之间。
+
+  \item \textbf{准备骨架}：如果使用磁芯，将磁芯插入骨架中；如果是空心线圈，直接使用空心骨架。
+
+  \item \textbf{绕制线圈}：
+    \begin{itemize}
+      \item 从骨架的一端开始，将多股漆包线整齐地绕在骨架上。
+      \item 保持绕线的紧密和均匀，避免交叉或重叠。
+      \item 每绕完一层，可使用绝缘纸或胶带进行层间绝缘。
+      \item 根据计算的匝数完成绕制。
+    \end{itemize}
+
+  \item \textbf{引出线处理}：在线圈的两端留出足够长度的引出线，去除漆皮并上锡，以便与电路连接。
+
+  \item \textbf{固定和封装}：使用胶带或热缩管将线圈固定在骨架上，确保线圈在使用过程中不会松动。
+\end{enumerate}
+
+\paragraph{注意事项}
+\begin{itemize}
+  \item \textbf{绕线质量}：绕线的均匀性和紧密性直接影响线圈的性能，应尽量保持一致。
+  \item \textbf{绝缘处理}：层间绝缘和引出线的绝缘处理要做好，避免短路或漏电。
+  \item \textbf{磁芯选择}：不同的磁芯材料对频率的响应不同，应选择适合长波频率的磁芯。
+  \item \textbf{线圈屏蔽}：为减少外部干扰，长波线圈可考虑添加屏蔽罩，但要注意屏蔽罩对线圈电感量的影响。
+  \item \textbf{测试调整}：绕制完成后，使用电感表测量实际电感量，并根据需要调整匝数以达到设计要求。
+\end{itemize}
+
+\paragraph{示例电路}
+\subparagraph{基本调谐回路}
+一个典型的长波调谐回路电路如下：
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+元件 & 参数 & 说明 \\
+\hline
+L1 & 1 mH & 长波线圈 \\
+C1 & 120-365 pF & 空气可变电容器 \\
+C2 & 1000 pF & 耦合电容 \\
+R1 & 1 MΩ & 阻尼电阻 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subparagraph{工作原理}
+\begin{enumerate}
+  \item \textbf{调谐原理}：长波线圈 L1 与可变电容器 C1 组成并联谐振回路，其谐振频率由公式 $ f = \frac{1}{2\pi\sqrt{LC}} $ 决定。通过调节 C1 的容量，可以改变谐振频率，从而选择不同的长波广播信号。
+
+  \item \textbf{信号耦合}：C2 作为耦合电容，将调谐回路选择的信号耦合到后续的放大电路，同时隔离直流分量。
+
+  \item \textbf{阻尼电阻}：R1 作为阻尼电阻，用于调整调谐回路的 Q 值，防止回路 Q 值过高导致的选择性过窄，同时提高回路的稳定性。
+\end{enumerate}
+
+\subparagraph{频率覆盖计算}
+\begin{itemize}
+  \item 使用 1 mH 线圈配合 365 pF 可变电容器：
+    \begin{itemize}
+      \item 最大容量（365 pF）时：$ f_{min} = \frac{1}{2\pi\sqrt{1\times10^{-3} \times 365\times10^{-12}}} \approx 265 kHz $ 
+      \item 最小容量（120 pF）时：$ f_{max} = \frac{1}{2\pi\sqrt{1\times10^{-3} \times 120\times10^{-12}}} \approx 460 kHz $ 
+    \end{itemize}
+
+  \item 若需要覆盖更低的频率（如 150 kHz），可：
+    \begin{itemize}
+      \item 增加线圈电感量至约 3 mH，配合 365 pF 可变电容器：
+         $ f_{min} = \frac{1}{2\pi\sqrt{3\times10^{-3} \times 365\times10^{-12}}} \approx 153 kHz $ 
+      \item 或使用更大容量的可变电容器（如 1000 pF），配合 1 mH 线圈：
+         $ f_{min} = \frac{1}{2\pi\sqrt{1\times10^{-3} \times 1000\times10^{-12}}} \approx 159 kHz $ 
+    \end{itemize}
+\end{itemize} 
+
+\subparagraph{实际应用考虑}
+\begin{itemize}
+  \item \textbf{天线耦合}：长波信号较弱，通常需要通过天线线圈与调谐回路进行耦合，以提高信号强度。天线线圈与调谐线圈之间的耦合度应适当，避免过耦合导致的选择性下降。
+
+  \item \textbf{前端放大}：由于长波信号较弱，调谐回路后通常需要添加低噪声放大器，以提高信号的信噪比。
+
+  \item \textbf{温度稳定性}：长波线圈的电感量会受温度影响，应选择温度系数小的材料制作线圈骨架和磁芯，以提高电路的温度稳定性。
+
+  \item \textbf{屏蔽措施}：为减少外部电磁干扰，调谐回路应尽量安装在金属屏蔽盒内，屏蔽盒接地。
+\end{itemize}
+
+\section{FM 收音机调谐}
+FM 广播频段通常为 87.5 MHz 至 108 MHz，使用 LC 调谐电路进行选频。由于频率较高，FM 调谐电路与 AM 调谐电路有所不同。
+
+\subsection{FM线圈的制作方法}
+\paragraph{材料选择}
+\begin{itemize}
+  \item \textbf{导线}：单股漆包线（如 0.08-0.1mm），FM 频率很高，需要细导线。
+  \item \textbf{磁芯}：通常使用铁粉芯或空心线圈，FM 频率高，铁氧体磁芯损耗较大。常用材料包括：
+    \begin{itemize}
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-6、T-68-6 等
+      \item \textbf{空心线圈}：无磁芯，适合 87.5-108MHz FM 频段，Q 值最高，损耗最小
+      \item \textbf{镍锌铁氧体（NiZn）}：如 43\# 等
+      \item \textbf{空气可调电感}
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-1、T-68-1 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-2、T-68-2 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-3、T-68-3 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-4、T-68-4 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-5、T-68-5 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-7、T-68-7 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-8、T-68-8 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-9、T-68-9 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-50-10、T-68-10 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 21\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 43\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 61\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 73\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 75\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 77\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 79\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 81\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 83\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 85\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 87\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 89\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 91\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 93\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 95\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 97\# 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 99\# 等
+      \item \textbf{R40C1}
+      \item \textbf{R40C2}
+      \item \textbf{R40C3}
+      \item \textbf{R40C4}
+      \item \textbf{R40C5}
+      \item \textbf{R40C6}
+      \item \textbf{R40C7}
+      \item \textbf{R40C8}
+      \item \textbf{R40C9}
+      \item \textbf{R40C10}
+      \item \textbf{R40C11}
+      \item \textbf{R40C12}
+      \item \textbf{R40C13}
+      \item \textbf{R40C14}
+      \item \textbf{R40C15}
+      \item \textbf{R60C1}
+      \item \textbf{R60C2}
+      \item \textbf{R60C3}
+      \item \textbf{R60C4}
+      \item \textbf{R60C5}
+      \item \textbf{R80C1}
+      \item \textbf{R80C2}
+      \item \textbf{R80C3}
+      \item \textbf{R80C4}
+      \item \textbf{R80C5}
+      \item \textbf{R100C1}
+      \item \textbf{R100C2}
+      \item \textbf{R100C3}
+      \item \textbf{R100C4}
+      \item \textbf{R100C5}
+      \item \textbf{R30C1}
+      \item \textbf{R30C2}
+      \item \textbf{R30C3}
+      \item \textbf{R30C4}
+      \item \textbf{R30C5}
+      \item \textbf{R30C6}
+      \item \textbf{R30C7}
+      \item \textbf{R30C8}
+      \item \textbf{R30C9}
+      \item \textbf{R30C10}
+      \item \textbf{R50C1}
+      \item \textbf{R50C2}
+      \item \textbf{R50C3}
+      \item \textbf{R50C4}
+      \item \textbf{R50C5}
+      \item \textbf{R50C6}
+      \item \textbf{R50C7}
+      \item \textbf{R50C8}
+      \item \textbf{R50C9}
+      \item \textbf{R50C10}
+      \item \textbf{R70C1}
+      \item \textbf{R70C2}
+      \item \textbf{R70C3}
+      \item \textbf{R70C4}
+      \item \textbf{R70C5}
+      \item \textbf{R70C6}
+      \item \textbf{R70C7}
+      \item \textbf{R70C8}
+      \item \textbf{R70C9}
+      \item \textbf{R70C10}
+      \item \textbf{R90C1}
+      \item \textbf{R90C2}
+      \item \textbf{R90C3}
+      \item \textbf{R90C4}
+      \item \textbf{R90C5}
+      \item \textbf{R90C6}
+      \item \textbf{R90C7}
+      \item \textbf{R90C8}
+      \item \textbf{R90C9}
+      \item \textbf{R90C10}
+      \item \textbf{MX-20}
+      \item \textbf{MX-30}
+      \item \textbf{MX-60}
+      \item \textbf{MX-80}
+      \item \textbf{MX-120}
+      \item \textbf{NXO-10}
+      \item \textbf{NXO-15}
+      \item \textbf{NXO-20}
+      \item \textbf{NXO-25}
+      \item \textbf{NXO-30}
+      \item \textbf{NXO-35}
+      \item \textbf{NXO-40}
+      \item \textbf{NXO-45}
+      \item \textbf{NXO-50}
+      \item \textbf{NXO-55}
+      \item \textbf{NXO-60}
+      \item \textbf{NXO-65}
+      \item \textbf{NXO-70}
+      \item \textbf{NXO-75}
+      \item \textbf{NXO-80}
+      \item \textbf{NXO-85}
+      \item \textbf{NXO-90}
+      \item \textbf{NXO-95}
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-25-6、T-37-6 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-44-6、T-50-6 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-68-6、T-80-6 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-94-6、T-106-6 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-25-2、T-37-2 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-44-2、T-50-2 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-68-2、T-80-2 等
+      \item \textbf{铁粉芯（Iron Powder Core）}：如 T-94-2、T-106-2 等
+      \item \textbf{镍锌铁氧体（NiZn）}：如 33\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 47\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 51\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 67\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 72\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 74\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 76\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 78\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 82\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 84\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 86\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 88\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 92\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 94\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 96\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 98\# 材料
+      \item \textbf{镍锌铁氧体（NiZn）}：如 100\# 材料
+    \end{itemize}
+    \begin{itemize}
+      \item \textbf{推荐材料}：空心线圈（Q值最高，损耗最小，适合高性能应用）；镍锌铁氧体 43\#（适合FM频段，损耗较小）；铁粉芯 T-50-6（成本低，适合一般应用）
+    \end{itemize}
+    铁粉芯直径通常为 6-10mm，长度 10-15mm。
+  \item \textbf{骨架}：塑料骨架，直径较小（如 5-10mm）。
+  \item \textbf{绝缘材料}：绝缘纸或胶带，用于层间绝缘。
+\end{itemize}
+
+\paragraph{线圈参数}
+FM 线圈的电感量很小，通常在 0.1-0.5 $\mu$H 之间：
+- 使用 0.1mm 漆包线
+- 线圈匝数：3-8 匝
+- 骨架直径：8mm 左右
+- 线圈长度：5-10mm
+
+\paragraph{绕制方法}
+1. \textbf{空心线圈}：直接在骨架上绕制 3-8 匝
+2. \textbf{铁粉芯线圈}：在铁粉芯上绕制更少的匝数
+3. \textbf{微调电容}：FM 调谐通常需要并联微调电容（5-10 pF）进行精确调谐
+4. \textbf{屏蔽措施}：FM 容易受到干扰，必须添加金属屏蔽罩
+
+\paragraph{调谐电路}
+FM 调谐回路通常由：
+- FM 线圈（0.2-0.3 $\mu$H）
+- 可变电容器（10-30 pF）
+- 微调电容（5-10 pF）
+- 耦合电容（1-5 pF）
+
+覆盖频率范围：87.5 MHz 至 108 MHz
+
+\section{数字收音机调谐}
+
+\chapter{专业设备中的调谐电路}
+\section{通信设备中的调谐电路}
+\subsection{接收机调谐}
+\subsection{发射机调谐}
+\subsection{天线调谐器}
+\section{测量仪器中的调谐电路}
+\subsection{频谱分析仪}
+\subsection{网络分析仪}
+\subsection{信号发生器}
+
+\chapter{调谐电路的设计与调试}
+\section{调谐电路的设计步骤}
+\section{元件的选择与匹配}
+\section{调谐电路的调试方法}
+\section{调谐电路的性能测试}
+
+\chapter{调谐电路的发展趋势}
+\section{现代调谐技术}
+\section{集成调谐电路}
+\section{软件调谐技术}
+\section{未来发展方向}
+
+\end{document}

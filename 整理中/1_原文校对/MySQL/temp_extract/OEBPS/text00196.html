@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.11　InnoDB后台线程</h3>
+<p class="p6">1.InnoDB主线程</p>
+<p class="ziti">InnoDB的主线程在后台承担了诸多任务，绝大多数是与IO操作相关的，比如将buffer pool中修改后的数据异步刷新到磁盘文件中，保证数据的一致性，包括脏页的刷新、合并change buffer、undo回滚页的回收等。</p>
+<p class="ziti">从MySQL 5.6开始，master线程的工作已经被大大减轻，类似purge、page clean都分配给独立的后台线程来进行。</p>
+<p class="ziti">Innodb_io_capacity参数设置了InnoDB的整体IO能力。该参数应该被设置为等同于操作系统每秒的IO操作数量。该参数可以设置为100及以上的任意数值，默认值是200。其中设置为100时相当于7200RPM的磁盘性能。</p>
+<p class="p6">2.InnoDB后台IO线程</p>
+<p class="ziti">在InnoDB存储引擎中可大量使用AIO（Async IO）来处理IO请求，这样可以提高数据库的性能，而IO线程的主要工作是负责这些IO请求的回调处理。</p>
+<p class="ziti">通过配置innodb_read_io_threads和innodb_write_io_threads参数来指定后台读和写数据页的线程的个数，默认值是4，容许的取值范围是1-64。</p>
+<p class="ziti">可以通过show engine innodb status命令来查看InnoDB中IO的线程情况：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show engine innodb status\G
+FILE I/O
+--------
+I/O thread 0 state: waiting for completed aio requests (insert buffer thread)
+I/O thread 1 state: waiting for completed aio requests (log thread)
+I/O thread 2 state: waiting for completed aio requests (read thread)
+I/O thread 3 state: waiting for completed aio requests (read thread)
+I/O thread 4 state: waiting for completed aio requests (read thread)
+I/O thread 5 state: waiting for completed aio requests (read thread)
+I/O thread 6 state: waiting for completed aio requests (write thread)
+I/O thread 7 state: waiting for completed aio requests (write thread)
+I/O thread 8 state: waiting for completed aio requests (write thread)
+I/O thread 9 state: waiting for completed aio requests (write thread)</pre>
+<hr/>
+<p class="p6">3.InnoDB purge线程</p>
+<p class="ziti">事务被提交之后，可能会不再需要其所使用的undo log，因此需要purge线程来回收已经使用并分配的undo页。</p>
+<p class="ziti">InnoDB的purge操作是一种垃圾回收操作，是由一个或多个独立的线程自动执行的。可通过innodb_purge_threads参数设置purge线程的数量，如果DML操作比较复杂且会涉及多个表时，则可以考虑增加此值，最大可以设置为32。</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb-purge_threads=1</pre>
+<hr/>
+<p class="p6">4.InnoDB脏页刷新线程</p>
+<p class="ziti">对磁盘数据页的更新都是先缓存在内存缓冲池中，那些已经被后台线程修改但还没有刷新到磁盘的数据页称为脏页，由于脏页的存在，为保证数据的持久化，需要有一个线程来承担定期刷新的任务。在早期的版本中，主要是由主线程来承担刷新任务；在后续的InnoDB版本中，脏页的刷新被单独分成一个线程处理，即脏页刷新线程。</p>
+<p class="p6">5.InnoDB线程并发度配置</p>
+<p class="ziti">InnoDB利用操作系统的线程技术可达到多线程实现。</p>
+<p class="ziti6">·Innodb_thread_concurrency参数用于限制同时执行的线程数目。默认值是0，代表没有限制。</p>
+<p class="ziti6">·Innodb_thread_sleep_delay参数确定。</p>
+</body>
+</html>

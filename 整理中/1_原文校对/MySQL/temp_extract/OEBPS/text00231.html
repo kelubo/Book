@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">15.6　让MySQL主从复制的从库只读访问</h2>
+<p class="ziti">read-only参数选项可以让从数据库服务器只允许具备主从复制权限的线程或具有SUPER权限的数据库用户进行更新，从而确保从服务器不接受来自用户端的其他普通用户的更新。</p>
+<p class="p6">1.read-only参数允许数据库更新的条件</p>
+<p class="ziti">read-only参数允许数据库更新的条件主要包含如下两种情况。</p>
+<p class="ziti6">·具有SUPER权限的用户可以更新，不受read-only参数影响，例如，管理员root。</p>
+<p class="ziti6">·来自从服务器具备主从复制权限的线程可以更新，不受read-only参数的影响，例如，前文的rep用户。</p>
+<p class="ziti">在生产环境中，可以在从库Slave中使用read-only参数，以确保从库数据不被非法更新。</p>
+<p class="p6">2.如何配置read-only参数</p>
+<p class="ziti">方法一：启动数据库时直接带“--read-only”参数启动，代码如下。</p>
+<hr/>
+<pre class="ziti1">mysqld_safe --read-only --user=mysql &amp;</pre>
+<hr/>
+<p class="ziti">方法二：在my.cnf中[mysqld]模块下加read-only参数，然后重启数据库，配置如下。</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+read-only</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_89">5.1.3　伪动态SSI服务器</h3> 
+ <p class="ziti3">Nginx可以通过SSI命令将多个超文本文件组合成一个页面文件发送给客户端。SSI（Server Side Include）是一种基于服务端的超文本文件处理技术。由于SSI仍是通过其他动态脚本语言获取动态数据的，所以此处将其归类为伪动态服务功能。SSI服务器可通过SSI命令实现诸多动态脚本语言的HTML模板功能，配合其他动态脚本服务的API，完全可以实现前后端分离的Web应用。</p> 
+ <p class="ziti3"><span class="yanse">1.配置指令</span></p> 
+ <p class="ziti3">Nginx是通过ngx_http_ssi_module模块实现SSI命令处理的，SSI配置指令如表5-1所示。</p> 
+ <p class="middle-img">表5-1　SSI配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b5-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b5-1.jpg" class="calibre198"/></a> 
+ </div> 
+ <p class="ziti3">上述指令均可编写在http、server、location指令域中，ssi指令还可编写在if指令域中。</p> 
+ <p class="ziti3"><span class="yanse">2.SSI命令</span></p> 
+ <p class="ziti3">SSI命令格式如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!--# command parameter1=value1 parameter2=value2 ... --&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx支持如下SSI命令。</p> 
+ <p class="ziti3">（1）block</p> 
+ <p class="ziti3">通过block命令可以定义一个超文本内容，该内容可以被include命令参数stub引用。超文本内容中可以包含其他SSI命令。</p> 
+ <p class="ziti3">（2）include</p> 
+ <p class="ziti3">通过include命令可以引入一个文件或请求响应的结果数据。参数有file（引入一个文件）、virtual（引入一个内部请求响应数据）、stub（引入一个block内容为默认数据）、wait（是否等待virtual参数发起请求处理完毕再处理SSI命令）、set（将virtual参数的响应内容输出到指定的变量）。</p> 
+ <p class="ziti3">SSI文件配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!--# block name="one" --&gt;&amp;nbsp;&lt;!--# endblock --&gt;      # block one的内容为空
+&lt;!--# include file="footer.html" stub="one" --&gt;         
+    # 引用文件footer.html的内容，若footer.html文件不存在或SSI命令出错，输出block one的内容
+&lt;!--# include virtual="/remote/body.php?argument=value" wait="yes" stub="one" 
+      set="body" --&gt; 
+    # 引用内部请求的响应数据，等待请求完毕再处理SSI指令，若出错则输出block one的内容，成功则
+    # 把返回结果赋值给变量body<span class="calibre19"><span class="calibre20">
+</span></span></pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx中样例配置如下：<br class="calibre3"/></p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location /remote/ {
+    subrequest_output_buffer_size 128k;　# 子请求的输出缓冲区大小是128KB
+    ...
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·include不支持“../”这样的相对路径。</p> 
+ <p class="ziti4">·include参数set的响应数据大小通过指令subrequest_output_buffer_size设置。</p> 
+ <p class="ziti3">（3）config</p> 
+ <p class="ziti3">通过config命令可以设置SSI处理过程中使用的参数errmsg（SSI处理出错时输出的字符串）和timefmt（输出时间的格式，默认为“%A,%d-%b-%Y %H:%M:%S %Z”）。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!--# config errmsg="oh!出错了" timefmt="%A, %d-%b-%Y %H:%M:%S %Z" --&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）set</p> 
+ <p class="ziti3">通过set命令设置变量。参数有var（变量名）和value（变量值）。</p> 
+ <p class="ziti3">（5）echo</p> 
+ <p class="ziti3">通过echo命令输出变量的值。参数有encoding（HTML编码方式，默认为entity）、default（变量不存在时定义的默认输出，默认为none）。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!--# set var="This_TEST" value="with a SSI test value" --&gt;
+&lt;!--# echo var="This_TEST" --&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（6）if</p> 
+ <p class="ziti3">通过if命令可进行条件控制，且if命令支持正则判断。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!--# if expr="$name != /text/" --&gt;
+    &lt;!--# echo var="name" --&gt;
+&lt;!--# endif --&gt;
+&lt;!--# if expr="$name = /(.+)@(?P&lt;domain&gt;.+)/" --&gt;
+    &lt;!--# echo var="domain" --&gt;
+&lt;!--# else --&gt;
+    &lt;!--# echo var="1" --&gt;
+&lt;!--# endif --&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">3.配置样例</span></p> 
+ <p class="ziti3">根据Nginx SSI模块提供的功能可以搭建一个类似HTML框架的前端模板网站。模板目录规划如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">├── _footer.html  
+├── _header.html
+├── _head.html
+├── index.html 
+├── _sidebar.html
+├── static
+│     └── main.css
+└── table.html
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">文件_footer.html内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;div id="footer"&gt;
+    &lt;!--# config timefmt="%Y" --&gt;&amp;copy;&lt;!--# echo var="date_local" --&gt; Nginx 
+          SSI sample - All Rights Reserved.
+&lt;/div&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">文件_header.html内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;div id="logo"&gt;
+    &lt;img src="http://nginx.org/nginx.png" style="width: 100px;" alt="nginx"&gt;
+&lt;/div&gt;
+&lt;div id="header"&gt;
+    &lt;ul class="nav nav-pills"&gt;
+        &lt;li class="active"&gt;&lt;a href="index.html"&gt;首页&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="table.html"&gt;表格测试&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#"&gt;测试2&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">文件_head.html内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type"&gt;
+        &lt;link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css"&gt;
+        &lt;script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"&gt;&lt;/script&gt;
+        &lt;script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"&gt;&lt;/script&gt;
+        &lt;link rel="stylesheet" href="/static/main.css?v=12"&gt;
+&lt;/head&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">文件index.html内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!--# block name="one" --&gt;&lt;!--# endblock --&gt;
+&lt;!--# include file="_head.html" stub="one" --&gt;    
+&lt;body&gt;
+    &lt;div&gt;
+        &lt;!--# include file="_header.html" stub="one" --&gt;    
+        &lt;!--# include file="_sidebar.html" stub="one" --&gt; 
+    &lt;/div&gt;
+&lt;div id="section"&gt;
+    &lt;h1&gt;Hello World&lt;/h1&gt;
+&lt;/div&gt;
+&lt;!--# include file="_footer.html" stub="one" --&gt; 
+&lt;/body&gt;
+&lt;/html&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">文件_sidebar.html内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;div id="sidebar"&gt;
+    &lt;ul class="nav navbar-nav"&gt;
+        &lt;li class="active"&gt;&lt;a href="http://www.baidu.com" target="blank"&gt;百度&lt;/a&gt;&lt;/li&gt;
+        &lt;li class="active"&gt;&lt;a href="#"&gt;测试&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">首页页面效果如图5-1所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/5-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/5-1.jpg" class="calibre199"/></a> 
+ </div> 
+ <p class="middle-img">图5-1　SSI框架首页</p> 
+ <p class="ziti3">文件table.html内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!--# block name="one" --&gt;&lt;!--# endblock --&gt;
+&lt;!--# include file="_head.html" stub="one" --&gt;    
+&lt;body&gt;
+    &lt;div&gt;
+        &lt;!--# include file="_header.html" stub="one" --&gt;    
+        &lt;!--# include file="_sidebar.html" stub="one" --&gt; 
+    &lt;/div&gt;
+&lt;div id="section"&gt;
+    &lt;table class="table"&gt;
+            &lt;caption&gt;表格示例&lt;/caption&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+            &lt;th&gt;省份&lt;/th&gt;
+            &lt;th&gt;省会&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+            &lt;td&gt;上海&lt;/td&gt;
+            &lt;td&gt;上海&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+            &lt;td&gt;广东&lt;/td&gt;
+            &lt;td&gt;广州&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/div&gt;
+&lt;!--# include file="_footer.html" stub="one" --&gt; 
+&lt;/body&gt;
+&lt;/html&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">表格页页面效果如图5-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/5-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/5-2.jpg" class="calibre200"/></a> 
+ </div> 
+ <p class="middle-img">图5-2　SSI框架表格页</p> 
+ <p class="ziti3">Nginx配置内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 8081; 
+    server_name localhost;
+    charset utf-8;
+    root /opt/nginx-web/nginx-ssi;
+    sendfile on;
+    ssi on;                         # 启用SSI命令解析支持
+    ssi_min_file_chunk 1k;          # 存储在磁盘上的响应数据的最小值为1KB
+    ssi_value_length 1024;          # SSI中变量值的最大长度为1024字节
+    ssi_silent_errors off;          # 输出errmsg的内容
+
+    location / {
+         index index.html;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.6　重做日志（redo log）</h3>
+<p class="ziti">redo日志是存在于磁盘上的文件，默认情况下包括ib_logfile0和ib_logfile1两个文件，常用于在crash（恢复）发生时将还没来得及写入到数据文件中但已经完成提交的事务在数据库初始化时重新执行一遍。</p>
+<p class="ziti">关于redo log buffer写入到redo log文件的方式，InnoDB提供了组提交（group commit）的方式，这就意味着针对一次写磁盘操作可以包含多个事务数据，用此方法可以提高性能。</p>
+<p class="ziti">为了提高IO效率，数据库修改的文件都是在内存缓存中完成的；那么，我们知道一旦断电，内存中的数据都将消失，而数据库又是如何保证数据的完整性的？答案是数据持久化与事务日志。</p>
+<p class="ziti">如果宕机了则会应用已经持久化好了的日志文件，读取日志文件中没有被持久化到数据文件里面的记录，然后将这些记录重新持久化到我们的数据文件中。redo log的示意图如图13-9所示。</p>
+<p class="p6">1.redo log文件配置</p>
+<p class="ziti">默认情况下InnoDB会在数据文件夹下创建两个48MB的日志文件，分别是ib_logfile0和ib_logfile1。</p>
+<p class="ziti">Innodb_log_group_home_dir参数用来定义redo日志的文件位置：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_log_group_home_dir = /dr3/iblogs</pre>
+<hr/>
+<p class="ziti">innodb_log_files_in_group参数用来定义日志文件的个数，默认和推荐值都是2，在日志组中每个重做日志文件的大小均一致，并以循环写入的方式运行。例如，如果是默认配置，则InnoDB存储引擎先写重做日志文件1，当达到文件的最后时，会切换到重做日志文件2，再当重做日志文件2也被写满时，再切换到重做日志文件1。</p>
+<p class="ziti">如果是拥有三个重做日志文件，则运行方式如图13-10所示。</p>
+<div class="pic"><img alt="" src="Image00097.jpg" />
+</div>
+<p class="middle-img">图13-9　redo log示意图</p>
+<div class="pic"><img alt="" src="Image00098.jpg" />
+</div>
+<p class="middle-img">图13-10　redo log文件组示意图</p>
+<p class="ziti">innodb_log_file_size参数定义了每个日志文件的大小，日志文件越大则意味着buffer pool进行文件间切换的操作就越少，从而减少IO，一般至少要保证在高峰期的1个小时之内，所有的日志都能存放在一个日志文件里而不发生切换，当然文件大小也有最大限制，也就是所有日志文件的总大小不能超过512G。</p>
+<p class="p6">2.重置InnoDB redo log文件大小</p>
+<p class="ziti">更改redo log文件大小的方法具体如下。</p>
+<p class="ziti">1）关闭MySQL。</p>
+<p class="ziti">2）通过innodb_log_file_size更改文件大小，通过innodb_log_files_in_group更改文件数量。</p>
+<p class="ziti">3）启动MySQL。</p>
+</body>
+</html>

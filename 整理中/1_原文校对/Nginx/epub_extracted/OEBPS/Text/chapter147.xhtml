@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_159">8.2.5　随机负载算法</h3>
+
+  <p class="ziti3">在Nginx集群环境下，每个Nginx均通过自身对上游服务器的了解情况进行负载均衡处理，这种场景下，很容易出现多台Nginx同时把请求都分配给同一台被代理服务器的场景，该场景被称为羊群行为（Herd Behavior）。Nginx基于两种选择的力量（Power of Two Choices）原理，设计了随机（Random）负载算法。该算法使Nginx不再基于片面的情况了解使用固有的负载均衡策略进行被代理服务器的选择，而是随机选择两个，在经过比较后进行最终的选择。随机负载算法提供了一个参数two，当这个参数被指定时，Nginx会在考虑权重的前提下，随机选择两台服务器，然后用以下几种方法选择一个服务器。</p>
+
+  <p class="ziti4">·最少连接数，配置指令为least_conn，默认配置。</p>
+
+  <p class="ziti4">·响应头最短平均时间，配置指令为least_time=header，仅对商业版本有效。</p>
+
+  <p class="ziti4">·完整请求最短平均时间，配置指令为least_time=last_byte，仅对商业版本有效。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">upstream backend {
+    random two least_conn;
+    server backend1.example.com;
+    server backend2.example.com;
+    server backend3.example.com;
+    server backend4.example.com;
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">在只有单台Nginx服务器时，一般不建议使用随机负载算法。</p>
+</body>
+</html>

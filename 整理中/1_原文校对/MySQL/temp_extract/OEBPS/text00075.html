@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">5.1.2　多实例MySQL启动与关闭方法示例</h3>
+<p class="ziti">下面我们看一下多实例MySQL启动与关闭方法的原理。</p>
+<p class="ziti">启动3306实例命令服务的命令为“/data/3306/mysql start”，实际上就是mysqld_safe加上不同的实例配置文件参数启动，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysqld_safe --defaults-file=/data/3306/my.cnf 2&gt;&amp;1 &gt; /dev/null &amp;</pre>
+<hr/>
+<p class="ziti">停止3306实例的命令为“/data/3306/mysql stop”，实际上使用的就是mysqladmin命令方法。示例如下：</p>
+<hr/>
+<pre class="ziti1">mysqladmin -uroot -poldboy123 -S /data/3306/mysql.sock shutdown</pre>
+<hr/>
+<p class="ziti">还有就是把多实例的停止改为使用和“/etc/init.d/mysqld stop”里面类似的kill方式，见MySQL默认启动脚本或第4章MySQL多实例启动脚本。</p>
+</body>
+</html>

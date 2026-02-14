@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.1　缓存池（buffer pool）</h3>
+<p class="ziti">buffer pool（缓存池）是InnoDB在内存中开辟的用来缓存表数据和索引数据的区域，一般可以设置为50%～80%的内存大小，通过将经常访问的数据放置到内存当中来加快访问速度。InnoDB buffer pool的组成如图13-5所示。</p>
+<p class="ziti">InnoDB数据的读写都需要经过缓存（缓存在buffer pool即内存中），数据以整页（16KB）为单位读取到缓存中。缓存中的数据以LRU策略换出（最少使用策略），IO效率高、性能好。如图13-6所示的是InnoDB buffer pool的作用示意图。</p>
+<div class="pic"><img alt="" src="Image00092.jpg" />
+</div>
+<p class="middle-img">图13-5　InnoDB buffer pool组成</p>
+<div class="pic"><img alt="" src="Image00093.jpg" />
+</div>
+<p class="middle-img">图13-6　InnoDB buffer pool作用示意图</p>
+<p class="ziti">buffer pool是内存中用来缓存数据和索引的存储区域，也是MySQL性能调优的重要一环。</p>
+<p class="ziti">理想情况下，设置的size越大，则缓存到内存中的数据越多，InnoDB就越像是内存数据库。</p>
+<p class="ziti">buffer pool的底层是一个列表，通过LRU算法进行数据页的换进换出操作。当空间原因导致新页的加入需要换出一页时，InnoDB取出最近最少使用的页并将这个新的数据页加入到列表的中央。从方向上看，列表的头部是最常使用的数据页，而在尾部则是最少使用的数据页。</p>
+<p class="ziti">buffer pool中3/8的部分是用于保存最少使用的数据页，而中央部分其实是经常使用和最少使用的结合点。当在最少使用中保存的数据页被访问时，数据页就会被移动到列表的头部变成最常使用的。</p>
+<p class="p6">1.配置大小</p>
+<p class="ziti">InnoDB buffer pool的大小既可以在启动时配置，也可以在启动之后配置。</p>
+<p class="ziti">增加和减少buffer pool的大小都是以大块的方式，块的大小由参数innodb_buffer_pool_chunk_size决定，默认为128MB。</p>
+<p class="ziti">Innodb_buffer_pool_size的大小可以自行设定，但必须是innodb_buffer_pool_chunk_size*innodb_buffer_pool_instances的整数倍，如果不是，则buffer pool会被调整成大于设定值且最接近的一个值，如下示例代码中，虽然buffer pool被设置为9GB，但实际生效的依然是10GB：</p>
+<hr/>
+<pre class="ziti1">shell&gt; mysqld --innodb_buffer_pool_size=9G --innodb_buffer_pool_instances=16
+
+mysql&gt; SELECT @@innodb_buffer_pool_size/1024/1024/1024;
++------------------------------------------+
+| @@innodb_buffer_pool_size/1024/1024/1024 |
++------------------------------------------+
+|                          10.000000000000 |
++------------------------------------------+</pre>
+<hr/>
+<p class="ziti">Innodb_buffer_pool_chunk_size可以自行设定，且增加和减少都要以MB为单位，并且只能在启动前修改，修改后的值*innodb_buffer_pool_instances不能大于buffer pool的大小，否则修改无效：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_buffer_pool_chunk_size=134217728</pre>
+<hr/>
+<p class="ziti">可以动态修改buffer pool的大小，用set语句直接修改，当语句发起时，会一直等到当前所有的事务都结束后才执行，而且一旦执行，则执行过程中的其他事务如果要访问buffer pool，就必须等待语句执行完毕：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SET GLOBAL innodb_buffer_pool_size=402653184;</pre>
+<hr/>
+<p class="ziti">当执行online的调整大小时，可以通过error log或者innodb_buffer_pool_resize_status查看进度：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SHOW STATUS WHERE Variable_name='InnoDB_buffer_pool_resize_status';
++----------------------------------+----------------------------------+
+| Variable_name                    | Value                            |
++----------------------------------+----------------------------------+
+| Innodb_buffer_pool_resize_status | Resizing also other hash tables. |
++----------------------------------+----------------------------------+</pre>
+<hr/>
+<p class="p6">2.配置多个buffer pool实例</p>
+<p class="ziti">当buffer pool的大小是GB级别时，将一个buffer pool分割成几个独立的实例能够降低多个线程同时读写缓存页的竞争性而提高并发性。设置innodb_buffer_pool_instances的参数可以调整实例个数。如果有多个实例，则缓存的数据页会随机放置到任意的实例中，且每个实例都有独立的buffer pool所有的特性。</p>
+<p class="ziti">Innodb_buffer_pool_instances的默认值是1，最大可以调整成64。</p>
+<p class="p6">3.buffer pool内数据页控制</p>
+<p class="ziti">新读取的数据页插入到buffer pool的LRU列表的中间位置，默认位置是从尾部开始算起的3/8的位置。当放入到buffer pool的页被第一次访问时其就开始往列表的前方移动，这样，列表的后部就是不经常访问的页甚至是从不访问的页。</p>
+<p class="ziti">通过参数innodb_old_blocks_pct可以控制列表中“old”数据页所占的百分比，默认是37%，等同于3/8，取值范围是5～95。</p>
+<p class="ziti">Innodb_old_blocks_time参数默认是1000毫秒，指定了页面读取到buffer pool后，但没有移动到经常受访问列表位置的时间窗口。</p>
+<p class="p6">4.InnoDB buffer pool预存取</p>
+<p class="ziti">read ahead是异步预先获取多个数据页到buffer pool的IO操作，这些数据页都是假定随后会被用到的。InnoDB可通过如下两种read-ahead算法提高IO性能。</p>
+<p class="ziti">1）线性read ahead：预测哪些页会被顺序访问。通过innodb_read_ahead_threshold参数调整顺序数据页的数量。当从一个区中顺序读取的页数量大于等于innodb_read_ahead_threshold时，InnoDB会触发异步read ahead操作将整个区都读到buffer pool中。该参数的默认值是56，取值范围是0～64。</p>
+<p class="ziti">2）随机read ahead：通过已经在buffer pool中的数据页来预测哪些页会被随后访问到。如果13个连续的处于相同区的页存在于buffer pool中，则InnoDB会把同一个区的其他页都读取进来。可通过设置innodb_random_read_ahead=ON来开启此方式。</p>
+<p class="ziti">可通过执行show engine innodb status命令显示的三个参数判断read-ahead算法的有效性，三个参数具体如下。</p>
+<p class="ziti6">·Innodb_buffer_pool_read_ahead</p>
+<p class="ziti6">·Innodb_buffer_pool_read_ahead_evicted</p>
+<p class="ziti6">·Innodb_buffer_pool_read_ahead_rnd</p>
+<p class="p6">5.InnoDB buffer pool磁盘持久化</p>
+<p class="ziti">InnoDB会在后台将buffer pool中的脏页（已经修改但没有写到数据文件）flush掉。当buffer pool中的脏页所占百分比达到innodb_max_dirty_pages_pct_lvm时会触发flush操作，当所占比例达到innodb_max_dirty_pages_pct时，InnoDB会“强烈”地flush。</p>
+<p class="ziti">针对数据修改操作频繁的系统，flush可能会严重滞后，从而导致大量的buffer pool内存占用，有一些参数专门针对修改繁忙的系统可以进行调整，具体如下。</p>
+<p class="ziti6">·Innodb_adaptive_flushing_lwm：为防止redo log被填满，此参数设置了一个阈值，如果redo log的容量超过此阈值，则执行adaptive flush操作。</p>
+<p class="ziti6">·Innodb_max_drity_pages_pct_lwm</p>
+<p class="ziti6">·Innodb_io_capacity_max</p>
+<p class="ziti6">·Innodb_flushing_avg_loops</p>
+<p class="p6">6.重置buffer pool状态</p>
+<p class="ziti">InnoDB可以通过配置innodb_buffer_pool_dump_at_shutdown参数来确保在服务器重启时部分经常使用的数据页能够直接加载到buffer pool中，通过批量加载的方式，来节省重启服务器所导致的warmup时间（原先在buffer pool中的数据页要从磁盘中再次加载到内存中）。</p>
+<p class="ziti">buffer pool的状态可以在任意时刻被保存，而重置状态也可以恢复任意保存的副本。</p>
+<p class="ziti">在数据库运行期间，动态配置buffer pool数据页保留占比的方式如下：</p>
+<hr/>
+<pre class="ziti1">SET GLOBAL innodb_buffer_pool_dump_pct=40;</pre>
+<hr/>
+<p class="ziti">而在配置文件中的配置方法为：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_buffer_pool_dump_pct=40</pre>
+<hr/>
+<p class="ziti">当服务器关闭时，配置保存buffer pool的当前状态的方法如下：</p>
+<hr/>
+<pre class="ziti1">SET GLOBAL innodb_buffer_pool_dump_at_shutdown=ON;</pre>
+<hr/>
+<p class="ziti">当服务器开启时，重新加载buffer pool的方法如下：</p>
+<hr/>
+<pre class="ziti1">mysqld --innodb_buffer_pool_load_at_startup=ON;</pre>
+<hr/>
+<p class="ziti">默认情况下innodb_buffer_pool_dump_at_shutdown和innodb_buffer_pool_load_at_startup两个配置均是开启状态。</p>
+<p class="ziti">数据库运行期间保存和重新加载buffer pool的方法如下：</p>
+<hr/>
+<pre class="ziti1">SET GLOBAL innodb_buffer_pool_dump_now=ON;
+SET GLOBAL innodb_buffer_pool_load_now=ON;</pre>
+<hr/>
+<p class="ziti">查看buffer pool保存和重新加载的进度的方法如下：</p>
+<hr/>
+<pre class="ziti1">SHOW STATUS LIKE 'Innodb_buffer_pool_dump_status';
+SHOW STATUS LIKE 'Innodb_buffer_pool_load_status';</pre>
+<hr/>
+<p class="p6">7.监控buffer pool的状态情况</p>
+<p class="ziti">通过show engine innodb status命令可以查看buffer pool的运行情况，代码如下：</p>
+<hr/>
+<pre class="ziti1">----------------------
+BUFFER POOL AND MEMORY
+----------------------
+Total large memory allocated 2198863872
+Dictionary memory allocated 776332
+Buffer pool size   131072
+Free buffers       124908
+Database pages     5720
+Old database pages 2071
+Modified db pages  910
+Pending reads 0
+Pending writes: LRU 0, flush list 0, single page 0
+Pages made young 4, not young 0
+0.10 youngs/s, 0.00 non-youngs/s
+Pages read 197, created 5523, written 5060
+0.00 reads/s, 190.89 creates/s, 244.94 writes/s
+Buffer pool hit rate 1000 / 1000, young-making rate 0 / 1000 not
+0 / 1000
+Pages read ahead 0.00/s, evicted without access 0.00/s, Random read
+ahead 0.00/s
+LRU len: 5720, unzip_LRU len: 0
+I/O sum[0]:cur[0], unzip sum[0]:cur[0]</pre>
+<hr/>
+<p class="middle-img">表13-1　InnoDB buffer pool运行状态重点参数解释</p>
+<div class="pic"><img alt="" src="Image00094.jpg" />
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_229">12.2.5　监控管理</h3>
+
+  <p class="ziti3">Nginx Ingress中已经集成了Nginx的Prometheus Exporter，可以直接使用Prometheus或Zabbix获取监控数据。Nginx监控支持可以在部署的时候使用部署参数controller.metrics.enabled=true启用。Prometheus及Zabbix的部署和使用可参见10.4节。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5"># 启用监控
+helm install --name nginx-ingress \
+             --namespace nginx-ingress \
+             stable/nginx-ingress \
+             --set "rbac.create=true,controller.kind=DaemonSet,controller.service.type=ClusterIP,controller.hostNetwork=true,controller.metrics.enabled=true"
+
+curl http://节点IP:9913/metrics
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

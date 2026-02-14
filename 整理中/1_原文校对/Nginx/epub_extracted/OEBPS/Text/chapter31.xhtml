@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_38">2.6.3　Dockerfile常用命令及编写</h3> 
+ <p class="ziti3">Dockerfile是按照Docker Build语法约定的顺序结构规则脚本文件。通过Dockerfile的编写可以实现Docker镜像的自动化制作，本章所介绍的编译过程均可被编写在Dockerfile中，使用Docker命令打包为Nginx的Docker镜像。</p> 
+ <p class="ziti3">Dockerfile常用命令如下。</p> 
+ <p class="ziti3">1）FROM用于指定构建当前镜像的基础镜像名，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">FROM centos
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">2）MAINTAINER用于填写作者声明的描述信息，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">MAINTAINER Nginx Dockerfile Write by John.Wang
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">3）ADD命令会向Image中添加文件，支持文件、目录、URL的源，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">ADD /tmp/init_nginx.sh /usr/local/nginx/sbin/
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">4）COPY用于向镜像内复制文件夹，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">COPY . /tmp
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">5）ENV设置Container启动后的环境变量，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">ENV PATH $PATH:/usr/local/nginx/sbin
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">6）EXPOSE设置Container启动后对外开放的端口，它只相当于一个防火墙开放端口的概念，与实际运行的服务无关，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">EXPOSE 8080
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">7）RUN用于在制作Image时执行指定的脚本或shell命令，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">RUM yum -y install net-tools
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">8）USER设置运行Image或Container的系统用户，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">USER nginx:nginx
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">9）VOLUME定义Image挂载点，该挂载点可被其他Container使用，且目录中的内容是共享的，将会同步更新，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">VOLUME ["/data1","/data2"]
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">10）WORKDIR设置CMD参数指定命令的运行目录，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">WORKDIR ~/
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">11）CMD命令是设定于Container启动后执行的命令，可被外部docker run命令参数覆盖，使用方法如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">CMD "Hello Nginx"
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">12）ENTRYPOINT命令是设定于Container启动后执行的命令，不可被外部docker run命令参数覆盖。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">ENTRYPOINT /usr/local/nginx/sbin/init_nginx.sh
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">现在，可以按照Dockerfile的命令格式编写Dockerfile了，基础镜像选用CentOS 7，Nginx选用Nginx的扩展版本OpenResty 1.15.8.2。</p> 
+ <p class="ziti3">Nginx镜像Dockerfile脚本如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">FROM centos:centos7
+MAINTAINER Nginx Dockerfile Write by John.Wang
+RUN yum -y install epel-release &amp;&amp; yum -y install wget gcc make pcre-devel \
+    zlib-devel openssl-devel libxml2-devel libxslt-devel luajit GeoIP-devel \
+    gd-devel libatomic_ops-devel luajit-devel perl-devel perl-ExtUtils-Embed
+
+RUN cd /tmp &amp;&amp; wget https://openresty.org/download/openresty-1.15.8.2.tar.gz  &amp;&amp; \
+    tar zxmf openresty-1.15.8.2.tar.gz &amp;&amp; \
+    cd openresty-1.15.8.2 &amp;&amp; \
+    ./configure \
+        --with-threads \
+        --with-file-aio \
+        --with-http_ssl_module \
+        --with-http_v2_module \
+        --with-http_realip_module \
+        --with-http_addition_module \
+        --with-http_xslt_module=dynamic \
+        --with-http_image_filter_module=dynamic \
+        --with-http_geoip_module=dynamic \
+        --with-http_sub_module \
+        --with-http_dav_module \
+        --with-http_flv_module \
+        --with-http_mp4_module \
+        --with-http_gunzip_module \
+        --with-http_gzip_static_module \
+        --with-http_auth_request_module \
+        --with-http_random_index_module \
+        --with-http_secure_link_module \
+        --with-http_degradation_module \
+        --with-http_slice_module \
+        --with-http_stub_status_module \
+        --with-stream=dynamic \
+        --with-stream_ssl_module \
+        --with-stream_realip_module \
+        --with-stream_geoip_module=dynamic \
+        --with-libatomic \
+        --with-pcre-jit \
+        --with-stream_ssl_preread_module &amp;&amp; \
+    gmake &amp;&amp; gmake install
+ENV PATH $PATH:/usr/local/nginx/sbin
+RUN ln -s /usr/local/openresty/nginx /usr/local/nginx
+RUN ln -sf /dev/stdout /usr/local/nginx/logs/access.log &amp;&amp;\
+    ln -sf /dev/stderr /usr/local/nginx/logs/error.log
+EXPOSE 80
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在Dockerfile文件的同一目录下，执行如下命令构建Nginx的Dokcer镜像。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">docker build -t nginx:v1.0 .
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在脚本执行结束后，当尾行出现“Successfully tagged nginx:v1.0”时表示Dokcer镜像已经构建成功，可以通过Docker命令docker images查看镜像是否已经存在于本地的镜像仓库中，查询结果如图2-3所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/2-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/2-3.jpg" class="calibre28"/></a> 
+ </div> 
+ <p class="middle-img">图2-3　本地镜像仓库中的所有Docker镜像</p> 
+</body>
+</html>

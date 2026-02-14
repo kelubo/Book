@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">8.4.1　逻辑备份方式</h3>
+<p class="p6">1.逻辑备份</p>
+<p class="ziti">MySQL的逻辑备份其实就是使用MySQL自带的mysqldump命令或其他相关工具，把MySQL数据以SQL语句的形式导出或备份成文件。在恢复的时候则通过执行mysql恢复命令（或source等）将存储的SQL语句文件数据还原到MySQL数据库中。</p>
+<p class="ziti">实现逻辑备份的常用工具为MySQL自带的mysqldump命令，备份所有库的命令为：</p>
+<hr/>
+<pre class="ziti1">mysqldump -A -B --master-data=2 --single-transaction |gzip &gt;/opt/all.sql.gz</pre>
+<hr/>
+<p class="ziti">恢复数据库的方法之一为：</p>
+<hr/>
+<pre class="ziti1">zcat opt/all.sql.gz|mysql</pre>
+<hr/>
+<p class="ziti">使用此种逻辑备份方式进行全量备份后的增量数据就是数据库记录的binlog日志文件，那么，如何增量恢复binlog日志呢？mysqlbinlog工具可以把binlog日志转换成SQL语句，然后通过mysql恢复命令（或source等）将SQL语句还原到MySQL数据库中。</p>
+<p class="ziti">恢复增量数据的命令方法为：</p>
+<hr/>
+<pre class="ziti1">mysqlbinlog oldboy-bin.000008 oldboy-bin.000009 &gt;bin.sql
+#&lt;==将binlog文件解析为SQL语句。
+mysql &lt;bin.sql                 #&lt;==恢复到数据库。</pre>
+<hr/>
+<p class="p6">2.逻辑备份的特点</p>
+<p class="ziti">逻辑备份的优点为操作简单、方便、可靠，并且备份的数据可以跨平台、跨版本、甚至跨软件、跨操作系统，还可以实现分库分表备份；逻辑备份也有一定的缺点，例如，备份速度比物理备份慢、恢复的效率也不是特别高等。</p>
+<p class="p6">3.逻辑备份的常用工具</p>
+<p class="ziti">mysqldump是MySQL官方自带的最常用的逻辑备份工具，还能实现分表分库备份，也是本章重点讲解的备份工具。除此之外，还有一个mydumper工具，它是一个在GPL许可下发布的高性能MySQL备份和恢复工具集，有兴趣的读者也可以研究下。</p>
+<p class="p6">4.逻辑备份的企业应用场景</p>
+<p class="ziti">适用于数据量不是特别大的场景，例如，老男孩所给的参考值为打包前不大于30GB的数据库数据，30GB的值主要是考虑备份效率的问题，以及管理员使用复杂度的平衡。</p>
+<p class="ziti">不过，在跨版本、跨软件升级或迁移数据的时候，此时物理备份一般就不能使用了。</p>
+</body>
+</html>

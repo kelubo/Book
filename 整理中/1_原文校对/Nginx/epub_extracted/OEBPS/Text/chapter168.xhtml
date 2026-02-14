@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_181">9.2.3　Nginx日志分析</h3> 
+ <p class="ziti3">Nginx通常被置于服务器访问的入口，其访问日志可以全局记录用户访问的来源、响应时间，以及用户行为热点等数据，通过对访问日志的分析，可以清晰地了解用户来源、用户行为习惯及自身服务器性能等情况。借助ELK的高性能处理能力，可以实时地将数据分析结果展现给服务器的维护人员及应用的开发人员，进而不断提高业务的可用性及产品的用户体验。Nginx的日志分析可以分为安全分析、性能分析、可用性分析及访问统计分析4个方面。</p> 
+ <p class="ziti3">（1）安全分析</p> 
+ <p class="ziti3">通常黑客对互联网应用的入侵都是先从Web服务器漏洞扫描开始的，最常用的扫描方式就是在URL中加入特定的脚本、命令或字符串不断尝试访问，并根据返回结果判断被扫描网站是否存在漏洞或后门。如SQL注入攻击会在访问的URL中带有select、and、or、order by等常见的SQL语句，XSS攻击会在访问的URL中带有javascript、vbscript、onmouseover、eval等Javascript或VBscript脚本命令。对管理后台入口的扫描也是常用的手段之一，多数情况下管理后台的安全加固是最容易被忽视的，往往认为不提供访问链接就高枕无忧了，而admin、manage等关键词通常会轻而易举地被穷举出来。</p> 
+ <p class="ziti3">这些不安全的访问痕迹都会被Nginx服务器记录到访问日志中，并通过ELK对Nginx访问日志中的request_uri字段进行关键字过滤和展示，以求在第一时间了解这些不安全事件并提前做好防范工作。</p> 
+ <p class="ziti3">（2）性能分析</p> 
+ <p class="ziti3">一个网站性能的最直接体现就是请求的响应时间。通常用户的请求响应时间都是以毫秒为单位计算的，若用户的请求响应时间以秒为单位时，将极大地加大用户的等待时间，进而影响用户体验。为方便对请求响应的分析，可以将表9-11所示的Nginx服务器提供的变量添加到访问日志中，以记录请求链中消耗的时间。</p> 
+ <p class="middle-img">表9-11　请求响应变量</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-11.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-11.jpg" class="calibre303"/></a> 
+ </div> 
+ <p class="ziti3">对请求响应时间的分析，可以通过ELK对访问日志$request_time字段的时间做排名，对时间值比较大的URL从SQL、代码、架构等多方面分析原因。</p> 
+ <p class="ziti3">（3）可用性分析</p> 
+ <p class="ziti3">HTTP请求的每条访问都会有相应的访问状态码，访问状态码标识了请求成功或失败的状态。常见状态码标识参见3.3.2节。通过ELK对访问日志按照状态码维度统计总访问量，可以很直观地展示当前网站的可用性比率。</p> 
+ <p class="ziti3">（4）访问统计分析</p> 
+ <p class="ziti3">访问统计分析，可以让网站管理者最直观地了解网站被访问及用户的访问情况，常见的是PV及UV统计。PV（Page View）即页面浏览量或点击量，可以让网站管理者清晰地了解当前网站的访问量；UV（Unique Visitor）即独立访客量，以每个同一IP（remote_addr）、同一客户端类型（http_user_agent）可被识别为独立访客作为统计单位。PV体现了用户的访问量，UV体现了访问当前网站的人数。URL的访问数量统计，可以清晰地展示网站的哪些功能被大量使用，可以让网站管理者知道用户对网站功能的喜好，以便进行相关的产品优化。</p> 
+</body>
+</html>

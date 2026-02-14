@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.3.2　多配置文件、多启动程序部署方案</h3>
+<p class="ziti">多配置文件、多启动程序部署方案，是本文主要讲解的方案，也是老男孩老师常用并极力推荐的方案。下面来看一下配置示例。</p>
+<p class="ziti">以下是老男孩已经部署好的MySQL双实例的目录信息及文件注释说明：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# tree /data
+/data
+|-- 3306
+|   |-- data   #&lt;==3306实例的数据文件。
+|   |-- my.cnf #&lt;==3306实例的配置文件。
+|   `-- mysql  #&lt;==3306实例的启动文件。
+`-- 3307
+    |-- data   #&lt;==3307实例的数据文件。
+    |-- my.cnf #&lt;==3307实例的配置文件。
+    `-- mysql  #&lt;==3307实例的启动文件。
+4 directories, 4 files</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 这里的配置文件my.cnf、启动程序mysql都是独立的文件，数据文件data目录也是独立的。</p>
+<p class="ziti">多实例MySQL数据库的安装和前文讲解的单实例没有任何区别，因此，读者如果有前文单实例的安装环境，那么可以直接略过4.4.1节的内容。</p>
+</body>
+</html>

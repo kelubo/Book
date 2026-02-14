@@ -1,0 +1,11 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.1.1　异步复制介绍</h3>
+<p class="ziti">这是可以用一个比喻来描述一主两从异步的概念，假设你买了两份礼物，需要同时送给你的两个好朋友，骑车找到第一个朋友家，放在她家的门口，然后打个电话告知她自己去取，接着继续到第二个朋友家，也是放到家门口，同样打个电话告知她自己去取，那么这两个传输的过程就都是异步的方式。异步的特点是不保证实时收到或者一定会收到，但效率比较高，因为不需要等着朋友出来取，直接放到她的家门口即可。</p>
+<p class="ziti">默认情况下，MySQL的复制就是异步的，即在Master上将所有的更新操作都写入Binlog之后并不能确保（也不关心）所有的更新是否都复制到了Slave服务器的中继日志中，以及是否应用到了Slave数据库里。</p>
+<p class="ziti">异步复制（async replication）的明显优势就是复制效率很高，但是其缺点也十分明显，那就是不同的服务器进行复制时可能会存在数据不一致的问题，甚至还可能会丢失数据；异步方式适合于常规的、普通的互联网应用场景。</p>
+</body>
+</html>

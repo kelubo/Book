@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">13.2　InnoDB和ACID模型</h2>
+<p class="ziti">事务（Transaction）是数据库区别于文件系统的重要特性之一，事务可由一条非常简单的SQL语句组成，也可以由一组复杂的SQL语句组成。事务中的操作，要么都做修改，要么都不做，这就是事务的基本目的。理论上说，事务有着极其严格的定义，它必须同时满足四个特性，即通常所说的事务的ACID特性。</p>
+<p class="ziti">ACID模型是关系型数据库普遍支持的事务模型，用于保证数据的一致性，其中的ACID所代表的具体含义分别如下。</p>
+<p class="ziti">1）A：atomicity原子性。事务是一个不可再分割的工作单位，事务中的操作要么都发生，要么都不发生。</p>
+<p class="ziti">2）C：consistency一致性。事务开始之前和事务结束以后，数据库的完整性约束没有被破坏。也就是说，数据库事务不能破坏关系数据的完整性以及业务逻辑上的一致性。</p>
+<p class="ziti">3）I：isolation独立性。多个事务并发访问时，事务之间是隔离的，一个事务不应该影响其他事务的运行效果。</p>
+<p class="ziti">4）D：durability持续性。在事务完成以后，该事务对数据库所做的更改便持久地保存在数据库之中，并不会被回滚。</p>
+<p class="ziti">举例来说，比如银行的汇款1000元的操作，简单来说，可以拆分成A账户的余额-1000，B账户的余额+1000，还要分别在A和B的账户流水上记录余额变更日志，这四个操作必须放在一个事务中完成，否则丢失其中的任何一条记录对整个系统来说都是不完整的。</p>
+<p class="ziti">对于上述例子来说，原子性体现在要么四条操作每条都成功，这就意味着汇款成功；要么其中某一个操作失败，则整个事务中的四条操作都回滚，即汇款失败。一致性表示当汇款结束时，A账户和B账户里的余额变化和操作日志记录是可以对应起来的。独立性表示在汇款操作过程中，如果有C账户也在往B账户里汇款的话，那么两个事务之间相互不会影响，即“A-&gt;B”有四个独立操作，“C-&gt;B”也有四个独立操作。持久性表示当汇款成功时，A和B的余额就变更了，不管是数据库重启还是别的什么原因，该数据已经写入到磁盘中作为永久存储，不会再发生变化，除非有新的事务发生。</p>
+<p class="ziti">其中事务的隔离性是通过MySQL锁机制来实现的，原子性、一致性、持久性则是通过MySQL的redo和undo日志记录来完成的</p>
+<p class="ziti">
+<span class="yanse">显式事务启动|结束</span>
+</p>
+<p class="ziti">1）以start transaction/begin开始事务。</p>
+<p class="ziti">2）以commit/rollback transaction结束事务。</p>
+<p class="ziti">
+<span class="yanse">隐形事务提交</span>
+</p>
+<p class="ziti">主要是DDL、DCL会引发事务隐形提交，比如create、alter语句以及grant、revoke等语句。</p>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">13.3　InnoDB多版本控制MVCC</h2>
+<p class="ziti">我们知道对较为繁忙的MySQL系统来说，任何时刻都很少会出现只有一个活跃的数据库链接在操作数据库，通常都是多个并行活跃的数据库链接在同时执行操作，而且也极有可能会出现在对某个表或某些行进行并行读写操作，那么为了保证操作能够并行执行且支持对事务的回滚操作，InnoDB会将修改前的数据存放在回滚段中。</p>
+<p class="ziti">多版本控制在InnoDB的默认隔离级别下，是指当有事务正在修改一些数据而未提交时，并行的读操作依然能够读到这部分数据而不需要等待事务提交，而读到的数据则是写事务开始之前的数据。InnoDB数据存储结构如图13-1所示。</p>
+<p class="ziti">如图13-2所示，InnoDB会在数据库的每一行上额外增加三个字段以实现多版本控制，第一个字段是DB_TRX_ID，用来存放针对该行最后一次执行insert、update操作的事务ID，而delete操作也会被认为是update，只是会有额外的一位来代表事务为删除操作；第二个字段是DB_ROLL_PTR指针，其指向回滚段里对应的undo日志记录；第三个字段是DB_ROW_ID，代表每一行的行ID。</p>
+<div class="pic"><img alt="" src="Image00088.jpg" />
+</div>
+<p class="middle-img">图13-1　InnoDB数据存储结构</p>
+<div class="pic"><img alt="" src="Image00089.jpg" />
+</div>
+<p class="middle-img">图13-2　InnoDB行数据结构</p>
+<p class="ziti">1）初始数据行的情况，六个字段的值分别是1、2、3、4、5、6。</p>
+<p class="ziti">2）事务1修改该数据行，将6个字段的值分别*10，并生成回滚日志记录，如图13-3所示。</p>
+<div class="pic"><img alt="" src="Image00090.jpg" />
+</div>
+<p class="middle-img">图13-3　InnoDB行数据与回滚段关系</p>
+<p class="ziti">3）事务2读取该数据行。</p>
+<p class="ziti">事务2按照自己的事务ID与行数据中的事务ID做对比，并按照事务隔离级别选取事务1修改前的回滚段中的数据进行返回。</p>
+<hr/>
+<pre class="ziti1">在两个数据库链接下实验默认隔离级别下的多版本控制
+链接1：mysql&gt; start transaction;
+链接2：mysql&gt; start transaction;
+链接1：mysql&gt; update score set score=88 where sid=1;
+链接2：mysql&gt; select * from score where sid=1;     ###链接1锁数据未释放，链接2也能访问修改前的数据
++------+-----------+-------+
+| sid  | course_id | score |
++------+-----------+-------+
+|    1 |         1 |    90 |
+|    1 |         2 |    90 |
+|    1 |         3 |    90 |
+|    1 |         4 |    90 |
+链接1： mysql&gt;commit;
+链接2：mysql&gt; select * from score where sid=1;     ###链接1锁释放，但链接2访问到的数据依然是之前的数据（这是由InnoDB的默认事务隔离级别决定的，可重复读的特性）
++------+-----------+-------+
+| sid  | course_id | score |
++------+-----------+-------+
+|    1 |         1 |    90 |
+|    1 |         2 |    90 |
+|    1 |         3 |    90 |
+|    1 |         4 |    90 |
+链接2：mysql&gt; commit;
+链接2：mysql&gt; select * from score where sid=1;     ###链接2提交之后，再访问到的数据就是修改后的数据了
++------+-----------+-------+
+| sid  | course_id | score |
++------+-----------+-------+
+|    1 |         1 |    88 |
+|    1 |         2 |    88 |
+|    1 |         3 |    88 |
+|    1 |         4 |    88 |</pre>
+<hr/>
+<p class="ziti">回滚段中的undo日志记录分为插入undo日志和update日志，且只有在事务commit提交之后才会被丢弃，为避免回滚段越来越大，需要注意应及时执行commit命令。</p>
+</body>
+</html>

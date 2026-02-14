@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">6.3.4　DML语句之管理表中的数据</h3>
+<p class="p6">1.往表中插入数据</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1">insert into &lt;表名&gt; [( &lt;字段名1&gt;[,..&lt;字段名n &gt; ])] values ( 值1 )[, ( 值n )]；</pre>
+<hr/>
+<p class="ziti">在插入数据前，先新建一个简单的测试表test，语句如下：</p>
+<hr/>
+<pre class="ziti1">use oldboy
+drop table test;
+CREATE TABLE test (
+   id int(4) NOT NULL AUTO_INCREMENT,
+  name char(20) NOT NULL,
+  PRIMARY KEY (id)
+) ;
+desc test;</pre>
+<hr/>
+<p class="ziti">往表中插入数据有几种不同的语法，具体如下。</p>
+<p class="ziti">第一种：按规则指定所有的列名，并且每列都插入值。命令如下：</p>
+<hr/>
+<pre class="ziti1">insert into test(id,name) values(1,'oldboy');</pre>
+<hr/>
+<p class="ziti">第二种：只在name列插入值，由于id列是自增的，所以可以这样操作。命令如下：</p>
+<hr/>
+<pre class="ziti1">insert into test(name) values('oldgirl');</pre>
+<hr/>
+<p class="ziti">也可以执行下面的语句来实现，注意，这两种请只选择一条执行：</p>
+<hr/>
+<pre class="ziti1">insert into test(id,name) values(null,'zhangsan');</pre>
+<hr/>
+<p class="ziti">第三种：如果不指定列，就要按规则为每列都插入恰当的值。命令如下：</p>
+<hr/>
+<pre class="ziti1">insert into test values(3,'inca');</pre>
+<hr/>
+<p class="ziti">第四种：批量插入数据的方法，可提升效率。命令如下：</p>
+<hr/>
+<pre class="ziti1">insert into test values(4,'zuma'),(5,'kaka'); #&lt;==批量插入2条记录，提升了效率。
+delete from test;
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka');</pre>
+<hr/>
+<p class="ziti">下面是插入数据的实践：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+mysql&gt; drop table test;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; CREATE TABLE test (
+    -&gt;    id int(4) NOT NULL AUTO_INCREMENT,
+    -&gt;   name char(20) NOT NULL,
+    -&gt;   PRIMARY KEY (id)
+    -&gt; ) ;
+Query OK, 0 rows affected (0.02 sec)
+mysql&gt; desc test;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int(4)   | NO   | PRI | NULL    | auto_increment |
+| name  | char(20) | NO   |     | NULL    |                |
++-------+----------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">通过以下命令插入第一行，请注意语法的细微不同：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; insert into test(id,name) values(1,'oldboy');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; insert into test(name) values('oldgirl');
+Query OK, 1 row affected (0.01 sec)
+mysql&gt; insert into test values(3,'inca');
+Query OK, 1 row affected (0.01 sec)
+mysql&gt; insert into test values(4,'zuma'),(5,'kaka');
+Query OK, 2 rows affected (0.00 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+mysql&gt; select * from test;  #&lt;==查看插入后的结果。
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)
+mysql&gt; delete from test;  #&lt;==全部删除，批量重新插入。
+Query OK, 5 rows affected (0.01 sec)
+mysql&gt; select * from test;
+Empty set (0.00 sec)
+mysql&gt; INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'),(5,'kaka');
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+mysql&gt; select * from test; #&lt;==查看批量插入后的结果。
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 请大家注意观察输出结果。</p>
+<p class="ziti">测试完毕，退出数据库，然后备份上述数据，留着备用，备份的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; exit
+Bye
+[root@oldboy ~]# mysqldump -uroot -poldboy123 -B oldboy &gt;/opt/bak.sql
+Warning: Using a password on the command line interface can be insecure.</pre>
+<hr/>
+<p class="ziti">备份后要检查一下备份的SQL数据内容，同时过滤无用信息：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ls -l /opt/bak.sql
+-rw-r--r--. 1 root root 2051 Mar  2 03:32 /opt/bak.sql
+#&lt;==这里的2051位置对应的数字不能太小，否则备份可能会有问题。
+[root@oldboy ~]# egrep -v "#|\/|^$|--" /opt/bak.sql
+USE `oldboy`;
+DROP TABLE IF EXISTS `test`;
+CREATE TABLE `test` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+LOCK TABLES `test` WRITE;
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka');
+UNLOCK TABLES;</pre>
+<hr/>
+<p class="ziti">可以看到上面备份的语句，就是我们执行的语句内容，后面会用到此处备份的数据还原填充数据。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">补充强调：</span>
+ 我们平时登录网站发帖子、博文、微信，实质上都是通过Web网站的程序连接MySQL数据库，然后使用上述的insert语句把数据存入数据库。</p>
+<p class="p6">2.查询表中的数据</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1">select &lt;字段1，字段2，...&gt; from &lt; 表名 &gt; where &lt; 表达式 &gt;；</pre>
+<hr/>
+<p class="ziti">其中，select、from、where是不能随便更改的，它们是关键字，支持大小写。</p>
+<p class="ziti">若要查看表test中的所有数据，可采用如下两种方法。</p>
+<p class="ziti">方法1：进入指定库后再查询（常用）。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+mysql&gt; select * from test;
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">方法2：直接在库外，使用“库.表”的方式查询。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from oldboy.test; #&lt;==用点号分隔库和表
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">这里的“*”表示查询表的所有字段，详情可查看help select。</p>
+<p class="ziti">可通过如下命令查询mysql库use表对应user和host列的用户，这是前面用过的方法：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select user,host from mysql.user;
++--------+------------+
+| user   | host       |
++--------+------------+
+| root   | 127.0.0.1  |
+| blog   | 172.16.1.% |
+| root   | localhost  |
+| system | localhost  |
+| test   | localhost  |
++--------+------------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">若要根据指定条件查询表的部分数据，这里面又分为以下几种情况，具体来看看。</p>
+<p class="ziti">第一种，查看表test中的前2行数据，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test limit 2;
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
++----+---------+
+2 rows in set (0.00 sec)
+mysql&gt; select * from test limit 0,3; #&lt;==从第0行开查，查3行记录。
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
++----+---------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">第二种，指定固定条件查询数据，一般结尾接where关键字并指定字段的条件查询。</p>
+<p class="ziti">假设要查询id为1的行，则命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test where id=1; #&lt;==查询数字列无须加引号，但是看起来是数字，
+                                      实际属于字符列就需要加引号了。
++----+--------+
+| id | name   |
++----+--------+
+|  1 | oldboy |
++----+--------+
+1 row in set (0.00 sec)
+mysql&gt; select * from test where name='oldgirl'; #&lt;==查询字符串务必要加单引号。
++----+---------+
+| id | name    |
++----+---------+
+|  2 | oldgirl |
++----+---------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 查询字符类型的条件列的值要带单引号，整形列的数字值不带引号，一切以字段类型为准。</p>
+<p class="ziti">若要同时查询多个条件，则取交集（and），例如查询id为2，并且name为oldgirl的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test where id=2 and name='oldgirl'; #&lt;==多个条件。
++----+---------+
+| id | name    |
++----+---------+
+|  2 | oldgirl |
++----+---------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">第三种，指定固定条件范围查询数据。</p>
+<p class="ziti">执行命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select id,name from test where id&gt;2 and id&lt;5; #&lt;==多个条件，and取交集。
++----+------+
+| id | name |
++----+------+
+|  3 | inca |
+|  4 | zuma |
++----+------+
+2 rows in set (0.00 sec)
+mysql&gt; select id,name from test where id&gt;3 or id&lt;2; #&lt;==多个条件，or取并集。
++----+--------+
+| id | name   |
++----+--------+
+|  1 | oldboy |
+|  4 | zuma   |
+|  5 | kaka   |
++----+--------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">第四种，其他查询功能。</p>
+<p class="ziti">若要查询排序功能，则可采用如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select id,name from test where id&gt;3 order by id asc;
++----+------+
+| id | name |
++----+------+
+|  4 | zuma |
+|  5 | kaka |
++----+------+
+2 rows in set (0.00 sec)
+mysql&gt; select id,name from test where id&lt;3 order by id desc;
++----+---------+
+| id | name    |
++----+---------+
+|  2 | oldgirl |
+|  1 | oldboy  |
++----+---------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6">
+<span class="yanse">小结：</span>
+ 前文已经讲解过，对于MySQL的DML语句，开发人员需要熟练掌握，运维人员只需简单了解即可，因此本书将其他的查询如子查询、join、union、多表关联查询、分组、having等放到了开发章节来讲，运维人员了解到这就可以了，有兴趣的运维读者可以去开发章节深入学习，较长的select语句展示见<a href="http://www.ithao123.cn/content-5282534.html">http://www.ithao123.cn/content-5282534.html</a>
+ 。</p>
+<p class="p6">3.修改表中的数据</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1">update 表名 set 字段=新值,… where 条件；</pre>
+<hr/>
+<p class="ziti">这里一定要注意条件。</p>
+<p class="ziti">下面是修改指定的行字段内容案例实践。</p>
+<p class="ziti">可通过如下命令查看要修改的表：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test;
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">若要将id为3的行的名字修改为gongli，可采用如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; update test set name='xiaoting' where id=3; #&lt;==等号可以改为其他任一
+                                                符号或增加多条件。
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+mysql&gt; select * from test where id=3;
++----+----------+
+| id | name     |
++----+----------+
+|  3 | xiaoting |
++----+----------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">4.修改数据导致的事故案例和解决方案</p>
+<p class="ziti">注意，以下介绍的是严重的事故案例，若误操作，则可能会导致数据丢失。</p>
+<p class="ziti">如果不带条件更改所有表的记录，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; update test set name='xiaoting'; #&lt;==如果不加条件则要十分小心。专业做法是要多向开发人员确认，发送给开发人员的语句一定要括号注明，以防止DBA误会。
+Query OK, 4 rows affected (0.01 sec)
+Rows matched: 5  Changed: 4  Warnings: 0</pre>
+<hr/>
+<p class="ziti">上述命令将会更改表的所有记录，此时如果是错误的修改，那么对企业来说就是重大的事故。查看更改后的结果：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test;
++----+----------+
+| id | name     |
++----+----------+
+|  1 | xiaoting | #&lt;==可以发现，所有的name列的内容都是相同的了。
+|  2 | xiaoting |
+|  3 | xiaoting |
+|  4 | xiaoting |
+|  5 | xiaoting |
++----+----------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">针对上面的故障，开始用备份的数据进行恢复（备份的重要性）：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop table test;
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; source /opt/bak.sql
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; select * from oldboy.test;
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">至于防止因发生误操作而导致上述数据库故障案例的方法之一，请读者到老男孩的博客<a href="http://oldboy.blog.51cto.com/2561410/1321061">http://oldboy.blog.51cto.com/2561410/1321061</a>
+ 查看。</p>
+<p class="p6">5.删除表中的数据</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1">delete from 表名 where 表达式；</pre>
+<hr/>
+<p class="ziti">下面是操作演示。</p>
+<p class="ziti">若要删除表test中编号为1的记录，可采用如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+mysql&gt; delete from test where id=1;          #&lt;==删除id为1的行。
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; delete from test where name='oldboy'; #&lt;==删除name 等于oldboy的行。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; select * from test;
++----+---------+
+| id | name    |
++----+---------+
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+4 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+</p>
+<p class="ziti6">·不加任何条件（where）就是全部删除，这也是非常危险的操作，这里就不演示了。对于不加条件的delete、update，一定要慎用回车键，按照流程操作（运维人员和开发人员一起操作）。</p>
+<p class="ziti6">·开发人员在程序里可能不用delete语句，而是用update语句来更新显示的状态（实现逻辑删除）。</p>
+<p class="ziti">以下是一个通过update伪删除数据的企业案例。</p>
+<p class="ziti">有些企业开发人员在开发程序时，会通过状态来判断页面内容显示。比如，在test表中有如下数据环境，环境接上文：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test add  state tinyint(2) not null default 1;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+mysql&gt; desc test;
++-------+------------+------+-----+---------+----------------+
+| Field | Type       | Null | Key | Default | Extra          |
++-------+------------+------+-----+---------+----------------+
+| id    | int(4)     | NO   | PRI | NULL    | auto_increment |
+| name  | char(20)   | NO   |     | NULL    |                |
+| state | tinyint(2) | NO   |     | 1       |                |
++-------+------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">然后，程序显示内容时，使用如下的语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test where state=1;
++----+---------+-------+
+| id | name    | state |
++----+---------+-------+
+|  2 | oldgirl |     1 |
+|  3 | inca    |     1 |
+|  4 | zuma    |     1 |
+|  5 | kaka    |     1 |
++----+---------+-------+
+4 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">此时，如果要删除数据，就可以用update替代delete实现逻辑删除，现在删除oldgirl所在的行：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; update test set state=0 where name='oldgirl';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0</pre>
+<hr/>
+<p class="ziti">查看删除结果，可以发现oldgirl所在的行确实消失了，但实际上数据表里依然有，只不过状态为0，从而不显示了：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test where state=1;
++----+------+-------+
+| id | name | state |
++----+------+-------+
+|  3 | inca |     1 |
+|  4 | zuma |     1 |
+|  5 | kaka |     1 |
++----+------+-------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+</p>
+<p class="ziti6">网页正常显示的数据SQL语句为“select*from test where state=1；”</p>
+<p class="ziti6">删除上述oldgirl的记录的语句为“update test set state=0 where name='oldgirl'；”</p>
+<p class="ziti6">因此实际上数据并未真的删除，而是显示状态变为0了，如果想要真正删除，还可以写个在夜里定时任务清理state为0的状态行。</p>
+<p class="p6">6.清空表中的数据</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1">truncate table表名;</pre>
+<hr/>
+<p class="ziti">以下是清空实践：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test; #&lt;==清空前查看下。
++----+---------+-------+
+| id | name    | state |
++----+---------+-------+
+|  2 | oldgirl |     0 |
+|  3 | inca    |     1 |
+|  4 | zuma    |     1 |
+|  5 | kaka    |     1 |
++----+---------+-------+
+4 rows in set (0.00 sec)
+mysql&gt; truncate table test; #&lt;==执行清空命令。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; select * from test; #&lt;==查询发现数据为空了。
+Empty set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">truncate和delete是有区别的，简单说明如下。</p>
+<p class="ziti6">·TRUNCATE与不带WHERE子句的DELETE语句功能相同：两者均删除表中的全部行，但TRUNCATE比DELETE速度更快。</p>
+<p class="ziti6">·TRUNCATE通过释放存储表数据所用的数据页来删除数据，并且只在事务日志中记录页的释放，因此使用的系统和事务日志资源更少。</p>
+<p class="ziti6">·DELETE语句每次删除一行，并且会在事务日志中为所删除的每一行记录一项。</p>
+</body>
+</html>

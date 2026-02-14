@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">12.9　ARCHIVE存储引擎</h2>
+<p class="ziti">ARCHIVE的中文意思是归档，因此ARCHIVE适用于存放大量归档历史数据（可查询但不能删除）的保存。</p>
+<p class="ziti">ARCHIVE引擎仅支持select、insert操作；MySQL 5.1以后开始支持索引等操作。</p>
+<p class="ziti">ARCHIVE引擎使用zlib无损数据压缩算法，压缩比可达10：1，可大量节省磁盘空间，设计ARCHIVE引擎的目标是提供高速的插入和压缩等功能。</p>
+<p class="ziti">如下范例所示，建立两个不同存储引擎的表，测试ARCHIVE存储引擎的表其占用空间的情况.</p>
+<p class="ziti">首先建立一个MyISAM存储引擎的表，插入数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create table t1 engine=myisam as select * from information_schema.columns;
+Query OK, 1683 rows affected (0.05 sec)
+Records: 1683  Duplicates: 0  Warnings: 0
+mysql&gt; show table status like 't1'\G
+*************************** 1. row ***************************
+           Name: t1
+         Engine: MyISAM
+        Version: 10
+     Row_format: Dynamic
+           Rows: 1683
+ Avg_row_length: 148
+    Data_length: 250716  #&lt;==总长度250716。
+Max_data_length: 281474976710655
+...省略若干...
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">再建立一个ARCHIVE引擎表，插入数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create table t2 engine=archive as select * from information_schema.columns;
+Query OK, 1703 rows affected (0.03 sec)
+Records: 1703  Duplicates: 0  Warnings: 0
+
+mysql&gt; show table status like 't2'\G
+*************************** 1. row ***************************
+           Name: t2
+         Engine: ARCHIVE
+        Version: 10
+     Row_format: Compressed #&lt;==压缩了。
+           Rows: 1703
+ Avg_row_length: 21
+    Data_length: 36679      #&lt;==总长度36679。
+...省略若干...
+1 row in set (0.01 sec)</pre>
+<hr/>
+<p class="ziti">数据文件形式如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# ll /application/mysql/data/oldboy/t2*
+-rw-rw----. 1 mysql mysql 36679 3月  26 06:58 /application/mysql/data/oldboy/t2.ARZ
+-rw-rw----. 1 mysql mysql 13658 3月  26 06:58 /application/mysql/data/oldboy/t2.frm
+提示：.ARZ是数据压缩文件，.frm是表结构定义文件</pre>
+<hr/>
+<p class="ziti">其他种类引擎的说明请读者回看12.3节“MySQL 5.6支持的存储引擎”中表12-1的说明。</p>
+<p class="ziti">实际工作中使用最多的就是InnoDB引擎，其次是MyISAM和NDB存储引擎，其他的例如Memory、Merge、CSV、Federate等存储引擎的使用场景都相对较少，本章也不进行过多讲解。</p>
+</body>
+</html>

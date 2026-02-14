@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_170">8.4.1　TCP/UDP负载均衡</h3>
+
+  <p class="ziti3">Nginx的Stream上游模块支持与Nginx HTTP上游模块一致的轮询（Round Robin）、哈希（Hash）及最少连接数（least_conn）负载均衡策略。Nginx默认使用轮询负载均衡策略，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">stream {
+    upstream backend {
+        server 192.168.2.145:389 weight=5;
+        server 192.168.2.159:389 weight=1;
+        server 192.168.2.109:389 weight=1;
+    }
+
+    server {
+        listen 389;
+        proxy_pass backend;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">哈希负载均衡策略可以通过客户端IP（$remote_addr）实现简单的会话保持，其可将同一IP客户端始终转发给同一台后端服务器。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">stream {
+    upstream backend {
+        hash $remote_addr;
+        server 192.168.2.145:389 weight=5;
+        server 192.168.2.159:389 weight=1;
+        server 192.168.2.109:389 weight=1;
+    }
+
+    server {
+        listen 389;
+        proxy_pass backend;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">真实客户端IP可参见6.2.5节的内容。</p>
+
+  <p class="ziti3">哈希负载均衡策略通过指令参数consistent设定是否开启一致性哈希负载均衡策略。Nginx的一致性哈希负载均衡策略是采用Ketama一致性哈希算法，当后端服务器组中的服务器数量变化时，只会影响少部分客户端的请求。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">stream {
+    upstream backend {
+        hash $remote_addr consistent;
+        server 192.168.2.145:389 weight=5;
+        server 192.168.2.159:389 weight=1;
+        server 192.168.2.109:389 weight=1;
+    }
+
+    server {
+        listen 389;
+        proxy_pass backend;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">最少连接负载均衡策略，可以在后端被代理服务器性能不均时，在考虑上游服务器组中各服务器权重的前提下，将客户端连接分配给活跃连接最少的被代理服务器，从而有效提高处理性能高的被代理服务器的使用率。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">stream {
+    upstream backend {
+        least_conn;
+        server 192.168.2.145:389 weight=5;
+        server 192.168.2.159:389 weight=1;
+        server 192.168.2.109:389 weight=1;
+    }
+
+    server {
+        listen 389;
+        proxy_pass backend;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

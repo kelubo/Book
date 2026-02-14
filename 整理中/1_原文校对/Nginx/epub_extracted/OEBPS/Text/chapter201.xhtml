@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_215">11.2.3　配置修改工具Ansible</h3>
+
+  <p class="ziti3">Ansible是一款自动化的运维工具，是基于Python开发的。Ansible提供了一种自动化执行框架，其可以按照用户设计的剧本自动化执行相关操作。Ansible是基于模块工作的，其可以实现使用各种模块，并按照设计的剧本，批量对多个目标执行相同的操作。Ansible集合了众多运维工具的优点，配置更加简单方便。</p>
+
+  <p class="ziti3"><span class="yanse">1.Ansible剧本（playbook）</span></p>
+
+  <p class="ziti3">Ansible剧本是Ansible可以自动化执行一系列动作的执行方式。其通过YAML格式文件描述任务步骤，Ansible按照指定的步骤有序执行，并支持同步和异步，非常适合完成各种复杂的部署工作。Ansible剧本的相关术语如下。</p>
+
+  <p class="ziti4">·任务（Tasks），由YAML描述的一系列操作步骤。</p>
+
+  <p class="ziti4">·变量（Variables），被剧本引用，可以使剧本的设计更加灵活，并根据变量的值执行不同的步骤。</p>
+
+  <p class="ziti4">·模板（Templates），可根据变量的值，动态生成目标文件的预置文件，Ansible使用Jinja2模板语法。</p>
+
+  <p class="ziti4">·处理器（Handlers），当剧本任务条件满足时，触发执行的任务步骤。</p>
+
+  <p class="ziti4">·角色（Roles），描述某一特定任务的集合，其由以上术语的YAML描述文件组成。</p>
+
+  <p class="ziti4">·主机（Hosts），被剧本操作的目标主机IP或组名称，主机组名称由外部的hosts文件定义。</p>
+
+  <p class="ziti3">Ansible中每个剧本只有一个主入口文件，并且只有一个主线任务，主线任务可根据不同条件选用不同的角色，每个角色由任务、变量、模板、处理器的YAML描述文件组成。Ansible及剧本目录结构如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">.
+├── ansible.cfg                 # ansible配置文件
+├── hosts                       # 目标主机资源文件
+└── roles                       # 剧本目录，可自定义
+    ├── nginx                       # 剧本角色名称及角色任务文件目录
+    │   ├── defaults                # 角色默认变量目录
+    │   │   └── main.yaml           # 默认变量自动加载的文件
+    │   ├── files                   # 文件存放目录
+    │   ├── handlers                # 处理器任务文件目录
+    │   │   └── main.yaml           # 默认处理器任务自动加载的文件
+    │   ├── tasks                   # 角色任务文件存放目录
+    │   │   └── main.yaml           # 当前角色默认的任务入口文件
+    │   └── templates               # 任务模板存放目录
+    └── nginx.yaml                  # 剧本入口文件
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3"><span class="yanse">2.基础语法</span></p>
+
+  <p class="ziti3">（1）步骤描述</p>
+
+  <p class="ziti3">任务由多个步骤组成，每个步骤由步骤命名、任务模块、动作组成，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">- name: reload Nginx Service                    # 步骤名
+  systemd: "name=nginx state=reloaded enabled=yes"  # 任务模块为systemd，动作是对系统服务
+                                                        # Nginx执行reload操作
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（2）执行顺序</p>
+
+  <p class="ziti3">Ansible剧本中的步骤是自上而下执行的，在默认情况下，每个步骤的执行结果返回值如果不为0，就会报错，剧本任务也终止，也可以通过忽略错误指令继续运行，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">- name: Create conf.d
+  shell: mkdir -p /etc/nginx/conf.d # 任务模块是shell，动作是执行mkdir命令
+  ignore_errors: True               # 如果当前动作执行出错，忽略错误继续执行
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（3）变量赋值</p>
+
+  <p class="ziti3">Ansible剧本中变量赋值有静态和动态两种方式，一种是在defaults目录的main.yaml文件中静态地直接赋值，这通常被用作默认变量的赋值，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">confdir: "/etc/nginx"                           # 定义变量confdir的值为/etc/nginx
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">另一种是在当前执行的过程中动态地进行变量赋值，被赋值的变量可以在当前剧本执行过程中被引用，配置样例如下所示：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5"># 方法一：将执行结果动态赋值给变量
+  - name: Test Nginx Config
+    shell: nginx -c {{ confdir }}/nginx.conf -t     # 任务模块是shell，动作是Nginx
+                                                        # 执行-t参数命令
+    register: test_result                           # 将执行结果赋值给变量test_result
+# 方法二：根据其他变量的值进行动态的变量赋值
+  - name: check set_fact output 
+    set_fact: output="{{ work }}/output"            # 为变量output赋值
+    when: test_result                               # 当变量test_result为真时
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（4）条件判断</p>
+
+  <p class="ziti3">在Ansible剧本中可以根据变量的值判断是否执行当前步骤，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">- debug: msg="{{ test_result.stderr_lines }}"   # 任务模块debug，输出变量test_result.
+                                                        # stderr_lines的内容
+  when: not test_result.stderr_lines == ""  # 当test_result变量的输出结果不为空，
+                                                        # 执行当前步骤
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（5）外部引入</p>
+
+  <p class="ziti3">多个步骤可以编写在一个YAML文件中，并通过指令include_tasks被其他任务引入，结合条件判断，它可以使主线任务因变量不同而存在多个不同分支，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">- name: "check system type"
+  include_tasks: linux.yaml                 # 引入外部任务步骤
+  when: ansible_os_family != "Windows"              # 当目标操作系统非windows时，执行当前
+                                                        # 任务
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3"><span class="yanse">3.剧本执行</span></p>
+
+  <p class="ziti3">Ansible剧本编写结束后，使用ansible-playbook命令调用剧本入口文件执行相应的剧本，即可自动完成预设的任务。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/nginx.yaml --extra-vars 'hosts=192.168.2.145'
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_158">8.2.4　最少连接</h3>
+
+  <p class="ziti3">默认配置下轮询算法是把客户端的请求平均分配给每个被代理服务器，每个被代理服务器的负载大致相同，该场景有个前提就是每个被代理服务器的请求处理能力是相当的。如果集群中某个服务器处理请求的时间比较长，那么该服务器的负载也相对增高。在最少连接（least_conn）负载均衡策略下，会在上游服务器组中各服务器权重的前提下将客户端请求分配给活跃连接最少的被代理服务器，进而有效提高处理性能高的被代理服务器的使用率。</p>
+
+  <p class="ziti3">配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">upstream backend {
+    least_conn;         # 启用最少连接负载均衡策略
+    server a weight=4;
+    server b weight=2;
+    server c weight=1;
+}
+
+server {
+    listen 80;
+    location / {
+        proxy_pass http://backend;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">配置样例中Nginx最少连接策略计算过程如下。</p>
+
+  <p class="ziti4">·遍历轮询策略中被代理服务器列表，比较各个后端的活跃连接数（conns）与其权重（weight）的比值，选取比值最小者分配客户端请求。</p>
+
+  <p class="ziti4">·如果上一次选择了a服务器，则当前请求将在b和c服务器中选择。</p>
+
+  <p class="ziti4">·设b的活跃连接数为100，c的活跃连接数为60，则b的比值（conns/weight）为50，c的比值（conns/weight）为60，因此当前请求将分配给b。</p>
+</body>
+</html>

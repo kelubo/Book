@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_190">10.2.3　主机状态监控配置</h3>
+
+  <p class="ziti3">模块nginx-module-vts为Nginx提供了很多监控统计功能。根据nginx-module-vts模块的配置指令，可以设计一个全局的配置。对于不同的主机站点可以按照具体的功能设置不同的状态统计配置。全局vts配置如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">vhost_traffic_status_zone;                              # 主机状态监控共享内存
+vhost_traffic_status_filter_by_host on;                 # 启用以server_name的主机名为关键字
+                                                        # 进行过滤统计
+vhost_traffic_status_display_sum_key all_zone;  # 将serverZones显示区域下总计条目的
+                                                        # 显示名称设置为all_zone
+vhost_traffic_status_dump /tmp/vts.db;          # 主机状态监控数据存储在/tmp/vts.db中
+
+server {
+    listen 8080;                            # 用于查看监控页的监听端口
+    access_log  off;
+    vhost_traffic_status off;                       # 关闭当前站点的监控统计
+
+    location /vts {
+        vhost_traffic_status_display;               # 启用主机状态监控数据输出功能
+        vhost_traffic_status_display_format html;   # 主机状态监控数据输出格式为html
+        allow 127.0.0.0/8;
+        allow 10.0.0.0/8;
+        allow 192.168.0.0/16;
+        deny all;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti4">·按照uri关键字进行过滤统计，可以显示对应主机每条URL的请求统计数据。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 8002;
+    server_name locahost www.nginxbar.org;
+    root /opt/nginx-web;
+    default_type text/xml;
+
+    # 按照URI进行过滤统计
+    vhost_traffic_status_filter_by_set_key $uri uri;
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

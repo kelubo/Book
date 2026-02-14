@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">15.8　MySQL主从延迟复制方案及恢复实践</h2>
+<p class="p6">1.MySQL主从延迟复制方案介绍</p>
+<p class="ziti">MySQL从5.6版本开始就支持主从延迟复制，这个功能主要解决的问题是，当主库有逻辑的数据删除或者错误更新时，所有的从库都会进行错误的更新，从而导致数据库的所有数据都异常，即使有定时的备份数据可以用于数据恢复，特别是数据库的数据量很大时，恢复时间也会很长，在恢复期间，数据库数据被删除或者出现错误数据都会影响正常的访问体验。</p>
+<p class="ziti">而延迟复制就可以很好地解决这个问题。例如，可以设定某一个从库和主库的更新延迟1个小时，这样当主库数据出现问题以后，1个小时以内即可发现，可以对这个从库进行无害恢复处理，使之依然是正确的完整的数据，这样就省去了数据恢复占用的时间，用户体验也会有所提高。</p>
+<p class="p6">2.MySQL主从延迟复制配置实践</p>
+<p class="ziti">MySQL 5.6版本的延迟复制配置，是通过在Slave上执行以下命令实现的：</p>
+<hr/>
+<pre class="ziti1">CHANGE MASTER TO MASTER_DELAY = N；   #&lt;==读者可在配置延迟从库Change Master时
+                                      直接加上MASTER_DELAY选项。</pre>
+<hr/>
+<p class="ziti">该语句设置Slave数据库延时N秒后，再与主数据库进行数据复制，具体操作为登录到Slave数据库服务器（本文是52），然后执行如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; stop slave;
+Query OK, 0 rows affected (0.45 sec)
+mysql&gt; CHANGE MASTER TO MASTER_DELAY = 20;   #&lt;==这是延迟的核心命令。
+Query OK, 0 rows affected (0.22 sec)
+mysql&gt; start slave;
+Query OK, 0 rows affected (0.15 sec)
+mysql&gt; show slave status\G
+*************************** 1. row ***************************
+            ...省略若干...
+            Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+            ...省略若干...
+            SQL_Delay: 20             #&lt;==这里设置的数字就是延迟20秒后进行复制。
+            SQL_Remaining_Delay: NULL #&lt;==还剩多少秒执行复制。
+Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it                   #&lt;==SQL线程的状态。
+...省略若干...
+1 row in set (0.09 sec)
+#&lt;==提示：复制状态里最常用的三个状态参数分别为SQL_Delay、SQL_Remaining_Delay、Slave_
+       SQL_Running_State，说明上面已经分别进行注释了。</pre>
+<hr/>
+<p class="ziti">主库插入数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create database lanlan;
+Query OK, 1 row affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">主库插入完数据1秒以后，从库执行“show databases；”查看数据是否及时同步了，结果如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| alex_python        |
+| mysql              |
+| performance_schema |
++--------------------+
+4 rows in set (0.36 sec)</pre>
+<hr/>
+<p class="ziti">在从库上并没有看到在主库上创建的数据库lanlan，此时可间歇性地执行“show slave status\G”查看延迟的参数状态，输出如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show slave status\G
+            ...省略若干...
+                    SQL_Delay: 20
+          SQL_Remaining_Delay: 13 #&lt;==剩余13秒执行复制。
+      Slave_SQL_Running_State: Waiting until MASTER_DELAY seconds after master executed event
+            ...省略若干...
+1 row in set (0.00 sec)
+mysql&gt; show slave status\G
+            ...省略若干...
+                    SQL_Delay: 20
+          SQL_Remaining_Delay: 9 #&lt;==剩余9秒执行复制。
+      Slave_SQL_Running_State: Waiting until MASTER_DELAY seconds after master executed event
+            ...省略若干...
+1 row in set (0.00 sec)
+mysql&gt; show slave status\G
+            ...省略若干...
+                    SQL_Delay: 20
+          SQL_Remaining_Delay: NULL #&lt;==复制完成后，没有新数据更新的状态。
+      Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it
+            ...省略若干...
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">在从库没有更新数据，并且处于延迟复制还没到时间的期间，查看从库的中继日志：</p>
+<hr/>
+<pre class="ziti1"> [root@db02 data]# pwd
+/application/mysql/data
+[root@db02 data]# mysqlbinlog db02-relay-bin.000002
+SET @@session.lc_time_names=0/*!*/;
+SET @@session.collation_database=DEFAULT/*!*/;
+create database lanlan #&lt;==中继日志中的确已经有了创建的语句，说明IO线程还是实时在工作的。</pre>
+<hr/>
+<p class="p6">3.MySQL主从延迟复制原理解析及结论</p>
+<p class="ziti">MySQL的延迟复制实际上影响的只是SQL线程将数据应用到从数据库，而I/O线程早已把主库更新的数据写到了从库的中继日志中，因此，在延迟复制期间，即使主库宕机了，从库到了延迟复制的时间，也依然会把数据更新到与主库宕机时一致。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">特别提示：</span>
+ 其实MySQL的延迟复制功能早在几年前，老男孩老师就已经用思想实现了这个功能，并应用于企业生产备份和恢复中了，方法如下。</p>
+<p class="ziti6">1）正如15.2节已经介绍过的，执行“mysql&gt;stop slave sql_thread；”停掉SQL线程，然后进行备份，备份期间主库可能会宕机，但是主库的binlog依然会及时发到从库，最终从库依然可以恢复到主库宕机之前的状态。</p>
+<p class="ziti6">2）编写一个脚本，利用定时任务控制sql_thread的停止和运行，进而库就可以控制实现简单的从库延迟复制功能了，这就是思想的重要性。当然了，对于5.6版本还是就用软件本身提供的功能吧，对于5.6以前的数据库若要实现延迟复制，则可以考虑下老男孩曾经使用过的延迟备份以及延迟复制的思路。</p>
+<p class="p6">4.使用MySQL主从延迟复制进行数据恢复实践</p>
+<p class="ziti">在企业中，我们应根据业务需求为延迟复制指定一个时间段，例如1个小时后进行该从库复制，那么在这一个小时之内，如果主库误更新了数据，其他的从库也都会依样误更新数据，那么如何将这个延迟的从库恢复到正常没有误更新数据前的完整状态呢？且看下文的实践。</p>
+<p class="ziti">1）模拟环境，将从库延迟调整为3600秒：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; stop slave;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; CHANGE MASTER TO MASTER_DELAY = 3600;
+Query OK, 0 rows affected (0.03 sec)
+mysql&gt; start slave;
+Query OK, 0 rows affected (0.08 sec)
+mysql&gt; show slave status\G
+            ...省略若干...
+                    SQL_Delay: 3600
+          SQL_Remaining_Delay: 2414
+      Slave_SQL_Running_State: Waiting until MASTER_DELAY seconds after master executed event
+            ...省略若干...
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">2）模拟在主库写入数据，每隔5秒写入1个库，就当是模拟用户写入数据了：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# for n in {1..5}
+&gt; do
+&gt;     mysql -e "create database oldboy$n"
+&gt;     sleep 5
+&gt; done
+提示：关于Shell脚本知识可以参考《跟老男孩学Linux运维:Shell编程实战》一书。</pre>
+<hr/>
+<p class="ziti">3）模拟人为破坏数据，也可以是不带where的update语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop database oldboy5;   #&lt;==删除oldboy5数据库，后面要做的就是把这个数据
+                                  库恢复回来，别的数据还得保留。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show databases like 'oldboy%';
++--------------------+
+| Database (oldboy%) |
++--------------------+
+| oldboy1            |
+| oldboy2            |
+| oldboy3            |
+| oldboy4            |
++--------------------+
+4 rows in set (0.00 sec)
+#此时，所有的从库都已经是坏数据了，只有延迟从库是好的，但是是一个小时之前的数据。</pre>
+<hr/>
+<p class="ziti">4）当数据库出现误删数据的情况时（特别是update不加条件破坏数据），要想完整恢复数据，最好选择对外停止访问措施，此时需要牺牲用户体验，除非业务可以忍受数据不一致，并且不会被二次破坏。从库可以适当地继续开放给用户读访问，但是也可能会导致用户读到的数据是坏的数据，这里就需要读者去衡量数据一致性和用户体验的问题。本例是使用iptables封堵用户对主库的所有访问：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# iptables -I INPUT -p tcp --dport 3306 ! -s 172.16.1.53 -j DROP
+#&lt;==非172.16.1.53禁止访问数据库3306端口,51是主库IP，172.16.1.53为远程连接SSH
+       客户端的IP。</pre>
+<hr/>
+<p class="ziti">5）登录主库执行“show processlist；”对binlog是否全部发送到该延迟从库进行确认，当然了，也可以登录延迟从库执行“show processlist；”对从库IO线程是否完全接收binlog进行状态查询确认：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show processlist;
++----+----------------------------------------------------------------------+------------------+
+| 12 | rep  | 172.16.1.52:39043 | NULL | Binlog Dump |  709 | Master has sent all binlog to slave; waiting for binlog to be updated | NULL             |
++----+----------------------------------------------------------------------+------------------+
+2 rows in set (0.00 sec)
+#上述提示表示主库已经发送完所有的Binlog日志到从库了。</pre>
+<hr/>
+<p class="ziti">6）在从库上执行“stop slave；”暂停主从复制，并查看数据库是否已同步过来：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; stop slave;
+mysql&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| alex_python        |
+| mysql              |
+| performance_schema |
++--------------------+
+4 rows in set (0.00 sec)
+#提示：因为还未到延迟时间，因此数据不会同步到该延迟从库。</pre>
+<hr/>
+<p class="ziti">7）根据relay-log.info记录的SQL线程读取relay-log的位置，解析未应用到从库的relay-bin日志：</p>
+<hr/>
+<pre class="ziti1">[root@db02 data]# pwd           #&lt;==进入到中继日志所在的目录。
+/application/mysql/data
+[root@db02 data]# ls -l *relay* #&lt;==查看中继日志的相关信息。
+-rw-rw----. 1 mysql mysql 172 9月  13 17:32 db02-relay-bin.000001 #&lt;==中继日志。
+-rw-rw----. 1 mysql mysql 993 9月  13 17:37 db02-relay-bin.000002 #&lt;==中继日志。
+-rw-rw----. 1 mysql mysql  48 9月  13 17:32 db02-relay-bin.index  #&lt;==中继日志索引。
+-rw-rw----. 1 mysql mysql  61 9月  13 17:32 relay-log.info #&lt;==SQL线程读取中继日志
+                                                    的位置信息。
+[root@db02 data]# cat relay-log.info  #&lt;==查看中继日志应用的位置信息。
+7
+./db02-relay-bin.000002  #&lt;==SQL线程读取中继日志的文件名信息。
+284                      #&lt;==SQL线程读取中继日志的位置点信息。
+oldboy-bin.000024
+309
+3600
+0
+1</pre>
+<hr/>
+<p class="ziti">8）解析SQL线程未解析的全部剩余relay-bin中继日志数据，由于本例模拟数据量不够大，因此本例中只有db02-relay-bin.000002一个中继日志，实际工作中可能会有多个，将它们一并解析到一个指定文件或者分成不同的文件存放也可以。</p>
+<hr/>
+<pre class="ziti1">[root@db02 data]# mysqlbinlog --start-position=284 db02-relay-bin.000002 &gt; relay.sql #&lt;==根据上述的relay-log.info的中级日志文件和位置信息进行中继日志解析，关于此命
+            令的用法前面章节已经讲解过了，此处不再累述。</pre>
+<hr/>
+<p class="ziti">9）找到破坏数据库数据的SQL语句，并从已解析的SQL语句中将其删除，这里使用的是“drop database oldboy5”：</p>
+<hr/>
+<pre class="ziti1">[root@db02 data]# egrep "drop database oldboy5" relay.sql #&lt;==检查是否存在误删
+                                                      的SQL语句。
+drop database oldboy5
+[root@db02 data]# sed -i '/drop database oldboy5/d' relay.sql #&lt;==删除，注意
+                                                          别删多了。
+[root@db02 data]# egrep "^drop database oldboy5" relay.sql  #&lt;==检查删除结果。</pre>
+<hr/>
+<p class="ziti">10）将解析后并处理好的relay.sql数据文件恢复到延迟从库：</p>
+<hr/>
+<pre class="ziti1">[root@db02 data]# mysql&lt;relay.sql  #&lt;==这一步就是从停止slave复制开始，根据relay- log.info位置将剩下的所有日志数据手动恢复到数据库中，需要注意的是应提前清理破坏数据库的语句，然后再恢复。
+[root@db02 data]# mysql -e "show databases like 'oldboy%';"
++--------------------+
+| Database (oldboy%) |
++--------------------+
+| oldboy1            |
+| oldboy2            |
+| oldboy3            |
+| oldboy4            |
+| oldboy5            |   #&lt;==之前删除的oldboy5数据库已经找回。
++--------------------+</pre>
+<hr/>
+<p class="ziti">行文至此，利用延迟数据库恢复数据完毕，此时还需要要将此从库提升为主库（见手工实现主从角色切换章节的内容），将VIP指向该“延迟从库”，即作为新主库提供用户访问，然后，再对其他遭到破坏的主从数据库进行修复。</p>
+</body>
+</html>

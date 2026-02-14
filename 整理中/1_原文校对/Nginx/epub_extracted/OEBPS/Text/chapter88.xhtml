@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_97">5.2.7　HTTPS配置样例</h3>
+
+  <p class="ziti3">HTTPS通过加密通道保护客户端与服务端之间的数据传输，极大地降低了数据被窃取、篡改的风险，增强了网站对数据安全的保护能力，已成为当前网站建设的必选配置。根据Nginx提供的配置指令，HTTPS配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">resolver 114.114.114.114 valid=300s;               # DNS服务器地址
+resolver_timeout 5s;                               # DNS解析超时时间为5s
+
+server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;   # DNS服务器地址
+    ssl_ciphers EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
+    ssl_prefer_server_ciphers on;                  # 启用服务端密码组件优先
+    ssl_dhparam  ssl/dhparam.pem;                  # 设置DH密钥交换算法参数
+    ssl_ecdh_curve secp384r1;                      # DH密钥交换椭圆曲线算法为secp384r1
+
+    ssl_certificate ssl/www_nginxbar_org.pem;      # 网站证书文件
+    ssl_certificate_key ssl/www_nginxbar_org.key;  # 网站证书密钥文件
+    ssl_password_file ssl/www_nginxbar_org.pass;   # 网站证书密钥密码文件
+
+    ssl_session_cache shared:SSL:10m;              # 会话缓存存储大小为10MB
+    ssl_session_timeout  10m;                      # 会话缓存超时时间为10分钟
+    ssl_session_tickets on;                        # 设置会话凭证为会话缓存机制
+    ssl_session_ticket_key  ssl/session_ticket.key;# 设置会话凭证密钥文件
+
+    ssl_stapling on;                               # 启用OCSP缓存
+    ssl_stapling_file ssl/ocsp.pem;                # OCSP结果缓存文件
+    ssl_stapling_verify on;                        # 设置OCSP结果缓存证书验证
+    ssl_trusted_certificate  ssl/ca.pem;           # 网站证书信任证书链的中间证书文件
+    
+    # 启用HSTS
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"; 
+
+    add_header X-Frame-Options DENY;               # 禁止被嵌入框架
+    add_header X-XSS-Protection "1; mode=block";   # XSS跨站防护
+    add_header X-Content-Type-Options nosniff;     # 防止在浏览器中的MIME类型混淆攻击
+}
+
+server {
+    listen      80;
+    server_name www.nginxbar.org;
+    rewrite ^(.*)$  https://$host$1? permanent;    # 强制HTTP访问跳转为HTTPS访问
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">可以通过网站ssllabs.com对HTTPS的配置进行安全性检测，并按照测试结果有针对性地进行优化。</p>
+</body>
+</html>

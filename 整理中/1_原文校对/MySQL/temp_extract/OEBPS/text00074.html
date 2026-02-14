@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">5.1.1　单实例MySQL启动与关闭知识</h3>
+<p class="p6">1.正确启动单实例MySQL数据库</p>
+<p class="ziti">第3章曾经讲解了单实例MySQL数据库的安装和部署，不知读者是否还记得在初始化数据库时有这么一条命令：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.40]# cp support-files/mysql.server /etc/init.d/mysqld</pre>
+<hr/>
+<p class="ziti">这条命令是把数据库自带的启动脚本，复制到/etc/init.d/目录实现管理MySQL服务的启动和停止。</p>
+<p class="ziti">下面就为大家介绍启动单实例数据库的两种正确方法。</p>
+<p class="ziti">（1）利用数据库自带的脚本启动数据库</p>
+<p class="ziti">正确启动MySQL服务的命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld start
+Starting MySQL.... SUCCESS!</pre>
+<hr/>
+<p class="ziti">执行启动命令之后，检测数据库是否已经启动：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ss -lnt|grep 330
+LISTEN     0      80                       :::3306                    :::*</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 根据输出可以得知数据库成功启动了。这里的“/etc/init.d/mysqld start”相当于“mysqld_safe 2&gt;&amp;1&gt;/dev/null &amp;”。</p>
+<p class="ziti">（2）用初始化数据库时MySQL系统给出的方法启动</p>
+<p class="ziti">首先，停止前面已启动的数据库，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop
+Shutting down MySQL.. SUCCESS!
+[root@oldboy ~]# ss -lnt|grep 330</pre>
+<hr/>
+<p class="ziti">然后，使用mysqld_safe启动数据库，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqld_safe --user=mysql &amp;
+[1] 53854
+[root@oldboy ~]# 170228 02:43:25 mysqld_safe Logging to '/application/mysql
+-5.6.40/data/oldboy.err'.
+170228 02:43:25 mysqld_safe Starting mysqld daemon with databases from /application/mysql-5.6.40/data</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 这里多出了很多提示信息，而且还需要再执行一次回车操作。</p>
+<p class="ziti">还可以使用如下不输出提示的命令替代上述启动命令：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqld_safe --user=mysql &gt;/dev/null 2&gt;&amp;1 &amp;
+[1] 53981</pre>
+<hr/>
+<p class="ziti">现在，再次检测数据库是否已经启动，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ss -lnt|grep 330
+LISTEN     0      80                       :::3306                    :::*</pre>
+<hr/>
+<p class="ziti">可以通过如下命令查看MySQL服务进程信息：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ps -ef|grep mysql|grep -v grep
+root  53981  53667  0 02:48 pts/1  00:00:00 /bin/sh /application/mysql/bin/mysqld_safe --user=mysql
+mysql     54070  53981  0 02:48 pts/1    00:00:00 /application/mysql-5.6.40/
+bin/mysqld --basedir=/application/mysql-5.6.40 --datadir=/application/mysql-5.6.40/data --plugin-dir=/application/mysql-5.6.40/lib/plugin --user=mysql --log-error=/
+application/mysql-5.6.40/data/oldboy.err --pid-file=/application/mysql-5.6.40/data/oldboy.pid</pre>
+<hr/>
+<p class="ziti">上述信息中一共有2个进程，一个是mysqld_safe进程，类似于Web服务的nginx master（管理进程），另一个是mysqld进程，类似于Web服务的nginx worker（工作进程）。</p>
+<p class="p6">2.MySQL单实例服务启动的基本原理</p>
+<p class="ziti">“/etc/init.d/mysqld”是MySQL自带的使用Shell编写的启动脚本，执行脚本后最终会调用mysqld_safe命令脚本，mysqld_safe脚本执行后又会调用mysqld主程序启动MySQL服务，因此在前文查看MySQL进程时，会发现不仅有mysqld_safe进程，还有mysqld进程。</p>
+<p class="ziti">查看执行“/etc/init.d/mysqld start”命令的脚本中调用mysqld_safe的程序代码如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# sed -n '271,283p' /etc/init.d/mysqld
+case "$mode" in
+  'start')
+    # Start daemon
+    # Safeguard (relative paths, core dumps..)
+    cd $basedir
+    echo $echo_n "Starting MySQL"
+    if test -x $bindir/mysqld_safe
+    then
+      # Give extra arguments to mysqld with the my.cnf file. This script
+      # may be overwritten at next upgrade.
+      $bindir/mysqld_safe --datadir="$datadir" --pid-file="$mysqld_pid_file_path" $other_args &gt;/dev/null &amp; #&lt;==这正是在初始化数据库时系统给出的快速启动MySQL的方式。</pre>
+<hr/>
+<p class="ziti">MySQL服务启动原理逻辑图如图5-1所示。</p>
+<div class="pic"><img alt="" src="Image00028.jpg" />
+</div>
+<p class="middle-img">图5-1　MySQL服务启动原理逻辑图</p>
+<p class="p6">3.MySQL单实例服务启动小结</p>
+<p class="ziti">1）使用“/etc/init.d/mysqld start”命令启动数据库的本质就相当于执行“mysqld_safe--user=mysql &amp;”命令。</p>
+<p class="ziti">2）老男孩开发Shell脚本启动多实例数据库时就是调用的mysqld_safe程序，最后由mysqld_safe程序调用mysqld完成数据库的启动。</p>
+<p class="ziti">3）在找回MySQL root密码时，也会使用mysqld_safe程序，并且会认带忽略授权表的参数启动来找回root密码。</p>
+<p class="p6">4.正确关闭单实例MySQL数据库</p>
+<p class="ziti">（1）使用数据库自带脚本关闭数据库</p>
+<p class="ziti">无论是使用自带脚本启动数据库，还是使用mysqld_safe启动数据库，都可以采用自带脚本关闭MySQL服务，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop
+Shutting down MySQL.. SUCCESS!
+[root@oldboy ~]# ps -ef|grep mysql|grep -v grep #&lt;==采用过滤进程方法查看mysql服务。</pre>
+<hr/>
+<p class="ziti">（2）使用mysqladmin管理命令关闭数据库</p>
+<p class="ziti">MySQL提供了一个mysqladmin管理命令，可以用来优雅地关闭数据库，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqladmin -uroot -poldboy123 shutdown  #&lt;==注意密码要正确。
+Warning: Using a password on the command line interface can be insecure.
+                                                         #&lt;==忽略它。
+[root@oldboy ~]# ps -ef|grep mysql|grep -v grep          #&lt;==已经关闭数据库。</pre>
+<hr/>
+<p class="p6">5.MySQL单实例服务关闭的基本原理</p>
+<p class="ziti">使用“/etc/init.d/mysqld stop”命令执行脚本关闭数据库的程序代码如下：</p>
+<hr/>
+<pre class="ziti1"> [root@oldboy ~]# sed -n '298,315p' /etc/init.d/mysqld
+  'stop')
+    # Stop daemon. We use a signal here to avoid having to know the
+    # root password.
+    if test -s "$mysqld_pid_file_path"         #&lt;==如果$mysqld_pid_file_
+                                          　　　path变量大小不为0。
+    then
+      mysqld_pid=`cat "$mysqld_pid_file_path"` #&lt;==则读取路径下的内容并赋值给
+                                          　　　mysqld_pid。
+      if (kill -0 $mysqld_pid 2&gt;/dev/null)     #&lt;==如果$mysqld_pid对应的进程
+                                          　　　ID存在则为真。
+      then
+        echo $echo_n "Shutting down MySQL"     #&lt;==打印提示。
+        kill $mysqld_pid               #&lt;==使用kill pid的方式关闭MySQL服务。
+        # mysqld should remove the pid file when it exits, so wait for it.
+        wait_for_pid removed "$mysqld_pid" "$mysqld_pid_file_path"; return_value=$?                                           #&lt;==传参给函数。
+      else
+        log_failure_msg "MySQL server process #$mysqld_pid is not running!"
+                                               #&lt;==传消息给msg函数。
+        rm "$mysqld_pid_file_path"             #&lt;==删除PID文件。
+      fi</pre>
+<hr/>
+<p class="ziti">第4章的多实例数据库启动采用的就是这个方法，有关Shell编程的知识，请参考《跟老男孩学Linux运维：Shell编程实战》一书，京东售卖地址：<a href="https://item.jd.com/12117874.html">ttps://item.jd.com/12117874.html</a>
+ 。</p>
+<p class="ziti">MySQL自带脚本关闭数据库的原理就是通过kill pid的方式关闭数据库。</p>
+<p class="p6">6.使用关闭进程命令关闭数据库</p>
+<p class="ziti">如果使用上述的常规方法无法关闭数据库，那么还有几个命令可以使用，它们分别是kill、killall、pkill，在不接任何参数的情况下，这几个命令发送的信号默认都是TERM（15），表示停止，但进程有权忽略该信号。示例如下：</p>
+<hr/>
+<pre class="ziti1">kill  pid            #&lt;==这里的pid是数据库服务对应的进程号。
+killall mysqld       #&lt;==这里的mysqld是数据库服务对应的进程名字。
+pkill mysqld         #&lt;==这里的mysqld是数据库服务对应的进程名字。</pre>
+<hr/>
+<p class="ziti">以下关闭数据库的操作应禁止使用，因为其很可能会导致MySQL数据库无法启动。</p>
+<hr/>
+<pre class="ziti1">killall -9 mysqld    #&lt;==这里的-9信号表示强制杀死进程。
+kill -9 pid          #&lt;==这里的-9信号表示强制杀死进程。</pre>
+<hr/>
+<p class="ziti">可通过如下地址查看企业生产高并发环境下野蛮粗鲁杀死数据库所导致的故障案例：</p>
+<p class="ziti">
+<a href="http://oldboy.blog.51cto.com/2561410/1431161">http://oldboy.blog.51cto.com/2561410/1431161</a>
+</p>
+<p class="ziti">
+<a href="http://oldboy.blog.51cto.com/2561410/1431172">http://oldboy.blog.51cto.com/2561410/1431172</a>
+</p>
+<p class="p6">7.关闭MySQL数据库方法小结</p>
+<p class="ziti">关闭MySQL数据库的方法选择顺序如下。</p>
+<p class="ziti">第一种使用MySQL自带的管理脚本，示例如下：</p>
+<hr/>
+<pre class="ziti1">/etc/init.d/mysqld stop</pre>
+<hr/>
+<p class="ziti">第二种为mysqladmin管理方法：</p>
+<hr/>
+<pre class="ziti1">mysqladmin -uroot -poldboy123 shutdown #&lt;==使用这个命令的最大障碍就是必须事先知道密码。</pre>
+<hr/>
+<p class="ziti">第三种为利用系统进程管理命令关闭MySQL：</p>
+<hr/>
+<pre class="ziti1">kill  pid       #&lt;==这里的pid为数据库服务对应的进程号。
+killall mysqld  #&lt;==这里的mysqld是数据库服务对应的进程名字。
+pkill mysqld    #&lt;==这里的mysqld是数据库服务对应的进程名字。</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">8.5　逻辑备份的企业级应用实战</h2>
+<h3 class="p3">
+<a id="b1">8.5.1　中小企业的MySQL备份实战</a>
+</h3>
+<p class="p6">1.中小企业全备备份策略与实践</p>
+<p class="ziti">中小企业一般会采用逻辑备份，常用的工具就是前文提到的mysqldump命令，备份的策略一般是每日进行全量备份，备份会选择在数据库业务流量低谷时执行，备份时可以锁表或者采用事务方式备份，其中一个简单的实战备份脚本案例为：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# cat bak.sh
+#!/bin/bash
+#Author: oldboy
+export PATH=/application/mysql/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+bak_path=/server/bakup
+[ ! -d $bak_path ] &amp;&amp; mkdir -p $bak_path   #&lt;==若备份路径不存在则创建。
+mysqldump -B -A --master-data=2 |gzip &gt;$bak_path/${file_name}.sql.gz
+#&lt;==如果仅为innodb引擎，则可以再加上--single-transaction参数。
+
+#rsync all data to backup server           #&lt;==备份完成后立刻推送至备份服务器，
+                                           需要提前部署rsync服务。
+rsync -az $bak_path/ rsync_backup@172.16.1.31::mysql/ --password-file=/etc/
+rsync.password
+#del expiries file         #&lt;==删除本地的7天备份，如果空间紧张那么保留三天也可以。
+find $bak_path/ -type -f -name "*.sql.gz" -mtime +7|xargs rm -f</pre>
+<hr/>
+<p class="ziti">稍微复杂点的备份脚本如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# cat bak.sh
+#!/bin/bash
+#Author: oldboy
+export PATH=/application/mysql/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+bak_path=/server/bakup
+[ ! -d $bak_path ] &amp;&amp; mkdir -p $bak_path
+#if week is 6 then bak other file name.
+if [ $(date +%w) -eq 6 ]             #&lt;==如果时间为周六，则，
+  then
+      file_name=bak_$(date +%w_%F)   #&lt;==将备份文件名改为周和日期，目的是在备份
+                                      服务器上保留每周六的数据。
+else
+      file_name=bak_$(date +%F)      #&lt;==否则，备份文件名为日期。
+fi
+mysqldump -B -A --master-data=2 |gzip &gt;$bak_path/${file_name}.sql.gz
+md5sum $bak_path/${file_name}.sql.gz &gt;$bak_path/${file_name}.flag
+#&lt;==做md5指纹的目的是用于未来检查备份及传输结果是否正常。
+#rsync all data to backup server     #&lt;==备份完成后立刻推送至备份服务器，需要提前
+                                      部署rsync服务。
+rsync -az $bak_path/ rsync_backup@172.16.1.31::mysql/ --password-file=/etc/
+rsync.password
+#del expiries file         #&lt;==删除本地的7天备份，如果空间紧张那么保留三天也可以。
+find $bak_path/ -type -f -name "*.sql.gz" -mtime +7|xargs rm -f
+#send mail to self or administrator  #&lt;==还可以将备份结果发送邮件给管理员，不过最佳策略是在备份服务器上检查备份结果统一发管理员。</pre>
+<hr/>
+<p class="ziti">上述两个脚本是相对较简单的企业级实战数据库备份脚本，在实际工作中，可能在判断及逻辑上会更复杂一些。</p>
+<p class="ziti">最后配置定时任务，使其每日0点执行上述脚本：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# crontab -l|tail -2
+#bak mysql for oldboy at 20170318
+00 00 * * * /bin/sh /server/scripts/bak.sh &amp;&gt;/dev/null</pre>
+<hr/>
+<p class="ziti">最终的数据库本地（备份服务器相同）备份结果示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# ll /server/bakup/
+total 360
+-rw-r--r--. 1 root root     70 Mar 19  2017 bak_2017-03-19.flag
+#&lt;==普通备份对应的指纹文件。
+-rw-r--r--. 1 root root 178891 Mar 19  2017 bak_2017-03-19.sql.gz
+#&lt;==普通的备份文件。
+-rw-r--r--. 1 root root     72 Mar 18 00:00 bak_6_2017-03-18.flag
+#&lt;==周六备份对应的指纹文件。
+-rw-r--r--. 1 root root 178892 Mar 18 00:00 bak_6_2017-03-18.sql.gz
+#&lt;==周六的备份文件。
+[root@oldboy scripts]# cat /server/bakup/bak_6_2017-03-18.flag
+50ae9d28d0719682b89f6c929d02dfa4  /server/bakup/bak_6_2017-03-18.sql.gz</pre>
+<hr/>
+<p class="ziti">将来在备份服务器上可以检查备份是否成功，以及数据在备份过程中是否被改变等：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy bakup]# md5sum -c bak_6_2017-03-18.flag
+#&lt;==检测备份文件是否正常以及在传输过程中是否有损坏或被篡改。
+/server/bakup/bak_6_2017-03-18.sql.gz: OK  #&lt;==OK表示一切正常。</pre>
+<hr/>
+<p class="ziti">一般会在备份服务器上保留最近7天的所有备份，同时保留每周六的全部备份命令：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy bakup]# find /server/bakup/ -type f -name "bak_*" -mtime +7 ! -name "bak_6*"
+/server/bakup/bak_2017-03-19.flag
+/server/bakup/bak_2017-03-19.sql.gz
+[root@oldboy bakup]# find /server/bakup/ -type f -name "bak_*" -mtime +7 ! -name "bak_6*"|xargs rm -f</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 上述备份保留策略是让备份的内容尽量多，但又要尽可能地减少重复。</p>
+<p class="ziti">有关服务器数据备份，老男孩曾经讲过一个很完备的备份和检查并发邮件的方案，请参考：<a href="http://edu.51cto.com/course/course_id-8198.html">http://edu.51cto.com/course/course_id-8198.html</a>
+ 。</p>
+<p class="p6">2.全备的数据什么时候可以派上用场</p>
+<p class="ziti">使用mysqldump全备的数据什么时候可以派上用场呢？</p>
+<p class="ziti6">·迁移或者升级数据库时。</p>
+<p class="ziti6">·增加从库的时候。</p>
+<p class="ziti6">·人为执行DDL、DML语句破坏数据库数据时（此时若使用主从库就会无法防止数据丢失，因为所有库都会执行破坏的语句）。</p>
+<p class="ziti6">·跨机房灾备时，此时需要将全备份复制到异地。</p>
+<p class="ziti">若是因为硬件或删除物理文件导致数据库故障，就不需要用备份数据恢复了，可以直接把主库关闭，在从库上配置好VIP等配置后，启动从库提供服务即可。</p>
+<p class="p6">3.中小企业增量备份策略与实践</p>
+<p class="ziti">中小企业增量备份就是备份binlog文件，在MySQL没有主从复制功能或主从复制功能不完善的时候，我们就曾采取定时或实时推binlog文件的方法。例如每分钟推一次binlog到备份服务器上，或者通过mysqlbinlog参数read-from-remote-server，在其他服务器上远程读取binlog。</p>
+<p class="ziti">但是这类方法都不是最佳的，因为有可能会丢失数据。比较好的binlog增量备份或MySQL备份方法就是为MySQL数据库配置异机主从复制功能（实时复制功能），即binlog会被实时地发送到从服务器上，这样效果才是最好的。当然，也要相应地在主从复制的从库上实现全备。</p>
+<p class="p6">4.备份binlog增量文件何时可以派上用场</p>
+<p class="ziti">当需要完整恢复数据库数据的时候，就会需要binlog增量恢复。</p>
+<p class="p6">5.企业里MySQL备份策略选择</p>
+<p class="ziti">大多数中小企业的数据库环境都为一主多从，因此，可采取在一个从库服务器上专门做全量以及增量备份（需要开启从库记录binlog日志功能），至于备份方法，采用mysqldump、Xtrabackup均可。</p>
+</body>
+</html>

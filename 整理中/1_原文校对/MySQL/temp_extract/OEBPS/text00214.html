@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.1.5　MySQL主从复制原理及过程详细描述</h3>
+<p class="ziti">下面简单描述下MySQL Replication复制的原理及过程。</p>
+<p class="ziti">1）在Slave服务器上执行start slave命令开启主从复制开关，主从复制开始进行。</p>
+<p class="ziti">2）此时，Slave服务器的I/O线程会通过在Master上已经授权的复制用户权限请求连接Master服务器，并请求从指定binlog日志文件的指定位置（日志文件名和位置就是在配置主从复制服务时执行change master命令指定的）之后开始发送binlog日志内容。</p>
+<p class="ziti">3）Master服务器接收到来自Slave服务器的I/O线程的请求之后，其上负责复制的binlog dump线程会根据Slave服务器的I/O线程请求的信息，分批读取指定binlog日志文件所指定位置之后的binlog日志信息，然后返回给Slave端的I/O线程。返回的信息中除了binlog日志内容之外，还包括在Master服务器端记录的新的binlog文件名称，以及在新的binlog中的下一个指定的更新位置。</p>
+<p class="ziti">4）当Slave服务器的I/O线程获取到Master服务器上I/O线程发送的日志内容及日志文件和位置点之后，会将binlog日志内容依次写入到Slave端自身的Relay Log（即中继日志）文件（MySQL-relay-bin.xxxxxx）的最末端，并将新的binlog文件名和位置记录到master-info文件中，以便下一次读取Master端新binlog日志时，能够告诉Master服务器需要从新binlog日志的指定文件及位置开始请求新的binlog日志内容。</p>
+<p class="ziti">5）Slave服务器端的SQL线程会实时地检测本地Relay Log中I/O线程新增加的日志内容，然后及时地把Relay Log文件中的内容解析成SQL语句，并在自身Slave服务器上按解析SQL语句的位置顺序执行和应用这些SQL语句，并将当前应用中继日志的文件名及位置点记录在relay-log.info中。</p>
+<p class="ziti">经过了上面的过程，就可以确保在Master端和Slave端执行了同样的SQL语句。在复制状态正常的情况下，Master端和Slave端的数据是完全一样的。当然，MySQL的复制机制也包含一些特殊的情况，具体请参考官方的说明，大多数情况下，大家是不用担心的。</p>
+<p class="ziti">图14-10为MySQL Replication的复制原理逻辑图。</p>
+<div class="pic"><img alt="" src="Image00116.jpg" />
+</div>
+<p class="middle-img">图14-10　MySQL主从复制基本原理逻辑图</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00024.jpg" />
+ <span class="yanse">特别说明：</span>
+ 当企业面试MySQL主从复制原理时，不管是面试还是笔试，都要尽量画图表达，而不是口头讲或者通过文字描述，面试时可以找黑板或者拿出纸来向面试官详细讲解，自MySQL 5.6起，Slave服务器端的SQL线程可以是很多个，针对多个库可以并行执行SQL解析及应用操作。</p>
+<p class="ziti">下面针对MySQL主从复制原理的重点进行小结。</p>
+<p class="ziti6">·主从复制是异步的逻辑的SQL语句级的复制。</p>
+<p class="ziti6">·复制时，主库有一个binlog dump线程，从库有两个线程，I/O线程和SQL线程。</p>
+<p class="ziti6">·从MySQL 5.6起，Slave服务器端的SQL线程可以是很多个。</p>
+<p class="ziti6">·实现主从复制的必要条件是主库要开启记录binlog的功能。</p>
+<p class="ziti6">·用于复制的所有MySQL节点配置中的server-id都不能相同。</p>
+<p class="ziti6">·binlog文件只记录对数据库有更改的SQL语句（来自主数据库内容的变更），不记录任何查询（select、show）以及未对数据库做出更改的语句。</p>
+</body>
+</html>

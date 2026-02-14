@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_226">12.2.2　集成的第三方模块</h3>
+
+  <p class="ziti3">Kubernetes的Nginx Ingress当前版本是0.25.1，其集成了Nginx的扩展版本Open-Resty的1.15.8.1版本，OpenResty的最大特点是集成了Lua脚本的嵌入式编程功能，基于Nginx的优化，使Nginx具有更强的扩展能力。Nginx Ingress通过Lua脚本编程，利用OpenResty的balancer_by_lua模块，可通过nginx-ingress控制器动态地修改Nginx上游服务器组的配置，无须Nginx进程的热加载，有效地解决了因Pod调度带来的Pod IP变化的问题。Kubernetes的Nginx Ingress在OpenResty基础上还集成了诸多的第三方模块，模块功能介绍如下。</p>
+
+  <p class="ziti3">（1）Ajp协议模块（nginx_ajp_module）</p>
+
+  <p class="ziti3">Ajp协议模块是一个使Nginx实现Ajp协议代理的模块，该模块可以使Nginx通过Ajp协议连接到被代理的Tomcat服务。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/nginx-modules/nginx_ajp_module" class="pcalibre calibre1">https://github.com/nginx-modules/nginx_ajp_module</a></p>
+
+  <p class="ziti3">（2）InfluxDB输出模块（nginx-influxdb-module）</p>
+
+  <p class="ziti3">InfluxDB输出模块可以使Nginx的每次请求记录以InfluxDB作为后端进行存储，其以非阻塞的方式对每个请求进行过滤，并使用UDP协议将处理后的数据发送到InfluxDB服务器。可以通过该模块实时监控Nginx的所有请求，获得每个请求的连接类型、请求状态，并通过InfluxDB实现相关故障状态的报警。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/influxdata/nginx-influxdb-module" class="pcalibre calibre1">https://github.com/influxdata/nginx-influxdb-module</a></p>
+
+  <p class="ziti3">（3）GeoIP2数据库模块（ngx_http_geoip2）</p>
+
+  <p class="ziti3">MaxMind的GeoIP数据库已经升级到第二代，GeoIP2数据库提供了准确的IP信息，包括IP地址的位置（国家、城市、经纬度）等数据。该模块增加了GeoIP2数据的支持。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/nginx-modules/ngx_http_geoip2_module" class="pcalibre calibre1">https://github.com/nginx-modules/ngx_http_geoip2_module</a></p>
+
+  <p class="ziti3">（4）摘要认证模块（nginx-http-auth-digest）</p>
+
+  <p class="ziti3">摘要认证模块使Nginx的基本认证功能增加了摘要认证（Digest Authentication）的支持，这是一种简单的身份验证机制，是对基本认证的一种安全改进，仅通过服务端及客户端根据用户名和密码计算的摘要信息进行验证，避免了密码的明文传递，增加了认证过程的安全性。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/nginx-modules/nginx-http-auth-digest" class="pcalibre calibre1">https://github.com/nginx-modules/nginx-http-auth-digest</a></p>
+
+  <p class="ziti3">（5）内容过滤模块（ngx_http_substitutions_filter_module）</p>
+
+  <p class="ziti3">内容过滤模块是一个内容过滤功能的模块，其相对于Nginx自带的内容过滤模块（ngx_http_sub_module，参见4.3.4节）增加了正则匹配的替换方式。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/nginx-modules/ngx_http_substitutions_filter_module" class="pcalibre calibre1">https://github.com/nginx-modules/ngx_http_substitutions_filter_module</a></p>
+
+  <p class="ziti3">（6）分布式跟踪模块（nginx-opentracing）</p>
+
+  <p class="ziti3">OpenTracing由API规范、实现该规范的框架和库以及项目文档组成，是一个轻量级的标准化规范，其位于应用程序和跟踪分析程序之间，解决了不同分布式追踪系统API不兼容的问题。OpenTracing允许开发人员使用API向应用程序代码中添加工具，实现业务应用中的分布式请求跟踪。分布式请求跟踪，也称分布式跟踪，是一种用于分析和监视应用程序的方法，特别是那些使用微服务体系结构构建的应用程序。分布式跟踪有助于查明故障发生的位置以及导致性能低下的原因。该模块是将Nginx的请求提供给OpenTracing项目的分布式跟踪系统用于应用的请求分析和监控。Nginx Ingress中集成了jaeger和zipkin两种分布式跟踪系统的OpenTracing项目插件，用户可根据实际情况进行选择使用。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/opentracing-contrib/nginx-opentracing" class="pcalibre calibre1">https://github.com/opentracing-contrib/nginx-opentracing</a></p>
+
+  <p class="ziti3">（7）Brotli压缩模块（ngx_brotli）</p>
+
+  <p class="ziti3">Brotli是Google推出的侧重于HTTP压缩的一种开源压缩算法，它使用lz77算法的现代变体、Huffman编码和基于上下文的二阶建模的组合来压缩数据。在与Deflate相似的压缩与解压缩速度下，增加了20%的压缩密度。在与gzip的测试下，因压缩密度高其消耗的压缩时间要比gzip多，但在客户端解压的时间则相当。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/google/ngx_brotli" class="pcalibre calibre1">https://github.com/google/ngx_brotli</a></p>
+
+  <p class="ziti3">（8）ModSecurity连接器模块（ModSecurity-nginx）</p>
+
+  <p class="ziti3">ModSecurity是一个开源的Web应用防火墙，其主要作用是增强Web应用的安全性并保护Web应用免受攻击。模块ModSecurity-nginx是一个Nginx的ModSecurity连接器，其提供了Nginx和libmodsecurity（ModSecurity v3）之间的通信通道。Nignx Ingress中已经集成了ModSecurity和OWASP规则集，在Nginx配置文件目录可以查看相关配置。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/nginx-modules/ModSecurity-nginx" class="pcalibre calibre1">https://github.com/nginx-modules/ModSecurity-nginx</a></p>
+
+  <p class="ziti3">（9）lua-resty-waf模块</p>
+
+  <p class="ziti3">lua-resty-waf是一个基于OpenResty的高性能Web应用防火墙，它使用Nginx Lua API及灵活的规则架构分析和处理HTTP请求信息，并不断开发和测试一些自定义的规则补丁来应对不断出现的新的安全威胁。lua-resty-waf提供了ModSecurity兼容的规则语法，支持ModSecurity现有规则的自动转换，用户无须学习新的语法规则就可以扩展lua-resty-waf的规则。</p>
+
+  <p class="ziti3">模块网址：<a href="https://github.com/p0pr0ck5/lua-resty-waf" class="pcalibre calibre1">https://github.com/p0pr0ck5/lua-resty-waf</a>。</p>
+</body>
+</html>

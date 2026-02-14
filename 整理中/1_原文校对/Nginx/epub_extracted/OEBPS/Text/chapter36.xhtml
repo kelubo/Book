@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_43">3.1.2　配置文件结构</h3> 
+ <p class="ziti3">为了便于了解Nginx配置文件的内部结构，这里约定几个名词的定义。</p> 
+ <p class="ziti4">·配置指令：在配置文件中，由Nginx约定的内部固定字符串，Nginx官方文档中的英文单词为directive，本书中则统一称为配置指令，简称指令。指令是Nginx中功能配置的最基本元素，Nginx的每个功能配置都是通过多个不同的指令组合来实现的。</p> 
+ <p class="ziti4">·配置指令值：每个配置指令都有对应的内容来表示该指令的控制参数，本书中约定其对应的内容为配置指令值，简称指令值。指令值可以是字符串、数字或变量等多种类型。</p> 
+ <p class="ziti4">·配置指令语句：指令与指令值组合构成指令语句。一条指令语句可以包含多个配置指令值，在Nginx配置文件中，每条指令语句都要用“;”作为语句结束的标识符。</p> 
+ <p class="ziti4">·配置指令域：配置指令值有时会是由“{}”括起来的指令语句集合，本书中约定“{}”括起来的部分为配置指令域，简称指令域。指令域既可以包含多个指令语句，也可以包含多个指令域。</p> 
+ <p class="ziti4">·配置全局域：配置文件nginx.conf中上层没有其他指令域的区域被称为配置全局域，简称全局域。</p> 
+ <p class="ziti3">Nginx的常见配置指令域如表3-1所示。</p> 
+ <p class="middle-img">表3-1　Nginx的常见配置指令域</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-1.jpg" class="calibre30"/></a> 
+ </div> 
+ <p class="ziti3">打开系统默认的nginx.conf文件，可以看到整个文件的结构如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">#user  nobody;
+worker_processes  1;                        # 只启动一个工作进程
+events {
+    worker_connections  1024;               # 每个工作进程的最大连接为1024
+}
+http {
+    include       mime.types;               # 引入MIME类型映射表文件
+    default_type  application/octet-stream;   # 全局默认映射类型为application/octet-stream
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent” "$http_x_forwarded_for"';
+    #access_log  logs/access.log  main;
+    sendfile        on;                     # 启用零复制机制
+    keepalive_timeout  65;                  # 保持连接超时时间为65s
+    server {
+        listen       80;                    # 监听80端口的网络连接请求
+        server_name  localhost;             # 虚拟主机名为localhost
+        #charset koi8-r;
+        #access_log  logs/host.access.log  main;
+        location / {
+            root   html; 
+            index  index.html index.htm;
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">由上述配置文件可以看出，配置文件中的指令和指令值是以类似于key-value的形式书写的。写在配置文件全局域的指令是Nginx配置文件的核心指令，主要是对Nginx自身软件运行进行配置的指令。其中，events和http所包含的部分分别为事件指令域和HTTP指令域，指令域内的指令则明确约定了该区域内的指令的应用范围。server指令域被包含于http指令域中，同时又包含了location指令域，各指令域中的共用范围逐层被上层指令域限定，可见各指令域匹配的顺序是由外到内的。Nginx的配置指令按照内部设定可以同时编写在不同指令域中，包含在最内层的指令将对外层同名指令进行指令值覆盖，并以最内层指令配置为最终生效配置。</p> 
+ <p class="ziti3">编写Nginx配置文件时，为了便于维护，也会把一些指令或指令域写在外部文件中，再通过include指令引入nginx.conf主配置文件中。例如，配置文件中把写有types指令域的mime.types文件引用到http指令域中。此处使用的是nginx.conf文件的相对路径。</p> 
+</body>
+</html>

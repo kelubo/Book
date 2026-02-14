@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_152">8.1.1　服务器配置指令</h3> 
+ <p class="ziti3">Nginx上游模块定义了upstream指令域，在该指令域内可设置服务器、负载均衡策略等负载均衡配置，配置样例如下，具体指令说明见表8-1～表8-6。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream backend {
+    server backend1.example.com       weight=5;     # 被代理服务器端口号为80，权重为5
+    server backend2.example.com:8080;               # 被代理服务器端口号为8080，默认权重为1
+    server unix:/tmp/backend3;
+
+    server backup1.example.com:8080   backup;       # 该被代理服务器为备份状态
+    server backup2.example.com:8080   backup;       # 该被代理服务器为备份状态
+}
+
+server {
+    location / {
+        proxy_pass http://backend;          # 将客户端请求反向代理到上游服务器组backend
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表8-1　服务器指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-1.jpg" class="calibre271"/></a> 
+ </div> 
+ <p class="ziti4">·服务器地址可以是指定端口的IP、域名或Unix套接字。</p> 
+ <p class="ziti4">·如不指定端口，默认端口号为80。</p> 
+ <p class="middle-img">表8-2　服务器指令参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-2.jpg" class="calibre272"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/233-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/233-i.jpg" class="calibre273"/></a> 
+ </div> 
+ <p class="ziti4">·slow_start参数不能与Hash负载均衡方法一同使用。</p> 
+ <p class="ziti4">·若上游服务器组中只有一台被代理服务器，则max_fails、fail_timeout和slow_start参数都会被忽略，并且这个服务器将永远不会被置为无效。</p> 
+ <p class="middle-img">表8-3　共享内存区指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-3.jpg" class="calibre274"/></a> 
+ </div> 
+ <p class="middle-img">表8-4　长连接最大请求数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-4.jpg" class="calibre118"/></a> 
+ </div> 
+ <p class="middle-img">表8-5　长连接缓存数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-5.jpg" class="calibre275"/></a> 
+ </div> 
+ <p class="ziti3">该指令不会对活跃的TCP连接数有影响。</p> 
+ <p class="middle-img">表8-6　长连接缓存超时时间</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-6.jpg" class="calibre276"/></a> 
+ </div> 
+</body>
+</html>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_225">12.2.1　Nginx Ingress原理</h3> 
+ <p class="ziti3">Nginx Ingress由资源对象Ingress、Ingress控制器、Nginx三部分组成，Ingress控制器用以将Ingress资源实例组装成Nginx配置文件（nginx.conf），并重新加载Nginx使变更的配置生效。当它监听到Service中Pod变化时通过动态变更的方式实现Nginx上游服务器组配置的变更，无须重新加载Nginx进程。工作原理如图12-8所示。</p> 
+ <p class="ziti4">·Ingress，一组基于域名或URL把请求转发到指定Service实例的访问规则，是Kubernetes的一种资源对象，Ingress实例被存储在对象存储服务etcd中，通过接口服务被实现增、删、改、查的操作。</p> 
+ <p class="ziti4">·Ingress控制器（Ingress controller），用以实时监控资源对象Ingress、Service、End-point、Secret（主要是TLS证书和Key）、Node、ConfigMap的变化，自动对Nginx进行相应的操作。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-8.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-8.jpg" class="calibre353"/></a> 
+ </div> 
+ <p class="middle-img">图12-8　Nginx Ingress工作原理</p> 
+ <p class="ziti4">·Nginx，实现具体的应用层负载均衡及访问控制。</p> 
+ <p class="ziti3">Ingress控制器通过同步循环机制实时监控接口服务Ingress等资源对象的变化，当相关Service对应的端点列表有变化时，会通过HTTP POST请求将变化信息发送到Nginx内部运行的Lua程序进行处理，实现对Nginx Upstream中后端Pod IP变化的动态修改。每个后端Pod的IP及targetPort信息都存储在Nginx的共享内存区域，Nginx对每个获取的请求将使用配置的负载均衡算法进行转发，Nginx的配置中应用Lua模块的balancer_by_lua功能实现upstream指令域的动态操作，Pod IP变化及资源对象Ingress对upstream指令域相关注解（annotation）的变化无须执行Nginx的reload操作。</p> 
+ <p class="ziti3">当Ingress控制器监控的其他资源对象变化时，会对当前变化的内容创建Nginx配置模型，如果新的配置模型与当前运行的Nginx配置模型不一致，则将新的配置模型按照模板生成新的Nginx配置，并对Nginx执行reload操作。Nginx配置模型避免了Nginx的无效reload操作。为避免因Nginx配置语法错误导致意外中断，Ingress控制器为Nginx的配置内容提供了冲突检测及合并机制，Ingress控制器使用了准入控制插件（Validating Admission Webhook）做验证Ingress配置语法的准入控制，验证通过的Ingress资源对象才会被保存在存储服务etcd中，并被Ingress控制器生成确保没有语法错误的Nginx配置文件。</p> 
+</body>
+</html>

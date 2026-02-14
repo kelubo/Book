@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_49">3.2.3　进程调试</h3> 
+ <p class="ziti3">Nginx调整配置或运行发生异常时，为了及时获知工作进程在事件处理过程中发生的问题，可通过获取内存中各状态机、变量等数据的内容进行调试。Nginx为用户提供了一些调试用的配置指令，方便用户进行进程调试。配置指令如表3-11～表3-14所示。</p> 
+ <p class="middle-img">表3-11　主进程指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-11.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-11.jpg" class="calibre42"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">master_process off;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">当只由主进程处理请求时，调试进程会更加方便。</p> 
+ <p class="middle-img">表3-12　调试点控制指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-12.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-12.jpg" class="calibre43"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">debug_points stop;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-13　工作目录指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-13.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-13.jpg" class="calibre44"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">working_directory logs
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">可以使用工具objdump、GDB进行文件分析。</p> 
+ <p class="middle-img">表3-14　调试文件大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-14.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-14.jpg" class="calibre45"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_rlimit_core 800m;
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

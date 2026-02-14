@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.1.1　yum/rpm方式安装MySQL</h3>
+<p class="ziti">MySQL官方网站及相关镜像网站提供了不同版本的RPM安装包，并且针对不同的硬件或操作系统平台，安装包的类型也会有区别。在使用时，可以到官方网站的下载页面进行选择，国内有一些互联网公司提供了镜像文件下载，比如搜狐、阿里云公司提供的镜像资源就非常不错。</p>
+<p class="ziti">下面是搜狐网提供的数据库软件镜像地址：<a href="http://mirrors.sohu.com/mysql">http://mirrors.sohu.com/mysql</a>
+ ，如果本书使用的版本不再发布，那么可以选择5.6的其他相关版本，老男孩也在本书开头提供的地址中上传了本书使用的版本的软件。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ yum/rpm安装方式适合所有MySQL软件产品。</p>
+<p class="p6">1.rpm包方式安装MySQL</p>
+<p class="ziti">rpm包的安装方式非常简单，这里以el6平台下的MySQL 5.6.40版本为例，首先，要通过上述搜狐镜像地址下载到如下四个MySQL相关软件安装包。</p>
+<hr/>
+<pre class="ziti1">MySQL-client-5.6.40-1.el6.x86_64.rpm
+MySQL-devel-5.6.40-1.el6.x86_64.rpm
+MySQL-server-5.6.40-1.el6.x86_64.rpm
+MySQL-shared-5.6.40-1.el6.x86_64.rpm</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 我们可以从Linux的对应系统盘或系统镜像里找到类似的rpm包，但是版本一般会较低一些。</p>
+<p class="ziti">一般来说，其中的MySQL-server-5.6.40-1.el6.x86_64.rpm和MySQL-client-5.6.40-1.el6.x86_64.rpm这两个软件包是必须要安装的，至于另外两个软件包，则可视实际需要进行安装，不过一般建议一起安装。</p>
+<p class="ziti">可以把这四个rpm包上传到服务器的目录中，然后执行如下rpm命令进行安装：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy tools]# rpm -qa|grep mysql         #&lt;==查找已经安装的mysql的包。
+mysql-libs-5.1.73-7.el6.x86_64
+rpm -e mysql-libs-5.1.73-7.el6.x86_64 --nodeps  #&lt;==卸载系统已经安装的mysql依赖包。
+rpm -ivh MySQL-client-5.6.40-1.el6.x86_64.rpm
+rpm -ivh MySQL-devel-5.6.40-1.el6.x86_64.rpm
+rpm -ivh MySQL-shared-5.6.40-1.el6.x86_64.rpm
+rpm -ivh MySQL-server-5.6.40-1.el6.x86_64.rpm</pre>
+<hr/>
+<p class="ziti">这里的el6表示适合操作系统的版本，还有el5、el7等。i686表示适合32位的系统，x86_64表示适合64位的系统。</p>
+<p class="ziti">执行上述命令即可完成MySQL软件的安装。</p>
+<p class="ziti">在采用rpm包安装方式时，必须要官方或第三方提供了现成的rpm软件包，否则是无法使用该方式安装的。另外，和直接采用yum的安装方式相比，rpm包的安装方式往往可以选择更新的版本，但是rpm包安装也有自身的问题，例如，无法满足定制化安装，比如，不能进行编译参数、路径等的更改。</p>
+<p class="p6">2.yum方式安装MySQL</p>
+<p class="ziti">yum方式安装MySQL数据库时，只需要执行一个命令“yum install mysql-server-y”即可，yum方式的安装原理是在执行yum安装命令之后，其会自动从yum源地址下载相应名称的MySQL数据库rpm包，然后到系统上安装，并自动解决各种软件包之间的依赖问题。这是一个非常不错的安装软件的方式，不仅仅是针对MySQL，安装其他软件也是如此。</p>
+<p class="ziti">yum安装方式的最大优点就是超级简单，但是它也有自身的问题：例如它继承了rpm包的无法定制化安装的问题；另外一个缺点是采用默认的yum安装时，一般随yum源附带的软件版本都比较低，例如，截至作者写作本文时（2018.5），使用CentOS 6.9 Linux默认yum安装的MySQL版本仅为5.1.73。</p>
+</body>
+</html>

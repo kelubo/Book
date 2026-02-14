@@ -1,0 +1,247 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="A4e2f0132-f942-40ef-b88a-11039d1176b8" class="calibre13">Chapter 17<br class="calibre8"/> 第十七章 Arduino与树莓派</h2> 
+ <h3 id="A1ea0dfd8-106b-4ef7-8fd1-4cded3dffe29" class="calibre14">17.1 Arduino与树莓派</h3> 
+ <p class="calibre3">Arduino与树莓派是创客们进行创作的两大利器，Arduino和树莓派看起来有些相似，都是小型的电路板，上面有一些芯片和管脚，但实际上它们之间的区别很大，是完全不同的设备。Arduino实际上只是一个微控制器，而树莓派是一台迷你计算机。微控制器只是计算机中的一部分，与树莓派相比只能算是一个子集，提供的功能有限。</p> 
+ <p class="calibre3">尽管Arduino可以通过一些小型的类C应用程序进行编程，但它无法运行一个全面完整的操作系统。所以想用Arduino来制作家里的媒体中心是不可能的。</p> 
+ <p class="calibre3">Arduino非常适合电子产品项目。它包含一组输入和输出管脚，常常可以直接同相关的部件连接。可以立刻撸起袖子开干，非常简单和容易。这使得Arduino非常适合制作产品原型。</p> 
+ <p class="calibre3">树莓派则是一台功能完整的迷你计算机，拥有一台完整的计算机所拥有的功能，计算机具有的功能树莓派全都有（只是体积更小）。存储空间是通过Micro SD卡来提供的，而内置的以太网接口则提供了连接到互联网的能力（Arduino也可以访问网络，但需要一些额外的部件）。</p> 
+ <p class="calibre3">树莓派的核心是一款ARM CPU，它也有内存及用来驱动HDMI输出的图形处理器GPU，可以外接一个键盘和显示器，加载Linux操作系统。树莓派是一款体积非常小但功能却非常强大的平台，非常适合嵌入式系统，或者那些需要更多互动能力和处理能力的项目。</p> 
+ <p class="calibre3">树莓派缺乏模拟输入，而Arduino非常容易处理模拟输入。事实上，这两个世界大家都可以同时拥有，在许多方面，结合使用Arduino与树莓派是一个非常棒的选择，因为它能够发挥两块电路板的优势。如果使用带有GPIO接口并含有类似于AlaMode这样兼容Arduino硬件的接口板，就可以将树莓派与Arduino的功效发挥到极致。</p> 
+ <h3 id="Aedc0a027-cf3b-451b-afa7-a417e32d26db" class="calibre14">17.2 在树莓派系统建立Arduino编程环境</h3> 
+ <p class="calibre3"><b class="calibre6">1．安装Arduino IDE</b></p> 
+ <p class="calibre3">在树莓派系统安装Arduino IDE的命令如下：</p> 
+ <div class="center">
+  <img alt="" class="u708" src="../Images/308_01.jpg" width="1280" height="91"/>
+ </div> 
+ <p class="calibre3">安装之后在树莓派系统的主菜单中会出现“Arduino IDE”命令，如图17-1所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u709" src="../Images/308_02.jpg" width="1074" height="755"/> 
+  <p class="imgtitle">图17-1 在树莓派系统安装Arduino IDE</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">2．在树莓派系统连接Arduino开发板</b></p> 
+ <p class="calibre3">（1）通过USB将Arduino开发板和树莓派连接起来，和将Arduino与PC连接一样。</p> 
+ <p class="calibre3">（2）配置通信端口，选择“Tools”＞“SerialPort”＞“/dev/ttyACM0”命令，如图17-2所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u710" src="../Images/308_03.jpg" width="743" height="836"/> 
+  <p class="imgtitle">图17-2 选择串口</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">3．编译测试</b></p> 
+ <p class="calibre3">选择“File”＞“Examples”＞“01.Basics”＞“Blink”命令，单击工具栏中的“Upload”按钮，将自动完成编译并下载到扩展板子上，可以看到界面下方出现“Done up-loading”，如图17-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u711" src="../Images/309_01.jpg" width="1280" height="558"/> 
+  <p class="imgtitle">图17-3 编译测试</p> 
+ </div> 
+ <h3 id="Ad78845b2-51f2-44e2-a0fb-5408a497bbe0" class="calibre14">17.3 在树莓派系统使用PyFirmata来控制Arduino</h3> 
+ <p class="calibre3">Firmata是一个PC与MCU通信的常用协议。其宗旨是能与任何PC软件包兼容。到目前为止，已经得到不少语言的支持，这样可方便地将对协议的支持加入软件系统中。Firmata起初是针对PC与Arduino通信的固件（Firmware），其目标是让开发者可以通过PC软件完全地控件Arduino。</p> 
+ <p class="calibre3">Firmata主页网址为：https：//www.arduino.cc/en/Reference/Firmata，下面这段代码展示了如何使用firmata发送和接收模拟量：</p> 
+ <div class="center">
+  <img alt="" class="u712" src="../Images/309_02.jpg" width="1280" height="608"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u713" src="../Images/310_01.jpg" width="1280" height="349"/>
+ </div> 
+ <p class="calibre3">Arduino IDE提供了Firmata，为了将Firmata安装到Arduino电路板，只需要下载一个sketch即可。在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFirmata”命令。使用Firmata库Arduino就可以树莓派通信了，现在需要在树莓派安装PyFirmata，它连接的是树莓派端，安装命令如下：</p> 
+ <div class="center">
+  <img alt="" class="u413" src="../Images/310_02.jpg" width="1280" height="175"/>
+ </div> 
+ <p class="calibre3">将树莓派主板和Arduino主板使用USB线连接起来，在树莓派的文件管理器中打开dev目录，可以看到ttyACM0设备，这个就是连接到Arduino主板的USB设备，如图17-4所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u714" src="../Images/310_03.jpg" width="1082" height="761"/> 
+  <p class="imgtitle">图17-4 ttyACM1</p> 
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为pyFirmata_Test.py：</p> 
+ <div class="center">
+  <img alt="" class="u715" src="../Images/310_04.jpg" width="1280" height="278"/>
+ </div> 
+ <p class="calibre3">运行结果如图17-5所示，结果是使Arduino板上的LED灯闪烁。</p> 
+ <div class="center"> 
+  <img alt="" class="u716" src="../Images/311_01.jpg" width="1280" height="325"/> 
+  <p class="imgtitle">图17-5 PyFirmata测试</p> 
+ </div> 
+ <h3 id="Ab1c0e4f0-dc9f-4999-85a0-f83478800dd1" class="calibre14">17.4 使用树莓派控制Arduino的输出</h3> 
+ <p class="calibre3">下面介绍如何通过树莓派的Python程序控制Arduino的引脚输出，包括输出数字信号、PWM信号和伺服电机（舵机）。</p> 
+ <h4 class="sigil_not_in_toc" id="A18530136-c3ef-4f2f-9370-49b73bc45d6a">17.4.1 使用PyFirmata控制Arduino数字引脚</h4> 
+ <p class="calibre3">在树莓派中利用PyFirmata可以控制Arduino的数字引脚，将LED接在Arduino的数字引脚10，以下Python程序将会令LED以1Hz的频率进行闪烁。</p> 
+ <p class="calibre3">在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFir-mata”命令，将示例写入Arduino开发板。</p> 
+ <p class="calibre3">在树莓派打开Python3的IDLE窗口中，新建文件，输入下列代码，并将文件保存为pyFirmata_Control_Digital.py：</p> 
+ <div class="center">
+  <img alt="" class="u717" src="../Images/311_02.jpg" width="1280" height="398"/>
+ </div> 
+ <p class="calibre3">运行pyFirmata_Control_Digital.py，连接在Arduino电路板上的LED以1Hz的频率进行闪烁。</p> 
+ <p class="calibre3">运行结果如图17-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u718" src="../Images/311_03.jpg" width="1280" height="314"/> 
+  <p class="imgtitle">图17-6 Python程序控制Arduino的数字引脚输出</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A67f60137-8b30-4341-8f09-9c822f3c30d1">17.4.2 使用PyFirmata控制Arduino输出PWM信号</h4> 
+ <p class="calibre3">在树莓派中利用PyFirmata可以控制Arduino的数字引脚输出PWM信号，将LED接在Arduino的数字引脚10，以下Python程序将控制LED的亮度。</p> 
+ <p class="calibre3">在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFir-mata”命令，将示例写入Arduino开发板。</p> 
+ <p class="calibre3">启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为pyFirmata_Control_PWM.py：</p> 
+ <div class="center">
+  <img alt="" class="u719" src="../Images/312_01.jpg" width="1280" height="387"/>
+ </div> 
+ <p class="calibre3">通过以下代码将其定义为PWM输出：</p> 
+ <div class="center">
+  <img alt="" class="u720" src="../Images/312_02.jpg" width="1280" height="47"/>
+ </div> 
+ <p class="calibre3">其中，p表示PWM，这个命令只能用于标记有～符号的Arduino引脚。</p> 
+ <p class="calibre3">运行结果如图17-7所示</p> 
+ <div class="center"> 
+  <img alt="" class="u721" src="../Images/312_03.jpg" width="1280" height="376"/> 
+  <p class="imgtitle">图17-7 PyFirmata控制Arduino的数字引脚输出PWM信号</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Aba5f0137-f5e6-4bbd-9f32-c87c97150502">17.4.3 使用PyFirmata控制Arduino伺服电机</h4> 
+ <p class="calibre3">在树莓派中可以使用PyFirmata通过Arduino控制伺服电机，使用PyFirmata向Arduino发命令，生成控制伺服电机转角所需的脉冲。</p> 
+ <p class="calibre3">在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFirmata”命令，将示例写入Arduino开发板。</p> 
+ <p class="calibre3">启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为pyFirmata Control Servo.py：</p> 
+ <div class="center">
+  <img alt="" class="u722" src="../Images/312_04.jpg" width="1280" height="139"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u723" src="../Images/313_01.jpg" width="1280" height="266"/>
+ </div> 
+ <p class="calibre3">通过以下代码将其定义为伺服电机的输出：</p> 
+ <div class="center">
+  <img alt="" class="u724" src="../Images/313_02.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3">其中，s表示Servo，这个命令只能用于Arduino的任意数字引脚。</p> 
+ <p class="calibre3">运行结果如图17-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u725" src="../Images/313_03.jpg" width="1280" height="453"/> 
+  <p class="imgtitle">图17-8 PyFirmata通过Arduino控制伺服电机</p> 
+ </div> 
+ <h3 id="Ad426077c-7afa-4094-a5b9-8174b3b97581" class="calibre14">17.5 读取Arduino的输入</h3> 
+ <p class="calibre3">下面介绍如何通过树莓派的Python程序读取Arduino的引脚输出，包括数字输入和模拟输入。</p> 
+ <p class="calibre3">在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFir-mata”命令，将示例写入Arduino开发板。</p> 
+ <p class="calibre3">启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为pyFirmata_Input_Digital.py：</p> 
+ <div class="center">
+  <img alt="" class="u726" src="../Images/313_04.jpg" width="1280" height="510"/>
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Aed5c0139-2254-46c0-9304-19d2c46e8e36">17.5.1 使用PyFirmata读取Arduino数字输入</h4> 
+ <p class="calibre3">本节以读取E18-D80NK红外光电开关传感器的值为例进行说明，E18-D80NK红外光电开关有3根接线，棕色：VCC正极；蓝色：GND负极；黑色：OUT信号。尾部的电位器旋钮用于调节检测距离，如图17-9所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u727" src="../Images/314_01.jpg" width="1096" height="405"/> 
+  <p class="imgtitle">图17-9 E18-D80NK光电开关</p> 
+ </div> 
+ <p class="calibre3">将红外开关的黑色信号线接到Arduino开发板的数字引脚4上。在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFirmata”命令，将示例写入Arduino开发板。</p> 
+ <p class="calibre3">下面的Python程序读取连接在Arduino的红外开关传感器的值，启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为pyFirmata_Input_Digital.py：</p> 
+ <div class="center">
+  <img alt="" class="u728" src="../Images/314_02.jpg" width="1280" height="524"/>
+ </div> 
+ <p class="calibre3">通过以下代码将其定义为数字引脚4：</p> 
+ <div class="center">
+  <img alt="" class="u729" src="../Images/314_03.jpg" width="1280" height="44"/>
+ </div> 
+ <p class="calibre3">其中d为数字引脚；4为引脚4；i表示输入。</p> 
+ <p class="calibre3">运行结果如图17-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u730" src="../Images/314_04.jpg" width="1280" height="364"/> 
+  <p class="imgtitle">图17-10 Python程序读取连接在Arduino的红外开关传感器的值</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Add82013a-f9c3-4db8-8772-092929cbfa7d">17.5.2 使用PyFirmata读取Arduino模拟输入</h4> 
+ <p class="calibre3">通过Python可以读取Arduino开发板的模拟输入。下面以光敏传感器为例进行说明。</p> 
+ <p class="calibre3">光敏传感器是把光信号变成电信号的一种传感器。光敏传感器实质是一个光敏电阻，根据光的照射强度会改变其自身的阻值光，光敏电阻传感器如图17-11所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u731" src="../Images/315_01.jpg" width="493" height="405"/> 
+  <p class="imgtitle">图17-11 光敏电阻传感器</p> 
+ </div> 
+ <p class="calibre3">光敏电阻传感器一般有3个引脚：“+”——电源；“-”——接地；“S”——信号。S是一个模拟输入口，连接Arduino的一个模拟输入引脚，将光敏电阻传感器的信号线接到Arduino开发板的模拟引脚A0上。在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFirmata”命令，将示例写入Arduino开发板。</p> 
+ <p class="calibre3">下面的Python程序会读取连接在Arduino的光敏电阻传感器的值。启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为pyFirmata_Input_Analog.py：</p> 
+ <div class="center">
+  <img alt="" class="u732" src="../Images/315_02.jpg" width="1280" height="515"/>
+ </div> 
+ <p class="calibre3">通过以下代码将其定义为模拟引脚0：</p> 
+ <div class="center">
+  <img alt="" class="u733" src="../Images/315_03.jpg" width="1280" height="50"/>
+ </div> 
+ <p class="calibre3">其中a为模拟引脚；0为引脚0；i表示输入。</p> 
+ <p class="calibre3">运行结果如图17-12所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u734" src="../Images/315_04.jpg" width="1280" height="422"/> 
+  <p class="imgtitle">图17-12 PyFirmata读取Arduino模拟输入</p> 
+ </div> 
+ <h3 id="A447690a2-8fa0-4991-af48-fcd51b859759" class="calibre14">17.6 通过I<sup class="calibre16">2</sup>C实现树莓派和Arduino之间的通信</h3> 
+ <p class="calibre3">树莓派和Arduino之间通过I<sup class="calibre9">2</sup>C接口可以进行数据通信。I<sup class="calibre9">2</sup>C总线具有主设备和从设备，主设备用来控制总线，一个主设备可以连接多个从设备，并且每个从设备都有自己的地址。</p> 
+ <p class="calibre3">I<sup class="calibre9">2</sup>C协议涉及使用两线发送和接收数据：串行时钟引脚（SCL）和一个串行数据引脚（SDA），通过两个引脚使两个设备之间进行数据通信。</p> 
+ <p class="calibre3">ArduinoUNO的A4和A5连接到树莓派的SDA和SCL引脚，接线关系如表17-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表17-1 Arduino UNO开发板与树莓派的I<sup class="calibre16">2</sup>C接线关系</p>
+  <img alt="" class="u735" src="../Images/316_01.jpg" width="1280" height="140"/>
+ </div> 
+ <p class="calibre3">ArduinoUNO开发板和树莓派的I<sup class="calibre9">2</sup>C的连线图如图17-13所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u736" src="../Images/316_02.jpg" width="1280" height="459"/> 
+  <p class="imgtitle">图17-13 ArduinoUNO开发板和树莓派的I<sup class="calibre16">2</sup>C的连线图</p> 
+ </div> 
+ <p class="calibre3">将Arduino UNO开发板作为I<sup class="calibre9">2</sup>C的从设备，启动Arduino IDE，新建文件，输入下列代码，并将文件保存为ArduinoI<sup class="calibre9">2</sup>C，ino，下载到Arduino UNO开发板：</p> 
+ <div class="center">
+  <img alt="" class="u737" src="../Images/316_03.jpg" width="1280" height="625"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u738" src="../Images/317_01.jpg" width="1280" height="997"/>
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为Raspberry_I<sup class="calibre9">2</sup>C.py：</p> 
+ <div class="center">
+  <img alt="" class="u739" src="../Images/317_02.jpg" width="1280" height="653"/>
+ </div> 
+ <p class="calibre3">运行结果如图17-14所示，Arduino UNO开发板的A0引脚接3.3V，输出174，A0接5.0V，输出255。</p> 
+ <div class="center"> 
+  <img alt="" class="u740" src="../Images/318_01.jpg" width="1280" height="484"/> 
+  <p class="imgtitle">图17-14 通过I<sup class="calibre16">2</sup>C实现树莓派和Arduino之间的通信</p> 
+ </div> 
+ <h3 id="Ae628b939-61a0-4f81-9a0a-4a6e4793bcca" class="calibre14">17.7 AlaMode板与树莓派</h3> 
+ <p class="calibre3">将Arduino的通用性与Raspberry Pi的强大功能相结合，ALaMode接口板已经迅速成为人们的最爱之一。有了它，人们可以在Raspberry Pi上的Linux中运行Arduino软件（Ardui-no IDE）。它可以让人们从Pi端对Arduino直接编程来开发复杂的项目，例如，可以将所看到、听到或接触到的信息广播到Web上的移动机器人。</p> 
+ <p class="calibre3">AlaMode接口板实际上就是Arduino UNO，只不过在电路板的一个角上提供了树莓派的GPIO接口而已，如图17-15所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u741" src="../Images/318_02.jpg" width="702" height="448"/> 
+  <p class="imgtitle">图17-15 ALaMode接口板</p> 
+ </div> 
+ <p class="calibre3">有大量使用树莓派的例子，不如使用Arduino更容易实现。Arduino有大量的例程库，例如控制各种电机、读各种传感器和控制显示器。通过AlaMode接口板可以在树莓派编写Arduino控制的各种应用程序，以及各种网络通信的应用。</p> 
+ <p class="calibre3">下面是一些AlaMode接口板的特性。</p> 
+ <p class="calibre3">（1）灵活的电源。电源可以直接从树莓派接口的5V引脚供电，也可以使用一个独立的电池及USB电源。</p> 
+ <p class="calibre3">（2）通信接口可以通过树莓派的UART接口、USB——串口的适配器及ISP。</p> 
+ <p class="calibre3">（3）集成了Fastrax UP501GPS接收模块，能在恶劣的条件下进行高性能的导航，甚至在低的GPS卫星环境下实现稳定的定位。</p> 
+ <p class="calibre3">（4）提供了DS3234实时时钟。</p> 
+ <p class="calibre3">（5）提供了Micro SD卡槽。扩展了Arduino的存储，丰富了Arduino的应用。</p> 
+ <p class="calibre3">（6）提供了直接连接伺服电机的接头。</p> 
+ <p class="calibre3">（7）可以作为I<sup class="calibre9">2</sup>C的从设备。除了进行串行连接外，AlaMode接口板的I<sup class="calibre9">2</sup>C可以连接到树莓派。</p> 
+ <h4 class="sigil_not_in_toc" id="Adb83013e-8080-4251-97a5-532084ea6896">17.7.1 使用AlaMode接口板</h4> 
+ <p class="calibre3">为了使用AlaMode接口板，打开树莓派终端，执行下列命令：</p> 
+ <div class="center">
+  <img alt="" class="u742" src="../Images/319_01.jpg" width="1280" height="176"/>
+ </div> 
+ <p class="calibre3">安装完成后，重新启动树莓派，启动Arduino IDE，选择“Tools”＞“Board”＞“AlaMode”命令，如图17-16所示。再选择“Tools”＞“Serial Port”＞“/dev/ttyACM0”命令，如图17-17所示，选择“File”＞“Example”＞“01 Basics”＞“Blink”命令，将示例程序下载到AlaMode接口板，示例程序开始运行。</p> 
+ <div class="center"> 
+  <img alt="" class="u743" src="../Images/319_02.jpg" width="907" height="682"/> 
+  <p class="imgtitle">图17-16 Arduino IDE的AlaMode板</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u744" src="../Images/319_03.jpg" width="613" height="682"/> 
+  <p class="imgtitle">图17-17 选择烧写接口</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A2178013e-32f4-4df9-a787-a55c8a405df3">17.7.2 利用PyFirmata访问AlaMode板</h4> 
+ <p class="calibre3">使用PyFirmata访问AlaMode开发板之前，在Arduino IDE的菜单栏中选择“File”＞“Example”＞“Firmata”＞“StandardFirmata”命令，将示例写入AlaMode开发板。</p> 
+ <p class="calibre3">在使用PyFirmata的时候，将原来Arduino的设备/dev/ttyACM0改为/dev/ttyAMA0，例如：</p> 
+ <div class="center">
+  <img alt="" class="u745" src="../Images/319_04.jpg" width="1280" height="87"/>
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python3的IDLE窗口，新建文件，输入下列代码，并将文件保存为py-Firmata_AlaMode_Output.py：</p> 
+ <div class="center">
+  <img alt="" class="u746" src="../Images/319_05.jpg" width="1280" height="224"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u747" src="../Images/320_01.jpg" width="1280" height="177"/>
+ </div> 
+ <p class="calibre3">运行结果为板上的LED灯以1秒的频率闪烁。</p> 
+ <h3 id="A10b8ac7d-6570-4dd2-a675-b749cce4fbcf" class="calibre14">17.8 本章小结</h3> 
+ <p class="calibre3">本章介绍了两者结合使用的相关内容，包括通过树莓派对Arduino编程、控制Arduino的输出、读取Arduino的输入、兼容Arduino硬件提供树莓派接口的AlaMode接口板等，给出了应用的例子和实现方法。</p> 
+</body>
+</html>

@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_124">6.2.1　stream核心模块</h3> 
+ <p class="ziti3">Nginx的TCP/UDP代理功能的模块分为核心模块和辅助模块，核心模块stream需要在编译配置时增加“--with-stream”参数进行编译。核心模块的全局配置指令如表6-4所示。</p> 
+ <p class="middle-img">表6-4　stream核心模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b6-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b6-4.jpg" class="calibre229"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/186-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/186-i.jpg" class="calibre226"/></a> 
+ </div> 
+ <p class="ziti4">·指令listen使用的指令域范围为server。</p> 
+ <p class="ziti4">·指令variables_hash_bucket_size和variables_hash_max_size使用的指令域范围为stream。</p> 
+ <p class="ziti4">·stream核心模块其余指令使用的指令域范围为stream、server。</p> 
+ <p class="ziti4">·resolver指令值可填写多个域名解析服务器地址，各个地址用空格分隔。</p> 
+ <p class="ziti4">·listen指令值参数如表6-5所示。</p> 
+ <p class="middle-img">表6-5　listen指令值参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b6-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b6-5.jpg" class="calibre230"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">stream {
+    resolver 114.114.114.114 valid=300s;  
+    resolver_timeout 2s;
+
+    upstream backend {
+       server 192.168.0.1:333;
+       server www.example.com:333;
+    }
+
+    server {
+        listen 127.0.0.1:333 udp reuseport;
+        proxy_timeout 20s;
+        proxy_pass backend;
+    }
+
+    server {
+        listen [::1]:12345;
+        proxy_pass unix:/tmp/stream.socket;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

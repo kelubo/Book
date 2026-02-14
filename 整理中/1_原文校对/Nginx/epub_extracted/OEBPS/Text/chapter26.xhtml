@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h2 class="p3" id="sigil_toc_id_31">2.5　Nginx部署</h2>
+
+  <h3 class="p" id="sigil_toc_id_32">2.5.1　环境配置</h3>
+
+  <p class="ziti3">Nginx编译成功后，为了便于操作维护，建议把Nginx执行文件的路径添加到环境变量中，可以通过如下命令完成。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">cat &gt;/etc/profile.d/nginx.sh &lt;&lt; EOF
+PATH=$PATH:/usr/local/nginx/sbin
+EOF
+source /etc/profile
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">对于OpenResty，为了保持与Nginx的维护一致性，可以将Nginx目录软连接到/usr/local目录下。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">ln -s /usr/local/openresty/nginx /usr/local/nginx
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">在CentOS操作系统中，配置文件通常放在/etc目录下，建议将Nginx的conf目录软连接到/etc目录下。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">ln -s /usr/local/nginx/conf /etc/nginx
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

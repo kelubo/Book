@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="p3" id="sigil_toc_id_160">8.3　负载均衡配置</h2> 
+ <h3 class="p" id="sigil_toc_id_161">8.3.1　负载均衡的长连接</h3> 
+ <p class="ziti3">当客户端通过浏览器访问HTTP服务器时，HTTP请求会通过TCP协议与HTTP服务器建立一条访问通道，当本次访问数据传输完毕后，该TCP连接会立即被断开，由于这个连接存在的时间很短，所以HTTP连接也被称为短连接。在HTTP/1.1版本中默认开启Connection:keep-alive，实现了HTTP协议的长连接，可以在一个TCP连接中传输多个HTTP请求和响应，减少了建立和关闭TCP连接的消耗和延迟，提高了传输效率。网络应用中，每个网络请求都会打开一个TCP连接，基于上层的软件会根据需要决定这个连接的保持或关闭。例如，FTP协议的底层也是TCP，是长连接。</p> 
+ <p class="ziti3">默认配置下，HTTP协议的负载均衡与上游服务器组中被代理的连接都是HTTP/1.0版本的短连接。Nginx的连接管理机制如图8-1所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/8-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/8-1.jpg" class="calibre282"/></a> 
+ </div> 
+ <p class="middle-img">图8-1　Nginx连接管理机制</p> 
+ <p class="ziti3">相关说明如下。</p> 
+ <p class="ziti4">·Nginx启动初始化时，每个Nginx工作进程（Worker Process）会生成一个由配置指令worker_connections指定大小的可用连接池（free_connection pool）。工作进程每建立一个连接，都会从可用连接池中分配（ngx_get_connection）到一个连接资源，而关闭连接时再通知（ngx_free_connection）可用连接池回收此连接资源。</p> 
+ <p class="ziti4">·客户端向Nginx发起HTTP连接时，Nginx的工作进程获得该请求的处理权并接受请求，同时从可用连接池中获得连接资源与客户端建立客户端连接资源。</p> 
+ <p class="ziti4">·Nginx的工作进程从可用连接池获取连接资源，并与通过负载均衡策略选中的被代理服务器建立代理连接。</p> 
+ <p class="ziti4">·默认配置下，Nginx的工作进程与被代理服务器建立的连接都是短连接，所以获取请求响应后就会关闭连接并通知可用连接池回收此代理连接资源。</p> 
+ <p class="ziti4">·Nginx的工作进程将请求响应返回给客户端，若该请求为长连接，则保持连接，否则关闭连接并通知可用连接池回收此客户端连接资源。</p> 
+ <p class="ziti4">·Nginx能建立的最大连接数是worker_connections×worker_processes。而对于反向代理的连接，最大连接数是worker_connections×worker_processes/2，但是其会占用与客户端及与被代理服务器建立的两个连接。</p> 
+ <p class="ziti3">在高并发的场景下，Nginx频繁与被代理服务器建立和关闭连接会消耗大量资源。Nginx的upstream_keepalive模块提供与被代理服务器间建立长连接的管理支持，该模块建立了一个长连接缓存，用于管理和存储与被代理服务器建立的连接。Nginx长连接管理机制如图8-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/8-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/8-2.jpg" class="calibre283"/></a> 
+ </div> 
+ <p class="middle-img">图8-2　Nginx长连接管理机制</p> 
+ <p class="ziti3">相关说明如下。</p> 
+ <p class="ziti4">·当upstream_keepalive模块初始化时，将建立按照upstream指令域中的keepalive指令设置大小的长连接缓存（Keepalive Connect Cache）池。</p> 
+ <p class="ziti4">·当Nginx的工作进程与被代理服务器新建的连接完成数据传输时，其将该连接缓存在长连接缓存池中。</p> 
+ <p class="ziti4">·当工作进程与被代理服务器有新的连接请求时，会先在长连接缓存池中查找符合需求的连接，如果存在则使用该连接，否则创建新连接。</p> 
+ <p class="ziti4">·对于超过长连接缓存池数量的连接，将使用最近最少使用（LRU）算法进行关闭或缓存。</p> 
+ <p class="ziti4">·长连接缓存池中每个连接最大未被激活的超时时间由upstream指令域中keepalive_timeout指令设置，超过该指令值时间未被激活的连接将被关闭。</p> 
+ <p class="ziti4">·长连接缓存池中每个连接可复用传输的请求数由upstream指令域中keepalive_requests指令设置，超过该指令值复用请求数的连接将被关闭。</p> 
+ <p class="ziti4">·Nginx与被代理服务器间建立的长连接是通过启用HTTP/1.1版本协议实现的。由于HTTP代理模块默认会将发往被代理服务器的请求头属性字段Connection的值设置为Close，因此需要通过配置指令清除请求头属性字段Connection的内容。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream http_backend {
+    server 192.168.2.154:8080;
+    server 192.168.2.109:8080;
+    keepalive 32;                           # 长连接缓存池大小为32
+    keepalive_requests 2000;                # 每条长连接最大复用请求数为2000
+}
+
+server {
+    location /http/ {
+        proxy_pass http://http_backend;
+        proxy_http_version 1.1;             # 启用HTTP/1.1版本与被代理服务器建立连接
+        proxy_set_header Connection "";     # 清空发送被代理服务器请求头属性字段Connection
+                                                # 的内容
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">对于FastCGI协议服务器，需要设置fastcgi_keep_conn指令启用长连接支持。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream fastcgi_backend {
+    server 192.168.2.154:9000;
+    server 192.168.2.109:9000;
+    keepalive 8;                            # 长连接缓存池大小为8
+}
+
+server {
+    ...
+
+    location /fastcgi/ {
+        fastcgi_pass fastcgi_backend;
+        fastcgi_keep_conn on;               # 启用长连接支持
+        ...
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·SCGI和uWSGI协议没有长连接的概念。</p> 
+ <p class="ziti4">·Memcached协议（由ngx_http_memcached_module模块提供）的长连接配置，只需在upstream指令域中设置keepalive指令即可。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream memcached_backend {
+    server 127.0.0.1:11211;
+    server 10.0.0.2:11211;
+
+    keepalive 32;                           # 长连接缓存池大小为32
+}
+
+server {
+    ...
+
+    location /memcached/ {
+        set $memcached_key $uri;            # 设置$memcached_key为$uri
+        memcached_pass memcached_backend;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

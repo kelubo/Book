@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_174">9.1.1　访问日志</h3> 
+ <p class="ziti3">Nginx的访问日志主要记录用户客户端的请求信息（见表9-1）。用户的每次请求都会记录在访问日志中，access_log指令可以设置日志的输出方式及引用的日志格式。</p> 
+ <p class="middle-img">表9-1　访问日志指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-1.jpg" class="calibre285"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/260-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/260-i.jpg" class="calibre286"/></a> 
+ </div> 
+ <p class="ziti4">·在同一级别的指令域中，也可指定多个日志。</p> 
+ <p class="ziti4">·指令值中的第一个参数用于设置输出日志的方式，默认是输出到本地的文件中。该指令也支持输出到syslog或内存缓冲区中。</p> 
+ <p class="ziti4">·该指令在stream指令域中时，默认值为off。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">access_log off;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·参数path，设置日志输出的文件路径或syslog服务器地址。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">access_log logs/access.log combined;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·参数format，设置关联log_format指令定义的日志格式名。</p> 
+ <p class="ziti4">·参数buffer，设置日志文件缓冲区大小。当缓冲区日志数据超出该值时，缓冲区日志数据会被写到磁盘文件。默认缓冲区大小为64KB。</p> 
+ <p class="ziti4">·参数flush，设置日志缓冲区刷新的时间间隔，缓冲区日志的保护时间超过这个设定值时，缓冲区日志数据会被写到磁盘文件。</p> 
+ <p class="ziti4">·参数gzip，设置缓冲区数据的压缩级别，缓冲区数据会被压缩后再写出到磁盘文件。压缩级别范围1～9，级别越高压缩比越高，系统资源消耗也最大，默认级别为1。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">access_log logs/log.gz combined gzip flush=5m;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·参数if，设置是否记录日志，当参数值的条件成立，即不为0或空时，才记录日志。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $status $loggable {
+    ~^[23]  0;
+    default 1;
+}
+
+access_log logs/access.log combined if=$loggable;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">日志格式指令如表9-2所示。</p> 
+ <p class="middle-img">表9-2　日志格式指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-2.jpg" class="calibre287"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/261-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/261-i.jpg" class="calibre288"/></a> 
+ </div> 
+ <p class="ziti4">·指令值参数name用于设置日志格式名。该名称全局唯一，可以被access_log引用。</p> 
+ <p class="ziti4">·指令值参数escape用于设置日志输出字符串编码格式，json支持中文字符内容输出。</p> 
+ <p class="ziti4">·指令值参数string用于设置日志输出格式字符串。该字符串由Nginx公共变量和仅在日志写入时存在的变量组成。HTTP常用变量如表9-3所示。</p> 
+ <p class="middle-img">表9-3　HTTP日志变量</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-3.jpg" class="calibre289"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 普通格式日志
+log_format  main  '$remote_addr - $connection - $remote_user [$time_local] "$request" - $upstream_addr'
+                  '$status  - $body_bytes_sent - $request_time - "$http_referer" '
+                  '"$http_user_agent" - "$http_x_forwarded_for" - ';
+
+# JSON格式日志
+log_format json '{"@timestamp": "$time_iso8601", '
+                '"connection": "$connection", '
+                '"remote_addr": "$remote_addr", '
+                '"remote_user": "$remote_user", '
+                '"request_method": "$request_method", '
+                '"request_uri": "$request_uri", '
+                '"server_protocol": "$server_protocol", '
+                '"status": "$status", '
+                '"body_bytes_sent": "$body_bytes_sent", '
+                '"http_referer": "$http_referer", '
+                '"http_user_agent": "$http_user_agent", '
+                '"http_x_forwarded_for": "$http_x_forwarded_for", '
+                '"request_time": "$request_time"}';
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx TCP/UDP的访问日志的变量与HTTP的访问日志的变量是不同的，TCP/UDP常见日志变量如表9-4所示。</p> 
+ <p class="middle-img">表9-4　TCP/UDP日志输出变量</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-4.jpg" class="calibre290"/></a> 
+ </div> 
+ <p class="ziti3">Nginx的TCP/UDP的日志处理是在连接处理阶段结束时才发生，所以TCP/UDP代理的访问日志只在连接关闭时才被记录。访问日志格式配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 普通格式日志
+log_format  tcp  '$remote_addr - $connection - [$time_local] $server_addr: $server_port '
+                  '- $status - $upstream_addr - $bytes_received - $bytes_sent - $session_time '
+                  '- $proxy_protocol_addr:$proxy_protocol_port ';
+
+# JSON格式日志
+log_format json '{"@timestamp": "$time_iso8601", '
+                '"connection": "$connection", '
+                '"remote_addr": "$remote_addr", '
+                '"server_addr": "$server_addr:$server_port" '
+                '"status": "$status" '
+                '"upstream_addr": "$upstream_addr" '
+                '"bytes_received": "$bytes_received" '
+                '"bytes_sent": "$bytes_sent" '
+                '"session_time": "$session_time" '
+                '"proxy_protocol_addr": "$proxy_protocol_addr:$proxy_protocol_port" '}'
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">打开日志缓存指令见表9-5。</p> 
+ <p class="middle-img">表9-5　打开日志缓存指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-5.jpg" class="calibre52"/></a> 
+ </div> 
+ <p class="ziti4">·默认配置下，Nginx每次将缓冲区日志数据保存到磁盘中，都需要先打开文件并获得文件描述符，然后向该文件描述符的文件中写入日志数据，最后关闭该文件描述符的文件。该指令把打开文件的文件描述符（文件句柄）存储在缓存中，进而提升写入日志的效率。</p> 
+ <p class="ziti4">·指令值max用于设置缓存中存储的文件描述符的最大数量，超过该值时，将按照LRU算法对缓存中文件描述符进行关闭。</p> 
+ <p class="ziti4">·指令值参数inactive用于设置缓存中每个文件描述符存活的时间，默认为10s。</p> 
+ <p class="ziti4">·指令值参数min_uses用于设置可被缓存文件描述符的最小使用次数，默认为1次。</p> 
+ <p class="ziti4">·指令值参数valid用于设置缓存检查频率，默认为60s。</p> 
+ <p class="ziti4">·指令值off用于关闭打开日志缓存的功能。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;
+logs/access.log combined;
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

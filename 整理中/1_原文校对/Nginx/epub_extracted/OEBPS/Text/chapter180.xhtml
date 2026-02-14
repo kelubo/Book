@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_194">10.3.3　TCP/UDP主机状态监控配置</h3>
+
+  <p class="ziti3">TCP/UDP主机监控状态页需要配置在http指令域中。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">http {
+    stream_server_traffic_status_zone;      # 启用stream主机状态监控，并使用默认共享内存配置
+
+    server {
+        listen 8080;                                　# 用于查看监控页的监听端口
+        access_log  off;
+
+        location /sts {
+            stream_server_traffic_status_display;   　# 启用stream主机状态监控数据输出
+            #stream主机状态监控数据输出格式为html
+            stream_server_traffic_status_display_format html;
+            allow 127.0.0.0/8;
+            allow 10.0.0.0/8;
+            allow 192.168.0.0/16;
+            deny all;
+        }
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">在stream指令域配置全局启用stream主机状态监控功能。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">stream {
+    server_traffic_status_zone;                     　# 启用stream主机状态监控，并使用默认
+                                                        　# 共享内存配置
+    upstream redis {
+        server 192.168.2.100:6379;
+    }
+
+    server {
+        listen 6379 ;
+        proxy_bind $remote_addr transparent;
+        proxy_pass redis;
+        proxy_connect_timeout 5s;
+        access_log logs/redis_access.log tcp;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

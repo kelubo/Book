@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.7.2　创建InnoDB表</h3>
+<p class="ziti">如下所示的代码是通过create table语句创建InnoDB表，因为默认存储引擎就是InnoDB，所以不需要在创建表的语句的最后指定engine=innodb：</p>
+<hr/>
+<pre class="ziti1">CREATE TABLE `students` (
+  `sid` int(11) DEFAULT NULL,
+  `sname` varchar(10) DEFAULT NULL,
+  `gender` int(11) DEFAULT NULL,
+  `dept_id` int(11) DEFAULT NULL
+)</pre>
+<hr/>
+<p class="ziti">InnoDB的表数据和索引数据默认都是存储在系统表空间中的，但可以通过开启innodb_file_per_table选项将表数据和索引数据存放在独立的表空间中。表创建完之后，会在表所在的数据库文件夹里创建“.frm”文件用来存储表的结构，系统表空间对应的“.ibdata”文件存储数据文件，而当开启独立表空间时，则会在表所在的数据库文件夹里创建“.ibd”用来存储表数据和索引数据。</p>
+<div class="pic"><img alt="" src="Image00106.jpg" />
+</div>
+<p class="middle-img">图13-15　InnoDB和MyISAM表结构对比</p>
+<p class="ziti">通过show table status语句可以查看InnoDB的表属性：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show table status like 'students'\G
+*************************** 1. row ***************************
+           Name: students
+         Engine: InnoDB
+        Version: 10
+     Row_format: Dynamic
+           Rows: 8
+ Avg_row_length: 2048
+    Data_length: 16384
+Max_data_length: 0
+   Index_length: 0
+      Data_free: 0
+ Auto_increment: NULL
+    Create_time: 2017-05-05 23:10:11
+    Update_time: 2017-05-05 23:25:29
+     Check_time: NULL
+      Collation: latin1_swedish_ci
+       Checksum: NULL
+ Create_options:
+        Comment:
+1 row in set (0.00 sec)</pre>
+<hr/>
+</body>
+</html>

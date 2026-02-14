@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_186">10.1.3　基于Zabbix的连接状态监控</h3>
+
+  <p class="ziti3">Nginx连接状态模块仅提供了各种连接状态的数据统计和输出，各状态数据可以通过Zabbix Agent脚本采集，并通过Zabbix服务端配置为监控项实现Nginx连接状态的监控。首先在Nginx服务器上启用连接状态统计并配置统计数据输出接口。Nginx配置如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 8080;
+    access_log  off;
+    error_log off;
+
+    location /status {
+        stub_status;          # 启用连接状态数据输出功能
+        allow 127.0.0.0/8;
+        allow 10.0.0.0/8;
+        allow 192.168.0.0/16;
+        deny all;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">Zabbix Agent脚本可以通过Nginx本机8080端口的status路径获取Nginx连接状态的数据。因连接状态在不同状态下的数据都在一个页面中展示，所以采集脚本需要通过不同的外部参数获取对应的数据。Zabbix Agent数据采集脚本如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">mkdir -p /etc/zabbix/scripts
+cat &gt;/etc/zabbix/scripts/nginx_status.sh&lt;&lt;EOF
+#!/bin/bash
+HOST=127.0.0.1:8080/status
+function accepts {
+    result='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| awk NR==3 | awk '{print int($1)}''
+    echo $result
+}
+function handled {
+    result='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| awk NR==3 | awk '{print int($2)}''
+    echo $result
+}
+function drops {
+    server='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| awk NR==3 | awk '{print $1" "$2}''
+    accepts='echo $server|awk '{print int($1)}''
+    handled='echo $server|awk '{print int($2)}''
+    echo $[ $accepts-$handled ]
+}
+function requests {
+    result='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| awk NR==3 | awk '{print int($3)}''
+    echo $result
+}
+function active {
+    result='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| grep 'Active' | awk '{print $NF}''
+    echo $result
+}
+function reading {
+    result='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| grep 'Reading' | awk '{print int($2)}''
+    echo $result
+}
+function writing {
+    result='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| grep 'Writing' | awk '{print int($4)}''
+    echo $result
+}
+function waiting {
+    result='/usr/bin/curl "http://$HOST" 2&gt;/dev/null| grep 'Waiting' | awk '{print int($6)}''
+    echo $result
+}
+
+$1
+EOF
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">在Zabbix Agent端添加监控项的脚本如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">cat &gt;/etc/zabbix/zabbix_agentd.d/nginx_status.conf&lt;&lt;EOF
+UserParameter=nginx.accepts,/etc/zabbix/scripts/nginx_status.sh accepts
+UserParameter=nginx.handled,/etc/zabbix/scripts/nginx_status.sh handled
+UserParameter=nginx.drops,/etc/zabbix/scripts/nginx_status.sh drops
+UserParameter=nginx.requests,/etc/zabbix/scripts/nginx_status.sh requests
+UserParameter=nginx.connections.active,/etc/zabbix/scripts/nginx_status.sh active
+UserParameter=nginx.connections.reading,/etc/zabbix/scripts/nginx_status.sh reading
+UserParameter=nginx.connections.writing,/etc/zabbix/scripts/nginx_status.sh writing
+UserParameter=nginx.connections.waiting,/etc/zabbix/scripts/nginx_status.sh waiting
+EOF
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

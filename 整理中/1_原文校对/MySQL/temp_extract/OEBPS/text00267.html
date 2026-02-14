@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.5.2　基于GTID复制技术的优缺点及工作原理</h3>
+<p class="p6">1.GTID复制的工作原理简介</p>
+<p class="ziti">GTID复制的工作原理具体如下。</p>
+<p class="ziti">1）当主数据库进行数据更新时，会在事务前产生GTID号，一同记录到binlog日志中。</p>
+<p class="ziti">2）从数据库端的I/O线程将变更的binlog数据，写入到本地的中继日志（relay log）中。</p>
+<p class="ziti">3）从数据库端的SQL线程从中继日志中获取GTID号，然后对比本地的Binlog查看其是否有记录。如果有记录，则说明该GTID的事务已经执行，此时从数据库会忽略。</p>
+<p class="ziti">4）如果没有记录，则从数据库就会从中继日志中获取数据并执行该GTID的事务，并记录到binlog中。</p>
+<p class="ziti">根据GTID号可以知道事务最初是在哪个数据库上提交的，GTID的存在方便了主从复制的宕机切换（failover）。</p>
+<p class="p6">2.传统主从复制的宕机切换</p>
+<p class="ziti">由图7-10可以看到，在MySQL的GTID功能出现以前，主从复制的宕机切换操作过程。</p>
+<div class="pic"><img alt="" src="Image00140.jpg" />
+</div>
+<p class="middle-img">图17-10　主从复制的宕机切换操作过程</p>
+<p class="ziti">若A服务器宕机，则需要将业务切换到B服务器上。同时，我们又需要使得C服务器与B服务器重新保持复制。这种情况的操作过程命令很简单，即在C服务器上执行“CHANGE MASTER TO MASTER_HOST='xxx'，MASTER_LOG_FILE='xxx'，MASTER_LOG_POS=nnn。”</p>
+<p class="ziti">问题在于同一个事务在每台数据库服务器上所在的binlog名字和位置点可能都不一样，那么怎样才能找到C当前同步的停止位置点呢，对应B的master_log_file和master_log_pos是什么的时候就变成了难题，这可能是官方推出GTID复制的原因。</p>
+<p class="ziti">老男孩：其实，作者在前文中已经介绍过了，master.info文件记录了master_log_file和master_log_pos的位置，可以通过读master.info文件来找到真正的位置点，因此，在没有GITD功能以前，我们也是很快就能够搞定切换的。更进一步的，我们还可以通过第三方工具，例如MHA等MySQL集群管理工具来实现主从复制主库宕机的切换以及从库和新主库复制的问题。</p>
+<p class="ziti">不过MySQL在5.6的GTID功能出现以后，对于上述问题的解决似乎变得更简单一些了。由于同一事务的GTID在所有节点上的值都是一致的，那么根据C服务器，当前停止点的GTID就能唯一定位到B上的GTID。而由于MASTER_AUTO_POSITION功能的出现，管理员不需要知道GTID的具体值，直接使用“CHANGE MASTER TO MASTER_HOST='xxx'，”MASTER_AUTO_POSITION命令就可以直接完成宕机切换的工作了。</p>
+</body>
+</html>

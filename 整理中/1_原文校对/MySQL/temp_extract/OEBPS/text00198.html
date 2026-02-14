@@ -1,0 +1,17 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.5.2　指定配置文件位置</h3>
+<p class="ziti">MySQL实例启动需要依赖my.cnf配置文件，而配置文件可以存在于多个操作系统目录下。my.cnf文件的默认查找路径，从上到下找到的文件先读，但优先级是逐级提升的。MySQL配置文件的位置如图13-13所示。</p>
+<div class="pic"><img alt="" src="Image00101.jpg" />
+</div>
+<p class="middle-img">图13-13　MySQL配置文件的位置</p>
+<p class="ziti">比如在/etc/my.cnf中指定了端口是3307，而在用户根目录下的“.my.cnf”中同时指定了端口是3308，则MySQL启动之后的侦听端口是3308。因为对相同的参数来说，根目录下的配置文件优先级更高。而如果在两个文件中仅在/etc/my.cnf中指定了端口，则会以该指定的端口开启MySQL。</p>
+<p class="ziti">为了确保使用的是指定的配置文件，可以使用“--defaults-file”参数指定启动文件的位置：</p>
+<hr/>
+<pre class="ziti1">mysqld --defaults-file=path_to_configuration_file</pre>
+<hr/>
+</body>
+</html>

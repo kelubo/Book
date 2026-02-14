@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.2.3　初始化MySQL数据库文件</h3>
+<p class="ziti">上述配置完毕后，就可以初始化数据库数据文件了，这个步骤其实也可以在编译安装MySQL之后就操作，只不过放到这里更合理一些。</p>
+<p class="ziti">（1）初始化MySQL数据库</p>
+<p class="ziti">初始化数据库的核心命令为：</p>
+<hr/>
+<pre class="ziti1">/application/mysql/scripts/mysql_install_db --basedir=/application/mysql/ --datadir=/application/mysql/data --user=mysql</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ --basedir=/application/mysql/为MySQL的安装路径，--datadir为数据文件目录。另外，需要注意mysql_install_db和MySQL 5.1的路径不同，MySQL 5.1在MySQL bin路径下。</p>
+<p class="ziti">整个初始化的操作过程为：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.34]# /application/mysql/scripts/mysql_install_db --basedir=/application/mysql/ --datadir=/application/mysql/data --user=mysql
+#&lt;==初始化mysql数据库文件，会有很多信息提示，如果没有ERROR级别的错误，有两个OK的字样，
+      则表示初始化成功，否则就要解决初始化的问题。
+WARNING：The host‘oldboy’could not be looked up with/application/mysq1//bin/resolveip.
+#&lt;==如果没做主机名解析，则提示警告。
+Installing MySQL system tables...2018-05-10 18:00:25 0 [Warning] TIMESTAMP with implicit DEFAULT value is deprecated. Please use --explicit_defaults_for_timestamp server option (see documentation for more details).
+2018-05-10 00:08:25 0 [Note] Ignoring --secure-file-priv value as server is running with --bootstrap.
+2018-05-10 00:08:25 0 [Note] /application/mysql//bin/mysqld (mysqld 5.6.40) starting as process 47993 ...
+2018-05-10 00:08:25 16787 [Note] InnoDB: Using atomics to ref count buffer pool pages
+2018-05-10 00:08:25 16787 [Note] InnoDB: The InnoDB memory heap is disabled
+2018-05-10 00:08:25 16787 [Note] InnoDB: Mutexes and rw_locks use GCC atomic builtins
+2018-05-10 00:08:25 16787 [Note] InnoDB: Memory barrier is not used
+2018-05-10 00:08:25 16787 [Note] InnoDB: Compressed tables use zlib 1.2.3
+2018-05-10 00:08:25 16787 [Note] InnoDB: Using Linux native AIO
+2018-05-10 00:08:25 16787 [Note] InnoDB: Using CPU crc32 instructions
+2018-05-10 00:08:25 16787 [Note] InnoDB: Initializing buffer pool, size = 128.0M
+2018-05-10 00:08:25 16787 [Note] InnoDB: Completed initialization of buffer pool
+2018-05-10 00:08:25 16787 [Note] InnoDB: The first specified data file ./ibdata1 did not exist: a new database to be created!
+2018-05-10 00:08:25 16787 [Note] InnoDB: Setting file ./ibdata1 size to 12 MB
+2018-05-10 00:08:25 16787 [Note] InnoDB: Database physically writes the file full: wait...
+...省略若干...
+2018-05-10 00:08:28 16787 [Note] InnoDB: Waiting for purge to start
+2018-05-10 00:08:28 16787 [Note] InnoDB: 5.6.34 started; log sequence number 0
+2018-05-10 00:08:28 16787 [Note] Binlog end
+2018-05-10 00:08:28 16787 [Note] InnoDB: FTS optimize thread exiting.
+2018-05-10 00:08:28 16787 [Note] InnoDB: Starting shutdown...
+2018-05-10 00:08:28 16787 [Note] InnoDB: Shutdown completed; log sequence number 1625977
+OK #&lt;==两个OK是初始化成功的标志。
+Filling help tables... 2018-05-10 00:08:28 0 [Warning] TIMESTAMP with implicit DEFAULT value is deprecated. Please use --explicit_defaults_for_timestamp server option (see documentation for more details).
+2018-05-10 00:08:28 0 [Note] Ignoring --secure-file-priv value as server is running with --bootstrap.
+2018-05-10 00:08:28 0 [Note] /application/mysql//bin/mysqld (mysqld 5.6.34) starting as process 48015 ...
+2018-05-10 00:08:28 16809 [Note] InnoDB: Using atomics to ref count buffer pool pages
+2018-05-10 00:08:28 16809 [Note] InnoDB: The InnoDB memory heap is disabled
+...省略若干...
+2018-05-10 00:08:28 16809 [Note] InnoDB: FTS optimize thread exiting.
+2018-05-10 00:08:28 16809 [Note] InnoDB: Starting shutdown...
+2018-05-10 00:08:28 16809 [Note] InnoDB: Shutdown completed; log sequence number 1625987
+OK #&lt;==两个OK是初始化成功的标志。
+To start mysqld at boot time you have to copy
+support-files/mysql.server to the right place for your system
+PLEASE REMEMBER TO SET A PASSWORD FOR THE MySQL root USER !
+To do so, start the server, then issue the following commands:
+/application/mysql//bin/mysqladmin -u root password 'new-password'
+/application/mysql//bin/mysqladmin -u root -h oldboy password 'new-password'
+Alternatively you can run:
+/application/mysql//bin/mysql_secure_installation
+which will also give you the option of removing the test
+databases and anonymous user created by default.  This is
+strongly recommended for production servers.
+See the manual for more instructions.
+You can start the MySQL daemon with:
+cd . ; /application/mysql//bin/mysqld_safe &amp;
+You can test the MySQL daemon with mysql-test-run.pl
+cd mysql-test ; perl mysql-test-run.pl
+Please report any problems at http://bugs.mysql.com/
+The latest information about MySQL is available on the web at
+http://www.mysql.com
+Support MySQL by buying support/licenses at http://shop.mysql.com
+###请注意如下几行英文的说明
+New default config file was created as /application/mysql//my.cnf and
+will be used by default by the server when you start it.
+You may edit this file to change server settings
+#从上述说明中可以知道MySQL的默认配置文件已经变到了/application/mysql//my.cnf下。
+WARNING: Default config file /etc/my.cnf exists on the system
+This file will be read by default by the MySQL server
+If you do not want to use this, either remove it, or use the
+--defaults-file argument to mysqld_safe when starting the server
+#从上述说明中可以看到数据库启动时会读取/etc/my.cnf，因此有可能会导致无法启动，避免的方法就是使用mysqld_safe 启动服务时采用“--defaults-file”参数指定配置文件，前文已将/etc/my.cnf改名了，并进行了新的配置文件替换，所以，就不需要指定参数了，这里是一个坑，请读者注意。</pre>
+<hr/>
+<p class="ziti">此步骤必须要初始化成功，否则，后面会出现登录不了数据库等各种问题。</p>
+<p class="ziti">（2）初始化数据库的原理及结果说明</p>
+<p class="ziti">初始化数据库的实质就是创建基础的数据库系统的库文件，例如，生成mysql库表等。</p>
+<p class="ziti">初始化数据库之后，查看数据目录，可以看到多了如下文件：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.40]# ls -l /application/mysql/data
+total 110604
+-rw-rw----. 1 mysql mysql 12582912 May 10 00:08 ibdata1
+-rw-rw----. 1 mysql mysql 50331648 May 10 00:08 ib_logfile0
+-rw-rw----. 1 mysql mysql 50331648 May 10 00:08 ib_logfile1
+drwx------. 2 mysql mysql     4096 May 10 00:08 mysql  #&lt;==用于存放管理mysql
+                                                   的数据。
+drwx------. 2 mysql mysql     4096 May 10 00:08 performance_schema
+#&lt;==5.5及以上增加的内部性能库。
+drwxr-xr-x. 2 mysql mysql     4096 May 10 00:48 test #&lt;==用于测试的test数据库。
+[root@oldboy mysql-5.6.40]# tree /application/mysql/data
+#&lt;==如果没有tree，则可以采用yum install tree –y方式安装
+/application/mysql/data
+├── ibdata1
+├── ib_logfile0
+├── ib_logfile1
+├── mysql
+│   ├── columns_priv.frm
+│   ├── columns_priv.MYD
+│   ├── columns_priv.MYI
+…省略若干…
+│   ├── general_log.CSV
+│   ├── general_log.frm
+│   ├── help_category.frm
+│   ├── procs_priv.frm
+│   ├── procs_priv.MYD
+│   ├── procs_priv.MYI
+│   ├── proxies_priv.frm
+│   ├── proxies_priv.MYD
+│   ├── proxies_priv.MYI
+│   ├── servers.frm
+…省略若干…
+│   ├── time_zone_name.MYI
+│   ├── time_zone_transition.frm
+│   ├── time_zone_transition.MYD
+│   ├── time_zone_transition.MYI
+│   ├── time_zone_transition_type.frm
+│   ├── time_zone_transition_type.MYD
+│   ├── time_zone_transition_type.MYI
+│   ├── user.frm
+│   ├── user.MYD
+│   └── user.MYI
+├── performance_schema
+│   ├── accounts.frm
+│   ├── cond_instances.frm
+│   ├── db.opt
+│   ├── events_stages_current.frm
+│   ├── events_stages_history.frm
+│   ├── events_stages_history_long.frm
+│   ├── events_stages_summary_by_account_by_event_name.frm
+…省略若干…
+│   ├── threads.frm
+│   └── users.frm
+└── test
+    └── db.opt
+3 directories, 136 files</pre>
+<hr/>
+<p class="ziti">（3）MySQL初始化故障排错集锦</p>
+<p class="ziti">本节的所有故障都必须要解除，即必须要出现两个Yes字样，否则，后面就算数据库服务可以启动，也会出现登录不了MySQL数据库等各种问题，因此读者若遇到了故障无法解决，则可以提前看一下本章结尾的故障集锦内容。</p>
+</body>
+</html>

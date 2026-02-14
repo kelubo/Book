@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_240">13.2.2　开源微服务网关Kong</h3> 
+ <p class="ziti3">Kong是一款开源的API平台，它是基于Nginx扩展版OpenResty的Lua应用，其将Nginx的配置解构成多个Lua应用模块，通过Lua应用实现了Nginx中各请求阶段的操作。Kong把Nginx操作的配置存储在外部数据库中，并提供了REST风格的管理接口，用户可以通过管理接口实现Kong所有功能的动态操作。Kong支持PostgreSQL和Cassandra两种数据库，可以通过数据库的主从同步或分布式部署实现配置数据的高可用，多台Kong服务器通过数据库共享配置数据，实现对多台Kong服务器的统一配置管理。Kong提供了基于Lua脚本实现的多种功能插件，在将用户请求转发给后端服务之前，用户可使用这些插件实现用户请求的认证、访问限流、链路跟踪、日志处理等各种操作。Kong是一个微服务网关平台，它作为微服务API的统一入口对外提供服务，为方便API的管理，定义了如下术语。</p> 
+ <p class="ziti3"><span class="yanse">1.消费者</span></p> 
+ <p class="ziti3">Kong系统中，把访问微服务API的用户定义为消费者，用户可以通过消费者对象定义消费者身份，并可通过相关插件实现消费者访问路由规则或服务的授权。</p> 
+ <p class="ziti3"><span class="yanse">2.消费者接口</span></p> 
+ <p class="ziti3">消费者接口是消费者访问微服务API的接口，用于实现后端被代理目标的访问转发。</p> 
+ <p class="ziti3"><span class="yanse">3.管理接口</span></p> 
+ <p class="ziti3">管理接口是进行Kong功能配置的接口，可通过管理接口对操作对象进行配置，其约定了REST风格的语法，用户可以很容易地通过管理接口实现对Kong的功能配置。</p> 
+ <p class="ziti3"><span class="yanse">4.操作对象</span></p> 
+ <p class="ziti3">Kong为方便实现Nginx配置的动态管理，定义了多个操作对象和对象参数，通过管理接口对不同的操作对象按照该对象的对象参数进行配置，可以非常快速地完成Kong的管理操作。Kong常用的操作对象有目标（target）对象、上游（upstream）对象、服务（service）对象、路由（route）对象、消费者（consumer）对象、插件（plugin）对象、证书（certificate）对象、CA证书（CA Certificate）对象、SNI对象。</p> 
+ <p class="ziti3">目标对象和上游对象构成真实的被访问服务器集群，可通过上游对象实现目标对象的负载均衡、会话保持等配置。路由对象和服务对象构成了Nginx虚拟主机的访问入口路由和转发目标的配置，服务对象可以直接代理一个外部主机域名，也可以直接关联上游对象实现用户请求的转发。插件对象由不同的功能插件脚本组成，其可以与路由对象、服务对象及消费者对象关联，实现消费者对象请求转发给后端服务之前的各种功能操作。消费者对象用于描述客户端标识，通过认证及ACL插件可以对其进行访问认证和访问路由对象或服务对象的授权。证书对象、CA证书对象、SNI对象均用于SSL相关配置。</p> 
+ <p class="ziti3">由于管理工具Konga基于管理接口提供了更加方便的Web化操作方式，这里为方便读者理解和操作，便直接使用Konga配置界面的对象参数介绍Kong的相关操作对象和对象参数。</p> 
+ <p class="ziti3">（1）目标对象</p> 
+ <p class="ziti3">目标对象等同于Nginx配置中上游服务器的主机，一个上游对象可以关联多个目标对象，目标对象的配置是动态即时生效的。由于上游对象需要维护目标对象的变更记录，因此目标对象只能手动或通过管理接口DELETE方法设置权重为0。目标对象的对象参数说明如表13-1所示。</p> 
+ <p class="middle-img">表13-1　目标对象参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b13-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b13-1.jpg" class="calibre387"/></a> 
+ </div> 
+ <p class="ziti3">（2）上游对象</p> 
+ <p class="ziti3">Kong的上游对象用于描述Nginx配置指令域upstream的配置内容，Kong支持对其所关联的目标对象进行主动或被动健康检测的设置。Kong为方便上游对象及其关联目标对象的管理，通过Lua脚本实现了加权轮询（round-robin）、一致性哈希（consistent-hashing）、最少连接（least-connections）负载均衡算法，默认为轮询。一个上游对象由多个目标对象组成，可以通过管理接口实现目标对象的动态变更。通常在一致性哈希算法和加权轮询负载策略下，目标对象数量的动态变化会引起负载策略的重新计算，虽然这种影响无法避免，但为了降低因负载算法重新计算产生的影响，Kong为每个上游对象定义了一个环平衡器（ring-balancer），每个环平衡器有预先定义好数量的插槽（slot），上游对象中的每个目标对象将根据其权重被分配到相应数量的插槽，当目标对象数量变化时，只需对部分目标对象重新分配插槽而不需要负载策略的重新计算。环平衡器只有在上游对象更改总插槽数时才会进行负载策略的重新计算，目标对象初始分配的插槽数官方建议至少为100个，当上游对象预期为8个时，即使初始时为两个目标也至少应将总插槽数定义为800。上游对象的对象参数说明如表13-2所示。</p> 
+ <p class="middle-img">表13-2　上游对象参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b13-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b13-2.jpg" class="calibre388"/></a> 
+ </div> 
+ <p class="ziti3">（3）服务对象</p> 
+ <p class="ziti3">Kong中的服务（Service）对象是指被代理的服务目标，既可以是一个域名，也可以是一个上游对象的名称，区别在于是否由Kong实现负载均衡。每个服务对象可以关联多个路由对象。一个服务对象只能关联一个上游对象或被代理的主机域名。服务对象的对象参数说明如表13-3所示。</p> 
+ <p class="middle-img">表13-3　服务对象参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b13-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b13-3.jpg" class="calibre389"/></a> 
+ </div> 
+ <p class="ziti3">（4）路由对象</p> 
+ <p class="ziti3">路由（Route）对象用于表示Nginx配置中虚拟主机的配置，对应Nginx的指令域Server及其包含的location配置。Kong配置结构中，因为服务对象用于关联被代理的目标，而路由对象单独存在没有意义，所以其必须与服务对象关联使用。路由对象的对象参数说明如表13-4所示。</p> 
+ <p class="middle-img">表13-4　路由对象参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b13-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b13-4.jpg" class="calibre25"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/423-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/423-i.jpg" class="calibre310"/></a> 
+ </div> 
+ <p class="ziti3">（5）插件对象</p> 
+ <p class="ziti3">插件对象用于对用户在消费接口的请求/响应闭环中的不同插件执行方法进行配置，不同的插件与路由对象、服务对象及消费者对象关联，实现对消费者对象在Nginx中各请求阶段的相关操作。Kong的插件对象既可以关联到服务对象，实现所有该服务的请求控制，也可以关联到路由对象，仅对某些路由接口的请求进行控制，甚至是更细粒度的，仅对指定的消费者进行控制。一个插件在一个请求的生命周期中只运行一次，当一个插件被与多个操作对象关联时，与路由对象、服务对象及消费者对象这3个对象关联的越具体则执行优先级最高，插件的全局配置优先级最低。</p> 
+ <p class="ziti3">（6）消费者对象</p> 
+ <p class="ziti3">消费者对象是描述用户身份的对象，通过认证及ACL插件可以对其进行访问认证和访问路由对象或服务对象的授权。</p> 
+ <p class="ziti3">（7）证书对象</p> 
+ <p class="ziti3">证书对象表示HTTPS域名关联的证书，证书对象用于存储SSL证书的公共证书/私钥对。Kong使用这些对象来处理加密请求的SSL终止。</p> 
+ <p class="ziti3">（8）CA证书对象</p> 
+ <p class="ziti3">CA证书对象表示受信任的CA。Kong使用这些对象来验证客户端或服务器证书的有效性。</p> 
+ <p class="ziti3">（9）SNI对象</p> 
+ <p class="ziti3">Kong的SNI（Server Name Indication）对象可与证书对象进行关联，将证书/密钥对绑定到一个或多个域名。SNI是一种改善SSL/TLS的技术，用于对客户端请头中Host字段进行处理，通过对Host字段的识别解决了当一个服务器绑定多个域名时SSL证书选择的问题，服务器将根据Host字段的域名返回该域名的SSL证书。</p> 
+</body>
+</html>

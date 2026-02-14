@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1 class="p1">第13章　MySQL引擎之InnoDB</h1>
+<h2 class="p2">
+<a id="a1">13.1　InnoDB存储引擎介绍</a>
+</h2>
+<p class="ziti">MySQL从5.5版本开始即将InnoDB作为默认存储引擎，该存储引擎是第一个完整支持事务ACID特性的存储引擎，且支持数据行锁、多版本并发控制（MVCC）、外键，以及一致性非锁定读。</p>
+<p class="ziti">InnoDB作为MySQL的默认存储引擎，这就意味着默认创建的表都会使用此存储引擎，除非使用“ENGINE=参数”指定创建其他存储引擎的表。</p>
+<p class="ziti">InnoDB的关键属性具体如下。</p>
+<p class="ziti">1）ACID事务特性支持，包括commit、rollback以及crash恢复的能力。</p>
+<p class="ziti">2）行级别锁以及多版本并发控制。</p>
+<p class="ziti">3）利用主键的聚簇索引（clustered index）在底层存储数据，以提升对主键查询的IO性能。</p>
+<p class="ziti">4）支持外键功能，管理数据的完整性。</p>
+<p class="ziti">在MySQL实例中执行“show engines”命令查看存储引擎的情况。</p>
+<p class="ziti">“Support=YES”代表当前支持的存储引擎，“DEFAULT”代表默认的存储引擎，具体如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show engines;
++--------------------+---------+-----------------------------------------+
+| Engine             | Support | Comment                                                        | Transactions | XA   | Savepoints |
++--------------------+---------+-----------------------------------------+
+| MyISAM             | YES     | MyISAM storage engine                                          | NO           | NO   | NO         |
+| CSV                | YES     | CSV storage engine                                             | NO           | NO   | NO         |
+| PERFORMANCE_SCHEMA | YES     | Performance Schema                                             | NO           | NO   | NO         |
+| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears) | NO           | NO   | NO         |
+| MRG_MYISAM         | YES     | Collection ofidentical MyISAM tables                          | NO           | NO   | NO         |
+| InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| ARCHIVE            | YES     | Archive storage engine                                         | NO           | NO   | NO         |
+| MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables      | NO           | NO   | NO         |
+| FEDERATED          | NO      | Federated MySQL storage engine                                 | NULL         | NULL | NULL       |
++--------------------+---------+-----------------------------------------+</pre>
+<hr/>
+</body>
+</html>

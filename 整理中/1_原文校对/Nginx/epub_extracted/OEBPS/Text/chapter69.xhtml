@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_77">4.2.8　并发连接数限制模块</h3> 
+ <p class="ziti3">模块名称：ngx_http_limit_conn_module</p> 
+ <p class="ziti3">该模块对访问连接中含有指定变量且变量值相同的连接进行计数，指定的变量可以是客户端IP地址或请求的主机名等。当计数值达到limit_conn指令设定的值时，将会对超出并发连接数的连接请求返回指定的响应状态码（默认状态码为503）。该模块只会对请求头已经完全读取完毕的请求进行计数统计。由于Nginx采用的是多进程的架构，该模块通过共享内存存储计数状态以实现多个进程间的计数状态共享。该模块的内置配置指令如表4-37～表4-40所示。</p> 
+ <p class="middle-img">表4-37　计数存储区指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-37.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-37.jpg" class="calibre165"/></a> 
+ </div> 
+ <p class="middle-img">表4-38　连接数设置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-38.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-38.jpg" class="calibre56"/></a> 
+ </div> 
+ <p class="middle-img">表4-39　连接数日志级别指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-39.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-39.jpg" class="calibre166"/></a> 
+ </div> 
+ <p class="middle-img">表4-40　连接数状态指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-40.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-40.jpg" class="calibre13"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">limit_conn_zone $binary_remote_addr zone=addr:10m;  # 对用户IP进行并发计数，将计数内存区命
+                                                    # 名为addr，设置计数内存区大小为10MB
+server {
+    location /web1/ {
+        limit_conn addr 1;                          # 限制用户的并发连接数为1
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·limit_conn_zone的格式为limit_conn_zone key zone=name:size。</p> 
+ <p class="ziti4">·limit_conn_zone的key可以是文本、变量或文本与变量的组合。</p> 
+ <p class="ziti4">·$binary_remote_addr为IPv4时占用4B，为IPv6时占用16B。</p> 
+ <p class="ziti4">·limit_conn_zone中1MB的内存空间可以存储32 000个32B或16 000个64B的变量计数状态。</p> 
+ <p class="ziti4">·变量计数状态在32位系统平台占用32B或64B，在64位系统平台占用64B。</p> 
+ <p class="ziti4">·并发连接数同样支持多个变量的同时统计，配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">limit_conn_zone $binary_remote_addr zone=perip:10m;
+limit_conn_zone $server_name zone=perserver:10m;
+
+server {
+    ...
+    limit_conn perip 10;
+    limit_conn perserver 100;
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

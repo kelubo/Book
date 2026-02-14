@@ -1,0 +1,417 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+  <head>
+    <title>CHAPTER 02　全面感知的联网节点</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="bodycontent-title"><span class="xbt"><span class="yhd">CHAPTER 02</span></span><br class="calibre1"/> 全面感知的联网节点</h2> 
+ <p class="bodycontent">点是构成平面最重要也是最基本的单位。它的结构看似简单，却必须担负起、承、转、结尾等不同的角色。凭借数以百计、数以千计的点，可以变化出无穷无尽的网络世界。</p> 
+ <h3 class="bodycontent-title1" id="CHP7-1">2-1　基础节点的组成</h3> 
+ <p class="bodycontent">在物联网的世界中，最基本也是最重要的莫过于担负起感测重任的节点（Node）了，这些节点必须要有能力进行物理世界的感知。例如温度、压力、酸碱度等，在不同场合的应用中，我们需要不同的物理信号，也由于这些节点在整个物联网架构中算是第一线接触到物理外部世界的节点，因此我们也称之为终端节点（End Node）。</p> 
+ <p class="bodycontent">因为物理世界中有太多太多种的信号与测量方式，所以在每个节点当中都要有一个核心，也就是这个节点的脑袋，来协助我们进行信号的初步处理与转换。我们希望感测的信号能够先转换成另一种稳定的信号后，再经过通信往其他端点或更上一层的节点进行传送，因此这个核心要有能力及时进行信号转换与处理，必要时还需要有足够的空间进行数据暂存的操作。</p> 
+ <p class="bodycontent">通常节点所要负责的事情都是每一时间间隔会持续重复的事件，举例：</p> 
+ <p class="bodycontent">（1）读取温度传感器的数据。</p> 
+ <p class="bodycontent">（2）转换读取到的信号并提供内部计算。</p> 
+ <p class="bodycontent">（3）暂时存储到一空间等待特定时间进行传递。</p> 
+ <p class="bodycontent">（4）通过某一方式将数据往另一节点发送。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float1" src="../Images/Figure-P22_26051.jpg"/> 
+  <p class="imgdescript-c">图2-1　中断节点的应用程序流程</p> 
+ </div> 
+ <p class="bodycontent">所以我们会利用程序的编写来完成这个固定的流程，并且让它可以在节点内重复无止境地执行。当然，也会有例外的时候，就是突发事件，专业的说法为中断。中断的意思就是在这个固定的流程中，在不特定的时间插入另一事件让节点进行处理，例如节点收到别的端点传输过来的数据，而这些数据必须在这个节点进行判断与分析（见图2-1）。</p> 
+ <p class="bodycontent">整理一下一个完整终端节点可能会有的组成部分，大致可以分成核心、输入和输出两大块，不过每一块细分下去还有很多重点需要仔细去评估与讨论。更不要忘记最重要的系统电源，要是没有电源，即使我们接了再多的组件在节点中也都是无用的。</p> 
+ <p class="bodycontent">从图2-2可以看到有很多的系统组件规格是我们在设计一个节点时需要思考评估的，该怎么选择才能够符合我们的需求以及满足实际应用时的需要呢？答案接近不可能！因为我们总是希望马儿跑又要马儿不吃草，能够在一个节点中实现的功能，我们总希望能全部一次到位。但是实际应用中，现场的变化与条件限制往往会让我们当初的设计遇到很大的阻碍。目前最好的方式就是采用模块化的设计，先以基本的单位组成进行现场实验，再根据实验的结果调整组件的规格与搭配。最终才可以找到适合的优化设计。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img8" src="../Images/Figure-P23_32190.jpg"/> 
+  <p class="imgdescript-c">图2-2　节点的系统组件示例</p> 
+ </div> 
+ <p class="bodycontent">现在是一个创客的时代，我们可以一步一步地实现规划中的物联网节点设计，也可以踏在巨人的肩膀上，利用众人的智慧与经验累积，修改现成的系统来满足自己的需要。下一章节我们将要介绍许许多多可以轻易获取的开发版，让我们可以快速地进入物联网的世界，建立属于自己的架构。</p> 
+ <h3 class="bodycontent-title1" id="CHP7-2">2-2　控制核心的选择</h3> 
+ <p class="bodycontent">一个好的系统设计，必定是从核心的规格确定开始第一步。而核心的选择绝对不是越贵越好，而是必须因地制宜，根据不同的应用场合来进行选择。举例来说，英特尔（Intel）公司或超威（AMD）公司的CPU几乎占据了个人计算机的所有市场，针对台式机或笔记本电脑，甚至是服务器的用户，他们会推出不同等级的CPU来满足这些用户的需要。台式机的用户通常会考虑大量的运算及复杂的图形显示，因此CPU运算的性能越高越好，而笔记本电脑的用户因为多半是以移动性为主要考虑因素，因此如何省电以延长使用的时间，就是这类电脑所用的CPU必须考虑的。</p> 
+ <p class="bodycontent">这里我们还是以为数最多的终端节点来进行系统设计。在早期笔者会建议直接以X86或RISC（Reduced Instruction Set Computing，精简指令集计算）来进行最初的分类，但是对于如今的技术演进而言，两者的差异已经不太明显。可以看到的是，X86目前以英特尔为主要厂商，但几乎是一家独大的场面；而RISC则以ARM为核心，通过技术的授权与合作，已可以看到许许多多知名的厂商，例如德州仪器（Texas Instruments，TI）、意法半导体（STMicroelectronics）和Atmel等。</p> 
+ <p class="bodycontent">这里需要注意的是，一般“标准”的X86处理器，还需要搭配其他芯片与内存，甚至外部存储器，才能构成一个完整的系统，因此在所谓物联网中的终端节点设计上并不会将X86作为第一考虑。但是这里的终端节点不包含智能手机等较高端的设备。在节点设计的考虑下，体积与成本将大大影响硬件的选择。</p> 
+ <p class="bodycontent">那么何谓不标准的X86呢？因为英特尔也嗅到物联网中的强大商机，在2013年推出的Quark系列的SoC（System on Chip），主要的对手就是以ARM为主的产品线。从图2-3中可以看到，Quark Soc只需要外接简单的几颗芯片，就可以拥有系统所需要的基本功能。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img9" src="../Images/Figure-P25_19623.jpg"/> 
+  <p class="imgdescript-c">图2-3　以Intel Quark SoC为核心的Galileo开发板（图片来源：Intel）</p> 
+ </div> 
+ <p class="bodycontent">好了，在这里我们就先不考虑X86的系统架构了，其实英特尔公司主要是把自己产品线的应用定位在网关（Gateway）的解决方案上，而并非是终端上，所以我们就以RISC为第一个分岔点的选择。既然我们已经往前跨出了一步，那么下一步又该怎么选择呢？其实从这里开始就因人而异了，既可以从成本区分，也可以从外围接口的支持来进行区分。但是，现代设备一定是以轻、薄、短、小、便宜等因素来进行选择的，毕竟外观有时候还是比功能重要许多的。下面将介绍所谓的微控制器（Microcontroller）。</p> 
+ <p class="bodycontent">什么是微控制器呢？跟刚才讨论的处理器有什么不一样？刚才谈到的都是处理器，那有没有微处理器（Microprocessor）呢？微控制器（Microcontroller）跟微处理器（Microprocessor）的差异又在哪里？是否有太多问号从脑袋当中跑了出来呢？别担心，我们会很简单地介绍两者的差异，以及为什么我们要利用微控制器来当作物联网的系统核心。</p> 
+ <p class="bodycontent">前面提到处理器就像人的大脑一般，还是需要手脚五官等来进行数据的收集与反应的动作。而控制器集成了处理器部分的输入和输出功能在同一颗芯片上，借此节省所需要的电路与提高使用的方便性。因此我们可以说：</p> 
+ <div class="calibre1"> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　微处理器（Microprocessor, MPU）＝中央处理单元（CPU）</p> 
+  <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P26_1.jpg"/>　微控制器（Microcontroller, MCU）＝MPU＋内存＋周边I/O</p> 
+ </div> 
+ <p class="bodycontent">其中的内存还分成FLASH、SRAM、EEPROM等，而周边I/O更是包罗万象，例如定时器（Timer）、时钟（Clock）、通信接口（UART/USART）、ADC（Analog to Digital Converter）转换器、DAC（Digital to Analog Converter）转换器、基本输入输出等。这些不同的功能集成在一起就会让微控制器有不同的体积大小，如28针脚的封装、64或100针脚的封装，如图2-4、图2-5所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img10" src="../Images/Figure-P26_26079.jpg"/> 
+  <p class="imgdescript-c">图2-4　Atmel ATMEGA328的两种针脚配置</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img11" src="../Images/Figure-P27_19632.jpg"/> 
+  <p class="imgdescript-c">图2-5　微控制器的组成（参考来源：www.mikroe.com）</p> 
+ </div> 
+ <p class="bodycontent">其实，现在还有另一个很热门的就是所谓的片上系统（System on Chip, SOC）芯片，它的组成更为复杂，可能包含一个微处理器或微控制器，再加上其他系统芯片，也有可能是多核的，也就是不止一个微控制器包含在里面。由于技术的发展，片上系统芯片已经可以像一台计算机一样应用了。目前许多智能设备都是使用所谓的片上系统芯片作为主要系统核心的。硬件厂商也多半会针对特定应用设计出来不同的片上系统芯片来满足特定需求。</p> 
+ <p class="bodycontent">说这些就是为了将目前常见的几种核心种类介绍给大家知道，下面列举几个这几年比较热门的开发板，其核心等级也有所不同，让大家思考看看适合用在哪些应用当中。</p> 
+ <p class="bodycontent" id="CHP7-2-1">Intel Galileo</p> 
+ <p class="bodycontent">前面提到了英特尔针对智能设备的普及，研发出一款低端的片上系统芯片：Quark。为了满足创客的需要，推出了Galileo的开发板，2014年底推出了第二代，如图2-6所示。其实Quark的主要内部处理器也就是早期的Pentium CPU，是以386、486作为计算机等级区别的那个年代的Pentium处理器核心。它支持标准的网络、USB以及miniSD卡，特别的是还要支持mini PCI express。不过，身为一台计算机，没有显示接口是它的小小缺憾。它可以支持Linux操作系统，也有支持Arduino的开发环境。顺便提一下，英特尔在Galileo之后又推出了一款Edison（如图2-7所示），其芯片大小接近一张SD卡的体积，不过因为太小了，开发时多半需要连接到另一块载板上。英特尔公司喊出的口号是：What will you make？希望能以在高端处理器的知名度打入目前火红的创客时代。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img12" src="../Images/Figure-P28_26088.jpg"/> 
+  <p class="imgdescript-c">图2-6　英特尔所推出的Galileo 2（图片来源：arduino.cc）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img13" src="../Images/Figure-P28_26091.jpg"/> 
+  <p class="imgdescript-c">图2-7　英特尔所推出的Edison（图片来源：arduino.cc）</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img14" src="../Images/Figure-T29_32360.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP7-2-2">Raspberry Pi series</p> 
+ <p class="bodycontent">Raspberry Pi（树莓派，见图2-8）可以说是继Arduino之后最火红的运算平台了。什么是树莓派绝对是大家不可以不知道的，它是由英国的树莓派基金会所发起，目标在于以低价硬件及自由软件让计算机教育普及化。从2012年推出到现在，已经发展了好几个版本，除了接口上的变化外，它能够搭载标准的Linux操作系统并且支持HDMI的输出一直是它的特色。到了第2代甚至连Windows 10都能够支持，可见其硬件处理器规格之强大。虽然它的硬件并未完全开放让大家自行生产，但是价位与体积足以吸引众多的玩家加入。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img15" src="../Images/Figure-P29_19689.jpg"/> 
+  <p class="imgdescript-c">图2-8　树莓派的外观</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img16" src="../Images/Figure-T30_32363.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP7-2-3">BeagleBone series</p> 
+ <p class="bodycontent">BeagleBone也是另一块类似于树莓派的高端微型开发板，它的版本利用PCB板子的颜色来区分，因此图2-9中的版本为BeagleBone Black，其搭载的Cortex-A8性能相当好，可以协助用户开发相当多的应用，例如与网络摄像机搭配进行图像处理等。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img17" src="../Images/Figure-P30_26146.jpg"/> 
+  <p class="imgdescript-c">图2-9　BeagleBone Black</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img18" src="../Images/Figure-T30_32365.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP7-2-4">Udoo</p> 
+ <p class="bodycontent">Udoo（见图2-10）是一块多种需求一次满足的开发板，直接在板子上内建了两个核心，一个是基于ARM的高端核心，另一个则是Arduino Due的微控制器。因此用户可以直接将Linux安装在高端核心后，再与另一个核心进行沟通与程序加载。整个开发板就像是一台计算机加上Arduino的开发板。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img19" src="../Images/Figure-P31_19697.jpg"/> 
+  <p class="imgdescript-c">图2-10　Udoo外观</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img20" src="../Images/Figure-T31_32368.jpg"/>
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP7-3">2-3　介绍Arduino</h3> 
+ <p class="bodycontent">在前面几个开发板的介绍中，是不是都看到了一个名称：Arduino。Arduino（见图2-11）也是一块开发板，它的基础版核心虽然只是八位的微控制器，但是它可以说是引领这一个创客时代来临最重要的推手之一。它第一个完全开放了硬件电路的原始文件，让所有有兴趣的人可以直接下载并找厂商生产，完全不用收取任何费用，当然这是指个人用途而不是以营利为目的的时候。此外，Arduino的开发环境也是完全免费的，可以直接在网络上下载，只需要解压缩后就可以使用，不需要另外安装，也不需要额外的下载通信线，开发板与计算机之间只需要一根USB线就可以提供电源及用于程序下载。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img21" src="../Images/Figure-P32_26207.jpg"/> 
+  <p class="imgdescript-c">图2-11　早期的Arduino没有USB接口</p> 
+ </div> 
+ <p class="bodycontent">Arduino是在2005年由意大利的团队所开发出来的，其宗旨是希望非电子电机专业的人都可以轻易地踏入程序开发与硬件使用的世界，所以他们称Arduino为物理运算平台，希望使用它的人都可以轻松将自己脑袋里的想法转化成现实，希望通过Arduino能够让更多的人对电子电路不再那么陌生和害怕，这样的理念让数字艺术、互动艺术的创作家们也都开始使用Arduino。</p> 
+ <p class="bodycontent">Arduino的发展超过了十个年头，已有数以万计的专题基于Arduino开发出来，也有近百个硬件开发板跟Arduino可以挂上点关系。更不用说物联网时代了，不管是机器对机器、设备对设备还是人对设备等的应用，大家都尝试用Arduino来实现。</p> 
+ <p class="bodycontent">因此本书将会以Arduino作为整个物联网当中的“拱心石”，从Arduino架构起的物联节点直到整个网络，大家通过本书可以轻松地实现物联网中的任何一个应用。</p> 
+ <p class="bodycontent">在开始之前还是要了解一下Arduino的相关硬件与开发环境，之后会再针对各个功能进行详细的介绍。</p> 
+ <p class="bodycontent">Arduino在2005年推出后，开始广为人知的版本是Arduino NG，这里的NG可不是NO GOOD的意思！而此时Arduino开发板上的微控制器是Atmel公司所推出的ATMEGA 8，这可是Arduino最关键的部分，也是Arduino持续不变的部分，后续的几代也都沿用了Atmel公司的ATMEGA系列，无论是8位还是32位。NG之后不久就进行了一些小升级，从ATMEGA 8升级到ATMEGA 168，名称也改为NG+。再过不久又进行了核心的变化，由168升级到328，之后就是更多人知道的Arduino UNO（见图2-12），比较多的人知道UNO的原因是在这个时候Arduino已经打开了所谓创客的市场与知名度，甚至在近期的Arduino Leonardo（见图2-13）也没有UNO这么出名，就算核心采用了更好的ATMEGA32u4。在这条主线不断更新的同时，也出现了一些特殊的板子，例如Arduino Nano（见图2-14）、Arduino Pro Mini和Arduino MEGA（见图2-15）等。在Arduino官网上，Leonardo已经被官方退休（retired）了。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img22" src="../Images/Figure-P34_26215.jpg"/> 
+  <p class="imgdescript-c">图2-12　Arduino UNO (ATMEGA328)</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img23" src="../Images/Figure-P34_26218.jpg"/> 
+  <p class="imgdescript-c">图2-13　Arduino Leonardo (ATMEGA32U4)</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img24" src="../Images/Figure-P34_26221.jpg"/> 
+  <p class="imgdescript-c">图2-14　Arduino Nano (ATMEGA328)</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img25" src="../Images/Figure-P34_26224.jpg"/> 
+  <p class="imgdescript-c">图2-15　Arduino MEGA (ATMEGA2560)</p> 
+ </div> 
+ <p class="bodycontent">下面整理了这几个开发板的微处理器的差异，可以看到大部分差异都是FLASH、EEPROM等的大小不同。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img26" src="../Images/Figure-T35_19906.jpg"/>
+ </div> 
+ <p class="bodycontent">Arduino.cc网站也很贴心地将所有官方的开发板定义好使用的领域，大家可以参考看看。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img27" src="../Images/Figure-P35_19909.jpg"/>
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float2" src="../Images/Figure-P35_19912.jpg"/> 
+  <p class="imgdescript-c">图2-16　Netduino</p> 
+ </div> 
+ <p class="bodycontent">Arduino不只是带领了创客时代，更是引领了风潮，它的外观从最开始到最新版变动都不大，因此各种各样的扩展模块都可以持续使用并应用于开发新的功能模块。这也造就了许多跟进者必须模仿类似的外型以争取用户及其他厂商的认同，例如Netduino（见图2-16）等都可以看到相似的外观。</p> 
+ <p class="bodycontent">回头看看Arduino为什么受到欢迎，可以从与8051的比较看出端倪。8051可以说是称霸微控制器的一款单芯片，几乎所有电子电机相关的课程都使用8051来进行教学与实习，从书架上相关书籍与相关的开发板就可以知道受重视的程度。而Arduino推出后，一开始的售价约要200元人民币，到现在已经降低到约60元，这样的一块开发板包含了以下几项。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　稳压电源：可以接外部9～12V的电池或变压器。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　通信接口：与计算机通过USB以串行通信方式进行数据交换。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　数字接口：Arduino提供多达13个接口的数字接口，可以由程序决定其功能。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　模拟接口：Arduino直接内置6组模拟信号输入，省去额外的转换芯片。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　PWM：数字接口中有数个PWM接口，可以用来控制马达和模拟信号。</p> 
+ <p class="bodycontent-kaiti"><img alt="" class="pic-h" src="../Images/Figure-P36_1.jpg"/>　程序刻录：借助芯片内的Bootloader，让用户直接通过USB下载程序。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float3" src="../Images/Figure-P36_26233.jpg"/> 
+  <p class="imgdescript-c">图2-17　Arduino的系统组成</p> 
+ </div> 
+ <p class="bodycontent">如此多的功能，若是用其他的单芯片可能要花更多的钱才能建立如此完善的系统。如此高性价比的Arduino（见图2-17）当然是慢慢冲击到微控制器的市场，并且激起一阵不小的浪花。</p> 
+ <p class="bodycontent">前面介绍了包括Arduino在内的许多类型的开发板，其实就像俗语所说的：不管黑猫白猫，会抓老鼠的就是好猫。如何在物联网中的各种应用中寻找到属于自己适合的开发板，需要时间与经验的累积。如果是入门者，强烈建议用Arduino作为第一个入门的硬件。</p> 
+ <h3 class="bodycontent-title1" id="CHP7-4">2-4　Arduino的软件介绍与第一次下载</h3> 
+ <p class="bodycontent">Arduino除了硬件的方便性与丰富的接口外，另外令人赞赏的就是它的开发环境完全免费，且只需要解压缩后就可以使用，它还提供了Windows和iOS等版本满足不同爱好者的需要。官方网站上从开始到现在持续保持更新并不断加入新的功能，也针对新的开发板保持持续的支持，因此建议大家每隔一段时间就到官网（见图2-18）上更新一下开发系统。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img28" src="../Images/Figure-P37_19926.jpg"/> 
+  <p class="imgdescript-c">图2-18　Arduino官方下载位置（www.arduino.cc）</p> 
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img-float4" src="../Images/Figure-P37_19930.jpg"/>
+ </div> 
+ <p class="bodycontent">选择适合自己的版本与操作系统后，单击即可开始下载，下载完成后会得到一个压缩文件：</p> 
+ <p class="bodycontent">直接把这个文件移到想要存放的文件夹后解压缩即可，建议存放到计算机的C或D磁盘的根目录下，这样以后要使用就会比较方便了。解压缩完会产生另一个文件夹，即Arduino的开发环境，这个文件夹会同时存放多个不同的版本，因此不用担心被覆盖的情况。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img29" src="../Images/Figure-P38_26244.jpg"/>
+ </div> 
+ <p class="bodycontent">本书会以arduino-1.6.8作为所有程序的编辑和开发环境，当然后续一定会有更新的版本，至少会有个依据，可以在遇到问题时比对版本来确认可能出现的原因。打开arduino-1.6.8的文件夹后，会有好几个文件夹包含函数库、硬件配置文件和范例程序等，最重要的是arduino.exe（见图2-19）这个执行文件，即开发环境，只要单击这个执行文件，我们就可以进入Arduino的开发环境中。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img30" src="../Images/Figure-P38_26247.jpg"/> 
+  <p class="imgdescript-c">图2-19　Arduino的开发环境执行文件</p> 
+ </div> 
+ <p class="bodycontent">arduino-1.6.8中还有一个arduino_debug.exe，这是在Windows下的调试工具，当发生无法顺利启动的情况时可以用它来了解情况。在启动环境时注意不要选错了。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float5" src="../Images/Figure-P39_19936.jpg"/> 
+  <p class="imgdescript-c">图2-20　Arduino开发环境</p> 
+ </div> 
+ <p class="bodycontent">启动开发环境，如图2-20所示。</p> 
+ <p class="bodycontent">整个环境可以分成三大部分，最上方有菜单栏和快捷功能按钮栏，包括文件的新建、保存和打开，以及项目的验证和上传；中间的白色部分则是系统程序编辑的区域，系统程序的编写主要由两个部分所组成：setup和loop两大程序区段。第一个setup指的是初始化和设置的部分，整个程序运行时，只有当电源开启或程序重置时才会执行一遍，因此所有只需单次执行的部分都可以在这里编辑。第二个loop则是程序的主轴，也就是程序会重复执行的部分，就像一般在编写单片机程序时会使用的while(1)一样。开发环境下方则是信息显示，包括编译与上传的结果等，可以借此了解是否有遗漏或是语法漏失而造成程序验证或上传失败。</p> 
+ <p class="bodycontent">现在，我们来进行第一个程序的上传练习。对于首次加入Arduino开发行列的创客，建议使用Arduino UNO作为第一块开发板，或基于UNO稍微调整的其他类UNO开发板，原因是UNO的尺寸是Arduino最标准的一种，也是最多扩展板可以支持的尺寸，我们在增加功能或是扩展接口时，这样的标准都会大大方便我们在硬件规划时的整合性。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float6" src="../Images/Figure-P40_26262.jpg"/> 
+  <p class="imgdescript-c">图2-21　驱动程序安装成功</p> 
+  <div class="calibre1"> 
+   <p class="bodycontent">Arduino所有的开发板背后都没有保护的机制，建议使用塑料柱将Arduino的开发板垫高，或背后贴上绝缘保护，避免针脚焊点接触到金属而短路。</p> 
+  </div> 
+ </div> 
+ <p class="bodycontent">前面提到了Arduino只需要一条USB就可以与计算机连接，同时具有供电和数据传输的功能。请先将计算机和Arduino连接起来，第一次的话需要安装驱动程序，只需要将驱动程序的路径指向Arduino文件夹内的drivers即可，计算机会自动安装，成功后应该能在设备管理器看到，如图2-21所示。</p> 
+ <p class="bodycontent">接着再重新启动开发环境，从菜单栏单击“文件”，在范例中选择01.Basics的Blink项目（先不用修改任何程序）。只需要从菜单栏中选择“工具”，再从开发板及端口选项中分别选择当前使用的板子及通信接口即可。以笔者使用的板子为例，从图2-21看到的是COM6，因此在软件中可以选择COM6（见图2-22）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img31" src="../Images/Figure-P40_32191.jpg"/> 
+  <p class="imgdescript-c">图2-22　在软件中选择通信接口</p> 
+ </div> 
+ <p class="bodycontent">接着，也就是最后一步了，单击快捷功能栏中一个向右的箭头，就可以将程序上传到Arduino中。若是成功上传，则会在下方看到如图2-23所示的信息。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img32" src="../Images/Figure-P40_26272.jpg"/> 
+  <p class="imgdescript-c">图2-23　上传完毕后的信息</p> 
+ </div> 
+ <p class="bodycontent">此时观察一下Arduino开发板上标示为L的LED灯，应该会一闪一闪地闪烁着，表示我们已经成功将环境构建完成。</p> 
+ <p class="bodycontent">若是没有成功也没有关系，把下面几个可能的问题确认一下即可。</p> 
+ <p class="bodycontent">（1）设备管理器中的Arduino是否正常显示。</p> 
+ <p class="bodycontent">（2）Arduino上的电源是否正常。（确认方式是板子上有一个ON的LED应该会亮灯。）</p> 
+ <p class="bodycontent">（3）开发环境中的板子与串行端口是否选择正确。</p> 
+ <p class="bodycontent">（4）程序是否编译成功。</p> 
+ <h3 class="bodycontent-title1" id="CHP7-5">2-5　如何感知信号</h3> 
+ <p class="bodycontent">在物联网中，谈论到了在各种场合的众多应用，唯一不变的是绝对会有大量信号的感知与检测，为什么要说感知与检测呢？我们可以将信号的读取分成两大类：连续性的数据采集及异常状态的检知。</p> 
+ <p class="bodycontent">连续性数据采集的重点在于长时间的观察与记录，通过长时间的数据采集，再搭配时间轴的推演，我们可以分析出优化的反应和预测未来可能的变化。因此，如何确保数据的连续性和每项数据都能包含数值与当下的时间是这类设备最重要的课题，像在农业当中若能长时间把作物生长周期所需要的温度与湿度记录下来，我们就可以按照不同种类的植物构建出最适合的环境，以达到优化的生产效率。</p> 
+ <p class="bodycontent">异常状态检知的重点则在于实时性。这类数据要定时进行采集，而每项数据的时间间隔会根据受测物的特性而有所不同。这类设备的重点是如何能够采集到反应瞬间的数据并且立即向后端报告。例如，脉搏的不规律跳动往往来得急去得快，要能够抓到这瞬间的异常现象才能够对病患进行进一步的治疗。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img33" src="../Images/Figure-P42_26279.jpg"/>
+ </div> 
+ <p class="bodycontent">至于信号的种类，基本上就是数字信号和模拟信号两种（见图2-24）。数字信号指的是传感器只会有0和1两种信号的变化。例如，门窗的开或关、开关的开或关、机构的接触与未接触等，这些都属于数字输入的范畴。另外，灯的开关、闸门的开关和马达的启动与停止等则属于数字输出的类型。至于模拟信号，则会有电压或电流的连续性变化，不像数字信号那么简明，模拟信号基本上每个时间的数值都会跟前后有相关性。举例来说，温度、压力和湿度等信号都是连续变化的，会随着时间的推移以及环境的影响而产生下一个时间点的数值。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img34" src="../Images/Figure-P42_26282.jpg"/> 
+  <p class="imgdescript-c">图2-24　数字信号和模拟信号的差异</p> 
+ </div> 
+ <p class="bodycontent" id="CHP7-5-1">2-5-1　数字信号</p> 
+ <p class="bodycontent">我们的第一个Arduino程序，上传的是内建的范例，其实它就是一种数字输出的信号控制，通过此程序可以驱动LED的亮暗变化。我们来仔细看看这个程序：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img35" src="../Images/Figure-P43_19962.jpg"/>
+ </div> 
+ <p class="bodycontent">首先看到程序的第20行，有一个pinMode的函数，因为Arduino很聪明地使用自己的数字引脚，每一个引脚可以设置为输入或输出，而设置成何种功能必须在setup中确定，在这里我们把第13个引脚设置为输出（output）。</p> 
+ <p class="bodycontent">设置完之后该怎么控制输出信号的变化呢？还记得数字信号只有0和1两种吗？在Arduino硬件上的0和1其实就是电压的高电平（5伏特）和低电平（0伏特），而程序中可以用HIGH和LOW来表示。在程序的第25行，我们用digitalWrite来进行这样的控制，函数有两个参数，第一个是要控制的引脚，第二个则是要输出的信号。是不是很简单、很直观呢？全部只需要两行程序就可以完成一个数字信号的输出控制。这些函数的名称也让人一眼就能知道它们的作用是什么。</p> 
+ <p class="bodycontent">而硬件上我们则是直接使用Arduino内建的LED，从电路图来看，第13个引脚默认是LED的控制引脚，因此范例程序中以第13个引脚来进行LED的控制，如图2-25所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img36" src="../Images/Figure-P44_32192.jpg"/> 
+  <p class="imgdescript-c">图2-25　Arduino UNO R3上的LED电路</p> 
+ </div> 
+ <p class="bodycontent">如果要使用其他引脚进行LED的控制，可以参考图2-26所示的电路范例。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img37" src="../Images/Figure-P44_26297.jpg"/> 
+  <p class="imgdescript-c">图2-26　两个LED的电路接线</p> 
+ </div> 
+ <p class="bodycontent">LED是有方向性的，两个引脚通常用长短来区分，短的接到GND。另外，可以看到电路中有一个电阻，其作用是限流，常见搭配的规格为1000欧姆以下。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float7" src="../Images/Figure-P45_19971.jpg"/> 
+  <p class="imgdescript-c">图2-27　8×8 LED矩阵</p> 
+ </div> 
+ <p class="bodycontent">学会控制多个LED后，就可以尝试来控制8×8的LED矩阵（见图2-27）了，以变化出不同的图案。</p> 
+ <p class="bodycontent">从一个设备的观点来看，灯号的显示是必要的部分，因为大部分设备在追求小巧时，利用灯号来进行状态辨识是一种非常好的办法，因为LED的成本低，若是可以同时用3个LED进行显示，几乎可以有十多种变化来分别表示十多种不同的状态，例如供电来源、系统运行或暂停、通信成功或失败、发生异常情况等，都可以通过LED的亮、暗、闪烁或多个组合让现场操作人员清楚地了解程序运行的状况。甚至在一些工业界使用的系统当中，几乎每一个输出或输入的引脚都会配上一个LED来作为信号显示。</p> 
+ <p class="bodycontent">某些大功率的设备想要用Arduino来做控制的话，建议使用一个继电器模块或晶体管作为一个中间信号放大的媒介。因为Arduino每只引脚只有5伏特的电压，功率更是远远小于1瓦，如图2-28所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img38" src="../Images/Figure-P45_19976.jpg"/> 
+  <p class="imgdescript-c">图2-28　Arduino的引脚电流上限（数据源：arduino.cc）</p> 
+ </div> 
+ <p class="bodycontent">在后面的专题中我们就可以看到利用继电器（见图2-29、图2-30）来做控制的例子。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img39" src="../Images/Figure-P46_26309.jpg"/> 
+  <p class="imgdescript-c">图2-29　继电器（以机械方式用小信号控制大功率）</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img40" src="../Images/Figure-P46_26312.jpg"/> 
+  <p class="imgdescript-c">图2-30　达灵顿晶体管继电器（以电路方式用小信号控制大功率）</p> 
+ </div> 
+ <p class="bodycontent">介绍完了如何用数字信号控制Arduino输出，我们知道了可以自由地控制许多Arduino以外的设备，创造出更多动态反应。不过，在整个系统的设计当中，输出的部分几乎都属于后期的反应动作，前面必须要有程序的逻辑判断或特定的事件来启动输出的机制。因此，下一个我们要讲的就是Arduino数字输入的部分。</p> 
+ <p class="bodycontent">数字输入看似简单，只有5伏特（高电平）和0伏特（低电平）两种信号变化，但是所搭配的传感器有各种各样的形式，必须按照实际的应用来进行适当的搭配。举例来说，光是按钮就有两种：按下即会弹回、按下即固定且需再次按下才会恢复初始状态。前面一种常见于设备设置键，每按一次就表示菜单变化或选择变化。后面一种则常用于设备状态键，例如启动键。有时候在工业应用中，还会设置两个按钮，操作人员必须同时按下这两个按钮才会真正启动设备，避免因为误触而导致误操作。</p> 
+ <p class="bodycontent">更不用说巷口的红外线感应灯了，以红外线判断距离来启动灯光；防盗的磁簧开关则是用磁力来判断门窗的开启或关闭；水银开关则用来检测设备是否倾斜。一个简单的ON/OFF信号就可以让我们感知周围的许多状态。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img-float8" src="../Images/Figure-P47_19985.jpg"/> 
+  <p class="imgdescript-c">图2-31　一个按钮控制LED开关</p> 
+ </div> 
+ <p class="bodycontent">在Arduino中，我们一样可以把第1至13个数字引脚用于数字输入的检测，这里我们先介绍一个简单的范例：通过一个按钮来控制LED，如图2-31所示。</p> 
+ <p class="bodycontent">程序当中大部分还是跟前一个范例类似，但是前面多了第5个引脚的功能声明。loop循环里则是多了一个digitalRead的函数，只要填入想要检测的引脚，便会返回当前该引脚的信号状态。所以范例中很简单地使用了一个if/else的条件判断语句来让Arduino Pin 5的状态决定Pin 7 LED的亮暗。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img41" src="../Images/Figure-P47_19989.jpg"/>
+ </div> 
+ <p class="bodycontent">这种按钮没有按下时，物理接线没有接到任何东西，也就是我们说的浮接。浮接的缺点是我们并不能确定此时的信号是否一定是低电平，因此遇到这种类型的按钮时我们会采用提升电路的方式来确保信号，我们先如图2-32所示调整硬件电路。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img42" src="../Images/Figure-P48_26323.jpg"/> 
+  <p class="imgdescript-c">图2-32　使用Arduino内部提升电路的接法</p> 
+ </div> 
+ <p class="bodycontent">这时候我们只需要稍微调整一下初始设置的部分，将pinMode里的INPUT改为INPUT_PULLUP：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img43" src="../Images/Figure-P48_26328.jpg"/>
+ </div> 
+ <p class="bodycontent">有没有发现这时候当按钮还没被按下时，LED就已经亮起，跟刚才的逻辑完全颠倒了，这是因为此时Pin 5的默认值是高电平，也是我们为什么要把按钮的另一端改为接地，这样按钮被按下时Pin 5就会是低电平。</p> 
+ <p class="bodycontent">这样提升电路可以确保传感器保持在没有被启动时的状态，因为它内部初始提供了一个高电平的信号，借此能提高系统读取的稳定性，就算外部的传感器发生故障，信号还是可以被保持在一个初始的状态。这在输入端电路上是一种常见的设计，而Arduino已把这种设计内建其中。</p> 
+ <p class="bodycontent">在终端设备上，我们不太可能内建键盘或鼠标来操作设备进行参数设置，常见的反而是通过多个开关组合进行信号的排列组合，借此让设备可以自动判断当前开关的设置而执行不同的参数，甚至是初始化。图2-33就是一种标准设备，我们称之为指拨开关。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img44" src="../Images/Figure-P49_19996.jpg"/> 
+  <p class="imgdescript-c">图2-33　指拨开关</p> 
+ </div> 
+ <p class="bodycontent" id="CHP7-5-2">2-5-2　模拟信号</p> 
+ <p class="bodycontent">在物联网的应用中，模拟信号可以说比数字信号更加重要，像温度、湿度、压力等这种类型的环境数据都必须通过模拟信号来进行读取。早期的8051芯片并没有模拟信号输入的引脚，而是必须通过另外一个模数转换的芯片来进行第一步的处理，8051再通过数字通信的方式从模数转换芯片读取数据。Arduino则内建了6个模拟输入通道（如图2-34所示），这里的通道数量是指PDIP封装时的数量，如果是TQFP的封装因为有32个引脚，所以模拟输入也就多了两个，这在某些厂商的开发板中可以看到。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img45" src="../Images/Figure-P50_26335.jpg"/> 
+  <p class="imgdescript-c">图2-34　Arduino的模拟输入引脚</p> 
+ </div> 
+ <p class="bodycontent">我们在利用芯片的模拟信号读取功能时，要注意几个重要的参数，其中最重要的就是分辨率，在规格表中会用几比特来表示，而Arduino的模拟信号分辨率为10-bit，如图2-35所示。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img46" src="../Images/Figure-P50_26339.jpg"/> 
+  <p class="imgdescript-c">图2-35　Arduino规格书中的模拟分辨率</p> 
+ </div> 
+ <p class="bodycontent">10-bit所代表的意思是什么呢？它指的是可以解析的信号大小。举例来说，Arduino的参考电压为5伏特，因此可以量测到的最小分辨率为：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img47" src="../Images/Figure-P50_32193.jpg"/>
+ </div> 
+ <p class="bodycontent">这样的分辨率对于一般的应用来说已经绰绰有余了，若是在“专业”一点的应用中，还是会采用另外一个转换芯片，利用专门的模数转换芯片来提高信号的分辨率及确保模数转换的时间。目前在某些研究专用的模拟信号中已经采集到24-bit的分辨率，这种应用的电路需要非常高超的技术，因为周围的自然噪声信号就有可能会大于实际量测到的信号。</p> 
+ <p class="bodycontent">我们利用一个可变电阻来尝试通过Arduino读取电压的变化。可变电阻是一种可调电阻值的电阻，其规格标示的是这个可变电阻的最大值，使用上可以通过某些机械结构来调整阻值，例如旋钮式的可变电阻（见图2-36）或线性可变电阻。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img48" src="../Images/Figure-P51_20007.jpg"/> 
+  <p class="imgdescript-c">图2-36　可变电阻的接线</p> 
+ </div> 
+ <p class="bodycontent">从图2-36中可以看到，我们选择旋钮式的可变电阻，其电阻有3个引脚，分别接到电源5V、接地GND和信号，信号这里我们接到Arduino的A0。程序的部分我们先用一个参数定义要读取的模拟输入引脚，再定义一个变量初值为0，后续这个变量就是读取到的信号数值：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img49" src="../Images/Figure-P51_20011.jpg"/>
+ </div> 
+ <p class="bodycontent">接着先忽略setup中的设置（这个部分我们会在下一个章节进行详细的介绍），直接看loop循环中的第一行，有一个简单易懂的函数：analogRead()。这个函数的参数传入要读取的引脚后，就会返回当前的模拟信号数值。是不是很简单呀？</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img50" src="../Images/Figure-P52_26352.jpg"/>
+ </div> 
+ <p class="bodycontent">程序上传完成后，选择Arduino软件右上方的串口监控器（见图2-37），就会一直有数值显示出来（见图2-38）。以刚才的程序而言，每秒应该有4项数据。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img51" src="../Images/Figure-P52_26355.jpg"/> 
+  <p class="imgdescript-c">图2-37　Arduino的串口监视器窗口</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img52" src="../Images/Figure-P52_26358.jpg"/> 
+  <p class="imgdescript-c">图2-38　Arduino返回的模拟数值</p> 
+ </div> 
+ <p class="bodycontent">此时调整可变电阻，数值就会在最小值0到最大值1023之间变化。这个数值其实是Arduino模拟信号的原始数据（raw data），其实也就是我们刚刚讲的分辨率。这个数值必须再进行计算后才可以得到有意义的物理参数，在此乘上0.0049就会变成伏特。在后面的章节中还有几种不同的模块需要经过公式计算后才能变成真正有意义的数值。</p> 
+ <p class="bodycontent">模拟信号怕的就是噪声，因为噪声的影响会导致我们无法确认信号的正确性。这时就不仅仅是信号的读取了，还必须加入一些算法来协助系统提高数据的正确性。例如，算术平均算法和移动平均算法都有各自的优缺点与适合的信号种类。我们列举几个例子以示参考。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img53" src="../Images/Figure-T53_32194.jpg"/>
+ </div> 
+ <p class="bodycontent">先来看看算术平均算法。方法很简单，设置一个要取平均的数据个数：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img54" src="../Images/Figure-P53_20075.jpg"/>
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img-float9" src="../Images/Figure-P54_26366.jpg"/>
+ </div> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img-float10" src="../Images/Figure-P54_26369.jpg"/>
+ </div> 
+ <p class="bodycontent">接着用一个循环来多次读取模拟信号，并且累加在一个变量中，最后输出时就是这个总和除以前面设置的平均数据个数：</p> 
+ <p class="bodycontent">再来看看移动平均又是通过怎样的方式来进行的呢？主要在于计算方式上的不同。可以从loop循环中看到，我们使用一个数据数组来进行数据的存储，先将一个最新数据存放到数组的最后。接着使用一个for循环来将所有数据往前搬动一个，这样第一个数据，也就是最旧的一个数据就会被覆盖掉。同时也累加了数组中的这些数据。最后输出时再除以数据个数即可。</p> 
+ <p class="bodycontent">这两种平均算法非常简单，不需要太多编程的技巧。不过这两种算法在系统一启动时都必须有一段时间来获得足够的数据个数，当我们想要的平均数越多时会花越多的时间。因此建议在系统程序运行时，必须加入一段初始时间，所有输出或控制逻辑在这段时间内都不操作，避免因为错误的数值结果导致发生错误的响应操作。</p> 
+ <p class="bodycontent">还有一种方式，利用多个模拟输入的信道来监视单个对象或环境，使用传感器不同的摆放位置与方式，这样同一时间内就可以获得多个数据来进行平均。甚至因为不同的配置，每个输入数值还可以有不同的加权比重（见图2-39）。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img55" src="../Images/Figure-P55_20087.jpg"/> 
+  <p class="imgdescript-c">图2-39　使用不同输入并利用加权的权重调整重要性</p> 
+ </div> 
+ <h3 class="bodycontent-title1" id="CHP7-6">2-6　系统规划与优化</h3> 
+ <p class="bodycontent">工欲善其事是，必先利其器。只有事先彻底了解Arduino拥有什么功能，才可以根据不同的需要来实现具体应用。前面的章节只是初浅的介绍，还有许多功能没能仔细说明，例如PWM等，大家可以查阅Arduino其他入门书籍或网络资料以便更深入地熟悉Arduino。这个章节我们将从系统运行的角度观点来进行介绍，让大家知道必须按照不同的应用来完善系统的设计。</p> 
+ <p class="bodycontent" id="CHP7-6-1">2-6-1　时间的重要性</p> 
+ <p class="bodycontent">在第一个范例程序中，如果我们要让LED灯先亮一秒再接着暗一秒地反复循环，我们使用的是delay()函数，在函数中填入想要暂留的秒数即可。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img56" src="../Images/Figure-P56_26376.jpg"/>
+ </div> 
+ <p class="bodycontent">问题来了，如果想要控制两盏LED灯，以第一盏亮一秒暗一秒、第二盏亮两秒暗两秒的规律来设计，程序上要怎么规划呢？</p> 
+ <p class="bodycontent">这里没有唯一的答案，因为程序好玩的地方就是“殊途同归”，只要能达到效率、功能的要求，程序编写的风格会因人而异。不过，要提醒大家的是：delay()这个函数是让程序的逻辑执行到这里后停留特定的秒数，在这个秒数之内发生的所有输入的变化是无法及时响应的。</p> 
+ <p class="bodycontent">一种改进的方式是通过内部的时钟来进行条件判断，借此提高整个程序运作时的灵活度，范例2-7是Arduino的原始范例：BlinkWithoutdelay，笔者只是将注释改为中文，我们可以从loop()中看到，在大部分的时间内程序只执行了一行进行条件判断的语句，唯有当条件满足设置值后才会进行灯号变化的控制。因此，在整个程序中并没有看到delay()这个函数，也不会有程序停留的现象发生，这样的方式在程序要同时处理许多输出状态的变化时更有弹性。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img57" src="../Images/Figure-P57_20096.jpg"/>
+ </div> 
+ <p class="bodycontent" id="CHP7-6-2">2-6-2　实时反应</p> 
+ <p class="bodycontent">前面介绍了Arduino上的输入，包含了数字信号与模拟信号。这两种信号在整个逻辑中都可以用一行程序完成读取数值的操作，不过深入这个函数的源代码，还会发现很多行细节的流程。</p> 
+ <p class="bodycontent">试想，当你为了你的系统编写了一个一千多行的程序代码，除了前面几行是读取I/O的状态外，其他都是基于这些状态的逻辑运算及响应的输出。如果传感器的状态在后面进行判断时突然有了变化，因为还没执行到程序中读取传感值的地方，所以实际Arduino无法及时接收到这样的信号。</p> 
+ <p class="bodycontent">图2-40就是一个例子，程序只在开始阶段进行状态读取，因此此时Arduino可以接收到外部实际的信号，当到了程序在进行逻辑判断时，外部若有突然的信号产生，此时Arduino并不会接收到。因此整个程序从头到尾外部实际共有三次脉冲信号，不过最终你的程序只记录到其中一次的状态变化。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img58" src="../Images/Figure-P58_26387.jpg"/> 
+  <p class="imgdescript-c">图2-40　外部数字信号的变化与内部实际收到的结果</p> 
+ </div> 
+ <p class="bodycontent">针对数字信号，其状态的变化称为“事件”。事件的种类可分为5种，整理如下：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img59" src="../Images/Figure-T58_32195.jpg"/>
+ </div> 
+ <p class="bodycontent">（续表）</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img60" src="../Images/Figure-T59_32196.jpg"/>
+ </div> 
+ <p class="bodycontent">一般我们在读取数字信号时，都是以判断电位的高低为主，上升沿或下降沿则比较少见，其实针对极短瞬间的脉冲信号，只要能抓到电位从低到高变化的瞬间，也就能掌握到这个信号。另外，有些周期性的信号通过两个上升沿信号的间隔长短也能检测到转速、位移等的变化。</p> 
+ <p class="bodycontent">那么有没有什么办法可以让Arduino只要一有状态的变化，马上就可以有所响应呢？当然是有的，我们称为中断（interrupt），指的就是在正常循环的程序中，若有中断的发生是可以立刻被感知的，以数字输入来说，我们需要的是外部中断，这里的“外部”指的就是其他信号源发给Arduino的。Arduino有特殊的引脚支持外部中断。不同的版本有不同的引脚及支持的数量。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img61" src="../Images/Figure-T59_20294.jpg"/>
+ </div> 
+ <p class="bodycontent">我们可以把比较重要的信号连接到这些引脚上，实时地让Arduino接收到设备的状态变化。我们用“按钮的状态来变化LED”的范例来看看这两者的差异。</p> 
+ <p class="bodycontent">先看看范例2-8，它先是很标准地进行按钮状态的读取，再进行LED灯光的控制：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img62" src="../Images/Figure-P60_26446.jpg"/>
+ </div> 
+ <p class="bodycontent">接着再来看看范例2-9：</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img63" src="../Images/Figure-P60_26449.jpg"/>
+ </div> 
+ <p class="bodycontent">首先在setup()里面可以看到一个特别的函数：attachInterrupt()。这个函数一共有三个参数，第一个是检测外部中断的引脚，这里的数字指的是中断的号码，而非实际的引脚，大家可以参考前面的表格，范例里的0就是UNO的Pin 2。第二个参数是指当中断启动后要执行的操作，因此大多是一个函数，要注意的是这个函数内是有一些限制的，例如delay()和millis()都不会起作用。另外，里面会用到的参数最好在定义前加上volatile，大家可以参考范例中变量state的定义，这样用的原因是让编译程序避免对此参数做优化的操作，详细的说明大家可以在网上查阅。最后一个参数则是利用判断信号的种类来启动此中断功能，范例使用change，表示信号只要有变化就会启动中断内的函数，也就是blink。</p> 
+ <p class="bodycontent">主程序loop则相当简单，只是持续进行LED的输出控制。下面可以看到blink函数也只有一行：每次执行都改变state的状态。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img64" src="../Images/Figure-P61_20302.jpg"/>
+ </div> 
+ <p class="bodycontent">大家可以通过这两个范例程序来比较差异性，因为这里程序执行的内容相对简单，也许没有办法明显地看出差异，但是有时候通过中断的使用可以大大提升我们整体系统的效率。</p> 
+ <p class="bodycontent" id="CHP7-6-3">2-6-3　信号警报</p> 
+ <p class="bodycontent">前一个章节介绍的是数字信号的事件变化，这个章节则要看看模拟信号的特性以及系统该怎么样处理模拟信号的变化。</p> 
+ <p class="bodycontent">从前面的认识中可以知道，模拟信号是一个具有连续性且与前面数值有所关联的信号，有些应用可能需要持续观察信号的数值变化与趋势。因此，在以模拟信号作为系统上的输入源时，我们会设置一至多个警戒区间（见图2-41），借此判断信号是否发生异常的情况。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img65" src="../Images/Figure-P62_26456.jpg"/> 
+  <p class="imgdescript-c">图2-41　模拟信号与高低警戒值</p> 
+ </div> 
+ <p class="bodycontent">在系统程序的设计上，我们会用另一个变量来记录这样的异常信号，一种方式是累加发生的次数；另一种则是指记录发生过，例如用灯号亮起表示。这两种方式都会再搭配其他的重置开关，将累加归零或将灯号恢复。</p> 
+ <p class="bodycontent" id="CHP7-6-4">2-6-4　电源规划</p> 
+ <p class="bodycontent">Arduino当初的设计就可以从USB直接使用计算机作为电力的来源（见图2-42）。另外，也支持通过变压器来当作外部电源，通常使用变压器是因为Arduino同时还接着扩展板与其他设备，USB不到500mA的电流限制会影响到系统的稳定性。（虽说标准USB的额定电流大小为500mA，有时候主板设计从业者为了保护硬件因为过大功率而损坏，会让极限小于500mA，这点因不同厂商而异，并非一定。）</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img66" src="../Images/Figure-P63_20312.jpg"/> 
+  <p class="imgdescript-c">图2-42　Arduino UNO左侧电源输入（上为USB，下为变压器端子）</p> 
+ </div> 
+ <p class="bodycontent">Arduino借助稳压IC的帮忙，让变压器端可以接受7～12V（原厂建议值）的电压，表示日常生活常见的9V方型电池和12V电池都可以当作Arduino电力来源，另外现在智能设备非常需要的移动电源也非常适合当作Arduino独立运行时的电力来源。此外，Arduino的硬件上还另外提供了3.3V作为其他设备的电力接点，让用户不用针对3.3V的设备再额外提供降压电路。</p> 
+ <p class="bodycontent">那么Arduino在系统运行时实际的耗电量大约是多少呢？这个计算对于物联网的终端设备是一个不容忽视的问题，因为有时侯我们可能需要将设备放置于户外没有电力供应的区域，如何让Arduino有个稳定且足够续航运行的电力来源便是我们身为系统设计者需要考虑的。</p> 
+ <p class="bodycontent">此外，刚才提到的移动电源或如图2-43所示的太阳能供电系统因为属于可多次充放电的电源类型，所以实际充满电时其电压多少会高于默认电压，在整个使用过程中电压会慢慢下降，到达临界点则会突然失效（见图2-44）。因此，如果我们可以随时检测外部电源的电压变化，就可以在失效点前提早做准备，例如发出信号通知管理员，或开始将重要参数进行保存，以避免系统失效时的数据丢失。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img67" src="../Images/Figure-P64_26466.jpg"/> 
+  <p class="imgdescript-c">图2-43　以太阳能板进行供电</p> 
+ </div> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img68" src="../Images/Figure-P64_32197.jpg"/> 
+  <p class="imgdescript-c">图2-44　常见充电电池的放电曲线</p> 
+ </div> 
+</body>
+</html>

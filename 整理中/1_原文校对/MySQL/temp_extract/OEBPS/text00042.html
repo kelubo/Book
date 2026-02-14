@@ -1,0 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.1.5　如何正确选择MySQL的安装方式</h3>
+<p class="ziti">若是对数据库要求不太高的场景，则可以采用yum/rpm方式安装MySQL，例如，并发不大，只是在公司内部（wiki系统）、企业内部（Zabbix监控系统，OpenStack后台管理）等需要数据库的一些应用场景，当然，生产场景下也是可以选择yum或rpm方式进行安装的。</p>
+<p class="ziti">但是，有很多大型网站或门户网站，在安装MySQL时，往往会有各种定制化、初始化的需求，这时，要根据企业的需求先把源码包制作成rpm包，然后搭建自己的yum仓库，最终采用“yum install mysql-server-y”的方式进行安装，这样做的优点是既兼顾了yum/rpm安装方式简单的优点，又用到了源码包安装方式的可定制性，但是，使用这个方法需要一定的技术能力，此部分的内容建议参考老男孩教育为读者提供的如下博文。</p>
+<p class="ziti">自动化运维必备技能——定制属于自己的RPM包<a href="http://blog.oldboyedu.com/autodeploy-rpm/">http://blog.oldboyedu.com/autodeploy-rpm/</a>
+ 。</p>
+<p class="ziti">自动化运维必备技能——搭建属于自己的YUM仓库<a href="http://blog.oldboyedu.com/autodeploy-yum/">http://blog.oldboyedu.com/autodeploy-yum/</a>
+ 。</p>
+<p class="ziti">二进制免编译安装方式简单方便，且适合5.0-5.1和5.5-5.7系列，是不少专业DBA的选择，普通Linux运维人员一般多采用编译的方式进行安装，对应到MySQL 5.0-5.1系列就是常规编译方式，对应到MySQL 5.5-5.7系列就是cmake编译方式。</p>
+<p class="ziti">所以综合来讲，这些安装方式都是可以使用的，只是不同层次的人习惯不同，实际应用的性能差距不是很大。</p>
+<p class="ziti">老男孩的建议：首先是选择MySQL<span class="yanse">5.5或以上的数据库版本</span>
+ ，当数据库服务器机器数量少的话，可以采用cmake编译方式安装，这是很多运维人员的习惯选择。在数据库服务器机器数量多的情况下，可采用二进制免编译方式安装，这是某些DBA的偏爱，若是数据库服务器机器数量特别大，且对定制化要求很高，则可以选择通过源码定制rpm包，搭建yum仓库的安装方式。当然了，采用此种方法的读者也要具备这方面的能力才行，前文已经给出了做rpm定制以及yum仓库搭建的地址，这里不再赘述。</p>
+</body>
+</html>

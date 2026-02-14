@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+  <head>
+    <title>APPENDIX A　如何破坏Arduino</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="preface-title" id="CHP12">APPENDIX A　如何破坏Arduino</h2> 
+ <h4 class="bodycontent-title2" id="CHP12-1">让Arduino延年益寿的方式</h4> 
+ <p class="preface-text"><span>网</span>络上有一篇由RUGGEO CIRCUITS所提出的文章，文章名为“10种摧毁Arduino的方式”（10-ways-to-destroy-an-arduino），网址为http://www.ruggedcircuits.com/10-ways-to-destroy-an-arduino。有兴趣的读者可以自己到网络上搜索。当然他们针对此方式进行了加强并且推出了Ruggeduino（见图A-1），因为笔者自己没有用过，所以没有办法分享心得。不过因为它是以Arduino早期的版本（微控制器是ATMEGA8）为基础的，有些可能和现在的版本不符了，但是应该还是有其参考价值的。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img351" src="../Images/Figure-P246_29120.jpg"/> 
+  <p class="imgdescript-c">图A-1　Ruggeduino</p> 
+ </div> 
+ <p class="preface-text">想深入了解的读者可以到网站上了解详情，其中包含了电路图的原理说明，会对大家进一步认识Arduino有不小的帮助。本书就只列举几个常见的错误，避免大家因为误接而损失一块Arduino。</p> 
+ <p class="preface-text">外部电源供应不要高于12V</p> 
+ <p class="preface-text">虽然Arduino UNO R3的稳压IC可以接受最大20V的输入，但是根据官网上的数据，建议大家还是以12V以下为主。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img352" src="../Images/Figure-P247_23091.jpg"/>
+ </div> 
+ <p class="preface-text">Arduino UNO每个引脚输入不要高于5V</p> 
+ <p class="preface-text">Arduino UNO的工作电压是5V，当引脚设置为输入（INPUT）时，不要输入高于5V的信号。若一定有需要，则可以在引脚前再接一个稳压IC，确保信号可以转为5V。有些Arduino是3.3V的版本，则不可以超过3.3V。</p> 
+ <p class="preface-text">Arduino电源端的引脚不要接到GND</p> 
+ <p class="preface-text">Arduino UNO为了使用方便，在板子上提供了两组5V和一组3.3V的电源输出（见图A-2），这部分要小心，不要接到旁边的GND以免造成短路的现象，导致元件烧毁。同时，也不要将高于其规格的电压输入到这几个引脚。</p> 
+ <div class="bodypic-c"> 
+  <img alt="" class="pic-img353" src="../Images/Figure-P247_23097.jpg"/> 
+  <p class="imgdescript-c">图A-2　Arduino UNO的供电部分</p> 
+ </div> 
+ <p class="preface-text">不要高于引脚的负载</p> 
+ <p class="preface-text">Arduino每一个引脚可以接受的负载为20mA，如要接到更大的功耗就使用晶体管或是有反向电动势保护的继电器模块。</p> 
+ <div class="bodypic-c">
+  <img alt="" class="pic-img354" src="../Images/Figure-P248_29130.jpg"/>
+ </div> 
+ <p class="preface-text">不要将Arduino直接置于金属表面</p> 
+ <p class="preface-text">Arduino背面焊点都没有额外保护，若直接接触金属表面则会造成某些引脚短路。建议使用六角脚柱垫高Arduino，避免与其他金属物体接触。</p> 
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.2.7　基本的MySQL安全配置</h3>
+<p class="p6">1.为root用户设置密码</p>
+<p class="ziti">MySQL管理员的账号root密码默认为空，极不安全，可以通过mysqladmin命令为mysql不同实例的数据库设置独立的密码：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqladmin -u root password 'oldboy123'
+#&lt;==为root用户设置密码oldboy123。
+Warning: Using a password on the command line interface can be insecure.
+#&lt;==这里是一个警告，提醒用户命令行放置密码是不安全的，请读者尽量不要在命令行输入密码，
+    而是采取交互式的方式输入密码。
+[root@oldboy ~]# mysql #&lt;==无法直接输入命令登录了。
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+[root@oldboy ~]# mysql -uroot -p #&lt;==新的登录方式，也可以直接带密码mysql -uroot
+                                 -poldboy123。
+Enter password:                  #&lt;==输入新密码oldboy123，交互式输入密码不会记录
+                                   在命令记录里，因此更安全。
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 5
+Server version: 5.6.40 Source distribution
+Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">读者也可以执行mysql_secure_installation命令交互式地设置系统的用户密码。</p>
+<p class="p6">2.清理mysql服务器内无用的用户</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select user,host from mysql.user;
++------+-----------+
+| user | host      |
++------+-----------+
+| root | 127.0.0.1 |
+| root | ::1       |
+|      | localhost |
+| root | localhost |
+|      | oldboy    |
+| root | oldboy    |
++------+-----------+
+6 rows in set (0.00 sec)
+
+mysql&gt; drop user root@'::1';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; drop user root@'oldboy';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; drop user ''@'oldboy';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; drop user ''@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; select user,host from mysql.user;
++------+-----------+
+| user | host      |
++------+-----------+
+| root | 127.0.0.1 |
+| root | localhost |
++------+-----------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 对于drop命令及数据库安全，后文会有详细讲解，此处不执行也可以。</p>
+<p class="ziti">有时使用drop命令可能会无法删除对应用户。比如，当数据库内的host等字段为大写及特殊Linux主机名时，删除用户就会遇到问题，例如：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop user ' '@'MySQL';
+ERROR 1396 (HY000): Operation DROP USER failed for ' '@'mysql'</pre>
+<hr/>
+<p class="ziti">可使用DML语句，并采用delete命令删除来解决此问题，具体命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; delete from mysql.user where user='' and host='MySQL';
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; flush privileges;
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="p6">3.删除mysql数据库内无用的test库</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop database test;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
++--------------------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">有关MySQL的更多安全措施，在后文会有更详细的讲解。</p>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_221">12.1.2　Kubernetes相关术语</h3> 
+ <p class="ziti3">Kubernetes提供了容器运行时各种资源自动化调度与管理的强大功能，为应对各种复杂环境的自动化管理操作，Kubernetes系统中定义了很多术语。本章涉及的术语可分为资源对象、资源控制器、资源配置和管理工具4类。</p> 
+ <p class="ziti3"><span class="yanse">1.资源对象</span></p> 
+ <p class="ziti3">资源对象指Kubernetes中所有被管理的资源，如Pod、节点、服务都属于资源对象。可以通过接口服务对Kubernetes集群中的所有资源对象进行增、删、改、查操作，资源对象相关数据被持久化保存在存储服务中。</p> 
+ <p class="ziti3">Kubernetes中被管理的资源对象会因版本不同而变化，本章涉及的资源对象如下。</p> 
+ <p class="ziti3">（1）Pod</p> 
+ <p class="ziti3">Pod是Kubernetes中的核心资源，每个Pod可包含多个容器，每个运行的Pod由一个名为pause的沙盒容器（Sandbox Container，也称基础容器）与一个或多个应用容器组成。基础容器为Pod中的应用容器提供如下功能。</p> 
+ <p class="ziti4">·共享PID命名空间，Pod中的应用程序可以查看彼此的进程ID。</p> 
+ <p class="ziti4">·共享网络命名空间，Pod中的不同容器共同使用一个IP和端口范围。</p> 
+ <p class="ziti4">·共享IPC命名空间，Pod中的不同容器的应用可以使用SystemV IPC或POSIX消息队列进行通信。</p> 
+ <p class="ziti4">·共享UTS命名空间，Pod中的所有容器共享同一个主机名及共享Pod级别定义的存储卷（Volume）。</p> 
+ <p class="ziti3">（2）Node</p> 
+ <p class="ziti3">Node是指Kubernetes集群中运行Pod的宿主机，每个Node都会运行节点代理服务（kubelet），负责各Node运行Pod容器的管理、监控，并向主节点汇报运行容器的状态，同时接收并执行主节点下发的任务。通过管理工具可对Node资源进行添加、删除及隔离等操作。</p> 
+ <p class="ziti3">（3）标签</p> 
+ <p class="ziti3">标签（Label）是与资源对象关联的键值对，用以标识资源实例的特征，方便用户对资源实例通过自定义标识进行归类。标签键（key）的长度最多63个字符，必须以字母或数字为开始和结束的字符，中间可以有“_”“-”“.”做连接符。标签键值（value）的长度最多63个字符，必须以字母或数字为首字符，也可以为空。每个资源实例与标签是多对多的关系，可以在资源实例初始时定义标签，也可以动态添加或删除。</p> 
+ <p class="ziti3">（4）注解</p> 
+ <p class="ziti3">注解（Annotation）也是与资源对象关联的键值对，用以对资源实例的内置属性进行描述。注解键值对不能用于资源实例的标识及选择，但资源实例被描述的属性数据可以被管理工具或系统扩展使用。注解键值对可以使用标签不允许的字符，可用于资源实例运行时的外部设置，使资源实例在注解值不同时实现不同的运行状态。</p> 
+ <p class="ziti3">（5）服务</p> 
+ <p class="ziti3">服务（Service）定义了由多个具有相同服务名称标签的Pod组成的虚拟网络集群，其负责虚拟集群内Pod的负载均衡和自动发现，每个服务会被分配一个全局唯一固定的虚拟IP（Cluster IP），Kubernetes集群内的所有应用都可以通过Cluster IP与这个服务实现TCP通信。</p> 
+ <p class="ziti3">（6）端点</p> 
+ <p class="ziti3">资源对象端点（Endpoint）表示一个由Pod IP和端口组成的可被访问的网络访问点，是构成Service的基础单位，每个Service负责实现端点列表中端点的负载均衡和网络请求转发。</p> 
+ <p class="ziti3">（7）配置映射</p> 
+ <p class="ziti3">配置映射（ConfigMap）提供了一种类似于配置中心的配置使用方法。应用容器的内容是在制作镜像时打包好的，如果要修改容器的内容，通常都需要重新制作镜像。日常使用中，会遇到很多只简单修改应用配置文件的需求，通过配置映射将配置变量或文件存储在存储服务etcd中，应用容器可以在运行的系统中以环境变量或挂载文件的方式使用这些配置变量。</p> 
+ <p class="ziti3">（8）命名空间</p> 
+ <p class="ziti3">命名空间（Namespace）是Kubernetes集群用于对资源进行管理的逻辑集合，不同命名空间的资源实例逻辑间是彼此隔离的。不同命名空间可通过设定资源配额、网络策略、RBAC策略进行资源实例的管控。网络策略需要网络插件的支持，如Flannel并没有提供网络策略的支持，所以无法实现网络隔离。</p> 
+ <p class="ziti3"><span class="yanse">2.资源控制器</span></p> 
+ <p class="ziti3">资源控制器用以实现每个资源对象的具体操作，每个资源对象都由对应的控制器进行管理和控制。Kubernetes通过各种控制器跟踪和对比存储服务中已保存资源实例的期望状态与当前集群中运行的资源实例的实际状态的差异来实现自动控制和纠错。</p> 
+ <p class="ziti3">Kubernetes通过管理控制服务来管理资源对象，管理控制服务由一系列资源控制器（Controller）组成，本章涉及的控制器有如下几种。</p> 
+ <p class="ziti3">（1）副本控制器</p> 
+ <p class="ziti3">副本控制器（Replication Controller，RC）与进程管理器类似，用以监控集群中所有节点上的Pod，并确保每个Pod都有设定数量的副本在运行。如果运行的Pod数量大于设定的数量，则关闭多余的Pod；反之，则启用足够数量的新Pod。</p> 
+ <p class="ziti3">（2）副本集</p> 
+ <p class="ziti3">副本集（Replica Set，RS）在RC原有功能的基础上提供了更多的增强工具，它主要被部署控制器（Deployment Controller）作为协调Pod创建、删除和更新使用。RS也被称为下一代副本控制器，官方已经推荐使用部署控制器管理RS（而不是RC）。</p> 
+ <p class="ziti3">（3）部署控制器</p> 
+ <p class="ziti3">部署控制器用来管理无状态应用，它通过资源对象Deployment的配置与RS组合来管理Pod的多个副本，确保Pod按照资源配置描述的状态运行。部署控制器完成资源对象Deployment实例的创建过程，由RS协助实现Pod副本的创建，并随时监控Deployment资源实例的部署状态，当部署状态不稳定时，可将Pod回滚到之前的Deployment资源实例版本。</p> 
+ <p class="ziti3">（4）DaemonSet控制器</p> 
+ <p class="ziti3">DaemonSet控制器可确保以该模式部署的Pod应用，在集群中的每个Node上都有一个Pod副本在运行，如果集群中增加了新的Node，也会自动在该Node创建该应用的Pod副本，常用来部署全局使用的日志采集、监控、系统管理等容器应用。</p> 
+ <p class="ziti3">（5）StatefulSet控制器</p> 
+ <p class="ziti3">StatefulSet控制器是用来管理有状态应用的，能够保证其管理的Pod的每个副本在整个生命周期中名称不变。通常每个Pod在被删除重建或重启后名称（PodName和HostName）都会变化，而StatefulSet控制器可以使Pod副本相关信息不变，也可以按照固定的顺序启动、更新或删除。StatefulSet控制器通常用来解决有状态服务的管理和维护。</p> 
+ <p class="ziti3">（6）端点控制器</p> 
+ <p class="ziti3">端点控制器（Endpoint Controller）负责与服务对应端点列表的生成和维护，监听服务及其对应Pod的变化。服务被创建或修改时，端点控制器根据服务信息获得其所有Pod的IP和端口信息，并创建或更新同名的端点对象列表。当服务被删除时，同名的端点列表也会被删除。kube-proxy服务通过获取每个服务对应的端点列表，实现服务的负载均衡和数据转发配置。</p> 
+ <p class="ziti3">（7）服务控制器</p> 
+ <p class="ziti3">服务控制器（Service Controller）是属于Pod应用对外发布服务的一个接口控制器，可通过ClusterIP、NodePort、LoadBalancer、ExternalName和externalIPs方式实现Pod应用的对外服务访问。服务控制器监听资源对象服务的变化，当服务是LoadBalancer类型时，确保外部的云平台上对该服务对应的LoadBalancer实例被相应地创建、删除及路由转发表的更新。</p> 
+ <p class="ziti3"><span class="yanse">3.资源配置</span></p> 
+ <p class="ziti3">资源配置是由用户编写来描述资源实例期望状态的Yaml格式数据或文本，每个资源对象被通过对应的资源接口创建或修改资源实例，并通过资源控制器使资源实例按照资源配置文件中描述的期望状态运行。</p> 
+ <p class="ziti3">本章涉及资源配置的资源接口版本（apiVersion）、资源类型（kind）、元数据（metadata）、规范（spec）四个部分。</p> 
+ <p class="ziti3">（1）资源接口版本</p> 
+ <p class="ziti3">因Kubernetes本身也在快速迭代，所以Kubernetes每次更新一个版本时，就会为被改变内容的资源接口创建一个新的版本，所以在编写资源配置时，需要先声明被操作资源接口的版本，以确保所描述的操作内容可被正常解析和执行。可使用如下命令查看当前Kubernetes集群接口服务支持的接口版本。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">kubectl api-versions
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）资源类型</p> 
+ <p class="ziti3">资源类型用以声明需要操作的资源类型名称，资源类型包括一个或多个可被操作的资源对象，常见的资源类型有Service、Deployment、Pod、Ingress。可使用如下命令查看当前Kubernetes集群接口服务可操作的资源对象名称和所属资源类型。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">kubectl api-resources
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）元数据</p> 
+ <p class="ziti3">元数据用以对当前操作的资源实例进行标识，元数据可以包括实例名称（name）、实例所在命名空间（namespace）、实例标签（label）、实例注解（Annotation）等信息。</p> 
+ <p class="ziti3">（4）规范</p> 
+ <p class="ziti3">规范用以描述被操作的资源实例在Kubernetes集群中的执行规范和被期望达成的状态。</p> 
+ <p class="ziti3">资源配置样例如下。</p> 
+ <p class="ziti3">创建名为nginx-svc的服务资源实例，将资源实例nginx-svc以NodePort类型对外开放端口30080，对应的Service端口为8080，Pod端口为80。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: v1          # 调用资源接口版本为v1
+kind: Service           # 资源类型为Service
+metadata:
+    name: nginx-svc # 资源实例名称为nginx-svc
+    namespace: webapps      # 资源实例所属命名空间为webapps
+    labels:
+        app: nginx-svc      # 资源实例的标签为nginx-svc
+spec:
+    type: NodePort          # 服务类型为NodePort
+    ports:
+    - port: 8080            # 服务的端口为8080
+      nodePort: 30080       # NodePort对外开放的端口为30080
+      targetPort: 80        # Pod应用的端口为80
+    selector:
+        app: nginx-web      # 服务用于筛选对应Pod的标签名为nginx-web
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">4.管理工具</span></p> 
+ <p class="ziti3">管理工具是用于与Kubernetes交互来实现资源对象操作的执行程序，资源配置文件就是通过管理工具提交给Kubernetes接口服务完成相关资源对象操作的。</p> 
+ <p class="ziti3">（1）集群部署工具kubeadm</p> 
+ <p class="ziti3">kubeadm是Kubernetes官方推荐的部署工具之一，可以实现Kubernetes集群容器化的快速部署。Master节点只需执行kubeadm init即可完成Master组件的自动化部署，Node节点只需执行kubeadm join即可完成加入指定Kubernetes集群的操作。执行kubeadm init命令时自动执行如下动作。</p> 
+ <p class="ziti3">1）系统环境检查。</p> 
+ <p class="ziti3">2）生成Master token。</p> 
+ <p class="ziti3">3）生成自签名的CA和Client证书。</p> 
+ <p class="ziti3">4）生成kubeconfig用于kubelet服务连接API server。</p> 
+ <p class="ziti3">5）初始化并启动kubelet服务。</p> 
+ <p class="ziti3">6）为Master各组件生成静态Pod配置（Static Pod manifests）并创建Pod应用，Master组件运行命名空间为kube-system。</p> 
+ <p class="ziti3">7）配置RBAC。</p> 
+ <p class="ziti3">8）添加kube-proxy和CoreDNS附加服务。</p> 
+ <p class="ziti3">该命令的其他参数如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 初始化主节点
+kubeadm init
+
+# 查看token
+kubeadm token list
+
+# 重新生成token
+kubeadm token generate
+
+# 清空kubeadm设置
+kubeadm reset
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）资源管理工具kubectl</p> 
+ <p class="ziti3">kubectl是Kubernetes的资源管理客户端程序，可以通过Kubernetes Master的接口服务（API Server）查看及进行创建、删除或更新资源对象等操作。通常建议在非Master节点主机运行或在Master节点上以非root权限用户运行。当Master节点被kubeadm初始化成功后，会提示将/etc/kubernetes/admin.conf复制到kubectl控制机或非root用户的Home目录中。该命令的其他参数如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 查看节点状态
+kubectl get nodes
+
+# 查看集群状态
+kubectl get cs
+
+# 查看所有事件
+kubectl get events --all-namespaces
+
+# 查看所有Pod
+kubectl get pods --all-namespaces -o wide
+
+# 查看所有服务
+kubectl get services --all-namespaces -o wide
+
+# 扩缩容，将以deployment部署方式部署的Pod资源实例nginx的副本数设定为3
+kubectl scale --replicas=3 deployment/nginx
+
+# 编辑配置，编辑资源对象Service实例名为nginx的资源配置
+kubectl edit service/nginx
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">为了更方便地扩展资源管理工具的功能，kubectl通过插件机制允许开发者以独立文件的形式发布自定义的kubectl子命令。kubectl插件可以使用任意语言开发，可以是一个Bash或Python的脚本，也可以是其他语言开发编译的二进制可执行文件，只要最终将脚本或二进制可执行文件以kubectl-为前缀命名，并存放到/root/.krew/bin/目录中即可。使用kubectl plugin list命令可以查看有哪些插件。krew是kubectl插件的管理器，使用krew可以轻松查找、安装和管理kubectl插件。krew本身也是一个kubectl插件。krew相关的命令如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 安装kubectl插件krew
+curl -fsSLO "https://storage.googleapis.com/krew/v0.2.1/krew.{tar.gz,yaml}"
+
+tar zxvf krew.tar.gz
+./krew-linux_amd64 install --manifest=krew.yaml --archive=krew.tar.gz
+echo "export PATH=\"\${KREW_ROOT:-\$HOME/.krew}/bin:\$PATH\"" &gt;&gt;/etc/profile
+source /etc/profile
+
+# 更新插件列表
+kubectl krew update
+
+# 查看插件列表
+kubectl krew list
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）应用部署工具Helm</p> 
+ <p class="ziti3">Helm并非官方提供的工具，而是Deis公司（已被微软收购）开发的用于Kubernetes下应用部署、更新、卸载的管理工具。Helm类似于Linux操作系统中的包管理工具，如CentOS下使用的yum。Helm让Kubernetes的用户可以像安装软件包一样，轻松查找、部署、升级或卸载各种应用。Helm的工作逻辑如图12-3所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-3.jpg" class="calibre345"/></a> 
+ </div> 
+ <p class="middle-img">图12-3　Helm工作逻辑<br class="calibre3"/></p> 
+ <p class="ziti3">关于Helm的几点说明如下。</p> 
+ <p class="ziti4">·Helm管理的安装包被称为Chart。</p> 
+ <p class="ziti4">·Chart存储在远端的Charts仓库（Repository）。</p> 
+ <p class="ziti4">·Tiller是Helm的服务端，以Pod方式部署在Kubernetes中，负责接收Helm客户端的控制命令，解析Chart并调用接口服务完成应用的部署和配置。</p> 
+ <p class="ziti3">常用的Helm命令如下。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 初始化Helm
+helm init
+
+# 查看当前安装的应用
+helm list
+
+# 安装应用
+helm install --namespace kubeapps --name kubeapps bitnami/kubeapps
+
+# 删除应用
+helm delete --purge kubeapps
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

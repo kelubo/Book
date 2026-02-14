@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="Af9f700ea-d76b-45fc-8d06-3004dbb5e5c4" class="calibre13">Chapter 13<br class="calibre8"/> 第十三章 树莓派典型控制器使用</h2> 
+ <p class="calibre3">目前，树莓派广泛用于飞行器、机器人的制作，而控制部分是其重要的组成部分，本章介绍树莓派典型控制器的使用。</p> 
+ <h3 id="A9b1af5b6-83aa-4185-b5ce-0b7f78f0a287" class="calibre14">13.1 直流减速电机控制</h3> 
+ <p class="calibre3">树莓派在控制直流减速电机时一般使用驱动板进行控制。美国纽约的Adafruit（主页：https：//www.adafruit.com）是一家DIY公司，网上对此公司评价多为创意无限，如图13-1所示为Adafruit设计的树莓派直流电机控制板。</p> 
+ <div class="center"> 
+  <img alt="" class="u545" src="../Images/235_01.jpg" width="1280" height="488"/> 
+  <p class="imgtitle">图13-1 Adafruit设计的树莓派直流电机控制板</p> 
+ </div> 
+ <p class="calibre3">如图13-2所示为奥松机器人设计的新版树莓派直流电机驱动板，与树莓派完美结合。供电电源采用LM2596开关稳压电源，具有效率更高、输出电流更大、发热量更低等特点。电机驱动板新品采用L293D，更小的封装尺寸，更合理的电路设计，可以直接安装URF02超声波传感器和蓝牙模块，制作树莓派小车更加方便、简洁。</p> 
+ <div class="center"> 
+  <img alt="" class="u546" src="../Images/236_01.jpg" width="1280" height="518"/> 
+  <p class="imgtitle">图13-2 树莓派直流电机驱动板</p> 
+ </div> 
+ <p class="calibre3">本书选用奥松机器人设计的树莓派电机驱动板，接口说明如图13-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u547" src="../Images/236_02.jpg" width="1280" height="477"/> 
+  <p class="imgtitle">图13-3 树莓派电机驱动板的接口说明</p> 
+ </div> 
+ <p class="calibre3">电机A口的使能接GPIO10，方向控制接GPIO25；电机B口的使能接GPIO17，方向控制接GPIO4。使用树莓派控制引脚可以控制电机的启动、停止和调速，通过方向引脚控制电机转向。</p> 
+ <p class="calibre3">（1）A口使能GPIO10输出高电平，A口方向GPIO25输出高电平，A口电机顺时针旋转。</p> 
+ <p class="calibre3">（2）A口使能GPIO10输出高电平，A口方向GPIO25输出低电平，A口电机逆时针旋转。</p> 
+ <p class="calibre3">（3）A口使能GPIO10输出低电平，A口电机停止转动。</p> 
+ <p class="calibre3">（4）B口使能GPIO17输出高电平，B口方向GPIO4输出高电平，B口电机顺时针旋转。</p> 
+ <p class="calibre3">（5）B口使能GPIO17输出高电平，B口方向GPIO4输出低电平，B口电机逆时针旋转；</p> 
+ <p class="calibre3">（6）B口使能GPIO17输出低电平，B口电机停止转动。</p> 
+ <p class="calibre3">I<sup class="calibre9">2</sup>C接口直接连接到树莓派的I<sup class="calibre9">2</sup>C引脚（GPIO2| SDA，GPIO3| SCL），可以扩展I<sup class="calibre9">2</sup>C模块。</p> 
+ <p class="calibre3">电机A口接左电机，电机B口接右电机，启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为DC_Motor.py：</p> 
+ <div class="center">
+  <img alt="" class="u548" src="../Images/236_03.jpg" width="1280" height="215"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u549" src="../Images/237_01.jpg" width="1280" height="1843"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u550" src="../Images/238_01.jpg" width="1280" height="401"/>
+ </div> 
+ <p class="calibre3">本程序的运行效果是：小车分别前进、后退、左转、右转2秒时间，最后停止。</p> 
+ <h3 id="Af8670ad1-39c3-4a37-9ee0-a0f00202f73e" class="calibre14">13.2 舵机控制</h3> 
+ <p class="calibre3">舵机是一种位置（角度）伺服的驱动器，适用于那些需要角度不断变化并可以保持的控制系统，在树莓派机器人控制系统应用广泛。</p> 
+ <h4 class="sigil_not_in_toc" id="Ab8f800ed-103f-4a3b-9b77-10d2dbd0a183">13.2.1 PWM控制</h4> 
+ <p class="calibre3">舵机的控制脉冲是周期20ms的PPM，PPM信号的频率为50Hz，脉宽为0.5ms～2.5ms，分别对应-90°～+90°的位置。</p> 
+ <p class="calibre3">脉宽调制（PWM）是指用微处理器的数字输出来对模拟电路进行控制，是一种对模拟信号电平进行数字编码的方法。在树莓派上，能够通过对GPIO的编程来实现PWM，主要方法如下：</p> 
+ <p class="calibre3">（1）创建一个PWM实例：P=GPIO.PWM（channel，frequency）。</p> 
+ <p class="calibre3">（2）启用PWM：p.start（dc）</p> 
+ <div class="center">
+  <img alt="" class="u551" src="../Images/238_02.jpg" width="1280" height="46"/>
+ </div> 
+ <p class="calibre3">（3）更改频率：</p> 
+ <div class="center">
+  <img alt="" class="u416" src="../Images/238_03.jpg" width="1280" height="47"/>
+ </div> 
+ <p class="calibre3">（4）更改占空比：</p> 
+ <div class="center">
+  <img alt="" class="u552" src="../Images/238_04.jpg" width="1280" height="43"/>
+ </div> 
+ <p class="calibre3">（5）停止PWM：</p> 
+ <div class="center">
+  <img alt="" class="u553" src="../Images/238_05.jpg" width="1280" height="43"/>
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：假设实例中的变量“p”超出范围，也会导致PWM停止。</p> 
+ <p class="calibre3">下面为使LED每两秒钟闪烁一次的演示样例。</p> 
+ <div class="center">
+  <img alt="" class="u554" src="../Images/238_06.jpg" width="1280" height="351"/>
+ </div> 
+ <p class="calibre3">选用S90舵机，舵机的针脚定义为：棕色线——GND，红色线——5V，橙色线——信号线，如图13-4所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u555" src="../Images/239_01.jpg" width="999" height="403"/> 
+  <p class="imgtitle">图13-4 S90舵机的针脚定义</p> 
+ </div> 
+ <p class="calibre3">Raspberry Pi B+控制器与S90舵机模块接线对应关系如表13-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表13-1 Raspberry Pi B+控制器与S90舵机模块接线对应关系</p>
+  <img alt="" class="u193" src="../Images/239_02.jpg" width="1280" height="186"/>
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为Ser-vo.py：</p> 
+ <div class="center">
+  <img alt="" class="u556" src="../Images/239_03.jpg" width="1280" height="947"/>
+ </div> 
+ <p class="calibre3">运行结果如图13-5所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u557" src="../Images/240_01.jpg" width="1280" height="535"/> 
+  <p class="imgtitle">图13-5 舵机PWM控制</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A524000ef-bfe7-4b20-8e26-9ff14db8c512">13.2.2 Servoblaster控制</h4> 
+ <p class="calibre3">利用树莓派的RPI.GPIO软件实现PWM舵机控制信号不稳定。目前，开源社区由舵机控制Servoblaster，可以用最方便的方式来控制舵机。</p> 
+ <p class="calibre3">具体来说，Servoblaster其实是个程序，而不是Python的库，所以要先运行Servoblaster，然后再运行Python程序，当Servoblaster运行的时候，在/dev/目录下面就会出现Servoblaster设备，就好像软件模拟出了一个设备，可以通过linux命令：echo转动角度＞/dev/servoblaster，这个命令控制舵机转动角度。Servoblaster的github上面有很详细的使用说明，其网址为：https：//github.com/richardghirst/PiBits/tree/master/ServoBlaster。Servoblaster用起来非常简单，而且可以同时控制五六个舵机。</p> 
+ <p class="calibre3">Servoblaster的使用步骤如下：</p> 
+ <p class="calibre3">（1）安装Git，命令为：sudo apt-get install git；使用Git从开源社区获取文件，命令为：git clone git：//github.com/richardghirst/PiBits.git；如图13-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u558" src="../Images/240_02.jpg" width="1210" height="786"/> 
+  <p class="imgtitle">图13-6 获取ServoBlaster</p> 
+ </div> 
+ <p class="calibre3">（2）获取完成以后的目录如图13-7所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u559" src="../Images/241_01.jpg" width="1280" height="655"/> 
+  <p class="imgtitle">图13-7 ServoBlaster目录</p> 
+ </div> 
+ <p class="calibre3">（3）切换到ServoBlaster/user目录，输入编译命令：sudo make servod，生成可执行文件servod，然后启动，命令为：sudo./servod，如图13-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u560" src="../Images/241_02.jpg" width="1229" height="1021"/> 
+  <p class="imgtitle">图13-8 编译启动ServoBlaster</p> 
+ </div> 
+ <p class="calibre3">（4）Servoblaster测试。首先安装Servoblaster，在当前目录（user目录）输入命令：sudo make install，当前舵机的信号线用到的GPIO接口是22，物理接口是15，控制转动的命令为：echo 4=60＞/dev/servobblaster，就可以看到舵机平稳的转动了，如图13-9所示。</p> 
+ <p class="calibre3">（5）在Python中使用Servoblaste。</p> 
+ <p class="calibre3">在Python中使用Servoblaster需要用到subprocess库，代码如下：</p> 
+ <div class="center"> 
+  <img alt="" class="u561" src="../Images/242_01.jpg" width="1280" height="363"/> 
+  <p class="imgtitle">图13-9 ServoBlaster控制舵机转动</p> 
+ </div> 
+ <div class="center">
+  <img alt="" class="u562" src="../Images/242_02.jpg" width="1280" height="96"/>
+ </div> 
+ <h3 id="A27c37f90-a4d9-4ccd-b8d6-8a763884f2b2" class="calibre14">13.3 步进电机</h3> 
+ <p class="calibre3">步进电机的优点在于它能够被精确定位，正向或反向一次性转动“一步”，并且也能够连续转动。本书选用的步进电机的驱动芯片是ULN2003APG。ULN2003APG是高耐压、大电流复合晶体管阵列，由7个硅NPN复合晶体管组成。ULN2003APG电机驱动板和步进电机的连接实物图如图13-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u563" src="../Images/242_03.jpg" width="1242" height="611"/> 
+  <p class="imgtitle">图13-10 ULN2003APG电机驱动板和步进电机的连接实物图</p> 
+ </div> 
+ <p class="calibre3">Raspberry Pi B+控制器与ULN2003APG电机驱动板接线对应关系如表13-2所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表13-2 Raspberry Pi B+控制器与ULN2003APG电机驱动板接线对应关系</p>
+  <img alt="" class="u114" src="../Images/242_04.jpg" width="1280" height="314"/>
+ </div> 
+ <p class="calibre3">按照表13-2将连线接好，启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为StepMotor.py：</p> 
+ <div class="center">
+  <img alt="" class="u564" src="../Images/243_01.jpg" width="1280" height="1753"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u565" src="../Images/244_01.jpg" width="1280" height="877"/>
+ </div> 
+ <p class="calibre3">运行结果如图13-11所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u566" src="../Images/244_02.jpg" width="1280" height="840"/> 
+  <p class="imgtitle">图13-11 步进电机控制</p> 
+ </div> 
+ <h3 id="Abb524245-3afb-4cdb-a38f-f0b76fb9a067" class="calibre14">13.4 LED交通信号灯模块</h3> 
+ <p class="calibre3">LED交通信号灯模块包括红、黄、绿3种颜色的灯，如图13-12所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u567" src="../Images/245_01.jpg" width="1213" height="520"/> 
+  <p class="imgtitle">图13-12 LED交通信号灯模块</p> 
+ </div> 
+ <p class="calibre3">接口说明：电压5V，数字信号输入，共阴极，红、黄、绿单独控制；红线——R，黄线——Y，绿线——G，地线——GND。</p> 
+ <p class="calibre3">Raspberry Pi B+控制器与LED交通信号灯模块接线对应关系如表13-3所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表13-3 Raspberry Pi B+控制器与LED交通信号灯模块接线对应关系</p>
+  <img alt="" class="u213" src="../Images/245_02.jpg" width="1280" height="228"/>
+ </div> 
+ <p class="calibre3">按照表13-3将连线接好，启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为LED.py：</p> 
+ <div class="center">
+  <img alt="" class="u568" src="../Images/245_03.jpg" width="1280" height="613"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u569" src="../Images/246_01.jpg" width="1280" height="827"/>
+ </div> 
+ <p class="calibre3">运行结果如图13-13所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u570" src="../Images/246_02.jpg" width="1280" height="848"/> 
+  <p class="imgtitle">图13-13 LED交通信号灯运行结果</p> 
+ </div> 
+ <h3 id="A52e1cd0c-be4f-496b-95f3-d1f64eef988e" class="calibre14">13.5 使用继电器控制大功率设备</h3> 
+ <p class="calibre3">树莓派直接控制电气设备的工作电压为3.3V，其他电压（例如12V、24V、220V）工作的设备，必须通过继电器进行转换控制，典型的树莓派使用的继电器如图13-14所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u571" src="../Images/247_01.jpg" width="1231" height="529"/> 
+  <p class="imgtitle">图13-14 树莓派使用继电器</p> 
+ </div> 
+ <p class="calibre3">下面以3路继电器扩展板为例进行说明，继电器控制板的构成说明如下：①RPi连接口，接入树莓派；②继电器接线端子；③继电器；④光耦，PC817光耦芯片；⑤继电器工作指示灯；⑥电源指示灯；⑦继电器控制管脚选择跳线。当连接跳线帽时，即可使用树莓派控制继电器，如图13-15所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u572" src="../Images/247_02.jpg" width="809" height="791"/> 
+  <p class="imgtitle">图13-15 继电器构成</p> 
+ </div> 
+ <p class="calibre3">继电器通道与Pi引脚的对应关系如表13-4所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表13-4 继电器通道与Pi引脚的对应关系</p>
+  <img alt="" class="u180" src="../Images/247_03.jpg" width="1280" height="183"/>
+ </div> 
+ <p class="calibre3">启动树莓派，打开Python 3的IDLE窗口，新建文件，输入下列代码，并将文件保存为Relay_ Module.py：</p> 
+ <div class="center">
+  <img alt="" class="u573" src="../Images/247_04.jpg" width="1280" height="168"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u574" src="../Images/248_01.jpg" width="1280" height="1503"/>
+ </div> 
+ <p class="calibre3">可以看到3个LED依次被点亮，继电器依次在常开触点和常闭触点之间来回切换。同时终端会显示目前继电器在哪个触点。</p> 
+ <h3 id="A43a829f9-8dc3-485f-8b61-dd93121ce465" class="calibre14">13.6 本章小结</h3> 
+ <p class="calibre3">本章详细介绍了机器人常用的3种运动控制的电机舵机、直流减速电机和步进电机在树莓派中的使用，以及如何使用继电器控制大功率设备，并给出了具体示例及实现方法。</p> 
+</body>
+</html>

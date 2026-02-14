@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.3.5　实践1：半同步复制是否配置成功测试</h3>
+<p class="ziti">1）登录主库db01再次确定半同步复制插件是否已经开启，状态是否正常。输出如图17-3所示</p>
+<div class="pic"><img alt="" src="Image00133.jpg" />
+</div>
+<p class="middle-img">图17-3　主库db01半同步复制插件已开启</p>
+<p class="ziti">图17-3中，方框结尾的值为ON，表示主库半同步插件都已处于工作状态，请注意其他状态值都为0。</p>
+<p class="ziti">2）登录从库db02确定半同步复制插件是否已经开启，并且从库的复制状态是正常的：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%semi%';
++---------------------------------+-------+
+| Variable_name                   | Value |
++---------------------------------+-------+
+| rpl_semi_sync_slave_enabled     | ON    |
+| rpl_semi_sync_slave_trace_level | 32    |
++---------------------------------+-------+
+2 rows in set (0.00 sec)
+mysql&gt; show slave status\G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+...省略若干...
+             Slave_IO_Running: Yes  #&lt;==确保主从复制是两个Yes。
+            Slave_SQL_Running: Yes
+...省略若干...
+ 1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">3）开始写入数据，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create database oldboy1; #&lt;==建立oldboy1库。
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; create database oldboy2; #&lt;==建立oldboy2库。
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; show databases like 'oldboy%';
++--------------------+
+| Database (oldboy%) |
++--------------------+
+| oldboy1            |
+| oldboy2            |
++--------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">4）查看主库半同步复制状态，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show global status like '%semi%';
++--------------------------------------------+-------+
+| Variable_name                              | Value |
++--------------------------------------------+-------+
+| Rpl_semi_sync_master_clients               | 1     |
+| Rpl_semi_sync_master_net_avg_wait_time     | 387   |#&lt;==平均网络等待时间为387毫秒。
+| Rpl_semi_sync_master_net_wait_time         | 775   |#&lt;==总网络等待时间为775毫秒。
+| Rpl_semi_sync_master_net_waits             | 2     |#&lt;==总网络等待次数为2。
+| Rpl_semi_sync_master_no_times              | 0     |
+| Rpl_semi_sync_master_no_tx                 | 0     |
+| Rpl_semi_sync_master_status                | ON    |
+| Rpl_semi_sync_master_timefunc_failures     | 0     |
+| Rpl_semi_sync_master_tx_avg_wait_time      | 466   |#&lt;==平均事务等待时间为466毫秒。
+| Rpl_semi_sync_master_tx_wait_time          | 933   |#&lt;==总事务等待时间为775毫秒。
+| Rpl_semi_sync_master_tx_waits              | 2     |#&lt;==总事务等待次数为2。
+| Rpl_semi_sync_master_wait_pos_backtraverse | 0     |
+| Rpl_semi_sync_master_wait_sessions         | 0     |
+| Rpl_semi_sync_master_yes_tx                | 2     | #&lt;==收到了2次接受的确认。
++--------------------------------------------+-------+
+14 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">从主库半同步复制状态的信息上看，复制是成功的。</p>
+</body>
+</html>

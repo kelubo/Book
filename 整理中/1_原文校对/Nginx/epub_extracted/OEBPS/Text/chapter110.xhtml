@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_121">6.1.4　HTTPS的反向代理</h3> 
+ <p class="ziti3">HTTPS通过加密通道保护客户端与服务端之间的数据传输，已成为当前网站部署的必选配置。在部署有Nginx代理集群的HTTPS站点，通常会把SSL证书部署在Nginx的服务器上，然后把请求代理到后端的上游服务器。这种部署方式由Nginx服务器负责SSL请求的运算，相对减轻了后端上游服务器的CPU运算量，这种方式也被称为SSL终止（SSL Termination）。因Nginx启用了对TSL SNI（Server Name Identification）技术的支持，所以在同一服务器上可以安装多个绑定不同域名的SSL证书，使其可以在Nginx服务器上统一部署，同时也极大地方便了证书的管理和维护。</p> 
+ <p class="ziti3">由Nginx服务器实现SSL终止的HTTPS的反向代理的常见方式有两种，一种是由Nginx通过HTTP方式与被代理服务器建立连接；另一种是由Nginx通过HTTPS方式与被代理服务器建立连接。由Nginx通过HTTP方式与被代理服务器建立连接的部署方式为客户端→Nginx服务器（HTTPS）→上游服务器（HTTP），配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    access_log  logs/sslproxy.access.log  main;
+    
+    tcp_nodelay off;                           # 因启用缓冲区功能，所以关闭立刻发送功能
+
+    ssl_certificate ssl/www_nginxbar_org.pem;    # 网站证书文件
+    ssl_certificate_key ssl/www_nginxbar_org.key; # 网站证书密钥文件
+
+    ssl_session_cache shared:SSL:10m;          # 会话缓存的存储大小为10MB
+    ssl_session_timeout  10m;                       # 会话缓存的超时时间为10分钟
+    ssl_session_tickets on;                         # 设置会话凭证为会话缓存机制
+    ssl_session_ticket_key  ssl/session_ticket.key; # 设置会话凭证密钥文件
+
+    location ~ ^/ {
+        proxy_pass   http://192.168.2.145:8082;
+        break;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">按照上面的配置，Nginx服务器与后端的上游服务器之间仍然采用的是HTTP透明传输，虽然可以与上游服务器部署在同一内网，但数据传输仍是不安全的。为了提高传输安全性，建议在上游服务器也开启HTTPS协议，实现全链路的安全数据传输。由Nginx通过HTTPS方式与被代理服务器建立连接的配置样例场景如下。</p> 
+ <p class="ziti3">在配置样例的场景中有两个HTTPS节点，为方便举例说明配置指令的功能及配置指令中所用的SSL证书的区别，共设计了3个SSL证书并通过自签证书的方式进行签发，部署方式如图6-3所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/6-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/6-3.jpg" class="calibre228"/></a> 
+ </div> 
+ <p class="middle-img">图6-3　HTTPS代理</p> 
+ <p class="ziti4">·<a href="http://www.nginxbar.org" class="pcalibre calibre1">www.nginxbar.org</a>证书为对外网站的域名证书，用于给用户提供身份验证。</p> 
+ <p class="ziti4">·<a href="htp://backend.nginxbar.org" class="pcalibre calibre1">backend.nginxbar.org</a>证书为被代理服务器的域名证书，用于给Nginx服务器提供身份验证。</p> 
+ <p class="ziti4">·<a href="http://proxy.nginxbar.com" class="pcalibre calibre1">proxy.nginxbar.com</a>证书为Nginx服务器的域名证书，用于给被代理服务器提供身份验证。</p> 
+ <p class="ziti3">自签证书命令如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 生成自建根域nginxbar.org证书
+openssl req -new -x509 -out /etc/nginx/conf/ssl/root.pem -keyout
+/etc/nginx/conf/ssl/root.key -days 3650 -subj
+"/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=admin/CN=nginxbar.org/emailAddress= admin@nginxbar.org"
+
+# 域名www.nginxbar.org生成请求文件，面向用户端的域名请求文件
+openssl req -out /etc/nginx/conf/ssl/www_nginxbar_org.csr -new -sha256
+-newkey rsa:2048 -nodes -keyout /etc/nginx/conf/ssl/www_nginxbar_org.key
+-subj
+"/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=www/CN=www.nginxbar.org/emailAddress= www@nginxbar.org"
+
+# 颁发自签域名www.nginxbar.org证书，面向用户端的域名证书
+openssl x509 -req -in /etc/nginx/conf/ssl/www_nginxbar_org.csr -out
+/etc/nginx/conf/ssl/www_nginxbar_org.pem -CA /etc/nginx/conf/ssl/root.pem 
+-CAkey /etc/nginx/conf/ssl/root.key  -CAcreateserial -days 3650
+
+# 域名backend.nginxbar.org生成请求文件，后端上游服务器的SSL请求文件
+openssl req -out /etc/nginx/conf/ssl/backend_nginxbar_org.csr -new -sha256
+-newkey rsa:2048 -nodes -keyout 
+/etc/nginx/conf/ssl/backend_nginxbar_org.key -subj 
+"/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=backend/CN=backend.nginxbar.org/emailAddress=backend@nginxbar.org"
+
+# 颁发自签域名backend.nginxbar.org证书，后端上游服务器的SSL证书
+openssl x509 -req -in /etc/nginx/conf/ssl/backend_nginxbar_org.csr -out 
+/etc/nginx/conf/ssl/backend_nginxbar_org.pem -CA 
+/etc/nginx/conf/ssl/root.pem -CAkey /etc/nginx/conf/ssl/root.key
+-CAcreateserial -days 3650
+
+# 生成自建根域nginxbar.com证书，该域名仅为方便区分代理端和后端证书使用，实际使用时可以使用一个根证书
+openssl req -new -x509 -out /etc/nginx/conf/ssl/proxy_root.pem -keyout 
+/etc/nginx/conf/ssl/proxy_root.key -days 3650 -subj 
+"/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=admin/CN=nginxbar.com/emailAddress= admin@nginxbar.com"
+
+# 域名proxy.nginxbar.com生成请求文件，Nginx服务器的SSL代理请求文件
+openssl req -out /etc/nginx/conf/ssl/proxy_nginxbar_com.csr -new -sha256 
+-newkey rsa:2048 -nodes -keyout /etc/nginx/conf/ssl/proxy_nginxbar_com.key 
+-subj “/C=CN/ST=Shanghai/L=Shanghai/O=nginxbar/OU=proxy/CN=proxy.nginxbar.com
+/emailAddress=proxy@nginxbar.com”
+
+# 颁发自签域名proxy.nginxbar.com证书，Nginx服务器的SSL代理证书
+openssl x509 -req -in /etc/nginx/conf/ssl/proxy_nginxbar_com.csr -out 
+/etc/nginx/conf/ssl/proxy_nginxbar_com.pem -CA 
+/etc/nginx/conf/ssl/proxy_root.pem -CAkey 
+/etc/nginx/conf/ssl/proxy_root.key  -CAcreateserial -days 3650
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx代理服务器的配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">resolver 114.114.114.114 valid=300s;              # DNS服务器地址
+resolver_timeout 5s;                              # DNS解析的超时时间为5s
+
+server {
+    listen      443 ssl;
+    server_name www.nginxbar.org;
+    access_log  logs/sslproxy2_access.log  main;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;     # 网站www.nginxbar.org证书文件
+    ssl_certificate_key ssl/www_nginxbar_org.key; # 网站www.nginxbar.org证书密钥文件
+
+    ssl_session_cache shared:SSL:10m;             # 会话缓存的存储大小为10MB
+    ssl_session_timeout  10m;                     # 会话缓存的超时时间为10分钟
+    ssl_session_tickets on;                       # 设置会话凭证为会话缓存机制
+    ssl_session_ticket_key  ssl/session_ticket.key;  # 设置会话凭证密钥文件
+
+    location / {
+        proxy_pass                    https://backend.nginxbar.org; # 被代理服务器的地址
+        proxy_ssl_certificate         ssl/proxy_nginxbar_com.pem;   # 代理服务器的客户端证书
+                                                                           # 文件
+        proxy_ssl_certificate_key     ssl/proxy_nginxbar_com.key;   # 代理服务器的客户端证书
+                                                                           # 密钥文件
+        proxy_ssl_protocols           TLSv1 TLSv1.1 TLSv1.2;
+        proxy_ssl_ciphers             HIGH:!aNULL:!MD5;
+
+        proxy_ssl_verify        on;                  # 启用验证被代理服务器的证书
+        proxy_ssl_trusted_certificate ssl/root.pem;  # 用于验证被代理服务器的主机名backend.
+                                                     # nginxbar.org的根证书
+        proxy_ssl_verify_depth  2;                   # 证书验证深度为2
+        proxy_ssl_session_reuse on;                  # SSL连接启用会话重用
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx Web服务器配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen      443 ssl;
+    server_name backend.nginxbar.org;
+    access_log  logs/sslbackend_access.log  main;
+
+    ssl_certificate        ssl/backend_nginxbar_org.pem;# 网站backend.nginxbar.org证书文件
+    ssl_certificate_key    ssl/backend_nginxbar_org.key;# 网站backend.nginxbar.org证书密钥
+                                                              # 文件
+    ssl_verify_client      on;                          # 启用对Nginx服务的证书验证
+    ssl_client_certificate ssl/proxy_root.pem;          # 用以验证Nginx服务器主机名
+                                                        # proxy.nginxbar.com的根证书
+    ssl_verify_depth  2;                                # 证书验证深度为2
+
+    ssl_session_cache shared:SSL:10m;                   # HTTPS会话缓存的存储大小为10MB
+    ssl_session_tickets off;                            # 以会话编号机制实现会话缓存
+    ssl_session_timeout 10m;                            # 会话缓存的超时时间为10分钟
+
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">HTTPS相关介绍请参见5.2节。</p> 
+</body>
+</html>

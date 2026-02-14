@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">16.1.2　MySQL级联复制实现要点</h3>
+<p class="ziti">我们已经知道了，MySQL主从复制技术的核心特点是通过传输binlog日志实现复制的功能。级联复制是主从复制的扩展变种，因此，级联复制架构中作为中间复制的从库B角色，如果同时还想做主库的话，就需要在B从库上开启binlog日志功能。</p>
+<p class="p6">1.从库开启binlog日志功能常见应用场景说明</p>
+<p class="ziti">从库开启binlog日志功能的常见应用场景具体如下。</p>
+<p class="ziti">1）当前的从库还要同时作为其他从库的主库，例如，级联复制或双主互为主从场景的情况下，就必须在从库上开启binlog日志功能。</p>
+<p class="ziti">2）前文提到的将从库作为数据库全备的服务器，此时也要开启binlog日志用于全备恢复之后的增量数据恢复。</p>
+<p class="p6">2.从库记录binlog日志方法</p>
+<p class="ziti">下面介绍一下从库记录binlog日志的方法。</p>
+<p class="ziti">在从库的my.cnf中加入如下参数，然后重启服务即可生效：</p>
+<hr/>
+<pre class="ziti1">log_bin = /application/mysql/logs/oldboy-bin
+log_slave_updates    #&lt;==必须要有这个参数，否则不会记录Binlog日志。
+expire_logs_days = 7 #&lt;==相当于find /path -type f -name " oldboy-bin.000*"
+                         -mtime +7 |xargs rm -f</pre>
+<hr/>
+<p class="p6">3.MySQL级联复制的实现说明</p>
+<p class="ziti">除了作为新主库的从库需要开启binlog日志功能之外，级联复制的其他实现步骤与普通的主从复制是相同的，没有任何差别，因此这里就不再赘述了，请读者参考前文尝试下级联复制的实现。</p>
+</body>
+</html>

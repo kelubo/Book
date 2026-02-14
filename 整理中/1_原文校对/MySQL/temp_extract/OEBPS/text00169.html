@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">12.6.2　MyISAM引擎的存储方式</h3>
+<p class="ziti">每一个MyISAM引擎的表都对应于硬盘上的三个文件。这三个文件虽然具有一样的文件名，但是其不同的扩展名指示了其不同的类型用途：“.frm”文件用于保存表的定义，该文件并不是MyISAM引擎的一部分，而是服务器的一部分；“.MYD”用于保存表的数据；“.MYI”则是表的索引文件。“.MYD”和.MYI是MyISAM的关键点。示例代码如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd /application/mysql/data
+[root@oldboy data]# ls -l mysql/|head -10
+总用量 1688
+-rw-r-----. 1 mysql mysql  8820 3月 22 10:01 columns_priv.frm #&lt;==存放表的定义。
+-rw-r-----. 1 mysql mysql     0 3月 22 10:01 columns_priv.MYD #&lt;==存放表的数据。
+-rw-r-----. 1 mysql mysql  4096 3月 22 10:01 columns_priv.MYI #&lt;==存放表的索引。
+-rw-r-----. 1 mysql mysql  9582 3月 22 10:01 db.frm
+-rw-r-----. 1 mysql mysql  1760 3月 22 10:01 db.MYD
+-rw-r-----. 1 mysql mysql  5120 3月 22 10:01 db.MYI
+-rw-r-----. 1 mysql mysql 10223 3月 22 10:01 event.frm
+-rw-r-----. 1 mysql mysql     0 3月 22 10:01 event.MYD
+-rw-r-----. 1 mysql mysql  2048 3月 22 10:01 event.MYI</pre>
+<hr/>
+<p class="ziti">MySQL数据库系统的表大多数都使用MyISAM引擎。</p>
+<p class="ziti">这里先向读者抛出两个小疑问，请读者带着疑问看看下面的知识。</p>
+<p class="ziti">1）为什么MySQL5.5.5以前默认是MyISAM引擎，而MySQL5.5.5以后默认是InnoDB？</p>
+<p class="ziti">2）为什么MySQL库里的表仍然默认为MyISAM引擎？</p>
+</body>
+</html>

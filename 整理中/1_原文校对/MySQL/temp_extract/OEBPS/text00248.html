@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">16.2.8　在主库1和主库2进行测试</h3>
+<p class="ziti">1）在主库1上建库建表，命令如下：</p>
+<hr/>
+<pre class="ziti1">create database two_master;
+use two_master;
+CREATE TABLE test(
+  id bigint(12) NOT NULL auto_increment COMMENT '主键',
+  name varchar(12) NOT NULL COMMENT '姓名',
+  PRIMARY KEY  (id)
+);</pre>
+<hr/>
+<p class="ziti">2）然后插入数据，执行过程如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; insert into test(name) values('jeacen'),('alex'),('老男孩');
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+mysql&gt; select * from test;
++----+-----------+
+| id | name      |
++----+-----------+
+|  1 | jeacen    |
+|  3 | alex      |
+|  5 | 老男孩    |
++----+-----------+
+3 rows in set (0.00 sec)
+#提示：可以看到ID都是奇数。</pre>
+<hr/>
+<p class="ziti">3）此时登录主库2（52）查看数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select * from test;
++----+-----------+
+| id | name      |
++----+-----------+
+|  1 | jeacen    |
+|  3 | alex      |
+|  5 | 老男孩    |
++----+-----------+
+3 rows in set (0.00 sec)
+#数据和主库1相同，因为实现了复制，ID也为奇数。</pre>
+<hr/>
+<p class="ziti">4）登录主库2（52）继续插入数据：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; insert into test(name) values('卧底'),('wu_sir'),('小曹');
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql&gt; select * from test;
++----+-----------+
+| id | name      |
++----+-----------+
+|  1 | jeacen    |
+|  3 | alex      |
+|  5 | 老男孩    |
+|  6 | 卧底      |
+|  8 | wu_sir    |
+| 10 | 小曹      |
++----+-----------+
+6 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">新插入的数据是从当前表中最大数字偶数6的基础上开始进行插入的，至此，双主复制测试成功。</p>
+</body>
+</html>

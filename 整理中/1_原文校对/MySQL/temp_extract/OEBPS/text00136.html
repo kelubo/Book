@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">9.4.2　安装Xtrabackup</h3>
+<p class="ziti">默认情况下系统中并没有安装Xtrabackup程序，因此，可以执行如下命令进行安装（前提是要确保服务器可以联网）。</p>
+<p class="ziti">1）配置epel源，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# wget -O /etc/yum.repos.d/epel.repo  http://mirrors.aliyun.com/repo/epel-6.repo</pre>
+<hr/>
+<p class="ziti">2）安装Xtrabackup软件需要的基础环境包：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# yum -y install perl perl-devel libaio libaio-devel perl-Time-HiRes perl-DBD-MySQL</pre>
+<hr/>
+<p class="ziti">3）下载Xtrabackup软件并安装：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# wget https://www.percona.com/downloads/XtraBackup/Percona- XtraBackup-2.4.4/binary/redhat/6/x86_64/percona-xtrabackup-24-2.4.4-1.el6.x86_64.rpm #&lt;==如果地址无效，请到官方网站寻找合适的版本。
+[root@oldboy ~]# ls -l percona-xtrabackup-24-2.4.4-1.el6.x86_64.rpm
+-rw-r--r--. 1 root root 8534624 Jul 21  2016 percona-xtrabackup-24-2.4.4-1.el6.x86_64.rpm
+[root@oldboy ~]# yum -y install percona-xtrabackup-24-2.4.4-1.el6.x86_64.rpm
+#&lt;==自动解决依赖包。</pre>
+<hr/>
+<p class="ziti">4）最后，查看安装后的结果：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ls -l `which xtrabackup innobackupex`
+lrwxrwxrwx. 1 root root   10 Mar 20 06:04 /usr/bin/innobackupex -&gt; xtrabackup
+#&lt;==软链接了。
+-rwxr-xr-x. 1 root root 22136096 Jul 21  2016 /usr/bin/xtrabackup</pre>
+<hr/>
+<p class="ziti">到此为止，Xtrabackup软件就安装完成了。</p>
+</body>
+</html>

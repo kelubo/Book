@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_146">7.3.4　客户端缓存控制</h3>
+
+  <p class="ziti3">客户端的缓存有两种验证机制，一种是基于有效期的本地有效期验证；另一种是由服务端提供的服务端验证。Nginx提供了expires、etag、if_modified_since指令可实现对客户端缓存的控制。</p>
+
+  <p class="ziti3"><span class="yanse">1.有效期验证</span></p>
+
+  <p class="ziti3">expires指令可实现在响应状态码为200、201、204、206、301、302、303、304、307或308时，对响应头中的属性字段Expires和Cache-Control进行添加或编辑操作。该指令会同时设置Expires和Cache-Control两个字段，客户端根据这两个字段的值执行内容缓存的本地有效期设置。</p>
+
+  <p class="ziti3">（1）设置相对时间</p>
+
+  <p class="ziti3">响应头字段Expires的值为当前时间与指令值的时间之和，响应头字段Cache-Control的值为指令值的时间。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    expires    24h;           # 设置Expires为当前时间过后的24小时，Cache-Control的值为24
+                              # 小时
+    expires    modified +24h; # 编辑Expires增加24小时，Cache-Control的值增加24小时
+    expires    $expires;      # 根据变量$expires的内容设置缓存时间
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（2）设置绝对时间</p>
+
+  <p class="ziti3">可以通过前缀@指定一个绝对时间，表示在当天的指定时间失效。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    expires    @15h;        # 设置Expires为当前日的15点，Cache-Control的值为到
+                            # 当前时间到15点的时间差
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（3）无有效期设置</p>
+
+  <p class="ziti3">时间为负值或为epoch时，响应头字段Cache-Control的值为no-cache，表示当前响应数据的内容缓存无有效期。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    expires    -1; 
+    expires    epoch;
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（4）最大值设置</p>
+
+  <p class="ziti3">指令值为max时，Expires的值为Thu,31 Dec 2037 23:55:55 GMT，Cache-Control为10年。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    expires  max;
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">Nginx除了提供指令expires可以实现有效期控制外，还提供了指令add_header，可以让用户自定义响应头实现客户端缓存的控制。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    add_header Cache-Control no-cache;  # 响应数据的内容缓存无有效期
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3"><span class="yanse">2.服务端验证</span></p>
+
+  <p class="ziti3">（1）Etag实体标签</p>
+
+  <p class="ziti3">Nginx作为Web服务器时，对静态资源会自动在响应头中添加响应头字段Etag，字段值为静态资源文件的最后编辑时间（last_modified_time）和文件大小的十六进制组合。对于代理的响应内容则由被代理服务器进行控制，不会自动添加Etag字段，只有存在Nginx服务器由Nginx直接读取的文件时才会自动添加Etag字段，它可以通过添加etag off指令禁止自动生成Etag。</p>
+
+  <p class="ziti3">（2）文件修改时间</p>
+
+  <p class="ziti3">Nginx作为Web服务器时，会对静态资源自动添加响应头字段Last-Modified，字段值为静态资源文件的最后编辑时间（last_modified_time）。</p>
+
+  <p class="ziti3">Nginx提供了配置指令if_modified_since，对文件修改时间的服务端校验提供了两种不同的比对方式。一种是指令值为exact时，Nginx会将请求头中if_modified_since的时间与响应数据中的时间做精确匹配，即完全相等才认为客户端缓存有效，返回响应状态码304；另一种是指令值为before时，则在请求头中if_modified_since的时间大于响应数据中的时间也认为客户端缓存有效，返回响应状态码304。该指令功能控制处于数据流的出入口，对于任何形式产生的响应数据都有效，当指令值为off时，则关闭Nginx对客户端缓存文件修改时间的服务端校验功能。</p>
+
+  <p class="ziti3">任何与用户私人相关的数据都不应该被缓存，所以对于私人内容数据建议设置HTTP信息头Cache-Control字段值为no-cache、no-store或private控制客户端不进行缓存，根据数据内容的敏感性，正确设置这些头字段，可以在保持维护私人信息安全的前提下利用缓存的优势提升网站的响应速度。</p>
+</body>
+</html>

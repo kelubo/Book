@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.8　File-per-table独立表空间设置</h3>
+<p class="ziti">通过设置File-per-table表空间，使得InnoDB的数据表不是共享一个系统表空间，而是每个表一个独立的表空间。可以通过设置innodb_file_per_table来开启此属性。开启之后每个表数据和索引数据都会默认单独存放在数据文件夹下的“.ibd”数据文件中。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%per_table%';
++-----------------------+-------+
+| Variable_name         | Value |
++-----------------------+-------+
+| innodb_file_per_table | ON    |
++-----------------------+-------+</pre>
+<hr/>
+<p class="ziti">
+<span class="yanse">配置单表数据文件表空间</span>
+</p>
+<p class="ziti">InnoDB的单表数据文件表空间代表每个InnoDB表的数据和索引数据都存放在单独的“.ibd”数据文件中，每个“.ibd”数据文件均代表独立的表空间。此属性可通过innodb_file_per_table配置。</p>
+<p class="ziti">此配置的主要优势具体如下。</p>
+<p class="ziti">1）当删除表或者truncate表的时候，意味着对磁盘空间可以回收。而共享表空间时，若删除一个表则空间不会释放而只是文件里有空闲空间。</p>
+<p class="ziti">2）truncate table命令比共享表空间要快。</p>
+<p class="ziti">3）通过定义“create table…data directory=”绝对路径，可以将特定的表放在特定的磁盘或者存储空间中。</p>
+<p class="ziti">4）可以将单独的表物理复制到另外的MySQL实例中。</p>
+<p class="ziti">此配置的劣势具体如下。</p>
+<p class="ziti">每个表都有未使用的空间，这就意味着磁盘空间有些浪费。</p>
+<p class="ziti">启动单独表空间的方式如下：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_file_per_table=1</pre>
+<hr/>
+<p class="ziti">当设置innodb_file_per_table=0时，所有创建的新表都会放置到共享表空间里，除非在create table命令里显式地使用tablespace选项。</p>
+<p class="ziti">将已经存在于共享表空间的表修改为独立表空间的方法如下：</p>
+<hr/>
+<pre class="ziti1">SET GLOBAL innodb_file_per_table=1;
+ALTER TABLE table_name ENGINE=InnoDB;</pre>
+<hr/>
+<p class="ziti">通过命令“create table…data directory=绝对路径”可以将单表数据文件创建在另外的目录里。在指定的绝对路径下，会创建与数据库名相同的文件夹，里面含有此表的“.ibd”文件，同时在MySQL的数据库名文件夹下会创建table_name.isl文件，文件内容包含了此表的真实路径，相当于link文件。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; USE test;
+Database changed
+
+mysql&gt; SHOW VARIABLES LIKE 'innodb_file_per_table';
++-----------------------+-------+
+| Variable_name         | Value |
++-----------------------+-------+
+| innodb_file_per_table | ON    |
++-----------------------+-------+
+1 row in set (0.00 sec)
+
+mysql&gt; CREATE TABLE t1 (c1 INT PRIMARY KEY) DATA DIRECTORY = '/alternative/directory';
+Query OK, 0 rows affected (0.03 sec)
+
+# MySQL creates a .ibd file for the new table in a subdirectory that corresponding
+# to the database name
+
+db_user@ubuntu:~/alternative/directory/test$ ls
+t1.ibd
+
+# MySQL creates a .isl file containing the path name for the table in a directory
+# beneath the MySQL data directory
+
+db_user@ubuntu:~/mysql/data/test$ ls
+db.opt  t1.frm  t1.isl</pre>
+<hr/>
+<p class="ziti">当没有开启innodb_file_per_table时，可以将tablespace和data directory两个参数配合使用：</p>
+<hr/>
+<pre class="ziti1">CREATE TABLE t2 (c1 INT PRIMARY KEY) TABLESPACE = innodb_file_per_table
+  DATA DIRECTORY = '/alternative/directory';</pre>
+<hr/>
+<p class="ziti">不管是出于备份复制还是别的什么原因，若要将单表复制到另外的数据库实例下，可以使用传输表空间的方法。</p>
+<p class="ziti">1）在原实例下创建表，代码如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use test;
+mysql&gt; CREATE TABLE t(c1 INT) engine=InnoDB;</pre>
+<hr/>
+<p class="ziti">2）在目标实例下创建表，代码如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use test;
+mysql&gt; CREATE TABLE t(c1 INT) engine=InnoDB;</pre>
+<hr/>
+<p class="ziti">3）在目标实例下去除表的表空间属性，代码如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; ALTER TABLE t DISCARD TABLESPACE;</pre>
+<hr/>
+<p class="ziti">此命令不支持有外键的表，必须首先执行foreign_key_checks=0</p>
+<p class="ziti">4）在原实例下表加锁仅允许读操作，并生成“.cfg”元文件：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use test;
+mysql&gt; FLUSH TABLES t FOR EXPORT;</pre>
+<hr/>
+<p class="ziti">5）将“.ibd”和“.cfg”文件复制到目标实例的指定目录下：</p>
+<hr/>
+<pre class="ziti1">shell&gt; scp /path/to/datadir/test/t.{ibd,cfg} destination-server:/path/to/datadir/test</pre>
+<hr/>
+<p class="ziti">6）在原实例下释放锁：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use test;
+mysql&gt; UNLOCK TABLES;</pre>
+<hr/>
+<p class="ziti">7）在目标实例下执行导入表空间操作：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use test;
+mysql&gt; ALTER TABLE t IMPORT TABLESPACE;</pre>
+<hr/>
+</body>
+</html>

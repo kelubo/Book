@@ -1,0 +1,1222 @@
+\documentclass{ctexbook}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{paracol}
+
+\title{
+    Radio Builder's Book\
+    From Detector to Software Defined Radio
+    \\%
+    无线电爱好者制作手册\
+    从检波器到软件定义无线电
+}
+\author{Burkhard Kainka, DK7JD}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\frontmatter
+
+\chapter*{版权信息}
+\begin{paracol}{2}
+\setlength{\columnsep}{2em}
+This is an Elektor Publication. Elektor is the media brand of 
+Elektor International Media B.V. 
+PO Box 11, NL-6114-ZG Susteren, The Netherlands 
+Phone: +31 46 4389444 
+
+\switchcolumn
+
+本出版物由Elektor出版。Elektor是Elektor International Media B.V.的媒体品牌。
+荷兰 苏斯特伦 NL-6114-ZG 邮政信箱11
+电话：+31 46 4389444
+
+\switchcolumn*
+
+\begin{itemize}
+    \item All rights reserved. No part of this book may be reproduced in any material form, including photocopying, or 
+    storing in any medium by electronic means and whether or not transiently or incidentally to some other use of this 
+    publication, without the written permission of the copyright holder except in accordance with the provisions of the 
+    Copyright Designs and Patents Act 1988 or under the terms of a licence issued by the Copyright Licencing Agency 
+    Ltd., 90 Tottenham Court Road, London, England W1P 9HE. Applications for the copyright holder's permission to 
+    reproduce any part of the publication should be addressed to the publishers. 
+    \item Declaration 
+    The author, editor, and publisher have used their best efforts in ensuring the correctness of the information contained 
+    in this book. They do not assume, and hereby disclaim, any liability to any party for any loss or damage caused by 
+    errors or omissions in this book, whether such errors or omissions result from negligence, accident or any other cause. 
+    All the programs given in the book are Copyright of the Author and Elektor International Media. These programs 
+    may only be used for educational purposes. Written permission from the Author or Elektor must be obtained before 
+    any of these programs can be used for commercial purposes. 
+    \item British Library Cataloguing in Publication Data 
+    A catalogue record for this book is available from the British Library 
+    \item ISBN 978-3-89576-565-0 Print 
+    ISBN 978-3-89576-566-7 eBook 
+    \item © Copyright 2023: Elektor International Media B.V. 
+    Translator: Martin Cooke 
+    Editor: Jan Buiting 
+    Prepress Production: D-Vision, Julian van den Berg
+\end{itemize}
+
+\switchcolumn
+
+\begin{itemize}
+    \item 保留所有权利。未经版权持有人书面许可，不得以任何物质形式复制本书的任何部分，包括影印或通过电子方式存储在任何介质中，无论是否暂时或附带于本出版物的其他用途，除非符合1988年《版权设计和专利法》的规定或根据版权许可机构有限公司（英国伦敦托特纳姆法院路90号，W1P 9HE）颁发的许可条款。申请版权持有人许可复制本出版物任何部分的，应向出版商提出。
+    \item 声明
+    作者、编辑和出版商已尽最大努力确保本书所包含信息的正确性。对于因本书中的错误或遗漏而导致的任何损失或损害，无论此类错误或遗漏是因疏忽、事故或任何其他原因造成的，他们不承担任何责任，并在此免责。本书中提供的所有程序均为作者和Elektor International Media的版权所有。这些程序仅可用于教育目的。在将这些程序用于商业目的之前，必须获得作者或Elektor的书面许可。
+    \item 大英图书馆出版数据目录
+    大英图书馆有本书的目录记录
+    \item ISBN 978-3-89576-565-0 纸质版
+    ISBN 978-3-89576-566-7 电子书
+    \item © 版权所有 2023：Elektor International Media B.V.
+    翻译：Martin Cooke
+    编辑：Jan Buiting
+    印前制作：D-Vision，Julian van den Berg
+\end{itemize}
+
+\end{paracol}
+
+\chapter*{前言}
+\begin{paracol}{2}
+\setlength{\columnsep}{2em}
+Discover the captivating world of radio technology and unlock the secrets of radio set 
+construction using this comprehensive guide. From the early days of the humble crystal 
+set to the modern wonders of Software-Defined Radios (SDRs), this book takes you on a 
+journey through time and technology. With detailed instructions and step-by-step illustra-
+tions, you'll learn how to build and assemble various receivers to understand their various 
+strengths and weaknesses. Practical antenna design and amateur radio rigs are also cov-
+ered in this inclusive handbook. 
+
+\switchcolumn
+
+探索无线电技术的迷人世界，使用这本综合指南解锁收音机建造的秘密。从早期简单的晶体收音机到现代的软件定义无线电（SDR）奇迹，本书带您踏上一段穿越时间和技术的旅程。通过详细的说明和分步插图，您将学习如何构建和组装各种接收器，以了解它们的各种优点和缺点。这本全面的手册还涵盖了实用天线设计和业余无线电设备。
+
+\switchcolumn*
+
+For many years in the early history of electronics, the construction of homebrew radio re-
+ceivers was the most common entry point to electronics. Nowadays, there are many other 
+routes in, especially through the use of computers, microcontrollers, and digital technology. 
+The analogue roots of electronics are now often overlooked but radio technology is particu-
+larly well suited as an introduction to electronics because you will be rewarded with early 
+success from even the most basic circuit. The connection to modern digital technology is 
+also obvious when it comes to modern tuning methods and the use of highly integrated 
+PLL, DDS and DSP radios. 
+
+\switchcolumn
+
+在电子学早期历史的许多年里，自制无线电接收器的建造是进入电子学的最常见切入点。如今，有许多其他途径，尤其是通过使用计算机、微控制器和数字技术。电子学的模拟根源现在经常被忽视，但无线电技术特别适合作为电子学的入门，因为即使是最基本的电路也能让您早日获得成功。当涉及到现代调谐方法和高度集成的PLL、DDS和DSP收音机的使用时，与现代数字技术的联系也显而易见。
+
+\switchcolumn*
+
+This book aims to provide an overview and present a collection of simple projects to en-
+courage budding engineers along the path of discovery. Now in its second edition, many 
+new projects have been added which include important circuits and cover most recent 
+developments. With this book by your side, you will go on to develop your own ideas and 
+design and test your own receivers. 
+
+\switchcolumn
+
+本书旨在提供概述并展示一系列简单项目，以鼓励初出茅庐的工程师沿着发现之路前进。现在是第二版，添加了许多新项目，包括重要电路并涵盖了最新发展。有了这本书的陪伴，您将继续发展自己的想法，设计和测试自己的接收器。
+
+\switchcolumn*
+
+Wishing you every success and crystal clear reception! 
+
+Burkhard Kainka, DK7JD 
+www.elektronik-labor.de
+
+\switchcolumn
+
+祝您一切顺利，接收清晰！
+
+Burkhard Kainka, DK7JD
+www.elektronik-labor.de
+
+\end{paracol}
+
+\tableofcontents
+
+\mainmatter
+
+\chapter{Introduction}
+\begin{paracol}{2}
+\setlength{\columnsep}{2em}
+Building radios is an old hobby that has seen something of a renaissance recently. In 
+addition to the classic and dead simple 'Foxhole' crystal radio set and more sophisticated vacuum tube receivers right up to the more recent software-defined radio projects, 
+there are many aspects to the technology for newcomers to get their teeth into. Recent 
+improvements in semiconductor technology and integrated circuits have allowed sophisticated features such as Direct Digital Synthesis (DDS) and integrated PLL technology to 
+be incorporated into home brew receiver designs to produce radios with surprisingly good 
+specifications. 
+
+\switchcolumn
+
+制作收音机是一项古老的爱好，最近迎来了某种复兴。除了经典的、极其简单的“散兵坑”晶体收音机和更复杂的真空管接收器，一直到较新的软件定义无线电项目，这项技术有许多方面可供新手深入研究。半导体技术和集成电路的最新改进使得诸如直接数字合成（DDS）和集成PLL技术等复杂功能能够被整合到自制接收器设计中，从而生产出规格令人惊讶的收音机。
+
+\switchcolumn*
+
+This book provides an overview of radio technology and clearly explains the basics of radio receiver design. Using numerous circuits and building plans it guides you step by step 
+along the way. If you want to cook up a simple crystal set or vacuum tube regenerative 
+type receiver, you'll find all the recipes here. As your knowledge and confidence grows you 
+will want to develop your own circuits. That's why the basics of resonant circuits, oscillator 
+configurations and antenna design are all explained clearly here. 
+
+\switchcolumn
+
+本书提供了无线电技术的概述，并清晰解释了无线电接收器设计的基础知识。通过众多电路和构建计划，它一步一步地引导您前进。如果您想制作一个简单的晶体收音机或真空管再生式接收器，您会在这里找到所有的“配方”。随着您的知识和信心增长，您将希望开发自己的电路。这就是为什么谐振电路、振荡器配置和天线设计的基础知识都在这里被清晰解释的原因。
+
+\switchcolumn*
+
+Tuned Radio Frequency and Audion type receivers are a step up from the basic crystal detector type receiver. They originally used a single vacuum tube to demodulate the received 
+signal and amplify the resulting baseband output. Receivers like this and simple transistor 
+radios for medium or shortwave reception can be built quickly and easily. They are a lot 
+of fun to play with and are a good way to gain knowledge of RF technology. Modern direct 
+mixing concepts using ring mixers and DDS or PLLs, or simple software-defined radios allow 
+the construction of universal receivers for amateur radio and digital operation. Many things 
+have become easier to build thanks to highly integrated modern chips, but it helps if you 
+also have the essential background information. In this book we only use components that 
+are easily obtainable. Elektor magazine has also created board layouts or finished assemblies and devices that can be sourced from its online store. 
+
+\switchcolumn
+
+调谐射频和三极管型接收器是在基本晶体检测器型接收器基础上的升级。它们最初使用单个真空管来解调接收信号并放大产生的基带输出。像这样的接收器和用于中波或短波接收的简单晶体管收音机可以快速而轻松地构建。它们非常有趣，是获取射频技术知识的好方法。使用环形混频器和DDS或PLL的现代直接混频概念，或简单的软件定义无线电，允许构建用于业余无线电和数字操作的通用接收器。由于高度集成的现代芯片，许多东西变得更容易构建，但如果您也具备必要的背景信息，将会有所帮助。在本书中，我们只使用容易获得的组件。Elektor杂志还创建了电路板布局或成品组件和设备，可以从其在线商店采购。
+
+\switchcolumn*
+
+My own interest in RF technology comes from an early fascination with amateur radio; I 
+spent many hours in my youth building and using my own transmitters and receivers. After 
+a long break and following the introduction of new digital broadcasting standards such as 
+DAB and DRM my interest has been rekindled. The challenge for me now was to design a 
+receiver sufficiently stable to decode DRM signals reliably on the short and medium wave 
+bands. I spent time tinkering with vacuum tubes and studied how they were used back 
+in the early days. Although the anode HT was usually high voltage DC, here you experiment with lower anode voltages starting from just 6 V to simplify experiments and make 
+tinkering less hazardous. Other topics explored here are IQ mixer design and building a 
+software-defined radio. 
+
+\switchcolumn
+
+我个人对射频技术的兴趣源于早期对业余无线电的迷恋；我在年轻时花了很多时间构建和使用自己的发射机和接收机。在长期中断后，随着DAB和DRM等新数字广播标准的引入，我的兴趣重新燃起。现在对我来说的挑战是设计一个足够稳定的接收器，能够在短波和中波频段可靠地解码DRM信号。我花时间摆弄真空管，并研究了它们在早期的使用方式。虽然阳极HT通常是高压直流，但在这里，您可以从仅6V的较低阳极电压开始实验，以简化实验并减少摆弄的危险性。这里探讨的其他主题包括IQ混频器设计和构建软件定义无线电。
+
+\switchcolumn*
+
+Personally, my interest in ham radio has also undergone a revival. For a long time, I had 
+accepted it would not be feasible to install a useful amateur radio antenna in the apartment 
+where I live now. With the help of newer techniques and improved measurement technology, I have been able to build simple and inconspicuous antennas that allow reasonably 
+interference-free reception and can also be used for low power transmitting.
+
+Radio technology has always been a theme of my professional work. More recently I have 
+been involved in the development of kits for the Kosmos-Verlag and the Franzis-Verlag, 
+as well as articles and projects for Elektor Magazine. Work for the AK Modul-Bus company 
+brought new challenges and resulted in projects for school teaching programs and hobby 
+electronics. Some radio receiver projects on topics such as vacuum tube technology, DRM 
+reception, software-defined radio and DSP radio have been developed using AK Modul-Bus 
+products and turned into Elektor Magazine projects.
+
+\switchcolumn
+
+就我个人而言，我对业余无线电的兴趣也经历了复兴。很长一段时间，我认为在我现在居住的公寓里安装一个有用的业余无线电天线是不可行的。借助较新的技术和改进的测量技术，我已经能够构建简单而不显眼的天线，这些天线允许相当无干扰的接收，也可以用于低功率传输。
+
+无线电技术一直是我专业工作的主题。最近，我参与了为Kosmos-Verlag和Franzis-Verlag开发套件，以及为Elektor杂志撰写文章和项目。为AK Modul-Bus公司工作带来了新的挑战，并产生了学校教学计划和业余电子项目。一些关于真空管技术、DRM接收、软件定义无线电和DSP无线电等主题的无线电接收器项目已经使用AK Modul-Bus产品开发，并转化为Elektor杂志项目。
+
+\end{paracol}
+
+\chapter{Detector Radios}
+\begin{paracol}{2}
+\setlength{\columnsep}{2em}
+Tuning in to radio broadcasts without a battery or any other power source is only possible 
+with a crystal radio receiver. This simplest of all radio circuits has not lost any of its charm 
+over the decades. In the early days of radio technology, the crystal radio or Foxhole receiver was a widely used concept. Today, just as 90 years ago, it serves as a great introduction 
+to RF technology. You don't necessarily have to recreate authentic historical devices or use 
+homemade crystal detectors. Using a germanium or Schottky diode detector simplifies the 
+process of recovering the baseband signal. You also won't even need an extremely long 
+antenna or highly sensitive headphones. Using an existing speaker amplifier, such as a set 
+of PC active speakers makes building your first radio a piece of cake. 
+
+\switchcolumn
+
+在没有电池或任何其他电源的情况下收听广播，只有使用晶体收音机才能实现。这种最简单的无线电电路几十年来丝毫没有失去其魅力。在无线电技术的早期，晶体收音机或“散兵坑”接收器是一个被广泛使用的概念。今天，就像90年前一样，它是射频技术的绝佳入门。您不一定需要重现真实的历史设备或使用自制的晶体检测器。使用锗或肖特基二极管检测器可以简化恢复基带信号的过程。您甚至不需要极长的天线或高灵敏度的耳机。使用现有的扬声器放大器，如一套PC有源扬声器，使构建您的第一台收音机变得轻而易举。
+
+\switchcolumn*
+
+2.1 The Diode Radio 
+The simplest receiver you can build consists of a long length of wire for use as an antenna, 
+a ground connection, a germanium (Ge) diode and a high-impedance headphone. The germanium diode may be difficult to source so a modern Schottky diode can be substituted. 
+The radio needs no external power supply because the signal picked up by the antenna 
+provides all the energy necessary, which is why it needs to be relatively long. Usually, a 10 
+meter length of wire will do the job. This design assumes a high-impedance headphone of 
+2 kΩ, but it will work just as well with a 600 Ω type. Standard low-impedance headphones 
+of modern design are usually 32 Ω but they can also be used with a suitable transformer 
+(see section 2.2) to provide impedance matching. 
+
+\switchcolumn
+
+2.1 二极管收音机
+您可以构建的最简单的接收器由一段用作天线的长电线、一个接地连接、一个锗（Ge）二极管和一个高阻抗耳机组成。锗二极管可能难以获取，因此可以用现代肖特基二极管替代。这种收音机不需要外部电源，因为天线接收的信号提供了所有必要的能量，这就是为什么它需要相对较长的原因。通常，10米长的电线就可以完成这项工作。这种设计假设使用2kΩ的高阻抗耳机，但它也可以与600Ω类型的耳机一起工作。现代设计的标准低阻抗耳机通常为32Ω，但它们也可以与合适的变压器（见2.2节）一起使用以提供阻抗匹配。
+
+\switchcolumn*
+
+Figure 2.1: The Diode Radio. 
+You can use any Ge diodes from type AA112 to AA144 or any Schottky diodes from BAT41 
+to BAT86. This simple radio is not selective, which means it receives all strong stations at 
+the same time. Unless a strong local station is overpowering all the others, you should be 
+able to hear some stations with fluctuating volume, especially at dusk. 
+
+\switchcolumn
+
+图2.1：二极管收音机
+您可以使用从AA112到AA144类型的任何锗二极管或从BAT41到BAT86的任何肖特基二极管。这种简单的收音机没有选择性，这意味着它会同时接收所有强信号电台。除非一个强大的本地电台压制了所有其他电台，否则您应该能够听到一些音量波动的电台，尤其是在黄昏时分。
+
+\switchcolumn*
+
+To achieve desired selectivity, a resonant circuit consisting of a coil and tuning capacitor can 
+be added to the circuit. Using a tuning capacitor of up to 320 pF and a coil of 300 µH, will 
+allow the entire medium-wave band can be covered. The coil consists of 90 turns of wire 
+wound onto a 4 cm diameter cardboard roll to make the necessary air-cored coil. 
+
+\switchcolumn
+
+为了实现所需的选择性，可以在电路中添加由线圈和调谐电容器组成的谐振电路。使用高达320pF的调谐电容器和300µH的线圈，可以覆盖整个中波频段。该线圈由90匝电线缠绕在4厘米直径的纸板卷上制成必要的空芯线圈。
+
+\switchcolumn*
+
+Figure 2.2 Diode receiver circuit with resonant circuit. 
+This radio is not very selective and doesn't achieve much in terms of output volume. It's 
+important to carefully adjust the antenna and rectifier; this can be achieved by adding tap 
+or connection points along the receiving coil. In section 2.2, a medium wave receiver is 
+described which uses adjustable matching. 
+
+\switchcolumn
+
+图2.2 带谐振电路的二极管接收器电路
+这种收音机的选择性不是很好，在输出音量方面也没有太大成就。仔细调整天线和整流器很重要；这可以通过沿接收线圈添加抽头或连接点来实现。在2.2节中，描述了一种使用可调匹配的中波接收器。
+
+\switchcolumn*
+
+You may wonder why a diode is necessary in a receiver circuit. To answer that one you 
+need to delve into a little bit of radio theory. A transmitter broadcasts high frequency electromagnetic waves into free space via a transmitting mast. The broadcast radiates in all 
+directions and induces a small signal in an antenna at the receiving location. Transmitters 
+that send on the medium wave band transfer their information, such as speech and music, 
+in the form of amplitude modulation (AM) of the carrier frequency. The radio frequency carrier amplitude changes in time with the low-frequency (baseband) voice or music signals. 
+
+\switchcolumn
+
+您可能想知道为什么接收器电路中需要二极管。要回答这个问题，您需要深入了解一点无线电理论。发射机通过发射桅杆向自由空间广播高频电磁波。广播向各个方向辐射，并在接收位置的天线中感应出小信号。在中波频段发送的发射机以载波频率的幅度调制（AM）形式传输其信息，如语音和音乐。射频载波幅度随低频（基带）语音或音乐信号而变化。
+
+\switchcolumn*
+
+Figure 2.3: Amplitude modulation. 
+The received radio signal remains inaudible even in headphones because our ears are only 
+sensitive to sound pressure waves up to about 20 kHz. The low-frequency signal carrying 
+the voice and music information needs to be recovered from the radio carrier wave. This 
+is where the diode comes in; using just one diode you can demodulate the RF signal. The 
+average current of the rectified signal corresponds to the original modulated AF signal.
+
+\switchcolumn
+
+图2.3：幅度调制
+即使在耳机中，接收到的无线电信号仍然听不见，因为我们的耳朵只对高达约20kHz的声压波敏感。携带语音和音乐信息的低频信号需要从无线电载波中恢复。这就是二极管的用武之地；仅使用一个二极管，您就可以解调RF信号。整流信号的平均电流对应于原始调制的AF信号。
+
+\switchcolumn*
+
+The first detector radios used crystal detectors. Lead sulfide (galena) or a piece of pyrite 
+crystal was used for this purpose. Both are sulfur compounds and occur in nature as ores 
+(lead ore; iron ore). 
+
+\switchcolumn
+
+最早的检测器收音机使用晶体检测器。为此，使用了硫化铅（方铅矿）或黄铁矿晶体。两者都是硫化合物，在自然界中以矿石形式存在（铅矿；铁矿）。
+
+\switchcolumn*
+
+Figure 2.5 shows a crystal holder with a lead sulfide crystal from the early days of radio 
+technologys technology. A spiral spring made of steel wire known as a cat's whisker contacts the crystal 
+surface. The characteristics of the semiconductor junction formed at the crystal surface can 
+be tested with an oscilloscope component tester. You will need to experiment a bit to find 
+a suitable spot on the crystal surface and to recognize a typical diode characteristic curve 
+on the component tester trace. 
+
+\switchcolumn
+
+图2.5显示了一个来自无线电技术早期的带有硫化铅晶体的晶体支架。一个由钢丝制成的螺旋弹簧，称为“猫须”，与晶体表面接触。在晶体表面形成的半导体结的特性可以用示波器组件测试仪进行测试。您需要进行一些实验，以找到晶体表面上的合适位置，并在组件测试仪轨迹上识别典型的二极管特性曲线。
+
+\switchcolumn*
+
+Figure 2.5: An original detector crystal mount. 
+The crystal can be used successfully to build a diode radio. Numerous strong stations can 
+be heard without the need for any additional amplifier. Even today, it is possible to build a 
+detector using these natural minerals. Pyrite forms regular, gold-colored cuboid crystals in 
+rock. Lead sulfide is black with areas of metallic shiny facets on its surface. A sewing needle 
+can be used as the cat's whisker detector. You will need to test various points on the crystal 
+surface until contact achieves a good rectification characteristic. 
+
+\switchcolumn
+
+图2.5：原始检测器晶体支架。
+该晶体可以成功用于构建二极管收音机。无需任何额外放大器即可听到许多强信号电台。即使在今天，也可以使用这些天然矿物构建检测器。黄铁矿在岩石中形成规则的金色长方体晶体。硫化铅是黑色的，其表面有金属光泽的小面区域。可以使用缝纫针作为“猫须”检测器。您需要测试晶体表面上的各个点，直到接触达到良好的整流特性。
+
+\switchcolumn*
+
+Figure 2.6: Naturally formed Pyrite and Lead sulfide. 
+
+\switchcolumn
+
+图2.6：天然形成的黄铁矿和硫化铅。
+
+\switchcolumn*
+
+2.2 Headphone Adapter 
+Vintage circuit diagrams for detector radios assume that headphones shown on the circuit 
+will be high-impedance types with 2000 Ω driver coils. These were standard back then. 
+Nowadays a typical set of headphones will use 32 Ω driver coils which will be too low 
+to function properly in the original circuit. You can, however, use a small transformer to 
+provide the necessary impedance matching. A transformer salvaged from a small mains 
+adapter can be used here. If the mains adapter has switchable taps, (3/4.5/6/9/12 V) on 
+the secondary winding you may be able to use these to optimize the impedance match. 
+Remove the transformer and connect the secondary winding to the headphones and the 
+primary winding to the circuit where the high impedance phones would normally be connected. 
+
+\switchcolumn
+
+2.2 耳机适配器
+检测器收音机的老式电路图假设电路上显示的耳机是带有2000Ω驱动线圈的高阻抗类型。这些在当时是标准的。如今，典型的耳机组使用32Ω驱动线圈，这在原始电路中功能不正常。但是，您可以使用小型变压器来提供必要的阻抗匹配。这里可以使用从小型电源适配器中回收的变压器。如果电源适配器在次级绕组上有可切换的抽头（3/4.5/6/9/12 V），您可以使用这些抽头来优化阻抗匹配。移除变压器，将次级绕组连接到耳机，将初级绕组连接到通常连接高阻抗耳机的电路。
+
+\switchcolumn*
+
+In a diode radio, correct antenna matching is the key to success because you cannot afford 
+to waste any of the received RF energy. The receiver coil, therefore, has several tap points. 
+Using a total of 80 turns of 'Litz' wire on a 10 mm diameter ferrite rod, makes sure you will 
+be able to cover the entire medium wave band. Long antennas should be connected to a 
+lower tap of the coil to not overly dampen the resonant circuit at the input. Try connecting 
+the long antenna to each of the winding taps to find which one gives the best reception. 
+Two coupling capacitors are also shown connected at the coil end. Experiment with the 
+aerial connection, a higher value of capacitance results in stronger coupling. 
+
+\switchcolumn
+
+在二极管收音机中，正确的天线匹配是成功的关键，因为您无法承受浪费任何接收到的RF能量。因此，接收线圈有多个抽头点。在10毫米直径的铁氧体棒上使用总共80匝“利兹”线，确保您能够覆盖整个中波频段。长天线应连接到线圈的较低抽头，以免过度阻尼输入处的谐振电路。尝试将长天线连接到每个绕组抽头，以找到哪个抽头提供最佳接收效果。还显示了两个连接在线圈末端的耦合电容器。通过天线连接进行实验，较高的电容值会导致更强的耦合。
+
+\switchcolumn*
+
+Figure 2.7: Low impedance headphones with transformer impedance matching. 
+
+\switchcolumn
+
+图2.7：带有变压器阻抗匹配的低阻抗耳机。
+
+\switchcolumn*
+
+For such a simple radio, a good antenna is crucial. If your house is fitted with metal rainwater guttering, this can make a good antenna. The guttering should not have a connection to 
+ground potential. A zinc gutter will often be cemented into a drainage pipe near the ground 
+and thereby will be insulated. All you need now is a connection wire, and that should make 
+a really good antenna. In case the reception is still too quiet for headphones, you can connect the output to a set of PC's active speakers. 
+
+\switchcolumn
+
+对于这样简单的收音机，良好的天线至关重要。如果您的房子装有金属雨水槽，这可以成为一个很好的天线。水槽不应与地电位连接。锌制水槽通常会被水泥固定在靠近地面的排水管中，从而被绝缘。现在您只需要一根连接电线，这应该会成为一个非常好的天线。如果耳机的接收仍然太安静，您可以将输出连接到一组PC的有源扬声器。
+
+\switchcolumn*
+
+Another good antenna is sometimes the heating system of an apartment. Although the 
+pipes are usually grounded at some point, the total length of all the piping can effectively 
+act as a loop antenna. In many cases, this can result in high received signal levels. 
+
+\switchcolumn
+
+另一个好的天线有时是公寓的供暖系统。尽管管道通常在某个点接地，但所有管道的总长度可以有效地充当环形天线。在许多情况下，这可以导致高接收信号水平。
+
+\switchcolumn*
+
+2.3 A Detector for Shortwave 
+Looking at old "plans" to build detector radios, they are usually designed to receive signals 
+from local stations in the medium wave band. These stations are becoming rarer and may 
+even be unavailable now as more countries shut down their medium wave transmitters. 
+Some countries such as the UK, Italy, France, and Spain however still broadcast in the 
+band. Transmitting on shortwave has the advantage of covering much greater distances. 
+Many countries have their own international broadcasting services designed to inform and 
+entertain overseas listeners. The tried-and-true AM radio is, therefore, just as active on 
+shortwave as ever. 
+
+\switchcolumn
+
+2.3 短波检测器
+查看构建检测器收音机的旧“计划”，它们通常设计用于接收中波频段本地电台的信号。随着更多国家关闭其中波发射机，这些电台变得越来越稀少，甚至可能无法使用。然而，一些国家如英国、意大利、法国和西班牙仍然在该频段广播。在短波上传输的优势是覆盖更远的距离。许多国家都有自己的国际广播服务，旨在为海外听众提供信息和娱乐。因此，经过验证的AM收音机在短波上仍然像以往一样活跃。
+
+\switchcolumn*
+
+Tuning in to higher frequencies requires smaller coils which are much easier to make. While 
+a good medium wave coil needs a ferrite rod and a coil wound from hard-to-find 'Litz' wire, 
+on shortwave, you can use standard insulated copper wire. A special coil former with a 
+ferrite core is not required; you can use any insulated wire. 
+
+\switchcolumn
+
+调谐到更高的频率需要更小的线圈，这更容易制作。虽然良好的中波线圈需要铁氧体棒和由难以找到的“利兹”线缠绕的线圈，但在短波上，您可以使用标准绝缘铜线。不需要带有铁氧体磁芯的特殊线圈骨架；您可以使用任何绝缘电线。
+
+\switchcolumn*
+
+For the first attempt, a coil with a total of 25 turns with four taps should be wound. I used 
+the plastic body of a banana plug which measures 8 mm diameter but you could use a ballpoint pen body. Two holes spaced 1 cm apart help to fix the wire ends. Then, wind 5 turns, 
+make a tap point, and apply the next turns. The finished coil connections can be soldered 
+to a 6-way pinheader strip.
+
+\switchcolumn
+
+对于第一次尝试，应该缠绕一个总共有25匝、四个抽头的线圈。我使用了直径为8毫米的香蕉插头的塑料主体，但您也可以使用圆珠笔主体。两个相距1厘米的孔有助于固定电线末端。然后，缠绕5匝，制作一个抽头点，然后应用下一组匝数。完成的线圈连接可以焊接到6路排针条上。
+
+\switchcolumn*
+
+Figure 2.8: Dual trimmer capacitor and shortwave coil assembly. 
+
+\switchcolumn
+
+图2.8：双微调电容器和短波线圈组件。
+
+\switchcolumn*
+
+The entire radio can be built on an experimental plug board. Pins have been soldered to the 
+variable connections so that it can be easily plugged into the prototyping plug board. The 
+only thing missing is the diode and a headphone jack with soldered connection wires. The 
+advantage of this construction method is that it allows for easy experimentation to try out 
+other circuit mods. 
+
+\switchcolumn
+
+整个收音机可以在实验插件板上构建。引脚已焊接到可变连接上，以便可以轻松插入原型插件板。唯一缺少的是二极管和带有焊接连接线的耳机插孔。这种构造方法的优点是它允许轻松实验以尝试其他电路修改。
+
+\switchcolumn*
+
+Figure 2.9: Testing using a plug board. 
+
+\switchcolumn
+
+图2.9：使用插件板进行测试。
+
+\switchcolumn*
+
+The respective taps for the antenna connection and the diode on the coil can be experimentally adjusted. This tuning capacitor is dual gang with both halves connected in parallel. If 
+only the upper range above 10 MHz is to be received, the lower-valued half of the tuning 
+capacitor rated at 80 pF will be sufficient. 
+
+\switchcolumn
+
+线圈上的天线连接和二极管的相应抽头可以通过实验进行调整。该调谐电容器是双连的，两个半部分并联连接。如果只需要接收10MHz以上的较高范围，额定值为80pF的调谐电容器的较低值半部分就足够了。
+
+\switchcolumn*
+
+Figure 2.10: Schematic of the shortwave detector. 
+
+\switchcolumn
+
+图2.10：短波检测器的原理图。
+
+\switchcolumn*
+
+The radio requires a high-impedance headphone, such as a piezoceramic crystal earpiece 
+or dynamic headphones with a 2 kΩ resistor placed in series with each capsule. Low-impedance 32 Ω types cannot be used directly and require an impedance transformer (see 
+Section 2.2). Medium-impedance headphones with 600 Ω can also be used directly. 
+
+\switchcolumn
+
+该收音机需要高阻抗耳机，例如压电陶瓷晶体耳机或每个胶囊串联2kΩ电阻的动圈式耳机。低阻抗32Ω类型不能直接使用，需要阻抗变压器（见2.2节）。600Ω的中等阻抗耳机也可以直接使用。
+
+\switchcolumn*
+
+A germanium or a Schottky diode can be used as the detector. Both of these diodes have 
+a low forward threshold voltage. A germanium diode also has reasonably low conductivity 
+in the reverse direction, which is important when using a high-impedance crystal earpiece. 
+
+\switchcolumn
+
+可以使用锗或肖特基二极管作为检测器。这两种二极管都具有低正向阈值电压。锗二极管在反向方向上也具有相当低的导电性，这在使用高阻抗晶体耳机时很重要。
+
+\switchcolumn*
+
+With a Schottky diode, the earpiece can become electrically charged like a capacitor. As the 
+charge builds up the diode is completely reverse biased. In this case, an additional 100 kΩ 
+resistor should be connected in parallel with the earphone to dissipate any charge build up 
+to ground. 
+
+\switchcolumn
+
+使用肖特基二极管时，耳机可能会像电容器一样带电。随着电荷积累，二极管会完全反向偏置。在这种情况下，应该在耳机并联一个额外的100kΩ电阻，以将任何电荷积累释放到地。
+
+\switchcolumn*
+
+For best reception you need an aerial wire a good 10 m long suspended as high as possible. 
+But even a short 3 m length of wire hooked up high up around a room will provide reasonable signal strength for initial trials. With careful tweaking of the tuning capacitor, several 
+stations will be heard with sufficient volume, especially in the evening. Often you will hear 
+two or three stations at the same time and tuning. The usual fluctuations in field strength 
+on shortwave reception mean that one station may be clearer than another at different 
+times of day. While individual radio bands are clear, nearby stations cannot be clearly separated. The selectivity of this radio design is not yet optimal. 
+
+\switchcolumn
+
+为了获得最佳接收效果，您需要一根至少10米长的架空天线，尽可能高悬挂。但即使是3米长的短线，高高挂在房间周围，也能为初始试验提供合理的信号强度。通过仔细调整调谐电容器，可以听到几个音量足够的电台，尤其是在晚上。通常，您会同时听到两三个电台并进行调谐。短波接收中通常的场强波动意味着，在一天中的不同时间，一个电台可能比另一个电台更清晰。虽然各个无线电频段清晰，但附近的电台无法清晰分离。这种收音机设计的选择性尚未达到最佳。
+
+\switchcolumn*
+
+The taps to the coil shown in the circuit diagram are only rough guidelines. Here you can 
+try to find the optimum balance between volume and selectivity, which is easily achievable 
+with the plug board construction method used here. The following rules of thumb apply: 
+• Lower taps points for the antenna and diode improve the receiver's selectivity 
+but reduce output volume. 
+• Long antennas should be connected to one of the lower tap points. Connecting 
+to points higher up results in reduced volume and lower selectivity. 
+These relationships can be easily verified experimentally. Later on you will take a closer 
+look at the theory to support these general rules. 
+
+\switchcolumn
+
+电路图中显示的线圈抽头只是粗略的指导。在这里，您可以尝试找到音量和选择性之间的最佳平衡，这通过这里使用的插件板构造方法很容易实现。以下经验法则适用：
+• 天线和二极管的较低抽头点提高接收器的选择性，但降低输出音量。
+• 长天线应连接到较低的抽头点之一。连接到较高的点会导致音量减少和选择性降低。
+这些关系可以通过实验轻松验证。稍后，您将更仔细地研究支持这些一般规则的理论。
+
+\switchcolumn*
+
+2.4 Silicon Diode Detector 
+Germanium diodes are rarely used nowadays. Silicon diodes are very popular for all sorts of 
+applications and the 1N4148 is the most commonly used universal diode. The circuit shown 
+in Figure 2.11 uses a silicon diode with an additional bias voltage applied. In addition, a 
+coupling capacitor is used here to connect the signal to an amplifier input. 
+
+\switchcolumn
+
+2.4 硅二极管检测器
+如今，锗二极管很少使用。硅二极管在各种应用中非常流行，1N4148是最常用的通用二极管。图2.11所示的电路使用了施加额外偏置电压的硅二极管。此外，这里使用耦合电容器将信号连接到放大器输入。
+
+\switchcolumn*
+
+Figure 2.11: Silicon diode detector with applied bias voltage. 
+
+\switchcolumn
+
+图2.11：带有施加偏置电压的硅二极管检测器。
+
+\switchcolumn*
+
+A silicon diode requires a forward voltage bias of around 0.5 V before any significant current 
+starts to flow. Since the received RF signal at the resonant circuit only rarely reaches such 
+high levels, you may not hear any recovered signal. Germanium diodes, however, have a 
+forward voltage threshold below 0.2 V so that smaller signals can be recovered. To overcome the high threshold of silicon diodes, you can set up a small DC current of about 10 µA 
+to flow through the diode. This will forward bias the junction allowing received signals below 
+100 mV to be demodulated. 
+
+\switchcolumn
+
+硅二极管需要约0.5V的正向电压偏置才能开始流过任何显著电流。由于谐振电路处接收到的RF信号很少达到如此高的水平，您可能听不到任何恢复的信号。然而，锗二极管的正向电压阈值低于0.2V，因此可以恢复较小的信号。为了克服硅二极管的高阈值，您可以设置约10µA的小直流电流流过二极管。这将使结正向偏置，允许解调低于100mV的接收信号。
+
+\switchcolumn*
+
+Although the circuit can be operated directly with headphones, it works better with a speaker amplifier. A set of active PC speakers, for example, will work well here. The built-in 
+audio amplifier provides sufficient amplification and a high input resistance in the order of 
+100 kΩ. This results in less damping of the resonant circuit and gives better selectivity. In 
+addition, compared to using headphones, you can connect the antenna to a lower tap on 
+the coil to improve selectivity and boost volume level.
+
+\switchcolumn
+
+虽然该电路可以直接与耳机一起操作，但与扬声器放大器一起使用效果更好。例如，一套有源PC扬声器在这里效果很好。内置音频放大器提供足够的放大和大约100kΩ的高输入电阻。这导致谐振电路的阻尼减少，并提供更好的选择性。此外，与使用耳机相比，您可以将天线连接到线圈的较低抽头，以提高选择性并提高音量水平。
+
+\switchcolumn*
+
+2.5 Coils and Resonant Circuits 
+In order to build each circuit described here we've provided the necessary inductance and 
+specific measurements. However, sometimes you may need to modify the circuit or use a 
+different coil body; in that case, you'll need to determine the number of turns yourself. It's 
+also possible that you have some old coils salvaged from redundant equipment that you can 
+modify and adapt. Regardless, it's useful to know how to calculate coils yourself. 
+
+\switchcolumn
+
+2.5 线圈和谐振电路
+为了构建这里描述的每个电路，我们提供了必要的电感和具体测量值。然而，有时您可能需要修改电路或使用不同的线圈主体；在这种情况下，您需要自己确定匝数。您也可能有一些从冗余设备中回收的旧线圈，您可以修改和适应。无论如何，了解如何自己计算线圈是有用的。
+
+\switchcolumn*
+
+There are basically two types of coils: those wound on a magnetizable core (like ferrite 
+or iron powder) and those without a core, known as air-core coils. Let's focus on air-core 
+coils first. For instance, a coil for a shortwave resonant circuit has 20 turns, a diameter 
+of 16 mm, and a coil length of 35 mm. It has an inductance of approximately 3 µH and, 
+when combined with a variable capacitor up to 300 pF, can reach a lower frequency limit of 
+around 5.3 MHz. We'll show you how to calculate this and introduce a simple tool that can 
+make the process easier. 
+
+\switchcolumn
+
+基本上有两种类型的线圈：那些缠绕在可磁化磁芯（如铁氧体或铁粉）上的线圈，以及那些没有磁芯的线圈，称为空芯线圈。让我们首先关注空芯线圈。例如，短波谐振电路的线圈有20匝，直径16毫米，线圈长度35毫米。它的电感约为3µH，当与高达300pF的可变电容器组合时，可以达到约5.3MHz的较低频率限制。我们将向您展示如何计算这一点，并介绍一个可以使过程更简单的工具。
+
+\switchcolumn*
+
+Figure 2.12: Air-core coil construction. 
+
+\switchcolumn
+
+图2.12：空芯线圈构造。
+
+\switchcolumn*
+
+In general, the following formula applies to a long coil where l > D where n is the number 
+of turns, A is the cross-sectional area in square meters, and l is the length in meters: 
+
+\switchcolumn
+
+一般来说，以下公式适用于l > D的长线圈，其中n是匝数，A是横截面积（单位为平方米），l是长度（单位为米）：
+
+\switchcolumn*
+
+L = µ0 * n² * A / l 
+where the magnetic field constant µ0 equals: 
+4 π * 10 –7 Vs/Am = 1.2466 * 10-6 Vs/Am 
+
+\switchcolumn
+
+L = µ0 * n² * A / l
+其中磁场常数µ0等于：
+4 π * 10 –7 Vs/Am = 1.2466 * 10-6 Vs/Am
+
+\switchcolumn*
+
+This formula actually only applies to an infinitely long coil but can be used as a useful 
+approximation up to a length of l =D. With a short coil of the same number of turns, the 
+magnetic coupling between individual turns increases, resulting in a higher inductance. 
+Conversely, stretching out the turns reduces inductance, which can sometimes be used to 
+adjust coils. 
+
+\switchcolumn
+
+这个公式实际上只适用于无限长的线圈，但可以作为l =D长度的有用近似。对于相同匝数的短线圈，各匝之间的磁耦合增加，导致电感更高。相反，拉伸匝数会减少电感，这有时可以用来调整线圈。
+
+\switchcolumn*
+
+The above formula can be simplified for a circular coil cross-section, where the diameter D 
+and length l of the coil are given in mm, to the following approximation formula: 
+L = 1 nH * n² × D²/mm² / (l/mm) 
+This formula uses the approximation of π × π = 10 which introduces an error of approximately 1.3%. This is generally an acceptable simplification; you cannot expect high accuracy since the shape of the coil, especially the ratio of length and thickness, wire thickness, 
+and even the location where the coil is mounted, all influence the final value of inductance 
+achieved. In practice you can expect to achieve accuracy within 10% for an air-core calculation. 
+
+\switchcolumn
+
+对于圆形线圈横截面，其中线圈的直径D和长度l以mm为单位，上述公式可以简化为以下近似公式：
+L = 1 nH * n² × D²/mm² / (l/mm)
+该公式使用π × π = 10的近似值，这会引入约1.3%的误差。这通常是可接受的简化；您不能期望高精度，因为线圈的形状，尤其是长度和厚度的比率、导线厚度，甚至线圈安装的位置，都会影响最终获得的电感值。在实践中，对于空芯计算，您可以期望达到10%以内的精度。
+
+\switchcolumn*
+
+RF coil formers with ferrite screw cores are often used. The coil inductance increases by up 
+to four times or more when a ferrite core is used. By changing the insertion depth of the 
+screw-in core the coil value can be adjusted. Ferrite cores are manufactured for use with 
+certain frequency bands in which they have lowest energy losses. 
+
+\switchcolumn
+
+经常使用带有铁氧体螺钉磁芯的RF线圈骨架。当使用铁氧体磁芯时，线圈电感最多增加四倍或更多。通过改变旋入式磁芯的插入深度，可以调整线圈值。铁氧体磁芯是为特定频段制造的，在这些频段中它们的能量损失最低。
+
+\switchcolumn*
+
+Much larger inductances can be achieved by using closed cores with or without an air gap. 
+The air gap reduces the inductance of the coil, but allows for greater magnetization, i.e., 
+the core itself only reaches magnetic saturation at higher currents. Common types of cores 
+include ring cores, transformer cores in E-I shape, and closed pot cores. 
+
+\switchcolumn
+
+通过使用带有或不带有气隙的闭合磁芯，可以实现更大的电感。气隙减少了线圈的电感，但允许更大的磁化，即磁芯本身仅在更高的电流下达到磁饱和。常见的磁芯类型包括环形磁芯、E-I形状的变压器磁芯和闭合罐形磁芯。
+
+\switchcolumn*
+
+Figure 2.13: Cross section of a ferrite E-I coil former with an air gap. 
+
+\switchcolumn
+
+图2.13：带有气隙的铁氧体E-I线圈骨架的横截面。
+
+\switchcolumn*
+
+The inductance depends heavily on the number of turns, the material used, and the geometry of the core. A theoretical calculation, like for the air-core coil, is not so simple. The 
+manufacturer will instead provide an AL value in nH/n² for each type of core. 
+L = AL * n² 
+
+\switchcolumn
+
+电感在很大程度上取决于匝数、使用的材料和磁芯的几何形状。像空芯线圈那样的理论计算并不那么简单。相反，制造商将为每种类型的磁芯提供nH/n²的AL值。
+L = AL * n²
+
+\switchcolumn*
+
+For example, an Amidon T37-2 ring core has an inductance of 40 µH at 100 turns, which 
+corresponds to an AL value of 4 nH/n². Reducing the winding to 30 turns, the inductance 
+becomes: 
+L = 30 * 30 * 4 nH = 3600 nH = 3.6 µH. 
+
+\switchcolumn
+
+例如，Amidon T37-2环形磁芯在100匝时的电感为40µH，对应于4 nH/n²的AL值。将绕组减少到30匝，电感变为：
+L = 30 * 30 * 4 nH = 3600 nH = 3.6 µH。
+
+\switchcolumn*
+
+The ring core coil is suitable for building an RF resonant circuit, just like an air-core coil. 
+Besides the AL value, the intended frequency range of a core is also important. The Amidon 
+type xxx-2 has the color code red which indicates it is suitable for frequencies up to 30 MHz.
+
+\switchcolumn
+
+环形磁芯线圈适用于构建RF谐振电路，就像空芯线圈一样。除了AL值外，磁芯的预期频率范围也很重要。Amidon类型xxx-2具有红色代码，表明它适用于高达30MHz的频率。
+
+\switchcolumn*
+
+2.6 Resonant Frequency and Bandwidth 
+If you connect a coil and a capacitor, a resonant circuit is created. Electrical energy can 
+oscillate back and forth between the coil and capacitor, similar to the decaying swing of a 
+pendulum, the period of the swing indicates the resonant frequency f . The electrical circuit 
+responds to a short pulse of current with a diminishing oscillatory voltage waveform. 
+
+\switchcolumn
+
+2.6 谐振频率和带宽
+如果您连接一个线圈和一个电容器，就会创建一个谐振电路。电能可以在线圈和电容器之间来回振荡，类似于钟摆的衰减摆动，摆动的周期表示谐振频率f。电路对短电流脉冲的响应是一个递减的振荡电压波形。
+
+\switchcolumn*
+
+The formula for calculating the resonance frequency is: 
+f = 1 / (2π√(L C)) 
+
+\switchcolumn
+
+计算谐振频率的公式是：
+f = 1 / (2π√(L C))
+
+\switchcolumn*
+
+Figure 2.14: A coil and capacitor form a tuned circuit. 
+
+\switchcolumn
+
+图2.14：线圈和电容器形成调谐电路。
+
+\switchcolumn*
+
+Tuned circuits are often used in electrical circuits that process a range of different signal 
+frequencies or mixed frequencies. Current and voltages that flow in such circuits will vary 
+according to the signal frequency. The parallel resonant circuit has a complex impedance 
+Z with a sharp maximum value at the resonant frequency f0. At this frequency, RC = RL 
+and the currents through the coil and capacitor cancel out exactly due to their total phase 
+difference of 180 degrees. An ideal oscillating circuit with no losses would have infinitely 
+large impedance at the resonant frequency. 
+
+\switchcolumn
+
+调谐电路常用于处理一系列不同信号频率或混合频率的电路中。在这些电路中流动的电流和电压会根据信号频率而变化。并联谐振电路具有复阻抗Z，在谐振频率f0处有一个尖锐的最大值。在这个频率下，RC = RL，并且由于它们的总相位差为180度，通过线圈和电容器的电流正好抵消。没有损耗的理想振荡电路在谐振频率处的阻抗会无限大。
+
+\switchcolumn*
+
+In practice however, damping of the oscillation occurs because of energy losses in the resistance of the coil wire, magnetic losses of the coil core, and electromagnetic radiation, 
+resulting in a finite resonant resistance. To simplify you can add all the losses together and 
+assign them as a parallel loss resistance R. 
+
+\switchcolumn
+
+然而，在实践中，由于线圈导线电阻的能量损失、线圈磁芯的磁损失和电磁辐射，振荡会发生阻尼，导致有限的谐振电阻。为了简化，您可以将所有损失加在一起，并将它们分配为并联损耗电阻R。
+
+\switchcolumn*
+
+Figure 2.15: A tuned circuit with loss resistance R. 
+
+\switchcolumn
+
+图2.15：带有损耗电阻R的调谐电路。
+
+\switchcolumn*
+
+Each resonant circuit has a property called the Quality factor or just Q which is inversely 
+proportional to the bandwidth of the circuit. Q can be easily determined when the parallel 
+damping resistance R is related to the inductive resistance RL = 2 π f L or to the capacitive 
+resistance RC = 1 / (2πfC) at the resonant frequency. 
+Q = R / RL or Q = R / RC 
+
+\switchcolumn
+
+每个谐振电路都有一个称为品质因数或简称Q的特性，它与电路的带宽成反比。当并联阻尼电阻R与谐振频率下的感抗RL = 2 π f L或容抗RC = 1 / (2πfC)相关时，可以很容易地确定Q。
+Q = R / RL 或 Q = R / RC
+
+\switchcolumn*
+
+If a resonant circuit is excited with a constant alternating current I of variable frequency, 
+or through an alternating current source with high internal resistance, then the resonant 
+circuit voltage is proportional to the magnitude of the complex impedance Z. At resonance, 
+the voltage is highest. The smaller the damping of the vibration due to energy losses of any 
+type, or the larger the quality of the resonant circuit, the higher the resonant voltage rises. 
+
+\switchcolumn
+
+如果用可变频率的恒定交流电I或通过高内阻的交流电源激励谐振电路，则谐振电路电压与复阻抗Z的大小成正比。在谐振时，电压最高。由于任何类型的能量损失导致的振动阻尼越小，或谐振电路的品质因数越大，谐振电压上升得越高。
+
+\switchcolumn*
+
+On both sides of the resonant frequency, points on the resonance curve can be determined 
+at which the voltage has dropped to a factor of 1 / √2 = 0.707 = –3 dB. The frequency 
+separation of these points is referred to as the bandwidth b of the circuit. Between the 
+resonant frequency f0, bandwidth b, and quality factor Q of the circuit, the relationship is 
+b = f0 / Q. 
+
+\switchcolumn
+
+在谐振频率的两侧，可以确定谐振曲线上的点，此时电压已下降到1 / √2 = 0.707 = –3 dB的因子。这些点的频率间隔被称为电路的带宽b。在电路的谐振频率f0、带宽b和品质因数Q之间，关系为b = f0 / Q。
+
+\switchcolumn*
+
+Figure 2.16: Response at resonance showing different values of Q. 
+
+\switchcolumn
+
+图2.16：显示不同Q值的谐振响应。
+
+\switchcolumn*
+
+Figure 2.16 shows the characteristic resonance curves of the quality (Q) factor. At Q = 50, 
+a larger bandwidth b1 results than at Q = 110 with bandwidth b2. At the same time, an 
+increasing resonance peak is observed at higher quality. This causes the resonant circuit to 
+oscillate more strongly at the resonance frequency. However, far away from the resonant 
+frequency, the resonance curves show little difference in their response. 
+
+\switchcolumn
+
+图2.16显示了品质（Q）因数的特征谐振曲线。在Q = 50时，产生的带宽b1比Q = 110时的带宽b2大。同时，在更高的品质因数下观察到谐振峰值增加。这导致谐振电路在谐振频率处振荡更强烈。然而，在远离谐振频率的地方，谐振曲线在其响应方面几乎没有差异。
+
+\switchcolumn*
+
+The damping of the circuit, and therefore its quality, is practically always caused by intrinsic 
+series and parallel resistances. The series resistance is due to the wire winding, but for a 
+certain frequency, it is greater than the DC resistance due to the skin effect. The parallel 
+resistance is determined by the connection impedance in the circuit. However, an iron or 
+ferrite core also has losses that can be represented by a parallel resistor. With the same 
+inductance, a coil with a core requires fewer turns and therefore incurs lower copper losses. 
+At the same time there are now losses in the core to consider. At very high frequencies of 
+around 100 MHz, pure air coils made of thick, silver-plated wire perform better, while at 
+medium frequencies of around 10 MHz, the best quality is achieved with a closed core such 
+as a toroidal core. Air coils, on the other hand, are an alternative down to about 1 MHz. 
+Coils and transformers used in the audio frequency range, however, are almost always built 
+with a core. 
+
+\switchcolumn
+
+电路的阻尼，因此其品质因数，实际上总是由内在的串联和并联电阻引起的。串联电阻是由于导线绕组引起的，但对于特定频率，由于趋肤效应，它大于直流电阻。并联电阻由电路中的连接阻抗决定。然而，铁或铁氧体磁芯也有损耗，可以用并联电阻表示。对于相同的电感，带磁芯的线圈需要更少的匝数，因此铜损耗更低。同时，现在需要考虑磁芯中的损耗。在大约100MHz的非常高的频率下，由厚的镀银线制成的纯空芯线圈性能更好，而在大约10MHz的中频下，使用闭合磁芯（如环形磁芯）可以获得最佳品质。另一方面，空芯线圈是低至约1MHz的替代方案。然而，在音频频率范围内使用的线圈和变压器几乎总是用磁芯构建的。
+
+\switchcolumn*
+
+You can expect to get a quality factor Q of up to 100 by being careful with coil construction. 
+A resonant circuit is however also damped by the external circuitry to which it is connected 
+to or by an antenna. This damping effect can to some extent be mitigated by ensuring a 
+loose coupling of the resonant circuit by using a small auxiliary winding, a tap point on the 
+coil, or a suitable coupling capacitor. When a coil connects directly to the input of an amplifier, its input impedance should be very high to lessen the damping effect. 
+
+\switchcolumn
+
+通过仔细构建线圈，您可以期望获得高达100的品质因数Q。然而，谐振电路也会被与其连接的外部电路或天线阻尼。这种阻尼效应可以通过使用小的辅助绕组、线圈上的抽头点或合适的耦合电容器来确保谐振电路的松散耦合，在一定程度上减轻。当线圈直接连接到放大器的输入时，其输入阻抗应该非常高，以减少阻尼效应。
+
+\switchcolumn*
+
+A small Visual Basic program can be found on the author's website called LCFR which has 
+been written to simplify the calculation of coils and resonant circuits. The program calculates the inductance of air coils and coils with a known AL value. In addition, the resonance 
+frequency, and the inductive resistance RL of the coil at this frequency can be determined if 
+a value of capacitance is given in addition to the inductance. The program consists of a user 
+interface made up of three independent calculation areas for practical reasons.
+
+\switchcolumn
+
+在作者的网站上可以找到一个名为LCFR的小型Visual Basic程序，该程序旨在简化线圈和谐振电路的计算。该程序计算空芯线圈和具有已知AL值的线圈的电感。此外，如果除了电感之外还给出了电容值，则可以确定谐振频率和线圈在该频率下的感抗RL。出于实际原因，该程序由三个独立的计算区域组成的用户界面。
+
+\switchcolumn*
+
+Air coils can 
+be calculated in the top section and coils with cores in the middle. At the bottom, you will 
+find a calculation of the resonance frequency and the inductive resistance. Any change in 
+the input variables immediately updates the output result. The last calculated inductance 
+of a coil is automatically transferred to the lower calculation. The program is useful for 
+quickly trying out new parameters. The displayed three decimal places for the inductance 
+value should not be interpreted as an indication of the calculation accuracy but makes it 
+simpler to show the calculation of coil characteristics in a wide range from a few nH (1 nH 
+= 0.001 µH) to many mH (1 mH = 1000 µH). 
+
+\switchcolumn
+
+空芯线圈可以在顶部区域计算，带磁芯的线圈在中间计算。在底部，您会找到谐振频率和感抗的计算。输入变量的任何更改都会立即更新输出结果。最后计算的线圈电感会自动传输到较低的计算中。该程序对于快速尝试新参数很有用。电感值显示的三位小数不应被解释为计算精度的指示，而是使显示从几nH（1 nH = 0.001 µH）到许多mH（1 mH = 1000 µH）的宽范围内的线圈特性计算变得更简单。
+
+\switchcolumn*
+
+Figure 2.17: Calculation of coil characteristics. 
+
+\switchcolumn
+
+图2.17：线圈特性的计算。
+
+\switchcolumn*
+
+If you want to build a specific resonant circuit, you could start by specifying the capacitance, then calculate the inductance, and finally determine the number of turns for a given 
+core or coil form. It often works better however if you are less systematic, meaning you 
+choose a type of coil and then try different inductances and capacitances until you get the 
+desired result. For example, you might ask what standard values of a fixed inductor and 
+capacitor can be used to build a resonant circuit that has a specific resonant frequency in a 
+given circuit. In this case, trial and error can often get you to the desired result faster than 
+a more conventional systematic approach. 
+
+\switchcolumn
+
+如果您想构建特定的谐振电路，您可以从指定电容开始，然后计算电感，最后确定给定磁芯或线圈形式的匝数。然而，如果你不那么系统化，通常效果会更好，这意味着你选择一种线圈类型，然后尝试不同的电感和电容，直到获得所需的结果。例如，你可能会问，在给定电路中，固定电感器和电容器的哪些标准值可以用来构建具有特定谐振频率的谐振电路。在这种情况下，试错法通常可以比更传统的系统化方法更快地获得所需的结果。
+
+\switchcolumn*
+
+Here are a few examples: 
+
+\switchcolumn
+
+这里有几个例子：
+
+\switchcolumn*
+
+To wind a coil with 300 µH for a medium-wave detector radio on a cardboard roll with a 
+diameter of 42 mm, assuming a wire diameter of 0.5 mm, you would need about 90 turns. 
+The tuning capacitor must be at least 320 pF to tune the medium-wave range starting from 
+530 kHz. 
+
+\switchcolumn
+
+要在直径为42毫米的 cardboard roll 上为中波检波器收音机绕制一个300µH的线圈，假设线径为0.5毫米，您需要约90匝。调谐电容器必须至少为320pF，才能调谐从中波范围530kHz开始的频率。
+
+\switchcolumn*
+
+For higher frequencies, you need fewer turns. For example, a coil in a shortwave receiver 
+has 25 turns, a diameter of 8 mm, and a coil length of 10 mm, resulting in an inductance 
+of 3 µH. With a capacitance of 320 pF, you can tune down to 4.4 MHz. 
+
+\switchcolumn
+
+对于更高的频率，您需要更少的匝数。例如，短波接收机中的线圈有25匝，直径8毫米，线圈长度10毫米，电感为3µH。使用320pF的电容，您可以调谐到低至4.4MHz的频率。
+
+\switchcolumn*
+
+The previous examples used air coils. But how can you use a ferrite core? Often you don't 
+have exact data on the core material properties, so you have to estimate by how much 
+the core increases the inductance or decreases the frequency. For a coil in the shortwave 
+range, with n = 18 turns, L = 12 mm, and D = 8 mm, you can estimate an inductance of 
+about 1.7 µH and a frequency of 7.3 MHz using a capacitance of 275 pF for an air coil. With 
+a variable capacitor of 275 pF and a fully inserted ferrite core, experiments show a lower 
+frequency limit of 3.7 MHz, or an inductance of about 6.8 µH. Using an adjustable screw 
+core, the frequency can be halved, and the inductance can be increased up to four times. 
+
+\switchcolumn
+
+之前的例子使用了空芯线圈。但是如何使用铁氧体磁芯呢？通常，你没有关于磁芯材料特性的确切数据，所以你必须估计磁芯增加电感或降低频率的程度。对于短波范围内的线圈，n = 18匝，L = 12毫米，D = 8毫米，对于空芯线圈，使用275pF的电容，你可以估计电感约为1.7µH，频率为7.3MHz。使用275pF的可变电容器和完全插入的铁氧体磁芯，实验显示较低的频率限制为3.7MHz，或电感约为6.8µH。使用可调节的螺钉磁芯，频率可以减半，电感可以增加多达四倍。
+
+\switchcolumn*
+
+Similarly, a longer ferrite rod for the medium-wave range can increase the inductance by 
+about ten times. Roughly speaking, for a coil on a ferrite rod to achieve the same inductance requires only about one-third of the turns of an air coil of the same size.
+
+\switchcolumn
+
+同样，用于中波范围的较长铁氧体棒可以将电感增加约十倍。粗略地说，要使铁氧体棒上的线圈达到相同的电感，只需要相同尺寸空芯线圈匝数的约三分之一。
+
+\switchcolumn*
+
+The resonant frequency of a resonant circuit can change significantly when installed in the 
+circuit. Especially at higher frequencies, line capacitances, for example, can have an effect. 
+For this reason you often have to make corrections afterwards or plan for adjustment options from the beginning, such as using screw cores or trimmers. For large changes, the 
+following rules of thumb, which can be derived directly from the formulae given and can be 
+simulated with the LCFR program, often help: doubling the number of turns causes quadruple the inductance and half the frequency with the same value of capacitance. So, the 
+frequency is inversely proportional to the number of turns. On the other hand, the frequency is inversely proportional to the square of the capacitance. Therefore, you can double the 
+frequency with a quarter of the capacitance value. For example, to tune a frequency range 
+from 1 to 3 using a variable capacitor, the capacitance ratio must be at least 1 to 9. 
+
+\switchcolumn
+
+谐振电路的谐振频率在安装到电路中时会发生显著变化。特别是在较高频率下，例如线路电容会产生影响。因此，您通常需要在事后进行校正，或从一开始就规划调整选项，例如使用螺钉磁芯或微调电容器。对于较大的变化，以下经验法则通常会有所帮助，这些法则可以直接从给出的公式推导出来，并可以用LCFR程序模拟：将匝数加倍会使电感增加四倍，在相同电容值的情况下频率减半。因此，频率与匝数成反比。另一方面，频率与电容的平方成反比。因此，您可以用四分之一的电容值将频率加倍。例如，要使用可变电容器调谐从1到3的频率范围，电容比必须至少为1:9。
+
+\switchcolumn*
+
+Let's take a closer look at the achievable bandwidth and quality with an example. Let's say 
+you have a shortwave resonant circuit with L = 3 µH, C = 240 pF, f = 5.9 MHz, RL = RC = 
+112 Ω. With a thick wire or a good ferrite core, you can achieve an unloaded quality factor 
+(Q) of 100, which means the unloaded bandwidth would be about b = 6000 kHz / 100 = 
+60 kHz. The resonant resistance would be 112 Ω × 100 = 11.2 kΩ, say roughly 10 kΩ. 
+
+\switchcolumn
+
+让我们通过一个例子更仔细地看看可实现的带宽和品质因数。假设您有一个短波谐振电路，L = 3 µH，C = 240 pF，f = 5.9 MHz，RL = RC = 112 Ω。使用粗线或良好的铁氧体磁芯，您可以实现100的无载品质因数(Q)，这意味着无载带宽约为b = 6000 kHz / 100 = 60 kHz。谐振电阻将是112 Ω × 100 = 11.2 kΩ，大约为10 kΩ。
+
+\switchcolumn*
+
+The actual losses, caused by copper resistance, are around 1 Ω, while the DC resistance is 
+much lower. However, the effective loss resistance increases due to skin effect, where the 
+RF current migrates to the thin outer layer of the conductor. To reduce losses, coils for the 
+medium and long wave bands are usually wound with multi-stranded, individually insulated 
+copper wires called "RF-Litz" wire. 
+
+\switchcolumn
+
+由铜电阻引起的实际损耗约为1Ω，而直流电阻要低得多。然而，由于趋肤效应，有效损耗电阻增加，其中RF电流迁移到导体的薄外层。为了减少损耗，中波和长波波段的线圈通常用多股、单独绝缘的铜线缠绕，称为"RF-Litz"线。
+
+\switchcolumn*
+
+In a crystal receiver, the working Q factor shouldn't be set too high to get a good output 
+volume. By loading the circuit with about 10 kΩ in parallel, you can achieve good power 
+matching and volume, with a working value of Q = 50 and a bandwidth of 120 kHz. This 
+example indicates that neighboring stations within a band will not be separated. The actual 
+value of Q also depends on the antenna used and its coupling.
+
+\switchcolumn
+
+在晶体接收器中，工作Q因子不应设置得太高，以获得良好的输出音量。通过在电路上并联约10kΩ的负载，您可以实现良好的功率匹配和音量，工作Q值为50，带宽为120kHz。这个例子表明，一个波段内的相邻电台不会被分离。Q的实际值还取决于所使用的天线及其耦合。
+
+\switchcolumn*
+
+2.7 The Vacuum Tube Detector 
+In addition to semiconductor diodes, there are also tubes that can serve the same function. A 
+typical tube diode that can be used as an RF detector is the EAA91. This is a dual diode with 
+a heater voltage of 6.3 V/0.3 A. Unlike a germanium or Schottky diode detector, a radio built 
+using this type of detector consumes a continuous 1.8 W of power just to recover the signal. 
+
+\switchcolumn
+
+2.7 真空管检波器
+除了半导体二极管外，还有可以提供相同功能的真空管。可以用作RF检波器的典型真空管二极管是EAA91。这是一个双二极管，加热电压为6.3 V/0.3 A。与锗或肖特基二极管检波器不同，使用这种检波器构建的收音机仅为了恢复信号就消耗1.8 W的连续功率。
+
+\switchcolumn*
+
+Unlike a germanium or silicon diode or even the crystal detector made from galena, the 
+tube diode does not require the signal to exceed a minimum voltage threshold before current starts to flow. Even without a positive anode voltage, some electrons will find their 
+way to the anode. A short-circuit current of about 30 µA can be measured. With a load resistance of 1 MΩ, the tube has a grid voltage of 0.5 V, thereby creating its own appropriate 
+bias voltage. 
+
+\switchcolumn
+
+与锗或硅二极管甚至由方铅矿制成的晶体检波器不同，真空管二极管不需要信号超过最小电压阈值就能开始流动电流。即使没有正阳极电压，一些电子也会找到通往阳极的路径。可以测量到约30 µA的短路电流。在1 MΩ的负载电阻下，真空管的栅极电压为0.5 V，从而产生自己适当的偏置电压。
+
+\switchcolumn*
+
+Using the two diodes in the tube together with a twin gang tuning capacitor (one range 
+value covers shortwave while the other is suitable for medium wave) and a few other components, you can build a dual-band radio covering both medium wave and shortwave. This 
+essentially builds two completely independent radios, with band switching occurring after 
+rectification. The output signal can then be fed to, for example, a set of PC active speakers. 
+The selectivity is good in both frequency bands because the rectifier circuit has very high 
+impedance. 
+
+\switchcolumn
+
+使用真空管中的两个二极管，加上一个双连调谐电容器（一个范围值覆盖短波，另一个适合中波）和其他一些组件，您可以构建一个覆盖中波和短波的双波段收音机。这实际上构建了两个完全独立的收音机，波段切换发生在整流之后。然后，输出信号可以馈送到例如一组PC有源扬声器。由于整流电路具有非常高的阻抗，两个频段的选择性都很好。
+
+\switchcolumn*
+
+Figure 3.18: Tube Detector for two wave bands. 
+
+\switchcolumn
+
+图3.18：两个波段的真空管检波器。
+
+\switchcolumn*
+
+The two-band radio is coupled to the antenna through small coupling capacitors of around 
+30 pF. With a sufficiently long antenna, you can receive numerous stations. Distant European stations can be heard on shortwave and medium wave, especially in the evening. 
+
+\switchcolumn
+
+双波段收音机通过约30 pF的小耦合电容器耦合到天线。使用足够长的天线，您可以接收许多电台。在短波和中波上可以听到远处的欧洲电台，尤其是在晚上。
+
+\switchcolumn*
+
+2.8 Diode Radio with Active Regeneration 
+You have seen that a simple shortwave detector is not very sensitive or selective but with 
+the help of a regeneration circuit, its performance can be significantly improved. The additional circuit can compensate for losses in the oscillator circuit. With this design, the RF 
+signal is amplified by a transistor and fed back (in phase) into the oscillating receive coil. 
+With carefully adjusted amplification, the feedback can compensate for all losses. In this 
+state the oscillating circuit will be optimally damped and have a very high quality factor up 
+to about Q = 1000. This high Q factor means that broadcast stations only 10 kHz apart can 
+be separated and very weak stations will be easily picked up. 
+
+\switchcolumn
+
+2.8 带有有源再生的二极管收音机
+您已经看到，简单的短波检波器不是很灵敏或选择性强，但借助再生电路，其性能可以显著提高。附加电路可以补偿振荡电路中的损耗。在这种设计中，RF信号由晶体管放大并（同相）反馈到振荡接收线圈中。通过仔细调整放大，反馈可以补偿所有损耗。在这种状态下，振荡电路将得到最佳阻尼，并具有高达约Q = 1000的非常高品质因数。这种高Q因数意味着相距仅10 kHz的广播电台可以被分离，非常弱的电台也会被轻易接收到。
+
+\switchcolumn*
+
+Figure 2.19: Detector with added feedback. 
+
+\switchcolumn
+
+图2.19：带有附加反馈的检波器。
+
+\switchcolumn*
+
+The regeneration feedback is produced here using an NPN transistor but you could also use 
+a tube. Even with this regeneration circuit the radio is still classed as a detector receiver. 
+It's only when the tube or transistor itself also replaces the function of the detector diode 
+that the radio becomes an Audion receiver. Audion refers back to Lee De Forest's patent 
+which turned out to be the prototype of the triode vacuum tube. Up until then crystal detectors were all you had to demodulate radio signals. De Forest's Audion tube took care of 
+demodulation and amplification of the recovered baseband signal. 
+
+\switchcolumn
+
+这里使用NPN晶体管产生再生反馈，但您也可以使用真空管。即使有这种再生电路，收音机仍被归类为检波器接收器。只有当真空管或晶体管本身也取代检波器二极管的功能时，收音机才成为Audion接收器。Audion指的是Lee De Forest的专利，它被证明是三极管真空管的原型。在那之前，晶体检波器是您解调无线电信号的唯一选择。De Forest的Audion管负责解调并放大恢复的基带信号。
+
+\switchcolumn*
+
+The feedback circuit used here could essentially be almost any oscillator circuit. Here, a 
+Hartley oscillator with emitter feedback is used because the necessary coil taps are already 
+available on the receiver coil. An alternative is the circuit shown further down in section 4.4 
+which uses two PNP transistors.
+
+\switchcolumn
+
+这里使用的反馈电路本质上可以是几乎任何振荡电路。这里使用带有发射极反馈的Hartley振荡器，因为接收线圈上已经有必要的线圈抽头。另一种选择是下面第4.4节中显示的使用两个PNP晶体管的电路。
+
+\switchcolumn*
+
+Figure 2.20: Testing the design built on a breadboard. 
+
+\switchcolumn
+
+图2.20：在面包板上测试设计。
+
+\switchcolumn*
+
+This circuit can be easily connected to an amplifier, such as a set of active PC speakers, 
+making it a great shortwave radio. The antenna doesn't need to be very long — a roughly 
+one meter long whip should do. To use the receiver, you tune it to a station and adjust the 
+regeneration level until good output volume is achieved. If you crank up the regen pot too 
+far, the set will burst into oscillation and what you thought was a receiver has now become 
+a small carrier wave transmitter. The coil providing the feedback to the receiver coil is also 
+known as a 'tickler' coil and can be electrically separate from the main coil. 
+
+\switchcolumn
+
+这个电路可以很容易地连接到放大器，例如一组有源PC扬声器，使其成为一个很好的短波收音机。天线不需要很长——大约一米长的鞭状天线就足够了。要使用接收器，您可以将其调谐到一个电台并调整再生水平，直到获得良好的输出音量。如果您将再生电位器调得太远，设备会突然振荡，您认为是接收器的东西现在变成了一个小型载波发射器。向接收线圈提供反馈的线圈也被称为'tickler'线圈，可以与主线圈电气分离。
+
+\switchcolumn*
+
+When properly adjusted, the regenerative receiver can hold its own against any conventional shortwave radio. The audio is quite pleasant, and unlike a simple superheterodyne 
+radio, there are no interference noises due to poor image rejection. During periods of 
+strong signal fading, there isn't any unpleasant sound distortion, just temporary reductions 
+in signal strength. 
+
+\switchcolumn
+
+正确调整后，再生接收器可以与任何传统的短波收音机相媲美。音频相当令人愉快，而且与简单的超外差收音机不同，没有由于图像抑制不良而产生的干扰噪声。在信号强烈衰落期间，没有任何令人不愉快的声音失真，只是信号强度的暂时降低。
+
+\switchcolumn*
+
+For those who think that a detector receiver using a battery and amplifier is cheating, don't 
+worry — you can remove the battery and connect a crystal earphone instead. The radio still 
+functions without the active regeneration signal, but with far less sensitivity.
+
+\switchcolumn
+
+对于那些认为使用电池和放大器的检波器接收器是作弊的人，不用担心——您可以移除电池并连接晶体耳机代替。收音机在没有有源再生信号的情况下仍然可以工作，但灵敏度要低得多。
+
+\end{paracol}
+
+\backmatter
+
+\end{document}

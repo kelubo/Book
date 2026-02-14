@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_76">4.2.7　用户cookie模块</h3> 
+ <p class="ziti3">模块名称：ngx_http_userid_module</p> 
+ <p class="ziti3">用户cookie模块的作用是为客户端设置cookie以标识不同的访问用户。可以通过内部变量$uid_got和$uid_set记录已接收和设置的cookie。该模块的内置配置指令如表4-29～表4-36所示。</p> 
+ <p class="middle-img">表4-29　用户cookie指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-29.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-29.jpg" class="calibre158"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/110-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/110-i.jpg" class="calibre159"/></a> 
+ </div> 
+ <p class="ziti4">·当指令值为off时，关闭用户cookie接收和记录功能。</p> 
+ <p class="ziti4">·当指令值为on时，启用用户cookie接收和记录功能，默认为v2版本设置cookie。设置cookie的响应头标识为Set-Cookie2。</p> 
+ <p class="ziti4">·当指令值为v1时，使用v1版本设置cookie，设置cookie的响应头标识为Set-Cookie。</p> 
+ <p class="ziti4">·当指令值为log时，不设置用户cookie，但对接收到的cookie进行记录。</p> 
+ <p class="middle-img">表4-30　用户cookie域指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-30.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-30.jpg" class="calibre114"/></a> 
+ </div> 
+ <p class="middle-img">表4-31　用户cookie过期指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-31.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-31.jpg" class="calibre160"/></a> 
+ </div> 
+ <p class="middle-img">表4-32　用户cookie标识指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-32.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-32.jpg" class="calibre161"/></a> 
+ </div> 
+ <p class="ziti4">·用作标记的指令值可以是任意英文字母（区分大小写）、数字或“=”。</p> 
+ <p class="ziti4">·userid_mark设置完成后，将与用户cookie中传送的Base64格式的标识的第一个字符进行比较，如果不匹配，则重新发送用户标识、userid_p3p及cookie的过期时间。</p> 
+ <p class="middle-img">表4-33　用户cookie名称指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-33.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-33.jpg" class="calibre162"/></a> 
+ </div> 
+ <p class="middle-img">表4-34　用户p3p指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-34.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-34.jpg" class="calibre13"/></a> 
+ </div> 
+ <p class="ziti3">P3P是W3C推荐的隐私保护标准，P3P头属性字段通常用于解决与支持P3P协议的浏览器的跨域访问问题。</p> 
+ <p class="middle-img">表4-35　用户cookie路径指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-35.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-35.jpg" class="calibre163"/></a> 
+ </div> 
+ <p class="middle-img">表4-36　用户cookie源服务器指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-36.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-36.jpg" class="calibre164"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 8083;
+    server_name example.com;
+    root /opt/nginx-web;
+
+    auth_request /auth;
+
+    userid         on;
+    userid_name    uid;
+    userid_domain  example.com;
+    userid_path    /;
+    userid_expires 1d;
+    userid_p3p     'policyref="/w3c/p3p.xml", CP="CUR ADM OUR NOR STA NID"';
+
+    location / {
+        index  index.html index.htm;
+        add_header    Set-Cookie "username=$remote_user";
+    }
+    location /auth {
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header X-Original-URI $request_uri;
+        proxy_pass http://192.168.2.145:8080/HttpBasicAuth.php;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

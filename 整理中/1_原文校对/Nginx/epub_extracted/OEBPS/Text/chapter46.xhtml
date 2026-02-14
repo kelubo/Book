@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_53">3.3.1　初始化服务</h3> 
+ <p class="ziti3">本节主要介绍与HTTP虚拟主机服务的建立、端口监听及监听方式等服务初始化有关的配置指令。</p> 
+ <p class="ziti3">表3-22为端口监听指令及其相关说明。</p> 
+ <p class="middle-img">表3-22　端口监听指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-22.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-22.jpg" class="calibre53"/></a> 
+ </div> 
+ <p class="ziti4">·Nginx服务通过listen指令的指令值监听网络请求，可以是IP协议的形式，也可以是UNIX域套接字。如果不设置listen指令，Nginx在以超级用户运行时则监听80端口，以非超级用户运行时则监听8000端口。</p> 
+ <p class="ziti4">·listen指令的指令值还针对监听方式提供了丰富的参数，如表3-23所示。</p> 
+ <p class="middle-img">表3-23　listen指令的指令值</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-23.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-23.jpg" class="calibre54"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/050-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/050-i.jpg" class="calibre55"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server {
+        listen 127.0.0.1:8000;           # 监听127.0.0.1的8000端口
+        listen 127.0.0.1;                # 监听127.0.0.1的默认80端口（root权限）
+        listen 8000;                     # 监听本机所有IP的8000端口
+        listen *:8000;                   # 监听本机所有IP的8000端口
+        listen localhost:8000;           # 监听locahost的8000端口
+        listen [::]:8000;                # 监听IPv6的8000端口
+        listen [::1];                    # 监听IPv6的回环IP的默认80端口(root权限)
+        listen unix:/var/run/nginx.sock; # 监听域套接字文件
+
+        listen *:8000 \                  # 监听本机的8000端口
+                default_server \         # 当前服务是http指令域的主服务
+                fastopen=30 \            # 开启fastopen功能并限定最大队列数为30
+                deferred \               # 拒绝空数据连接
+                reuseport \              # 工作进程共享socket这个监听端口
+                backlog=1024 \           # 请求阻塞时挂起队列数是1024个
+                so_keepalive=on;         # 当socket为保持连接时，开启状态检测功能
+
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">表3-24～表3-34给出了与端口监听方式等服务初始化有关的配置指令。</p> 
+ <p class="middle-img">表3-24　关闭保持连接指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-24.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-24.jpg" class="calibre56"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    keepalive_disable none;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">保持连接机制可以使同一客户端的多个HTTP请求复用TCP连接，减少TCP握手次数和并发连接数，从而降低服务器资源消耗。</p> 
+ <p class="middle-img">表3-25　保持连接复用请求数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-25.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-25.jpg" class="calibre57"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    keepalive_requests 1000;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-26　保持连接超时指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-26.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-26.jpg" class="calibre58"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    keepalive_timeout 75s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">keepalive_timeout的设定需要根据具体的场景来考虑，最重要的是要理解保持连接的工作方式与场景需求的匹配情况。</p> 
+ <p class="middle-img">表3-27　保持连接时最快发数据指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-27.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-27.jpg" class="calibre59"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    tcp_nodelay off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-28　域名解析服务器指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-28.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-28.jpg" class="calibre60"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    resolver 127.0.0.1 [::1]:5353 valid=30s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·指令值参数valid：用于设置缓存解析结果的时间。</p> 
+ <p class="ziti4">·指令值参数ipv6：默认配置下，Nginx将在解析域名的同时查找IPv4和IPv6地址。设置参数ipv6=off，可以关闭IPv6地址的查找。</p> 
+ <p class="ziti4">·指令值参数status_zone：设置收集指定区域请求和响应的DNS服务器统计信息，仅商业版本有效。</p> 
+ <p class="middle-img">表3-29　域名解析超时指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-29.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-29.jpg" class="calibre61"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    resolver_timeout 5s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-30　主机名指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-30.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-30.jpg" class="calibre62"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http { 
+    server { 
+        server_name example.com .example.com; # 泛域名的使用
+        server_name www.example.;                   # 多个后缀域名的使用server_name
+        www.example.com ~^www.example.com$;        # 正则表达式匹配
+        # 正则匹配变量的场景
+        server_name ~^(www\.)?(.+)$;
+        location / {
+            root /sites/$2;
+        }
+
+        # 正则匹配为变量的场景
+        server_name ~^(www\.)?(?&lt;domain&gt;.+)$;
+        location / {
+            root /sites/$domain;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">当server_name指令值中有多个主机名时，第一个主机名为首主机名。</p> 
+ <p class="middle-img">表3-31　主机名哈希表最大值指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-31.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-31.jpg" class="calibre63"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server_names_hash_max_size 1024;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-32　主机名哈希桶最大值指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-32.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-32.jpg" class="calibre64"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server_names_hash_bucket_size 128;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-33　变量哈希表最大值指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-33.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-33.jpg" class="calibre65"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    variables_hash_max_size 1024;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-34　变量哈希桶最大值指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-34.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-34.jpg" class="calibre66"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    variables_hash_bucket_size 128;
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">18.7.3　检测MySQL集群主从复制状况</h3>
+<hr/>
+<pre class="ziti1">masterha_check_repl --conf=/etc/mha/app1.cnf
+#当看到出现‘MySQL Replication Health is OK’字样，则证明主从复制没有问题。
+#启动MHA
+nohup masterha_manager --conf=/etc/mha/app1.cnf --remove_dead_master_conf --ignore_last_failover &lt; /dev/null &gt; /var/log/mha/app1/manager.log 2&gt;&amp;1 &amp;
+#--conf指定配置文件。
+#--remove_dead_master_conf在配置文件中删除宕机的master信息。
+#--ignore_last_failover忽略上一次故障切换。</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_7">1.1.4　扩展版本OpenResty</h3> 
+ <p class="ziti3">OpenResty是基于Nginx开源版本的扩展版本，它利用Nginx的模块特性，使Nginx支持Lua语言的脚本编程，鉴于Lua本身嵌入应用程序中增强应用程序扩展和定制功能的设计初衷，开源版本Nginx的可编程性得到大大增强。</p> 
+ <p class="ziti3">据OpenResty官网介绍，2017年全球互联网中至少有23万台主机正在使用Nginx的OpenResty版本作为Web服务器或网关应用。OpenResty®是一个基于Nginx与Lua的高性能Web平台，其内部集成了大量精良的Lua库、第三方模块以及大多数依赖项，以便搭建能够处理超高并发、扩展性极高的动态Web应用、Web服务和动态网关。OpenResty®通过汇聚各种设计精良的Nginx模块（主要由OpenResty团队自主开发），将Nginx变成一个强大的通用Web应用平台。这样，Web开发人员和系统工程师就可以使用Lua脚本语言调动Nginx支持的各种C模块及Lua模块，快速构造出足以胜任一万乃至百万以上单机并发连接的高性能Web应用系统。OpenResty®的目标是让Web服务直接运行在Nginx服务内部，充分利用Nginx的非阻塞I/O模型，不仅对HTTP客户端请求，还对远程后端如MySQL、PostgreSQL、Memcached及Redis等都进行一致的高性能响应。</p> 
+ <p class="ziti3">OpenResty构架在Nginx和LuaJIT的基础之上，利用Nginx的模块特性集成了大量Lua支持库，用户可以很方便地使用Lua编程语言对Nginx的功能进行扩展和增强。OpenResty通过基于Nginx优化的ngx.location.capture_multi功能，可以非阻塞地并行转发多个子请求给后端服务器，当后端服务器返回数据时进行相应的归类和排序处理，进而有效提升客户端的请求响应速度。在OpenResty代码架构中，其代码以ngx_lua模块的形式嵌入Nginx代码中，从而使用户编写的Lua代码与Nginx进程协同工作。OpenResty为每个Nginx工作进程（Worker Process）创建了一个Lua虚拟机（LuaVM），如图1-1所示，并将Nginx I/O原语封装注入Lua虚拟机中供Lua代码访问，每个外部请求都由Lua虚拟机产生一个Lua协程（coroutine）进行处理，协程之间彼此数据隔离并共享对应的Lua虚拟机。当Lua代码调用异步接口时，会挂起当前协程以不阻塞Nginx工作进程，等异步接口处理完成时再还原当前协程继续运行。</p> 
+ <p class="ziti3">OpenResty项目开始于2007年10月，最早是为雅虎中国搜索部门开发的项目，后由章亦春进行开发和维护，并得到了国内外诸多企业的应用，目前主要由OpenResty软件基金会和OpenResty Inc.公司提供支持。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/1-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/1-1.jpg" class="calibre2"/></a> 
+ </div> 
+ <p class="middle-img">图1-1　OpenResty Lua虚拟机<br class="calibre3"/></p> 
+</body>
+</html>

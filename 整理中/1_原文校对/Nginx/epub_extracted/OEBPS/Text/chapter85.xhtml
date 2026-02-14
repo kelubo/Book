@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_94">5.2.4　HTTPS会话缓存</h3>
+
+  <p class="ziti3">HTTPS建立连接时传递证书及协商会话密钥会占用一定资源，为加快HTTPS建立连接的速度，提升性能，TLS协议使用了会话缓存机制。会话缓存机制可以使已经断开连接的HTTPS会话重用之前的协商会话密钥继续HTTPS数据传输。会话缓存机制有两种实现方式：会话编号（Session ID）和会话凭证（Session Ticket）。</p>
+
+  <p class="ziti3">（1）会话编号</p>
+
+  <p class="ziti3">服务端在与客户端进行数据传输时，会为每次会话生成一个会话编号，并存储该会话编号与会话协商数据。HTTPS会话中断需要重新连接时，客户端将最后一次会话的会话编号发送给服务端，服务端检查存储中该编号是否存在，如果存在就与客户端使用原有的会话密钥进行数据传输。配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;
+    ssl_certificate_key ssl/www_nginxbar_org.key;
+    ssl_password_file ssl/www_nginxbar_org.pass;
+
+    ssl_session_cache shared:SSL:10m;               # HTTPS会话缓存存储大小为10MB
+    ssl_session_tickets off;                        # 以会话编号机制实现会话缓存
+    ssl_session_timeout 10m;                        # 会话缓存超时时间为10分钟
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">这里作以下两点说明。</p>
+
+  <p class="ziti4">·服务端会存储会话编号和会话协商数据，相对会消耗服务器资源。</p>
+
+  <p class="ziti4">·当Nginx服务器为多台时，无法实现会话共享。</p>
+
+  <p class="ziti3">（2）会话凭证</p>
+
+  <p class="ziti3">会话凭证类似于cookie，它将协商的通信数据加密之后发送给客户端保存，服务端只保存密钥。HTTPS建立连接后，服务端发送一个会话凭证给客户端，当需要重新连接时，客户端发送会话凭证与服务端恢复会话连接。配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;
+    ssl_certificate_key ssl/www_nginxbar_org.key;
+    ssl_password_file ssl/www_nginxbar_org.pass;
+
+    ssl_session_cache shared:SSL:10m;               # HTTPS会话缓存存储大小为10MB
+    ssl_session_tickets off;                        # 以会话凭证机制实现会话缓存
+    ssl_session_timeout 10m;                        # 会话缓存超时时间为10分钟
+    ssl_session_ticket_key ssl/session_ticket.key;  # 会话凭证密钥文件
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">ssl_session_ticket_key可以实现多台Nginx间共用会话缓存，解决了会话缓存共享问题，可通过如下命令生成：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">openssl rand 80 &gt; /etc/nginx/conf/ssl/session_ticket.key
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

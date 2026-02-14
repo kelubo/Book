@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.2.4　配置并启动MySQL数据库</h3>
+<p class="ziti">1）设置MySQL启动脚本：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.40]# pwd
+/home/oldboy/tools/mysql-5.6.40
+[root@oldboy mysql-5.6.40]# cp support-files/mysql.server /etc/init.d/mysqld
+#&lt;==将mysql启动脚本复制到mysql的命令路径。
+[root@oldboy mysql-5.6.40]# chmod 700 /etc/init.d/mysqld  #&lt;==使脚本可执行，注意权限要小一些。
+[root@oldboy mysql-5.6.40]# ls -l /etc/init.d/mysqld
+-rwx------. 1 root root 10619 May 10 00:20/etc/init.d/mysqld
+#提示：老男孩开发了一个专业、规范，且相对简单的Shell版MySQL服务启动脚本，地址如下：
+http://oldboy.blog.51cto.com/2561410/1945183</pre>
+<hr/>
+<p class="ziti">2）启动MySQL数据库：</p>
+<hr/>
+<pre class="ziti1">#&lt;==这是启动数据库规范方法之一,还可以使用” /application/mysql/bin/mysqld_safe
+    --user=mysql &amp;”启动。这个命令结尾 “&amp;”符号的作用是，在后台执行mysql服务，这条
+    命令执行完 还需要按下回车才能进入到命令行状态。
+#&lt;==注意，如果已经执行了上面的/etc/init.d/mysqld start启动命令，还想尝试下面mysqld_
+     safe的命令，请先执行/etc/init.d/mysqld stop结束mysql进程。
+[root@oldboy mysql-5.6.40]# /etc/init.d/mysqld start
+Starting MySQL. SUCCESS!</pre>
+<hr/>
+<p class="ziti">特别提示：这里有一个大坑，就是数据库可能会无法启动，报错信息如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.40]# /etc/init.d/mysqld start
+Starting MySQL.Logging to '/application/mysql-5.6.40/data/oldboy.err'.
+180510 00:21:04 mysqld_safe Directory '/application/mysql-5.6.40/tmp' for UNIX socket file don't exists.
+ ERROR! The server quit without updating PID file (/application/mysql-5.6.40/data/oldboy.pid).
+提示：/application/mysql-5.6.40/tmp目录不存在，5.6.34前的早期版本没事。</pre>
+<hr/>
+<p class="ziti">解决办法：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.40]# mkdir -p /application/mysql-5.6.40/tmp
+#&lt;==编译时指定的socket路径。
+[root@oldboy mysql-5.6.40]# chown -R mysql.mysql /application/mysql/
+[root@oldboy mysql-5.6.40]# /etc/init.d/mysqld start
+Starting MySQL. SUCCESS!</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 禁止使用kill-9、killall-9等命令强制杀死数据库，这会引起数据库无法启动等故障发生。企业中曾发生过的血的教训案例请看<a href="http://oldboy.blog.51cto.com/2561410/1431161">http://oldboy.blog.51cto.com/2561410/1431161</a>
+ 。</p>
+<p class="ziti">3）检查MySQL数据库是否启动：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# netstat -lntup|grep mysql
+tcp        0      0 :::3306           :::*         LISTEN    48065/mysqld</pre>
+<hr/>
+<p class="ziti">如果发现3306端口没起来，则请使用tail-100/application/mysql/data/机器名.err检查日志报错进行调试。经常查看服务运行日志是个很好的习惯，也是高手的习惯。</p>
+<p class="ziti">4）查看MySQL数据库启动结果日志：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# tail /application/mysql/data/oldboy.err
+2018-05-10 17:38:36 48065 [Note] InnoDB: Waiting for purge to start
+2018-05-10 17:38:36 48065 [Note] InnoDB: 5.6.40 started; log sequence number 1625987
+2018-05-10 17:38:36 48065 [Warning] No existing UUID has been found, so we assume that this is the first time that this server has been started. Generating a new UUID: 4f94404a-fc74-11e6-8112-000c292ece3f.
+2018-05-10 17:38:36 48065 [Note] Server hostname (bind-address): '*'; port: 3306
+2018-05-10 17:38:36 48065 [Note] IPv6 is available.
+2018-05-10 17:38:36 48065 [Note]   - '::' resolves to '::';
+2018-05-10 17:38:36 48065 [Note] Server socket created on IP: '::'.
+2018-05-10 17:38:36 48065 [Note] Event Scheduler: Loaded 0 events
+2018-05-10 17:38:36 48065 [Note] /application/mysql-5.6.40/bin/mysqld: ready for connections.
+Version: '5.6.34'  socket: '/application/mysql-5.6.40/tmp/mysql.sock'  port: 3306  Source distribution</pre>
+<hr/>
+<p class="ziti">本例查看了错误日志的命令及错误日志中的内容，这里省略了大部分日志内容，只给出了默认的10行，如果有错误，一般会显示error字样。</p>
+<p class="ziti">5）设置MySQL开机自启动：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# chkconfig --add mysqld
+[root@oldboy ~]# chkconfig --list mysqld
+mysqld               0:off       1:off      2:on      3:on      4:on      5:on      6:off</pre>
+<hr/>
+<p class="ziti">此外，将启动命令/etc/init.d/mysqld start放到/etc/rc.local里面也可以实现开机自启动。</p>
+<p class="ziti">若MySQL安装及使用出现故障，则可根据下面的分析思路进行检查。</p>
+<p class="ziti6">·细看所有步骤执行命令返回的屏幕输出，不要忽略关键的输出内容。</p>
+<p class="ziti6">·查看mysql错误日志/application/mysql/data/机器名.err。</p>
+<p class="ziti6">·辅助查看系统日志/var/log/messages。</p>
+<p class="ziti6">·如果是MySQL关联了其他服务，则还要同时查看相关服务的日志。</p>
+<p class="ziti6">·仔细阅读，重新查看所有操作的步骤是否正确，书写的命令及字符是否都正确。</p>
+<p class="ziti">经常查看各种服务运行日志是个很好的习惯，也是成长为高手的必经之路！</p>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">10.3　普通查询日志的介绍与配置</h2>
+<p class="p6">1.普通查询日志的介绍</p>
+<p class="ziti">普通查询日志的作用是记录客户端连接信息，以及执行的SQL语句信息。</p>
+<p class="p6">2.普通查询日志的功能配置</p>
+<p class="ziti">可能官方考虑到普通查询日志的重要性比较低，因此默认情况下普通查询日志是关闭状态，如下所示：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'general_log%';
++------------------+-------------------------------------------+
+| Variable_name    | Value                                     |
++------------------+-------------------------------------------+
+| general_log      | OFF                                       |
+| general_log_file | /application/mysql-5.6.40/data/oldboy.log |
++------------------+-------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">可以执行在线修改的命令使其临时生效：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; set global general_log = on;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show variables like 'general_log%';
++------------------+-------------------------------------------+
+| Variable_name    | Value                                     |
++------------------+-------------------------------------------+
+| general_log      | ON                                        |
+| general_log_file | /application/mysql-5.6.40/data/oldboy.log |
++------------------+-------------------------------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">如果希望永久生效，则可以把参数写入my.cnf的配置文件里的[mysqld]模块下：</p>
+<hr/>
+<pre class="ziti1">general_log = on
+general_log_file = /application/mysql-5.6.40/data/oldboy.log</pre>
+<hr/>
+<p class="p6">3.普通查询日志示例</p>
+<p class="ziti">可在执行几个操作后，观察查询日志文件的变化：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# tail oldboy.log
+/application/mysql-5.6.40/bin/mysqld, Version: 5.6.40-log (Source distribution). started with:
+Tcp port: 3306  Unix socket: /application/mysql-5.6.40/tmp/mysql.sock
+Time                 Id Command    Argument
+180319 19:53:47         67 Query      show variables like 'general_log%'
+180319 19:55:45         67 Query      show variables like 'log_error%'
+180319 19:55:52         67 Query      select * from oldboy.test
+180319 19:55:57         67 Quit</pre>
+<hr/>
+<p class="p6">4.普通查询日志的生产使用建议</p>
+<p class="ziti">在高并发数据库的场景下，普通查询日志应该是关闭状态的（默认也是关闭的），主要是因为查询日志的信息量很大，容易导致磁盘I/O性能问题。当访问量不是很大，而企业又有审计执行的SQL语句的需求时，可以考虑开启该功能。</p>
+</body>
+</html>

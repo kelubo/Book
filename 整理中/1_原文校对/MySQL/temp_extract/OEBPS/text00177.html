@@ -1,0 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">12.7.6　InnoDB引擎调优的基本方法</h3>
+<p class="ziti">1）主键应尽可能小，以避免对Secondary index带来过大的空间负担。</p>
+<p class="ziti">2）建立有效索引避免全表扫描，因为会使用表锁。</p>
+<p class="ziti">3）尽可能缓存所有的索引和数据，提高响应速度，减少磁盘IO消耗。</p>
+<p class="ziti">4）在进行大批量小插入的时候，应尽量自己控制事务而不要使用autocommit自动提交。若有开关则可以控制提交方式。</p>
+<p class="ziti">5）合理设置innodb_flush_log_at_trx_commit参数值，不要过度追求安全性。</p>
+<p class="ziti">6）应避免主键更新，因为这会带来大量的数据移动。</p>
+</body>
+</html>

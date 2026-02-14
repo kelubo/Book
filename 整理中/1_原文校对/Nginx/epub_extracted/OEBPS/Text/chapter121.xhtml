@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_132">6.3.3　gRPC反向代理配置</h3> 
+ <p class="ziti3">gRPC是基于HTTP/2协议的，所以Nginx的gRPC代理需要启用HTTP/2，然后gRPC客户端将请求发送到Nginx。Nginx为gRPC服务提供了一个稳定的网关。其部署方式如图6-6所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/6-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/6-6.jpg" class="calibre248"/></a> 
+ </div> 
+ <p class="middle-img">图6-6　gRPC代理</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen  8080 http2;                               # 设置监听端口为8080并启用http/2协议支持
+    access_log /var/log/nginx/grpc_access.log main;
+    location / {
+        grpc_pass grpc://192.168.2.145:50051;         # 设置gRPC服务器
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">gRPC模块同样提供对后端SSL gRPC服务器的反向代理，配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen  80 http2;                                 # 设置监听端口为80并启用http/2协议支持
+    access_log /var/log/nginx/grpcs_access.log main;
+    grpc_ssl_verify off;                              # 关闭对gRPC服务器的SSL证书验证
+    grpc_ssl_session_reuse on;                        # 设置gRPC服务器
+    location / {
+        grpc_pass grpcs://192.168.2.145:50051;        # 设置SSL gRPC服务器
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx可以通过HTTP协议的SSL证书，对外提供安全的gRPC代理转发，部署方式为客户端→Nginx服务器（HTTPS）→被代理服务器（SSL gRPC）。配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 443 ssl http2 default_server;         # 设置监听端口为443并启用SSL及HTTP/2协议支持
+    access_log /var/log/nginx/grpcs_access.log main;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;    # 网站证书文件
+    ssl_certificate_key ssl/www_nginxbar_org.key;# 网站证书密钥文件
+
+    grpc_ssl_verify off;
+    grpc_ssl_session_reuse on;
+    location / {
+        grpc_pass grpcs://192.168.2.145:50051;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

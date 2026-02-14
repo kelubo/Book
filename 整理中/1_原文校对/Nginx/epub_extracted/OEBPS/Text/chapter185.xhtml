@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_199">10.4.4　监控TCP/UDP主机状态</h3> 
+ <p class="ziti3">TCP/UDP主机状态模块nginx-module-sts虽然也提供了Prometheus格式数据输出，但仍然不够详细，同时也没有可用的开源Exporter。为实现Nginx TCP/UDP主机状态数据的采集，可以按照Prometheus的数据规范编写一个Exporter。</p> 
+ <p class="ziti3">（1）Prometheus的数据类型</p> 
+ <p class="ziti4">·计数类型（Counter）：计数类型用于累加值，一直增加或一直减少，重启进程后，会被重置。如记录请求次数、错误发生次数等。</p> 
+ <p class="ziti4">·计量类型（Gauge）：计量类型用于常规数值，用以表示瞬间状态的数值，可大可小，重启进程后，会被重置，如硬盘空间、内存使用等。</p> 
+ <p class="ziti4">·直方图（Histogram）：直方图可以理解为柱状图，常用于表示一段时间内数据的采样，能够对其指定区间及总数进行统计。</p> 
+ <p class="ziti4">·合计统计（Summary）：合计统计和直方图相似，常用于表示一段时间内数据采样的结果。Histogram需要通过_bucket计算quantile（按百分比划分跟踪的结果），而Summary直接存储了quantile的值。</p> 
+ <p class="ziti3">（2）Exporter数据输出格式</p> 
+ <p class="ziti3">Exporter输出的数据是以Metric行为单位的文本数据，数据输出格式规范如下。</p> 
+ <p class="ziti4">·Exporter输出数据的Content-Type必须是text类型（text/plain）。</p> 
+ <p class="ziti4">·Exporter输出内容以行为单位，空行将被忽略，文本内容最后一行为空行。</p> 
+ <p class="ziti4">·每个输出监控数据的行被称为Metric行，每一行文本的最后不能有空格，否则会不被识别。</p> 
+ <p class="ziti4">·以“# HELP”开头的行为注释行，表示帮助信息。</p> 
+ <p class="ziti4">·以“# TYPE”开头的行为类型声明行，用以声明至下一个注释行间Metric数据的数据类型。</p> 
+ <p class="ziti3">类型声明与注释行间的文本为Metric数据，每行结构如图10-6所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-6.jpg" class="calibre316"/></a> 
+ </div> 
+ <p class="middle-img">图10-6　Metric数据行结构</p> 
+ <p class="ziti3">（3）编写Exporter脚本</p> 
+ <p class="ziti3">Python下的prometheus_client模块可以实现Prometheus Exporter的快速开发，因Prome-theus是采用拉取方式获取监控数据的，所以还需要用flask实现Web框架和访问路由功能。脚本代码如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">import prometheus_client
+from prometheus_client import Counter,Gauge
+import requests
+import sys
+import json
+import time
+from flask import Response, Flask
+
+# 初始化监控项
+nginx_info = Gauge("nginx_info", "nginx_info nginx info",['hostName','nginxVersion'])
+nginx_server_info = Gauge("nginx_server_info", "nginx_server_info nginx server info",['host','port','protocol'])
+nginx_server_connections = Gauge("nginx_server_connections", "nginx connections", ['status'])
+nginx_server_bytes = Counter("nginx_server_bytes","request/response bytes", ['direction','host'])
+nginx_upstream_responses = Counter("nginx_upstream_requests","requests counter", ['backend','code','upstream'])
+
+app = Flask(__name__)
+
+@app.route("/metrics")
+def requests_metrics():
+    metrics=""
+    url = "http://127.0.0.1:8080/sts/format/json"
+    res = requests.get(url)
+    all_data = json.loads(json.dumps(res.json()))
+
+    # server_info
+    nginx_info.labels(hostName=all_data["hostName"],nginxVersion=all_data["nginx-Version"]).set(time.time())
+    metrics+=prometheus_client.generate_latest(nginx_info)
+
+    # connections
+    connections=["accepted","active","handled","reading","requests","waiting", "writing"]
+    for con in connections:
+        nginx_server_connections.labels(status=con).set(all_data["connections"][con])
+    metrics+=prometheus_client.generate_latest(nginx_server_connections)
+
+    # streamServerZones
+    for k,streamServer in all_data["streamServerZones"].items():
+        nginx_server_bytes.labels(direction="in",host=k).inc(streamServer["inBytes"])
+        nginx_server_bytes.labels(direction="out",host=k).inc(streamServer["outBytes"])
+        nginx_server_info.labels(host=k,port=streamServer["port"],protocol=stream-Server["protocol"]).set(1)
+
+    metrics+=prometheus_client.generate_latest(nginx_server_bytes)
+    metrics+=prometheus_client.generate_latest(nginx_server_info)
+
+    # streamUpstreamZones
+    status_code=["1xx","2xx","3xx","4xx","5xx"]
+    for ups,stream in all_data["streamUpstreamZones"].items():
+        for v in stream:
+            for code in status_code:
+                nginx_upstream_responses.labels(backend=v["server"],code=code,up-stream=ups).inc(v["responses"][code])
+
+    metrics+=prometheus_client.generate_latest(nginx_upstream_responses)
+
+    return Response(metrics,mimetype="text/plain")
+
+@app.route('/')
+def index():
+    html='''&lt;html&gt;
+            &lt;head&gt;&lt;title&gt;Nginx sts Exporter&lt;/title&gt;&lt;/head&gt;
+            &lt;body&gt;
+            &lt;h1&gt;Nginx sts Exporter&lt;/h1&gt;
+            &lt;p&gt;&lt;a href="/metrics"&gt;Metrics&lt;/a&gt;&lt;/p&gt;
+            &lt;/body&gt;
+            &lt;/html&gt;'''
+    return html
+
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port= 9912,
+        debug=True
+        )
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在此处只选了几个监控项做样例，感兴趣的读者可继续补充完整。</p> 
+ <p class="ziti3">（4）Exporter脚本部署</p> 
+ <p class="ziti3">将Exporter脚本保存为/usr/local/nginx/sbin/nginx-sts-exporter.py。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 配置运行环境
+yum install python2-pip
+pip install prometheus_client requests flask
+
+# 运行Exporter
+python /usr/local/nginx/sbin/nginx-sts-exporter.py
+
+# 测试
+curl http://127.0.0.1:9912/metrics
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（5）在Prometheus上配置监控job</p> 
+ <p class="ziti3">具体配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cd /opt/data/apps
+cat&gt;&gt;prometheus/prometheus/prometheus.yml&lt;&lt;EOF
+    # nginx-vts-exporter &amp;&amp; nginx-sts-exporter job
+    - job_name: nginx_exporter_8
+        static_configs:
+        - targets: ['10.10.4.8:9913','10.10.4.8:9912']
+          labels:
+            instance: nginx-8
+EOF
+
+# 重启Prometheus，使配置生效
+docker restart prometheus
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

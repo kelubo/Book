@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">8.6.2　如何进行分库备份</h3>
+<p class="ziti">最佳的方法就是从数据库中取出所有库名，然后对每个数据库执行一次备份。</p>
+<p class="ziti">分库备份的脚本如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# cat fenku.sh
+#!/bin/bash
+#Author: oldboy
+export PATH=/application/mysql/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+bak_path=/server/bakup/$(date +%F)
+[ ! -d $bak_path ] &amp;&amp; mkdir -p $bak_path
+for dbname in `mysql -e "show databases"|sed '1,2d'|grep -v _schema`
+#&lt;==取库名轮询备份。
+do
+    mysqldump -B --master-data=2 |gzip &gt;$bak_path/${dbname}_$(date +%F).sql.gz
+    #&lt;==注意备份的名字。
+done</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 有关Shell脚本的实战知识，请参考老男孩已出版的新书《跟老男孩学Linux运维：Shell编程实战》一书。</p>
+<p class="ziti">下面就来执行分库脚本并查看备份结果：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# sh fenku.sh
+[root@oldboy scripts]# ll /server/bakup/2017-03-19/
+total 12
+-rw-r--r--. 1 root root 130 Mar 19 11:10 mysql_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:10 oldboy_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:10 oldboy_utf8_2017-03-19.sql.gz</pre>
+<hr/>
+</body>
+</html>

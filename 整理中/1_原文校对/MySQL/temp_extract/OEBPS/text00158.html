@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">11.4　如何更改MySQL数据库库表的字符集</h2>
+<h3 class="p3">
+<a id="b1">11.4.1　更改库的字符集</a>
+</h3>
+<p class="ziti">管理员可以使用alter命令对数据库的字符集进行更改，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show create database oldboy\G
+*************************** 1. row ***************************
+       Database: oldboy
+Create Database: CREATE DATABASE `oldboy` /*!40100 DEFAULT CHARACTER SET utf8 */
+1 row in set (0.00 sec)
+
+mysql&gt; alter database oldboy CHARACTER SET latin1 COLLATE = latin1_swedish_ci;
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; show create database oldboy\G
+*************************** 1. row ***************************
+       Database: oldboy
+Create Database: CREATE DATABASE `oldboy` /*!40100 DEFAULT CHARACTER SET latin1 */
+1 row in set (0.00 sec)
+
+mysql&gt; alter database oldboy CHARACTER SET utf8 collate utf8_general_ci;
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; show create database oldboy\G
+*************************** 1. row ***************************
+       Database: oldboy
+Create Database: CREATE DATABASE `oldboy` /*!40100 DEFAULT CHARACTER SET utf8 */
+1 row in set (0.00 sec)</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">20.4.5　RDS for MySQL远程访问</h3>
+<p class="p6">1.RDS for MySQL访问模式</p>
+<p class="ziti">RDS for MySQL支持两种访问模式：标准模式和高安全模式。</p>
+<p class="ziti">（1）标准模式</p>
+<p class="ziti">使用负载均衡屏蔽了数据库引擎HA切换对应用层的影响，标准模式响应时间最短，如图20-41所示。</p>
+<div class="pic"><img alt="" src="Image00190.jpg" />
+</div>
+<p class="middle-img">图20-41　RDS for MySQL标准模式</p>
+<p class="ziti">（2）高安全模式</p>
+<p class="ziti">高安全模式可以预防90%的链路闪断，因所有的SQL语句都会经过代理层，高安全模式可以支持SQL注入的防御，可以分析SQL语句，来防护SQL注入，目前支持MySQL和PostgreSQL，高安全模式会增加响应时间，如图20-42所示。</p>
+<div class="pic"><img alt="" src="Image00191.jpg" />
+</div>
+<p class="middle-img">图20-42　RDS for MySQL高安全模式</p>
+<p class="p6">2.RDS for MySQL切换访问模式</p>
+<p class="ziti">RDS for MySQL切换访问模式依次如图20-43到图20-46所示。</p>
+<div class="pic"><img alt="" src="Image00192.jpg" />
+</div>
+<p class="middle-img">图20-43　数据库连接界面选择“切换访问模式”</p>
+<div class="pic"><img alt="" src="Image00193.jpg" />
+</div>
+<p class="middle-img">图20-44　切换访问模式界面</p>
+<div class="pic"><img alt="" src="Image00194.jpg" />
+</div>
+<p class="middle-img">图20-45　输入手机验证码</p>
+<div class="pic"><img alt="" src="Image00195.jpg" />
+</div>
+<p class="middle-img">图20-46　实例列表界面查看基本信息</p>
+<p class="p6">3.RDS for MySQL申请外网地址</p>
+<p class="ziti">（1）标准模式</p>
+<p class="ziti">RDS for MySQL申请外网地址界面，如图20-47和图20-48所示。</p>
+<div class="pic"><img alt="" src="Image00196.jpg" />
+</div>
+<p class="middle-img">图20-47　数据库连接界面选择“申请外网地址”</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ 如果需要同时使用内网和外网地址，请将“标准模式”切换为“高安全模式”。外网服务器IP地址需要设置白名单之后，方可通过外网地址连接实例。</p>
+<div class="pic"><img alt="" src="Image00197.jpg" />
+</div>
+<p class="middle-img">图20-48　申请外网地址界面</p>
+<p class="ziti">申请外网地址，状态显示为“内外网切换中”，如图20-49所示。</p>
+<div class="pic"><img alt="" src="Image00198.jpg" />
+</div>
+<p class="middle-img">图20-49　实例列表界面查看基本信息</p>
+<p class="ziti">（2）高安全模式</p>
+<p class="ziti">申请内网地址，如图20-50所示。</p>
+<div class="pic"><img alt="" src="Image00199.jpg" />
+</div>
+<p class="middle-img">图20-50　申请内网地址前切换为高安全模式</p>
+<p class="ziti">切换回“高安全模式”，申请内网地址，高安全模式可以同时支持内网地址和外网地址。</p>
+<p class="ziti">已经是高安全访问模式，申请内网地址，如图20-51和图20-52所示。</p>
+<div class="pic"><img alt="" src="Image00200.jpg" />
+</div>
+<p class="middle-img">图20-51　数据库连接界面选择“申请内网地址”</p>
+<div class="pic"><img alt="" src="Image00201.jpg" />
+</div>
+<p class="middle-img">图20-52　是否确定申请内网地址</p>
+<p class="ziti">点击“确定”之后，回到RDS管理菜单可以查看工作状态，如图20-53所示。</p>
+<div class="pic"><img alt="" src="Image00202.jpg" />
+</div>
+<p class="middle-img">图20-53　实例列表界面查看基本信息</p>
+<p class="ziti">等待任务完成后，就可以看到RDS已经有了内网地址和外网地址，如图20-54所示。</p>
+<div class="pic"><img alt="" src="Image00203.jpg" />
+</div>
+<p class="middle-img">图20-54　RDS已经有了内网地址和外网地址</p>
+<p class="p6">4.RDS for MySQL连接地址修改</p>
+<p class="ziti">RDS的连接地址，可以进行自定义，这样便于维护管理，如图20-55所示。</p>
+<div class="pic"><img alt="" src="Image00204.jpg" />
+</div>
+<p class="middle-img">图20-55　RDS连接地址可进行修改</p>
+<p class="ziti">点击图20-55中的“修改连接地址”，选择内网或外网地址，如图20-56所示。</p>
+<div class="pic"><img alt="" src="Image00205.jpg" />
+</div>
+<p class="middle-img">图20-56　选择网络类型界面</p>
+<p class="ziti">连接地址，可以更改为比较有意义的名称，例如WordPress-db，同时还可以自定义数据库的端口号，内网地址和外网地址都可以进行自定义，如图20-57和20-58所示。</p>
+<div class="pic"><img alt="" src="Image00206.jpg" />
+</div>
+<p class="middle-img">图20-57　自定义数据库端口和内网地址</p>
+<div class="pic"><img alt="" src="Image00207.jpg" />
+</div>
+<p class="middle-img">图20-58　自定义数据库端口和外网地址</p>
+<p class="ziti">点击图20-59中的“点击获取”，输入验证码后开始更改。</p>
+<div class="pic"><img alt="" src="Image00208.jpg" />
+</div>
+<p class="middle-img">图20-59　输入手机验证码</p>
+</body>
+</html>

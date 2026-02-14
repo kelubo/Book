@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.10　临时表空间</h3>
+<p class="ziti">临时表空间（temporary）用于存放临时表，默认情况下，是在数据文件夹下的ibtmp1数据文件，此数据文件被设置为每次自动增长12MB大小，当然也可以设置innodb_temp_data_file_path来指定临时表空间文件的存放位置。</p>
+<p class="ziti">临时表空间文件在正常的shutdown之后会自动清除，如果发现临时表空间数据文件比较大，那么可以考虑重启MySQL来释放空间大小，如图13-12所示。</p>
+<div class="pic"><img alt="" src="Image00100.jpg" />
+</div>
+<p class="middle-img">图13-12　重启MySQL</p>
+<p class="ziti">但在crash发生时不会清除，这就需要DBA手动删除表空间文件或重启服务器。</p>
+<p class="ziti">查看临时表空间文件的方法如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%innodb_temp%';
++----------------------------+-----------------------+
+| Variable_name              | Value                 |
++----------------------------+-----------------------+
+| innodb_temp_data_file_path | ibtmp1:12M:autoextend |</pre>
+<hr/>
+</body>
+</html>

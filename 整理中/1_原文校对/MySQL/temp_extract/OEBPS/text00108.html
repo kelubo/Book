@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">7.2.4　利用mysql-e参数查看mysql数据</h3>
+<p class="ziti">mysql命令提供了一个功能，可以让使用者无须登录数据库，在Linux命令行就可以执行SQL语句。</p>
+<p class="p6">1.查看数据库oldboy库test表数据</p>
+<p class="ziti">在Linux命令行可通过如下命令实现上述功能：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "use oldboy;select * from test;"
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
+|  6 | 小陶    |
++----+---------+</pre>
+<hr/>
+<p class="p6">2.利用mysql-e参数查看SQL线程执行状态</p>
+<p class="ziti">在Linux命令行可通过如下命令查看SQL线程执行状态：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "show processlist;"
++----+------+-----------+------+---------+------+-------+------------------+
+| Id | User | Host      | db   | Command | Time | State | Info             |
++----+------+-----------+------+---------+------+-------+------------------+
+| 21 | root | localhost | NULL | Query   |    0 | init  | show processlist |
++----+------+-----------+------+---------+------+-------+------------------+</pre>
+<hr/>
+<p class="ziti">以下命令用于查看完整的线程状态，此命令在查看大量慢查询语句时非常有用：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "show full processlist;"
++----+------+-----------+------+---------+------+-------+-----------------------+
+| Id | User | Host      | db   | Command | Time | State | Info                  |
++----+------+-----------+------+---------+------+-------+-----------------------+
+| 22 | root | localhost | NULL | Query   |    0 | init  | show full processlist |
++----+------+-----------+------+---------+------+-------+-----------------------+</pre>
+<hr/>
+<p class="ziti">来看一个企业故障案例，故障原因是mysql系统的sleep线程过多，有大量的慢查询语句，导致数据库无法接受正常的请求。</p>
+<hr/>
+<pre class="ziti1">mysql&gt;show full processlist;</pre>
+<hr/>
+<p class="ziti">结果分别如图7-5和图7-6所示。</p>
+<div class="pic"><img alt="" src="Image00057.jpg" />
+</div>
+<p class="middle-img">图7-5　数据库里正在执行的SQL语句的列属性</p>
+<div class="pic"><img alt="" src="Image00058.jpg" />
+</div>
+<p class="middle-img">图7-6　数据库里正在执行的SQL语句的信息</p>
+<p class="ziti">图7-5和图7-6实际上是一张图，为了显示的清晰分为两张图片展示给读者。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; kill 212555221;</pre>
+<hr/>
+<p class="ziti">在“mysql&gt;kill 212555221；”语句中，84是ID，若使用kill（insert，update）命令则可能会丢失数据。</p>
+<p class="ziti">
+<span class="yanse">解决办法</span>
+</p>
+<p class="ziti">先调整MySQL的如下两个超时参数配置：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%_timeout%';
++----------------------------+----------+
+| Variable_name              | Value    |
++----------------------------+----------+
+| connect_timeout            | 10       |
+| interactive_timeout        | 28800    |
+| wait_timeout               | 28800    |
++----------------------------+----------+
+10 rows in set (0.00 sec)
+set global wait_timeout = 60;
+set global interactive_timeout = 60;</pre>
+<hr/>
+<p class="ziti">然后在配置文件里修改：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+interactive_timeout = 120  #&lt;==此参数设置后wait_timeout自动生效。
+wait_timeout = 120</pre>
+<hr/>
+<p class="ziti">其他补充方法具体如下。</p>
+<p class="ziti">1）在PHP程序中，不使用持久链接，即使用mysql_connect而不是pconnect。</p>
+<p class="ziti">2）PHP程序执行完毕，应该显式调用mysql_close。</p>
+<p class="ziti">3）Java程序调整连接池（C3P0）或者调整JAVA服务（Tomcat有关连接池参数）。</p>
+<p class="ziti">4）逐步分析MySQL的SQL查询及慢查询日志，找到查询过慢的SQL，优化之。</p>
+<p class="p6">3.利用mysql-e参数查看mysql变量及性能状态</p>
+<p class="ziti">通过以下命令查看mysql的所有参数配置：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "show variables;"
+Variable_name      Value
+auto_increment_increment      1
+auto_increment_offset      1
+autocommit      ON
+automatic_sp_privileges      ON
+...省略上百行...</pre>
+<hr/>
+<p class="ziti">可通过以下命令查看my.cnf配置文件的配置有没有在数据库中生效：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "show variables like 'log_bin';"
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| log_bin       | ON    |
++---------------+-------+</pre>
+<hr/>
+<p class="ziti">查看mysql数据库运行状态的命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "show global status;"|head -5
+Variable_name            Value
+Aborted_clients            0
+Aborted_connects            0
+Binlog_cache_disk_use      0
+Binlog_cache_use            7</pre>
+<hr/>
+<p class="ziti">高级管理员可以对这个状态信息和配置文件参数进行比较，从而找出优化数据库配置的方法，案例可以参考老男孩学员的文章，地址为：<a href="http://www.xuliangwei.com/xubusi/213.html">http://www.xuliangwei.com/xubusi/213.html</a>
+ 。</p>
+<p class="p6">4.利用mysql-e参数不重启数据库修改数据库参数</p>
+<p class="ziti">不重启数据库修改数据库参数还能生效的示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "show variables;"|grep key_buffer
+key_buffer_size      8388608
+[root@oldboy ~]# mysql -e "set global key_buffer_size = 1024*1024*16;"
+[root@oldboy ~]# mysql -e "show variables;"|grep key_buffer
+key_buffer_size      16777216</pre>
+<hr/>
+<p class="ziti">从上面的示例可以得知，实现不重启数据库更改数据库参数的命令为：</p>
+<hr/>
+<pre class="ziti1">set global key_buffer_size = 1024*1024*16;  #&lt;==及时生效，重启mysql失效。</pre>
+<hr/>
+<p class="ziti">在该过程中，配置文件也要增加或修改，编辑/etc/my.cnf，修改key_buffer_size=16M。</p>
+<p class="p6">5.利用mysql-e参数引出的重要命令</p>
+<p class="ziti">下面将给出利用mysql-e参数引出的重要命令，这些命令虽然没有详细讲解，但是，在工作中还是很重要的，请读者牢记：</p>
+<hr/>
+<pre class="ziti1">show processlist;    #&lt;==查看数据库里正在执行的SQL语句，可能无法看全完整的SQL语句。
+show full processlist  #&lt;==查看正在执行的完整SQL语句，完整显示。
+set global key_buffer_size = 1024*1024*16 #&lt;==不重启数据库调整数据库参数，直接生效，
+                                        重启后失效。
+show variables;        #&lt;==查看数据库的配置参数信息，例如，my.cnf里参数的生效情况。
+show variables like '%log_bin%';"
+kill ID                #&lt;==杀掉SQL线程的命令，ID为线程号。
+show session status;   #&lt;==查看当前会话的数据库状态信息。
+show global status;    #&lt;==查看整个数据库运行的状态信息，很重要，要分析并要做好监控。
+show engine innodb status; #&lt;==显示innodb引擎的性能状态（早期版本show innodb status）。</pre>
+<hr/>
+<p class="p6">6.mysqladmin命令常用参数</p>
+<p class="ziti">mysqladmin命令也有很多查看数据库信息的命令，具体如下：</p>
+<hr/>
+<pre class="ziti1">mysqladmin的相关命令：
+mysqladmin password oldboy123                  #&lt;==设置密码，前文用过的。
+mysqladmin -uroot -poldboy123 password oldboy  #&lt;==修改密码，前文用过的。
+mysqladmin -uroot -poldboy123 status           #&lt;==查看状态，相当于show status。
+mysqladmin -uroot -poldboy123 -i 1 status      #&lt;==每秒查看一次状态。
+mysqladmin -uroot -poldboy123 extended-status  #&lt;==等同于“show global status;”。
+mysqladmin -uroot -poldboy123 flush-logs       #&lt;==切割日志。
+mysqladmin -uroot -poldboy123 processlist      #&lt;==查看执行的SQL语句信息。
+mysqladmin -uroot -poldboy123 processlist -i 1 #&lt;==每秒查看一次执行的SQL语句。
+mysqladmin -uroot -p'oldboy123' shutdown       #&lt;==关闭mysql服务，前文用过的。
+mysqladmin -uroot -p'oldboy123' variables      #&lt;==相当于show variables。</pre>
+<hr/>
+<p class="p6">7.mysql命令常用参数</p>
+<p class="ziti">表7-4针对mysql命令的常用基础参数进行了说明。</p>
+<p class="middle-img">表7-4　mysql命令常用参数总结</p>
+<div class="pic"><img alt="" src="Image00059.jpg" />
+</div>
+<p class="ziti">更多命令信息，可执行“mysql-help”查看。</p>
+</body>
+</html>

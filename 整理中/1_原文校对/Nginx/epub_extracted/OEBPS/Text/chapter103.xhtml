@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="p3" id="sigil_toc_id_113">5.7　HTTP增强协议服务器的搭建</h2> 
+ <h3 class="p" id="sigil_toc_id_114">5.7.1　HTTP/2协议服务</h3> 
+ <p class="ziti3">HTTP/2是HTTP协议的2.0版本，该协议通过多路复用、请求优化、HTTP头压缩等功能提升网络传输速度、优化用户体验。HTTP/2使用二进制分帧层将传输的数据分割为更小的数据和帧，并对它们进行二进制格式编码处理，以实现在不改变HTTP现有语义等标准的基础上提升传输性能，从而降低响应延迟、提高请求吞吐的能力。HTTP/2通过多路复用技术使客户端可以并行发送多个请求，以提高带宽的利用率。HTTP/2是基于SPDY协议设计的，是SPDY的演进版本，但其不强制使用HTTPS协议，仍可支持HTTP明文传输。Nginx是通过ngx_http_v2_module实现HTTP/2协议支持的，编译配置时可通过增加参数--with-http_v2_module启用HTTP2模块。HTTP2模块配置指令如下。</p> 
+ <p class="middle-img">表5-9　HTTP2模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b5-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b5-9.jpg" class="calibre217"/></a> 
+ </div> 
+ <p class="ziti4">·http2_recv_buffer_size指令可编写在http指令域中。</p> 
+ <p class="ziti4">·http2_chunk_size、http2_push、http2_push_preload指令可编写在http、server、location指令域中。</p> 
+ <p class="ziti4">·其余的指令可编写在http、server指令域中。</p> 
+ <p class="ziti3">HTTP2服务器推送可以实现将多个资源文件（CSS、JS、图片等）同时发送到客户端，如下页面中包含style.css和nginx.png两个资源文件。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Nginx HTTPv2 Test&lt;/title&gt;
+&lt;head&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Nginx HTTPv2 Test&lt;/h1&gt;
+    &lt;img src="nignx.png"&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在没有服务器推送的情况下，客户端通过3个GET方法获取该页面的所有资源。在启用服务器推送后客户端只需通过一个GET方法，就可以获取到该页面的所有资源。配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 443 ssl http2 default_server;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;       # 网站证书文件
+    ssl_certificate_key ssl/www_nginxbar_org.key;   # 网站证书密钥文件
+    ssl_password_file ssl/www_nginxbar_org.pass;    # 网站证书密钥密码文件
+    root /opt/nginx-web;
+    location / {
+        http2_push /style.css                       # 服务端推送
+        http2_push /nginx.png                       # 服务端推送
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

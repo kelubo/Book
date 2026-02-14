@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">7.3.4　mysqlbinlog工具解析binlog日志实践</h3>
+<p class="ziti">默认情况下，binlog日志是二进制格式的，不能使用查看文本工具的命令（比如，cat、vi等）查看：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd /application/mysql/data/
+[root@oldboy data]# ls -l oldboy-bin*
+-rw-rw----. 1 mysql mysql  143 Mar  3 05:50 oldboy-bin.000001
+-rw-rw----. 1 mysql mysql  168 Mar  3 05:57 oldboy-bin.000002
+-rw-rw----. 1 mysql mysql  168 Mar  3 05:57 oldboy-bin.000003
+-rw-rw----. 1 mysql mysql 6967 Mar  3 09:44 oldboy-bin.000004
+#&lt;==找一个内容大的文件做测试。
+-rw-rw----. 1 mysql mysql   80 Mar  3 05:57 oldboy-bin.index
+[root@oldboy data]# file oldboy-bin.000004
+oldboy-bin.000004: MySQL replication log        #&lt;==复制log文件。
+[root@oldboy data]# tail -2 oldboy-bin.000004   #&lt;==使用tail查看内容，很混乱，
+                                                确定其是非纯文本文件。
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8TNF                                                       oldboyoldboy/*!40000 ALTER TABLE `test` DISABLE KEYS */#ЪF    std!!!
+          oldboyoldboyBEGIN8A
+           oldboyoldboyINSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'), (3,'inca'),(4,'zuma'),(5,'kaka'),(6,'小陶')~F¤筙x7
+          td!!!
+               oldboyoldboy/*!40000 ALTER TABLE `test` ENABLE KEYS */z4</pre>
+<hr/>
+<p class="p6">1.解析指定库的binlog日志</p>
+<p class="ziti">利用“mysqlbinlog-d”参数解析指定库的binlog日志：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# mysqlbinlog -d oldboy oldboy-bin.000004 -r bin.sql
+#&lt;==-d指定库，-r指定生成的文件。
+[root@oldboy data]# grep -i insert bin.sql #&lt;==过滤内容，看到了曾经恢复的SQL语句。
+/*!40019 SET @@session.max_insert_delayed_threads=0*/;
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka')
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka')
+SET INSERT_ID=6/*!*/;
+insert into test(name) values('小陶')
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka'),(6,'小陶')
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka'),(6,'小陶')
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka'),(6,'小陶')
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka'),(6,'小陶')</pre>
+<hr/>
+<p class="ziti">结论：mysqlbinlog可以指定-d实现分库导出binlog，如果使用-d参数，那么在更新数据时，必须要有use库名，才能分出指定库的binlog，例如，写入数据库的语句必须采用如下写法：</p>
+<hr/>
+<pre class="ziti1">use oldboy;
+insert into test values(1,'oldboy')</pre>
+<hr/>
+<p class="ziti">下面的这种写法就不行：</p>
+<hr/>
+<pre class="ziti1">insert into oldboy.test values(2,'oldgirl')</pre>
+<hr/>
+<p class="p6">2.按照位置截取binlog内容</p>
+<p class="ziti">按照位置截取binlog内容的优点是精确，但是要花费时间寻找位置，例如，要截取oldboy-bin.000009文件从位置365到位置456的日志，命令如下。</p>
+<hr/>
+<pre class="ziti1">mysqlbinlog oldboy-bin.000009 --start-position=365 --stop-position=456 -r pos.sql</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 开始位置点必须存在于binlog里，结尾位置点可以不存在。</p>
+<p class="ziti">若指定了开始位置，而不指定结束位置，那么请问结束位置是？可通过如下命令查看：</p>
+<hr/>
+<pre class="ziti1">mysqlbinlog oldboy-bin.000009 --start-position=365 -r pos.sql</pre>
+<hr/>
+<p class="ziti">若指定了结束位置，而不指定开始位置，那么请问开始位置是？可通过如下命令查看：</p>
+<hr/>
+<pre class="ziti1">mysqlbinlog oldboy-bin.000009 --stop-position=456 -r pos.sql</pre>
+<hr/>
+<p class="ziti">所谓的位置点，就是mysqlbinlog解析文件里的不同行行首的“#at数字”标识的数据。</p>
+<p class="p6">3.按照时间截取binlog内容</p>
+<p class="ziti">按照时间截取binlog内容的缺点是模糊、不准确，截取的内容会丢失部分数据，精确到秒，1秒也可能会有多条语句。</p>
+<p class="ziti">下面语句标识截取的是oldboy-bin.000009文件中从‘2014-10-1617：14：15’时间到‘2014-10-1617：15：15’时间的数据：</p>
+<hr/>
+<pre class="ziti1">mysqlbinlog oldboy-bin.000009 --start-datetime='2014-10-16 17:14:15' --stop -datetime='2014-10-16 17:15:15' -r time.sql</pre>
+<hr/>
+<p class="ziti">若指定了开始时间，而不指定结束时间，那么请问结束时间是？可通过如下命令查看：</p>
+<hr/>
+<pre class="ziti1">mysqlbinlog oldboy-bin.000009 --start-datetime='2014-10-16 17:14:15'  -r time.sql</pre>
+<hr/>
+<p class="ziti">若指定了结束时间，而不指定开始时间，那么请问开始时间是？可通过如下命令查看：</p>
+<hr/>
+<pre class="ziti1">mysqlbinlog oldboy-bin.000009  --stop-datetime='2014-10-16 17:15:15' -r time.sql
+提示：所谓的时间点就是mysqlbinlog解析文件里的不同行行首的“#170303  9:44:22”标识的数据。</pre>
+<hr/>
+<p class="ziti">后文的增量恢复案例中会有mysqlbinlog命令的实战应用。</p>
+</body>
+</html>

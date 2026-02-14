@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">7.1.2　使用mysqldump进行数据库备份实践</h3>
+<p class="ziti">MySQL数据库自带了一个很优秀的备份命令，即mysqldump，下面就来了解它的用法。</p>
+<p class="ziti">mysqldump语法如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump -u用户名 -p密码 参数 数据库名&gt; 备份的文件名.sql #&lt;==-u和-p后可无空格。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">特别说明：</span>
+ 为了防止密码外泄，在第5章中，我们已经将密码写入配置文件中，具体配置见5.2节，因此，本章会使用不带用户和密码的命令替换带用户和密码的命令，例如，使用如下命令：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql &lt;/opt/bak.sql</pre>
+<hr/>
+<p class="ziti6">替换如下命令：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -uroot -poldboy123 &lt;/opt/bak.sql
+#&lt;==这是使用mysql将第5章的实验数据还原的命令。</pre>
+<hr/>
+<p class="p6">1.不带参数备份单个数据库</p>
+<p class="ziti">
+<span class="yanse">范例</span>
+ ：不加任何参数备份名字为oldboy的库。</p>
+<p class="ziti">首先，查看备份前的数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+...省略若干行...
+mysql&gt; use oldboy
+Database changed
+mysql&gt; select * from test; #&lt;==一共5行记录。
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">然后，执行备份oldboy库的命令，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump oldboy &gt;/opt/mysql_bak.sql  #&lt;==密码在配置文件里了。</pre>
+<hr/>
+<p class="ziti">最后，使用egrep命令检查备份的结果：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# egrep -v "#|\*|--|^$" /opt/mysql_bak.sql
+                                             #&lt;==为了清晰排除了注释等特殊字符。
+DROP TABLE IF EXISTS `test`;                 #&lt;==删除表语句。
+CREATE TABLE `test` (                        #&lt;==建表语句。
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+LOCK TABLES `test` WRITE;
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka');                                      #&lt;==插入语句。
+UNLOCK TABLES;</pre>
+<hr/>
+<p class="ziti">可能读者已经发现了一个现象，mysqldump备份的内容就是曾经执行过的SQL语句，所不同的是，为了恢复效率，mysqldump把数据写成了一个insert语句，另外多了两行锁表和解锁的操作。</p>
+<p class="p6">2.加-B参数备份的实践</p>
+<p class="ziti">下面以备份oldboy库时加-B参数为例进行讲解。</p>
+<p class="ziti">备份命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]#  mysqldump -B oldboy &gt;/opt/mysql_bak_B.sql</pre>
+<hr/>
+<p class="ziti">将该例和上一个范例（没加参数的备份文件）进行对比，即可了解“-B”参数的作用：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# diff /opt/mysql_bak.sql /opt/mysql_bak_B.sql
+#&lt;==使用diff或vimdiff比较。
+18a19,26
+&gt; -- Current Database: `oldboy`
+&gt; --
+&gt;
+&gt; CREATE DATABASE /*!32312 IF NOT EXISTS*/ `oldboy` /*!40100 DEFAULT CHARACTER SET utf8 */;
+&gt;
+&gt; USE `oldboy`;
+&gt;
+&gt; --
+51c59
+&lt; -- Dump completed on 2017-03-02 10:00:56
+---
+&gt; -- Dump completed on 2017-03-02 10:05:39</pre>
+<hr/>
+<p class="ziti">可以看到，加“B”参数的作用是增加<span class="yanse">创建数据库和连接数据库的语句</span>
+ 。即如下这两条语句：</p>
+<hr/>
+<pre class="ziti1">CREATE DATABASE /*!32312 IF NOT EXISTS*/ `oldboy` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `oldboy`;</pre>
+<hr/>
+<p class="ziti">别小看这两条语句，在恢复数据库时可是有大作用的，后面讲解恢复知识时会进一步说明。</p>
+<p class="ziti">除此之外，若使用“B”参数备份数据库，那么后面可以直接接多个库名，即同时备份多个库。</p>
+<p class="p6">3.使用gzip压缩备份数据库的实践</p>
+<p class="ziti">指定压缩命令gzip压缩备份oldboy数据库，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump -B oldboy|gzip&gt;/opt/mysql_bak_B.sql.gz
+#&lt;==注意压缩命令前要加管道。
+[root@oldboy ~]# ls -l /opt/
+total 16
+-rw-r--r--. 1 root root 2051 Mar  2 03:32 bak.sql
+-rw-r--r--. 1 root root 2051 Mar  2 10:05 mysql_bak_B.sql
+#&lt;==没有压缩的备份数据较大。
+-rw-r--r--. 1 root root  779 Mar  2 10:16 mysql_bak_B.sql.gz
+#&lt;==压缩过的数据库备份小了很多。
+-rw-r--r--. 1 root root 1908 Mar  2 10:00 mysql_bak.sql</pre>
+<hr/>
+<p class="ziti">同样的数据，没有压缩备份时是2051字节，压缩备份后为779字节，整整缩小了三分之二。</p>
+<p class="ziti">
+<span class="yanse">阶段性知识点小结</span>
+</p>
+<p class="ziti6">通过以上几个范例，可以得出几个重要的mysqldump参数知识点。</p>
+<p class="ziti6">·使用-B参数备份数据库，会在备份的数据中增加建库及use库的语句。</p>
+<p class="ziti6">·使用-B参数备份数据库，后面还可以直接接多个库名，实现同时备份多个库。</p>
+<p class="ziti6">·使用gzip命令压缩备份的数据，备份的压缩包是原来的1/3大小。</p>
+<p class="p6">4.mysqldump命令工作原理</p>
+<p class="ziti">利用mysqldump命令备份数据的过程，实际上就是把数据（包括库表）从MySQL库里以SQL语句的形式直接输出或者生成备份文件的过程，这种备份成SQL语句的方式称为逻辑备份。</p>
+<p class="ziti">把备份的数据过滤掉注释信息，剩下的都是SQL语句，过滤结果如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# egrep -v "#|\*|--|^$" /opt/mysql_bak.sql
+DROP TABLE IF EXISTS `test`;
+CREATE TABLE `test` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+LOCK TABLES `test` WRITE;
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka');
+UNLOCK TABLES;</pre>
+<hr/>
+<p class="ziti">使用mysqldump命令可以把数据库中的数据导出来，并通过SQL语句的形式存储。这种备份方式称为逻辑备份，效率不是很高。在当下的生产场景中，多用于数据量不是很大的备份情况，例如30GB以内的数据。若在数据库数据很大的时候采用此备份方法，则所用的时间就会很长，恢复的时间也会很长，因此，当数据大于30GB（参考值）后，建议选择其他的诸如Xtrabackup的物理方式进行备份和恢复，见第9章内容。</p>
+<p class="p6">5.备份多个库</p>
+<p class="ziti">（1）备份多个库的实践</p>
+<p class="ziti">前文已经提到过，备份多个库时，可使用mysqldump命令的参数-B实现，操作结果如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show databases;#&lt;==查看当前数据库里的库信息。
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              | #&lt;==实验备用库mysql。
+| oldboy             | #&lt;==实验备用库oldboy。
+| oldboy_utf8        | #&lt;==实验备用库oldboy_utf8。
+| performance_schema |
++--------------------+
+5 rows in set (0.00 sec)
+mysql&gt; quit
+Bye
+[root@oldboy ~]#  mysqldump -B oldboy oldboy_utf8|gzip&gt;/opt/test.sql.gz
+#&lt;==同时备份两个库。
+#提示：使用-B参数即表示后面可接多个库，并且在备份文件里会增加use db,和create database db的信息。
+[root@oldboy ~]#  mysqldump -B oldboy oldboy_utf8 mysql|gzip&gt;/opt/all.sql.gz
+#&lt;==MySQL 5.5数据库备份mysql库时需要加一个--events参数否则会有警告信息，
+    MySQL 5.6版就没有提示了。
+[root@oldboy ~]# ls -l /opt/all.sql.gz
+-rw-r--r--. 1 root root 178750 Mar  2 11:09 /opt/all.sql.gz
+#&lt;==备份的数据库不能太小（例如几字节），否则可能是由于命令或参数等导致备份结果有问题。</pre>
+<hr/>
+<p class="ziti">（2）如何做分库备份</p>
+<p class="ziti">上文使用mysqldump命令备份时，是把多个库备份成了一个文件。有时一个企业的数据库实例里会有多个库，例如（www、bbs、blog），但是出问题的时候可能只是其中某一个库，如果在备份时把所有的库都备份成了一个数据文件的话，恢复某一个库的数据时就比较麻烦了，因此有了分库备份的需求。</p>
+<p class="ziti">分库备份实际上就是每次只执行一个mysqldump备份命令语句备份一个库，如果数据库里有多个库，就执行多条相同的语句来备份各个库。注意每个库都可以用对应备份的库作为库名，结尾加“.sql”即可。备份多个库的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump -uroot -p'oldboy123' -B oldboy ...
+mysqldump -uroot -p'oldboy123' -B oldboy_utf8 ...
+mysqldump -uroot -p'oldboy123' -B mysql ...
+......</pre>
+<hr/>
+<p class="ziti">这里分享一个特殊技巧，即用如下命令实现分库备份，操作过程部分实现如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "show databases;"|egrep -v "_schema|atabase"
+#&lt;==取出需要备份的库名列表。
+mysql
+oldboy
+oldboy_utf8
+[root@oldboy ~]# mysql -e "show databases;"|egrep -v "_schema|atabase"|sed -r 's#^(.*)#mysqldump -B \1|gzip &gt;/tmp/\1.sql.gz#g' #&lt;==利用命令拼接成多个mysqldump备份的具体命令，如下。
+mysqldump -B mysql|gzip &gt;/tmp/mysql.sql.gz
+mysqldump -B oldboy|gzip &gt;/tmp/oldboy.sql.gz
+mysqldump -B oldboy_utf8|gzip &gt;/tmp/oldboy_utf8.sql.gz
+[root@oldboy ~]# mysql -e "show databases;"|egrep -v "_schema|atabase"|sed -r 's#^(.*)#mysqldump -B \1|gzip &gt;/tmp/\1.sql.gz#g'|bash #&lt;==最后管道对bash执行这些备份命令，就是一次分开备份多个库了。
+[root@oldboy ~]# ls -l /tmp/*.sql.gz #&lt;==大功告成，怎么样？
+-rw-r--r--. 1 root root 178591 Mar  2 11:35 /tmp/mysql.sql.gz
+-rw-r--r--. 1 root root    778 Mar  2 11:35 /tmp/oldboy.sql.gz
+-rw-r--r--. 1 root root    510 Mar  2 11:35 /tmp/oldboy_utf8.sql.gz</pre>
+<hr/>
+<p class="ziti">当然了，读者还可以用Shell脚本实现分库备份的脚本，可以看老男孩曾经录制的视频：<a href="http://edu.51cto.com/course/course_id-808.html">http://edu.51cto.com/course/course_id-808.html</a>
+ 。</p>
+<p class="p6">6.备份单个表</p>
+<p class="ziti">语法如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump -u用户名 -p数据库名 表名&gt;备份的文件名</pre>
+<hr/>
+<p class="ziti">当不加-B参数备份数据库时，例如“mysqldump oldboy test”，mysqldump命令默认就会把oldboy当作库，把test当作表，如果后面还有多个字符串，例如“mysqldump oldboy test test1”，那么除了oldboy为库之外，其他的test、test1都是oldboy库的表。</p>
+<p class="ziti">执行结果如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump oldboy test&gt;/tmp/oldboy_test.sql
+#&lt;==仅备份oldboy库里的test表。</pre>
+<hr/>
+<p class="p6">7.备份多个表</p>
+<p class="ziti">语法如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump -u用户名 -p数据库名 表名1 表名2 &gt; 备份的文件名</pre>
+<hr/>
+<p class="ziti">下面的命令可同时备份mysql库下的user表和db表：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]#  mysqldump mysql user db&gt;/tmp/mysql.sql
+提示：此时不能加-B参数了，因为库后面都是表了。
+[root@oldboy ~]# egrep -v "#|\*|--|^$" /tmp/mysql.sql
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (  #&lt;==user表。
+  `Host` char(60) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `User` char(16) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `Password` char(41) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL DEFAULT '',
+...省略若干行...
+  `password_expired` enum('N','Y') CHARACTER SET utf8 NOT NULL DEFAULT 'N',
+  PRIMARY KEY (`Host`,`User`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Users and global privileges';
+LOCK TABLES `user` WRITE;
+UNLOCK TABLES;
+DROP TABLE IF EXISTS `db`;
+CREATE TABLE `db` (  #&lt;==db表。
+  `Host` char(60) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `Db` char(64) COLLATE utf8_bin NOT NULL DEFAULT '',
+  `User` char(16) COLLATE utf8_bin NOT NULL DEFAULT '',
+...省略若干行...
+  PRIMARY KEY (`Host`,`Db`,`User`),
+  KEY `User` (`User`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Database privileges';
+LOCK TABLES `db` WRITE;
+INSERT INTO `db` VALUES ('%','test','','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','N','N','Y','Y'),('%','test\\_%','','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','N','N','Y','Y'),('localhost','oldboy','test','N','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y'),('172.16.1.%','blog','blog','Y','Y','Y','Y','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N');
+UNLOCK TABLES;</pre>
+<hr/>
+<p class="ziti">可以看到mysql.sql文件里确实有了user表和db表的备份信息。</p>
+<p class="ziti">企业中可能会存在这样的情况，一个库里有大表也有小表，有时可能需要只恢复某一个小表，上面实现的多表备份文件很难拆开，就像没有分库那样会导致恢复某一个小表也很麻烦。那么又如何进行分表备份呢？</p>
+<p class="ziti">这里的思路和分库备份是一样的，每执行一条语句就备份一个表，生成不同的数据文件即可。命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump oldboy test &gt; oldboy_test.sql
+mysqldump oldboy test1&gt; oldboy_test1.sql
+......</pre>
+<hr/>
+<p class="ziti">将上述命令放入一个脚本里就是脚本分表备份了，当然这样是很土的备份脚本了，更好的备份脚本见分库分表备份视频，我们在学习Shell脚本编程时，会实现这个分表分库备份的脚本，视频链接为<a href="http://edu.51cto.com/course/course_id-808.html">http://edu.51cto.com/course/course_id-808.html</a>
+ 。</p>
+<p class="ziti">分表备份的缺点：数据文件多，很碎，一旦需要全部恢复又很麻烦。</p>
+<p class="ziti">解决办法具体如下。</p>
+<p class="ziti6">·做一个完整全备，再做一个分库分表备份。</p>
+<p class="ziti6">·虽然文件多、碎，但可以利用脚本批量操作多个SQL文件。</p>
+<p class="p6">8.企业备份案例解析</p>
+<p class="ziti">企业面试案例：如果多个库或多个表备份到了一个文件里，那么这种情况下，如何恢复单个库或者单个表？</p>
+<p class="ziti">解答具体如下。</p>
+<p class="ziti6">·找个第三方测试库，将所有备份都导入到这个测试库里，然后把需要的单库或表再备份出来，最后恢复到需要恢复的正式库里。</p>
+<p class="ziti6">·如果是单表恢复，还可以执行“grep-w表名bak.sql&gt;表名.sql”命令。</p>
+<p class="ziti">当然最好是备份时提前采用分库分表备份。</p>
+<p class="p6">9.备份数据库表结构（不包含数据）</p>
+<p class="ziti">利用mysqldump的-d参数可以只备份表的结构，即建表的语句。下面的示例将展示如何备份oldboy库中所有表的结构：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump -d oldboy &gt;/opt/oldboy.sql
+#&lt;==备份oldboy库的所有表结构，也可以指定某一个表。
+[root@oldboy ~]# egrep -v "#|\*|--|^$" /opt/oldboy.sql
+DROP TABLE IF EXISTS `test`;
+CREATE TABLE `test` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;</pre>
+<hr/>
+<p class="ziti">说明一下，因为oldboy库里只有test表，因此这里只显示了test的表结构。</p>
+<p class="p6">10.只备份数据库表的数据（不包含表结构）</p>
+<p class="ziti">利用-t参数备份数据库表的数据（SQL语句形式），命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump -t oldboy &gt;/opt/oldboy1.sql
+#&lt;==备份oldboy库的所有表的内容，也可以指定某一个表。
+[root@oldboy ~]# egrep -v "#|\*|--|^$" /opt/oldboy1.sql
+LOCK TABLES `test` WRITE;
+INSERT INTO `test` VALUES (1,'oldboy'),(2,'oldgirl'),(3,'inca'),(4,'zuma'), (5,'kaka');
+UNLOCK TABLES;</pre>
+<hr/>
+<p class="p6">11.同时将数据和表结构分离导出</p>
+<p class="ziti">利用-T参数可以实现将数据和表结构同时分离备份。不过有可能会碰到如下情况：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump oldboy test --compact -T /tmp/
+#&lt;==5.6版本因为安全权限问题不能直接导出了。
+mysqldump: Got error: 1290: The MySQL server is running with the --secure-file-priv option so it cannot execute this statement when executing 'SELECT INTO OUTFILE' #&lt;==提示是因为--secure-file-priv选项所导致。</pre>
+<hr/>
+<p class="ziti">如果依然想以此方式备份数据，那么可以调整配置文件参数并重启MySQL：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# grep sec /etc/my.cnf
+secure_file_priv='' #&lt;==在[mysqld]模块下增加
+[root@oldboy ~]# /etc/init.d/mysqld restart
+Shutting down MySQL.. SUCCESS!
+Starting MySQL.... SUCCESS!</pre>
+<hr/>
+<p class="ziti">备份的命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump oldboy test --compact -T /tmp/
+#&lt;==--compact是减少无用输出的意思。
+[root@oldboy ~]# ls -l /tmp/test*
+-rw-r--r--. 1 root  root  331 Mar  3 03:09 /tmp/test.sql
+-rw-rw-rw-. 1 mysql mysql  40 Mar  3 03:09 /tmp/test.txt
+[root@oldboy ~]# cat /tmp/test.sql              #&lt;==建表的语句。
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `test` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+[root@oldboy ~]# cat /tmp/test.txt              #&lt;==纯文本数据，非SQL语句了。
+1      oldboy
+2      oldgirl
+3      inca
+4      zuma
+5      kaka</pre>
+<hr/>
+<p class="ziti">
+<span class="yanse">mysqldump参数新小结</span>
+</p>
+<p class="ziti6">通过以上讲解，可以得出如下关于mysqldump参数的新知识点。</p>
+<p class="ziti6">·-d参数的作用是只备份库表结构（SQL语句形式）。</p>
+<p class="ziti6">·-t参数的作用是只备份表内的数据（SQL语句形式）。</p>
+<p class="ziti6">·-T将库表和数据分离成不同的文件，数据是纯文本，表结构是SQL语句。</p>
+<p class="p6">12.刷新binlog文件参数（-F）</p>
+<p class="ziti">（1）binlog是什么</p>
+<p class="ziti">Binlog是一个二进制格式的文件，用于记录用户对数据库更新的SQL语句信息，例如更改数据库库表和更改表内容的SQL语句都会记录到binlog里，但是对库表等内容的查询则不会记录到日志中。</p>
+<p class="ziti">（2）binlog对于备份的作用</p>
+<p class="ziti">当有数据写入到数据库时，还会同时把更新的SQL语句写入到对应的binlog文件里，这个文件就是上文所说的binlog文件。</p>
+<p class="ziti">使用mysqldump备份时，一般是对某一时刻的数据进行全备，例如，0点进行数据库备份。</p>
+<p class="ziti">假设是每天0点对数据库进行备份，那么在两次备份之间就有24小时的数据没有备份，在这期间如果数据库发生故障，使用mysqldump全量恢复也只能恢复到当日0点，但是有了binlog文件，就可以将两次完整备份间隔之间的数据还原，因为binlog文件里的数据就是写入数据库的数据，使用binlog文件恢复数据，我们称之为二进制增量数据恢复。</p>
+<p class="ziti">（3）为什么要刷新binlog</p>
+<p class="ziti">刷新（切割）binlog日志的目的就是确定全备和增量备（binlog文件）的临界点，当全备完成后，全备时刻以前的binlog文件就无用了（全备里已有这部分数据了），但是全备以后到下一次全备之前的数据就是十分重要的，这部分数据就存在于binlog文件里，因此在进行全备时需要找到全备之后和binlog增量之间的临界点，使得恢复时，需要的binlog文件数据一条不多（不能和全备的内容重合），一条不少（全备后的所有数据都要有）。图7-1是在企业中使用-F刷新日志的原理图。</p>
+<div class="pic"><img alt="" src="Image00049.jpg" />
+</div>
+<p class="middle-img">图7-1　使用-F刷新日志的原理图</p>
+<p class="ziti">（4）如何开启binlog功能？</p>
+<p class="ziti">binlog文件生效需要一个参数：log_bin，编辑配置文件增加log_bin参数即可，注意，MySQL 5.6版本变成了下划线连接的格式（MySQL 5.6以前是中杠）。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# grep log_bin /etc/my.cnf
+log_bin #&lt;==默认binlog文件名前缀为“主机名-bin”，也可以自定义名字，例如log_bin =
+             mysql-bin。
+[root@oldboy ~]# /etc/init.d/mysqld restart
+Shutting down MySQL.. SUCCESS!
+Starting MySQL. SUCCESS!
+[root@oldboy ~]# ls -lrt /application/mysql/data/oldboy-bin*
+-rw-rw----. 1 mysql mysql 143 Mar  3 05:50 /application/mysql/data/oldboy-bin.000001 #&lt;==日志文件。
+-rw-rw----. 1 mysql mysql  40 Mar  3 05:50 /application/mysql/data/oldboy-bin.index  #&lt;==索引文件。</pre>
+<hr/>
+<p class="ziti">binlog日志切割就是确定全备和binlog增量备份的临界点，当然，后文还有类似的参数，如“--master-data”。</p>
+<p class="ziti">（5）使用-F刷新binlog日志</p>
+<p class="ziti">使用-F将会从备份后的时刻起重新记录binlog日志文件，将来增量恢复从新的binlog日志文件开始即可。</p>
+<p class="ziti">例如，早晨10点丢失数据需要恢复数据，则数据恢复步骤具体如下。</p>
+<p class="ziti">1）将0：00点时刻备份的全备数据还原到数据库，这个时候数据就恢复到了当日00点。</p>
+<p class="ziti">2）0：00点-10：00丢失的数据，就要从全备后当天的所有binlog里恢复，而使用-F切割日志，就是找到0：00点这个时刻全备和binlog接缝的起始binlog文件。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump -F -B oldboy|gzip &gt;/opt/bak_$(date +%F).sql.gz
+#&lt;==带-F备份。
+[root@oldboy ~]# ls -lrt /application/mysql/data/oldboy-bin*
+-rw-rw----. 1 mysql mysql 143 Mar  3 05:50 /application/mysql/data/oldboy-bin.000001
+-rw-rw----. 1 mysql mysql 168 Mar  3 05:57 /application/mysql/data/oldboy-bin.000002 #&lt;==新binlog。
+-rw-rw----. 1 mysql mysql  60 Mar  3 05:57 /application/mysql/data/oldboy-bin.index
+[root@oldboy ~]# mysqldump -F -B oldboy|gzip &gt;/opt/bak_$(date +%F).sql.gz
+[root@oldboy ~]# ls -lrt /application/mysql/data/oldboy-bin*
+-rw-rw----. 1 mysql mysql 143 Mar  3 05:50 /application/mysql/data/oldboy-bin.000001
+-rw-rw----. 1 mysql mysql 168 Mar  3 05:57 /application/mysql/data/oldboy-bin.000002
+-rw-rw----. 1 mysql mysql 168 Mar  3 05:57 /application/mysql/data/oldboy-bin.000003 #&lt;==新binlog。
+-rw-rw----. 1 mysql mysql  80 Mar  3 05:57 /application/mysql/data/oldboy-bin.index
+提示：可以看到，使用-F参数后，每备份一次，都会重新生成新的binlog记录数据。</pre>
+<hr/>
+<p class="p6">13.记录binlog位置的特殊参数（--master-data）</p>
+<p class="ziti">mysqldump里提供了一个参数，使得管理员不用刷新binlog，也可以找到全量和增量的临界点，这就是“--master-data”参数。使用这个参数备份后，在备份的文件对应的SQL语句里会添加CHANGE MASTER语句及binlog文件及位置点信息。</p>
+<p class="ziti">当“--master-data=1”时，备份结果为可执行的“CHANGE MASTER...”语句；当“--master-data=2”时，备份结果为注释的“--CHANGE MASTER...”语句，“--”在SQL语句里为注释的意思。“--master-data”参数除了确定增量恢复和全备之间的临界点之外，进行主从复制时的作用更大，详情见后文。</p>
+<p class="ziti">操作示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump --master-data=1 oldboy --compact|head -1
+#&lt;==--master-data=1的结果。
+CHANGE MASTER TO MASTER_LOG_FILE='oldboy-bin.000004', MASTER_LOG_POS=120;
+[root@oldboy ~]# mysqldump --master-data=2 oldboy --compact|head -1
+#&lt;==--master-data=2的结果。
+-- CHANGE MASTER TO MASTER_LOG_FILE='oldboy-bin.000004', MASTER_LOG_POS=120;</pre>
+<hr/>
+<p class="p6">14.锁定所有表备份（-x参数）</p>
+<p class="ziti">默认情况下，在使用mysqldump命令备份期间，数据库依然是可以写入数据的，此时，备份的数据就不是某一个时刻的一致性备份了，因此也会在恢复时造成困扰。例如备份时使用-x锁表备份就会取得0点时刻的完整备份，即在0点时刻停止所有写入操作，然后导出备份数据，备份完毕，放开写入，备份时刻停止写入的情况如图7-2所示。</p>
+<p class="ziti">如果不锁表进行备份，就会无法得到某一个时刻的完整备份，由于是一边备份数据一边写入数据，因此最后备份的数据很可能就是一个时间段的数据，而非某一个时刻的一致性全备（如图7-3所示）。</p>
+<div class="pic"><img alt="" src="Image00050.jpg" />
+</div>
+<p class="middle-img">图7-2　锁表备份示意图</p>
+<div class="pic"><img alt="" src="Image00051.jpg" />
+</div>
+<p class="middle-img">图7-3　不锁表备份示意图</p>
+<p class="p6">15.innodb表特有的备份参数（--single-transaction）</p>
+<p class="ziti">当使用mysqldump的“--single-transaction”对innodb表进行备份时，会开启一个事务，并将整个备份过程放到一个事务里，以确保执行本次dump会话时，不会看到其他连接会话已经提交了的数据，即备份开始时刻的数据是什么样，备份出来就是什么样子（如图7-4所示）。这也相当于是锁表之后备份的数据，但是这个参数是允许在备份期间写入数据的，而不是在使用“-x”参数锁表之后，备份期间无法写入任何数据。操作例子如下：</p>
+<hr/>
+<pre class="ziti1">mysqldump -B --master-data=2 --single-transaction oldboy|gzip &gt;/opt/all.sql.gz</pre>
+<hr/>
+<div class="pic"><img alt="" src="Image00052.jpg" />
+</div>
+<p class="middle-img">图7-4　--single-transaction备份原理示意图</p>
+<p class="ziti">这就是为什么要强调“--single-transaction”是innodb表的特有备份参数了，只有事务型引擎，才能支持这样的备份功能。</p>
+</body>
+</html>

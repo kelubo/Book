@@ -1,0 +1,430 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_232">12.3.2　注解Annotations</h3> 
+ <p class="ziti3">Nginx Ingress注解使用在Ingress资源实例中，用以设置当前Ingress资源实例中Nginx虚拟主机的相关配置，对应配置的是Nginx当前虚拟主机的server指令域内容。在与Nginx Ingress配置映射具有相同功能配置时，将按照所在指令域层级遵循Nginx配置规则覆盖。Nginx Ingress注解按照配置功能有如下分类。</p> 
+ <p class="ziti3">（1）Nginx原生配置指令</p> 
+ <p class="ziti3">支持在注解中添加Nginx原生配置指令。配置说明如表12-16所示。</p> 
+ <p class="middle-img">表12-16　原生配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-16.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-16.jpg" class="calibre271"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org
+    annotations:
+        nginx.ingress.kubernetes.io/server-snippet: |
+            location / {
+                return 302 /coffee;
+            }
+spec:
+    rules:
+    - host: web.nginxbar.org
+      http:
+            paths:
+            - path: /tea
+              backend:
+                  serviceName: tea-svc
+                  servicePort: 80
+            - path: /coffee
+            backend:
+                serviceName: coffee-svc
+                servicePort: 80
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）通用配置</p> 
+ <p class="ziti3">Nginx虚拟主机中的通用配置。通用配置说明如表12-17所示。</p> 
+ <p class="middle-img">表12-17　通用配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-17.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-17.jpg" class="calibre374"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/397-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/397-i.jpg" class="calibre375"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org
+    namespace: default
+    annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /tea/$1
+        nginx.ingress.kubernetes.io/enable-rewrite-log: "true"
+spec:
+    rules:
+    - host: web.nginxbar.org   # 此service的访问域名
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web
+            servicePort: 8080
+        path: /coffee/(.+)
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）访问控制</p> 
+ <p class="ziti3">用以设置基于流量、请求连接数、请求频率的访问控制。访问控制配置说明如表12-18所示。</p> 
+ <p class="middle-img">表12-18　访问控制配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-18.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-18.jpg" class="calibre376"/></a> 
+ </div> 
+ <p class="ziti3">（4）认证管理</p> 
+ <p class="ziti3">Nginx Ingress提供了基本认证、摘要认证和外部认证3种方式，为被代理服务器提供认证支持。认证管理配置说明如表12-19所示。</p> 
+ <p class="middle-img">表12-19　认证管理配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-19.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-19.jpg" class="calibre377"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/399-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/399-i.jpg" class="calibre378"/></a> 
+ </div> 
+ <p class="ziti3">基本认证配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建基本认证用户名nginxbar、密码123456，输出文件名必须是auth
+htpasswd -bc auth nginxbar 123456
+
+# 创建资源对象secret保存账号和密码
+kubectl create secret generic basic-auth --from-file=auth
+
+# 查看创建的basic-auth
+kubectl get secret basic-auth -o yaml
+
+# 创建基本认证的Ingress实例
+cat&gt;auth-nginxbar-org.yaml&lt;&lt;EOF
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: auth-nginxbar-org
+    namespace: default
+    annotations:
+        # 设置认证类型
+        nginx.ingress.kubernetes.io/auth-type: basic
+        # 关联账号和密码
+        nginx.ingress.kubernetes.io/auth-secret: basic-auth
+        # 显示认证提示信息
+        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required for web.nginxbar.org'
+spec:
+    rules:
+    - host: auth.nginxbar.org   # 此service的访问域名
+      http:
+          paths:
+          - backend:
+              serviceName: nginx-web
+              servicePort: 8080
+EOF
+
+kubectl create -f auth-nginxbar-org.yaml
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">认证转发配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: auth-nginxbar-org
+    namespace: default
+    annotations:
+        nginx.ingress.kubernetes.io/auth-url: "http://$host/auth2"
+        nginx.ingress.kubernetes.io/auth-signin: "http://$host/auth/start"
+        nginx.ingress.kubernetes.io/auth-method: "POST"
+        nginx.ingress.kubernetes.io/auth-cache-key: "foo",
+        nginx.ingress.kubernetes.io/auth-cache-duration": "200 202 401 30m"
+        nginx.ingress.kubernetes.io/auth-snippet: |
+            proxy_set_header Foo-Header 42;
+spec:
+    rules:
+    - host: auth.nginxbar.org   # 此service的访问域名
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web
+            servicePort: 8080
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（5）跨域访问</p> 
+ <p class="ziti3">跨域访问功能配置说明如表12-20所示。</p> 
+ <p class="middle-img">表12-20　跨域访问</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-20.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-20.jpg" class="calibre379"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org
+    namespace: default
+    annotations:
+        nginx.ingress.kubernetes.io/cors-allow-headers: &gt;-
+            DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,
+            If-Modified-Since,Cache-Control,Content-Type,Authorization
+        nginx.ingress.kubernetes.io/cors-allow-methods: 'PUT, GET, POST, OPTIONS'
+        nginx.ingress.kubernetes.io/cors-allow-origin: '*'
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-max-age: 600
+spec:
+    rules:
+    - host: web.nginxbar.org
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web
+            servicePort: 8080
+          path: /
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（6）代理配置</p> 
+ <p class="ziti3">Nginx代理相关功能配置说明如表12-21所示。</p> 
+ <p class="middle-img">表12-21　代理配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-21.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-21.jpg" class="calibre380"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/402-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/402-i.jpg" class="calibre381"/></a> 
+ </div> 
+ <p class="ziti3">（7）负载均衡</p> 
+ <p class="ziti3">为方便上游服务器组的动态管理，Nginx Ingress基于Lua实现了一致性哈希、基于子集的一致性哈希、轮询调度及峰值指数加权移动平均（Peak Exponentially Weighted Moving-Average，Peak EWMA）负载均衡算法。负载均衡配置说明如表12-22所示。</p> 
+ <p class="middle-img">表12-22　负载均衡配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-22.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-22.jpg" class="calibre382"/></a> 
+ </div> 
+ <p class="ziti4">·子集模式的一致性哈希负载算法是将上游服务器组中的被代理服务器分成固定数量的分组，然后把每个分组当作一致性哈希计算的虚拟节点。默认一致性哈希是按照每个被代理服务器为虚拟节点进行计算的。</p> 
+ <p class="ziti4">·Peak EWMA负载均衡算法，是对每个Pod请求的往返延时（Round-Trip Time，RTT）计算移动平均值，并用该Pod的未完成请求数对这个平均值加权计算，计算值最小的Pod端点将被分配新的请求。</p> 
+ <p class="ziti3">（8）会话保持配置</p> 
+ <p class="ziti3">设置基于cookie的会话亲缘关系，也就是会话保持功能。启用基于cookie的会话保持功能时，可以使同一客户端的请求始终转发给同一后端服务器。Nginx Ingress对启用会话保持功能的Service集群使用一致性哈希负载算法，即使后端Pod数量变化，也不会对会话保持功能产生太大的影响。会话保持配置说明如表12-23所示。</p> 
+ <p class="middle-img">表12-23　会话保持配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-23.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-23.jpg" class="calibre383"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org
+    annotations:
+        nginx.ingress.kubernetes.io/affinity: "cookie"
+        nginx.ingress.kubernetes.io/session-cookie-name: "route"
+        nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+        nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+
+spec:
+    rules:
+    - host: web.nginxbar.org
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web
+            servicePort: 8080
+        path: /
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（9）HTTPS配置</p> 
+ <p class="ziti3">HTTPS功能的配置说明如表12-24所示。</p> 
+ <p class="middle-img">表12-24　HTTPS配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-24.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-24.jpg" class="calibre368"/></a> 
+ </div> 
+ <p class="ziti3">HTTPS配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建TLS证书
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /data/apps/certs/dashboard.key -out /data/apps/certs/dashboard.crt -subj "/CN=dashboard.nginxbar.org/O=dashboard.nginxbar.org"
+kubectl -n kube-system  create secret tls ingress-secret --key /data/apps/certs/dashboard.key --cert /data/apps/certs/dashboard.crt
+
+# 创建HTTPS服务
+cat&gt;dashboard-ingress.yaml&lt;&lt;EOF
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: dashboard-ingress
+    namespace: kube-system
+    annotations:
+        nginx.ingress.kubernetes.io/ingress.class: nginx
+        # 使用HTTPS协议代理后端服务器
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        # 启用SSL透传
+        nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+spec:
+    tls:
+    - hosts:
+        - dashboard.nginxbar.org
+        secretName: ingress-secret
+    rules:
+        - host: dashboard.nginxbar.org
+          http:
+            paths:
+            - path: /
+              backend:
+                serviceName: kubernetes-dashboard
+                servicePort: 443
+EOF
+
+kubectl create -f dashboard-ingress.yaml
+
+curl -k -H "Host:dashboard.nginxbar.org" https://10.103.196.209
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx-ingress在用户没有提供证书的情况下会提供一个内置的默认TLS证书，如果secretName参数没有配置或配置错误，Nginx会使用系统默认的证书，所以配置后仍需检查确认。</p> 
+ <p class="ziti3">HTTPS客户端证书身份认证配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建客户端证书资源对象default/ca-secret
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    annotations:
+        # 启用客户端证书验证
+        nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+        # 绑定客户端证书的资源对象名称，是命名空间default的ca-secret
+        nginx.ingress.kubernetes.io/auth-tls-secret: "default/ca-secret"
+        # 客户端证书链的验证深度为1
+        nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
+        # 设置客户端证书验证错误时的跳转页面
+        nginx.ingress.kubernetes.io/auth-tls-error-page: "http://www.mysite.com/error-cert.html"
+        # 指定证书传递到上游服务器
+        nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    name: nginx-test
+    namespace: default
+spec:
+    rules:
+    - host: mydomain.com
+        http:
+            paths:
+            - backend:
+                serviceName: http-svc
+                servicePort: 80
+            path: /
+    tls:
+    - hosts:
+        - mydomain.com
+        secretName: tls-secret
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（10）“金丝雀”发布</p> 
+ <p class="ziti3">“金丝雀”发布又称为灰度发布，灰度发布功能可以将用户请求按照指定的策略进行分割，并转发到不同的代理服务器组，通过不同的代理服务器部署应用不同版本可进行对照比较，因该方式对于新版本而言类似于使用“金丝雀”的方式进行测试，所以也叫“金丝雀”发布。Nginx Ingress支持Header、cookie和权重3种方式，可单独使用，也可以组合使用。“金丝雀”发布配置说明如表12-25所示。</p> 
+ <p class="middle-img">表12-25　“金丝雀”发布配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-25.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-25.jpg" class="calibre384"/></a> 
+ </div> 
+ <p class="ziti3">“金丝雀”路由规则同时存在时的优先顺序是canary-by-header、canary-by-cookie、canary-weight。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建主机web.nginxbar.org的Ingress资源配置
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org
+    namespace: default
+    annotations:
+        nginx.ingress.kubernetes.io/ingress.class: "nginx"
+spec:
+    rules:
+    - host: web.nginxbar.org   # 此service的访问域名
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web
+            servicePort: 8080
+
+# 创建主机web.nginxbar.org金丝雀组的Ingress资源配置
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org-canary
+    namespace: default
+    annotations:
+        nginx.ingress.kubernetes.io/ingress.class: "nginx"
+        nginx.ingress.kubernetes.io/canary: "true",
+        # 根据请求头字段CanaryByHeader的值进行判断
+        nginx.ingress.kubernetes.io/canary-by-header: "CanaryByHeader",
+        # 请求头字段CanaryByHeader的值为DoCanary时，路由到“金丝雀”服务器组
+        nginx.ingress.kubernetes.io/canary-by-header-value: "DoCanary",
+        # 根据Cookie字段CanaryByCookie的值进行判断
+        nginx.ingress.kubernetes.io/canary-by-cookie: "CanaryByCookie",
+        # 随机10%的请求路由到“金丝雀”服务器组
+        nginx.ingress.kubernetes.io/canary-weight: "10",
+spec:
+    rules:
+    - host: web.nginxbar.org   # 此service的访问域名
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web-canary
+            servicePort: 8080
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（11）lua-resty-waf模块</p> 
+ <p class="ziti3">lua-resty-waf是一个基于OpenResty的高性能Web应用防火墙，对当前虚拟主机的访问可以按照相关防火墙规则进行访问过滤。模块配置说明如表12-26所示。</p> 
+ <p class="middle-img">表12-26　lua-resty-waf模块</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-26.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-26.jpg" class="calibre385"/></a> 
+ </div> 
+ <p class="ziti3">（12）ModSecurity模块配置</p> 
+ <p class="ziti3">ModSecurity是一个开源的Web应用防火墙。必须首先通过在ConfigMap中启用Mod-Security来加载ModSecurity模块。这将为所有路径启用ModSecurity过滤，可以手动在Ingress资源实例中禁用此功能。ModSecurity模块配置说明如表12-27所示。</p> 
+ <p class="middle-img">表12-27　ModSecurity模块配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-27.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-27.jpg" class="calibre386"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org
+    annotations:
+        nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+        nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+        nginx.ingress.kubernetes.io/modsecurity-transaction-id: "$request_id"
+        nginx.ingress.kubernetes.io/modsecurity-snippet: |
+        SecRuleEngine On
+        SecDebugLog /tmp/modsec_debug.log
+spec:
+    rules:
+    - host: web.nginxbar.org
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web
+            servicePort: 8080
+            path: /
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（13）Influxdb模块配置</p> 
+ <p class="ziti3">通过使用Nginx Influxdb模块，可以用UDP协议将请求记录实时发送到后端的Influxdb服务器。Influxdb模块配置说明如表12-28所示。</p> 
+ <p class="middle-img">表12-28　Influxdb模块配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-28.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-28.jpg" class="calibre79"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: web-nginxbar-org
+    annotations:
+        nginx.ingress.kubernetes.io/enable-influxdb: "true"
+        nginx.ingress.kubernetes.io/influxdb-measurement: "nginxbar-reqs"
+        nginx.ingress.kubernetes.io/influxdb-port: "8089"
+        nginx.ingress.kubernetes.io/influxdb-host: "192.168.2.110"
+        nginx.ingress.kubernetes.io/influxdb-server-name: "nginxbar-com"
+spec:
+    rules:
+    - host: web.nginxbar.org
+      http:
+        paths:
+        - backend:
+            serviceName: nginx-web
+            servicePort: 8080
+        path: /
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

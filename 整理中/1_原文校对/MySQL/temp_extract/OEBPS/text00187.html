@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.2　change pool缓存池</h3>
+<p class="ziti">change buffering是MySQL5.5中加入的新特性，change buffering是insert buffer的加强。insert buffer只针对insert有效，由于对非聚簇索引叶子节点的插入往往不像主键插入一样是按顺序的，而是随机读写的，从而导致了插入操作性能的下降，所以为了提高性能，InnoDB存储引擎对非聚簇索引的插入或更新操作并不是每次都直接插入到索引页，而是先判断插入的索引页是否在缓冲池中，如果在则直接插入，如果不在则先将插入信息放到change buffer中，然后再以一定的频率和情况对buffer和索引叶子节点进行合并操作，这时通常能将多个插入合并到一个操作中，这也就大大提高了插入的性能</p>
+<p class="ziti">change buffering对insert、delete、update(delete+insert)、purge都有效。同样的，当修改一个索引块（secondary index）的数据时，索引块在buffter pool中不存在，修改信息就会被cache在change buffer中，当通过索引扫描把需要的索引块读取到buffer pool中时，其会与change buffer中的修改信息合并，再择机写回disk。</p>
+<p class="ziti">Innodb_change_buffering参数缓存所对应的操作（update会被认为是delete+insert）具体如下。</p>
+<p class="ziti6">·all：默认值，缓存insert、delete、purges操作。</p>
+<p class="ziti6">·none：不缓存。</p>
+<p class="ziti6">·inserts：缓存insert操作。</p>
+<p class="ziti6">·deletes：缓存delete操作。</p>
+<p class="ziti6">·changes：缓存insert和delete操作。</p>
+<p class="ziti6">·purges：缓存后台执行的物理删除操作。</p>
+<p class="ziti">一般情况下，当辅助索引页被读取到缓冲池中时，例如在执行正常的select查询操作时，这时就会确认索引页是否在change buffer的B+树中，若有，则将结构中的记录和缓冲池中的索引页进行合并操作。</p>
+<p class="ziti">可以通过show engine innodb status命令查看change buffer的操作信息：</p>
+<hr/>
+<pre class="ziti1">-------------------------------------
+INSERT BUFFER AND ADAPTIVE HASH INDEX
+-------------------------------------
+Ibuf: size 1, free list len 0, seg size 2, 0 merges
+merged operations:
+ insert 0, delete mark 0, delete 0</pre>
+<hr/>
+<p class="ziti">其中，merged operations代表了辅助索引页与change buffer的合并操作次数，insert代表insert buffer，delete mark代表delete buffer，delete代表purge buffer。</p>
+<p class="ziti">innodb_change_buffer_max_size参数用于配置change buffer在buffer pool中所占的最大百分比，默认是25%，最大可以设置为50%。当MySQL实例中有大量的修改操作时，需要考虑增大innodb_change_buffer_max_size的值。</p>
+</body>
+</html>

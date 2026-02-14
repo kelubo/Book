@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">9.5.8　使用Xtrabackup物理分库分表备份</h3>
+<p class="ziti">使用Xtrabackup物理分库分表备份的前提是开启独立表空间模式，即设置innodb_file_per_table=On，MySQL 5.6版本默认已经开启了此模式。</p>
+<p class="ziti">1）备份单个库oldboy：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password
+=oldboy123 --socket=/application/mysql-5.6.40/tmp/mysql.sock --no-timestamp --databases=
+"oldboy" /server/backup/oldboy_full
+[root@oldboy ~]# ls -l /server/backup/oldboy_full/
+total 77848
+-rw-r-----. 1 root root      418 Mar 22 12:27 backup-my.cnf
+-rw-r-----. 1 root root 79691876 Mar 22 12:27 ibdata1
+drwxr-x---. 2 root root     4096 Mar 22 12:27 oldboy
+-rw-r-----. 1 root root       22 Mar 22 12:27 xtrabackup_binlog_info
+-rw-r-----. 1 root root      113 Mar 22 12:27 xtrabackup_checkpoints
+-rw-r-----. 1 root root      595 Mar 22 12:27 xtrabackup_info
+-rw-r-----. 1 root root     2560 Mar 22 12:27 xtrabackup_logfile</pre>
+<hr/>
+<p class="ziti">2）备份多个库：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password=
+oldboy123 --socket=/application/mysql-5.6.40/tmp/mysql.sock --no-timestamp --databases= "oldboy oldgirl" /server/backup/oldboy_oldgirl
+[root@oldboy ~]# ls -l /server/backup/oldboy_oldgirl/
+total 77852
+-rw-r-----. 1 root root      418 Mar 22 12:30 backup-my.cnf
+-rw-r-----. 1 root root 79691876 Mar 22 12:30 ibdata1
+drwxr-x---. 2 root root     4096 Mar 22 12:30 oldboy
+drwxr-x---. 2 root root     4096 Mar 22 12:30 oldgirl
+-rw-r-----. 1 root root       22 Mar 22 12:30 xtrabackup_binlog_info
+-rw-r-----. 1 root root      113 Mar 22 12:30 xtrabackup_checkpoints
+-rw-r-----. 1 root root      606 Mar 22 12:30 xtrabackup_info
+-rw-r-----. 1 root root     2560 Mar 22 12:30 xtrabackup_logfile</pre>
+<hr/>
+<p class="ziti">3）备份单个表：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password=
+oldboy123 --socket=/application/mysql-5.6.40/tmp/mysql.sock --no-timestamp --databases= "oldboy.test" /server/backup/oldboy_test</pre>
+<hr/>
+<p class="ziti">4）备份多个库的多个表：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password=
+oldboy123 --socket=/application/mysql-5.6.40/tmp/mysql.sock --no-timestamp --databases= "oldboy.test oldboy.student" /server/backup/oldboy_test_student
+[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password=
+oldboy123 --socket=/application/mysql-5.6.40/tmp/mysql.sock --no-timestamp --databases= "oldboy.test oldboy.student mysql.user" /server/backup/all</pre>
+<hr/>
+<p class="ziti">其他用法还有“--tables-file”、“——include”等参数，读者可以参考官方说明进行尝试。</p>
+</body>
+</html>

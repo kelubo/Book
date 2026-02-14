@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">5.5.2　找回MySQL多实例root用户的密码方法</h3>
+<p class="ziti">这里以多实例的3307为例进行讲解。</p>
+<p class="ziti">第一步，关闭多实例3307 MySQL服务。</p>
+<p class="ziti">首先使用killall mysqld或者kill pid（需要使用ps查到pid的值）的方式关闭指定实例3307的数据库，对于多实例的脚本（/data/3307/mysql），老男孩之前是使用mysqladmin的方式进行关闭的，这种方式需要使用密码才行，因此这个脚本此时就无法关闭（假设忘记了密码）了。</p>
+<p class="ziti">第二步，启动数据库时加“--skip-grant-tables”参数，注意，该参数要放到结尾：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqld_safe --defaults-file=/data/3307/my.cnf --skip-grant-tables &gt;/dev/null 2&gt;&amp;1 &amp;
+[1] 58437
+[root@oldboy ~]# ss -lnt|grep 3307
+LISTEN     0      128                      :::3307                    :::*</pre>
+<hr/>
+<p class="ziti">第三步，使用登录命令，示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -S /data/3307/mysql.sock   #&lt;==登录时空密码即可。</pre>
+<hr/>
+<p class="ziti">第四步，修改密码，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; update mysql.user set password=PASSWORD("oldboy123") where user="root" and host="localhost";
+mysql&gt; FLUSH PRIVILEGES;
+mysql&gt; quit</pre>
+<hr/>
+<p class="ziti">现在，可以重启服务，使用新密码登录了。</p>
+<p class="ziti">改完密码后，停止数据库，以正常启动的方式重新启动并登录：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /data/3307/mysql stop
+#&lt;==要提前编辑脚本，将修改后的密码写到脚本密码参数位置，否则会无法关闭数据库。
+Stoping MySQL...
+Warning: Using a password on the command line interface can be insecure.
+[1]+  Done                   mysqld_safe --defaults-file=/data/3307/my.cnf --skip-grant-tables &gt; /dev/null 2&gt;&amp;1
+[root@oldboy ~]# /data/3307/mysql start          #&lt;==正式重启多实例MySQL。
+Starting MySQL...
+[root@oldboy ~]# ss -lnt|grep 3307               #&lt;==检查是否重启成功。
+LISTEN     0      128                      :::3307                    :::*
+[root@oldboy ~]# mysql -S /data/3307/mysql.sock  #&lt;==不用密码登录不行了。
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[root@oldboy ~]# mysql -uroot -poldboy -S /data/3307/mysql.sock
+                                                 #&lt;==使用新密码登录。
+Warning: Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+...省略若干行...
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">特殊提示：本章在单实例和多实例数据库之间进行了各种切换，请在使用单实例数据库之前，停止掉多实例中的3306实例，停止命令为/data/3306/mysql stop，如果想使用多实例3306实例及3307实例，则需要提前停止单实例数据库，停止命令为/etc/init.d/mysqd stop。</p>
+</body>
+</html>

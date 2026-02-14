@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="p3" id="sigil_toc_id_79">4.3　数据处理功能模块</h2> 
+ <h3 class="p" id="sigil_toc_id_80">4.3.1　首页处理</h3> 
+ <p class="ziti3">HTTP请求经过一系列的请求流程处理后，最终将读取数据并把数据内容返回给用户。当用户请求没有明确指定请求的文件名称时，Nginx会根据设定返回默认数据，实现这一功能包含ngx_http_index_module、ngx_http_random_index_module、ngx_http_autoindex_module这3个模块。</p> 
+ <p class="ziti3">常用的首页处理配置指令如表4-45～表4-50所示。</p> 
+ <p class="middle-img">表4-45　首页指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-45.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-45.jpg" class="calibre114"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location / {
+    index index.$geo.html index.html;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·指令值为多个文件时，会按照从左到右的顺序依次查找，找到对应文件后将结束查找。</p> 
+ <p class="middle-img">表4-46　随机首页指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-46.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-46.jpg" class="calibre170"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">root /opt/nginx-web/html;
+location / {
+    random_index on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·该指令的执行优先级高于index指令。</p> 
+ <p class="ziti4">·文件目录中的隐藏文件将被忽略。</p> 
+ <p class="middle-img">表4-47　自动首页指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-47.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-47.jpg" class="calibre133"/></a> 
+ </div> 
+ <p class="middle-img">表4-48　自动首页格式指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-48.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-48.jpg" class="calibre171"/></a> 
+ </div> 
+ <p class="middle-img">表4-49　自动首页文件大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-49.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-49.jpg" class="calibre172"/></a> 
+ </div> 
+ <p class="middle-img">表4-50　自动首页时间指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-50.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-50.jpg" class="calibre173"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location / {
+    autoindex on;
+    autoindex_format html;
+    autoindex_exact_size off;
+    autoindex_localtime on; 
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">18.6.6　配置MHA管理节点</h3>
+<p class="ziti">安装完MHA管理节点之后，需要进行相关文件的配置，实操步骤如下：</p>
+<hr/>
+<pre class="ziti1">[root@db03 ~]# mkdir -p /etc/mha           #&lt;==在/etc下创建mha目录。
+[root@db03 ~]# mkdir -p /var/log/mha/app1  #&lt;==在/etc下创建mha目录。
+[root@db03 ~]# vim /etc/mha/app1.cnf       #&lt;==编辑mha配置文件，增加配置内容。
+[server default]                           #&lt;==默认模块标签。
+manager_log=/var/log/mha/app1/manager.log  #&lt;==配置日志路径。
+manager_workdir=/var/log/mha/app1.log      #&lt;==配置工作日志路径。
+master_binlog_dir=/application/mysql/data  #&lt;==配置MHA保存主库binlog日志的路径。
+user=mha                                   #&lt;==MySQL数据中授权的用户。
+password=mha                               #&lt;==MySQL数据中授权的用户。
+ping_interval=2                       #&lt;==设置监控主库发送ping数据包的时间间隔，
+                                       若尝试三次没有回应则自动进行failover。
+repl_user=rep                              #&lt;==主从复制对应的用户。
+repl_password=oldboy123                    #&lt;==主从复制用户对应的密码。
+ssh_user=root                              #&lt;==ssh远程连接服务器的用户。
+report_script=/usr/local/send_report       #&lt;==设置故障发生切换后触发执行的脚本。
+secondary_check_script=/usr/local/bin/masterha_secondary_check -s db03 -s db02 --user=root --master_host=db01 --master_ip=10.0.0.51 --master_port=3306
+#&lt;==当MHA Manager节点到MASTER节点（db01）的监控之间出现问题时，MHA Manager将会
+       尝试从其他路径登录到MASTER（db01）节点。
+#&lt;==注：此配置在MHA Manager节点只有单独一台机器时起作用。意思就是，在Manager节点
+       联系不上Master时，通过两个从节点（db02、db03）去探视Master（db01）节点的状态。
+shutdown_script="" #&lt;==设置故障发生后执行主机脚本关闭故障机（防止故障机活过来发生脑裂）
+[server1]                                  #&lt;==第一个mysql主机模块标签。
+hostname=10.0.0.51                         #&lt;==第一个mysql主机IP。
+port=3306                                  #&lt;==第一个mysql主机端口。
+[server2]
+hostname=10.0.0.53
+port=3306
+candidate_master=1           #&lt;==设定此参数后，server2标签的主机，将优先作为主库
+                               宕机的候选服务器（切换主库优先选择）。
+check_repl_delay=0  #&lt;==设定此参数后，MHA会忽略主从复制延迟，将此服务器作为后选主机。
+[server3]
+hostname=172.16.1.52
+port=3306</pre>
+<hr/>
+<p class="ziti">最终去掉解释说明及无关配置的案例代码如下：</p>
+<hr/>
+<pre class="ziti1">[server default]
+manager_log=/var/log/mha/app1/manager.log
+manager_workdir=/var/log/mha/app1.log
+master_binlog_dir=/application/mysql/data
+master_ip_failover_script=/usr/local/bin/master_ip_failover
+user=mha
+password=mha
+ping_interval=2
+repl_user=rep
+repl_password=oldboy123
+ssh_user=root
+shutdown_script=""
+[server1]
+candidate_master=1
+check_repl_delay=0
+hostname=10.0.0.51
+port=3306
+[server2]
+hostname=10.0.0.52
+port=3306
+candidate_master=1
+check_repl_delay=0
+[server3]
+hostname=10.0.0.53
+port=3306</pre>
+<hr/>
+<p class="ziti6">至此，我们的MHA就已经安装并配置完毕了，但是我们还需要做一些动作。</p>
+</body>
+</html>

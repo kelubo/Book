@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_93">5.2.3　HTTPS密钥交换算法</h3>
+
+  <p class="ziti3">在HTTPS建立连接进行密钥交换阶段，可以通过多种密钥交换算法实现密钥交换。基于RSA的密钥交换过程是客户端把第3个随机数发送给服务端，但在HTTPS建立连接阶段的传输仍是明文的，会存在安全问题。DH（Diffie-Hellman）密钥交换算法可保证通信双方在明文传输的环境下安全地交换密钥。基于DH的密钥交换过程是在服务端产生服务端随机数后，将DH参数和密钥交换服务端公钥加密后传递给客户端，客户端根据DH参数和密钥交换服务端公钥计算出第3个随机数，并把自己产生的密钥更换为客户端公钥发送给服务端，服务端依据密钥交换客户端公钥计算出第3个随机数并完成后续的操作。椭圆曲线的DH（ECDH）密钥交换算法与DH交换算法相似，但使用了不同的数学模型。在使用椭圆曲线的DH密钥交换时，服务器会为密钥交换指定一条预先定义好参数的曲线，Nginx的ECDH密钥交换默认配置的是prime256v1曲线算法。配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;
+    ssl_certificate_key ssl/www_nginxbar_org.key;
+    ssl_password_file ssl/www_nginxbar_org.pass;
+    ssl_dhparam ssl/dhparam.pem;                    # DH参数文件
+    ssl_ecdh_curve auto;                            # ECDH椭圆曲线算法为prime256v1
+}
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">DH参数文件可通过如下命令生成。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">openssl dhparam -out /etc/nginx/conf/ssl/dhparam.pem 2048
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">基于DH的密钥交换算法也称前向加密（Forward Secrecy）或完全前向加密（Perfect Forward Secrecy），其应用场景是即便日后服务器的SSL私钥被第三方获得，后者也无法推算出会话密钥。</p>
+</body>
+</html>

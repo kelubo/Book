@@ -1,0 +1,342 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_54">3.3.2　HTTP请求处理</h3> 
+ <p class="ziti3">标准的HTTP请求从开始到结束包括请求报文和响应报文。</p> 
+ <p class="ziti3">请求报文是客户端向服务端发起请求时告知服务端请求的方式、相关属性和请求内容的数据包，由请求行、请求头、请求体组成，这里以百度首页的请求为例，HTTP请求头结构如图3-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/3-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/3-2.jpg" class="calibre67"/></a> 
+ </div> 
+ <p class="middle-img">图3-2　HTTP请求头结构</p> 
+ <p class="ziti4">·请求行是请求头内容的第一行，包括请求方法GET，请求的URI地址<a href="https://www.baidu.com" class="pcalibre calibre1">https://www.baidu.com</a>，请求的协议及版本号HTTP/1.1。</p> 
+ <p class="ziti4">·请求头还包含此次请求所设定的若干属性字段，属性字段由属性名称和属性值组成，如浏览器信息User-Agent等。</p> 
+ <p class="ziti4">·请求体则是请求数据，该请求是无参数的GET方法，请求体中无内容。</p> 
+ <p class="ziti3">常见的请求头属性如表3-35所示。</p> 
+ <p class="middle-img">表3-35　常见的请求头属性</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-35.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-35.jpg" class="calibre68"/></a> 
+ </div> 
+ <p class="ziti3">响应报文是服务端处理客户端请求后返回客户端的数据，数据包括响应行、响应头、响应体3个部分，HTTP响应头结构如图3-3所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/3-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/3-3.jpg" class="calibre69"/></a> 
+ </div> 
+ <p class="middle-img">图3-3　HTTP响应头结构</p> 
+ <p class="ziti4">·响应行是响应头内容的第一行，包含报文协议及版本号HTTP/1.1、响应状态码200、响应状态描述OK。</p> 
+ <p class="ziti4">·响应头则包含服务端处理完请求后响应设定的若干属性字段，如set-cookie信息等。</p> 
+ <p class="ziti4">·响应体为返回的处理结果，本次请求的响应体是HTML页面数据。</p> 
+ <p class="ziti3">HTTP响应状态码是响应报文中对HTTP请求处理结果的重要标识，响应状态码是由RFC 2616规范定义的，并由互联网号码分配局（Internet Assigned Numbers Authority）维护，状态码可以分为以下5个类别。</p> 
+ <p class="ziti4">·1××（消息）：表示服务端已经接收到请求，正在进行处理。</p> 
+ <p class="ziti4">·2××（处理成功）：表示服务端已经正确处理完客户端的HTTP请求。</p> 
+ <p class="ziti4">·3××（重定向）：服务端接收到HTTP请求，并将其HTTP请求重定向到客户本地或其他服务器进行处理。</p> 
+ <p class="ziti4">·4××（客户端请求有误）：客户端提交的请求不符合规范或未被授权、禁止访问等。</p> 
+ <p class="ziti4">·5××（服务端处理出错）：服务端无法正常完成请求操作，如超时等。</p> 
+ <p class="ziti3">常见的响应头属性如表3-36所示。</p> 
+ <p class="middle-img">表3-36　常见的响应头属性</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-36.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-36.jpg" class="calibre70"/></a> 
+ </div> 
+ <p class="ziti3">当Nginx接收HTTP请求后，处理相关的配置指令如表3-37～表3-58所示。</p> 
+ <p class="middle-img">表3-37　忽略请求头无效属性指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-37.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-37.jpg" class="calibre71"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    ignore_invalid_headers off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-38　请求头中下划线连接属性名指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-38.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-38.jpg" class="calibre72"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    underscores_in_headers on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-39　请求头缓冲区大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-39.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-39.jpg" class="calibre73"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    client_header_buffer_size 2k;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-40　超大请求头缓冲区大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-40.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-40.jpg" class="calibre74"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    large_client_header_buffers 10 8k;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-41　请求头超时指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-41.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-41.jpg" class="calibre66"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    client_header_timeout 180s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-42　请求头内存池大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-42.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-42.jpg" class="calibre75"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    request_pool_size 4k;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">官方文档中提到，请求头内存池大小指令对性能的提升作用很小，不建议调整。</p> 
+ <p class="middle-img">表3-43　请求体大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-43.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-43.jpg" class="calibre76"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    client_max_body_size 100m;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">当指令值为0时，表示没有限制。</p> 
+ <p class="middle-img">表3-44　请求体缓冲区大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-44.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-44.jpg" class="calibre77"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    request_pool_size 4k;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-45　请求体写入缓冲区指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-45.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-45.jpg" class="calibre78"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    request_pool_size 4k;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-46　请求体写入文件指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-46.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-46.jpg" class="calibre79"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    client_body_in_file_only on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">指令值为on时，HTTP请求结束后临时文件会被保留。指令值为clean时，HTTP请求结束后临时文件会被删除。</p> 
+ <p class="middle-img">表3-47　请求体临时文件目录指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-47.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-47.jpg" class="calibre80"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    client_body_temp_path /tmp/nginx/client_temp 1 2;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">默认值是在编译时由configure的配置参数--http-proxy-temp-path决定的，没有参数指定时为Nginx安装目录的client_body_temp文件夹。</p> 
+ <p class="middle-img">表3-48　请求体超时指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-48.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-48.jpg" class="calibre81"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    client_body_timeout 120s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-49　文件修改判断指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-49.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-49.jpg" class="calibre82"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    if_modified_since before;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">当指令值为off时，忽略请求头中if_modified_since属性的处理，关闭Nginx的服务端校验功能；当指令值为exact时，与被请求文件的修改时间做精确匹配，即完全相等则认为客户端缓存有效，返回响应状态码304；当指令值为before时，被请求文件的修改时间小于if_modified_since属性字段中设定的时间，认为客户端缓存有效，返回响应状态码304。</p> 
+ <p class="middle-img">表3-50　实体标签指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-50.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-50.jpg" class="calibre83"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   etag off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-51　范围请求的最大值指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-51.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-51.jpg" class="calibre84"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/062-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/062-i.jpg" class="calibre85"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    max_ranges 1024 ;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">可在断点续传等场景中使用范围请求的最大值指令。</p> 
+ <p class="middle-img">表3-52　文件类型指令集</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-52.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-52.jpg" class="calibre86"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">types {
+    application/octet-stream yaml;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">将匹配路径的所有文件指定为MIME类型，配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location /download/ {
+    types        { }
+    default_type application/octet-stream;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-53　文件类型哈希表大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-53.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-53.jpg" class="calibre87"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    types_hash_max_size 2048;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-54　文件类型哈希桶大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-54.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-54.jpg" class="calibre88"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    types_hash_bucket_size 64;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-55　错误跳转指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-55.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-55.jpg" class="calibre89"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    error_page 404             /404.html;
+    error_page 500 502 503 504 /50x.html;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">可设定为一个location内部访问，配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    error_page 404 = @fallback;
+    location @fallback {
+        proxy_pass http://backend;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">响应状态码可通过“=response”语法进行修改，配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    error_page 404 =200 /empty.gif;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-56　多级错误跳转指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-56.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-56.jpg" class="calibre90"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/064-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/064-i.jpg" class="calibre91"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    proxy_intercept_errors on;          # 当上游服务器返回非200状态码时，返回代理服务器处理
+    recursive_error_pages on;           # 启用多级错误跳转功能
+    location / {
+        error_page 404 = @fallback;     # 当前URL请求为404时执行内部请求@fallback
+    }
+    location @fallback {
+        proxy_pass http://backend;      # 当前所有请求代理到上游服务器backend
+        error_page 502 = @upfallback;   # 当上游服务器返回502状态码时，执行内部请求@upfallback
+    }
+    location @upfallback {
+        proxy_pass http://newbackend;   # 当前的所有请求代理到上游服务器newbackend
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">上述配置样例中，如果recursive_error_pages指令值为off，Nginx只会处理一次error_page 404。当指令值为on，且upstream返回状态码为502时，才会调用upfallback的内部访问。</p> 
+ <p class="middle-img">表3-57　响应服务版本号指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-57.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-57.jpg" class="calibre32"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   server_tokens off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-58　msie响应注释指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-58.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-58.jpg" class="calibre92"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/065-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/065-i.jpg" class="calibre93"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    msie_padding off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">代码中显示该指令配置也支持Chrome客户端。</p> 
+</body>
+</html>

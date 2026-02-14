@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_51">3.2.5　核心指令配置样例</h3>
+
+  <p class="ziti3">本节核心指令的配置样例如下。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">daemon on;                                              # 以守护进程的方式运行Nginx
+pid  logs/nginx.pid;                                    # 主进程ID记录在logs/nginx.pid中
+user nobody nobody;                                     # 工作进程运行用户为nobody
+load_module "modules/ngx_http_xslt_filter_module.so";   # 加载动态模块ngx_http_xslt_
+                                                        # filter_module.so
+error_log  logs/error.log debug;                        # 错误日志输出级别为debug
+pcre_jit on;                                            # 启用pcre_jit技术
+thread_pool default threads=32 max_queue=65536;         # 线程池的线程数为32，等待队列中的最大
+                                                          # 任务数为65536
+timer_resolution 100ms;                                 # 定时器周期为100毫秒
+worker_priority -5;                                     # 工作进程系统优先级为-5
+worker_processes auto;                                  # 工作进程数由Nginx自动调整
+worker_cpu_affinity auto;                               # 工作进程的CPU绑定由Nginx自动调整
+worker_rlimit_nofile 65535;                             # 所有工作进程的最大连接数是65535
+worker_shutdown_timeout 10s;                            # 工作进程关闭等待时间是10秒
+lock_file logs/nginx.lock;                              # 互斥锁文件的位置是logs/nginx.lock
+
+working_directory logs                                  # 工作进程工作目录是logs
+debug_points stop;                                      # 调试点模式为stop
+worker_rlimit_core 800m;                                # 崩溃文件大小为800MB
+
+events {
+    worker_connections 65535;                           # 每个工作进程的最大连接数是65535
+    use epoll;                                          # 指定事件模型为epoll
+    accept_mutex on;                                    # 启用互斥锁模式的进程调度
+    accept_mutex_delay 300ms;                           # 互斥锁模式下进程等待时间为300毫秒
+    multi_accept on;                                    # 启用支持多连接
+    worker_aio_requests 128;                            # 完成异步操作最大数为128
+    debug_connection 192.0.2.0/24;                       # 调试指定连接的IP地址和端口是192.0.2.0/24
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

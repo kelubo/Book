@@ -1,0 +1,462 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">6.3.3　DDL语句之管理表</h3>
+<p class="ziti">下面以前文给出的MySQL单实例编译场景为例，针对默认字符集格式的oldboy库进行讲解，环境准备如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create database oldboy;
+ERROR 1007 (HY000): Can't create database 'oldboy'; database exists
+#&lt;==提示已存在就不用创建了。
+mysql&gt; show create database oldboy\G
+*************************** 1. row ***************************
+       Database: oldboy
+Create Database: CREATE DATABASE `oldboy` /*!40100 DEFAULT CHARACTER SET utf8 */
+#&lt;==utf8字符集。
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">1.建立表</p>
+<p class="ziti">MySQL数据库中的表和Word、Excel里的表是一模一样的，相关表的基本知识如图6-3所示。</p>
+<div class="pic"><img alt="" src="Image00044.jpg" />
+</div>
+<p class="middle-img">图6-3　数据库中的表</p>
+<p class="ziti">建表的基本命令语法为：</p>
+<hr/>
+<pre class="ziti1">create table &lt;表名&gt; (
+&lt;字段名1&gt; &lt;类型1&gt; ,
+…
+&lt;字段名n&gt; &lt;类型n&gt;);</pre>
+<hr/>
+<p class="ziti">其中，create table是关键字，不能更改，但是大小写可以变化。</p>
+<p class="ziti">下面是人工设计的建表语句示例，表名为student：</p>
+<hr/>
+<pre class="ziti1">create table student(
+id int(4) not null,
+name char(20) not null,
+age tinyint(2)  NOT NULL default '0',
+dept varchar(16)  default NULL
+);</pre>
+<hr/>
+<p class="ziti">第二种MySQL生成的建表语句，表名为student：</p>
+<hr/>
+<pre class="ziti1">CREATE TABLE `student` (
+  `id` int(4) NOT NULL,
+  `name` char(20) NOT NULL,
+  `age` tinyint(2) NOT NULL DEFAULT '0',
+  `dept` varchar(16) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</pre>
+<hr/>
+<p class="ziti">上述语句表示创建一个student表，该表有4个字段：</p>
+<hr/>
+<pre class="ziti1">CREATE TABLE `student` (   #&lt;== CREATE TABLE是创建表的固定关键字，student为表名。
+  `id` int(4) NOT NULL,            #&lt;==学号列，数字类型，长度为4，不为空值。
+  `name` char(20) NOT NULL,        #&lt;==名字列，定长字符类型，长度为20，不为空值。
+  `age` tinyint(2) NOT NULL DEFAULT '0', #&lt;==年龄列，很小的数字类型，长度为2，
+                                         不为空，默认为0值。
+  `dept` varchar(16) DEFAULT NULL  #&lt;==系别列，变长字符类型，长度为16，默认为空。
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;    #&lt;==引擎和字符集，引擎默认为InnoDB，
+                                         字符集，继承库的utf8。</pre>
+<hr/>
+<p class="ziti">对于上面的student表内容可以用表6-9直观显示，字段下面的5表示表的5条记录。</p>
+<p class="middle-img">表6-9　student表内容</p>
+<div class="pic"><img alt="" src="Image00045.jpg" />
+</div>
+<p class="ziti">可以看到，MySQL的表和Word、Excel表几乎没有什么区别。很简单吧！</p>
+<p class="ziti">下面进行实战演示。</p>
+<p class="ziti">首先，执行student建表语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy;
+Database changed
+mysql&gt; create table student( id int(4) not null, name char(20) not null, age tinyint(2)  NOT NULL default '0', dept varchar(16)  default NULL  );
+Query OK, 0 rows affected (0.02 sec)
+mysql&gt; show tables;
++------------------+
+| Tables_in_oldboy |
++------------------+
+| student          |
++------------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">可通过如下命令查看建表的语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show create table student\G
+*************************** 1. row ***************************
+       Table: student
+Create Table: CREATE TABLE `student` (
+  `id` int(4) NOT NULL,
+  `name` char(20) NOT NULL,
+  `age` tinyint(2) NOT NULL DEFAULT '0',
+  `dept` varchar(16) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">需要注意的是，在MySQL 5.1和MySQL 5.5及以上环境中，默认建表语句中的引擎是不同的，如果希望控制表的引擎，就要在建表语句里显式地指定表引擎建表。</p>
+<p class="ziti">MySQL 5.1及以前的版本中，默认引擎为<span class="yanse">MyISAM</span>
+ ，MySQL 5.5.5及以后的版本中，默认引擎为<span class="yanse">InnoDB</span>
+ 。</p>
+<p class="ziti">通过以下命令可查看表结构：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; desc student;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| id    | int(4)      | NO   |     | NULL    |       |
+| name  | char(20)    | NO   |     | NULL    |       |
+| age   | tinyint(2)  | NO   |     | 0       |       |
+| dept  | varchar(16) | YES  |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">上面提及的表的字段类型知识见表6-10。</p>
+<p class="middle-img">表6-10　字段类型表的对应列的类型说明</p>
+<div class="pic"><img alt="" src="Image00046.jpg" />
+</div>
+<p class="ziti">表6-11说明了CHAR和VARCHAR之间的差别。</p>
+<p class="middle-img">表6-11　CHAR和VARCHAR之间的差别</p>
+<div class="pic"><img alt="" src="Image00047.jpg" />
+</div>
+<p class="ziti">针对表6-11中存储需求的说明如下。</p>
+<p class="ziti">VARCHAR(10)列可以容纳最大长度为10的字符串。实际存储需求是字符串（L）的长度，加上一个记录字符串长度的字节。对于字符串'abcd'，L是4，存储需要5字节。</p>
+<p class="ziti">
+<span class="yanse">CHAR和VARCHAR的差别小结</span>
+</p>
+<p class="ziti6">char类型是定长，不够的在右边用空格补全，这会浪费存储空间，以此列为查询条件时，速度更快，多数系统表的字段都是定长。</p>
+<p class="ziti6">varchar类型是变长，节省存储空间，以此列为查询条件时速度较慢。</p>
+<p class="ziti">下面来看看生产环境下的标准的UTF8格式表结构语句。下面是某sns产品生产中的正式建表语句：</p>
+<hr/>
+<pre class="ziti1">use sns;
+set names gbk;
+CREATE TABLE `subject_comment_manager` (
+  `subject_comment_manager_id` bigint(12) NOT NULL auto_increment COMMENT '主键',
+  `subject_type` tinyint(2) NOT NULL COMMENT '素材类型',
+  `subject_primary_key` varchar(255) NOT NULL COMMENT '素材的主键',
+  `subject_title` varchar(255) NOT NULL COMMENT '素材的名称',
+  `edit_user_nick` varchar(64) default NULL COMMENT '修改人',
+  `edit_user_time` timestamp NULL default NULL COMMENT '修改时间',
+  `edit_comment` varchar(255) default NULL COMMENT '修改的理由',
+  `state` tinyint(1) NOT NULL default '1' COMMENT '0代表关闭，1代表正常',
+  PRIMARY KEY  (`subject_comment_manager_id`),
+  KEY `IDX_PRIMARYKEY` (`subject_primary_key`(32)), #&lt;==括号内的32表示对前
+                                                  32个字符做前缀索引。
+  KEY `IDX_SUBJECT_TITLE` (`subject_title`(32))
+  KEY `index_nick_type` (`edit_user_nick`(32),`subject_type`)
+  #&lt;==联合索引，此行为是新加的，用来为大家讲解。实际表语句内没有此行。
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;</pre>
+<hr/>
+<p class="p6">2.查看表结构</p>
+<p class="ziti">
+<span class="yanse">查看表结构的</span>
+ 命令语法为：</p>
+<hr/>
+<pre class="ziti1">desc表名或者show [full] columns from 表名 FROM db_name；</pre>
+<hr/>
+<p class="ziti">查看表结构有如下几种方法。</p>
+<p class="ziti">方法1：先通过use进入到指定库，然后再查看。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+mysql&gt; desc student;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| id    | int(4)      | NO   |     | NULL    |       |
+| name  | char(20)    | NO   |     | NULL    |       |
+| age   | tinyint(2)  | NO   |     | 0       |       |
+| dept  | varchar(16) | YES  |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">方法2：无须进入指定库，通过如下命令直接查看。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show columns from oldboy.student;
++-------+-------------+------+-----+---------+-------+
+| Field | Type        | Null | Key | Default | Extra |
++-------+-------------+------+-----+---------+-------+
+| id    | int(4)      | NO   |     | NULL    |       |
+| name  | char(20)    | NO   |     | NULL    |       |
+| age   | tinyint(2)  | NO   |     | 0       |       |
+| dept  | varchar(16) | YES  |     | NULL    |       |
++-------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+mysql&gt; show full columns from student from oldboy;
++-------+-------------+-----------------+------+-----+---------+-------+-
+--------------------------------+---------+
+| Field | Type        | Collation       | Null | Key | Default | Extra | Privileges                      | Comment |
++-------+-------------+-----------------+------+-----+---------+-------+-
+--------------------------------+---------+
+| id    | int(4)      | NULL            | NO   |     | NULL    |       | select,insert,update,references |         |
+| name  | char(20)    | utf8_general_ci | NO   |     | NULL    |       | select,insert,update,references |         |
+| age   | tinyint(2)  | NULL            | NO   |     | 0       |       | select,insert,update,references |         |
+| dept  | varchar(16) | utf8_general_ci | YES  |     | NULL    |       | select,insert,update,references |         |
++-------+-------------+-----------------+------+-----+---------+-------+-
+--------------------------------+---------+
+4 rows in set (0.01 sec)</pre>
+<hr/>
+<p class="p6">3.更改表名</p>
+<p class="ziti">更改表名有两种方法。</p>
+<p class="ziti">第一种是采用rename命令更改表名。</p>
+<p class="ziti">命令的语法为：</p>
+<hr/>
+<pre class="ziti1">rename table 原表名 to 新表名;</pre>
+<hr/>
+<p class="ziti">例如，要将表student名字更改为test，执行命令与结果如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; rename table student to test;
+Query OK, 0 rows affected (0.03 sec)
+mysql&gt; show tables;
++------------------+
+| Tables_in_oldboy |
++------------------+
+| test             |
++------------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">第二种方法为采用alter法修改表名。</p>
+<p class="ziti">命令示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test rename to student;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql&gt; show tables;
++------------------+
+| Tables_in_oldboy |
++------------------+
+| student          |
++------------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">4.增、删、改表的字段</p>
+<p class="ziti">添加字段</p>
+<p class="ziti">命令语法为：</p>
+<hr/>
+<pre class="ziti1">alter table 表名 add 字段 类型 其他;</pre>
+<hr/>
+<p class="ziti">在添加字段时，先通过如下命令测试表数据：</p>
+<hr/>
+<pre class="ziti1">CREATE TABLE `test` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8;</pre>
+<hr/>
+<p class="ziti">然后，查看表结构：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; desc test;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int(4)   | NO   | PRI | NULL    | auto_increment |
+| name  | char(20) | NO   |     | NULL    |                |
++-------+----------+------+-----+---------+----------------+
+2 rows in set (0.01 sec)</pre>
+<hr/>
+<p class="ziti">若要在表test中添加字段sex、age和qq，类型分别为char(4)、int(4)、varchar(15)，那么可以通过如下命令来完成。</p>
+<p class="ziti">先添加性别列，长度为4，内容非空。示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test add sex char(4);
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+mysql&gt; desc test;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int(4)   | NO   | PRI | NULL    | auto_increment |
+| name  | char(20) | NO   |     | NULL    |                |
+| sex   | char(4)  | YES  |     | NULL    |                |  #&lt;==此行为新增
+                                                           的sex列。
++-------+----------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 默认情况下，列会增加到所有字段的结尾。</p>
+<p class="ziti">下面指定添加年龄列到name列后面的位置，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test add age int(4) after name;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+mysql&gt; desc test;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int(4)   | NO   | PRI | NULL    | auto_increment |
+| name  | char(20) | NO   |     | NULL    |                |
+| age   | int(4)   | YES  |     | NULL    |                |
+| sex   | char(4)  | YES  |     | NULL    |                |
++-------+----------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">现在通过下面的命令在第一列添加qq字段：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test add qq varchar(15) first;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+mysql&gt; desc test;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| qq    | varchar(15) | YES  |     | NULL    |                |
+| id    | int(4)      | NO   | PRI | NULL    | auto_increment |
+| name  | char(20)    | NO   |     | NULL    |                |
+| age   | int(4)      | YES  |     | NULL    |                |
+| sex   | char(4)     | YES  |     | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">若要删除字段，可采用如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test drop qq;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql&gt; alter table test drop age;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0</pre>
+<hr/>
+<p class="ziti">若要同时添加两个字段，可采用如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test add age tinyint(2) first,add qq varchar(15);
+Query OK, 5 rows affected (0.06 sec)
+Records: 5  Duplicates: 0  Warnings: 0</pre>
+<hr/>
+<p class="ziti">下面来看一些生产环境下的命令使用案例。</p>
+<p class="ziti">增加1个字段的命令如下：</p>
+<hr/>
+<pre class="ziti1">ALTER TABLE `etiantian` ADD `FIRSTPHOTO_URL` varchar(255) default NULL COMMENT '第一张图片URL'</pre>
+<hr/>
+<p class="ziti">增2个字段的命令如下：</p>
+<hr/>
+<pre class="ziti1">ALTER TABLE `basic` ADD `adhtml_top`  varchar(1024) default NULL COMMENT
+'顶部广告html' ,
+                    ADD `adhtml_right` varchar(1024) default NULL COMMENT '右侧广告html' ;</pre>
+<hr/>
+<p class="ziti">改变字段的命令如下：</p>
+<hr/>
+<pre class="ziti1">alter table ett_ambiguity change ambiguity_state  ambiguity_state tinyint  comment '状态，默认1=正常，0=失效';
+ALTER TABLE `ett_photo`
+MODIFY COLUMN `PHOTO_DESCRIPTION` varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '描述' AFTER PHOTO_TITLE`;</pre>
+<hr/>
+<p class="ziti">修改字段类型的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test modify age char(4) after name;
+Query OK, 6 rows affected (0.00 sec)
+Records: 6  Duplicates: 0  Warnings: 0</pre>
+<hr/>
+<p class="ziti">修改字段名称的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test change age oldboyage char(4) after name;
+Query OK, 6 rows affected (0.01 sec)
+Records: 6  Duplicates: 0  Warnings: 0</pre>
+<hr/>
+<p class="ziti">这里要说明一下企业里更改数据的流程：开发人员写出SQL语句，发给运维人员或DBA检验并执行（如图6-4所示）！</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 工作中添加字段的需求来自开发人员，运维人员或DBA执行开发人员提供的语句。</p>
+<p class="ziti6">对数据库表的修改，应尽量选在代码上线的时候或者业务低谷的时候执行，不要在流量高峰期处理大表的更改。</p>
+<div class="pic"><img alt="" src="Image00048.jpg" />
+</div>
+<p class="middle-img">图6-4　开发人员提交的修改数据库的SQL语句</p>
+<p class="ziti">下班的时候尽量不要独自在生产线上更改东西，老男孩在刚入行的时候就犯过一次这样的错误，还好提前备份了，迅速改了回来，不过还是吓出了一身冷汗。</p>
+<p class="p6">5.创建和删除索引</p>
+<p class="ziti">数据库的索引就像书的目录一样，如果在字段上建立了索引，那么以索引列为查询条件时可以加快查询数据的速度，这是MySQL优化的重要内容之一，后文会详细讲解，这里老男孩先带大家尝个鲜。</p>
+<p class="ziti">常见的为表内字段建立索引的方法有如下两种。</p>
+<p class="ziti">方法1：建表后利用alter命令增加普通索引。</p>
+<p class="ziti">在此之前，要删除建表时创建的index_name索引，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table student drop index index_name;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+mysql&gt; desc student;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | int(11)     | NO   | PRI | NULL    | auto_increment |
+| name  | char(20)    | NO   |     | NULL    |                |
+| age   | tinyint(2)  | NO   |     | 0       |                |
+| dept  | varchar(16) | YES  |     | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+4 rows in set (0.01 sec)</pre>
+<hr/>
+<p class="ziti">然后，就可以在test表的name列上添加索引了，索引名为index_name，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table test add index index_name(name);
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0</pre>
+<hr/>
+<p class="ziti">方法2：使用create为test表的qq列创建普通索引。</p>
+<p class="ziti">示例命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; create index index_qq on test(qq);
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0</pre>
+<hr/>
+<p class="ziti">查看结果：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; desc test;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| age   | tinyint(2)  | YES  |     | NULL    |                |
+| id    | int(4)      | NO   | PRI | NULL    | auto_increment |
+#&lt;==PRI为主键的标识。
+| name  | char(20)    | NO   | MUL | NULL    |                |
+#&lt;==MUL这里原来是空。
+| sex   | char(4)     | YES  |     | NULL    |                |
+| qq    | varchar(15) | YES  | MUL | NULL    |                |
+#&lt;==MUL这里原来是空。
++-------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">其中，PRI为主键索引的标识，MUL为普通索引的标识。</p>
+<p class="ziti">删除建表时创建的index_name索引的命令为：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; alter table student drop index index_name;</pre>
+<hr/>
+<p class="ziti">
+<span class="yanse">生产场景下的经验</span>
+</p>
+<p class="ziti6">当数据量以及访问量很大的时候，不适合临时建立索引，因为会影响用户访问。老男孩曾经在生产上为有着四五百万条记录的表建立索引，花了90～180秒，说多了都是血和泪啊，读者应尽量选择在业务流量低谷时建立索引，以避免重蹈覆辙。</p>
+<p class="p6">6.查看建表语句</p>
+<p class="ziti">可通过如下命令查看已建表对应的SQL语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show create table test\G  #&lt;==\G垂直显示结果。
+*************************** 1. row ***************************
+       Table: test
+Create Table: CREATE TABLE `test` (
+  `age` tinyint(2) DEFAULT NULL,
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  `sex` char(4) DEFAULT NULL,
+  `qq` varchar(15) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">7.删除表</p>
+<p class="ziti">命令的语法为：</p>
+<hr/>
+<pre class="ziti1">drop table &lt;表名&gt;；</pre>
+<hr/>
+<p class="ziti">例如，删除表名为test的表，执行的命令和结果如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show tables from oldboy;
++------------------+
+| Tables_in_oldboy |
++------------------+
+| student          |
+| test             |
++------------------+
+2 rows in set (0.00 sec)
+mysql&gt; drop table student;   #&lt;==删除表名为test的表。
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; show tables from oldboy;
++------------------+
+| Tables_in_oldboy |
++------------------+
+| test             |
++------------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+</body>
+</html>

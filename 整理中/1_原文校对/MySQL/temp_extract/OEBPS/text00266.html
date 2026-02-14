@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">17.5　MySQL GTID复制</h2>
+<h3 class="p3">
+<a id="b1">17.5.1　GTID复制简介</a>
+</h3>
+<p class="ziti">GTID（global transaction identifier）是一个在主数据库上对每个已经提交到数据库的事务的唯一编号，这个标识不仅在主数据库上是唯一的，而且在整个复制架构中的所有数据库中都是唯一的。</p>
+<p class="ziti">一个GTID由一对坐标表示，用冒号（：）分隔，代码如下所示：</p>
+<hr/>
+<pre class="ziti1">GTID = source_id ：transaction_id</pre>
+<hr/>
+<p class="ziti">在上面的定义中，每一个GTID均代表一个数据库的事务，等号右边的source_id表示执行事务的源服务器主库的uuid（也就是server_uuid），而transaction_id是一个从1开始的自增的序列号，表示在这个主库上执行的第n个事务。只要保证每台数据库的server_uuid全局唯一，以及每台数据库生成的transaction_id自身唯一，就能保证GTID的全局唯一性。</p>
+<p class="ziti">GTID是事务在数据库中提交时创建分配的唯一标识符，所有事务均与GTID一一映射。下面是一个GTID的具体形式：</p>
+<hr/>
+<pre class="ziti1">2E11FA47-61CA-11E1-9E33-C70AA9429562:28</pre>
+<hr/>
+<p class="ziti">什么是sever_uuid？</p>
+<p class="ziti">MySQL 5.6用128位的server_uuid代替了原本32位的server_id的大部分功能。原因很简单，server_id依赖于my.cnf的手工配置，有可能会产生冲突，而自动产生128位uuid的算法可以保证所有的MySQL uuid都不会发生冲突。</p>
+<p class="ziti">在进行首次启动时，MySQL会自动生成一个server_uuid，并且保存到数据库目录下的auto.cnf文件里，这个文件目前存在的唯一目的就是保存server_uuid。在MySQL再次启动时其会读取auto.cnf文件，继续使用上次生成的server_uuid。</p>
+</body>
+</html>

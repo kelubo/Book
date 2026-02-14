@@ -1,0 +1,15 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">11.4.3　生产环境更改数据库（含数据）字符集的方法</h3>
+<p class="ziti">对于已经包含了数据的库表，若要对字符集进行调整，就需要将数据先导出，然后更改数据库环境，更改建库和表的字符集之后，重新导入数据，这样才能实现相应的调整。整个过程具体如下。</p>
+<p class="ziti">1）确保数据库不要更新，然后导出所有数据为SQL的文件。</p>
+<p class="ziti">2）针对导出的数据进行字符集替换（替换表和库），例如把GBK改为UTF8。</p>
+<p class="ziti">3）修改my.cnf配置文件，更改MySQL客户端及服务端的字符集，重启生效。</p>
+<p class="ziti">4）导入更改过新字符集的库表的数据，包括表结构语句，然后提供服务。</p>
+<p class="ziti">5）将操作系统、SSH客户端，以及程序更改为对应的新字符集。</p>
+<p class="ziti">另外，更改字符集时，要将小的字符集集合更改为大的字符集集合，不然可能会丢失数据。整个操作步骤比较简单，这里就不演示给读者了。</p>
+</body>
+</html>

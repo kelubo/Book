@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.6　MySQL相关命令加入全局路径的配置</h3>
+<p class="p6">1.配置全局路径的意义</p>
+<p class="ziti">如果不为MySQL的命令配置全局路径，就会无法直接在命令行输入mysql这样的命令，这时只能使用全路径命令（“/application/mysql/bin/mysql”），而这种带着路径输入命令的方式很麻烦。</p>
+<p class="p6">2.配置MySQL全局路径的方法</p>
+<p class="ziti">1）确认mysql命令所在的路径，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ls /application/mysql/bin/mysql
+/application/mysql/bin/mysql</pre>
+<hr/>
+<p class="ziti">2）在PATH变量前增加/application/mysql/bin路径，并追加到/etc/profile文件中，示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# echo 'export PATH=/application/mysql/bin:$PATH' &gt;&gt;/etc/profile
+#&lt;==注意，echo后是单引号，双引号是不行的。
+[root@oldboy ~]# tail -1 /etc/profile
+export PATH=/application/mysql/bin:$PATH
+[root@oldboy ~]# source  /etc/profile
+#&lt;==执行source使上一行添加到/etc/profile中，内容直接生效。
+#&lt;==以上命令的用途为，定义mysql全局路径，实现在任意路径执行mysql命令。
+[root@oldboy ~]# echo $PATH
+/application/mysql/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+#&lt;==执行echo $PATH，若有/application/mysql/bin输出则表示配置成功。
+提示：如果第3章已经配置过，这里就不用配置了。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 更简单的设置方法为使用如下命令来做软链接：</p>
+<p class="ziti6">ln-s/application/mysql/bin/*/usr/local/sbin/</p>
+<p class="ziti6">把mysql命令所在路径链接到全局路径/usr/local/sbin/的下面。</p>
+<p class="p6">3.因MySQL环境变量配置顺序导致的错误案例</p>
+<p class="ziti">特别强调：务必把MySQL命令路径放在PATH路径中其他路径的前面，否则，可能会导致使用的mysql等命令和编译安装的mysql命令不是同一个，进而产生错误。下面的网址中给出了因为MySQL路径配置问题而导致的错误案例：<a href="http://oldboy.blog.51cto.com/2561410/1122867">http://oldboy.blog.51cto.com/2561410/1122867</a>
+ ，实际上就是因为使用yum安装的MySQL客户端命令访问了编译安装的服务端而出了问题。</p>
+</body>
+</html>

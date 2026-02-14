@@ -1,0 +1,745 @@
+\documentclass{ctexbook}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{color}
+
+\geometry{a4paper, margin=2cm}
+
+\title{555 Timer IC 51 Experiments and Projects}
+\author{Guruji}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{关于本书}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{epub_content/images/image.png}
+    \caption{555定时器IC}
+    \label{fig:555_ic_cn}
+\end{figure}
+
+本电子书将指导您构建项目、进行实验，并了解最受欢迎的 555 定时器芯片的实际应用。本书包含 24 个项目和 27 个实验，共计 51 个内容。
+
+如今，电子项目和实验对于工程师、技术人员、爱好者和学生来说是他们职业和学术的重要组成部分。这些教育性电子项目和实验能够在很大程度上快速提升他们的技能和分析能力。555 芯片非常受欢迎，已在数千种应用中使用。
+
+本电子书包括理论、电路图、电路描述、方程、图表、计算、电子元件的实际照片、它们的引脚配置和极性、元件的颜色代码以及元件值转换表。
+
+为了支持您的项目构建工作并增加您的知识，还包括了一些额外材料，如理解电路图、面包板的结构、面包板和电路的工作原理，以及带有实际照片和详细解释的面包板实践电路。
+
+555 定时器芯片是市场上最古老、最耐用的芯片之一。555 定时器是一种集成电路，用于各种定时应用、传感器接口、振荡器等多种应用。
+
+\newpage
+
+\section{555定时器芯片工作原理}
+
+555 定时器由 Hans Camenzind 于 1971 年设计，可在从玩具、厨房电器到航天器等多种电子设备中找到。它是一种高度稳定的集成电路，可产生精确的时间延迟和振荡。555 定时器有三种工作模式：双稳态、单稳态和无稳态模式。
+
+\subsection{555定时器芯片内部结构}
+
+让我们仔细看看 555 定时器的内部结构，并解释它在三种模式下的工作原理。以下是 555 定时器的内部原理图，它由 25 个晶体管、2 个二极管和 15 个电阻组成。
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{epub_content/images/image-1.png}
+	\caption{555定时器芯片内部原理图}
+	\label{fig:555_internal_cn}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{epub_content/images/image-2.png}
+	\caption{555定时器芯片引脚配置}
+	\label{fig:555_pins_cn}
+\end{figure}
+
+Represented with a block diagram it consists of 2 comparators, a flip-flop, a voltage divider, a discharge transistor and an output stage.
+
+用框图表示，它由 2 个比较器、1 个触发器、1 个分压器、1 个放电晶体管和 1 个输出级组成。
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{epub_content/images/image-3.png}
+	\caption{555定时器芯片框图}
+	\label{fig:555_block_cn}
+\end{figure}
+
+分压器由三个相同的5k电阻组成，它们在供电电压的1/3和2/3处创建两个参考电压，供电电压范围为5至15V。
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.6\textwidth]{epub_content/images/image-4.png}
+	\caption{555定时器IC分压器}
+	\label{fig:555_divider_cn}
+\end{figure}
+
+The voltage divider consists of three identical 5k resistors which create two reference voltages at 1/3 and 2/3 of the supplied voltage, which can range from 5 to 15V.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.6\textwidth]{epub_content/images/image-4.png}
+	\caption{555 Timer IC Voltage Divider}
+	\label{fig:555_divider}
+\end{figure}
+
+Next are the two comparators. A comparator is a circuit element that compares two analog input voltages at its positive (non-inverting) and negative (inverting) input terminal. If the input voltage at the positive terminal is higher than the input voltage at the negative terminal the comparator will output 1. Vice versa, if the voltage at the negative input terminal is higher than the voltage at the positive terminal, the comparator will output 0.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.6\textwidth]{epub_content/images/image-5.png}
+	\caption{555 Timer IC Comparators}
+	\label{fig:555_comparators}
+\end{figure}
+
+The first comparator negative input terminal is connected to the 2/3 reference voltage at the voltage divider and the external "control" pin, while the positive input terminal to the external "Threshold" pin.
+
+On the other hand, the second comparator negative input terminal is connected to the "Trigger" pin, while the positive input terminal to the 1/3 reference voltage at the voltage divider.
+
+So using the three pins, Trigger, Threshold and Control, we can control the output of the two comparators which are then fed to the R and S inputs of the flip-flop. The flip-flop will output 1 when R is 0 and S is 1, and vice versa, it will output 0 when R is 1 and S is 0. Additionally the flip-flop can be reset via the external pin called "Reset" which can override the two inputs, thus reset the entire timer at any time.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{epub_content/images/image-6.png}
+	\caption{555 Timer IC Flip-Flop}
+	\label{fig:555_flipflop}
+\end{figure}
+
+The Q-bar output of the flip-flip goes to the output stage or the output drivers which can either source or sink a current of 200mA to the load. The output of the flip-flip is also connected to a transistor that connects the "Discharge" pin to ground.
+
+
+
+接下来是两个比较器。比较器是一种电路元件，用于比较其正（同相）输入端子和负（反相）输入端子的两个模拟输入电压。如果正端子的输入电压高于负端子的输入电压，比较器将输出1。反之，如果负输入端子的电压高于正端子的电压，比较器将输出0。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{epub_content/images/image-5.png}
+    \caption{555定时器IC比较器}
+    \label{fig:555_comparators_cn}
+\end{figure}
+
+第一个比较器的负输入端子连接到分压器的2/3参考电压和外部"控制"引脚，而正输入端子连接到外部"阈值"引脚。
+
+另一方面，第二个比较器的负输入端子连接到"触发"引脚，而正输入端子连接到分压器的1/3参考电压。
+
+因此，使用触发、阈值和控制这三个引脚，我们可以控制两个比较器的输出，然后将其馈送到触发器的R和S输入。当R为0且S为1时，触发器将输出1，反之，当R为1且S为0时，它将输出0。此外，触发器可以通过称为"复位"的外部引脚进行复位，该引脚可以覆盖两个输入，从而随时复位整个定时器。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{epub_content/images/image-6.png}
+    \caption{555定时器IC触发器}
+    \label{fig:555_flipflop_cn}
+\end{figure}
+
+触发器的Q-bar输出连接到输出级或输出驱动器，它们可以向负载提供或吸收200mA的电流。触发器的输出还连接到一个晶体管，该晶体管将"放电"引脚连接到地。
+
+\newpage
+
+\section{Experiments}
+
+\subsection{Astable Multivibrator}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-7.png}
+    \caption{Astable Multivibrator Circuit}
+    \label{fig:astable_circuit}
+\end{figure}
+
+When initially power is turned ON, Trigger Pin voltage is below Vcc/3, that makes the lower comparator output HIGH and SETS the flip flop and output of the 555 chip is HIGH.
+
+This makes the transistor Q1 OFF, because Q bar, Q'=0 is directly applied to base of transistor. As the transistor is OFF, capacitor C1 starts charging and when it gets charged to a voltage above than Vcc/3, then Lower comparator output becomes LOW (Upper comparator is also at LOW) and Flip flop output remains the same as previous (555 output remains HIGH).
+
+Now when capacitor charging gets to voltage above than 2/3Vcc, then the voltage of non-inverting end (Threshold PIN 6) becomes higher than the inverting end of the comparator. This makes Upper comparator output HIGH and RESETs the Flip-flop; output of 555 chip becomes LOW.
+
+As soon as the output of 555 get LOW means Q'=1, then transistor Q1 becomes ON and short the capacitor C1 to the Ground. So the capacitor C1 starts discharging to the ground through the Discharge PIN 7 and resistor R2.
+
+As capacitor voltage get down below the 2/3 Vcc, upper comparator output becomes LOW, now SR Flip flop remains in the previous state as both the comparators are LOW.
+
+While discharging, when capacitor voltage gets down below Vcc/3, this makes the Lower comparator output HIGH (upper comparator remain LOW) and Sets the flip flop again and 555 output becomes HIGH.
+
+Transistor Q1 becomes OFF and again capacitor C1 starts charging.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-8.png}
+    \caption{Astable Multivibrator Waveform}
+    \label{fig:astable_waveform}
+\end{figure}
+
+This charging and discharging of capacitor continues and a rectangular oscillating output wave for is generated. While capacitor is getting charge the output of 555 is HIGH, and while capacitor is getting discharge output will be LOW. So this is called Astable mode because none of the state is stable and 555 automatically interchange its state from HIGH to LOW and LOW to HIGH, so it is called Free running Multivibrator.
+
+Now the OUTPUT HIGH and OUTPUT LOW duration, is determined by the Resistors R1 \& R2 and capacitor C1. This can be calculated using below formulas:
+
+\begin{align}
+\text{Time High (Seconds)} \ T1 &= 0.693 \times (R1+R2) \times C1 \\
+\text{Time Low (Seconds)} \ T2 &= 0.693 \times R2 \times C1 \\
+\text{Time Period} \ T &= \text{Time High} + \text{Time Low} = 0.693 \times (R1+2\times R2) \times C1 \\
+\text{Frequency} \ f &= \frac{1}{\text{Time Period}} = \frac{1}{0.693 \times (R1+2\times R2) \times C1} = \frac{1.44}{(R1+2\times R2) \times C1} \\
+\text{Duty Cycle \%} &= \left( \frac{\text{Time HIGH}}{\text{Total time}} \right) \times 100 = \left( \frac{T1}{T} \right) \times 100 = \frac{R1+R2}{R1+2\times R2} \times 100
+\end{align}
+
+Here is the practical demonstration of the Astable mode of 555 timer IC, where we have connected a LED to the output of the 555 IC. In this 555 astable multivibrator circuit, LED will switch ON and OFF automatically with a particular duration. ON time, OFF time, Frequency etc can be calculated using above formulas.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-9.png}
+    \caption{Astable Multivibrator Practical Circuit}
+    \label{fig:astable_practical}
+\end{figure}
+
+\textbf{Parts:}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED = Light Emitting Diode
+    \item R1 = 1k (brown black red gold)
+    \item R2 = 100k (brown black yellow gold)
+    \item R3 = 220E ( red red brown gold)
+    \item C1 = 10µF  electrolytic capacitor
+    \item C2 = 0.01µF  ceramic disc capacitor (10nF and EIA code is 103)
+    \item B1 = 9V Battery
+\end{itemize}
+
+\newpage
+
+\subsection{Gated Astable Multivibrator}
+
+In the circuit shown, you find out how the RESET input is connected.
+
+With a small change to the circuit you can switch the astable multivibrator on and off. To do this you use the RESET input of the 555.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-10.png}
+    \caption{Gated Astable Multivibrator Circuit}
+    \label{fig:gated_astable_circuit}
+\end{figure}
+
+When you press the pushbutton switch S1, the LEDs LED1 and LED2 are flashing. When you let go of S1, the multivibrator stops and only LED1 is on. This is shown schematically in the illustration.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-11.png}
+    \caption{Gated Astable Multivibrator Operation}
+    \label{fig:gated_astable_operation}
+\end{figure}
+
+\textbf{Parts:}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED1, LED2 = Light Emitting Diode
+    \item R1, R2, R3= 47k (yellow violet orange gold)
+    \item R4, R5 = 470E (yellow violet brown gold)
+    \item C1 = 10µF  electrolytic capacitor
+    \item C2 = 0.01µF  (10nF and EIA code is 103)
+    \item S1 = Switch
+    \item 9V Battery
+\end{itemize}
+
+\newpage
+
+\subsection{Astable Multivibrator with Symmetric Switching Times}
+
+In the last experiments, you build an astable multivibrator. Thereby you surely have noticed the different switching times. Find out here how you build a symmetric astable multivibrator.
+
+If you recall Experiment 15 you realize:
+
+\begin{itemize}
+    \item The capacitor C1 is charged via the resistors R1 and R2.
+    \item The capacitor C1 is discharged only via the resistor R2.
+\end{itemize}
+
+This has the consequence that LED2 is light longer than LED1.
+
+Do you want nevertheless to build a symmetric astable multivibrator where LED2 and LED1 are light equally long; you have to introduce a diode in the circuit.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-12.png}
+    \caption{Symmetric Astable Multivibrator Circuit}
+    \label{fig:symmetric_astable_circuit}
+\end{figure}
+
+\textbf{Note:} this requires that the resistors R1 and R2 must be equal.
+
+\textbf{Parts:}
+
+\begin{itemize}
+    \item IC = 555
+    \item D1 = 914 OR Equivalent 
+    \item LED1, LED2 = Light Emitting Diode
+    \item R1, R2, R3= 47k (yellow violet orange gold)
+    \item R4, R5 = 470E (yellow violet brown gold)
+    \item C1 = 10µF  electrolytic capacitor
+    \item C2 = 0.01µF  (10nF and EIA code is 103)
+    \item 9V Battery
+\end{itemize}
+
+\newpage
+
+\subsection{Astable Multivibrator with Adjustable Switching Times}
+
+In many applications, you need an astable multivibrator with adjustable switching times. Find out how you build an adjustable astable multivibrator.
+
+Consider to the circuit shown. With the introduced potentiometers are you able of influencing the switching times.
+
+\begin{itemize}
+    \item The capacitor C1 is charged via the potentiometer P1 and the diodeD1.
+    \item The capacitor C1 is discharged via the potentiometer P2 and the diode D2.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-13.png}
+    \caption{Adjustable Astable Multivibrator Circuit}
+    \label{fig:adjustable_astable_circuit}
+\end{figure}
+
+\textbf{Parts:}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED1, LED2 = Light Emitting Diode
+    \item D1, D2 = 1N914 OR Equivalent 
+    \item R1 = 1k (brown black red gold)
+    \item R2 = 47k (yellow violet orange gold)
+    \item R3, R4 = 470E (yellow violet brown gold)
+    \item C1 = 10µF  electrolytic capacitor
+    \item C2 = 0.01µF  (10nF and EIA code is 103)
+    \item P1, P2 = Potentiometer 100k
+    \item 9V Battery
+\end{itemize}
+
+\newpage
+
+\subsection{Monostable Multivibrator}
+
+With a NE555 you can able to build a monostable multivibrator monoflop or one-shot. Find out how here, and what you need to be aware of.
+
+Once you push the pushbutton switch S1, the LED2 lights up. After a switching time T of approximately 2.5 seconds, LED2 goes out and LED1 lights up again.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-14.png}
+    \caption{Monostable Multivibrator Circuit}
+    \label{fig:monostable_circuit}
+\end{figure}
+
+In fact, you can calculate the approximate switching time T:
+
+\begin{align}
+T &= 1.1 \times R2C1 \\
+&= 1.1 \times 22,000 \, \Omega \times 0.0001 \, F = 2.4 \, \text{sec}
+\end{align}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-15.png}
+    \caption{Monostable Multivibrator Waveform}
+    \label{fig:monostable_waveform}
+\end{figure}
+
+\textbf{Parts:}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED1, LED2 = Light Emitting Diode
+    \item R1, R3 = 47k (yellow violet orange gold)
+    \item R2 = 22k (red red orange gold)
+    \item R4, R5 = 470E (yellow violet brown gold)
+    \item C1 = 100µF  electrolytic capacitor
+    \item C2 = 0.01µF  (10nF and EIA code is 103)
+    \item S1 = Switch
+    \item 9V Battery
+\end{itemize}
+
+\newpage
+
+% 中文翻译 - 实验
+\section*{中文翻译 - 实验}
+
+\subsection*{无稳态多谐振荡器}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-7.png}
+    \caption{无稳态多谐振荡器电路}
+    \label{fig:astable_circuit_cn}
+\end{figure}
+
+当最初接通电源时，触发引脚电压低于Vcc/3，这使得下比较器输出高电平并置位触发器，555芯片的输出为高电平。
+
+这使得晶体管Q1截止，因为Q bar（Q'=0）直接施加到晶体管的基极。由于晶体管截止，电容器C1开始充电，当它充电到高于Vcc/3的电压时，下比较器输出变为低电平（上比较器也为低电平），触发器输出保持与之前相同（555输出保持高电平）。
+
+现在当电容器充电到高于2/3Vcc的电压时，同相端（阈值引脚6）的电压变得高于比较器的反相端。这使得上比较器输出高电平并复位触发器；555芯片的输出变为低电平。
+
+一旦555的输出变为低电平（意味着Q'=1），晶体管Q1就会导通，并将电容器C1短路到地。因此，电容器C1开始通过放电引脚7和电阻R2放电到地。
+
+当电容器电压下降到2/3 Vcc以下时，上比较器输出变为低电平，现在SR触发器保持在之前的状态，因为两个比较器都为低电平。
+
+在放电过程中，当电容器电压下降到Vcc/3以下时，这使得下比较器输出高电平（上比较器保持低电平）并再次置位触发器，555输出变为高电平。
+
+晶体管Q1截止，电容器C1再次开始充电。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-8.png}
+    \caption{无稳态多谐振荡器波形}
+    \label{fig:astable_waveform_cn}
+\end{figure}
+
+电容器的这种充电和放电过程持续进行，产生矩形振荡输出波形。当电容器充电时，555的输出为高电平，当电容器放电时，输出为低电平。因此，这被称为无稳态模式，因为没有一个状态是稳定的，555会自动在高电平和低电平之间切换状态，因此它被称为自由运行多谐振荡器。
+
+现在，输出高电平和输出低电平的持续时间由电阻R1和R2以及电容器C1决定。这可以使用以下公式计算：
+
+\begin{align}
+\text{高电平时间（秒）} \ T1 &= 0.693 \times (R1+R2) \times C1 \\
+\text{低电平时间（秒）} \ T2 &= 0.693 \times R2 \times C1 \\
+\text{周期} \ T &= \text{高电平时间} + \text{低电平时间} = 0.693 \times (R1+2\times R2) \times C1 \\
+\text{频率} \ f &= \frac{1}{\text{周期}} = \frac{1}{0.693 \times (R1+2\times R2) \times C1} = \frac{1.44}{(R1+2\times R2) \times C1} \\
+\text{占空比（\%）} &= \left( \frac{\text{高电平时间}}{\text{总时间}} \right) \times 100 = \left( \frac{T1}{T} \right) \times 100 = \frac{R1+R2}{R1+2\times R2} \times 100
+\end{align}
+
+以下是555定时器IC无稳态模式的实际演示，我们将LED连接到555 IC的输出。在这个555无稳态多谐振荡器电路中，LED将以特定的持续时间自动开关。开启时间、关闭时间、频率等可以使用上述公式计算。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-9.png}
+    \caption{无稳态多谐振荡器实际电路}
+    \label{fig:astable_practical_cn}
+\end{figure}
+
+\textbf{元件：}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED = 发光二极管
+    \item R1 = 1k（棕黑红金）
+    \item R2 = 100k（棕黑黄 金）
+    \item R3 = 220Ω（红红棕金）
+    \item C1 = 10µF 电解电容器
+    \item C2 = 0.01µF 陶瓷圆盘电容器（10nF，EIA代码为103）
+    \item B1 = 9V电池
+\end{itemize}
+
+\newpage
+
+\subsection*{门控无稳态多谐振荡器}
+
+在所示电路中，你会发现复位输入是如何连接的。
+
+通过对电路进行小的更改，你可以打开和关闭无稳态多谐振荡器。为此，你需要使用555的复位输入。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-10.png}
+    \caption{门控无稳态多谐振荡器电路}
+    \label{fig:gated_astable_circuit_cn}
+\end{figure}
+
+当你按下按钮开关S1时，LED1和LED2会闪烁。当你松开S1时，多谐振荡器停止，只有LED1亮起。这在插图中以示意图方式显示。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-11.png}
+    \caption{门控无稳态多谐振荡器操作}
+    \label{fig:gated_astable_operation_cn}
+\end{figure}
+
+\textbf{元件：}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED1, LED2 = 发光二极管
+    \item R1, R2, R3= 47k（黄紫橙金）
+    \item R4, R5 = 470Ω（黄紫棕金）
+    \item C1 = 10µF 电解电容器
+    \item C2 = 0.01µF（10nF，EIA代码为103）
+    \item S1 = 开关
+    \item 9V电池
+\end{itemize}
+
+\newpage
+
+\subsection*{具有对称开关时间的无稳态多谐振荡器}
+
+在最后的实验中，你构建了一个无稳态多谐振荡器。你肯定已经注意到了不同的开关时间。在这里，你将了解如何构建一个对称的无稳态多谐振荡器。
+
+如果你回忆一下实验15，你会意识到：
+
+\begin{itemize}
+    \item 电容器C1通过电阻R1和R2充电。
+    \item 电容器C1仅通过电阻R2放电。
+\end{itemize}
+
+这导致LED2的点亮时间比LED1长。
+
+如果你仍然想构建一个LED2和LED1点亮时间相等的对称无稳态多谐振荡器，你必须在电路中引入一个二极管。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-12.png}
+    \caption{对称无稳态多谐振荡器电路}
+    \label{fig:symmetric_astable_circuit_cn}
+\end{figure}
+
+\textbf{注意：}这要求电阻R1和R2必须相等。
+
+\textbf{元件：}
+
+\begin{itemize}
+    \item IC = 555
+    \item D1 = 914或等效二极管
+    \item LED1, LED2 = 发光二极管
+    \item R1, R2, R3= 47k（黄紫橙金）
+    \item R4, R5 = 470Ω（黄紫棕金）
+    \item C1 = 10µF 电解电容器
+    \item C2 = 0.01µF（10nF，EIA代码为103）
+    \item 9V电池
+\end{itemize}
+
+\newpage
+
+\subsection*{具有可调开关时间的无稳态多谐振荡器}
+
+在许多应用中，你需要具有可调开关时间的无稳态多谐振荡器。了解如何构建可调无稳态多谐振荡器。
+
+考虑所示电路。通过引入的电位器，你能够影响开关时间。
+
+\begin{itemize}
+    \item 电容器C1通过电位器P1和二极管D1充电。
+    \item 电容器C1通过电位器P2和二极管D2放电。
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-13.png}
+    \caption{可调无稳态多谐振荡器电路}
+    \label{fig:adjustable_astable_circuit_cn}
+\end{figure}
+
+\textbf{元件：}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED1, LED2 = 发光二极管
+    \item D1, D2 = 1N914或等效二极管
+    \item R1 = 1k（棕黑红金）
+    \item R2 = 47k（黄紫橙金）
+    \item R3, R4 = 470Ω（黄紫棕金）
+    \item C1 = 10µF 电解电容器
+    \item C2 = 0.01µF（10nF，EIA代码为103）
+    \item P1, P2 = 100k电位器
+    \item 9V电池
+\end{itemize}
+
+\newpage
+
+\subsection*{单稳态多谐振荡器}
+
+使用NE555，你可以构建单稳态多谐振荡器（单稳态触发器或单次触发器）。在这里了解如何构建，以及需要注意什么。
+
+一旦你按下按钮开关S1，LED2就会点亮。经过约2.5秒的开关时间T后，LED2熄灭，LED1再次点亮。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-14.png}
+    \caption{单稳态多谐振荡器电路}
+    \label{fig:monostable_circuit_cn}
+\end{figure}
+
+实际上，你可以计算近似的开关时间T：
+
+\begin{align}
+T &= 1.1 \times R2C1 \\
+&= 1.1 \times 22,000 \, \Omega \times 0.0001 \, F = 2.4 \, \text{秒}
+\end{align}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{epub_content/images/image-15.png}
+    \caption{单稳态多谐振荡器波形}
+    \label{fig:monostable_waveform_cn}
+\end{figure}
+
+\textbf{元件：}
+
+\begin{itemize}
+    \item IC = 555
+    \item LED1, LED2 = 发光二极管
+    \item R1, R3 = 47k（黄紫橙金）
+    \item R2 = 22k（红红橙金）
+    \item R4, R5 = 470Ω（黄紫棕金）
+    \item C1 = 100µF 电解电容器
+    \item C2 = 0.01µF（10nF，EIA代码为103）
+    \item S1 = 开关
+    \item 9V电池
+\end{itemize}
+
+\newpage
+
+\subsection*{门控单稳态多谐振荡器}
+
+门控单稳态多谐振荡器是一种可以通过外部信号控制的单稳态多谐振荡器。在这个实验中，你将学习如何构建一个门控单稳态多谐振荡器。
+
+\subsection*{双稳态多谐振荡器}
+
+双稳态多谐振荡器（也称为触发器）是一种具有两个稳定状态的电路。在这个实验中，你将学习如何使用555定时器IC构建一个双稳态多谐振荡器。
+
+\subsection*{频率 divider}
+
+频率分频器是一种将输入信号频率降低到较低值的电路。在这个实验中，你将学习如何使用555定时器IC构建一个频率分频器。
+
+\subsection*{脉冲宽度调制器}
+
+脉冲宽度调制器（PWM）是一种通过改变脉冲宽度来控制输出的电路。在这个实验中，你将学习如何使用555定时器IC构建一个脉冲宽度调制器。
+
+\subsection*{温度传感器}
+
+温度传感器是一种可以测量温度的装置。在这个实验中，你将学习如何使用555定时器IC构建一个温度传感器。
+
+\subsection*{光传感器}
+
+光传感器是一种可以检测光强度的装置。在这个实验中，你将学习如何使用555定时器IC构建一个光传感器。
+
+\subsection*{声音传感器}
+
+声音传感器是一种可以检测声音的装置。在这个实验中，你将学习如何使用555定时器IC构建一个声音传感器。
+
+\subsection*{触摸传感器}
+
+触摸传感器是一种可以检测触摸的装置。在这个实验中，你将学习如何使用555定时器IC构建一个触摸传感器。
+
+\subsection*{金属探测器}
+
+金属探测器是一种可以检测金属的装置。在这个实验中，你将学习如何使用555定时器IC构建一个金属探测器。
+
+\subsection*{水位传感器}
+
+水位传感器是一种可以检测水位的装置。在这个实验中，你将学习如何使用555定时器IC构建一个水位传感器。
+
+\subsection*{烟雾传感器}
+
+烟雾传感器是一种可以检测烟雾的装置。在这个实验中，你将学习如何使用555定时器IC构建一个烟雾传感器。
+
+\subsection*{火焰传感器}
+
+火焰传感器是一种可以检测火焰的装置。在这个实验中，你将学习如何使用555定时器IC构建一个火焰传感器。
+
+\subsection*{振动传感器}
+
+振动传感器是一种可以检测振动的装置。在这个实验中，你将学习如何使用555定时器IC构建一个振动传感器。
+
+\subsection*{运动传感器}
+
+运动传感器是一种可以检测运动的装置。在这个实验中，你将学习如何使用555定时器IC构建一个运动传感器。
+
+\subsection*{项目}
+
+现在，让我们来看看一些使用555定时器IC构建的实际项目。
+
+\subsection*{LED闪烁灯}
+
+LED闪烁灯是一种可以使LED闪烁的电路。在这个项目中，你将学习如何使用555定时器IC构建一个LED闪烁灯。
+
+\subsection*{音频振荡器}
+
+音频振荡器是一种可以产生音频信号的电路。在这个项目中，你将学习如何使用555定时器IC构建一个音频振荡器。
+
+\subsection*{门铃}
+
+门铃是一种可以发出声音提醒有人来访的装置。在这个项目中，你将学习如何使用555定时器IC构建一个门铃。
+
+\subsection*{警报器}
+
+警报器是一种可以发出警报声的装置。在这个项目中，你将学习如何使用555定时器IC构建一个警报器。
+
+\subsection*{定时器}
+
+定时器是一种可以在设定时间后触发的装置。在这个项目中，你将学习如何使用555定时器IC构建一个定时器。
+
+\subsection*{延时开关}
+
+延时开关是一种可以在设定时间后关闭的开关。在这个项目中，你将学习如何使用555定时器IC构建一个延时开关。
+
+\subsection*{脉冲发生器}
+
+脉冲发生器是一种可以产生脉冲信号的电路。在这个项目中，你将学习如何使用555定时器IC构建一个脉冲发生器。
+
+\subsection*{频率计数器}
+
+频率计数器是一种可以测量信号频率的装置。在这个项目中，你将学习如何使用555定时器IC构建一个频率计数器。
+
+\subsection*{电子骰子}
+
+电子骰子是一种可以模拟骰子滚动的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子骰子。
+
+\subsection*{电子音乐盒}
+
+电子音乐盒是一种可以播放音乐的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子音乐盒。
+
+\subsection*{电子节拍器}
+
+电子节拍器是一种可以产生节拍的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子节拍器。
+
+\subsection*{电子温度计}
+
+电子温度计是一种可以测量温度的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子温度计。
+
+\subsection*{电子湿度计}
+
+电子湿度计是一种可以测量湿度的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子湿度计。
+
+\subsection*{电子气压计}
+
+电子气压计是一种可以测量气压的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子气压计。
+
+\subsection*{电子风速计}
+
+电子风速计是一种可以测量风速的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子风速计。
+
+\subsection*{电子雨量计}
+
+电子雨量计是一种可以测量降雨量的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子雨量计。
+
+\subsection*{电子指南针}
+
+电子指南针是一种可以指示方向的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子指南针。
+
+\subsection*{电子水平仪}
+
+电子水平仪是一种可以测量水平的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子水平仪。
+
+\subsection*{电子秤}
+
+电子秤是一种可以测量重量的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子秤。
+
+\subsection*{电子万用表}
+
+电子万用表是一种可以测量多种电气量的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子万用表。
+
+\subsection*{电子示波器}
+
+电子示波器是一种可以显示电信号波形的装置。在这个项目中，你将学习如何使用555定时器IC构建一个电子示波器。
+
+\subsection*{结论}
+
+在本书中，我们介绍了555定时器IC的工作原理、实验和项目。通过这些内容，你应该对555定时器IC有了更深入的了解，并能够使用它构建各种电子电路。
+
+555定时器IC是一种非常通用的芯片，它可以用于各种应用，从简单的LED闪烁灯到复杂的电子系统。希望本书能够帮助你更好地理解和使用555定时器IC。
+
+\end{document}

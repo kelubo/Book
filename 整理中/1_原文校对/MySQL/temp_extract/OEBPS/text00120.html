@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">8.3.3　全量与增量如何结合备份</h3>
+<p class="ziti">下面以mysqldump命令和binlog日志增量数据为例讲解企业中按天全备和按周全备的方法，具体见表8-1和表8-2。</p>
+<p class="middle-img">表8-1　按天全备与增量备份数据示例</p>
+<div class="pic"><img alt="" src="Image00061.jpg" />
+</div>
+<p class="ziti">按天全备的特点如下。</p>
+<p class="ziti6">·优点：恢复数据时需要的数据文件数量少，恢复时间短，维护成本低。</p>
+<p class="ziti6">·缺点：每天一个全备，占用空间多，占用系统资源多，经常备份会影响用户体验。</p>
+<p class="ziti">中小企业用得最多的策略就是按天全备，然后根据空间情况保留全备份数，例如仅保留7天内的备份数据，如果企业数据很重要，则可以使用磁带机等设备留存1年以上的备份数据。</p>
+<p class="ziti">binlog增量的清理可以通过在my.cnf中配置“过期清理天数”的相关参数（expire_logs_days=7）来实现，例如保留7天内的binlog日志，理论上如果每天进行全备，那么binlog只要保留1天的就够了。</p>
+<p class="middle-img">表8-2　按周全备与增量备份数据示例</p>
+<div class="pic"><img alt="" src="Image00062.jpg" />
+</div>
+<p class="ziti">按周全备的特点如下。</p>
+<p class="ziti6">·优点：每周仅有一个完整备份，因此占用磁盘总空间小，占用系统资源少，备份次数少，用户体验好一些。</p>
+<p class="ziti6">·缺点：恢复时数据文件多，导致恢复麻烦，维护成本高，恢复时间长。</p>
+<p class="ziti">大型企业由于数据量特别大，每天全备时间太长，因此有可能会采用周备的策略，这样不仅有利于节省数据存储空间而且不会影响用户访问数据库的体验。</p>
+</body>
+</html>

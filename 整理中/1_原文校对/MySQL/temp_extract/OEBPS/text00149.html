@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">10.4　二进制日志的介绍与配置</h2>
+<p class="p6">1.二进制日志的介绍</p>
+<p class="ziti">二进制日志的作用是记录数据库里的数据被修改的SQL语句，一般为DDL和DML语句，例如含有insert、update、delete、create、drop、alter等关键字的语句。</p>
+<p class="p6">2.二进制日志的作用</p>
+<p class="ziti">二进制日志最重要的作用有2个，具体如下。</p>
+<p class="ziti">第一个是记录MySQL数据的增量数据，用来做增量数据库恢复，没有二进制日志功能，MySQL的备份将无法完整还原数据。</p>
+<p class="ziti">第二个是实现主从复制功能，具体见MySQL主从复制的相关内容。</p>
+<p class="p6">3.二进制日志的配置</p>
+<p class="ziti">二进制日志的调整，前文已经讲解并实际操作过了，查验如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# grep log_bin /etc/my.cnf
+log_bin   #&lt;==默认情况下记录日志前缀为“主机名-bin”。
+mysql&gt; show variables like 'log_bin';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| log_bin       | ON    | #&lt;==记录binlog开关。
++---------------+-------+
+1 row in set (0.00 sec)
+
+mysql&gt; show variables like '%log_bin';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| log_bin       | ON    | #&lt;==记录binlog开关。
+| sql_log_bin   | ON    | #&lt;==临时不记录binlog开关。
++---------------+-------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">有个参数可以实现在开启binlog功能的前提下，临时不记录binlog，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; set session sql_log_bin = OFF; #&lt;==临时停止记录binlog，注意是session
+                                       级别，不影响其他会话。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show variables like '%log_bin';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| log_bin       | ON    |
+| sql_log_bin   | OFF   | #&lt;==已关闭。
++---------------+-------+
+2 rows in set (0.00 sec)
+mysql&gt; create database oldgirl; #&lt;==建库测试。
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; show binary logs; #&lt;==查看binlog文件列表及位置点。
++-------------------+-----------+
+| Log_name          | File_size |
++-------------------+-----------+
+| oldboy-bin.000001 |       143 |
+| oldboy-bin.000002 |       168 |
+| oldboy-bin.000003 |       168 |
+| oldboy-bin.000004 |      9299 |
+| oldboy-bin.000005 |       211 | #&lt;==最新的binlog文件及位置点，也可以通过
+                                    “show master status;”来确定。
++-------------------+-----------+
+5 rows in set (0.00 sec)
+mysql&gt; system mysqlbinlog oldboy-bin.000005|grep "oldgirl"
+#&lt;==过滤binlog文件，没有记录binlog。
+mysql&gt; set session sql_log_bin = On; #&lt;==开启开关。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; drop database oldgirl;        #&lt;==删除数据库。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; system mysqlbinlog oldboy-bin.000005|grep "oldgirl"
+#&lt;==继续过滤，发现记录了binlog。
+drop database oldgirl</pre>
+<hr/>
+<p class="ziti">到这里，读者应该知道sql_log_bin的功能了吧，这个功能通常用于在用户使用mysql恢复数据时不希望恢复的数据SQL记录到binlog里的情况。当然，还有其他的应用场景。</p>
+<p class="p6">4.二进制日志文件的刷新条件</p>
+<p class="ziti">1）数据库重启会自动刷新binlog为新文件。</p>
+<p class="ziti">2）执行“mysqldump-F”或“mysqladmin flush-logs”会将binlog刷新为新文件。</p>
+<p class="ziti">3）binlog文件达到1GB左右时，会自动刷新binlog为新文件。</p>
+<p class="ziti">4）人为配置切割及调整。</p>
+<p class="ziti">binlog最大值控制参数及默认大小查看方法如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'max_binlog_size';
++-----------------+------------+
+| Variable_name   | Value      |
++-----------------+------------+
+| max_binlog_size | 1073741824 |
++-----------------+------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">5.二进制日志索引文件</p>
+<p class="ziti">除了很多按序列生成的binlog文件列表之外，还有一个索引文件，例如下文里的oldboy-bin.index：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# pwd
+/application/mysql/data
+[root@oldboy data]# ls -l oldboy-bin.*
+-rw-rw----. 1 mysql mysql  143 Mar  3 05:50 oldboy-bin.000001
+-rw-rw----. 1 mysql mysql  168 Mar  3 05:57 oldboy-bin.000002
+-rw-rw----. 1 mysql mysql  168 Mar  3 05:57 oldboy-bin.000003
+-rw-rw----. 1 mysql mysql 9299 Mar 19 19:34 oldboy-bin.000004
+-rw-rw----. 1 mysql mysql  211 Mar 19 20:15 oldboy-bin.000005
+-rw-rw----. 1 mysql mysql  100 Mar 19 19:34 oldboy-bin.index</pre>
+<hr/>
+<p class="ziti">索引文件的文件名和binlog文件一样，只是扩展名为index，查看索引文件内容的命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# cat oldboy-bin.index
+./oldboy-bin.000001
+./oldboy-bin.000002
+./oldboy-bin.000003
+./oldboy-bin.000004
+./oldboy-bin.000005</pre>
+<hr/>
+<p class="ziti">binlog索引文件的控制参数为：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'log_bin_index';
++---------------+-------------------------------------------------+
+| Variable_name | Value                                           |
++---------------+-------------------------------------------------+
+| log_bin_index | /application/mysql-5.6.40/data/oldboy-bin.index |
++---------------+-------------------------------------------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="p6">6.删除二进制日志的方法</p>
+<p class="ziti">binlog日志很重要，不能随意清除，有些读者看到所维护的服务器空间满了，竟然会直接删除binlog物理文件，这样的操作是错误的，应避免。那么如何正确删除binlog文件呢？</p>
+<p class="ziti">首先，要确定什么时候可以删除binlog。</p>
+<p class="ziti">理论上每天的数据库全备时刻以前的binlog都是无用的，但是工作中我们会根据需要保留3～7天的本地binlog文件。</p>
+<p class="ziti">下面来看看具体的删除方式。</p>
+<p class="ziti">（1）设置参数自动删除binlog</p>
+<p class="ziti">设置参数自动删除binlog是每个管理员都应该做的，参数设置示例如下。</p>
+<p class="ziti">假设参数为：</p>
+<hr/>
+<pre class="ziti1">expire_logs_days = 7  #&lt;==删除7天前的日志</pre>
+<hr/>
+<p class="ziti">该参数默认是没有配置的，生产中可以同时实现在线更改以及永久更改配置文件：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'expire_logs_days';
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| expire_logs_days | 0     |
++------------------+-------+
+1 row in set (0.00 sec)
+
+mysql&gt; set global expire_logs_days = 7;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; show variables like 'expire_logs_days';
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| expire_logs_days | 7     |
++------------------+-------+
+1 row in set (0.00 sec)
+
+[root@oldboy data]# grep expir /etc/my.cnf
+expire_logs_days = 7</pre>
+<hr/>
+<p class="ziti">（2）从最开始一直删除到指定的文件位置（不含指定文件）</p>
+<p class="ziti">这种方法一般用于处理临时的需求，操作如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# cp oldboy-bin.* /tmp</pre>
+<hr/>
+<p class="ziti">登录数据库时执行如下命令：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show binary logs;
++-------------------+-----------+
+| Log_name          | File_size |
++-------------------+-----------+
+| oldboy-bin.000001 |       143 |
+| oldboy-bin.000002 |       168 |
+| oldboy-bin.000003 |       168 |
+| oldboy-bin.000004 |      9299 |
+| oldboy-bin.000005 |       211 |
++-------------------+-----------+
+4 rows in set (0.00 sec)
+mysql&gt; purge binary logs to 'oldboy-bin.000002';
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show binary logs;
++-------------------+-----------+
+| Log_name          | File_size |
++-------------------+-----------+
+| oldboy-bin.000002 |       168 | #&lt;==序列000002以前的就没了。
+| oldboy-bin.000003 |       168 |
+| oldboy-bin.000004 |      9299 |
+| oldboy-bin.000005 |       211 |
++-------------------+-----------+
+4 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">（3）按照时间删除binlog日志</p>
+<p class="ziti">这种方法也是用于处理临时的需求，操作如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# ls -l --time-style=long-iso oldboy-bin*
+-rw-rw----. 1 mysql mysql  168 2018-03-03 05:57 oldboy-bin.000002
+-rw-rw----. 1 mysql mysql  168 2018-03-03 05:57 oldboy-bin.000003
+-rw-rw----. 1 mysql mysql 9299 2018-03-19 19:34 oldboy-bin.000004
+-rw-rw----. 1 mysql mysql  211 2018-03-19 20:15 oldboy-bin.000005
+-rw-rw----. 1 mysql mysql   80 2018-03-19 21:15 oldboy-bin.index</pre>
+<hr/>
+<p class="ziti">下面删除“2018-03-1919：34”以前的binlog文件：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; PURGE MASTER LOGS BEFORE '2018-03-19 19:34';
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; system ls -l --time-style=long-iso oldboy-bin*
+-rw-rw----. 1 mysql mysql 9299 2018-03-19 19:34 oldboy-bin.000004
+-rw-rw----. 1 mysql mysql  211 2018-03-19 20:15 oldboy-bin.000005
+-rw-rw----. 1 mysql mysql   40 2018-03-19 21:20 oldboy-bin.index</pre>
+<hr/>
+<p class="ziti">（4）清除所有的binlog，并从000001开始重新记录</p>
+<p class="ziti">reset master指令可以清除数据库所有的binlog文件，并从000001开始重新记录：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; reset master;
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; system ls -l --time-style=long-iso oldboy-bin*
+-rw-rw----. 1 mysql mysql 120 2018-03-19 21:22 oldboy-bin.000001
+-rw-rw----. 1 mysql mysql  20 2018-03-19 21:22 oldboy-bin.index</pre>
+<hr/>
+<p class="ziti">下面是binlog相关参数的设置和优化思路。</p>
+<p class="ziti">使用如下命令可以查看binlog相关的参数：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'binlog_%';
+mysql&gt; show variables like '%log_bin%';</pre>
+<hr/>
+<p class="ziti">这里只给大家讲解工作中比较常用的参数。</p>
+<p class="ziti">（1）binlog_cache_size</p>
+<p class="ziti">二进制日志缓存是数据库为每一个客户连接分配的内存空间。对于事务引擎来说，适当调整该参数会获得更好的性能，该参数的默认值为：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%binlog_cache%';
++-----------------------+----------------------+
+| Variable_name         | Value                |
++-----------------------+----------------------+
+| binlog_cache_size     | 32768                |
+| max_binlog_cache_size | 18446744073709547520 |
++-----------------------+----------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">（2）max_binlog_size</p>
+<p class="ziti">该参数用于设置binlog日志的最大大小，默认为1GB，但是该值并不能严格控制binlog的大小。若binlog大小接近1GB，而此时又在执行一个较大的事务，那么为了保证事务的完整性，数据库不会做日志刷新动作，而是直到该事务的日志全部记录进入当前binlog日志后才会进行刷新。该参数的默认值查询结果为：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%max_binlog_size%';
++-----------------+------------+
+| Variable_name   | Value      |
++-----------------+------------+
+| max_binlog_size | 1073741824 |
++-----------------+------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">（3）sync_binlog</p>
+<p class="ziti">这个参数的作用是控制binlog什么时候同步到磁盘。对数据库来说，这是很重要的参数，它不仅会影响数据库的性能，还会影响数据库数据的完整性。</p>
+<p class="ziti">对于“sync_binlog”参数的说明具体如下。</p>
+<p class="ziti6">·“sync_binlog=0”表示在事务提交之后，数据库不会将binlog_cache中的数据刷新到磁盘，而是让文件系统自行决定什么时候来做刷新或者在缓存满了之后才刷新到磁盘。</p>
+<p class="ziti6">·“sync_binlog=n”表示每进行n次事务提交之后，数据库都会进行一次将缓存数据强制刷新到磁盘的操作。</p>
+<p class="ziti">该参数默认的设置是0，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%sync_binlog%';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| sync_binlog   | 0     |
++---------------+-------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">设置为0时数据库的性能是最好的，但数据风险也是最大的，对于数据安全性要求较高的数据库，应该调整该参数将其改为1，值得注意的是，即使参数设置为1，仍然有binlog记录的内容与数据库的实际内容不一致的风险。</p>
+<p class="p6">7.记录二进制日志的三种模式</p>
+<p class="ziti">MySQL使用不同的模式记录二进制日志信息，常见的有三种模式。</p>
+<p class="ziti">（1）语句模式</p>
+<p class="ziti">语句（statement-based）模式是MySQL5.6版本默认的模式，简单地说，就是每一条被修改的数据的SQL语句都会记录到master的binlog中。在复制slave库的时候，SQL进程会解析成与原来master端执行过的相同的SQL来再次执行。</p>
+<p class="ziti">该模式的优点是不需要记录细到每一行数据的更改变化，因此，可减少binlog日志量，实际上是减少了很多，节约了磁盘I/O，提高了系统性能。</p>
+<p class="ziti">但该模式同样有一些缺点，由于语句模式记录的是执行的SQL语句，所以，对于某些具有特殊功能的SQL语句来说，就可能会导致无法在从库上正确执行，从而导致主从库数据不一致的问题。</p>
+<p class="ziti">例如，当特殊的函数被执行时，当触发器、存储过程等特殊功能被执行时，而row level模式是基于每一行来记录变化的，所以不会出现类似的问题（更多详情请参考混合模式）。</p>
+<p class="ziti">（2）行级模式</p>
+<p class="ziti">简单地说，行级（row-based）模式就是将数据被修改的每一行的情况记录为一条语句。</p>
+<p class="ziti">优点：在行级模式下，binlog中可以不记录执行的SQL语句的上下文相关信息，仅仅记录哪一条记录被修改了，修改成什么样了即可，所以row level的日志内容会非常清楚地记录下每一行数据修改的细节，非常容易理解。而且不会出现某些特定情况下的存储过程或function以及trigger的调用和触发无法被正确复制的问题。</p>
+<p class="ziti">缺点：行级模式下，所有的执行语句都将根据修改的行来记录，而这就可能会产生大量的日志内容，例如一条语句修改了100万行，语句模式就用一条语句即可搞定，而行级模式执行之后，日志中记录的就是100万行的修改记录，binlog日志的量可能会大得惊人。</p>
+<p class="ziti">（3）混合模式</p>
+<p class="ziti">混合（mixed-based）模式默认采用语句模式记录日志，在一些特定的情况下会将记录模式切换为行级模式记录，这些特殊情况包含但不限于以下情况。</p>
+<p class="ziti6">·当函数中包含UUID()时。</p>
+<p class="ziti6">·当表中有自增列（AUTO_INCREMENT）被更新时。</p>
+<p class="ziti6">·当执行触发器（trigger）或者存储过程（stored function）等特殊功能时。</p>
+<p class="ziti6">·当FOUND_ROWS()、ROW_COUNT()、USER()、CURRENT_USER()、CURRENT_USER等执行时。</p>
+<p class="p6">8.企业中如何选择二进制日志模式</p>
+<p class="ziti">在互联网公司中，使用MySQL的特殊功能比较少（存储过程、触发器、函数），此时可以选择默认的语句模式。</p>
+<p class="ziti">如果公司较多用到MySQL的特殊功能，如存储过程、触发器、函数等，并且需要做主从复制请首选行级模式，次选mixed模式。</p>
+<p class="p6">9.二进制日志的模式配置调整</p>
+<p class="ziti">临时调整命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SET GLOBAL binlog_format = 'STATEMENT';
+mysql&gt; SET GLOBAL binlog_format = 'ROW';
+mysql&gt; SET GLOBAL binlog_format = 'MIXED';</pre>
+<hr/>
+<p class="ziti">永久调整可以将“binlog_format='模式名'”写入到my.cnf配置文件中，并重启服务。</p>
+<p class="p6">10.二进制日志的读取和增量恢复</p>
+<p class="ziti">此部分请参考本书的第7章7.3节，此处不再赘述。</p>
+<p class="p6">11.行级模式二进制日志实际读取示例</p>
+<p class="ziti">当在数据库中执行如下语句：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SET GLOBAL binlog_format = 'ROW';</pre>
+<hr/>
+<p class="ziti">或者在my.cnf中加入binlog_format='ROW'配置生效后，此时如果更新或者删除多行数据就会发现binlog日志记录的内容有所不同，具体命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy 3306]# mysqlbinlog --base64-output=decode-rows -v oldboy-bin.000001
+#&lt;==--base64-output=decode-rows -v以行级模式解析binlog日志。
+/*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;
+# at 233
+#180306  6:26:27 server id 1  end_log_pos 233   Table_map: `oldboy`.`student` mapped to number 64
+#180306  6:26:27 server id 1  end_log_pos 500   Update_rows: table id 64 flags: STMT_END_F
+### UPDATE `oldboy`.`student`
+### WHERE
+###   @1=1
+###   @2='oldboy1'
+### SET
+###   @1=1
+###   @2='test'
+### UPDATE `oldboy`.`student`
+### WHERE
+###   @1=3
+###   @2='oldboy2'
+### SET
+###   @1=3
+###   @2='test'
+### UPDATE `oldboy`.`student`
+### WHERE
+###   @1=5
+###   @2='oldboy3'
+### SET
+###   @1=5
+###   @2='test'
+### UPDATE `oldboy`.`student`
+### WHERE
+###   @1=6
+###   @2='oldgirl1'
+### SET
+###   @1=6
+###   @2='test'
+# at 500</pre>
+<hr/>
+</body>
+</html>

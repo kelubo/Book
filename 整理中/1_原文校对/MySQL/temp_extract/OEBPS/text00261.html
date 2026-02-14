@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">17.3.4　MySQL从库（db02）半同步插件安装和配置</h3>
+<p class="ziti">登录MySQL从库（db02）安装半同步插件，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; INSTALL PLUGIN rpl_semi_sync_slave SONAME 'semisync_slave.so';
+Query OK, 0 rows affected (0.34 sec)</pre>
+<hr/>
+<p class="ziti">开始配置从库半同步插件。</p>
+<p class="ziti">临时生效方法具体如下。</p>
+<p class="ziti">控制Slave是否开启半同步，需要将如下参数设置为ON或OFF：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SET GLOBAL rpl_semi_sync_slave_enabled = ON;
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">永久生效方法具体如下。</p>
+<p class="ziti">编辑配置文件“/etc/my.cnf”调整如下参数到[mysqld]模块下：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+rpl_semi_sync_slave_enabled = ON</pre>
+<hr/>
+<p class="ziti">以上两种方法如果同时配置，则可以不重启数据库，生产库可以同时进行配置。</p>
+<p class="ziti">如果在一个正在运行的Slave上开启半同步复制的功能，那么在配置半同步以后，需要重启停止Slave的I/O线程：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show slave status\G
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+...省略若干...
+             Slave_IO_Running: Yes  #&lt;==确保主从复制是两个Yes。
+            Slave_SQL_Running: Yes
+...省略若干...
+ 1 row in set (0.00 sec)
+mysql&gt; stop slave io_thread; #&lt;==停止IO线程。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; start slave io_thread;  #&lt;==启动IO线程。
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">检查<span class="yanse">主库</span>
+ （db01）开启及配置的插件的生效方法：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show global status like '%semi%'; #&lt;==查看从库半同步复制的状态。
++----------------------------+-------+
+| Variable_name              | Value |
++----------------------------+-------+
+| Rpl_semi_sync_slave_status | ON    |   #&lt;==为ON表示已开启。
++----------------------------+-------+
+1 row in set (0.00 sec)
+mysql&gt; show variables like '%semi%';     #&lt;==查看从库半同步复制插件的参数，共2个。
++---------------------------------+-------+
+| Variable_name                   | Value |
++---------------------------------+-------+
+| rpl_semi_sync_slave_enabled     | ON    | #&lt;==表示是否激活半同步插件。
+| rpl_semi_sync_slave_trace_level | 32    | #&lt;==从库半同步复制的调试级别。
++---------------------------------+-------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">同时查看主库db01上面的半同步插件是否开启，输出如图17-2，注意第一个参数clients的值变为1了（之前是0），表示主从半同步复制连接成功。</p>
+<div class="pic"><img alt="" src="Image00132.jpg" />
+</div>
+<p class="middle-img">图17-2　主从半同步复制连接成功</p>
+</body>
+</html>

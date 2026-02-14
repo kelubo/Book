@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_214">11.2.2　配置归档工具GitLab</h3>
+
+  <p class="ziti3">GitLab是使用Ruby语言编写的Git仓库管理工具，以Git作为代码管理工具，并提供了Web管理、WIKI及Issue等功能。GitLab是按照MIT许可证分发的开源软件，已被很多知名公司使用，目前由GitLabInc.开发维护。GitLab可以搭建在私有服务器上，被授权的用户可以创建自己的代码仓库，并可授权给多人协作进行维护。GitLab拥有与GitHub类似的功能，可以通过Web浏览器浏览代码、管理缺陷和注释。通过GitLab管理Nginx配置文件可以从Web浏览器中非常方便地浏览到提交过的历史变更，也可以利用Git相关命令实现Nginx配置的快速回滚操作。GitLab同样支持以Docker方式部署，官方在Docker Hub中也提供了可直接使用的镜像，通过编写相应的docker-compose脚本，可以快速搭建GitLab服务器，部署过程如下。</p>
+
+  <p class="ziti3">（1）初始化系统环境</p>
+
+  <p class="ziti3">主机的操作系统为CentOS 7.6，初始化Docker环境如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">yum install -y yum-utils                        # 安装yum工具
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo                           　　 # 安装Docker安装源
+yum install -y docker-ce docker-compose # 安装Docker和docker-compose
+systemctl enable docker                 # 将Docker注册为自启动服务
+systemctl start docker
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（2）编写docker-compose脚本</p>
+
+  <p class="ziti3">创建docker-compose脚本，保存为gitlab.yaml。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">gitlab:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab'
+    container_name: gitlab
+#   environment:
+#     GITLAB_OMNIBUS_CONFIG: |
+      #external_url ‘https://gitlab.example.com’
+      #Add any other gitlab.rb configuration here, each on its own line
+    ports:
+        - '8080:80'
+        - '8443:443'
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（3）持久化GitLab数据</p>
+
+  <p class="ziti3">GitLab需要持久化的有3个部分的内容，分别是GitLab的配置、GitLab的代码仓库和GitLab日志。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5"># 运行GitLab容器
+docker -f gitlab.yaml up -d
+
+# 创建挂载目录并复制原容器内的文件
+mkdir -p /opt/data/apps/gitlab
+docker cp gitlab:/etc/gitlab /opt/data/apps/gitlab/config
+docker cp gitlab:/var/opt/gitlab /opt/data/apps/gitlab/data
+docker cp gitlab:/var/log/gitlab /opt/data/apps/gitlab/logs
+chown -R 998:998 /opt/data/apps/gitlab/logs
+# 添加挂载卷配置
+echo "
+    volumes:
+        - '/opt/data/apps/gitlab/config:/etc/gitlab'
+        - '/opt/data/apps/gitlab/logs:/var/log/gitlab'
+        - '/opt/data/apps/gitlab/data:/var/opt/gitlab'
+" &gt;&gt;gitlab.yaml
+docker stop gitlab
+docker rm gitlab
+docker-compose -f gitlab.yaml up -d
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">GitLab运行后可通过<a href="http://IP:8080" class="pcalibre calibre1">http://IP:8080</a>访问登录。如果GitLab仅作为代码仓库应用，只需默认配置即可使用。</p>
+</body>
+</html>

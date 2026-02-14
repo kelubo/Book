@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">7.2.2　利用source命令恢复数据库</h3>
+<p class="p6">1.使用source命令恢复数据库的说明</p>
+<p class="ziti">进入mysql数据库控制台后，切换到想恢复数据的数据库。</p>
+<hr/>
+<pre class="ziti1">mysql&gt;use 数据库</pre>
+<hr/>
+<p class="ziti">接着，使用source命令进行恢复，后面接.sql文件，即上文使用mysqldump备份的文件或者人工编辑的SQL语句文件：</p>
+<hr/>
+<pre class="ziti1">mysql&gt;source oldboy_db.sql</pre>
+<hr/>
+<p class="ziti">这个oldboy_db.sql文件是系统的相对路径，默认是登录MySQL前的系统路径，也可以使用完整的路径。</p>
+<p class="p6">2.恢复演示</p>
+<p class="ziti">先执行一次正式的备份：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqldump -B --master-data=2 --single-transaction oldboy| gzip &gt;/opt/oldboy.sql.gz
+[root@oldboy ~]# ls -l /opt/oldboy.sql.gz
+-rw-r--r--. 1 root root 867 Mar  3 08:34 /opt/oldboy.sql.gz</pre>
+<hr/>
+<p class="ziti">恢复前解压为SQL文件：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# gzip -d /opt/oldboy.sql.gz
+[root@oldboy ~]# ll /opt/
+total 4
+-rw-r--r--. 1 root root 2204 Mar  3 08:34 oldboy.sql</pre>
+<hr/>
+<p class="ziti">登录数据库删除oldboy数据库，然后准备用source恢复：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop database oldboy;           #&lt;==删除数据库oldboy。
+Query OK, 1 row affected (0.03 sec)
+mysql&gt; select * from oldboy.test;      #&lt;==查询数据看是否还有？
+ERROR 1146 (42S02): Table 'oldboy.test' doesn't exist #&lt;==报错了。
+mysql&gt; source /opt/oldboy.sql          #&lt;==执行恢复命令。
+Query OK, 0 rows affected (0.00 sec)
+..省略若干...
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; select * from oldboy.test;      #&lt;==查询数据看是否还有？显然有了。
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">如果是utf8数据库，人工编辑的SQL文件，则建议使用“UTF8没有签名”格式。</p>
+</body>
+</html>

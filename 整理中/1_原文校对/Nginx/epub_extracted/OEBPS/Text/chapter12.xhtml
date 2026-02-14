@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h2 class="p3" id="sigil_toc_id_13">2.1　编译环境准备</h2>
+
+  <h3 class="p" id="sigil_toc_id_14">2.1.1　操作系统的准备</h3>
+
+  <p class="ziti3">Nginx是一款优秀的开源软件，是运行在操作系统上的应用程序，因此Nginx的性能依赖于操作系统及其对底层硬件的管理机制，为了使Nginx在运行时发挥最大的性能，需要对操作系统的服务配置和参数做一些调整。系统服务配置可用如下方式实现。</p>
+
+  <p class="ziti3">（1）系统服务安装</p>
+
+  <p class="ziti3">CentOS可用最小化安装，安装完毕后，用如下命令补充工具。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">yum -y install epel-release                     # 安装扩展工具包yum源
+yum install net-tools wget nscd lsof            # 安装工具
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（2）DNS缓存</p>
+
+  <p class="ziti3">编辑/etc/resolv.conf配置DNS服务器，打开NSCD服务，缓存DNS，提高域名解析响应速度。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">systemctl start nscd.service                    # 启动NSCD服务
+systemctl enable nscd.service
+</pre>
+  <hr class="calibre6"/>
+
+  <p class="ziti3">（3）修改文件打开数限制</p>
+
+  <p class="ziti3">操作系统默认单进程最大打开文件数为1024，要想实现高并发，可以把单进程的文件打开数调整为65536。</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">echo "* soft nofile 65536                             # *号表示所用用户
+\* hard nofile 65536" &gt;&gt;/etc/security/limits.conf
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

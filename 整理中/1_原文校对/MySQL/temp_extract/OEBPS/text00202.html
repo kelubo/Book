@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.5.6　索引页之间合并阈值</h3>
+<p class="ziti">当索引页的数据由于删除操作或者修改操作低于阈值时，InnoDB可以通过配置merge_threshold来确保其会将此索引页和邻近的索引页合并。merge-threshold的默认值是50，取值范围是1到50。</p>
+<p class="ziti">merge_threshold参数可以定义在表上，也可以定义在一个独立的索引上。</p>
+<hr/>
+<pre class="ziti1">CREATE TABLE t1 (
+   id INT,
+  KEY id_index (id)
+) COMMENT='MERGE_THRESHOLD=45';
+CREATE TABLE t1 (
+   id INT,
+  KEY id_index (id)
+);
+
+ALTER TABLE t1 COMMENT='MERGE_THRESHOLD=40';
+CREATE TABLE t1 (
+   id INT,
+  KEY id_index (id) COMMENT 'MERGE_THRESHOLD=40'
+);
+CREATE TABLE t1 (id INT);
+CREATE INDEX id_index ON t1 (id) COMMENT 'MERGE_THRESHOLD=40';</pre>
+<hr/>
+<p class="ziti">评估merge_threshold参数的合理方法是查看innodb_metrics表里的相关参数，确保发生了较少的索引页合并，且合并请求和成功合并的数量相当：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SELECT NAME, COMMENT FROM INFORMATION_SCHEMA.INNODB_METRICS
+WHERE NAME like '%index_page_merge%';
++-----------------------------+----------------------------------------+
+| NAME                        | COMMENT                                |
++-----------------------------+----------------------------------------+
+| index_page_merge_attempts   | Number ofindex page merge attempts    |
+| index_page_merge_successful | Number of successful index page merges |
++-----------------------------+----------------------------------------+</pre>
+<hr/>
+</body>
+</html>

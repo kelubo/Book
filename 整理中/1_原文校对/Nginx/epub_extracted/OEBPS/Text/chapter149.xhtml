@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_162">8.3.2　upstream的容错机制</h3> 
+ <p class="ziti3">Nginx在upstream模块中默认的检测机制是通过用户的真实请求去检查被代理服务器的可用性，这是一种被动的检测机制，通过upstream模块中server指令的指令值参数max_fails及fail_timeout实现对被代理服务器的检测和熔断。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream http_backend {
+    # 10s内出现3次错误，该服务器将被熔断10s
+    server 192.168.2.154:8080 max_fails=3 fail_timeout=10s;
+    server 192.168.2.109:8080 max_fails=3 fail_timeout=10s;
+    server 192.168.2.108:8080 max_fails=3 fail_timeout=10s;
+    server 192.168.2.107:8080 max_fails=3 fail_timeout=10s;
+}
+
+server {
+    proxy_connect_timeout 5s;               # 与被代理服务器建立连接的超时时间为5s
+    proxy_read_timeout 10s;                 # 获取被代理服务器的响应最大超时时间为10s
+
+    # 当与被代理服务器通信出现指令值指定的情况时，认为被代理出错，并将请求转发给上游服务器组中
+    # 的下一个可用服务器
+    proxy_next_upstream http_502 http_504 http_404 error timeout invalid_header;
+    proxy_next_upstream_tries 3;            # 转发请求最多3次
+    proxy_next_upstream_timeout 10s;        # 总尝试超时时间为10s
+
+    location /http/ {
+        proxy_pass http://http_backend;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">其中的参数和指令说明如下。</p> 
+ <p class="ziti4">·指令值参数max_fails是指10s内Nginx分配给当前服务器的请求失败次数累加值，每10s会重置为0。</p> 
+ <p class="ziti4">·指令值参数fail_timeout既是失败计数的最大时间，又是服务器被置为失败状态的熔断时间，超过这个时间将再次被分配请求。</p> 
+ <p class="ziti4">·指令proxy_connect_timeout或proxy_read_timeout为超时状态时，都会触发proxy_next_upstream的timeout条件。</p> 
+ <p class="ziti4">·proxy_next_upstream是Nginx下提高请求成功率的机制，当被代理服务器返回错误并符合proxy_next_upstream指令值设置的条件时，将尝试转发给下一个可用的被代理服务器。</p> 
+ <p class="ziti4">·指令proxy_next_upstream_tries的指令值次数包括第一次转发请求的次数。</p> 
+ <p class="ziti3">Nginx被动检测机制的优点是不需要增加额外进程进行健康检测，但用该方法检测是不准确的。如当响应超时时，有可能是被代理服务器故障，也可能是业务响应慢引起的。如果是被代理服务器故障，那么Nginx仍会在一定时间内将客户端的请求转发给该服务器，用以判断其是否恢复。</p> 
+ <p class="ziti3">Nginx官方的主动健康检测模块仅集成在商业版本中，对于开源版本，推荐使用Nginx扩展版OpenResty中的健康检测模块lua-resty-upstream-healthcheck。该模块的检测参数如表8-12所示。</p> 
+ <p class="middle-img">表8-12　lua-resty-upstream-healthcheck模块的检测参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b8-12.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b8-12.jpg" class="calibre284"/></a> 
+ </div> 
+ <p class="ziti3">模块lua-resty-upstream-healthcheck的原理是每到（interval）设定的时间，就会对被代理服务器的HTTP端口主动发起GET请求（http_req），当请求的响应状态码在确定为合法的列表（valid_status）中出现时，则认为被代理服务器是健康的，如果请求的连续（fall）设定次数返回响应状态码都未在列表（valid_status）中出现，则认为是故障状态。对处于故障状态的设备，该模块会将其置为DOWN状态，直到请求的连续（rise）次返回的状态码都在确定为合法的列表中出现，被代理服务器才会被置为UP状态，并获得Nginx分配的请求，Nginx在整个运行过程中不会将请求分配给DOWN状态的被代理服务器。lua-resty-upstream-healthcheck模块只会使用Nginx中的一个工作进程对被代理服务器进行检测，不会对被代理服务器产生大量的重复检测。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    # 关闭socket错误日志
+    lua_socket_log_errors off;
+
+    # 上游服务器组样例
+    upstream foo.com {
+        server 127.0.0.1:12354;
+        server 127.0.0.1:12355;
+        server 127.0.0.1:12356 backup;
+    }
+
+    # 设置共享内存名称及大小
+    lua_shared_dict _foo_zone 1m;
+
+    init_worker_by_lua_block {
+        # 引用resty.upstream.health-check模块
+        local hc = require "resty.upstream.healthcheck"
+
+        local ok, err = hc.spawn_checker{
+            shm = "_foo_zone",              # 绑定lua_shared_dict定义的共享内存
+            upstream = "foo.com",           # 绑定upstream指令域
+            type = "http",
+
+            http_req = "GET /status HTTP/1.0\r\nHost: foo.com\r\n\r\n",
+                                                # 用以检测的raw格式http请求
+
+            interval = 2000,                # 每2s检测一次
+            timeout = 1000,                 # 检测请求超时时间为1s
+            fall = 3,                       # 连续失败3次，被检测节点被置为DOWN状态
+            rise = 2,                       # 连续成功2次，被检测节点被置为UP状态
+            valid_statuses = {200, 302},    # 当健康检测请求返回的响应码为200或302时，被认
+                                                # 为检测通过
+            concurrency = 10,               # 健康检测请求的并发数为10
+        }
+        if not ok then
+            ngx.log(ngx.ERR, "failed to spawn health checker: ", err)
+            return
+        end
+    }
+
+    server {
+        listen 10080;
+        access_log  off;                    # 关闭access日志输出
+        error_log  off;                     # 关闭error日志输出
+
+        # 健康检测状态页
+        location = /healthcheck {
+            allow 127.0.0.1;
+            deny all;
+
+            default_type text/plain;
+            content_by_lua_block {
+                # 引用resty.upstream.healthcheck模块
+                local hc = require "resty.upstream.healthcheck"
+                ngx.say("Nginx Worker PID: ", ngx.worker.pid())
+                ngx.print(hc.status_page())
+            }
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">以下是对该配置样例的几点说明。</p> 
+ <p class="ziti4">·该配置样例参照OpenResty官方样例简单修改。</p> 
+ <p class="ziti4">·对不同的upstream需要通过参数upstream进行绑定。</p> 
+ <p class="ziti4">·建议为每个上游服务器组指定独享的共享内存，并用参数shm进行绑定。</p> 
+</body>
+</html>

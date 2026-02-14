@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_211">11.1.4　Nginx集群负载搭建</h3> 
+ <p class="ziti3">基于LVS和Keepalived的Nginx集群负载是使用LVS做传输层的负载均衡设备，将客户端请求从传输层负载到后端的多组Nginx集群，并由Nginx集群实现应用层负载均衡处理的多层负载均衡网络架构。Keepalived通过文件配置的方式实现LVS的运行管理，并通过VRRP机制实现传输层负载的高可用，为Nginx集群提供高性能、高可用的负载应用。Nginx集群负载部署图如图11-4所示。</p> 
+ <p class="ziti4">·LVS作为传输层负载均衡与接入路由对接，负责把数据包转发给后端的Nginx服务器。</p> 
+ <p class="ziti4">·LVS选用DR转发模式，网络数据包在传输层被分发到Nginx服务器，并由Nginx经过本地路由返回给客户端。</p> 
+ <p class="ziti4">·LVS对后端Nginx服务器集群选用加权轮询（wrr）的负载均衡调度策略。</p> 
+ <p class="ziti4">·Keepalived通过VRRP协议组播通告状态信息，确保两台LVS服务器的高可用。</p> 
+ <p class="ziti4">·当处于MASTER状态的Keepalived发生故障时，处于BACKUP状态的Keepalived切换为MASTER状态，负责与接入路由对接，把数据包转发给后端的Nginx服务器。</p> 
+ <p class="ziti4">·Keepalived通过健康检测机制检测Nginx集群内每台Nginx服务器的健康状态。</p> 
+ <p class="ziti4">·Nginx负责应用层负载均衡，完成客户端请求的负载、路由分流、过滤等操作。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/11-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/11-4.jpg" class="calibre339"/></a> 
+ </div> 
+ <p class="middle-img">图11-4　Nginx集群负载部署图</p> 
+ <p class="ziti3">（1）Keepalived安装</p> 
+ <p class="ziti3">Keepalived在CentOS 7系统下使用yum安装即可。在CentOS 7系统下，LVS已被集成到内核中，无须单独安装。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">yum  -y install keepalived
+
+systemctl enable keepalived
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）Keepalived配置</p> 
+ <p class="ziti3">Keepalived需要分别在两台LVS服务器上进行配置，主服务器上的Keepalived配置如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">! Configuration File for keepalived
+
+global_defs {
+    notification_email {
+      monitor@nginxbar.org                          # 发生故障时发送邮件告警通知的邮箱
+    }
+    notification_email_from admin@nginxbar.org      # 使用哪个邮箱发送
+    smtp_server mail.nginxbar.org                   # 发件服务器
+    smtp_connect_timeout 30
+    router_id LVS_01                                # 当前设备路由ID为LVS_01
+}
+
+vrrp_instance VI_1 {
+    state MASTER                                    # 初始路由状态为MASTER
+    interface eth0                                  # VRRP绑定的本地网卡接口为eth0
+    virtual_router_id 51                            # 虚拟路由器的VRID为51
+    priority 100                                    # 当前设备的优先级是100
+    advert_int 5                                    # VRRP组播的间隔时间是5s
+    authentication {
+        auth_type PASS                                      # 认证类型为PASS
+        auth_pass 2222                                      # 认证密码为2222
+    }
+    virtual_ipaddress {
+        192.168.21.155                                      # 虚拟服务器的VIP是192.168.21.155
+    }
+}
+
+virtual_server 192.168.21.155 80 {                      # 虚拟服务器IP及端口
+    delay_loop 6                                            # 健康检测间隔时间为6s
+    lb_algo wrr                                             # 负载均衡调度算法为加权轮询
+    lb_kind DR                                              # 转发模式为DR
+    persistence_timeout 60                                  # 保持连接的超时时间为60s
+    protocol TCP                                            # 负载均衡转发协议为TCP
+    real_server 192.168.2.108 80 {                          # 真实服务器IP及端口
+        weight 100                                          # 真实服务器权重为100
+        notify_down /etc/keepalived/scripts/stop.sh         # 当真实服务器健康检测失败时执
+                                                                # 行stop.sh脚本
+        HTTP_GET {
+            url {
+                path "/healthcheck"                         # 指定要检查的URL的路径
+                digest bfaa324fdd71444e43eca3b7a1679a1a     # 检测URL返回值的MD5计算值
+                status_code 200                             # 健康检测返回状态码
+            }
+            connect_timeout 10                      # 连接超时时间为10s
+            nb_get_retry 3                          # 重试3次确认失败
+            delay_before_retry 3                    # 失败重试的时间间隔为3s
+        }
+    }
+    real_server 192.168.2.109 80 {                  # 真实服务器IP及端口
+        weight 100                                  # 真实服务器权重为100
+        notify_down /etc/keepalived/scripts/stop.sh # 当真实服务器健康检测失败时执
+                                                                # 行stop.sh脚本
+        HTTP_GET {
+            url {
+                path "/healthcheck"                         # 指定要检查的URL的路径
+                digest bfaa324fdd71444e43eca3b7a1679a1a     # 检测URL返回值的MD5计算值
+                status_code 200                             # 健康检测返回状态码
+            }
+            connect_timeout 10                              # 连接超时时间为10s
+            nb_get_retry 3                          # 重试3次确认失败
+            delay_before_retry 3                    # 失败重试的时间间隔为3s
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">备份服务器上的Keepalived配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">! Configuration File for keepalived
+
+global_defs {
+    notification_email {
+      monitor@nginxbar.org                          # 发生故障时发送邮件告警通知
+                                                                # 的邮箱
+    }
+    notification_email_from admin@nginxbar.org              # 使用哪个邮箱发送
+    smtp_server mail.nginxbar.org                   # 发件服务器
+    smtp_connect_timeout 30
+    router_id LVS_02                                # 当前设备路由ID为LVS_02，此
+                                                                # 处与主服务器配置不同
+}
+
+vrrp_instance VI_1 {
+    state BACKUP                                    # 初始路由状态为BACKUP，此处
+                                                                # 与主服务器配置不同
+    interface eth0                                  # VRRP绑定的本地网卡接口为eth0
+    virtual_router_id 51                            # 虚拟路由器的VRID为51
+    priority 99                                     # 当前设备的优先级是99，此处
+                                                                # 与主服务器配置不同
+    advert_int 5                                    # VRRP组播的间隔时间是5s
+    authentication {
+        auth_type PASS                                      # 认证类型为PASS
+        auth_pass 2222                                      # 认证密码为2222
+    }
+    virtual_ipaddress {
+        192.168.21.155                              # 虚拟服务器的VIP是192.168.21.155
+    }
+}
+
+virtual_server 192.168.21.155 80 {                      # 虚拟服务器IP及端口
+    delay_loop 6                                            # 健康检测间隔时间为6s
+    lb_algo wrr                                             # 负载均衡调度算法为加权轮询
+    lb_kind DR                                              # 转发模式为DR
+    persistence_timeout 60                                  # 保持连接的超时时间为60s
+    protocol TCP                                            # 负载均衡转发协议为TCP
+    real_server 192.168.2.108 80 {                          # 真实服务器IP及端口
+        weight 100                                  # 真实服务器权重为100
+        notify_down /etc/keepalived/scripts/stop.sh # 当真实服务器健康检测失败时执
+                                                                # 行stop.sh脚本
+        HTTP_GET {
+            url {
+                path "/healthcheck"                         # 指定要检查的URL的路径
+                digest bfaa324fdd71444e43eca3b7a1679a1a     # 检测URL返回值的MD5计算值
+                status_code 200                             # 健康检测返回状态码
+            }
+            connect_timeout 10                              # 连接超时时间为10s
+            nb_get_retry 3                                  # 重试3次确认失败
+            delay_before_retry 3                            # 失败重试的时间间隔为3s
+        }
+    }
+    real_server 192.168.2.109 80 {                          # 真实服务器IP及端口
+        weight 100                                          # 真实服务器权重为100
+        notify_down /etc/keepalived/scripts/stop.sh # 当真实服务器健康检测失败时执
+                                                                # 行stop.sh脚本
+        HTTP_GET {
+            url {
+                path "/healthcheck"                         # 指定要检查的URL的路径
+                digest bfaa324fdd71444e43eca3b7a1679a1a     # 检测URL返回值的MD5计算值
+                status_code 200                             # 健康检测返回状态码
+            }
+            connect_timeout 10                              # 连接超时时间为10s
+            nb_get_retry 3                                  # 重试3次确认失败
+            delay_before_retry 3                            # 失败重试的时间间隔为3s
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">至此，高可用的LVS负载均衡就配置完成了。当主LVS服务器出现故障时，备份LVS服务器可以快速接管传输层网络数据的负载均衡工作，将数据包分发给后端的Nginx服务器集群。</p> 
+</body>
+</html>

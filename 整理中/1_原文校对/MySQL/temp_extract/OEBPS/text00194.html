@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.9　undo日志</h3>
+<p class="ziti">undo日志是由一系列事务的undo日志记录组成的，每一条undo日志记录均包含了事务数据回滚的相关原始信息，所以当其他的事务需要查看修改前的原始数据时，会从此undo日志记录中获取。undo日志存放在回滚段中的undo日志段中。默认情况下，回滚段是作为系统表空间的一部分的，但也可以通过设置innodb_undo_tablespaces和innodb_undo_directory两个参数而拥有自己独立的undo表空间。</p>
+<p class="ziti">InnoDB支持最大128个回滚段，其中的32个用于服务临时表的相关事务操作，剩下的96个用于服务非临时表，每个回滚段都可以同时支持1023个数据修改事务，也就是总共96K个数据修改事务。</p>
+<p class="ziti">Innodb_undo_logs参数可用来设置回滚段的个数。</p>
+<p class="ziti">undo log的原理很简单，为了满足事务的原子性，在操作任何数据之前，首先将数据备份到一个地方（这个存储数据备份的地方称为undo log）。然后进行数据的修改。如果出现了错误，或者用户执行了ROLLBACK语句，那么系统可以利用undo log中的备份将数据恢复到事务开始之前的状态。</p>
+<p class="p6">1.undo表空间配置</p>
+<p class="ziti">默认情况下，undo日志是存放在系统表空间里的，但也可以选择在独立的一个或多个undo表空间中存放undo日志。</p>
+<p class="ziti6">·Innodb_undo_directory参数决定了独立的undo表空间存放目录。</p>
+<p class="ziti6">·Innodb_undo_logs参数决定了回滚段的个数，该变量可以动态调整。</p>
+<p class="ziti6">·Innodb_undo_tablespaces参数决定了独立的undo表空间的个数，比如将该参数设置为16时，则会在undo表空间的存放目录下创建16个undo文件，默认为10MB。</p>
+<p class="ziti">示例代码如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%innodb_undo%';
++--------------------------+-------+
+| Variable_name            | Value |
++--------------------------+-------+
+| innodb_undo_directory    | ./    |
+| innodb_undo_log_truncate | OFF   |
+| innodb_undo_logs         | 128   |
+| innodb_undo_tablespaces  | 0     |</pre>
+<hr/>
+<p class="p6">2.设置undo log独立表空间</p>
+<p class="ziti">默认情况下，undo log是存储在系统表空间里的，我们也可以将其存放在一个或多个独立表空间下。</p>
+<p class="ziti6">·Innodb_undo_tablespaces参数定义了有多少个undo表空间，此参数只能在建立MySQL实例时被配置。</p>
+<p class="ziti6">·innodb_undo_directory参数定义了undo表空间的存放路径。</p>
+<p class="ziti6">·innodb_undo_logs参数定义了回滚段的数量。</p>
+<p class="p6">3.清空undo表空间的内容</p>
+<p class="ziti">MySQL实例最少会有两个undo表空间，在清空一个undo表空间的同时需要保证至少有一个undo表空间是可用的：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SELECT @@innodb_undo_tablespaces;
++---------------------------+
+| @@innodb_undo_tablespaces |
++---------------------------+
+|                         2 |
++---------------------------+</pre>
+<hr/>
+<p class="ziti">Innodb_undo_logs参数决定了回滚段的数量，取值范围是35～128，默认是128，其中的前33个分布在系统表空间和临时表空间里，剩余的则在表空间之间通过round-robin方式依次分布：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SELECT @@innodb_undo_logs;
++--------------------+
+| @@innodb_undo_logs |
++--------------------+
+|                128 |
++--------------------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">Innodb_undo_log_truncate参数决定是否开启undo表空间清空：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SET GLOBAL innodb_undo_log_truncate=ON;</pre>
+<hr/>
+<p class="ziti">当将此参数设置为ON后，则代表将undo文件大小超过innodb_max_undo_log_size（默认值是128MB）的都标记为清空：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; SELECT @@innodb_max_undo_log_size;
++----------------------------+
+| @@innodb_max_undo_log_size |
++----------------------------+
+|                 1073741824 |
+
+mysql&gt; SET GLOBAL innodb_max_undo_log_size=2147483648;
+Query OK, 0 rows affected (0.00 sec)</pre>
+<hr/>
+<p class="ziti">当标记为清空后，若回滚段标记为非激活状态则表示不接收新的事务，而已存在的事务会等到完成；然后通过purge操作释放回滚段空间；当undo表空间的所有回滚段都释放后，表空间就会清空成初始大小10MB；然后回滚段重新变成激活状态以接收新的事务。</p>
+</body>
+</html>

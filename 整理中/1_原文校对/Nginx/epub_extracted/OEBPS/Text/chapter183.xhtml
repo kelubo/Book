@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_197">10.4.2　Prometheus部署</h3> 
+ <p class="ziti3">Prometheus支持多种方式部署，鉴于Docker化部署的便捷性，此处选择基于docker-compose脚本部署Docker化的Prometheus环境，部署示意如图10-3所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-3.jpg" class="calibre313"/></a> 
+ </div> 
+ <p class="middle-img">图10-3　Prometheus部署</p> 
+ <p class="ziti4">·在服务器10.10.4.38上部署Prometheus的基础服务和Grafana服务。</p> 
+ <p class="ziti4">·在服务器10.10.4.39上部署Prometheus的推送网关服务和Prometheus的告警服务。</p> 
+ <p class="ziti3">（1）安装Prometheus和Grafana</p> 
+ <p class="ziti3">在服务器10.10.4.38上初始化Prometheus和Grafana的docker-compose脚本。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cat&gt;prometheus.yaml&lt;&lt;EOF
+version: '3.5'
+services:
+    prometheus:
+        hostname: prometheus
+        container_name: prometheus
+        restart: always
+        image: prom/prometheus
+        ports:
+            - "9090:9090"
+        stop_grace_period: 1m
+    grafana:
+        hostname: grafana
+        container_name: grafana
+        restart: always
+        image: grafana/grafana
+        ports:
+            - "3000:3000"
+        stop_grace_period: 1m
+EOF
+
+# 启动镜像
+docker-compose -f prometheus.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）配置Prometheus</p> 
+ <p class="ziti3">配置Prometheus并持久化Prometheus及Grafana数据。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cd /opt/data/apps
+mkdir -p {prometheus,grafana}
+
+# 复制配置文件
+docker cp prometheus:/etc/prometheus prometheus/prometheus
+
+# 复制监控数据文件
+docker cp prometheus:/prometheus prometheus/prometheus_data
+
+# 配置Alertmanager服务器地址
+sed -i "s/# - alertmanager:9093/ - 10.10.4.39:9093/g" prometheus/prometheus/prometheus.yml
+
+# 配置告警规则文件目录
+sed -i "/rule_files:/a\  - /etc/prometheus/*.rules" prometheus/prometheus/prometheus.yml
+
+# 配置PushGateway地址
+cat&gt;&gt;prometheus/prometheus/prometheus.yml&lt;&lt;EOF
+
+    - job_name: pushgateway                 # 监控job名称，全局唯一
+      static_configs:
+        - targets: ['10.10.4.39:9091']      # 被监控主机的IP及Exporter的端口
+          labels:
+            instance: pushgateway           # 被监控主机的标识，多为主机名或docker实例名称
+EOF
+
+# 设置目录权限
+chown -R 65534:65534 prometheus/*
+
+# 复制Grafana配置文件
+docker cp grafana:/etc/grafana grafana/config
+# 复制Grafana数据文件
+docker cp grafana:/var/lib/grafana grafana/data
+
+# 设置目录权限
+chown -R 472:472 grafana/*
+
+# 修改docker-compose脚本
+cat&gt;prometheus.yaml&lt;&lt;EOF
+version: '3.5'
+services:
+    prometheus:
+        hostname: prometheus
+        container_name: prometheus
+        restart: always
+        image: prom/prometheus
+        ports:
+            - "9090:9090"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /opt/data/apps/prometheus/prometheus:/etc/prometheus
+            - /opt/data/apps/prometheus/prometheus_data:/prometheus
+        stop_grace_period: 1m
+    grafana:
+        hostname: grafana
+        container_name: grafana
+        restart: always
+        image: grafana/grafana
+        ports:
+            - "3000:3000"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /opt/data/apps/grafana/config:/etc/grafana
+            - /opt/data/apps/grafana/data:/var/lib/grafana
+        stop_grace_period: 1m
+EOF
+
+# 重建并运行镜像
+docker-compose -f prometheus.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·通过浏览器访问<a href="http://10.10.4.38:9090/targets" class="pcalibre calibre1">http://10.10.4.38:9090/targets</a>，就可以看到Prometheus和PushGateway这两个Endpoint。</p> 
+ <p class="ziti4">·通过浏览器访问Grafana Web管理页面<a href="http://10.10.4.38:3000" class="pcalibre calibre1">http://10.10.4.38:3000</a>，初始用户名和密码都是admin。</p> 
+ <p class="ziti3">（3）安装Alertmanager和PushGateway</p> 
+ <p class="ziti3">在服务器10.10.4.39上初始化Alertmanager和PushGateway的docker-compose脚本。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cat&gt;prometheus.yaml&lt;&lt;EOF
+version: '3.5'
+services:
+    alertmanager:
+        hostname: alertmanager
+        container_name: alertmanager
+        restart: always
+        image: prom/alertmanager
+        ports:
+            - "9093:9093"
+        stop_grace_period: 1m
+    pushgateway:
+        hostname: pushgateway
+        container_name: pushgateway
+        restart: always
+        image: prom/pushgateway
+        ports:
+            - "9091:9091"
+        stop_grace_period: 1m
+EOF
+
+# 运行镜像
+docker-compose -f prometheus.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）配置Alertmanager</p> 
+ <p class="ziti3">配置Alertmanager并持久化Alertmanager及PushGateway数据。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cd /opt/data/apps
+mkdir -p prometheus
+
+# 复制Alertmanager配置文件
+docker cp alertmanager:/etc/alertmanager prometheus/alertmanager
+# 复制Alertmanager数据文件
+docker cp alertmanager:/alertmanager prometheus/alertmanager_data
+
+# 配置目录权限
+chown -R 65534:65534 prometheus/alertmanager
+chown -R 65534:65534 prometheus/alertmanager_data
+
+# 配置prometheus.yaml
+cat&gt;prometheus.yaml&lt;&lt;EOF
+version: '3.5'
+services:
+    alertmanager:
+        hostname: alertmanager
+        container_name: alertmanager
+        restart: always
+        image: prom/alertmanager
+        ports:
+            - "9093:9093"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /opt/data/apps/prometheus/alertmanager:/etc/alertmanager
+            - /opt/data/apps/prometheus/alertmanager_data:/alertmanager
+        stop_grace_period: 1m
+    pushgateway:
+        hostname: pushgateway
+        container_name: pushgateway
+        restart: always
+        image: prom/pushgateway
+        ports:
+            - "9091:9091"
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+EOF
+
+# 重建并运行镜像
+docker-compose -f prometheus.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·通过浏览器访问<a href="http://10.10.4.39:9093" class="pcalibre calibre1">http://10.10.4.39:9093</a>，可以查看Alertmanager的告警信息及配置。</p> 
+ <p class="ziti4">·通过浏览器访问<a href="http://10.10.4.39:9091" class="pcalibre calibre1">http://10.10.4.39:9091</a>，可以查看PushGateway的相关信息。</p> 
+</body>
+</html>

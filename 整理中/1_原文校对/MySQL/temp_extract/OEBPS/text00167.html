@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">12.5　设置与更改MySQL的引擎</h2>
+<p class="p6">1.设置表的引擎</p>
+<p class="ziti">如果建表的时候不指定引擎，那么表的引擎就会和数据库的默认配置一致。下面就来讲解下如何指定表的引擎建立表，例如建立一个学生表，代码如下：</p>
+<hr/>
+<pre class="ziti1">CREATE TABLE `student` (
+  `Sno` int(10) NOT NULL COMMENT '学号',
+  `Sname` varchar(16) NOT NULL COMMENT '姓名',
+  `Ssex` char(2) NOT NULL COMMENT '性别',
+  `Sage` varchar(16) default NULL,
+  `Sdept` varchar(16) default NULL COMMENT '学生所在系别',
+  KEY `ind_sage` (`Sage`),
+  KEY `ind_sno` (`Sno`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 #&lt;==最后一行括号外，指定引擎。</pre>
+<hr/>
+<p class="p6">2.更改表的引擎</p>
+<p class="ziti">一般来说，更改MySQL引擎的需求并不多见，但偶尔也会有，下面就向大家介绍几种修改方法。</p>
+<p class="ziti">方法1：利用SQL命令语句修改引擎，具体命令如下。</p>
+<hr/>
+<pre class="ziti1">ALTER TABLE oldboy ENGINE = INNODB;
+ALTER TABLE oldboy ENGINE = MyISAM;</pre>
+<hr/>
+<p class="ziti">更改引擎实例：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show create table test\G
+*************************** 1. row ***************************
+       Table: test
+Create Table: CREATE TABLE `test` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ind_name` (`name`(8))
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 #&lt;==默认是InnoDB。
+1 row in set (0.00 sec)
+
+mysql&gt; ALTER TABLE test ENGINE=MyISAM;      #&lt;==将test表的引擎更改为MyISAM。
+Query OK, 5 rows affected (0.02 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql&gt; show create table test\G
+*************************** 1. row ***************************
+       Table: test
+Create Table: CREATE TABLE `test` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` char(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ind_name` (`name`(8))
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 #&lt;==已改为MyISAM。
+1 row in set (0.00 sec)
+特别提示：更改MySQL引擎之后也需要相关配置参数的支持，否则，效果可能不佳。</pre>
+<hr/>
+<p class="ziti">使用此方法若要批量修改，则需要通过开发脚本实现，与分表分库脚本差不多。</p>
+<p class="ziti">方法2：使用sed对备份的SQL文件进行批量转换。</p>
+<p class="ziti">使用sed对备份内容进行引擎转换：</p>
+<hr/>
+<pre class="ziti1">nohup sed -e 's/MyISAM/InnoDB/g' oldboy.sql &gt; oldboy_1.sql &amp;</pre>
+<hr/>
+<p class="ziti">方法3：mysql_convert_table_format命令修改。</p>
+<hr/>
+<pre class="ziti1">mysql_convert_table_format  --user=root --password=oldboy123 --socket=/data/3306/mysql.sock --engine=MyISAM oldboy test</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 该命令需要一些依赖包，安装方法为：</p>
+<hr/>
+<pre class="ziti1">yum -y install perl-DBI perl-DBD-MySQL perl-Time-HiRes。</pre>
+<hr/>
+</body>
+</html>

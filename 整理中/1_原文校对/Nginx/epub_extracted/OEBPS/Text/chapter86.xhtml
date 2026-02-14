@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_95">5.2.5　HTTPS双向认证配置</h3>
+
+  <p class="ziti3">通常网站的HTTPS访问，都是客户端通过证书验证所访问服务器的身份，而服务器对来访的客户端并不做身份验证，也称单向认证。在一些场景中，也会增加客户端身份验证以提高数据传输的安全性，这就是双向认证。配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">server {
+    listen 443 ssl;
+    server_name www.nginxbar.org;
+    charset utf-8;
+    root /opt/nginx-web;
+    index index.html index.htm;
+
+    ssl_certificate ssl/www_nginxbar_org.pem;
+    ssl_certificate_key ssl/www_nginxbar_org.key;
+    ssl_password_file ssl/www_nginxbar_org.pass;
+
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_session_ticket_key ssl/session_ticket.key;
+
+    ssl_verify_client on;                          # 启用客户端证书认证
+    ssl_client_certificate ssl/ca.pem;             # 客户端证书信任链的CA中间证书或根证书
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

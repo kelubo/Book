@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">3.1.3　采用cmake方式编译安装MySQL</h3>
+<p class="ziti">考虑到MySQL 5.4.xx及以后系列产品的特殊性，其编译方式和早期的第一条产品线的有所不同，这里采用cmake或gmake的方式编译安装。即“./cmake；make；make install”，生产场景的具体命令及参数具体如下：</p>
+<hr/>
+<pre class="ziti1">tar zxf mysql-5.6.40.tar.gz
+cd mysql-5.6.40
+cmake . -DCMAKE_INSTALL_PREFIX=/application/mysql-5.6.40 \
+-DMYSQL_DATADIR=/application/mysql-5.6.40/data \
+-DMYSQL_UNIX_ADDR=/application/mysql-5.6.40/tmp/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_EXTRA_CHARSETS=all \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_FEDERATED_STORAGE_ENGINE=1 \
+-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 \
+-DWITH_ZLIB=bundled \
+-DWITH_SSL=bundled \
+-DENABLED_LOCAL_INFILE=1 \
+-DWITH_EMBEDDED_SERVER=1 \
+-DENABLE_DOWNLOADS=1 \
+-DWITH_DEBUG=0
+#提示，编译时可配置的选项很多，具体可参考本章最后一部分的内容或官方文档。
+make
+make install
+ln -s /application/mysql-5.6.40/ /application/mysql</pre>
+<hr/>
+<p class="ziti">安装到这里，MySQL数据库仍然无法正常启动使用，还需要进行初始化数据库等工作，具体可以参考后文的安装部分，另外，cmake等用于编译的工具也需要提前进行安装。相关参数的说明，请见本章结尾的内容。</p>
+<p class="ziti">如果上述操作未出现错误，则MySQL 5.6.40软件cmake方式的安装就算成功了。</p>
+</body>
+</html>

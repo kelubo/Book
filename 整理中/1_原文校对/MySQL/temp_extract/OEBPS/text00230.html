@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">15.5　MySQL多线程复制解决复制延迟实践</h2>
+<p class="ziti">早在MySQL 5.6版本以前，就有一线门户公司开发过MySQL多线程复制功能，MySQL软件从5.6.3开始支持多线程复制功能，但这个多线程复制并不是完全的多线程复制，而是有条件的多线程复制，即只能针对不同的数据库多线程，而不能针对一个库里的多个表多线程，总的来说，多线程复制还是一个不错的功能。</p>
+<p class="ziti">具体的配置如下。</p>
+<p class="ziti">1）查看当前slave服务器的SQL线程状态，提示为“<span class="yanse">Waiting for master to send event</span>
+ ”，表示等待主库发送事件日志：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show processlist;
++----+-------------+-----------+------+---------+-------+-------------------+
+| Id | User        | Host      | db   | Command | Time  | State                            | Info             |
++----+-------------+-----------+------+---------+-------+-------------------+
+| 21 | system user |           | NULL | Connect | 23240 | Waiting for master to send event | NULL             |
+| 32 | root        | localhost | NULL | Query   |     0 | init                             | show processlist |
++----+-------------+-----------+------+---------+-------+-------------------+
+2 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">2）检查多线程的参数配置：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like '%parallel%';
++------------------------+-------+
+| Variable_name          | Value |
++------------------------+-------+
+| slave_parallel_workers | 0     | #&lt;==默认为0，即单线程复制。
++------------------------+-------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">3）停止主从复制：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; stop slave;
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; set global slave_parallel_workers = 4; #&lt;==在线修改为4个线程。
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; show variables like '%parallel%';
++------------------------+-------+
+| Variable_name          | Value |
++------------------------+-------+
+| slave_parallel_workers | 4     |            #&lt;==参数修改成功。
++------------------------+-------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">4）启动数据库查看修改效果：</p>
+<div class="pic"><img alt="" src="Image00122.jpg" />
+</div>
+<p class="ziti">从输出中可以看到，已经启动了4个SQL线程，如果希望永久生效，则可同时在my.cnf中配置该参数，无须重启：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+slave_parallel_workers = 4</pre>
+<hr/>
+</body>
+</html>

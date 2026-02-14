@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.7.5　InnoDB表主要的限制</h3>
+<p class="ziti6">·InnoDB表目前只支持最多1017个列。</p>
+<p class="ziti6">·InnoDB表目前支持最大64个二级索引。</p>
+<p class="ziti6">·多列索引目前支持最大16个列。</p>
+<p class="ziti6">·如果表中不存在text或者blob类型字段，则行数据整体的最大长度是65535个字节：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; CREATE TABLE t (a VARCHAR(8000), b VARCHAR(10000),
+    -&gt; c VARCHAR(10000), d VARCHAR(10000), e VARCHAR(10000),
+    -&gt; f VARCHAR(10000), g VARCHAR(10000)) ENGINE=InnoDB;
+ERROR 1118 (42000): Row size too large. The maximum row size for the
+used table type, not counting BLOBs, is 65535. You have to change some
+columns to TEXT or BLOBs</pre>
+<hr/>
+</body>
+</html>

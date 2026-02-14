@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 id="A7fa80078-a511-46c9-8d3c-78bc49b36187" class="calibre13">Chapter 7<br class="calibre8"/> 第七章 Arduino无线通信</h2> 
+ <p class="calibre3">目前机器人的远程操控成为了机器人的主要构成部分，远程操控是利用无线对远端的机器人进行操作的。本章介绍典型的机器人无线通信技术。</p> 
+ <h3 id="Afec76d3a-44a6-4b4c-951e-1585c82f8714" class="calibre14">7.1 蓝牙传输</h3> 
+ <h4 class="sigil_not_in_toc" id="A133a0078-1434-430b-ae72-03a57a6eceb3">7.1.1 蓝牙技术简介</h4> 
+ <p class="calibre3">蓝牙（Bluetooth）是一种无线技术标准，可实现固定设备、移动设备和楼宇个人域网之间的短距离数据交换（使用2.4GHz～2.485GHz的ISM波段的UHF无线电波）。蓝牙技术最初由电信巨头爱立信公司于1994年创制，当时是作为RS232数据线的替代方案。蓝牙可连接多个设备，克服了数据同步的难题。</p> 
+ <p class="calibre3">蓝牙能在包括移动电话、PDA、无线耳机、笔记本电脑、相关外设等众多设备之间进行无线信息交换。蓝牙采用分散式网络结构，以及快跳频和短包技术，支持点对点及点对多点通信，工作在全球通用的2.4GHz频段，其数据速率为1Mbps。</p> 
+ <p class="calibre3">2010年7月，以低功耗为特点的蓝牙4.0标准推出，蓝牙可以跨领域应用，主要有4个生态系统，分别是智能手机与笔记本电脑等终端市场、消费电子市场、汽车前装市场和健身运动器材市场。蓝牙4.0是蓝牙3.0+HS规范的补充，专门面向对成本和功耗都有较高要求的无线方案，可广泛用于卫生保健、体育健身、家庭娱乐、安全保障等诸多领域。它支持两种部署方式：双模式和单模式。在双模式中，低功耗蓝牙功能集成在现有的经典蓝牙控制器中，或在现有经典蓝牙技术（2.1+EDR/3.0+HS）芯片上增加低功耗堆栈，整体架构基本不变，因此成本增加有限。</p> 
+ <h4 class="sigil_not_in_toc" id="A0fee0078-14d8-4c3f-b0f5-651734e00e70">7.1.2 蓝牙模块的使用</h4> 
+ <p class="calibre3">蓝牙模块是指集成蓝牙功能的芯片基本电路集合，用于无线网络通信。典型的蓝牙模块如图7-1～图7-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u229" src="../Images/122_01.jpg" width="603" height="458"/> 
+  <p class="imgtitle">图7-1 HC-05蓝牙模块</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u230" src="../Images/122_02.jpg" width="550" height="455"/> 
+  <p class="imgtitle">图7-2 HC-06蓝牙模块</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u231" src="../Images/122_03.jpg" width="447" height="446"/> 
+  <p class="imgtitle">图7-3 蓝牙4.0模块</p> 
+ </div> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_04.jpg" width="40" height="44"/>HC-05和HC-06蓝牙模块支持无线蓝牙串口透传，它有4个引脚：VCC——接电源正极，GND——接电源负极，TXD——发送端，RXD——接收端。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_05.jpg" width="40" height="44"/>HC-06蓝牙模块是专为智能无线数据传输而打造的，采用英国CSR公司的BlueCore4-Ext芯片，遵循V2.0+EDR蓝牙规范。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_06.jpg" width="40" height="44"/>HC-05可以切换主从模式，但是HC-06虽然既可以做主机又可以做从机，但是不能切换模式。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_07.jpg" width="40" height="44"/>蓝牙4.0模块专为智能无线数据传输而打造，该模块遵循BT2.1+EDR/3.0/4.0（BLE）蓝牙规范，支持SPP蓝牙串口协议、HID、BLE等。模块集成了MCU和蓝牙芯片，支持UART、SPI、I<sup class="calibre9">2</sup>C、I2S等接口，包含4个PWM端口和6个12bit ADC通道，具有集成度高、成本低、功耗低、蓝牙射频性能优越等特点。支持iOS和Android 4.0及以上系统。</p> 
+ <p class="calibre3">下面以HC-05蓝牙模块为例说明使用过程，HC-05蓝牙模块共有6个引脚，如图7-4所示。蓝牙模块默认的波特率为9600，默认密码为1234，默认名称为HC-05。</p> 
+ <p class="calibre3">配对成功以后，可以作为全双工串口使用，无须了解任何蓝牙协议，支持8位数据位、1位停止位、无奇偶校验的通信格式，可以通过AT命令切换主机和从机模式。</p> 
+ <div class="center"> 
+  <img alt="" class="u232" src="../Images/122_08.jpg" width="1140" height="415"/> 
+  <p class="imgtitle">图7-4 HC-05蓝牙模块6个引脚</p> 
+ </div> 
+ <p class="calibre3">HC-05蓝牙模块接线口说明如下：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_09.jpg" width="40" height="44"/>VCC：接电源正极。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_10.jpg" width="40" height="44"/>GND：接电源负极。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_11.jpg" width="40" height="44"/>RXD：接收端。蓝牙模块接收从其他设备发来的数据，正常情况下接其他设备的发送端TXD。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/122_12.jpg" width="40" height="44"/>TXD：发送端。蓝牙模块发送数据给其他设备，正常情况下接其他设备的接收端RXD。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/123_01.jpg" width="40" height="45"/>EN：使能端。需要进入AT模式时接3.3V。</p> 
+ <p class="calibre3">为了方便使用蓝牙模块，可以使用提供蓝牙接口的Arduino扩展板，这种扩展板设计了蓝牙模块的插座，如图7-5所示，其中P4口接蓝牙，P4口的引脚为VCC、GND、TXD、RXD。</p> 
+ <p class="calibre3">HC-05蓝牙模块与扩展板的连接如图7-6所示，蓝牙模块使用其中的4个引脚VCC、GND、TXD、RXD，其他悬空，注意引脚对应关系。</p> 
+ <div class="center"> 
+  <img alt="" class="u233" src="../Images/123_02.jpg" width="841" height="531"/> 
+  <p class="imgtitle">图7-5 具有蓝牙插座的Arduino扩展板</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u234" src="../Images/123_03.jpg" width="590" height="534"/> 
+  <p class="imgtitle">图7-6 智能小车的HC-05蓝牙模块与扩展板的连接</p> 
+ </div> 
+ <p class="calibre3">将Arduino扩展板与Arduino Uno开发板连接，在Arduino中使用串口通信函数就可以使用蓝牙模块。</p> 
+ <h4 class="sigil_not_in_toc" id="A0643007a-82f4-4783-abae-4fdf946fddb5">7.1.3 实例：Android手机与Arduino开发板蓝牙通信</h4> 
+ <p class="calibre3">Android手机与Arduino开发板蓝牙通信结构如图7-7所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u235" src="../Images/123_04.jpg" width="1280" height="288"/> 
+  <p class="imgtitle">图7-7 Android手机与Arduino开发板蓝牙通信结构</p> 
+ </div> 
+ <p class="calibre3">在Android手机中安装蓝牙串口调试助手<img alt="" class="u236" src="../Images/123_05.jpg" width="400" height="59"/>，如图7-8所示。</p> 
+ <p class="calibre3">在Arduino IDE中输入如下代码：</p> 
+ <div class="center">
+  <img alt="" class="u237" src="../Images/123_06.jpg" width="1280" height="392"/>
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u238" src="../Images/124_01.jpg" width="1210" height="1074"/> 
+  <p class="imgtitle">图7-8 Android手机的蓝牙串口调试助手</p> 
+ </div> 
+ <div class="center">
+  <img alt="" class="u239" src="../Images/124_02.jpg" width="1280" height="942"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u240" src="../Images/125_01.jpg" width="1280" height="391"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u241" src="../Images/125_02.jpg" width="56" height="53"/>和“下载”<img alt="" class="u242" src="../Images/125_03.jpg" width="58" height="53"/>按钮，下载完成后，给连接蓝牙模块的Arduino UNO开发板加电启动，在Android手机与HC-05蓝牙模块连接配对，如图7-9所示。然后启动“蓝牙串口调试助手”，发送“W”，在数据接收显示区返回Arduino返回的字符串“the light flash two times”，如图7-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u243" src="../Images/125_04.jpg" width="523" height="927"/> 
+  <p class="imgtitle">图7-9 蓝牙模块配对</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u244" src="../Images/125_05.jpg" width="533" height="939"/> 
+  <p class="imgtitle">图7-10 测试结果</p> 
+ </div> 
+ <h3 id="A1a2af43d-031c-4b61-a070-9b78855626a6" class="calibre14">7.2 无线数传</h3> 
+ <p class="calibre3">Arduino的无线通信可以使用Zigbee、Wi-Fi、蓝牙等，Zigbee和Wi-Fi都附带有网络协议，便于组网和控制，而蓝牙适合以手机等移动设备为控制端进行控制，它们成本比较高。如果只需要点对点控制，可以选用不带网络协议的2.4GB无线数传模块。</p> 
+ <h4 class="sigil_not_in_toc" id="Afa42007c-0883-4403-b2f7-941d39078164">7.2.1 无线数传模块nRF24L01</h4> 
+ <p class="calibre3">本书主要介绍目前广泛使用于遥控玩具领域的nRF24L01无线数传模块，如图7-11所示。</p> 
+ <p class="calibre3">nRF24L01是一款新型单片射频收发器件，工作于2.4GHz～2.5GHz ISM频段，传输距离大约是空旷距离40m左右。内置频率合成器、功率放大器、晶体振荡器、调制器等功能模块，并融合了增强型ShockBurst技术，其中输出功率和通信频道可通过程序进行配置。NRF24L01功耗低，在以-6dBm功率发射时，工作电流也只有9mA；接收时，工作电流只有12.3mA，多种低功率工作模式（掉电模式和空闲模式）使节能设计更方便。</p> 
+ <div class="center"> 
+  <img alt="" class="u245" src="../Images/126_01.jpg" width="1194" height="474"/> 
+  <p class="imgtitle">图7-11 nRF24L01无线数传模块</p> 
+ </div> 
+ <p class="calibre3">nRF24L01模块的引脚说明如下：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/126_02.jpg" width="40" height="44"/>CE：使能发射或接收。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/126_03.jpg" width="40" height="45"/>SPI接口引脚：CSN、SCK、MOSI、MISO，通过此引脚配置nRF24L01。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/126_04.jpg" width="40" height="44"/>IRQ：中断。</p> 
+ <p class="calibre3">nRF24L01模块的引脚位置如图7-12所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u246" src="../Images/126_05.jpg" width="1014" height="400"/> 
+  <p class="imgtitle">图7-12 nRF24L01模块引脚位置</p> 
+ </div> 
+ <p class="calibre3">nRF24L01模块的引脚定义如表7-1所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表7-1 nRF24L01模块引脚定义</p>
+  <img alt="" class="u247" src="../Images/126_06.jpg" width="1280" height="400"/>
+ </div> 
+ <p class="calibre3">连接注意事项：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/127_01.jpg" width="40" height="45"/>VCC引脚的电压范围为2.3V～3.6V，超过3.6V模块会被烧掉，建议使用3.3V左右。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/127_02.jpg" width="40" height="44"/>该模块也可以通过普通I/O口模拟SPI时序进行读写数据操作。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/127_03.jpg" width="40" height="44"/>使用两个模块同时发射时，两者频道间隔应该至少相差1MHz，否则同频道之间易干扰。</p> 
+ <h4 class="sigil_not_in_toc" id="Af5c4007e-0924-4868-bbdc-f1fe35ffeb69">7.2.2 实例：nRF24L01模块点对点通信</h4> 
+ <p class="calibre3">nRF2401模块与Arduino开发板之间的接口连接为SPI总线。实现nRF2401模块点对点通信需要两块Arduino开发板和两块nRF2401模块，两块Arduino开发板和两块nRF2401模块接线如表7-2所示。</p> 
+ <div class="center"> 
+  <p class="imgtitle1">表7-2 Arduino开发板和nRF2401模块接线</p>
+  <img alt="" class="u248" src="../Images/127_04.jpg" width="1280" height="401"/>
+ </div> 
+ <p class="calibre3">要使用nRF2401模块，需要下载nRF2401库，下载网址：https：//github.com/nRF24/RF24，如图7-13所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u249" src="../Images/127_05.jpg" width="1280" height="843"/> 
+  <p class="imgtitle">图7-13 下载nRF2401库</p> 
+ </div> 
+ <p class="calibre3">安装库文件的方法见前面的第三章。</p> 
+ <p class="calibre3">硬件清单：两块Arduino Uno开发板；两块nRF2401模块。</p> 
+ <p class="calibre3">在Arduino IDE输入如下代码，作为发送端代码，详见文件“nRF24l01_TX.ino”：</p> 
+ <div class="center">
+  <img alt="" class="u250" src="../Images/128_01.jpg" width="1280" height="1733"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u251" src="../Images/129_01.jpg" width="1280" height="1855"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u252" src="../Images/130_01.jpg" width="1280" height="1853"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u253" src="../Images/131_01.jpg" width="1280" height="1099"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u241" src="../Images/131_02.jpg" width="56" height="53"/>和“下载”<img alt="" class="u242" src="../Images/131_03.jpg" width="58" height="53"/>按钮，完成发送端下载。</p> 
+ <p class="calibre3">在Arduino IDE输入如下代码，作为接收端代码，详见文件“nRF24l01_RX.ino”：</p> 
+ <div class="center">
+  <img alt="" class="u254" src="../Images/131_04.jpg" width="1280" height="651"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u255" src="../Images/132_01.jpg" width="1280" height="1845"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u226" src="../Images/133_01.jpg" width="1280" height="1844"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u256" src="../Images/134_01.jpg" width="1280" height="1856"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u257" src="../Images/135_01.jpg" width="1280" height="584"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u241" src="../Images/135_02.jpg" width="56" height="53"/>和“下载”<img alt="" class="u242" src="../Images/135_03.jpg" width="58" height="53"/>按钮，完成接收端下载。</p> 
+ <p class="calibre3">在接收端的Arduino IDE菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图7-14所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u258" src="../Images/135_04.jpg" width="1244" height="771"/> 
+  <p class="imgtitle">图7-14 nRF2401模块运行结果</p> 
+ </div> 
+ <h3 id="Ac46d8bb1-3d18-49ca-8b94-aed795cfd45c" class="calibre14">7.3 Wi-Fi无线模块</h3> 
+ <h4 class="sigil_not_in_toc" id="Acb790086-1051-464e-9085-58dc58d1d089">7.3.1 Wi-Fi技术简介</h4> 
+ <p class="calibre3">Wi-Fi（Wireless Fidelity）俗称无线宽带，Wi-Fi基于IEEE 802.11无线局域网通信标准，又叫802.11b标准，是IEEE定义的一个无线网络通信的工业标准。IEEE802.11b标准是在IEE E802.11的基础上发展起来的，工作在2.4Hz频段，最高传输率能够达到150Mbps。其主要特性是：传输速度快、可靠性高。在开放区域，如果使用大功率平板天线，传输距离可以达到数十千米。该技术是一种可以将个人电脑、手持设备等终端以无线方式互相连接的一种技术，从而使网络的构建和终端的移动更加灵活。也广泛应用于机器人、智能家居和智能玩具等领域，实现无线的联网与控制。</p> 
+ <h4 class="sigil_not_in_toc" id="A5c950087-31c2-49f9-a8e3-7b7a49ab2d97">7.3.2 串口Wi-Fi模块</h4> 
+ <p class="calibre3">Arduino开发板访问Wi-Fi模块是通过串口进行通信的。Arduino开发板通过串口发送和接收Wi-Fi模块的数据，Wi-Fi模块再通过无线网络传送给其他Wi-Fi网络，或通过无线从其他Wi-Fi网络接收数据。本书介绍一种直接兼容Arduino Uno的串口Wi-Fi模块，如图7-15所示。</p> 
+ <p class="calibre3">一般使用的Wi-Fi模块芯片是ESP8266。ESP8266是一款超低功耗的UART-Wi-Fi透传模块，专为移动设备和物联网应用设计，可将用户的物理设备连接到Wi-Fi无线网络上，进行互联网或局域网通信，实现联网功能。ESP8266在较小尺寸的封装中集成了业界领先的Tensilica L106超低功耗32位微型MCU，带有16位精简模式，主频支持80MHz和160MHz，支持RTOS，集成Wi-Fi MAC/ BB/RF/PA/LNA，板载天线。ESP8266-07天线采用IPEX接口。该模块支持标准的IEEE802.11b/g/n协议，有完整的TCP/IP协议栈。用户可以使用该模块为现有的设备添加联网功能，也可以构建独立的网络控制器。该模块接口为串口，可以实现与控制器的串口进行数据传输。</p> 
+ <div class="center"> 
+  <img alt="" class="u259" src="../Images/136_01.jpg" width="1076" height="446"/> 
+  <p class="imgtitle">图7-15 串口Wi-Fi模块</p> 
+ </div> 
+ <p class="calibre3">ESP8266模块支持STA/AP/STA+AP三种工作模式。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_02.jpg" width="40" height="45"/>STA模式：ESP8266模块通过路由器连接互联网，手机或计算机通过互联网实现对设备的远程控制。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_03.jpg" width="40" height="44"/>AP模式：ESP8266模块作为热点，实现手机或计算机直接与模块通信，实现局域网无线控制。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_04.jpg" width="40" height="45"/>STA+AP模式：两种模式的共存模式，即通过互联网控制可以实现无缝切换，方便操作。</p> 
+ <p class="calibre3">串口Wi-Fi模块产品参数如下：</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_05.jpg" width="40" height="45"/>无线标准：802.11b/g/n。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_06.jpg" width="40" height="44"/>频率范围：2.4GHz～2.5GHz（2400M～2483.5M）。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_07.jpg" width="40" height="44"/>数据接：UART/HSPI/I<sup class="calibre9">2</sup>C/I2S/Ir Remote Contorl。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_08.jpg" width="40" height="45"/>工作电压：3.3V～5V。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_09.jpg" width="40" height="44"/>工作电流：平均值：80mA。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_10.jpg" width="40" height="44"/>工作温度：-40°～125°。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_11.jpg" width="40" height="45"/>接口类型：UART串口。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_12.jpg" width="40" height="45"/>传输速率：110bps～921600bps。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_13.jpg" width="40" height="44"/>TCP Client：5个。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/136_14.jpg" width="40" height="44"/>无线网络模式：station/SoftAP/SoftAP+station。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/137_01.jpg" width="40" height="44"/>安全机制：WPA/WPA2。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/137_02.jpg" width="40" height="45"/>加密类型：WEP/TKIP/AES。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/137_03.jpg" width="40" height="44"/>升级固件：本地串口烧录/云端升级/主机下载烧录。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/137_04.jpg" width="40" height="45"/>软件开发：支持客户自定义服务器，提供SDK给客户二次开发。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/137_05.jpg" width="40" height="44"/>网络协议：IPv4和TCP/UDP/HTTP/FTP。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/137_06.jpg" width="40" height="45"/>用户配置：AT+指令集、云端服务器、Android/iOS APP。</p> 
+ <p class="calibre3">串口Wi-Fi模块的引脚定义：TX——串口发送；RX——串口接收；-——电源地；+——电源正极。</p> 
+ <h4 class="sigil_not_in_toc" id="Ade1b0088-727f-4042-b30f-179c49ecfb8b">7.3.3 实例：串口Wi-Fi模块和计算机之间通信</h4> 
+ <p class="calibre3">串口Wi-Fi模块“RX”接到控制器扩展板的“TX”，“TX”引脚接到控制器扩展板“RX”，“+”和“-”分别接到电源的“+5V”和“GND”。</p> 
+ <p class="calibre3">硬件清单：Arduino Uno开发板、串口Wi-Fi模块及笔记本电脑。</p> 
+ <p class="calibre3">下面以服务器和客户端测试为例进行说明。</p> 
+ <p class="calibre3">设置Wi-Fi模块为作为服务器的步骤如下：</p> 
+ <p class="calibre3">（1）AT指令设置模块进入Server模式，AT命令为：AT+CWMODE=3，设置为AP+STA共存模式，响应OK，如图7-16所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u260" src="../Images/137_07.jpg" width="1063" height="492"/> 
+  <p class="imgtitle">图7-16 AT指令设置模块进入Server模式</p> 
+ </div> 
+ <p class="calibre3">（2）重启生效，AT命令：AT+RST，重启，响应OK，如图7-17所示。</p> 
+ <p class="calibre3">（3）启动多连接，AT命令：AT+CIPMUX=1，响应OK，如图7-18所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u261" src="../Images/137_08.jpg" width="808" height="522"/> 
+  <p class="imgtitle">图7-17 重启生效</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u262" src="../Images/137_09.jpg" width="820" height="529"/> 
+  <p class="imgtitle">图7-18 启动多连接</p> 
+ </div> 
+ <p class="calibre3">（4）建立Server，AT命令：AT+CIPSERVER=1，响应OK。默认端口为333，如图7-19所示。AT命令：AT+CIFSR，查询模块IP地址，如图7-20所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u263" src="../Images/138_01.jpg" width="818" height="530"/> 
+  <p class="imgtitle">图7-19 建立Server</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u264" src="../Images/138_02.jpg" width="880" height="533"/> 
+  <p class="imgtitle">图7-20 模块IP地址</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：服务器和客户端要搭载在同一网络上。</p> 
+ <p class="calibre3">在Arduino IDE中输入以下代码：</p> 
+ <div class="center">
+  <img alt="" class="u265" src="../Images/138_03.jpg" width="1280" height="1168"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u266" src="../Images/139_01.jpg" width="1280" height="236"/>
+ </div> 
+ <p class="calibre3">在Arduino IDE中单击“编译”<img alt="" class="u241" src="../Images/139_02.jpg" width="56" height="53"/>和“下载”<img alt="" class="u242" src="../Images/139_03.jpg" width="58" height="53"/>按钮，完成下载。</p> 
+ <p class="calibre3">Arduino UNO开发板和串口Wi-Fi模块之间的连线如图7-21所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u267" src="../Images/139_04.jpg" width="1280" height="539"/> 
+  <p class="imgtitle">图7-21 Arduino UNO开发板和Wi-Fi转串口模块的连线</p> 
+ </div> 
+ <p class="calibre3">串口Wi-Fi模块启动以后，打开笔记本的无线连接功能，连接无线网络。下载网络调试助手“netassist.zip”，运行并设置网络调试助手，如图7-22所示。在Arduino IDE的菜单栏中选择“工具”＞“串口监视器”命令，运行结果如图7-23所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u268" src="../Images/139_05.jpg" width="699" height="668"/> 
+  <p class="imgtitle">图7-22 网络调试助手</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u269" src="../Images/139_06.jpg" width="893" height="668"/> 
+  <p class="imgtitle">图7-23 运行结果</p> 
+ </div> 
+ <p class="calibre3">更复杂一点的Wi-Fi模块支持视频转发、数据转发（双向），如图7-24所示。模块出厂预刷OpenWrt固件，模块是一个视频服务器，开放TCP连接，一般端口号为2001，因此自己DIY程序时，需要将程序设为Client客户端模式，然后连到模块的2001端口，即可发送、接收数据，视频端口一般为8080。</p> 
+ <div class="center"> 
+  <img alt="" class="u270" src="../Images/140_01.jpg" width="986" height="624"/> 
+  <p class="imgtitle">图7-24 视频转发Wi-Fi模块</p> 
+ </div> 
+ <h3 id="Aabc0bcc3-51b5-4215-b5a1-7edcd0ce8d78" class="calibre14">7.4 本章小结</h3> 
+ <p class="calibre3">本章介绍了Arduino常用的无线通信的3种方法，以及它们的技术特点，并给出了具体实例及实现方法。</p> 
+</body>
+</html>

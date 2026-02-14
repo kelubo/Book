@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">10.5　慢查询日志</h2>
+<p class="p6">1.慢查询日志介绍</p>
+<p class="ziti">简单地理解，慢查询日志（slow query log）就是记录执行时间超出指定值（long_query_time）或其他指定条件（例如，没有使用到索引，结果集大于1000行）的SQL语句。</p>
+<p class="p6">2.慢查询日志相关参数说明</p>
+<p class="ziti">慢查询的参数，对于数据库SQL的优化非常重要，是SQL优化的前提，因此，这里以表的形式进行说明，具体见表10-2。</p>
+<p class="middle-img">表10-2　慢查询的参数及说明</p>
+<div class="pic"><img alt="" src="Image00077.jpg" />
+</div>
+<p class="p6">3.慢查询日志重要参数配置</p>
+<p class="ziti">企业中常见的配置慢查询的参数为：</p>
+<hr/>
+<pre class="ziti1">slow-query-log = ON                        #&lt;==慢查询开启开关
+long_query_time = 2                        #&lt;==记录大于2秒的SQL语句。
+log_queries_not_using_indexes = ON         #&lt;==没有使用到索引的SQL语句。
+slow-query-log-file = /application/mysql/slow.log  #&lt;==记录SQL语句的文件。
+min_examined_row_limit = 800               #&lt;==记录结果集大于800行的SQL语句。</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00019.jpg" />
+ <span class="yanse">注意：</span>
+ MySQL 5.6与以前的版本略微有变化，主要变化就是中杠“-”和下划线“_”。</p>
+<p class="ziti">可将上述参数配置到my.cnf里，配置完毕重启MySQL服务，并进行检查：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'slow_query%';
++---------------------+-----------------------------+
+| Variable_name       | Value                       |
++---------------------+-----------------------------+
+| slow_query_log      | ON                          | #&lt;==开关已打开。
+| slow_query_log_file | /application/mysql/slow.log | #&lt;==文件路径已生效。
++---------------------+-----------------------------+
+2 rows in set (0.00 sec)
+mysql&gt; show variables like '%long_query%';
++-----------------+----------+
+| Variable_name   | Value    |
++-----------------+----------+
+| long_query_time | 2.000000 | #&lt;==记录大于2秒的查询已生效。
++-----------------+----------+
+1 row in set (0.01 sec)
+mysql&gt; show variables like '%log_queries_not%';
++-------------------------------+-------+
+| Variable_name                 | Value |
++-------------------------------+-------+
+| log_queries_not_using_indexes | ON    | #&lt;==记录没有使用索引的查询已生效。
++-------------------------------+-------+
+1 row in set (0.00 sec)
+
+mysql&gt; show variables like '%min_examined_row_limit%';
++------------------------+-------+
+| Variable_name          | Value |
++------------------------+-------+
+| min_examined_row_limit | 800   | #&lt;==记录查询结果集大于800行的SQL已生效。
++------------------------+-------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">到此，就已经设定好记录慢查询SQL语句的条件了，那么，对于每天所产生的大量慢查询，又该如何处理和分析呢？</p>
+<p class="p6">4.慢查询日志的刷新方法</p>
+<p class="ziti">在工作中，可以利用定时任务按天对慢查询日志进行切割，然后再分析。</p>
+<p class="ziti">示例切割脚本如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# mkdir /server/scripts/ -p
+[root@oldboy data]# cat /server/scripts/cut_slow_log.sh
+#!/bin/bash
+# Author: oldboy
+# Organization: www.oldboyedu.com
+# Created Time : 2018-03-19 23:47:21
+export PATH=/application/mysql/bin:/sbin:/bin:/usr/sbin:/usr/bin
+cd /application/mysql &amp;&amp;\
+mv slow.log slow.log.$(date +%F)&amp;&amp;\
+mysqladmin flush-log</pre>
+<hr/>
+<p class="ziti">将上述脚本放入定时任务，每天0点执行切割任务，配置结果如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# tail -2 /var/spool/cron/root
+#cut mysql slow log by oldboy at 20180324
+00 00 * * * /bin/sh /server/scripts/cut_slow_log.sh &gt;/dev/null 2&gt;&amp;1</pre>
+<hr/>
+<p class="p6">5.使用工具分析慢查询日志案例</p>
+<p class="ziti">实际工作中，慢查询的日志可能非常多，给运维人员的优化工作带来了一定的困难，MySQL官方提供了慢查询的分析工具mysqldumpslow，有兴趣的读者可以参考官方手册的4.6.9节“mysqldumpslow”了解该工具的用法。</p>
+<p class="ziti">下面为大家介绍一款很不错的第三方分析工具mysqlsla（需要单独安装该工具）。</p>
+<p class="ziti">（1）安装mysqlsla</p>
+<p class="ziti">请提前下载好mysqlsla-2.03.tar.gz到指定目录下，然后执行如下命令安装：</p>
+<hr/>
+<pre class="ziti1">yum install  perl-devel perl-DBI perl-DBD-MySQL -y
+rpm -qa perl-devel perl-DBI perl-DBD-MySQL
+tar xf mysqlsla-2.03.tar.gz
+cd mysqlsla-2.03
+perl Makefile.PL
+make
+make install</pre>
+<hr/>
+<p class="ziti">（2）利用mysqlsla工具分析慢查询</p>
+<p class="ziti">mysqlsla命令的默认路径为：/usr/local/bin/mysqlsla。</p>
+<p class="ziti">简单语法如下：</p>
+<hr/>
+<pre class="ziti1">mysqlsla -lt slow [SlowLogFilePath] &gt; [ResultFilePath]</pre>
+<hr/>
+<p class="ziti">在实际工作中，老男孩通常使用脚本调用mysqlsla工具进行分析，然后每天早晨8点，把分析结果发给企业的核心人员（DBA、运维总监、CTO、研发总监、核心开发），最后由DBA配合核心开发共同优化这些棘手的SQL慢查询。</p>
+<p class="ziti">简单的案例脚本如下，注意切割日志和分析合并为一个脚本了：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysqlsla-2.03]# cat  /server/scripts/slow_log_analyze.sh
+#!/bin/bash
+#Author: oldboy
+#Organization: www.oldboyedu.com
+#Created Time : 2018-03-19 23:47:21
+export PATH=/application/mysql/bin:/sbin:/bin:/usr/sbin:/usr/bin
+Date=`date +%F -d -1day`
+
+#cut slow log
+cd /application/mysql &amp;&amp;\
+mv slow.log slow.log_$Date &amp;&amp;\
+mysqladmin flush-log
+
+#analyze slow log
+Time=`date +%F`
+Path=/usr/local/bin/mysqlsla
+cd /application/mysql &amp;&amp;\
+$Path/mysqlsla -lt slow slow.log_$Date &gt;analyzed_slow_$Date.log 2&gt;&amp;1
+
+#rsync analyzed_slow to backup server 省略了此步。
+#send analyzed slow log to adminstrator on backup server by mail. 省略了此步。</pre>
+<hr/>
+<p class="ziti">将上述脚本放入定时任务，每天0点执行切割任务，配置结果如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy data]# tail -2 /var/spool/cron/root
+#analyzed mysql slow log by oldboy at 20180324
+00 00 * * * /bin/sh /server/scripts/slow_log_analyze.sh &gt;/dev/null 2&gt;&amp;1</pre>
+<hr/>
+<p class="ziti">（3）分析前后的日志结果对比</p>
+<p class="ziti">比如原始慢日志中有一堆语句如下：</p>
+<hr/>
+<pre class="ziti1"># Time: 110417  0:00:09
+# User@Host: oldboy[oldboy] @  [172.16.1.51]
+# Query_time: 3  Lock_time: 0  Rows_sent: 1  Rows_examined: 17600
+select min(BBS_HI_ID) AS BBS_HI_ID from t_******** where BBS_HI_ISTEAMMATE=1 and BBS_HI_EDITOR_USER_ID_ENCRYPT='asdfEWERADFS';
+# User@Host: oldboy[oldboy] @  [172.16.1.51]
+# Query_time: 4  Lock_time: 0  Rows_sent: 1  Rows_examined: 17600
+select min(BBS_HI_ID) AS BBS_HI_ID from t_******** where BBS_HI_ISTEAMMATE=1 and BBS_HI_EDITOR_USER_ID_ENCRYPT='asdfEWERADFS';
+# User@Host: bbs[oldboy] @  [172.16.1.52]
+# Query_time: 4  Lock_time: 0  Rows_sent: 1  Rows_examined: 17600
+select min(BBS_HI_ID) AS BBS_HI_ID from t_******** where BBS_HI_ISTEAMMATE=1 and BBS_HI_EDITOR_USER_ID_ENCRYPT='NFCDebkasdf';
+# User@Host: oldboy[oldboy] @  [172.16.1.51]
+# Query_time: 3  Lock_time: 0  Rows_sent: 1  Rows_examined: 17600
+select min(BBS_HI_ID) AS BBS_HI_ID from t_******** where BBS_HI_ISTEAMMATE=1 and BBS_HI_EDITOR_USER_ID_ENCRYPT='NFCDebkasdf';
+# User@Host: bbs[oldboy] @  [172.16.1.52]
+# Query_time: 5  Lock_time: 0  Rows_sent: 1  Rows_examined: 17600
+select min(BBS_HI_ID) AS BBS_HI_ID from t_******** where BBS_HI_ISTEAMMATE=1 and BBS_HI_EDITOR_USER_ID_ENCRYPT='nfEACwQEW5MICAN2';
+....................
+....................</pre>
+<hr/>
+<p class="ziti">使用mysqlsla处理后，结果呈现为：</p>
+<hr/>
+<pre class="ziti1">Count         : 23  (8.52%)
+Time          : 102 s total, 4.434783 s avg, 3 s to 7 s max  (6.79%)
+  95% of Time : 88 s total, 4.190476 s avg, 3 s to 6 s max
+Lock Time (s) : 0 total, 0 avg, 0 to 0 max  (0.00%)
+  95% of Lock : 0 total, 0 avg, 0 to 0 max
+Rows sent     : 1 avg, 1 to 1 max  (0.02%)
+Rows examined : 11.53k avg, 5.70k to 17.60k max  (1.07%)
+Database      : bbsdb
+Users         :
+        oldboy@ 172.16.1.51 : 86.96% (20) of query, 11.11% (30) of all users
+        bbs@ 172.16.1.52 : 13.04% (3) of query, 2.96% (8) of all users
+Query abstract:
+SELECT MIN(BBS_HI_id) AS BBS_HI_id FROM t_******** WHERE BBS_HI_isteammate=N AND BBS_HI_editor_user_id_encrypt='S';
+Query sample:
+select min(BBS_HI_ID) AS BBS_HI_ID from t_******** where BBS_HI_ISTEAMMATE=1 and BBS_HI_EDITOR_USER_ID_ENCRYPT='asdfEWERADFS';</pre>
+<hr/>
+<p class="ziti">在上述结果中，语句的执行情况（执行次数、对象信息、查询记录量、时间开销、来源统计）等信息一目了然，更方便运维人员以及DBA做进一步分析。</p>
+<p class="ziti">除了mysqlsla和mysqldumpslow慢查询分析工具之外，还有一些第三方分析工具，如pt-query-diges、myprofi、mysql-explain-slow-log、mysqllogfilter等，读者若感兴趣可以深入研究。</p>
+<p class="ziti">当然还可以把日志收集到数据库中或使用ELK等流行工具收集慢查询日志，最后分析后可视化展现，具体情况如图10-1所示。</p>
+<div class="pic"><img alt="" src="Image00078.jpg" />
+</div>
+<p class="middle-img">图10-1　企业中的慢查询可视化展示图</p>
+</body>
+</html>

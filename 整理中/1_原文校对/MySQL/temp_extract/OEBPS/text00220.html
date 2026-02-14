@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.2.6　MySQL主从复制配置步骤小结</h3>
+<p class="ziti">MySQL主从复制配置的完整步骤具体如下。</p>
+<p class="ziti">1）准备两台数据库环境，关闭Selinux和Iptables防火墙，确定其能正常启动和登录。</p>
+<p class="ziti">2）配置my.cnf文件：主库配置log_bin和server_id参数；从库配置server_id参数，该值不能像主库及其他从库一样，从库一般不开启log_bin功能。配置参数后需要重启才能生效。</p>
+<p class="ziti">3）登录主库增加用于同步的账户，例如rep，并授权replication slave同步的权限。</p>
+<p class="ziti">4）登录主库，整库锁表flush table with read lock（窗口关闭后即失效，超时参数设置的时间到了，锁表也会失效），然后show master status查看binlog的位置状态。</p>
+<p class="ziti">5）新开窗口，在Linux命令行备份导出原有的数据库数据，并复制到从库所在的服务器目录。如果数据库数据量很大，则使用热备工具Xtrabackup或停机打包，而不用mysqldump。</p>
+<p class="ziti">6）导出主库中数据之后，即可刻执行unlock tables解锁主库。</p>
+<p class="ziti">7）把从主库中导出的数据恢复到从库。</p>
+<p class="ziti">8）根据主库的show master status查看到的binlog的位置状态，在从库中执行“change master to...”语句。</p>
+<p class="ziti">9）从库开启复制开关，即执行“start slave；”。</p>
+<p class="ziti">10）从库“show slave status\G”，检查同步状态（两个Yes和一个延迟秒数是否为0），并在主库中进行更新，在从库中检查测试复制是否成功。</p>
+</body>
+</html>

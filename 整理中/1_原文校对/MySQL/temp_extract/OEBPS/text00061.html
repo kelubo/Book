@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">4.4　安装并配置多实例MySQL数据库</h2>
+<h3 class="p3">
+<a id="b1">4.4.1　安装MySQL多实例</a>
+</h3>
+<p class="p6">1.安装MySQL需要的依赖包和编译软件</p>
+<p class="ziti">（1）安装MySQL需要的依赖包</p>
+<p class="ziti">安装MySQL之前，最好先安装MySQL需要的依赖包，不然后面会出现很多报错信息，到那时再回来安装MySQL的依赖包会很麻烦。安装命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# yum install ncurses-devel libaio-devel -y
+[root@oldboy ~]# rpm -qa ncurses-devel libaio-devel
+libaio-devel-0.3.107-10.el6.x86_64
+ncurses-devel-5.7-4.20090207.el6.x86_64</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 安装后检查，如果出现两行信息则表示安装成功。</p>
+<p class="ziti">（2）安装编译MySQL需要的软件</p>
+<p class="ziti">由于MySQL 5.5及以上系列产品采用了特殊的编译方式安装数据库，因此，需要安装常用的编译MySQL的工具cmake软件包，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# yum install cmake -y
+[root@oldboy ~]# rpm -qa cmake
+cmake-2.8.12.2-4.el6.x86_64</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 安装后使用“rpm-qa cmake”检查，如果出现一行如上信息则表示安装成功。此外，网上有资料选用源码包的方式安装cmake，比较复杂，因此一般建议读者选择这种简单的yum安装cmake的方法。</p>
+<p class="p6">2.开始安装MySQL</p>
+<p class="ziti">为了让大家学习更多的MySQL技术，这里选择以相对复杂的源代码安装为例来讲解MySQL多实例的安装。大型公司一般都会将MySQL软件定制成rpm包，然后放到yum仓库里，使用yum安装，在中小型企业里，二进制和编译安装方式的区别不大。</p>
+<p class="ziti">（1）建立MySQL用户账号</p>
+<p class="ziti">首先以root身份登录到Linux系统中，然后执行如下命令创建mysql用户账号：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# useradd -s /sbin/nologin -M mysql #&lt;==默认会创建和mysql用户
+                                                　同名的组。
+[root@oldboy ~]# id mysql
+uid=500(mysql) gid=500(mysql) 组=500(mysql)</pre>
+<hr/>
+<p class="ziti">根据上述结果输出，可以看到mysql用户和组已经成功创建。</p>
+<p class="ziti">（2）获取MySQL软件包</p>
+<p class="ziti">MySQL软件包的下载地址为：<a href="http://dev.mysql.com/downloads/mysql/">http://dev.mysql.com/downloads/mysql/</a>
+ （如果地址变更无法下载，则去<a href="http://mirrors.sohu.com/mysql">http://mirrors.sohu.com/mysql</a>
+ 上下载，或者通过老男孩在本文开头给出的云盘地址下载）。可以把软件下载到客户端电脑本地后使用rz等工具传到Linux里，或者找到网络下载地址后直接在Linux里使用wget下载。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 本例是以MySQL编译的方式来讲解。在生产场景中，二进制和源码包两种安装方法都是可用的，其应用场景一般没有什么太大的差别。不同之处在于，二进制的安装包较大，二进制的安装过程比源码更快，此外在名字和源码包方面也有些区别。</p>
+<p class="ziti">（3）采用编译方式安装MySQL</p>
+<p class="ziti">本节所讲的安装过程与3.2.1节“安装MySQL数据库”一节的内容一模一样，读者可以去第3章查看。</p>
+</body>
+</html>

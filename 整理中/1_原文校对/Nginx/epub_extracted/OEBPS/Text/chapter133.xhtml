@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_145">7.3.3　Memcached缓存应用</h3> 
+ <p class="ziti3">为了提高动态网站的响应速度，有时会采用将动态网站转换成静态化文件的方式进行优化，而相对于磁盘存储，使用Memcached进行静态文件的存储则可以进一步提升网站的响应速度。Memcached是基于内存的高性能对象缓存系统，因为存储数据都是在内存中的，所以减少了系统的I/O操作，从而避免了因磁盘性能带来的影响。使用Memcached作为缓存存储服务器，可以直接利用Memcached缓存的过期机制实现缓存的自动化过期管理，且利用Nginx的负载机制和Memcached分布式特性，可以非常方便地横向扩展，以提升处理性能。Memcached缓存应用场景如图7-9所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/7-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/7-9.jpg" class="calibre268"/></a> 
+ </div> 
+ <p class="middle-img">图7-9　Memcached缓存应用</p> 
+ <p class="ziti4">·Web服务器将动态文件以请求URI作为Memcached的key初始化到Memcached服务器中。</p> 
+ <p class="ziti4">·Nginx将用户请求转发到Memcached服务器中，并将以请求URI作为Memcached key的数据返回给用户。</p> 
+ <p class="ziti4">·当Memcached的请求失败后，则将请求转发给后端Web服务器的接口动态生成对应的静态文件，返回响应数据并更新Memcached。</p> 
+ <p class="ziti3">Memcached的安装非常简单，在CentOS 7系统下使用yum安装即可，安装方法如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">yum -y install memcached
+
+cat /etc/sysconfig/memcached
+PORT="11211"            # 端口
+USER="memcached"
+MAXCONN="1024"          # 最大连接数
+CACHESIZE="64"          # 使用内存大小为64M
+OPTIONS=""
+
+systemctl start memcached
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx服务器配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">upstream backend {
+    server 192.168.2.145:8190;                              # 后端PHP服务器IP
+}
+
+upstream memcached {
+    hash $host$request_uri consistent;                      # 一致性hash
+    server 192.168.2.145:11211;                             # Memcached服务器IP
+    server 192.168.2.109:11211;                             # Memcached服务器IP
+}
+
+server {
+    listen       8181;
+    access_log logs/mem_access.log;
+    set $memcached_key $host$request_uri;                   # 设置Memcached的key
+    location / {
+        memcached_connect_timeout 5s;             # 与Memcached建立连接超时时间为5s
+        memcached_read_timeout 2s;                # 连续两次读的超时时间为2s
+        memcached_send_timeout 2s;                # 连续两次写的超时时间为2s
+        memcached_pass memcached;                 # 代理到Memcached集群
+        add_header X-Cache-Satus HIT;             # 显示缓存命中状态
+        add_header Content-Type 'text/html; charset=utf-8'; # 强制响应数据格式为html
+    }
+
+    error_page     404 502 504 = @fallback;
+
+    location @fallback {
+        proxy_set_header   X-Memcached-Key $memcached_key;  # 将memecached key传递
+                                                            # 给PHP服务器
+        proxy_pass     http://backend;                      # PHP服务器
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">为了方便演示Memcached的使用方法，在此处提供了一段简单的PHP测试代码。在测试代码中，使用了PHP模块Memcached与Nginx兼容的一致性哈希算法实现分布式Memcached集群的支持。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;?php
+// 测试数据
+$html = file_get_contents('https://www.baidu.com');
+
+if ($_SERVER['REQUEST_METHOD'] != 'GET' || !isset($_SERVER['HTTP_X_MEMCACHED_KEY']) || !$_SERVER['HTTP_X_MEMCACHED_KEY']) {
+    echo $html;
+    exit();
+}
+
+$memcachedKey = $_SERVER['HTTP_X_MEMCACHED_KEY'];
+
+// 初始化Memcached
+$memcached = new Memcached();
+
+// 配置分布式hash一致性算法，兼容Nginx的Ketama算法
+$memcached-&gt;setOptions(array(
+    Memcached::OPT_DISTRIBUTION=&gt;Memcached::DISTRIBUTION_CONSISTENT,
+    Memcached::OPT_LIBKETAMA_COMPATIBLE=&gt;true,
+    Memcached::OPT_REMOVE_FAILED_SERVERS=&gt;true,
+    Memcached::OPT_COMPRESSION=&gt;false
+));
+
+// 添加Memcached服务器
+$memcached-&gt;addServers(array(
+    array('192.168.2.145', 11211),
+    array('192.168.2.109', 11211)
+));
+
+// 存储到Memcached，缓存有效期1天
+$memcached-&gt;set($memcachedKey, $html, 86400);
+
+//调试用
+header('X-Cache-Status: MISS');
+header('X-Cache-Key: ' . $memcachedKey);
+
+//输出静态文件
+print $html;
+
+?&gt;
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

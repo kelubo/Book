@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_231">12.3.1　配置映射ConfigMap</h3> 
+ <p class="ziti3">通过Helm安装Nginx Ingress的默认关联配置映射实例名称为nginx-ingress-controller，用户可以通过修改资源对象Deployment/DaemonSet实例nginx-ingress-controller中的参数--configmap自定义关联配置映射实例的名称。Nginx Ingress控制器约定Nginx Ingress配置映射实例中的键值只能是字符串，即便是数字或布尔值时也要以字符串的形式书写，比如"true"、"false"、"100"，"[]string"或"[]int"的Slice类型则表示内部数据是以","分隔的字符串。根据配置涉及的功能可以有如下分类。</p> 
+ <p class="ziti3">（1）Nginx原生配置指令</p> 
+ <p class="ziti3">用以提供向Nginx配置中添加Nginx原生配置指令，功能说明如表12-5所示。</p> 
+ <p class="middle-img">表12-5　原生指令配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-5.jpg" class="calibre359"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">echo '
+apiVersion: v1
+kind: ConfigMap
+data:
+    http-snippet: |
+        ancient_browser "UCWEB";
+        ancient_browser_value oldweb;
+        server {
+            listen 8080;
+            if ($ancient_browser) {
+                rewrite ^ /${ancient_browser}.html; # 重定向到oldweb.html
+            }
+        }
+metadata:
+    name: nginx-ingress-controller
+    namespace: nginx-ingress
+' | kubectl create -f -
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）通用配置</p> 
+ <p class="ziti3">提供Nginx核心配置相关配置指令的配置，功能说明如表12-6所示。</p> 
+ <p class="middle-img">表12-6　通用配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-6.jpg" class="calibre360"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/387-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/387-i.jpg" class="calibre361"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cat&gt;test.yaml&lt;&lt;EOF
+apiVersion: v1
+kind: ConfigMap
+data:
+    keep-alive:   "60"
+    disable-ipv6: "true"
+metadata:
+    name: nginx-ingress-controller
+    namespace: nginx-ingress
+EOF
+
+kubectl create -f test.yaml
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）响应数据配置</p> 
+ <p class="ziti3">提供响应信息头修改及响应数据压缩相关功能的配置，功能说明如表12-7所示。</p> 
+ <p class="middle-img">表12-7　响应数据配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-7.jpg" class="calibre362"/></a> 
+ </div> 
+ <p class="ziti3">（4）访问控制</p> 
+ <p class="ziti3">提供限制连接数、访问速度、访问连接及防火墙的配置，功能说明如表12-8所示。</p> 
+ <p class="middle-img">表12-8　访问控制</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-8.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-8.jpg" class="calibre363"/></a> 
+ </div> 
+ <p class="ziti3">（5）HTTPS配置</p> 
+ <p class="ziti3">提供与HTTPS相关的配置，功能说明如表12-9所示。</p> 
+ <p class="middle-img">表12-9　HTTPS配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-9.jpg" class="calibre364"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/390-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/390-i.jpg" class="calibre365"/></a> 
+ </div> 
+ <p class="ziti3">（6）HSTS配置</p> 
+ <p class="ziti3">HSTS（HTTP Strict Transport Security）是一种新的Web安全协议，HSTS配置启用后，将强制客户端使用HTTPS协议与服务器建立连接，配置映射提供的HSTS功能配置功能说明如表12-10所示。</p> 
+ <p class="middle-img">表12-10　HSTS配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-10.jpg" class="calibre366"/></a> 
+ </div> 
+ <p class="ziti3">（7）认证转发配置</p> 
+ <p class="ziti3">提供认证转发功能的全局配置，功能说明如表12-11所示。</p> 
+ <p class="ziti3">（8）代理配置</p> 
+ <p class="ziti3">设置Nginx的代理功能配置，相关配置说明如表12-12所示。</p> 
+ <p class="middle-img">表12-11　认证转发配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-11.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-11.jpg" class="calibre367"/></a> 
+ </div> 
+ <p class="middle-img">表12-12　代理配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-12.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-12.jpg" class="calibre368"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/393-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/393-i.jpg" class="calibre369"/></a> 
+ </div> 
+ <p class="ziti3">（9）负载均衡配置</p> 
+ <p class="ziti3">Nginx Ingress为方便上游服务器组的动态管理，其基于Lua实现了轮询调度及峰值指数加权移动平均（Peak Exponentially Weighted Moving-Average，Peak EWMA）负载均衡算法。配置映射的配置为全局负载均衡的配置，详见本章的注解负载均衡说明。配置映射还提供了被代理服务器长连接的配置支持，配置说明如表12-13所示。</p> 
+ <p class="middle-img">表12-13　负载均衡配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-13.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-13.jpg" class="calibre370"/></a> 
+ </div> 
+ <p class="ziti3">（10）日志配置</p> 
+ <p class="ziti3">设置Nginx的日志功能配置，相关配置说明如表12-14所示。</p> 
+ <p class="middle-img">表12-14　日志配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-14.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-14.jpg" class="calibre371"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/395-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/395-i.jpg" class="calibre372"/></a> 
+ </div> 
+ <p class="ziti3">（11）分布式跟踪配置</p> 
+ <p class="ziti3">设置分布式跟踪功能的配置，配置键及功能描述如表12-15所示。</p> 
+ <p class="middle-img">表12-15　分布式跟踪配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-15.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-15.jpg" class="calibre373"/></a> 
+ </div> 
+</body>
+</html>

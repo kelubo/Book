@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h2 class="p3" id="sigil_toc_id_224">12.2　Nginx Ingress</h2>
+
+  <p class="ziti3">Kubernetes通过kube-proxy服务实现了Service的对外发布及负载均衡，它的各种方式都是基于传输层实现的。在实际的互联网应用场景中，不仅要实现单纯的转发，还有更加细致的策略需求，如果使用真正的负载均衡器更会增加操作的灵活性和转发性能。基于以上需求，Kubernetes引入了资源对象Ingress，Ingress为Service提供了可直接被集群外部访问的虚拟主机、负载均衡、SSL代理、HTTP路由等应用层转发功能。Kubernetes官方发布了基于GCE和Nginx的Ingress控制器，Nginx Ingress控制器能根据Service中Pod的变化动态地调整配置，结合Nginx的高稳定性、高性能、高并发处理能力等特点，使Kubernetes对集群中运行于容器的应用程序具有了更加灵活的应用层管理能力。</p>
+
+  <p class="ziti3">Nginx Ingress因使用Nginx的不同版本，分为Nginx官方版本和Kubernetes社区版。Nginx官方版本提供其基于Go语言开发的Ingress控制器，并与Nginx集成分为Nginx开源版和Nginx Plus版；开源版仅基于Nginx的原始功能，提供了Nginx原生配置指令的支持，相较于Nginx Plus版功能简单且不支持Pod变化的动态变更。Nginx Plus版则提供了诸多完善的商业功能，其支持Nginx原生配置指令、JWT验证、Pod变化的动态配置及主动健康检查等功能。Kubernetes社区版是基于Nginx的扩展版OpenResty及诸多第三方模块构建的，其基于OpenResty的Lua嵌入式编程能力，扩展了Nginx的功能，并基于balancer_by_lua模块实现了Pod变化的动态变更功能。本章将基于Kubernetes社区版的Nginx Ingress进行介绍。</p>
+</body>
+</html>

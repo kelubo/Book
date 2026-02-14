@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_109">5.5.2　XSLT服务器配置样例</h3> 
+ <p class="ziti3">本节的配置样例是将Nginx利用自动索引功能生成XML格式目录列表，通过XSLT模板将XML数据转换成Bootstrap样式的HTML表格页面，页面效果如图5-4所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/5-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/5-4.jpg" class="calibre214"/></a> 
+ </div> 
+ <p class="middle-img">图5-4　XSLT页面示例图</p> 
+ <p class="ziti3">Nginx配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 8081;
+    server_name localhost;
+    charset utf-8;
+    root /opt/nginx-web/files;
+    default_type text/xml;
+
+    location / {
+       autoindex on;                                    # 启用自动页面功能
+       autoindex_localtime on;                          # 使用Nginx服务器时间
+       autoindex_format xml;                            # 自动页面输出格式为XML
+       xslt_stylesheet conf/conf.d/example/test2.xslt;  # 引入XSLT模板文件
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">页面模板文件test2.xslt内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt;
+    &lt;xsl:template match="/"&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+        &lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;
+        &lt;link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/ 3.3.7/css/bootstrap.min.css"/&gt;
+        &lt;script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"&gt;&lt;/script&gt;
+        &lt;script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap. min.js"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h3&gt;Nginx XSLT示例&lt;/h3&gt;
+        &lt;table  class="table table-striped table-bordered"&gt;
+        &lt;thead&gt;
+            &lt;th&gt;文件名&lt;/th&gt;
+            &lt;th&gt;文件大小&lt;/th&gt;
+            &lt;th&gt;文件修改时间&lt;/th&gt;
+        &lt;/thead&gt;
+        &lt;xsl:for-each select="list/*"&gt;
+        &lt;xsl:sort select="mtime"/&gt;
+            &lt;xsl:variable name="name"&gt;
+                &lt;xsl:value-of select="."/&gt;
+            &lt;/xsl:variable&gt;
+            &lt;xsl:variable name="size"&gt;
+                &lt;xsl:if test="string-length(@size) &amp;gt; 0"&gt;
+                        &lt;xsl:if test="number(@size) &amp;gt; 0"&gt;
+                            &lt;xsl:choose&gt;
+                                    &lt;xsl:when test="round(@size div 1024) &amp;lt; 1"&gt;&lt;xsl:value-of select="@size" /&gt;&lt;/xsl:when&gt;
+                                    &lt;xsl:when test="round(@size div 1048576) &amp;lt; 1"&gt;&lt;xsl:value-of select="format-number((@size div 1024), '0.0')" /&gt;K&lt;/xsl:when&gt;
+                                    &lt;xsl:otherwise&gt;&lt;xsl:value-of select="format-number((@size div 1048576), '0.00')" /&gt;M&lt;/xsl:otherwise&gt;
+                            &lt;/xsl:choose&gt;
+                        &lt;/xsl:if&gt;
+                &lt;/xsl:if&gt;
+            &lt;/xsl:variable&gt;
+            &lt;xsl:variable name="date"&gt;
+                &lt;xsl:value-of select="substring(@mtime,1,4)"/&gt;-&lt;xsl:value-of select="substring(@mtime,6,2)"/&gt;-&lt;xsl:value-of select= "substring(@mtime,9,2)"/&gt;&lt;xsl:text&gt; &lt;/xsl:text&gt;
+                &lt;xsl:value-of select="substring(@mtime,12,2)"/&gt;:&lt;xsl:value-of select= "substring(@mtime,15,2)"/&gt;:&lt;xsl:value-of select="substring(@mtime,18,2)”/&gt;
+            &lt;/xsl:variable&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;a href=”{$name}”&gt;&lt;xsl:value-of select=”.”/&gt;&lt;/a&gt;&lt;/td&gt;
+            &lt;td align=”center”&gt;&lt;xsl:value-of select=”$size”/&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;xsl:value-of select=”$date”/&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;/xsl:for-each&gt;
+        &lt;/table&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
+    &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">XSLT样式模板可以引入CSS、JS文件，所以它可将XML文件渲染成具有更多功能的前端动态页面。</p> 
+</body>
+</html>

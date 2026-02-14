@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">11.3　如何防止数据库的中文显示乱码</h2>
+<p class="ziti">管理员在配置MySQL数据库字符集时，需要尽可能地确保11.2节开头提到的7大项字符集统一，对于管理员来说，查看数据库字符集的基本方法具体如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; show variables like 'character_set%';
+Variable_name            | Value
+-------------------------+-----------------------------------------------
+character_set_client     | utf8    #客户端字符集;
+character_set_connection | utf8    #客户端连接字符集;
+character_set_database   | utf8    #数据库字符集，配置文件时指定或建库建表时指定；
+character_set_filesystem | binary  #文件系统字符集；
+character_set_results    | utf8    #客户端返回结果字符集;
+character_set_server     | utf8    #服务器字符集，配置文件时指定或建库建表时指定；
+character_set_system     | utf8    #系统字符集。
+character_sets_dir       | /application/mysql-5.5.32/share/charsets/ |</pre>
+<hr/>
+<p class="ziti">更改Linux系统字符集变量之后，可以查看MySQL中字符集的变化。</p>
+<h4 class="p4">彻底防止MySQL数据库内的数据中文乱码方法</h4>
+<p class="ziti">切记，字符集的不一致是数据库乱码的罪魁祸首，要想避免MySQL数据库内的数据中文乱码方法，就要遵循前文所说的7大项字符集设置规则，即Linux系统服务端与Linux系统客户端字符集、MySQL服务端数据库实例与MySQL数据库客户端字符集、MySQL数据库中的库和表的字符集、程序代码的字符集要一致。如果是利用文件还原数据，还要注意文件的编码问题。</p>
+<p class="ziti">下面是一个不按要求来操作，导致出现乱码的范例：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; set names gbk;                      #&lt;==修改MySQL客户端字符集为GBK。
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; use tingting
+Database changed
+
+mysql&gt; create table t1(id int(4),name varchar(16));  #&lt;==默认建表。
+Query OK, 0 rows affected (0.01 sec)
+
+mysql&gt; insert into t1 values(1,'老男');              #&lt;==插入中文。
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; select * from t1;
++------+--------+
+| id   | name   |
++------+--------+
+|    1 | 老男   |  #&lt;==正常。
++------+--------+
+1 row in set (0.00 sec)
+
+mysql&gt; set names utf8; #&lt;==修改MySQL客户端字符集为UTF8。
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; select * from t1;
++------+-----------+
+| id   | name      |
++------+-----------+
+|    1 | 鑰佺敺    | #&lt;==发现数据乱码了，这就是客户端字符集和服务端不一致时插入数据而
+                       导致的乱码问题。
++------+-----------+
+1 row in set (0.00 sec)</pre>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_140">7.2.1　代理缓存模块</h3> 
+ <p class="ziti3">Nginx的缓存功能是集成在代理模块中的，当启用缓存功能时，Nginx将请求返回的响应数据持久化在服务器磁盘中，响应数据缓存的相关元数据、有效期及缓存内容等信息将被存储在定义的共享内存中。当收到客户端请求时，Nginx会在共享内存中搜索缓存信息，并把查询到的缓存数据从磁盘中快速交换到操作系统的页面缓存（Page Cache）中，整个过程的速度非常快。Nginx缓存会缓存加载进程（Cache Loader Process）和库存管理（Cade Manger Process）进行管理。缓存加载进程只在Nginx启动时执行一次，将上一次Nginx运行时缓存有关数据的元数据加载到共享内存区域，加载结束后它将自动退出。为了避免缓存因加载缓存降低Nginx的性能，缓存加载进程会采用周期性迭代式加载缓存数据，且迭代加载的时间间隔、每次最大消耗时间和每次迭代加载的数量可以由配置指令proxy_cache_path的指令值参数设置。缓存管理进程则周期性的检查缓存的状态，负责清除在一段时间内未被访问的缓存文件，并对超出缓存存储最大值的缓存对象进行删除，缓存管理进程的删除操作也是周期性迭代执行的，并由配置指令proxy_cache_path的指令值参数设置。</p> 
+ <p class="ziti3">（1）缓存处理流程及状态</p> 
+ <p class="ziti3">当客户端发起请求到Nginx缓存服务器时，Nginx会先检查本地是否已经有该请求的内容缓存，有的话会直接返回数据，缓存请求状态会被标记为HIT，否则该缓存请求状态就会被标记为MISS。如果指令proxy_cache_lock未被启用，则会直接向源服务器发起访问请求，如果被启用，则会先确认当前请求是不是第一个发起的请求，若不是，则等待；若是，则向源服务器发起访问请求。服务器响应数据返回后会先被存储在本地缓存，然后再返回给客户端。缓存处理流程如图7-7所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/7-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/7-7.jpg" class="calibre258"/></a> 
+ </div> 
+ <p class="middle-img">图7-7　Nginx缓存处理流程图</p> 
+ <p class="ziti3">Nginx在处理缓存过程中，客户端请求的缓存请求状态会被记录在变量$upstream_cache_status中，缓存请求状态如表7-4所示。</p> 
+ <p class="middle-img">表7-4　缓存请求状态及说明</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-4.jpg" class="calibre259"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/215-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/215-i.jpg" class="calibre260"/></a> 
+ </div> 
+ <p class="ziti3">（2）缓存配置指令</p> 
+ <p class="ziti3">Nginx缓存配置指令如表7-5所示。</p> 
+ <p class="middle-img">表7-5　Nginx缓存配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-5.jpg" class="calibre261"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/216-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/216-i.jpg" class="calibre262"/></a> 
+ </div> 
+ <p class="ziti4">·该模块指令列表中指令的指令域范围都是http、server、location。</p> 
+ <p class="ziti4">·proxy_cache_path指令只能编写在http指令域中。</p> 
+ <p class="ziti4">·proxy_cache与proxy_store指令不能在同一指令域中同时使用。</p> 
+ <p class="ziti4">·proxy_cache_path指令值参数如表7-6所示。</p> 
+ <p class="middle-img">表7-6　proxy_cache_path指令值参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-6.jpg" class="calibre263"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/217-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/217-i.jpg" class="calibre264"/></a> 
+ </div> 
+ <p class="ziti3">（3）HTTP范围请求</p> 
+ <p class="ziti3">范围请求允许服务器只发送请求的一部分响应数据给客户端，通常对大文件传输时，用以实现断点续传、多线程下载等功能。若服务端响应信息头中包含字段Accept-Ranges:bytes，则表示服务端支持范围请求，且节点范围的单位为字节（bytes）。在Nginx缓存默认配置下，Nginx处理完一个大文件的初始请求后，后续的用户请求必须等待整个文件下载结束并存入缓存后才可以继续被处理，整个过程非常耗时。为解决这个问题，Nginx提供了ngx_http_slice_module模块，用以缓存范围请求的支持。该模块将文件分成更小的切片（slices），客户端每个范围请求覆盖特定的切片，如果该范围没有缓存，则从源服务器请求后存入缓存，否则就从缓存中返回数据。http_slice模块配置指令如表7-7所示。</p> 
+ <p class="middle-img">表7-7　http_slice模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b7-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b7-7.jpg" class="calibre182"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location / {
+    slice             1m;                               # 切片大小为1MB
+    proxy_cache       cache;                            # 缓存共享内存名称为cache
+    proxy_cache_key   $uri$is_args$args$slice_range;    # 设置缓存key
+    proxy_set_header  Range $slice_range;               # 添加头字段Range的字段值为
+                                                        # $slice_range
+    proxy_cache_valid 200 206 1h;           # 响应状态码为200及206的内容缓存有效期为1h
+    proxy_pass        http://localhost:8000;
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

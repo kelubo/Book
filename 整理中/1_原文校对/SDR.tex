@@ -1,0 +1,349 @@
+\documentclass[UTF8]{ctexbook}
+\usepackage{geometry}
+\geometry{a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\title{软件定义无线电}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{SDR 基础概念}
+\section{SDR 简介}
+\subsection{SDR 的定义}
+软件定义无线电（Software Defined Radio，简称 SDR）是一种无线电通信系统，其关键功能通过软件实现，而非传统的硬件电路。SDR 的核心思想是将传统无线电中由硬件实现的功能（如调制解调、滤波、频率变换等）尽可能地转移到软件中处理，从而实现系统的灵活性和可重构性。
+
+SDR 系统通常由天线、射频前端、模数/数模转换器和数字信号处理器组成。射频前端负责接收和发射射频信号，ADC/DAC 负责信号的模数/数模转换，而数字信号处理器则通过软件算法实现各种信号处理功能。
+
+\subsection{SDR 的特点}
+\subsubsection{灵活性}
+SDR 系统可以通过修改软件来适应不同的通信标准和协议，无需更换硬件设备。这种灵活性使得 SDR 能够快速适应不断发展的通信技术，为未来的技术升级提供了便利。
+
+\subsubsection{可重构性}
+SDR 系统的功能可以通过软件重新配置，实现不同的通信模式和功能。例如，同一个 SDR 设备可以在不同时间执行不同的任务，如接收广播、进行业余无线电通信或监测频谱。
+
+\subsubsection{成本效益}
+虽然 SDR 设备的初始成本可能较高，但其软件可升级的特性使得长期维护成本降低。同时，通用硬件平台可以支持多种应用，减少了专用硬件的需求。
+
+\subsubsection{易于升级}
+当需要支持新的通信标准或改进系统性能时，SDR 系统可以通过软件升级来实现，无需更换硬件。这种升级方式更加便捷和经济。
+
+\subsubsection{高度集成}
+SDR 系统可以将多种通信功能集成到一个平台上，减少了设备数量和复杂性，提高了系统的可靠性和可维护性。
+
+\subsection{SDR 的应用领域}
+\subsubsection{通信系统}
+SDR 广泛应用于各种通信系统，如蜂窝通信（4G/5G）、卫星通信、军事通信等。其灵活性和可重构性使得通信系统能够适应不同的环境和需求。
+
+\subsubsection{广播接收}
+SDR 可以用于接收各种广播信号，包括 AM/FM 广播、数字广播和卫星广播。通过软件配置，同一个设备可以接收不同类型的广播信号。
+
+\subsubsection{业余无线电}
+业余无线电爱好者使用 SDR 设备进行各种通信活动，如短波通信、卫星通信和数字模式通信。SDR 为业余无线电提供了更多的功能和灵活性。
+
+\subsubsection{频谱监测}
+SDR 可以用于监测频谱使用情况，检测非法信号和干扰源。其宽带接收能力使得频谱监测更加高效和全面。
+
+\subsubsection{军事与国防}
+在军事领域，SDR 用于电子战、情报收集和安全通信。其抗干扰能力和可重构性使其成为现代军事通信系统的重要组成部分。
+
+\subsubsection{研究与教育}
+SDR 为通信原理和信号处理的教学提供了实验平台，同时也是通信技术研究的重要工具。学生和研究人员可以通过 SDR 实验深入理解无线电通信的原理和技术。
+
+\subsubsection{物联网}
+在物联网应用中，SDR 可以用于实现不同物联网设备之间的通信，支持多种通信协议和标准，为物联网的发展提供了技术支持。
+\section{SDR 的发展历史}
+\subsection{早期发展}
+\subsection{技术突破}
+\subsection{标准化进程}
+\subsection{当前发展状况}
+\section{SDR 与传统无线电的区别}
+\subsection{架构差异}
+\subsection{灵活性对比}
+\subsection{成本效益分析}
+\subsection{维护与升级}
+\section{SDR 的基本原理}
+\subsection{信号处理流程}
+\subsection{软件可配置性}
+\subsection{实时处理要求}
+\subsection{性能指标}
+
+\chapter{SDR 系统架构}
+\section{硬件架构}
+\subsection{天线}
+\subsubsection{天线类型}
+\subsubsection{天线参数}
+\subsubsection{天线选择考虑因素}
+\subsection{射频前端}
+\subsubsection{低噪声放大器 (LNA)}
+\subsubsection{混频器}
+\subsubsection{滤波器}
+\subsubsection{射频功率放大器}
+\subsection{模数转换器 (ADC)}
+\subsubsection{采样定理}
+\subsubsection{ADC 性能参数}
+\subsubsection{高速 ADC 技术}
+\subsection{数模转换器 (DAC)}
+\subsubsection{DAC 工作原理}
+\subsubsection{DAC 性能参数}
+\subsubsection{高速 DAC 技术}
+\subsection{数字信号处理器 (DSP)}
+\subsubsection{DSP 类型}
+\subsubsection{FPGA 在 SDR 中的应用}
+\subsubsection{GPU 加速}
+\subsubsection{多核处理器}
+\section{软件架构}
+\subsection{操作系统}
+\subsubsection{实时操作系统}
+\subsubsection{通用操作系统}
+\subsubsection{嵌入式系统}
+\subsection{驱动程序}
+\subsubsection{硬件抽象层}
+\subsubsection{设备驱动}
+\subsubsection{性能优化}
+\subsection{信号处理库}
+\subsubsection{基础信号处理函数}
+\subsubsection{高级信号处理算法}
+\subsubsection{开源信号处理库}
+\subsection{应用层软件}
+\subsubsection{波形设计工具}
+\subsubsection{频谱分析软件}
+\subsubsection{通信协议栈}
+\subsubsection{用户界面}
+
+\chapter{SDR 关键技术}
+\section{数字信号处理}
+\subsection{滤波技术}
+\subsubsection{FIR 滤波器}
+\subsubsection{IIR 滤波器}
+\subsubsection{多速率信号处理}
+\subsubsection{数字下变频 (DDC)}
+\subsubsection{数字上变频 (DUC)}
+\subsection{调制解调}
+\subsubsection{模拟调制}
+\subsubsection{数字调制}
+\subsubsection{自适应调制}
+\subsubsection{解调算法}
+\subsection{频谱分析}
+\subsubsection{FFT 分析}
+\subsubsection{频谱监测}
+\subsubsection{信号识别}
+\subsubsection{干扰检测}
+\subsection{同步技术}
+\subsubsection{载波同步}
+\subsubsection{位同步}
+\subsubsection{帧同步}
+\subsubsection{网络同步}
+\section{射频技术}
+\subsection{宽带射频前端}
+\subsubsection{宽带设计挑战}
+\subsubsection{可调谐滤波器}
+\subsubsection{宽带放大器}
+\subsection{低噪声放大器}
+\subsubsection{LNA 设计考虑}
+\subsubsection{噪声系数优化}
+\subsubsection{线性度改善}
+\subsection{混频器}
+\subsubsection{混频器类型}
+\subsubsection{镜像抑制}
+\subsubsection{噪声与失真}
+\subsection{滤波器设计}
+\subsubsection{射频滤波器类型}
+\subsubsection{滤波器参数}
+\subsubsection{实现技术}
+\section{ADC/DAC 技术}
+\subsection{采样率}
+\subsubsection{奈奎斯特采样}
+\subsubsection{过采样技术}
+\subsubsection{带通采样}
+\subsection{位数}
+\subsubsection{分辨率与动态范围}
+\subsubsection{量化噪声}
+\subsubsection{有效位数 (ENOB)}
+\subsection{动态范围}
+\subsubsection{信噪比 (SNR)}
+\subsubsection{无杂散动态范围 (SFDR)}
+\subsubsection{互调失真 (IMD)}
+
+\chapter{SDR 硬件平台}
+\section{商业 SDR 设备}
+\subsection{USRP 系列}
+\subsubsection{USRP 产品系列}
+\subsubsection{技术规格}
+\subsubsection{应用场景}
+\subsection{HackRF}
+\subsubsection{HackRF One}
+\subsubsection{技术特点}
+\subsubsection{开源社区支持}
+\subsection{BladeRF}
+\subsubsection{BladeRF 系列}
+\subsubsection{性能参数}
+\subsubsection{应用案例}
+\subsection{LimeSDR}
+\subsubsection{LimeSDR 系列}
+\subsubsection{FPGA 配置}
+\subsubsection{宽带能力}
+\subsection{RTL-SDR}
+\subsubsection{RTL-SDR 接收器}
+\subsubsection{低成本优势}
+\subsubsection{限制与应用}
+\subsection{其他商业 SDR 设备}
+\section{开源 SDR 硬件}
+\subsection{开源硬件项目}
+\subsection{硬件设计资源}
+\subsection{社区贡献}
+\subsection{开源硬件优势}
+\section{自制 SDR 设备}
+\subsection{DIY 硬件设计}
+\subsection{组件选择}
+\subsection{测试与校准}
+\subsection{性能评估}
+
+\chapter{SDR 软件工具}
+\section{GNU Radio}
+\subsection{GNU Radio 简介}
+\subsection{GNU Radio Companion}
+\subsection{信号处理模块}
+\subsection{流程图设计}
+\subsection{Python 集成}
+\subsection{应用案例}
+\section{MATLAB/Simulink}
+\subsection{MATLAB 信号处理工具}
+\subsection{Simulink 模型设计}
+\subsection{SDR 支持包}
+\subsection{算法开发与验证}
+\section{Python 信号处理库}
+\subsection{NumPy/SciPy}
+\subsection{Matplotlib}
+\subsection{scikit-signal}
+\subsection{PySDR}
+\subsection{实时处理库}
+\section{专用 SDR 软件}
+\subsection{频谱分析软件}
+\subsection{信号解码软件}
+\subsection{业余无线电软件}
+\subsection{信号生成软件}
+\subsection{网络 SDR 软件}
+
+\chapter{SDR 应用场景}
+\section{无线电接收}
+\subsection{广播接收}
+\subsubsection{AM/FM 广播}
+\subsubsection{数字广播}
+\subsubsection{卫星广播}
+\subsection{业余无线电}
+\subsubsection{短波接收}
+\subsubsection{卫星通信}
+\subsubsection{数字模式通信}
+\subsection{信号监测}
+\subsubsection{频谱监测}
+\subsubsection{干扰检测}
+\subsubsection{信号识别}
+\section{无线电发射}
+\subsection{业余无线电通信}
+\subsubsection{语音通信}
+\subsubsection{数据通信}
+\subsubsection{数字模式}
+\subsection{软件无线电测试}
+\subsubsection{调制测试}
+\subsubsection{发射机测试}
+\subsubsection{天线测试}
+\subsection{其他发射应用}
+\section{研究与教育}
+\subsection{通信原理教学}
+\subsection{信号处理实验}
+\subsection{毕业设计}
+\subsection{研究项目}
+\section{军事与国防}
+\subsection{电子战}
+\subsection{情报收集}
+\subsection{通信系统}
+\subsection{雷达应用}
+\section{物联网}
+\subsection{无线传感器网络}
+\subsection{低功耗通信}
+\subsection{物联网网关}
+\section{其他应用场景}
+\subsection{航空通信}
+\subsection{ maritime 通信}
+\subsection{应急通信}
+\subsection{智能交通}
+
+\chapter{SDR 实验项目}
+\section{AM/FM 广播接收}
+\subsection{实验目的}
+\subsection{所需设备}
+\subsection{实验步骤}
+\subsection{信号处理流程}
+\subsection{实验结果分析}
+\section{数字信号解码}
+\subsection{RTTY 解码}
+\subsection{APRS 解码}
+\subsection{数字电视信号解码}
+\subsection{卫星信号解码}
+\section{信号分析与识别}
+\subsection{频谱分析实验}
+\subsection{信号识别实验}
+\subsection{干扰检测实验}
+\subsection{调制识别实验}
+\section{简单通信系统实现}
+\subsection{模拟通信系统}
+\subsection{数字通信系统}
+\subsection{点对点通信}
+\subsection{网络通信实验}
+\section{高级实验项目}
+\subsection{软件定义雷达}
+\subsection{认知无线电实验}
+\subsection{MIMO 系统实验}
+\subsection{卫星通信实验}
+
+\chapter{SDR 未来发展}
+\section{技术趋势}
+\subsection{硬件技术发展}
+\subsubsection{高速 ADC/DAC}
+\subsubsection{高性能 FPGA}
+\subsubsection{新型 RF 前端}
+\subsection{软件技术发展}
+\subsubsection{AI 与机器学习}
+\subsubsection{实时处理优化}
+\subsubsection{开源软件生态}
+\subsection{标准化进程}
+\section{应用前景}
+\subsection{5G/6G 通信}
+\subsection{卫星互联网}
+\subsection{车联网}
+\subsection{工业物联网}
+\subsection{医疗健康}
+\subsection{智能城市}
+\section{挑战与机遇}
+\subsection{技术挑战}
+\subsubsection{实时处理}
+\subsubsection{功耗优化}
+\subsubsection{电磁兼容}
+\subsection{频谱管理挑战}
+\subsection{安全挑战}
+\subsection{机遇与发展方向}
+\subsubsection{军民融合}
+\subsubsection{产业发展}
+\subsubsection{人才培养}
+
+\end{document}

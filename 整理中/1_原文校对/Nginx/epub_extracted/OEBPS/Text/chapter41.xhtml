@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_48">3.2.2　进程调优</h3> 
+ <p class="ziti3">Nginx是按照事件驱动架构设计的。每个外部请求都以事件的形式被工作进程（Worker Process）响应，并发完成各种功能的操作处理。Nginx工作进程的性能依赖于硬件和操作系统的配置，在实际应用场景中，用户需要按照硬件、操作系统或应用场景需求的侧重点进行相应的配置调整。Nginx的进程调优配置指令如表3-3～表3-10所示。</p> 
+ <p class="middle-img">表3-3　线程池指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-3.jpg" class="calibre33"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">thread_pool pool_1 threads=16;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">具体参数说明如下。</p> 
+ <p class="ziti4">·thread_pool也可以编写在http指令域中。</p> 
+ <p class="ziti4">·threads参数定义了线程池的线程数。</p> 
+ <p class="ziti4">·max_queue参数指定了等待队列中的最大任务数，在线程池中所有线程都处于繁忙状态时，新任务将进入等待队列。等待队列中的最大任务数为65536。</p> 
+ <p class="ziti4">·线程池指令需要在编译配置时增加--with-threads参数。</p> 
+ <p class="middle-img">表3-4　定时器方案指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-4.jpg" class="calibre34"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">timer_resolution 100ms;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在因频繁调用时间函数引发的资源消耗不大的场景中可不设定该指令。</p> 
+ <p class="middle-img">表3-5　工作进程优先级指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-5.jpg" class="calibre35"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_priority -5;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">worker_priority指令值的取值范围是-20～19，数值越小，优先级越高，获得的CPU时间就越多。配置生效后可以通过如下命令查看，输出结果如图3-1所示。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">ps axo command,pid,ni | grep nginx | grep -v grep
+</pre> 
+ <hr class="calibre6"/> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/3-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/3-1.jpg" class="calibre36"/></a> 
+ </div> 
+ <p class="middle-img">图3-1　Nginx工作进程</p> 
+ <p class="middle-img">表3-6　工作进程数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-6.jpg" class="calibre37"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_processes auto;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">工作进程数指令的指令值有两种类型，分别为数字和auto。指令值为auto时，Nginx会根据CPU的内核数生成等数量的工作进程。</p> 
+ <p class="middle-img">表3-7　工作进程CPU绑定指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-7.jpg" class="calibre38"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_processes 8;
+worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">指令值是用CPU掩码来表示的，使用与CPU数量相等位数的二进制值来表示。单个CPU用单个二进制值表示，多个CPU组合可用二进制值相加来表示。如配置样例所示，CPU有8个核，分别表示绑定了从第0核到第7核的CPU。CPU核数是从0开始计数的。</p> 
+ <p class="ziti3">指令值除了可以是CPU掩码外，还可以是auto。当指令值为auto时，Nginx会自动进行CPU绑定。</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_processes auto;  
+worker_cpu_affinity auto;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">工作进程与CPU核数也可以是多种对应组合，指令语句如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_processes 4;  
+worker_cpu_affinity 01 10 01 10; # 表示把第1、3工作进程绑定在2核CPU的第0核，第2、4工作
+                                 # 进程绑定在2核CPU的第1核
+
+worker_processes 2;  
+worker_cpu_affinity 0101 1010;   # 表示把第1工作进程绑定在CPU的第0核和第2核，第2工作进程
+                                 # 绑定在CPU的第1核和第3核
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">工作进程CPU绑定指令仅适合于FreeBSD和Linux操作系统。</p> 
+ <p class="middle-img">表3-8　工作进程开文件数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-8.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-8.jpg" class="calibre39"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_rlimit_nofile 65535;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-9　工作进程关闭等待时间指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-9.jpg" class="calibre40"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">worker_shutdown_timeout 10s;
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-10　设置互斥锁文件指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-10.jpg" class="calibre41"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">lock_file logs/nginx.lock;
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

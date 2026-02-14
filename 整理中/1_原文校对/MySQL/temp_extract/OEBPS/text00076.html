@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">5.2　MySQL连接原理方法及提示符设置</h2>
+<h3 class="p3">
+<a id="b1">5.2.1　客户端连接MySQL服务器原理结构</a>
+</h3>
+<p class="p6">1.MySQL客户端简介</p>
+<p class="ziti">MySQL是一个典型的C/S服务结构软件，作为运维或DBA人员，我们经常使用MySQL自带的客户端程序（在“/application/mysql/bin”目录下）对其进行管理，常用的管理命令有mysql、mysqladmin、mysqldump、mysqlbinlog，mysql是登录MySQL最常用的客户端程序（有一些程序员也会使用类似phpmyadmin或者Navicat等的客户端管理软件）。</p>
+<p class="p6">2.客户端连接MySQL服务器原理结构</p>
+<p class="ziti">图5-2为本地客户端和远程应用服务程序，连接MySQL服务的工作原理逻辑图。</p>
+<div class="pic"><img alt="" src="Image00029.jpg" />
+</div>
+<p class="middle-img">图5-2　客户端连接MySQL服务器原理结构图</p>
+<p class="p6">3.MySQL连接方式介绍</p>
+<p class="ziti">如图5-2所示，MySQL的连接方式有TCP/IP和Socket连接方式。TCP/IP连接方式一般是应用（PHP/Python/Java程序）和数据库服务不在一台机器上的连接方案，对于mysql命令来说就是指定-h参数登录，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql -uroot -poldboy123 -h 10.0.0.52</pre>
+<hr/>
+<p class="ziti">本地连接数据库常用的方式一般是Socket连接方式，特别是多实例本地MySQL登录，本书就首推socket的连接方式，命令如下：</p>
+<hr/>
+<pre class="ziti1">mysql -uroot -poldboy123 -S /tmp/mysql.sock</pre>
+<hr/>
+</body>
+</html>

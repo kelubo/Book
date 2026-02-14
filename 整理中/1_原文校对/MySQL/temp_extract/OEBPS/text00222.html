@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.2.8　生产场景中部署MySQL主从复制方案</h3>
+<p class="p6">1.快速配置MySQL主从复制</p>
+<p class="ziti">快速配置MySQL主从复制的步骤具体如下。</p>
+<p class="ziti">1）安装好要配置的从库的数据库，配置好log_bin和server_id参数。</p>
+<p class="ziti">2）无须配置主库my.cnf文件，主库的log_bin和server_id参数默认就是配置好的。</p>
+<p class="ziti">3）登录主库，增加从库连接主库同步的账户，例如rep，并授权replication slave同步的权限。</p>
+<p class="ziti">4）使用曾经在半夜通过mysqldump带“-x”和“<span class="yanse">--master-data=1”的命令及参数</span>
+ 定时备份的全备数据备份文件，把它恢复到从库。</p>
+<p class="ziti">5）在从库中执行“change master to...”语句，无须binlog文件及对应位置点。</p>
+<p class="ziti">6）从库开启同步开关，start slave。</p>
+<p class="ziti">7）在从库中执行“show slave status\G”，检查同步状态，并在主库中进行更新测试。</p>
+<p class="p6">2.无须熬夜，轻松部署MySQL主从复制</p>
+<p class="ziti">实战过程如下。</p>
+<p class="ziti">1）在主库上通过定时任务使其半夜执行如下所示的命令，备份并导出主库数据：</p>
+<hr/>
+<pre class="ziti1">mysqldump -A -B -x --master-data=1|gzip &gt;/opt/bak1_$(date +%F).sql.gz</pre>
+<hr/>
+<p class="ziti">“--master-data=1”参数会在备份数据里增加如下语句：</p>
+<hr/>
+<pre class="ziti1">-- Position to start replication or point-in-time recovery from
+CHANGE MASTER TO MASTER_LOG_FILE='oldboy-bin.000024', MASTER_LOG_POS=107;</pre>
+<hr/>
+<p class="ziti">2）白天找机会在需要做复制的从库上导入全备</p>
+<hr/>
+<pre class="ziti1">zcat /opt/bak1_$(date +%F).sql.gz|mysql
+mysql &lt;&lt; EOF
+CHANGE MASTER TO
+MASTER_HOST='172.16.1.51',
+MASTER_PORT=3306,
+MASTER_USER='rep',
+MASTER_PASSWORD='oldboy123';
+EOF
+提示：这里忽略了两个参数MASTER_LOG_FILE和MASTER_LOG_POS，这是因为在备份的时候使用了“--master-data=1”，在导入数据库时，这两个参数已经自动设置好了。</pre>
+<hr/>
+<p class="ziti">这里的CHANGE MASTER后面无须指定binlog文件名及具体位置，因为这部分已经在还原数据时提前应用到数据库里了（备份时使用“--master-data=1”的功劳）。</p>
+<p class="ziti">最后在从库上开启复制开关，检验成果：</p>
+<hr/>
+<pre class="ziti1">start slave;         #&lt;==开启主从复制开关。
+show slave status\G  #&lt;==查看主从复制状态。</pre>
+<hr/>
+</body>
+</html>

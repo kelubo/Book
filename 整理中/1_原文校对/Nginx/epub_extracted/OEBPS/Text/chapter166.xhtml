@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_179">9.2.1　ELK简介</h3> 
+ <p class="ziti3">ELK（Elasticsearch、Logstash、Kibana）是开源的实时日志收集分析解决方案。ELK访问逻辑如图9-1所示，是由Elasticsearch、Logstash、Kibana这三款软件和数据采集客户端（如Filebeat）等实现日志采集、储存、搜索分析等操作。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/9-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/9-1.jpg" class="calibre297"/></a> 
+ </div> 
+ <p class="middle-img">图9-1　ELK访问逻辑</p> 
+ <p class="ziti3">（1）Elasticsearch是一款用Java语言开发的，基于Lucene的开源搜索引擎，它提供了分布式多用户的全文搜索、分析、存储能力。Elasticsearch的常见关键词如表9-10所示。</p> 
+ <p class="middle-img">表9-10　Elasticsearch关键词</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b9-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b9-10.jpg" class="calibre298"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/270-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/270-i.jpg" class="calibre299"/></a> 
+ </div> 
+ <p class="ziti3">（2）Logstash是基于C/S架构，对日志进行收集、过滤、转发的日志收集引擎，它可以同时从多个源获取数据，动态地将客户端采集的数据进行分拣、过滤，并转发到不同存储服务器。Logstash是以pipeline方式处理每条日志信息的，在每个pipeline中都有输入（INPUTS）、过滤（FILTERS）、输出（OUTPUTS）3个处理动作。每个处理动作可由一个或多个插件实现复杂的功能。输入处理是获取日志数据；过滤处理可以对日志进行分拣、修改；输出处理则是将日志数据发送给目标存储服务器。Logstash工作原理如图9-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/9-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/9-2.jpg" class="calibre300"/></a> 
+ </div> 
+ <p class="middle-img">图9-2　Logstash原理</p> 
+ <p class="ziti3">（3）Kibana是Elasticsearch的Web管理工具，它提供了友好的界面化操作方式和统计分析的Dashboard工具，让使用者只需简单点击就可完成基本的数据搜索、分析等工作。</p> 
+ <p class="ziti3">（4）Filebeat隶属于Beats工具包，是负责文件数据采集的客户端工具。Filebeat由pro-spector和harvester两个主要组件组成。prospector目前只支持log文件和stdin两个输入类型，是harvester的管理进程，负责按照配置参数paths的内容查找日志文件，并为每个日志文件分配一个harvester。harvester负责实时读取单个日志文件，harvester将日志内容发送给底层的libbeat，libbeat将日志数据发送给配置文件中指定的输出目标。Filebeat工作原理如图9-3所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/9-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/9-3.jpg" class="calibre301"/></a> 
+ </div> 
+ <p class="middle-img">图9-3　Filebeat原理</p> 
+</body>
+</html>

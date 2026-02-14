@@ -1,0 +1,334 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="zh-CN">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h1 id="Aadb60019-5d19-44f3-9678-636e9b2bdd9a" class="calibre2">Arduino篇</h1> 
+ <p class="calibre3">第三章 Arduino介绍</p> 
+ <p class="calibre3">第四章 Arduino基本函数</p> 
+ <p class="calibre3">第五章 Arduino典型电机控制</p> 
+ <p class="calibre3">第六章 Arduino典型传感器使用</p> 
+ <p class="calibre3">第七章 Arduino无线通信</p> 
+ <p class="calibre3">第八章 Arduino Wi-Fi视频智能小车循迹避障机器人</p> 
+ <h2 id="A42d3001a-1fa5-4550-92be-074baad64174" class="calibre13">Chpater 3<br class="calibre8"/> 第三章 Arduino介绍</h2> 
+ <p class="calibre3">Arduino不仅是全球最流行的开源硬件之一，而且是一个优秀的硬件开发平台，更是硬件开发的趋势。Arduino简单的开发方式使得开发者更关注创意与实现，从而更快地完成自己的项目开发，大大节约了学习成本，缩短了开发周期。在这款便捷灵活、方便上手的开源电子原型平台中，包含了硬件（各种型号的Arduino板）和软件（Arduino IDE），适用于爱好者、艺术家、设计师和对“互动”有兴趣的朋友们。</p> 
+ <h3 id="Aedc185bf-c577-4628-947e-24576bbefcee" class="calibre14">3.1 Arduino开发板</h3> 
+ <p class="calibre3">使用Arduino之前，首先要选择一块Arduino开发板。Arduino目前有很多种类型的开发板，如图3-1所示，可以根据需要和开发板的参数进行选择。</p> 
+ <p class="calibre3">下面介绍几款最常用的开发板类型。</p> 
+ <h4 class="sigil_not_in_toc" id="A9a7f001a-6e4e-401c-b46c-10c085a2806f">3.1.1 Arduino UNO</h4> 
+ <p class="calibre3">Arduino UNO是Arduino开发最常用的开发板，是一款基于ATmega328的微控制器板。它有14个数字输入/输出引脚（其中6个可用作PWM输出，数字前面标识为～）、6个模拟输入、1个16MHz陶瓷谐振器、1个USB连接、1个电源插座、1个ICSP头和1个复位按钮。它包含支持微控制器所需的一切，只需通过USB电缆将其连至计算机或者通过AC-DC适配器或电池为其供电即可开始，如图3-2所示。</p> 
+ <p class="calibre3">使用Arduino UNO开发板时，在Arduino IDE的菜单栏中选择：“工具”＞“开发板”＞“Arduino/Genuino UNO”命令，如图3-3所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u17" src="../Images/28_01.jpg" width="1280" height="890"/> 
+  <p class="imgtitle">图3-1 Arduino开发板类型</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u18" src="../Images/28_02.jpg" width="820" height="573"/> 
+  <p class="imgtitle">图3-2 Arduino UNO开发板</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u19" src="../Images/28_03.jpg" width="866" height="792"/> 
+  <p class="imgtitle">图3-3 Arduino IDE使用Arduino UNO开发板</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A10df001b-097f-421c-b1e1-1806485a137f">3.1.2 Arduino Leonardo</h4> 
+ <p class="calibre3">Arduino Leonardo是集成了USB HID、基于ATmega32u4的开发板。它有20个数字输入/输出引脚（其中7个可用作PWM输出，12个作为模拟输入）、16MHz晶振，微型USB连接、ICSP接头和复位按钮。只需使用USB电缆将其连接到计算机，或使用AC-to-DC适配器或电池为其供电即可开始使用，如图3-4所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u20" src="../Images/29_01.jpg" width="963" height="661"/> 
+  <p class="imgtitle">图3-4 Arduino Leonardo开发板</p> 
+ </div> 
+ <p class="calibre3">Leonardo与先前所有开发板的不同之处在于：ATmega32 u4具有内置的USB通信，无须使用辅助处理器。这允许Leonardo作为鼠标和键盘出现在连接的计算机上，以及虚拟（CDC）串口或COM端口，适合使用模拟键盘、鼠标的应用中。</p> 
+ <p class="calibre3">使用Arduino Leonardo开发板时，在Arduino IDE的菜单栏中选择“工具”＞“开发板”＞“Arduino Leonardo”命令，如图3-5所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u21" src="../Images/29_02.jpg" width="985" height="870"/> 
+  <p class="imgtitle">图3-5 Arduino IDE使用Arduino Leonardo开发板</p> 
+ </div> 
+ <p class="calibre3">另外，“Arduino Leonardo ETH”是基于ATmega32U4和新版W5500 TCP/IP嵌入式以太网控制器的微控制器电路板。Leonardo ETH有20个数字输入/输出引脚（其中7个可用作PWM输出，12个用作模拟输入）、一个16MHz晶体振荡器、一个RJ45接口、一个微型USB连接器、一个电源插孔、一个ICSP头部，以及一个重置按钮。它含有为微控制器提供支持所需的功能，只需利用USB电缆将其连接到计算机，或通过AC-DC适配器或电池为其供电即可启动。因为ATmega32u4有内置的USB通信功能，不必配备外部USB-串口转换器。这使得Leonardo ETH在所连接的计算机上显示为鼠标和键盘——除虚拟（CDC）串行/COM端口之外。还有针对电路板行为的其他暗示。可选的以太网供电模块也可添加到Leonardo ETH电路板上。</p> 
+ <p class="calibre3">Leonardo ETH具有与以太网扩展板2同样的Wiznet以太网接口。板载microSD读卡器可用于存储文件，以便通过网络提供服务，该读卡器可通过SD库访问。引脚10为Wiznet接口预留，用于SD卡的SS在引脚4上。</p> 
+ <p class="calibre3">Arduino Leonardo ETH开发板如图3-6所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u22" src="../Images/30_01.jpg" width="786" height="677"/> 
+  <p class="imgtitle">图3-6 Arduino Leonardo ETH开发板</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Ad87a001d-8982-4bf2-a6c6-9b0e277f3c00">3.1.3 Arduino Mega 2560</h4> 
+ <p class="calibre3">Arduino Mega 2560适用于更复杂的项目设计，是基于ATmega2560的单片机开发板。该开发板有54个数字输入/输出引脚（其中15路可以用作PWM输出）、16路模拟输入、4个UART（硬件串口）、1个16MHz的晶振、1个USB接口、1个电源接头、ICSP接口及复位按钮。它包含单片机运行所需的所有要素，使用USB连接线将其连接到计算机，利用ACDC适配器或电池供电即可使用。Arduino Mega能与绝大部分为Genuino UNO设计的sheild兼容。</p> 
+ <p class="calibre3">Arduino Mega 2560开发板已成为大多数3D打印和机器人项目的选择，如图3-7所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u23" src="../Images/30_02.jpg" width="1190" height="586"/> 
+  <p class="imgtitle">图3-7 Arduino Mega 2560开发板</p> 
+ </div> 
+ <p class="calibre3">使用Arduino Mega开发板时，在Arduino IDE的菜单中选择“工具”＞“开发板”＞“Arduino Mega SDK”命令，如图3-8所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u24" src="../Images/31_01.jpg" width="954" height="833"/> 
+  <p class="imgtitle">图3-8 Arduino IDE使用Arduino Mega开发板</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Ab866001e-00ce-412d-9ba7-c200125ed8ae">3.1.4 英特尔<sup class="calibre15">®</sup>Galileo开发板和英特尔<sup class="calibre15">®</sup>Edison开发板</h4> 
+ <p class="calibre3">英特尔<sup class="calibre9">®</sup>Galileo是x86构架的Arduino开发板，同时具有英特尔技术的卓越性能，以及Arduino软件开发环境的易用性。这一可开发电路板支持Arduino软件库的开源Linux操作系统，可扩展性强，可重复使用现有软件库资源（名为“sketches”）。英特尔<sup class="calibre9">®</sup>Galileo开发板可以采用Mac OS、微软Windows和Linux主机操作系统进行编程，也可被设计成为与Arduino生态系统兼容的软硬件产品。</p> 
+ <p class="calibre3">为了超越Arduino生态系统，扩展其原生应用及能力，英特尔<sup class="calibre9">®</sup>Galileo电路板以标准化的方式，支持多种计算行业标准I/O接口，包括ACPI、PCI Express∗、10/100MB以太网、SD、USB 2.0设备，以及EHCI/OHCI USB主机端口、高速UART、RS-232串行端口、可编程8MB NOR闪存，以及可方便调试的JTAG端口。英特尔<sup class="calibre9">®</sup>Galileo基于通用开源工具链支持，将Arduino集成开发环境（IDE）的许多优势，与完整的、未经修改的Linux软件栈的广泛软件开发工具和先进能力相结合，汇集在一个平台之上。如图3-9所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u25" src="../Images/31_02.jpg" width="927" height="657"/> 
+  <p class="imgtitle">图3-9 英特尔<sup class="calibre16">®</sup>Galileo开发板</p> 
+ </div> 
+ <p class="calibre3">总的来说，英特尔<sup class="calibre9">®</sup>Galileo可开发电路板为快速开发简单交互式设计原型，诸如能响应社交媒体、或者能处理更复杂项目（从家用电器自动化，到用智能手机控制的真人大小机器人）的LED光显示等，提供了卓越工具。</p> 
+ <p class="calibre3">英特尔<sup class="calibre9">®</sup>Edison是一个微型的超低功耗开发平台，它的尺寸仅相当于一个SD卡，小到几乎可以被任何东西容纳。经过设计后它可以和大多数设备一起工作，其中包括计算机、手机或平板电脑，而且还包括椅子、咖啡机甚至咖啡杯。其用途的广泛性甚至超出了所有企业家和发明家的想象。如图3-10所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u26" src="../Images/32_01.jpg" width="960" height="683"/> 
+  <p class="imgtitle">图3-10 英特尔<sup class="calibre16">®</sup>Edison</p> 
+ </div> 
+ <p class="calibre3">英特尔<sup class="calibre9">®</sup>Edison综合了小尺寸、低功耗、强大功能等独特优势，这使其成为游戏规则的颠覆者，为数以千计富有远见的厂商降低了进入的门槛。搭载英特尔<sup class="calibre9">®</sup>Edison模块的设备可以通过高度定制和复杂的方式开展合作。这些设备在使用上并非一成不变，它们可以装载多种应用，而且这些应用的下载和安装方式类似于手机和平板电脑。</p> 
+ <p class="calibre3">入门者通过搭配使用英特尔Edison for Arduino开发板能够快速简便地将自己有趣的创意变成现实。资深的创客与企业还能无缝地将原型变成量产的成品。因此，只需一张小小的英特尔Edison开发板，便能完成从想法到产品的飞跃。</p> 
+ <p class="calibre3">英特尔Edison开发板具有以下特性：</p> 
+ <p class="calibre3">（1）英特尔<sup class="calibre9">®</sup>Edison开发板采用22纳米的英特尔SoC包括一颗双核双线程500MHz的英特尔Atom处理器，同时具备40个GIPO、1GB LPDDR3、4GB EMMC、双频Wi-Fi和蓝牙。</p> 
+ <p class="calibre3">（2）Edison初期支持Arduino和C/C++的编译。Node.js、Python、RTOS和可视化编程功能将会逐渐开放。</p> 
+ <p class="calibre3">（3）Edison包含设备之间和设备与云端通信的固件，能够支持多设备、云基设备、多用户、时间序列的分析服务。</p> 
+ <p class="calibre3">在Arduino IDE中不能直接使用英特尔<sup class="calibre9">®</sup>Galileo开发板和英特尔<sup class="calibre9">®</sup>Edison开发板，需要安装开发板的软件包，安装方法如下：</p> 
+ <p class="calibre3">（1）在Arduino IDE的菜单栏中选择“工具”＞“开发板”＞“开发板管理器”命令，如图3-11所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u27" src="../Images/32_02.jpg" width="953" height="825"/> 
+  <p class="imgtitle">图3-11 选择“开发板管理器”命令</p> 
+ </div> 
+ <p class="calibre3">（2）弹出如图3-12所示的对话框，最下面的两项即是。</p> 
+ <div class="center"> 
+  <img alt="" class="u28" src="../Images/33_01.jpg" width="1280" height="726"/> 
+  <p class="imgtitle">图3-12 “开发板管理器”对话框</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="Ae01a0020-7dd4-4bac-8a0c-4fbe03d9818e">3.1.5 Arduino Due</h4> 
+ <p class="calibre3">Arduino Due是一块基于Atmel SAM3X8E CPU的微控制器板。它是第一块基于32位ARM核心的Arduino。它有54个数字I/O口（其中12个可用于PWM输出）、12个模拟输入口、4路UART硬件串口、84MHz的时钟频率、一个USB OTG接口、两路DAC（模数转换）、两路TWI、一个电源插座、一个SPI接口、一个JTAG接口、一个复位按键和一个擦写按键，Arduino Due由于使用32位ARM核心的Due相较于以往的使用8位AVR核心的其他Arduino更强大。Arduino Due开发板如图3-13所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u29" src="../Images/33_02.jpg" width="1280" height="647"/> 
+  <p class="imgtitle">图3-13 Arduino Due开发板</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">注意</b>：不同于其他Arduino，Arduino Due的工作电压为3.3V，和后面介绍的树莓派的工作电压相同。I/O口可承载的电压也为3.3V。如果你使用更大的电压，比如5V到一个I/O口，可能会烧了芯片。</p> 
+ <p class="calibre3">使用Arduino Due开发板时，在Arduino IDE的菜单栏中选择“工具”＞“开发板”“Arduino Due”命令，如图3-14所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u30" src="../Images/34_01.jpg" width="764" height="948"/> 
+  <p class="imgtitle">图3-14 Arduino IDE使用Arduino Due开发板</p> 
+ </div> 
+ <h3 id="Af121615b-8c0b-4451-8426-0a59bd01a7f8" class="calibre14">3.2 Arduino扩展板</h3> 
+ <p class="calibre3">Arduino扩展板通常具有和Arduino开发板一样的引脚位置，可以堆叠接插到Arduino上，进而实现特定功能的扩展。在面包板上接插元件固然方便，但需要有一定的电子知识来搭建各种电路。而使用扩展板可以一定程度地简化电路搭建过程，更快速地搭建出你自己的项目，Arduino的扩展板目前种类繁多，下面介绍常用的几种。</p> 
+ <p class="calibre3"><b class="calibre6">1．传感器扩展板</b></p> 
+ <p class="calibre3">用于将各种传感器的接线口统一，例如DFRobot Arduino V7传感器扩展板，如图3-15所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u31" src="../Images/34_02.jpg" width="899" height="738"/> 
+  <p class="imgtitle">图3-15 传感器扩展板</p> 
+ </div> 
+ <p class="calibre3">DFRobot Arduino V7传感器扩展板为初学者省去烦琐的面包板接线和故障排除，专注实现自己的创意想法，具有如下特性：</p> 
+ <p class="calibre3">（1）把Arduino的端口扩展成3P接口，直插3P传感器模块，有14个数字口（6个PWM口）、6个模拟口。</p> 
+ <p class="calibre3">（2）丰富的通信和存储模块接口。中部直插Xbee封装的蓝牙、Wi-Fi和Xbee通信模块。旁边设置了普通蓝牙模块、APC和SD卡的扩展接口。</p> 
+ <p class="calibre3">（3）外部电源扩展，为Arduino提供长久续航。扩展板角落接线柱为主控制器和扩展板供电，中部接线柱为数字口上的舵机供电。</p> 
+ <p class="calibre3">（4）5.5V的时候提供3.3V的供电，兼容更多3.3V的元件。</p> 
+ <p class="calibre3">（5）传感器扩展板V7不断适应用户习惯，兼容Arduino的变化。</p> 
+ <p class="calibre3">（6）跳线切换5V与3.3V供电，适应Arduino旗下控制器不同的工作电压。DUE为3.3V，其他控制器为5V。</p> 
+ <p class="calibre3">（7）扩展板附带通信模块时，也能烧录程序。大家只需将开关拨到PROG即可，完成后拨回RUN。</p> 
+ <p class="calibre3">（8）添加1个I<sup class="calibre9">2</sup>C接口和1个3.3V电源输出。</p> 
+ <p class="calibre3">（9）更强易用性，不用说明书也能了解其功能。</p> 
+ <p class="calibre3">（10）每个端口都带有清楚的标识，让你一眼就辨别出它的功能。</p> 
+ <p class="calibre3">（11）数字和模拟端口采用不同的彩色排针。接口顺序和颜色兼容DFRobot所有传感器。</p> 
+ <p class="calibre3"><b class="calibre6">2．电机控制板</b></p> 
+ <p class="calibre3">Arduino开发板如果要控制电机，必须使用电机驱动板。例如，DFROBOT出品Arduino四路电机驱动板，如图3-16所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u32" src="../Images/35_01.jpg" width="772" height="655"/> 
+  <p class="imgtitle">图3-16 DFROBOT出品Arduino四路电机驱动板</p> 
+ </div> 
+ <p class="calibre3">DFRobot推出四路直流电机驱动扩展板，兼容5V/3.3V Arduino主控器，仅需要8个管脚，既可以同时控制4个直流电机，支持PWM调速和正反转控制。驱动板集成了两块TB6612FNG电机驱动芯片，相对于传统的L298N，效率提高了很多，体积也大幅度减少，在额定范围内，芯片基本不发热，单路高可输出1.2A持续电流，并且内置低压检测电路与热停机保护电路，安全可靠。适用于各类DIY制作。</p> 
+ <p class="calibre3"><b class="calibre6">3．无线通信扩展板</b></p> 
+ <p class="calibre3">实现与上位机和移动终端的通信。例如，DFRobot出品的Wi-Fi模块，如图3-17所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u33" src="../Images/35_02.jpg" width="806" height="621"/> 
+  <p class="imgtitle">图3-17 DFRobot出品Wi-Fi模块</p> 
+ </div> 
+ <p class="calibre3">基于WizFi210的Wi-Fi无线模块提供TTL电平串口到IEEE802.11b/g/n无线通信的桥接。IEEE802.11n是IEEE新批准的无线传输标准协议，具备更高传输速度、更广网络覆盖、更强兼容性、更加安全的特点。目前，许多无线电子设备厂商已经在大量产品中应用这一标准。如果想兼容更多新设备，Wizfi210是一个很好的方案。通过Wizfi210，任何具有TTL串口的设备都可以很容易地建立起无线网络，实现远程管理和控制。</p> 
+ <h3 id="A1a7e13fa-e5c7-449e-a1a4-948106479f6f" class="calibre14">3.3 Arduino开发环境</h3> 
+ <p class="calibre3">Arduino开发包含两个要素：Arduino开发板和Arduino集成开发环境。目前应用最多的Arduino开发环境为官方的免费Arduino IDE编程环境，官方网址为https：//www.arduino.cc，到本书撰写时最新的版本为1.8.4，支持Windows，MacOS和Linux操作系统。如果习惯微软的Visual Studio环境，也有Arduino for Microsoft Visual Studio的插件，网址http://www.visualmicro.com/，安装后可以在Visual Studio里面进行Arduino的开发。</p> 
+ <p class="calibre3">ArduBlock是一款为Arduino设计的图形化编程软件，ArduBlock是一个Arduino的扩展库，以图形化积木搭建的方式编程。</p> 
+ <p class="calibre3">Processing的最初目标是开发图形的sketchbook和环境，用来形象地教授计算机科学的基础知识。之后，它逐渐演变成了用于创建图形可视化专业项目的一种环境。如今，围绕它已经形成了一个专门的社区，致力于构建各种库以供用这种语言和环境进行动画、可视化、网络编程及很多其他的应用。</p> 
+ <p class="calibre3">下面分别进行介绍。</p> 
+ <h4 class="sigil_not_in_toc" id="A2f730023-93a9-4cc2-b9fa-cf050dad2364">3.3.1 Arduino IDE介绍</h4> 
+ <p class="calibre3">Arduino IDE的主页为https：//www.arduino.cc，支持Windows、Mac OS和Linux操作系统，最新版本为1.8.4。Windows平台又分为Windows安装包和Windows免安装ZIP包，如图3-18所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u34" src="../Images/36_01.jpg" width="1280" height="541"/> 
+  <p class="imgtitle">图3-18 Arduino IDE下载界面</p> 
+ </div> 
+ <p class="calibre3">下面以“Windows免安装ZIP包”为例说明使用过程。</p> 
+ <p class="calibre3">下载软件包arduino-1.8.4-windows.zip以后，解压，不需要安装，直接运行其中的arduino.exe文件即可，如图3-19所示。</p> 
+ <p class="calibre3">运行arduino.exe文件，启动Arduino IDE，界面如图3-20所示，开发环境非常简洁，包括菜单栏、图形化的工具栏、中间的编辑区域和底部的状态区域。</p> 
+ <div class="center"> 
+  <img alt="" class="u35" src="../Images/37_01.jpg" width="1147" height="913"/> 
+  <p class="imgtitle">图3-19 Arduino IDE目录</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u36" src="../Images/37_02.jpg" width="1189" height="1033"/> 
+  <p class="imgtitle">图3-20 Arduino IDE主界面</p> 
+ </div> 
+ <p class="calibre3">Arduino IDE界面的工具栏，从左至右依次为“编译”“下载”“新建”“打开”“保存”、“串口监视器（Serial Monitor）”和“新建标签”等按钮。</p> 
+ <p class="calibre3">Arduino开发板和运行Arduino IDE的PC是通过USB线连接的，如图3-21所示，因此首先需要安装USB变SERIAL的驱动。</p> 
+ <div class="center"> 
+  <img alt="" class="u37" src="../Images/38_01.jpg" width="831" height="408"/> 
+  <p class="imgtitle">图3-21 Arduino开发板和PC的连接</p> 
+ </div> 
+ <p class="calibre3">Arduino开发板的驱动文件大部分在Arduino IDE的drivers目录下，如果安装不成功，先确定Arduino开发板的USB变SERIAL驱动芯片，再下载相应的驱动程序，安装完成以后在设备管理器可以看到对应的串口号，如图3-22所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u38" src="../Images/38_02.jpg" width="1060" height="779"/> 
+  <p class="imgtitle">图3-22 在设备管理器查看对应的串口号</p> 
+ </div> 
+ <p class="calibre3">然后在Arduino IDE的主界面，选中菜单栏中的“工具”＞“端口”命令，接着选择串口号，如图3-23所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u39" src="../Images/38_03.jpg" width="795" height="759"/> 
+  <p class="imgtitle">图3-23 选择串口号</p> 
+ </div> 
+ <p class="calibre3">还需要选择开发板类型，方法是在Arduino IDE主界面的菜单栏中选择“工具”＞“开发板”命令。</p> 
+ <p class="calibre3">Arduino的程序组成必须有的两个函数是：</p> 
+ <div class="center">
+  <img alt="" class="u40" src="../Images/39_01.jpg" width="1280" height="305"/>
+ </div> 
+ <p class="calibre3">前一个函数放置初始化Arduino的程序，以及引脚的输出模式，在未执行后一个函数之前设置好相关参数。后一个是一个死循环，意思就是一直执行，除非断电。</p> 
+ <p class="calibre3">比如，Arduino UNO开发板13号引脚连接板上的LED灯，控制LED亮灭的Arduino的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u41" src="../Images/39_02.jpg" width="1280" height="392"/>
+ </div> 
+ <p class="calibre3">单击Arduino IDE中的“下载”按钮<img alt="" class="u42" src="../Images/39_03.jpg" width="59" height="62"/>下载到目标板，就可以看到LED灯的闪烁效果。</p> 
+ <h4 class="sigil_not_in_toc" id="A96f50026-ec47-4181-9efa-7f3afe580818">3.3.2 ArduBlock-Arduino的图形开发环境</h4> 
+ <p class="calibre3">ArduBlock中文版是一款开源的图形化编程工具，这款软件必须依附于Arduino IDE环境启动，ArduBlock是以图形化积木搭建的方式编程的，这样的方式会使编程的可视化和交互性加强，降低编程门槛，即使没有编程经验的人也可以尝试给Arduino控制器编写程序。</p> 
+ <div class="center"> 
+  <img alt="" class="u43" src="../Images/39_04.jpg" width="1201" height="307"/> 
+  <p class="imgtitle">图3-24 ArduBlock插件安装目录</p> 
+ </div> 
+ <p class="calibre3">然后启动Arduino IDE，在主界面选择“工具”＞“ArduBlock”命令（ArduBlock是安装ArduBlock插件出现的新菜单），弹出可视化编程窗口，如图3-25所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u44" src="../Images/40_01.jpg" width="1280" height="601"/> 
+  <p class="imgtitle">图3-25 ArduBlock图形化编程环境</p> 
+ </div> 
+ <p class="calibre3">例如，串口显示超声波测距的ArduBlock程序，如图3-26所示。单击“下载到Arduino”按钮可直接下载到Arduino开发板。</p> 
+ <div class="center"> 
+  <img alt="" class="u45" src="../Images/40_02.jpg" width="1280" height="557"/> 
+  <p class="imgtitle">图3-26 串口显示超声波测距的ArduBlock程序</p> 
+ </div> 
+ <h4 class="sigil_not_in_toc" id="A13380027-75cb-409c-9af7-8cd49abe5fab">3.3.3 Arduino使用外部库</h4> 
+ <p class="calibre3">Arduino IDE中已经集成了库管理功能，通过选择“项目”＞“加载库”＞“管理库”命令，如图3-27所示，就可以打开库管理器了。</p> 
+ <div class="center"> 
+  <img alt="" class="u46" src="../Images/40_03.jpg" width="857" height="482"/> 
+  <p class="imgtitle">图3-27 选择“管理库”命令</p> 
+ </div> 
+ <p class="calibre3">“库管理器”对话框如图3-28所示，在这里以安装DHT11库为例，搜索找到DHT11库，然后选择想要安装的库版本，然后单击“安装”按钮，开始安装。</p> 
+ <div class="center"> 
+  <img alt="" class="u47" src="../Images/41_01.jpg" width="1280" height="727"/> 
+  <p class="imgtitle">图3-28 “库管理器”对话栏</p> 
+ </div> 
+ <p class="calibre3">安装完成以后，在Arduino IDE中选择“文件”＞“首选项”命令，打开“首选项”对话框，在“项目文件夹位置”下的“libraries”目录下存放下载的文件，如图3-29所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u48" src="../Images/41_02.jpg" width="1280" height="212"/> 
+  <p class="imgtitle">图3-29 库下载位置</p> 
+ </div> 
+ <p class="calibre3">在Arduino IDE菜单栏中选择“文件”＞“示例”命令，可以看到新增加的“Simple DHT”命令，选择此命令即可打开DHT类库的示例程序，如图3-30所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u49" src="../Images/41_03.jpg" width="667" height="851"/> 
+  <p class="imgtitle">图3-30 增加的DHT示例</p> 
+ </div> 
+ <p class="calibre3">例如，选择“DHT11 Default”命令，示例代码及运行结果如图3-31所示（DHT11温湿度传感器的使用详见第六章）。</p> 
+ <div class="center"> 
+  <img alt="" class="u50" src="../Images/42_01.jpg" width="1280" height="1084"/> 
+  <p class="imgtitle">图3-31 DHT11Default示例代码及运行结果</p> 
+ </div> 
+ <p class="calibre3">在“库管理器”对话框中可以很方便地添加第三方库，但其中只提供了一些常用的库资源，如果需要添加更多的库资源或者自定义的库，就需要用户自己准备，找到或编写库。大部分开发者都喜欢将他们编写的Arduino库放到开源社区上分享。</p> 
+ <p class="calibre3">Github是全球最大的git服务提供商，也是最大的开源社区之一，很多常用的Arduino库，都可以通过Github找到。</p> 
+ <p class="calibre3">仍以SR04超声波传感器模块为例，可以在以下网址下载这个类库：http://clz.me/101-book/lib/sr04/，在该页面可以使用SR04的下载超链接，下载后，会得到一个名为SR04.zip的文件，使用这个库有两种方法。</p> 
+ <p class="calibre3"><b class="calibre6">方法1</b></p> 
+ <p class="calibre3">解压该文件，并将解压出的SR04文件夹放到Arduino IDE所在文件夹中的libraries文件夹内，例如arduino-1.8.4\libraries，如图3-32所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u51" src="../Images/42_02.jpg" width="698" height="739"/> 
+  <p class="imgtitle">图3-32 将SR04复制到库目录</p> 
+ </div> 
+ <p class="calibre3">libraries文件夹中存放的是Arduino的各种类库，将类库放入其中后，便可以在编写程序时调用这个库及使用示例代码。</p> 
+ <p class="calibre3"><b class="calibre6">需要注意的是</b>：库文件夹下要直接显示∗.cpp和∗.h文件，绝对不可以把这些库文件再套到二级以上目录，否则会导致IDE无法识别。</p> 
+ <p class="calibre3">打开Arduino IDE，可以在Arduino IDE的菜单中选择“文件”＞“示例”命令，可以看到新增加的“SR04”命令，如图3-33所示，选择此命令即可打开SR04类库的示例程序。</p> 
+ <div class="center"> 
+  <img alt="" class="u52" src="../Images/43_01.jpg" width="1070" height="1196"/> 
+  <p class="imgtitle">图3-33 SR04类库的示例菜单</p> 
+ </div> 
+ <p class="calibre3">SR04示例OutputDistance的代码如图3-34所示（SR04超声波传感器的使用详见第六章）。</p> 
+ <div class="center"> 
+  <img alt="" class="u53" src="../Images/43_02.jpg" width="1173" height="821"/> 
+  <p class="imgtitle">图3-34 OutputDistance的代码</p> 
+ </div> 
+ <p class="calibre3"><b class="calibre6">方法2</b></p> 
+ <p class="calibre3">在Arduino IDE的菜单中选择“项目”＞“加载库”＞“添加一个.zip库”命令，如图3-35所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u54" src="../Images/44_01.jpg" width="1012" height="841"/> 
+  <p class="imgtitle">图3-35 添加一个.zip库</p> 
+ </div> 
+ <p class="calibre3">将库文件加载到C：\Users\用户名\Documents\Arduino\libraries目录下，便可以在编写程序时调用这个库及使用示例代码。</p> 
+ <h3 id="Ae351f2aa-e91b-4e6a-8fc3-93ea0fa79201" class="calibre14">3.4 Processing介绍</h3> 
+ <p class="calibre3">Processing是一种计算机语言，以Java语法为基础，可转化成Java程序，不过在语法上简易许多。开放所有的原始代码及开发环境，主要用于艺术、影像、影音的设计与处理。</p> 
+ <p class="calibre3">Processing的程序代码是开放的，使用者可根据自己的需要自由裁剪出最合适的使用模式。Processing的应用千变万化，但都遵守开放源代码的规定，这样的设计大幅增加了整个社群的互动性与学习效率。</p> 
+ <p class="calibre3">Processing还可以结合Arduino、树莓派、pcduino、Beagleboard、MakeyMakey硬件，制作出非常多的互动作品。</p> 
+ <p class="calibre3">Processing可以在Windows、Mac OS及Linux等操作系统上使用。Processing软件的下载主页为https：//processing.org/，如图3-36所示，这里显示的版本是3.3.6。</p> 
+ <div class="center"> 
+  <img alt="" class="u55" src="../Images/44_02.jpg" width="1280" height="327"/> 
+  <p class="imgtitle">图3-36 Processing下载页面</p> 
+ </div> 
+ <p class="calibre3">下载软件包processing-3.3.6-windows32.zip以后，解压，不需要安装，直接运行其中的processing.exe文件即可，如图3-37所示。运行processing.exe文件，启动Processing，界面如图3-38所示，开发环境非常简洁，包括菜单栏、图形化的工具栏、中间的编辑区域和底部的状态区域。</p> 
+ <div class="center"> 
+  <img alt="" class="u56" src="../Images/45_01.jpg" width="888" height="531"/> 
+  <p class="imgtitle">图3-37 Processing目录</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u57" src="../Images/45_02.jpg" width="763" height="664"/> 
+  <p class="imgtitle">图3-38 Processing主界面</p> 
+ </div> 
+ <p class="calibre3">Processing应用程序至少包含两个函数：setup()和draw()。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/45_03.jpg" width="40" height="44"/>setup()函数在Processing执行程序时被执行一次，可以用来初始化一些指令。</p> 
+ <p class="calibre3"><img alt="" class="u58" src="../Images/45_04.jpg" width="40" height="44"/>draw()在Processing重绘画布时由Processing自动调用。</p> 
+ <p class="calibre3">Processing软件本身附带了许多例子，在其菜单栏中选择“文件”＞“范例程序”命令，打开例子窗口，如图3-39所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u59" src="../Images/45_05.jpg" width="1173" height="775"/> 
+  <p class="imgtitle">图3-39 Processing范例程序</p> 
+ </div> 
+ <p class="calibre3">例子RotatingArcs的运行结果如图3-40所示。在https：//www.openprocessing.org/网站每天都会有大家上传的作品，可以下载学习，如图3-41所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u60" src="../Images/46_01.jpg" width="722" height="563"/> 
+  <p class="imgtitle">图3-40 例子RotatingArcs的运行结果</p> 
+ </div> 
+ <div class="center"> 
+  <img alt="" class="u61" src="../Images/46_02.jpg" width="892" height="566"/> 
+  <p class="imgtitle">图3-41 https：//www.openprocessing.org/网站</p> 
+ </div> 
+ <p class="calibre3">Processing支持Android mode、Java mode、Python mode等好几个模式，前面使用的是默认的Java模式，Python也比较简单方便，在Processing右上角单击“Java”按钮，出现下拉菜单，选择“添加模式”命令，弹出模式选择窗口，如图3-42所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u62" src="../Images/46_03.jpg" width="1280" height="549"/> 
+  <p class="imgtitle">图3-42 Processing模式选择</p> 
+ </div> 
+ <p class="calibre3">现在选择Python模式，单击下方的“Install”按钮开始安装，如图3-43所示。</p> 
+ <div class="center"> 
+  <img alt="" class="u63" src="../Images/46_04.jpg" width="908" height="751"/> 
+  <p class="imgtitle">图3-43 Python模式安装</p> 
+ </div> 
+ <h3 id="A401e9be3-d5bd-434d-a44a-29198f30f026" class="calibre14">3.5 Arduino和Processing的交互</h3> 
+ <p class="calibre3">如果想让在计算机中设计的艺术作品与外部物理世界进行互动，让作品能与人和物产生“对话”，就需要使用传感器把外部环境的信息，采集到计算机中处理。要做到这一点，目前通常的方法是通过Arduino控制器把传感器数据，通过串口通信，读到上位机软件Processing里，然后通过处理，让Processing数位作品的某些特征与传感器数据产生关联。于是物理世界的环境数据发生变化时，也会使虚拟数字世界的作品随之互动，不断幻化出动态语义的奇妙画面。</p> 
+ <p class="calibre3">Arduino和Processing可以作为交互媒体艺术的两个主要部分，各自承担着不同的角色。</p> 
+ <p class="calibre3">作为一个交互作品，传感器是一个输入的感知器件，感知器件通过Arduino模块将各种物理量变换成数据传给计算机，计算机再去处理各类事件，形成交互过程。传感器+Arduino可以说是交互系统的“输入”端。</p> 
+ <p class="calibre3">Processing在交互系统中充当“表达”角色，Processing起源于数据可视化，经过进化加入了很多多媒体处理能力，因此它不仅可以用图形来表达，也可以用处理视频、声音来表达。因此在交互系统中，Processing的角色是“信号处理”和“输出”。</p> 
+ <p class="calibre3">传感器+Arduino+Processing+投影+音箱可以构成一个完整的媒体交互艺术的系统。</p> 
+ <p class="calibre3">下面是一个简单的测试程序。</p> 
+ <p class="calibre3">Arduino部分的代码如下：</p> 
+ <div class="center">
+  <img alt="" class="u64" src="../Images/47_01.jpg" width="1280" height="382"/>
+ </div> 
+ <p class="calibre3">Processing程序部分：</p> 
+ <div class="center">
+  <img alt="" class="u65" src="../Images/47_02.jpg" width="1280" height="515"/>
+ </div> 
+ <div class="center">
+  <img alt="" class="u66" src="../Images/48_01.jpg" width="1280" height="101"/>
+ </div> 
+ <p class="calibre3">从Processing下面的小黑窗中可以看到收到的数据是否正确。</p> 
+ <p class="calibre3">假设Arduino的<i class="calibre17">x</i>=0或<i class="calibre17">x</i>=1可以看成仿真开关情况，收到的数据“0”或“1”可以模仿开关的“开”或“关”。</p> 
+ <p class="calibre3">需要注意以下事项：</p> 
+ <p class="calibre3">（1）Arduino调试程序使用的是Serial.print()和Serial.println()语句，联合使用Arduino和Processing要改为Serial.write()语句。Serial.print()和Serial.write()不要同时使用。</p> 
+ <p class="calibre3">（2）在Processing上输入简单的测试程序，需要注意使用同样的COM口和同样的波特率。</p> 
+ <h3 id="A8b2dd5fe-ade2-4147-8339-fb3957e24bde" class="calibre14">3.6 本章小结</h3> 
+ <p class="calibre3">进行Arduino开发需要准备两部分：Arduino开发板和Arduino开发环境，本章主要介绍这两部分，为后面介绍Arduino开发做好准备。</p> 
+</body>
+</html>

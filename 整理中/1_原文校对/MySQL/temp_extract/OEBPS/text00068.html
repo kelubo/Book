@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.8　启动MySQL多实例数据库</h3>
+<p class="ziti">下面来看看启动MySQL多实例数据库的命令，启动前要做一些准备工作，否则数据库可能无法正常启动。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# mkdir -p /application/mysql-5.6.40/tmp
+#&lt;==编译时指定的socket路径。
+[root@oldboy scripts]# chown -R mysql.mysql /application/mysql/</pre>
+<hr/>
+<p class="ziti">如果按照第3章的内容安装了单实例数据库，则需要先停止之前启动的数据库。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop
+Shutting down MySQL.... SUCCESS!
+[root@oldboy ~]# chkconfig mysqld off
+[root@oldboy ~]# chkconfig --list mysqld
+mysqld               0:off      1:off      2:off      3:off      4:off      5:off      6:off</pre>
+<hr/>
+<p class="ziti">第一个实例3306的启动命令为：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# /data/3306/mysql start
+Starting MySQL...</pre>
+<hr/>
+<p class="ziti">第二个实例3307的启动命令为：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# /data/3307/mysql start
+Starting MySQL...</pre>
+<hr/>
+<p class="ziti">现在，检查MySQL多实例数据库是否启动成功：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# netstat -lntup|grep 330
+tcp        0      0 :::3306        :::*           LISTEN     48065/mysqld
+tcp        0      0 :::3307        :::*           LISTEN     50011/mysqld</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">特别强调：</span>
+ 因为第3章讲解过MySQL单实例，因此读者在实践第4章的内容时，最好将第3章的环境通过虚拟机还原到安装前的状态，否则可能会造成原来的进程处于启动状态，从而引发与多实例启动的冲突，老男孩的处理方法为，停止原来的单实例3306库，暂不使用。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# /etc/init.d/mysqld stop
+Shutting down MySQL.. SUCCESS!
+[root@oldboy scripts]# netstat -lntup|grep 330
+[root@oldboy scripts]# chkconfig mysqld off
+[root@oldboy scripts]# chkconfig --list mysqld
+mysqld               0:off       1:off       2:off      3:off       4:off      5:off       6:off</pre>
+<hr/>
+<p class="ziti">根据输出可以看到，3306和3307实例均已正常启动。</p>
+</body>
+</html>

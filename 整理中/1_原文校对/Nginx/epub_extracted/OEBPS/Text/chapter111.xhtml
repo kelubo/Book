@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_122">6.1.5　反向代理的真实客户端IP</h3> 
+ <p class="ziti3">客户端在访问互联网应用服务器时，与真实的应用服务器之间会因为有多层反向代理，而导致真实应用服务器获取的仅是最近一层的反向代理服务器IP。为使Nginx后端的上游服务器可以获得真实客户端IP，Nginx提供了ngx_http_realip_module模块用以实现真实客户端IP的获取及传递的功能。通过该模块提供的配置指令，用户可以手动设置上层反向代理服务器的IP作为授信IP，Nginx服务器根据配置指令的配置排除授信IP，而甄别出真实的客户端IP进行日志记录，并传递给上游服务器。模块配置指令如表6-3所示。</p> 
+ <p class="middle-img">表6-3　真实客户端IP模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b6-3.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b6-3.jpg" class="calibre31"/></a> 
+ </div> 
+ <p class="ziti3">该模块指令使用的指令域范围为http、server、location。配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen       8088;
+    access_log  logs/proxy.access.log  main;
+    
+    set_real_ip_from 192.168.2.159;   # 设置192.168.2.159为授信IP
+    real_ip_header X-Forwarded-For;   # 通过HTTP头字段X-Forwarded-For获取真实客户端IP
+    real_ip_recursive on;             # 以最后一个非授信IP为真实客户端IP
+    
+    tcp_nodelay off;                  # 因启用缓冲区功能，所以关闭立刻发送功能
+
+    location ~ ^/ {
+        proxy_force_ranges on;        # 强制启用字节范围请求支持
+        proxy_pass   http://192.168.2.145:8082;
+        break;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

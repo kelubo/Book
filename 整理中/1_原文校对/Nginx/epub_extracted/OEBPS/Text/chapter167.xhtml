@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_180">9.2.2　ELK安装</h3> 
+ <p class="ziti3">ELK支持多种安装方式，鉴于Docker化部署的便捷性，本小节以基于docker-compose脚本的Docker化来部署ELK环境，部署示意如图9-4所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/9-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/9-4.jpg" class="calibre302"/></a> 
+ </div> 
+ <p class="middle-img">图9-4　ELK部署示意</p> 
+ <p class="ziti3">（1）初始化系统环境</p> 
+ <p class="ziti3">首先要初始化系统环境并安装Docker应用。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 安装yum工具
+yum install -y yum-utils
+# 安装Docker官方yum源
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+# 安装docker及docker-compose应用
+yum install -y docker-ce docker-compose
+# 设置docker服务开机自启动
+systemctl enable docker
+# 启动docker服务
+systemctl start docker
+
+# 优化内核参数，设置一个进程拥有VMA（虚拟内存区域）的最大数量为262144
+sysctl -w vm.max_map_count=262144
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）编写docker-compose文件</p> 
+ <p class="ziti3">使用docker-compose工具进行ELK容器运行编排。docker-compose文件如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cat elk.yaml
+
+version: '2'
+services:
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.0.1
+        container_name: elasticsearch701
+        environment:
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+            hard: -1
+        hostname: elasticsearch
+        restart: always
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.0.1
+        container_name: kibana701
+        hostname: kibana
+        depends_on:
+            - elasticsearch
+        restart: always
+        ports:
+            - "5601:5601"
+    logstash:
+        image: docker.elastic.co/logstash/logstash:7.0.1
+        container_name: logstash701
+        hostname: logstash
+        restart: always
+        depends_on:
+            - elasticsearch
+        ports:
+            - "5044:5044"
+
+# 运行ELK容器
+docker-compose -felk.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">docker-compose是功能非常强的容器运行编排工具，内部含有很多配置指令可以完成容器的资源配置、运行、服务依赖、网络配置等运行时的编排配置，具体指令说明可参照docker-compose的官方文档。</p> 
+ <p class="ziti3">（3）数据持久化</p> 
+ <p class="ziti3">Docker的镜像（Image）文件存放在一个只读层，而容器（Container）的文件则是存放在可写层，当容器删除或重建时，该容器运行时变更的文件将会丢失，所以需要通过外挂卷的方式将变更的配置和文件保存到主机系统中。ELK容器有Elasticsearch、Logstash和Kibana 3个容器，这3个容器都需要实现数据持久化。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cd /opt/data/apps
+# 创建容器外挂卷目录及数据存储目录
+mkdir -p {elasticsearch/data,elasticsearch/config,elasticsearch/modules,elastic-search/plugins,kibana/config,logstash/pipeline,logstash/config}
+
+# 复制容器数据到数据存储目录
+docker cp elasticsearch701:/usr/share/elasticsearch/data elasticsearch
+docker cp elasticsearch701:/usr/share/elasticsearch/config elasticsearch
+docker cp elasticsearch701:/usr/share/elasticsearch/modules elasticsearch
+docker cp elasticsearch701:/usr/share/elasticsearch/plugins elasticsearch
+docker cp logstash701:/usr/share/logstash/config logstash
+docker cp logstash701:/usr/share/logstash/pipeline logstash
+docker cp kibana701:/usr/share/kibana/config kibana
+
+# Logstash配置
+
+cat&gt;logstash/pipeline/logstash.conf&lt;&lt;EOF
+input {
+    beats {
+        port =&gt; 5044
+        codec =&gt;"json"
+    }
+}
+output {
+    elasticsearch {
+        hosts =&gt; ["http://10.10.4.37:9200"]
+        index =&gt; "logstash-nginx-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+    }
+}
+EOF
+
+# 配置目录权限
+chown -R 1000:1000 elasticsearch/*
+chown -R 1000:1000 logstash/*
+
+# 配置docker-compose脚本，挂载数据存储目录
+
+cat elk.yaml
+
+version: '2'
+services:
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.0.1
+        container_name: elasticsearch701
+        environment:
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+            - /opt/data/apps/elasticsearch/modules:/usr/share/elasticsearch/modules
+            - /opt/data/apps/elasticsearch/plugins:/usr/share/elasticsearch/plugins
+            - /opt/data/apps/elasticsearch/data:/usr/share/elasticsearch/data
+            - /opt/data/apps/elasticsearch/config:/usr/share/elasticsearch/config
+        hostname: elasticsearch
+        restart: always
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.0.1
+        container_name: kibana701
+        hostname: kibana
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+            - /opt/data/apps/kibana/config:/usr/share/kibana/config
+        depends_on:
+            - elasticsearch
+        restart: always
+        ports:
+            - "5601:5601"
+    logstash:
+        image: docker.elastic.co/logstash/logstash:7.0.1
+        container_name: logstash701
+        hostname: logstash
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+            - /opt/data/apps/logstash/pipeline:/usr/share/logstash/pipeline
+            - /opt/data/apps/logstash/config:/usr/share/logstash/config
+        restart: always
+        depends_on:
+            - elasticsearch
+        ports:
+            - "5044:5044"
+
+# 运行ELK容器
+
+docker-compose -f elk.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）Nginx配置</p> 
+ <p class="ziti3">在运行Nginx的主机上把Nginx日志定义为json格式，编辑nginx.conf文件并在http指令域添加如下指令：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">log_format json '{"@timestamp": "$time_iso8601", '
+                '"connection": "$connection", '
+                '"remote_addr": "$remote_addr", '
+                '"remote_user": "$remote_user", '
+                '"request_method": "$request_method", '
+                '"request_uri": "$request_uri", '
+                '"server_protocol": "$server_protocol", '
+                '"status": "$status", '
+                '"body_bytes_sent": "$body_bytes_sent", '
+                '"http_referer": "$http_referer", '
+                '"http_user_agent": "$http_user_agent", '
+                '"http_x_forwarded_for": "$http_x_forwarded_for", '
+                '"request_time": "$request_time"}';
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（5）Filebeat安装</p> 
+ <p class="ziti3">在Nginx服务器安装Filebeat进行Nginx日志采集。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 安装Filebeat
+rpm -ivh https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.0.1 -x86_64.rpm
+
+# 设置输出数据到Logstash及Logstash地址
+sed -i "s/#output.logstash:/output.logstash:/g" /etc/filebeat/filebeat.yml
+sed -i "s/#hosts: \[\"localhost:5044\"\]/  hosts: \[\"10\.10\.4\.37:5044\"\]/g" /etc/filebeat/filebeat.yml
+
+# 关闭直接输出数据到Elasticsearch
+sed -i "s/output.elasticsearch/#output.elasticsearch/g" /etc/filebeat/filebeat.yml
+sed -i "s/hosts: \[\"localhost:9200\"\]/#hosts: \[\"localhost:9200\"\]/g" /etc/filebeat/filebeat.yml
+
+# 安装Filebeat Nginx模块
+filebeat modules enable nginx
+
+# 配置Filebeat Nginx模块
+cat &gt;/etc/filebeat/modules.d/nginx.yml&lt;&lt;EOF
+- module: nginx
+    access:
+        enabled: true
+        var.paths: ["/usr/local/nginx/logs/*access.log"]
+    error:
+        enabled: true
+        var.paths: ["/usr/local/nginx/logs/*error.log"]
+EOF
+
+# 检查配置
+filebeat test config
+filebeat test output
+
+# 启动Filebeat
+systemctl restart filebeat
+
+# 设置为自启动
+systemctl enable filebeat
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（6）Kibana展示</p> 
+ <p class="ziti3">在浏览器中打开<a href="http://10.10.4.37:5601" class="pcalibre calibre1">http://10.10.4.37:5601</a>，在右侧菜单栏中选择management→index_patterns→Create index pattern，然后输入logstash-nginx-*，接着点击Next Step添加Nginx日志索引。在左侧菜单栏中点击Discover选择logstash-nginx-就可以实时查看Nginx输出的访问或错误日志了。</p> 
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">1.4　常用非关系型数据库产品介绍</h2>
+<h3 class="p3">
+<a id="b1">1.4.1　Memcached(key-value)</a>
+</h3>
+<div class="pic"><img alt="" src="Image00010.jpg" />
+</div>
+<p class="ziti">Memcached是一个开源的、支持高性能、高并发的分布式内存缓存系统，由C语言编写，总共2000多行代码。从软件名称上看，前3个字符“Mem”就是内存的意思，而接下来的5个字符“Cache”就是缓存的意思，最后一个字符d，是daemon的意思，代表是服务端守护进程模式服务。</p>
+<p class="ziti">Memcached服务分为服务端和客户端两部分，其中，服务端软件的名字形如Memcached-1.4.24.tar.gz，客户端软件的名字形如Memcached-2.25.tar.gz。</p>
+<p class="ziti">Memcached软件诞生于2003年，最初由LiveJournal的Brad Fitzpatrick开发完成。Memcache是整个项目的名称，而Memcached是服务器端的主程序名，因其协议简单，应用部署方便且支持高并发，因此广泛应用于互联网企业，直到现在仍然如此。其官方网站地址为：<a href="http://memcached.org/">http://memcached.org/</a>
+ 。</p>
+<p class="ziti">缓存一般用于保存一些经常被存取的对象或数据（例如，浏览器会把经常访问的网页缓存起来），通过缓存来存取对象或数据要比在磁盘上存取快很多，因为前者使用的是内存，后者使用的是磁盘。Memcached是一种纯内存缓存系统，把经常存取的对象或数据缓存在Memcached的内存中，程序通过API的方式存取这些被缓存的数据，Memcached里面的数据就像一张巨大的HASH表，数据以key-value对的方式存在。Memcached通过缓存经常被存取的对象或数据，从而减轻频繁读取数据库的压力，提高网站的响应速度，构建出速度更快的可扩展的Web应用。</p>
+<p class="ziti">由于Memcached为纯内存缓存软件，一旦重启，所有的数据都会丢失，因此，新浪网基于Memcached开发了一个开源项目Memcachedb。通过为Memcached增加Berkeley DB的持久化存储机制和异步主辅复制机制，使Memcached具备了事务恢复能力、持久化数据存储能力和分布式复制能力，Memcachedb非常适合需要超高性能读写速度、持久化保存的应用场景，但是最近几年其正逐渐被其他的持久化产品所替代，例如redis。</p>
+<p class="ziti">
+<span class="yanse">有关Memcached的知识小结</span>
+</p>
+<p class="ziti6">1）Memcached为key-value型数据库。</p>
+<p class="ziti6">2）Memcached为纯内存数据库。</p>
+<p class="ziti6">3）Memcached相关持久化产品Memcachedb、Tokyo Cabinet\Tokyo Tyrant(ttserver)。</p>
+<p class="ziti6">4）Memcached企业级讲解见《跟老男孩学Linux运维：Web集群实战》<sup>
+<a id="ch1" href="text00014.html#ch1_back">[1]</a>
+</sup>
+ 第13章。</p>
+<p class="fnote">
+<a id="ch1_back" href="text00014.html#ch1">[1]</a>
+ 该书已由机械工业出版社出版，书号为ISBN978-7-111-52983-5。——编辑注</p>
+</body>
+</html>

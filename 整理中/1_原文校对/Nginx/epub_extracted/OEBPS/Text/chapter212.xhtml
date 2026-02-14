@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_227">12.2.3　安装部署</h3> 
+ <p class="ziti3">Helm是一个非常方便的Kubernetes应用部署工具，支持Nginx Ingress的快速部署和卸载。通过Helm可快速将Nginx Ingress部署在Kubernetes集群中，Helm中Nginx Ingress的1.19.1版本Chart部分参数如表12-4所示。</p> 
+ <p class="middle-img">表12-4　部署参数</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b12-4.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b12-4.jpg" class="calibre354"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/379-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/379-i.jpg" class="calibre355"/></a> 
+ </div> 
+ <p class="ziti3">Nginx Ingress的默认部署方式是Deployment，只会部署一个副本，Service对外发布类型是LoadBalancer，安装参数如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">helm install --name nginx-ingress stable/nginx-ingress --set rbac.create=true
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·Helm安装的应用名称为nginx-ingress。</p> 
+ <p class="ziti4">·rbac.create参数用以为nginx-ingress创建RBAC资源，获取与接口服务的访问授权。</p> 
+ <p class="ziti3"><span class="yanse">1.Nginx Ingress部署</span></p> 
+ <p class="ziti3">Nginx Ingress以Pod形式运行在Kubernetes集群中，用户可根据Kubernetes的网络通信特点以及实际场景选择灵活的部署方式进行Nginx Ingress的部署，此处分别以基于资源对象Service的NodePort方式和Pod的hostNetwork方式举例介绍。</p> 
+ <p class="ziti3">（1）Service的NodePort方式</p> 
+ <p class="ziti3">以NodePort类型部署Nginx Ingress，需要使用参数进行指定controller.service.type为NodePort。为便于管理，可以为Nginx Ingress创建单独使用的命名空间nginx-ingress，部署拓扑如图12-9所示。</p> 
+ <p class="ziti3">部署命令如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 安装nginx-ingress
+helm install --name nginx-ingress \
+             --namespace nginx-ingress \
+             stable/nginx-ingress \
+             --set "rbac.create=true,controller.autoscaling.enabled=true,controller. autoscaling.minReplicas=2,controller.service.type=NodePort,con-troller.service.externalTrafficPolicy=Local"
+
+# 也可以在创建后调整副本数
+kubectl scale --replicas=3 deployment/nginx-ingress
+</pre> 
+ <hr class="calibre6"/> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-9.jpg" class="calibre356"/></a> 
+ </div> 
+ <p class="middle-img">图12-9　NodePort方式</p> 
+ <p class="ziti4">·Helm安装的应用名称为nginx-ingress，命名空间为nginx-ingress。</p> 
+ <p class="ziti4">·以默认的Deployment方式部署，设置Pod副本数为2，并以Service的NodePort方式对外发布服务，设置流量调度策略为Local。</p> 
+ <p class="ziti4">·Kubernetes将为nginx-ingress Service随机创建范围在30000～32767之间的Node-Port端口。</p> 
+ <p class="ziti4">·用户将Kubernetes中节点IP和NodePort手动添加到传输层负载均衡中的虚拟服务器集群中。</p> 
+ <p class="ziti4">·外部请求发送到传输层负载均衡虚拟服务器，传输层负载将请求数据转发到Kubernetes集群节点的NodePort。</p> 
+ <p class="ziti4">·NodePort类型的Service将请求负载到对应的Nginx Pod。</p> 
+ <p class="ziti4">·Nginx将用户请求进行应用层负载转发到配置的应用Pod。</p> 
+ <p class="ziti4">·在该部署方式下，Nginx Pod需要使用Local的流量调度策略，获取客户端的真实IP。</p> 
+ <p class="ziti3">（2）Pod的hostNetwork方式</p> 
+ <p class="ziti3">主机网络（hostNetwork）方式可以使Pod与宿主机共享网络命名空间，外网传输效率最高。因Pod直接暴露外网，虽然存在一定的安全问题，但不存在客户端源IP隐藏的问题，部署拓扑如图12-10所示。</p> 
+ <p class="ziti3">部署命令如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 以Deployment方式部署
+helm install --name nginx-ingress \
+             --namespace nginx-ingress \
+             stable/nginx-ingress \
+             --set "rbac.create=true,controller.service.type=ClusterIP,controller. hostNetwork=true"
+</pre> 
+ <hr class="calibre6"/> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-10.jpg" class="calibre357"/></a> 
+ </div> 
+ <p class="middle-img">图12-10　hostNetwork方式</p> 
+ <p class="ziti4">·Deployment方式部署时，Nginx Ingress的Service设置类型为ClusterIP，仅提供内部服务端口。</p> 
+ <p class="ziti4">·用户将Kubernetes中节点IP及80、443端口手动添加到传输层负载均衡中的虚拟服务器集群中。</p> 
+ <p class="ziti4">·用户请求经传输层负载均衡设备转发到Nginx，Nginx将用户请求负载到Kubernetes集群内的Pod应用。</p> 
+ <p class="ziti3">也可以使用DaemonSet部署方式，在集群中的每个节点自动创建并运行一个Nginx Ingress Pod，实现Nginx Ingress的自动扩展。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 以DaemonSet方式部署nginx-ingress并成为集群唯一入口
+helm install --name nginx-ingress \
+             --namespace nginx-ingress \
+             stable/nginx-ingress \
+             --set "rbac.create=true,controller.kind=DaemonSet,controller.service.type=ClusterIP,controller.hostNetwork=true"
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）SSL终止（SSL Termination）和SSL透传（SSL Passthrough）</p> 
+ <p class="ziti3">SSL终止模式下，客户端的TLS数据会在代理服务器Nginx中解密，解密的数据由代理服务器直接或再次TLS加密后传递给被代理服务器，这种模式下，相对增加代理服务器的计算负担，但方便了SSL证书的统一管理。</p> 
+ <p class="ziti3">SSL透传模式下，Nginx不会对客户端的HTTPS请求进行解密，加密的请求会被直接转发到后端的被代理服务器，这种方式常被应用到后端的HTTPS服务器需要对客户端进行客户端证书验证的场景，相对也会降低Nginx对TLS证书加解密的负担。由于请求数据是保持加密传输的，HTTP消息头将无法修改，所以消息头字段X-forwarded-*的客户端IP无法被添加。Nginx Ingress默认部署方式没有开启SSL透传的支持，需要在部署时使用参数--enable-ssl-passthrough进行开启。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 修改部署资源对象nginx-ingress-controller
+kubectl edit Deployment/nginx-ingress-controller -n nginx-ingress
+
+# 在规范部分添加容器启动参数--enable-ssl-passthrough
+    spec:
+        containers:
+        - args:
+          - /nginx-ingress-controller
+          - --default-backend-service=nginx-ingress/nginx-ingress-default-backend
+          - --election-id=ingress-controller-leader
+          - --ingress-class=nginx
+          - --configmap=nginx-ingress/nginx-ingress-controller
+          - --enable-ssl-passthrough
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）卸载Nginx Ingress</p> 
+ <p class="ziti3">Nginx的配置是以资源对象ConfigMap和Ingress方式存储在etcd服务中的，所以即便删除或重新部署Nginx Ingress也不会影响之前的配置。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">helm delete --purge nginx-ingress
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">2.管理工具</span></p> 
+ <p class="ziti3">Nginx Ingress提供了基于kubectl工具的管理插件ingress-nginx，用于Nginx Ingress的日常维护。插件ingress-nginx安装方法如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 安装插件ingress-nginx
+kubectl krew install ingress-nginx
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">常见命令参数如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 显示所有的Ingress实例摘要
+kubectl ingress-nginx ingresses
+
+# 查看所有的后端Service配置
+kubectl ingress-nginx backends -n nginx-ingress
+
+# 查看Nginx的所有配置
+kubectl ingress-nginx conf -n nginx-ingress
+
+# 查看指定主机名的Nginx配置
+kubectl ingress-nginx conf -n nginx-ingress --host auth.nginxbar.org
+
+# 查看Nginx服务器的配置目录
+kubectl ingress-nginx exec -i -n nginx-ingress -- ls /etc/nginx
+
+# 查看Nginx服务器的日志
+kubectl ingress-nginx logs -n nginx-ingress
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

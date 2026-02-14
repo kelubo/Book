@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">13.4.7　系统（共享）表空间</h3>
+<p class="ziti">InnoDB的系统表空间可用来存放表和索引数据，同时也是doublewriter缓存、change缓存和回滚日志的存储空间，系统表空间是被多个表共享的表空间。</p>
+<p class="ziti">默认情况下，系统表空间只有一个系统数据文件，名为ibdata1。系统数据文件的位置和个数均由参数innodb_data_file_path来决定。InnoDB表与表空间文件依赖如图13-11所示。</p>
+<div class="pic"><img alt="" src="Image00099.jpg" />
+</div>
+<p class="middle-img">图13-11　InnoDB表与表空间文件依赖</p>
+<p class="p6">1.系统表空间数据文件配置</p>
+<p class="ziti">可以通过innodb_data_file_path和innodb_data_home_dir来配置系统表空间数据文件。</p>
+<p class="ziti">Innodb_data_file_path可以包含一个或多个数据文件，中间用“；”分开：</p>
+<hr/>
+<pre class="ziti1">innodb_data_file_path=datafile_spec1[;datafile_spec2]...
+datafile_spec1 = file_name:file_size[:autoextend[:max:max_file_size]]</pre>
+<hr/>
+<p class="ziti">其中autoextend和max选项只能用作最后的这个数据文件。Autoextend在默认情况下是一次增加64MB，如果要修改此值，可通过innodb_autoextend_increment参数。Max用来指定可扩展数据文件的最大容量以避免数据文件大小超过可用磁盘空间的大小。</p>
+<p class="ziti">举例如下：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_data_file_path=ibdata1:50M;ibdata2:50M:autoextend</pre>
+<hr/>
+<p class="ziti">上述语句表示指定ibdata1和ibdata2两个数据文件，其中ibdata1文件为固定的50MB大小，而ibdata2文件则是初始化为50MB并可自动扩展容量。</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_data_file_path=ibdata1:12M:autoextend:max:500M</pre>
+<hr/>
+<p class="ziti">上述语句表示指定ibdata1一个数据文件，ibdata文件初始化为12MB，并可自动扩展容量到500MB。</p>
+<p class="ziti">innodb_data_home_dir参数用于显示指定数据文件的存储目录，默认是MySQL安装后的数据文件目录，举例如下：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_data_home_dir = /path/to/myibdata/
+innodb_data_file_path=ibdata1:50M;ibdata2:50M:autoextend</pre>
+<hr/>
+<p class="ziti">当然也可以在innodb_data_file_path中指定绝对路径的数据文件：</p>
+<hr/>
+<pre class="ziti1">[mysqld]
+innodb_data_home_dir =
+innodb_data_file_path=/path/to/myibdata/ibdata1:50M;/path/to/myibdata/ibdata2:
+50M:autoextend</pre>
+<hr/>
+<p class="p6">2.重置InnoDB系统表空间</p>
+<p class="ziti">最简单的增加系统表空间的办法就是在初始化阶段配置数据文件的自增长，配置最后一个文件的autoextend属性，当数据文件空间不足时默认自动增长64MB大小。也可以通过修改innodb_autoextend_increment参数来修改自动增长的大小。</p>
+<p class="ziti">还可以通过增加另一个数据文件方法来扩展表空间，具体步骤如下。</p>
+<p class="ziti">1）关闭MySQL。</p>
+<p class="ziti">2）检查配置的最后一个数据文件是否为autoextend，如果是则根据当前数据文件的大小去掉自动扩展属性，改成当前大小。</p>
+<p class="ziti">3）在配置文件的innodb_data_file_path参数里增加一个新的数据文件，选择是否自动扩展。</p>
+<p class="ziti">4）启动MySQL。</p>
+<p class="ziti">代码如下：</p>
+<hr/>
+<pre class="ziti1">innodb_data_home_dir =
+innodb_data_file_path = /ibdata/ibdata1:10M:autoextend
+####改成
+innodb_data_home_dir =
+innodb_data_file_path = /ibdata/ibdata1:988M;/disk2/ibdata2:50M:autoextend</pre>
+<hr/>
+<p class="ziti">减小系统表空间大小的方法具体如下。</p>
+<p class="ziti">1）MySQL dump出所有的InnoDB表，包括MySQL系统数据库下的五个表，代码如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select table_name from information_schema.tables where table_schema= 'mysql' and engine='InnoDB';
++----------------------+
+| table_name           |
++----------------------+
+| innodb_index_stats   |
+| innodb_table_stats   |
+| slave_master_info    |
+| slave_relay_log_info |
+| slave_worker_info    |
++----------------------+</pre>
+<hr/>
+<p class="ziti">2）关闭MySQL。</p>
+<p class="ziti">3）删除InnoDB的所有数据文件和日志文件，包括“*.ibd”和ib_log文件，还有在MySQL库文件夹下的“*.ibd”文件。</p>
+<p class="ziti">4）删除所有“.frm”的InnoDB表文件。</p>
+<p class="ziti">5）在配置文件里配置新的表空间文件。</p>
+<p class="ziti">6）启动MySQL。</p>
+<p class="ziti">7）导入备份出的dump文件。</p>
+</body>
+</html>

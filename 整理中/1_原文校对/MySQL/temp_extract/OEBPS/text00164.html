@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">12.2　查看MySQL支持的存储引擎</h2>
+<p class="ziti">可以在MySQL中使用显示引擎的命令来得到一个可用引擎的列表：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; select version();
++------------+
+| version()  |
++------------+
+| 5.6.34-log |
++------------+
+1 row in set (0.00 sec)
+mysql&gt; show engines;
++--------------------+---------+-----------------------------------------+
+| Engine             | Support | Comment
+                     | Transactions | XA   | Savepoints |
++--------------------+---------+-----------------------------------------+
+| MRG_MYISAM         | YES     | Collection ofidentical MyISAM tables
+                     | NO           | NO   | NO         |
+| CSV                | YES     | CSV storage engine
+                     | NO           | NO   | NO         |
+| MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables     | NO           | NO   | NO         |
+| BLACKHOLE          | YES     | /dev/null storage engine (anything you write to it disappears)    | NO           | NO   | NO         |
+| MyISAM             | YES     | MyISAM storage engine
+                     | NO           | NO   | NO         |
+| PERFORMANCE_SCHEMA | YES     | Performance Schema
+                     | NO           | NO   | NO         |
+| ARCHIVE            | YES     | Archive storage engine
+                     | NO           | NO   | NO         |
+| InnoDB             | DEFAULT | Supports transactions, row-level locking, and foreign keys     | YES          | YES  | YES        |
+| FEDERATED          | NO      | Federated MySQL storage engine
+                     | NULL         | NULL | NULL       |
++--------------------+---------+-----------------------------------------+
+9 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">以上命令的结果显示了数据库可用引擎的全部名单，以及在当前的数据库中是否支持这些引擎，其中前四列比较重要，第一列是引擎名字，第二列是当前数据库是否支持，第三列是描述，第四列表示是否支持事务。</p>
+</body>
+</html>

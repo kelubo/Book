@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">3.2　安装并配置MySQL数据库</h2>
+<h3 class="p3">
+<a id="b1">3.2.1　安装MySQL数据库</a>
+</h3>
+<p class="p6">1.MySQL数据库的安装环境准备</p>
+<p class="ziti">如果读者没有物理服务器环境，则可以搭建vmware等虚拟机环境学习，相应地需要准备如下内容。</p>
+<p class="ziti">1）请提前加大VM虚拟机硬件的内存，最好将内存设置成2GB以上。</p>
+<p class="ziti">2）最好提前下载好要安装的MySQL相关软件包（<a href="http://mirrors.sohu.com/mysql/">http://mirrors.sohu.com/mysql/</a>
+ ），如果本书使用的软件版本已更新，请更新至5.6的最新版即可。</p>
+<p class="ziti">3）重视每个操作过程的输出，有错误要解决掉然后再继续，不能忽略掉操作中的错误（error）。</p>
+<p class="ziti">4）建议进入虚拟机界面去执行make以及make install，通过SSH操作有时会导致网络中断。</p>
+<p class="ziti">有关vmware虚拟化学习软件和CentOS 6操作系统的安装详细步骤见《跟老男孩学Linux运维：Web集群实战》，或者参看免费部署文章：<a href="http://book.51cto.com/art/201605/510756.htm">http://book.51cto.com/art/201605/510756.htm</a>
+ 。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">特别提示：</span>
+ Linux操作系统的安装选包很重要，如果系统安装的不合适（不要按照上述文章来安装，除非你真正知道自己在做什么），会导致MySQL无法正常安装及使用。</p>
+<p class="p6">2.安装MySQL需要的依赖包和编译软件</p>
+<p class="ziti">当前的Linux系统环境情况如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cat /etc/redhat-release   #&lt;==操作系统版本
+CentOS release 6.9 (Final)
+[root@oldboy ~]# uname -r                  #&lt;==内核版本
+2.6.32-696.el6.x86_64
+[root@oldboy ~]# uname -m
+x86_64                                     #&lt;==64位系统</pre>
+<hr/>
+<p class="ziti">（1）安装MySQL需要的依赖包</p>
+<p class="ziti">安装MySQL之前，最好先安装MySQL需要的依赖包，不然后面会出现很多报错信息，到那时还得再回来安装MySQL的依赖包。安装命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# yum install ncurses-devel libaio-devel -y  #&lt;==确保系统可以
+                                                         上网再执行。
+[root@oldboy ~]# rpm -qa ncurses-devel libaio-devel
+ncurses-devel-5.7-4.20090207.el6.x86_64
+libaio-devel-0.3.107-10.el6.x86_64</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 安装后使用rpm-qa ncurses-devel libaio-devel命令进行检查，如果出现两行如上信息则表示安装成功。</p>
+<p class="ziti">（2）安装编译MySQL需要的软件</p>
+<p class="ziti">由于MySQL 5.5及以上的系列产品要采用特殊的编译方式安装，因此，需要先安装常用的编译MySQL的工具cmake软件包，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# yum install cmake -y
+[root@oldboy ~]# rpm -qa cmake
+cmake-2.8.12.2-4.el6.x86_64</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 安装后使用“rpm-qa cmake”检查，如果出现一行如上信息则表示安装成功。</p>
+<p class="ziti">此外，也有网友采用源码包的方式安装cmake的，但是操作起来比较复杂，因此一般建议读者选择这个简单的yum安装方法。</p>
+<p class="p6">3.开始安装MySQL</p>
+<p class="ziti">为了让大家学习更多的MySQL技术，本文选择以相对复杂的源代码安装方式为例来讲解MySQL多实例安装，大型公司一般都会将MySQL软件定制成rpm包，然后放到yum仓库里，使用yum安装，中小型企业里的二进制和编译安装的区别不大。</p>
+<p class="ziti">使用二进制方式安装MySQL的方法见<a href="http://oldboy.blog.51cto.com/2561410/1893734">http://oldboy.blog.51cto.com/2561410/1893734</a>
+ 。</p>
+<p class="ziti">（1）建立MySQL用户账号</p>
+<p class="ziti">首先以root身份登录到Linux系统中，然后执行如下命令创建mysql用户账号：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# useradd -s /sbin/nologin -M mysql #&lt;==默认会创建和mysql用户
+                                                 同名的组。
+[root@oldboy ~]# id mysql
+uid=500(mysql) gid=500(mysql) groups=500(mysql)</pre>
+<hr/>
+<p class="ziti">根据上述结果输出，可以看到mysql用户和组已经创建成功。</p>
+<p class="ziti">（2）获取MySQL软件包</p>
+<p class="ziti">MySQL软件包的下载地址为：<a href="http://dev.mysql.com/downloads/mysql/">http://dev.mysql.com/downloads/mysql/</a>
+ （如果地址变更无法下载，则可以去<a href="http://mirrors.sohu.com/mysql">http://mirrors.sohu.com/mysql</a>
+ 下载或者去本章开头提供的云盘地址去下载相关的软件包）。可以把软件下载到客户端电脑本地后，使用rz等工具传到Linux里，或者找到网络下载地址后，直接在Linux里使用wget命令下载下来。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 本书以MySQL编译的方式进行讲解，使用二进制方式安装的完整过程前文已经给过地址了。在生产场景中，二进制和源码包两种安装方法都是可用的，其应用场景一般没什么太大差别。不同之处在于：二进制的安装包较大，名字和源码包也有些区别，二进制的安装过程比源码更快，更多区别在前文选择安装方式章节中已经讲解过了，这里就不再赘述了。</p>
+<p class="ziti">MySQL源码包和二进制安装包的名称见表3-1。</p>
+<p class="middle-img">表3-1　MySQL二进制和源码包名称</p>
+<div class="pic"><img alt="" src="Image00020.jpg" />
+</div>
+<p class="ziti">（3）采用编译方式安装MySQL</p>
+<p class="ziti">配置及编译安装的步骤具体如下。</p>
+<p class="ziti">第一步，下载mysql软件包，命令及操作如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mkdir -p /home/oldboy/tools  #&lt;==这是老男孩习惯使用的软件目录。
+[root@oldboy ~]# cd /home/oldboy/tools/
+[root@oldboy tools]# wget -q http://mirrors.163.com/mysql/Dowloads/MySQL-5.6/mysql-5.6.40.tar.gz
+#&lt;==如果数据库软件更新了，请参考前文执行更换。
+[root@oldboy tools]# ls -lh
+total 31M
+-rw-r--r--. 1 root root 31M Nov 28 07:46 mysql-5.6.40.tar.gz  #&lt;==源码包大小31M。</pre>
+<hr/>
+<p class="ziti">第二步，解压并配置mysql，命令及操作如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy tools]# tar xf mysql-5.6.40.tar.gz
+[root@oldboy tools]# cd mysql-5.6.40
+[root@oldboy tools]# cmake . -DCMAKE_INSTALL_PREFIX=/application/mysql-5.6.40 \
+-DMYSQL_DATADIR=/application/mysql-5.6.40/data \
+-DMYSQL_UNIX_ADDR=/application/mysql-5.6.40/tmp/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_EXTRA_CHARSETS=all \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_FEDERATED_STORAGE_ENGINE=1 \
+-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 \
+-DWITH_ZLIB=bundled \
+-DWITH_SSL=bundled \
+-DENABLED_LOCAL_INFILE=1 \
+-DWITH_EMBEDDED_SERVER=1 \
+-DENABLE_DOWNLOADS=1 \
+-DWITH_DEBUG=0</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+</p>
+<p class="ziti6">1）编译时可配置的选项很多，常见的参数选项请参见3.4节的选项说明讲解，此处就不特别说明了。</p>
+<p class="ziti6">2）编译MySQL需要安装gcc等工具，此部分在安装操作系统时就已经安装上了，具体请参考CentOS 6操作系统的详细安装步骤，可参见《跟老男孩学Linux运维：Web集群实战》——书或免费部署文章<a href="http://book.51cto.com/art/201605/510756.htm">http://book.51cto.com/art/201605/510756.htm</a>
+ 。</p>
+<p class="ziti6">3）如果读者感觉输入这些配置比较费时间，可以加本篇开头的QQ交流群获取文件。</p>
+<p class="ziti">第三步，编译并安装mysql，命令及操作如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.34]# make      #&lt;==如果是多核cpu，则可指定make -j
+                                        cpu核数，加快编译速度。
+[root@oldboy mysql-5.6.34]# make install</pre>
+<hr/>
+<p class="ziti">如果是虚拟环境测试，以上两步过程可能有些长，请耐心等待。</p>
+<p class="ziti">第四步，为mysql安装路径设置不带版本号的软链接/application/mysql，操作命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy mysql-5.6.34]# ln -s /application/mysql-5.6.34/ /application/mysql
+#补充：如果系统里有曾经安装的数据库文件和启动程序，则最好停掉或删除，以免发生冲突。
+[root@oldboy mysql-5.6.34]# ls -l /application/
+total 4
+lrwxrwxrwx.  1 root root   26 Feb 26 17:49 mysql -&gt; /application/mysql-5.6.34/
+drwxr-xr-x. 13 root root 4096 Feb 26 17:49 mysql-5.6.34
+[root@oldboy mysql-5.6.34]# ls /application/mysql/    #&lt;==这是老男孩常用的mysql的
+                                                安装路径。
+bin  COPYING  data  docs  include  lib  man  mysql-test  README  scripts  share  sql-bench  support-files</pre>
+<hr/>
+<p class="ziti">如果上述操作未出现错误（每个步骤结束后，都可以使用“echo$?”查看返回值是否为0，为0则表示正确），则查看/application/mysql/目录；若其下有内容，则表示MySQL 5.6.40源代码包采用cmake方式安装成功了。</p>
+</body>
+</html>

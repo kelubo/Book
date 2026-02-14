@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">4.4.9　MySQL多实例数据库启动故障排错说明</h3>
+<p class="ziti">如果MySQL多实例数据库有服务没有被启动，那么排查办法具体如下。</p>
+<p class="ziti">如果发现没有显示MySQL对应实例的端口，则请稍微等待几秒再检查，MySQL服务的启动比Web服务等会慢一些。</p>
+<p class="ziti">如果还不行，则请查看MySQL服务对应实例的错误日志，错误日志路径在my.cnf配置的最下面定义。例如，3306实例的错误日志为：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# grep log-error /data/3306/my.cnf|tail -1
+log-error=/data/3306/oldboy_3306.err</pre>
+<hr/>
+<p class="ziti">那么，可以执行“tail-100/data/3306/mysql_oldboy3306.err”检查mysql错误日志：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# tail /data/3306/oldboy_3306.err
+2018-05-10 22:05:14 49285 [Note] Shutting down plugin 'MyISAM'
+2018-05-10 22:05:14 49285 [Note] Shutting down plugin 'CSV'
+2018-05-10 22:05:14 49285 [Note] Shutting down plugin 'MRG_MYISAM'
+2018-05-10 22:05:14 49285 [Note] Shutting down plugin 'sha256_password'
+2018-05-10 22:05:14 49285 [Note] Shutting down plugin 'mysql_old_password'
+2018-05-10 22:05:14 49285 [Note] Shutting down plugin 'mysql_native_password'
+2018-05-10 22:05:14 49285 [Note] Shutting down plugin 'binlog'
+2018-05-10 22:05:14 49285 [Note] /application/mysql-5.6.40/bin/mysqld: Shutdown complete</pre>
+<hr/>
+<p class="ziti">上面的提示级别都为Note，表示没有错误。下面的提示中就有报错信息了：</p>
+<hr/>
+<pre class="ziti1">170226 22:05:14 mysqld_safe mysqld from pid file /data/3306/mysqld.pid ended
+/usr/local/mysql/libexec/mysqld: Can't find file: './mysql/plugin.frm' (errno: 13)
+120412 15:23:33 [ERROR] Can't open the mysql.plugin table. Please run mysql_upgrade to create it.
+120412 15:23:34  InnoDB: Initializing buffer pool, size = 32.0M
+120412 15:23:34  InnoDB: Completed initialization of buffer pool
+120412 15:23:34  InnoDB: Operating system error number 13 in a file operation.
+InnoDB: The error means mysqld does not have the access rights to
+InnoDB: the directory.
+InnoDB: File name ./ibdata1
+InnoDB: File operation call: 'create'.
+InnoDB: Cannot continue operation.
+120412 15:23:34 mysqld_safe mysqld from pid file /data/3306/mysqld.pid ended</pre>
+<hr/>
+<p class="ziti">此外，还可以通过以下方式来检查。</p>
+<p class="ziti6">·细看所有步骤执行命令返回的屏幕输出，不要忽略关键的输出内容。</p>
+<p class="ziti6">·查看mysql错误日志/application/mysql/data/机器名.err。</p>
+<p class="ziti6">·辅助查看系统日志/var/log/messages。</p>
+<p class="ziti6">·如果是MySQL关联了其他服务，则要同时查看相关服务的日志。</p>
+<p class="ziti6">·仔细阅读，重新查看所有操作的步骤是否正确，书写的命令及字符是不是都对。</p>
+<p class="ziti">经常查看各种服务运行日志是一个很好的习惯，也是成为高手的必经之路！</p>
+<p class="ziti">其他可能导致故障的问题如下。</p>
+<p class="ziti6">·数据库服务器磁盘空间满了（可用“df-h”查看磁盘空间是否满）。</p>
+<p class="ziti6">·防火墙iptables和selinux是否关闭。</p>
+<p class="ziti6">·更多故障问题可以搜索或者加入老男孩交流群（号码见前言部分）。</p>
+</body>
+</html>

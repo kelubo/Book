@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">18.6.5　MHA管理节点安装</h3>
+<p class="ziti">管理节点既可以部署在任何一台机器上，也可以部署在MySQL集群的其中一台机器上，并且一个管理节点可以管理多套MySQL集群。</p>
+<p class="ziti">1）使用epel源安装perl相关语言环境依赖：</p>
+<hr/>
+<pre class="ziti1">wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-6.repo</pre>
+<hr/>
+<p class="ziti">2）安装管理节点所需的依赖：</p>
+<hr/>
+<pre class="ziti1">yum install -y perl-Config-Tiny epel-release perl-Log-Dispatch perl-Parallel-ForkManager perl-Time-HiRes</pre>
+<hr/>
+<p class="ziti">3）安装MHA-node包（需要去Google上下载或者加入开篇老男孩读者群来获取），本文为了节省服务器，选择在db03上安装MHA-manger，上文已经安装好了node包：</p>
+<hr/>
+<pre class="ziti1">rpm -ivh mha4mysql-node-0.56-0.el6.noarch.rpm</pre>
+<hr/>
+<p class="ziti">4）安装MHA-manger包（需要去Google上下载或者加入开篇老男孩读者群来获取）：</p>
+<hr/>
+<pre class="ziti1">rpm -ivh mha4mysql-manager-0.56-0.el6.noarch.rpm</pre>
+<hr/>
+<p class="ziti">在安装完MHA-manger包的机器上执行如下命令，可以看到前文提到的MHA-manger包里所包含的工具，这些工具依然都是perl语言编写的脚本，功能说明前文已述，此处不再累述：</p>
+<hr/>
+<pre class="ziti1">[root@db03 bin]# ls -l /usr/bin/masterha_*
+-rwxr-xr-x. 1 root root 1995 3月  31 2014 /usr/bin/masterha_check_repl
+-rwxr-xr-x. 1 root root 1779 3月  31 2014 /usr/bin/masterha_check_ssh
+-rwxr-xr-x. 1 root root 1865 3月  31 2014 /usr/bin/masterha_check_status
+-rwxr-xr-x. 1 root root 3201 3月  31 2014 /usr/bin/masterha_conf_host
+-rwxr-xr-x. 1 root root 2517 3月  31 2014 /usr/bin/masterha_manager
+-rwxr-xr-x. 1 root root 2165 3月  31 2014 /usr/bin/masterha_master_monitor
+-rwxr-xr-x. 1 root root 2373 3月  31 2014 /usr/bin/masterha_master_switch
+-rwxr-xr-x. 1 root root 5171 3月  31 2014 /usr/bin/masterha_secondary_check
+-rwxr-xr-x. 1 root root 1739 3月  31 2014 /usr/bin/masterha_stop</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ MHA-manager不要安装在主库所在的服务器上，一旦主库因为物理宕机或者网络故障，则会无法完成故障切换，MHA是通过SSH来进行检测的，MHA-manager相当于这套高可用方案中的“大脑”。</p>
+</body>
+</html>

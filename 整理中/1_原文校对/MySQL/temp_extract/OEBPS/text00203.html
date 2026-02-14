@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">13.6　InnoDB普通表空间</h2>
+<p class="ziti">InnoDB除了上文中讲述的系统表额空间和独立表空间之外，也可以创建普通表空间，可以将多个表指定放在此表空间上，以便与系统表空间文件区别对待。</p>
+<p class="ziti">利用create tablespace命令可以创建一个共享的InnoDB表空间，与系统表空间一样，多个表可以在此表空间上存储数据，此表空间的数据文件可以放置在任意的文件夹下：</p>
+<hr/>
+<pre class="ziti1">CREATE TABLESPACE tablespace_name
+    ADD DATAFILE 'file_name'
+    [FILE_BLOCK_SIZE = value]
+        [ENGINE [=] engine_name]
+
+mysql&gt; CREATE TABLESPACE `ts1` ADD DATAFILE 'ts1.ibd' Engine=InnoDB;
+##创建在MySQL数据目录下
+mysql&gt; CREATE TABLESPACE `ts1` ADD DATAFILE '/my/tablespace/directory/ts1.ibd' Engine=InnoDB;</pre>
+<hr/>
+<p class="ziti">创建完表空间之后，就可以通过“create table…tablespace”或者“alter table…tablespace”命令将表增加到此表空间上：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; CREATE TABLE t1 (c1 INT PRIMARY KEY) TABLESPACE ts1 ROW_FORMAT=COMPACT;
+mysql&gt; ALTER TABLE t2 TABLESPACE ts1;</pre>
+<hr/>
+<p class="ziti">alter table命令可以使得InnoDB表在系统表空间、独立表空间和普通表空间之间互相转化：</p>
+<hr/>
+<pre class="ziti1">ALTER TABLE tbl_name TABLESPACE [=] tablespace_name
+##从系统表空间或者独立表空间上转移到普通表空间
+ALTER TABLE tbl_name ... TABLESPACE [=] innodb_system
+##从普通表空间或者独立表空间上转移到系统表空间
+ALTER TABLE tbl_name ... TABLESPACE [=] innodb_file_per_table
+##从系统表空间或者普通表空间上转移到独立表空间</pre>
+<hr/>
+<p class="ziti">“Alter table…tablespace”语句的执行都会导致此表重建，即使表空间的属性和之前的是一样的。</p>
+<p class="ziti">当删除一个普通表空间时，首先需要保证此表空间上的所有表都已被删除，否则会报错。删除表空间是通过drop tablespace语句来执行的。Drop database的动作会删除所有的表，但创建的tablespace不会被自动删除，必须通过drop tablespace显式执行。</p>
+<hr/>
+<pre class="ziti1">mysql&gt; drop tablespace ts1;
+ERROR 1529 (HY000): Failed to drop TABLESPACE ts1
+mysql&gt; drop table temp123;
+Query OK, 0 rows affected (0.00 sec)
+mysql&gt; drop tablespace ts1;
+Query OK, 0 rows affected (0.01 sec)</pre>
+<hr/>
+<p class="ziti">普通表空间不支持临时表，而且也不支持“alter table…discard tablespace”和“alter table…import tablespace”命令。</p>
+</body>
+</html>

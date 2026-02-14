@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.2.4　启动从库同步开关并测试主从复制</h3>
+<p class="ziti">1）启动从库主从复制开关，并查看复制状态。相关语句如下：</p>
+<hr/>
+<pre class="ziti1"> [root@db02 opt]# mysql -e "start slave;"
+[root@db02 opt]# mysql -e "show slave status\G;"
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 172.16.1.51
+                  Master_User: rep
+                  Master_Port: 3306
+                Connect_Retry: 60
+              Master_Log_File: oldboy-bin.000023
+          Read_Master_Log_Pos: 626
+               Relay_Log_File: db02-relay-bin.000002
+                Relay_Log_Pos: 284
+        Relay_Master_Log_File: oldboy-bin.000023
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB:
+          Replicate_Ignore_DB:
+           Replicate_Do_Table:
+       Replicate_Ignore_Table:
+      Replicate_Wild_Do_Table:
+  Replicate_Wild_Ignore_Table:
+                   Last_Errno: 0
+                   Last_Error:
+                 Skip_Counter: 0
+          Exec_Master_Log_Pos: 626
+              Relay_Log_Space: 456
+              Until_Condition: None
+               Until_Log_File:
+                Until_Log_Pos: 0
+           Master_SSL_Allowed: No
+           Master_SSL_CA_File:
+           Master_SSL_CA_Path:
+              Master_SSL_Cert:
+            Master_SSL_Cipher:
+               Master_SSL_Key:
+        Seconds_Behind_Master: 0
+Master_SSL_Verify_Server_Cert: No
+                Last_IO_Errno: 0
+                Last_IO_Error:
+               Last_SQL_Errno: 0
+               Last_SQL_Error:
+  Replicate_Ignore_Server_Ids:
+             Master_Server_Id: 1
+                  Master_UUID: 4c92bf66-0f0b-11e7-ba4a-000c292ece3d
+             Master_Info_File: /application/mysql/data/master.info
+                    SQL_Delay: 0
+          SQL_Remaining_Delay: NULL
+Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it
+           Master_Retry_Count: 86400
+                  Master_Bind:
+      Last_IO_Error_Timestamp:
+     Last_SQL_Error_Timestamp:
+               Master_SSL_Crl:
+           Master_SSL_Crlpath:
+           Retrieved_Gtid_Set:
+            Executed_Gtid_Set:
+                Auto_Position: 0
+
+Master_SSL_Verify_Server_Cert: No
+                Last_IO_Errno: 0
+                Last_IO_Error:
+               Last_SQL_Errno: 0
+               Last_SQL_Error:
+  Replicate_Ignore_Server_Ids:
+             Master_Server_Id: 1
+提示：有关show slave status结果的详细说明，请大家查看MySQL手册。</pre>
+<hr/>
+<p class="ziti">主从复制是否配置成功了，最关键的是查看下面3项状态参数：</p>
+<hr/>
+<pre class="ziti1">[root@db02 opt]# mysql -e "show slave status\G;"|egrep "IO_Running|SQL_Running: |_Behind_Master"
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+        Seconds_Behind_Master: 0</pre>
+<hr/>
+<p class="ziti6">·Slave_IO_Running：Yes，这个表示I/O的线程状态，I/O线程负责从主库中读取Binlog日志，并将Binlog日志写入从库的中继日志中，状态为Yes表示I/O线程工作正常，否则异常。</p>
+<p class="ziti6">·Slave_SQL_Running：Yes，这个表示SQL的线程状态，SQL线程负责读取中继日志（relay-log）中的数据并转换为SQL语句应用到从数据库中，状态为Yes表示I/O线程工作正常，否则异常。</p>
+<p class="ziti6">·Seconds_Behind_Master：0，这个表示在复制过程中，从库比主库延迟的秒数，这个参数很重要，但企业里有更准确地判断主从延迟的方法：在主库中写时间戳，然后通过从库读取时间戳，与当前数据库时间进行比较，从而认定是否真的延迟。</p>
+<p class="ziti">2）测试主从复制结果。在主库中写入数据，然后观察从库的数据状况：</p>
+<hr/>
+<pre class="ziti1">[root@db01 ~]# mysql -e "create database alex_python;"  #&lt;==注意提示符：这是
+                                                       主库建库操作。
+[root@db02 ~]# mysql -e "show databases like 'alex%';"   #&lt;==这是从库查询检查。
++------------------+
+| Database (alex%) |
++------------------+
+| alex_python      |
++------------------+</pre>
+<hr/>
+<p class="ziti">根据测试可以判断，从库（172.16.1.52）和主库（172.16.1.51）是同步的，到此，主从复制的基本实践就已经全部完成了。</p>
+</body>
+</html>

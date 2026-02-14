@@ -1,0 +1,193 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_56">3.3.4　访问重写rewrite</h3> 
+ <p class="ziti3">访问重写rewrite是Nginx HTTP请求处理过程中的一个重要功能，它是以模块的形式存在于代码中的，其功能是对用户请求的URI进行PCRE正则重写，然后返回30×重定向跳转或按条件执行相关配置。rewrite模块内置了类似脚本语言的set、if、break、return配置指令，通过这些指令，用户可以在HTTP请求处理过程中对URI进行更灵活的操作控制。rewrite模块提供的指令可以分两类，一类是标准配置指令，这部分指令只是对指定的操作进行相应的操作控制；另一类是脚本指令，这部分指令可以在HTTP指令域内以类似脚本编程的形式进行编写。</p> 
+ <p class="ziti3"><span class="yanse">1.标准配置指令</span></p> 
+ <p class="ziti3">常用的标准配置指令如表3-65～表3-67所示。</p> 
+ <p class="middle-img">表3-65　rewrite日志记录指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-65.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-65.jpg" class="calibre100"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   rewrite_log off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-66　未初始化变量告警日志记录指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-66.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-66.jpg" class="calibre101"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    uninitialized_variable_warn off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-67　rewrite指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-67.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-67.jpg" class="calibre48"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    rewrite ^/users/(.*)$ /show?user=$1 last;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">rewrite访问重写是通过rewrite指令实现的，rewrite指令的语法格式如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">rewrite regex replacement [flag];
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">1）regex是PCRE语法格式的正则表达式。</p> 
+ <p class="ziti3">2）replacement是重写URI的改写规则。当改写规则以“http://”“https://”或“$scheme”开头时，Nginx重写该语句后将停止执行后续任务，并将改写后的URI跳转返回客户端。</p> 
+ <p class="ziti3">3）flag是执行该条重写指令后的操作控制符。操作控制符有如下4种：</p> 
+ <p class="ziti4">·last：执行完当前重写规则跳转到新的URI后继续执行后续操作。</p> 
+ <p class="ziti4">·break：执行完当前重写规则跳转到新的URI后不再执行后续操作。不影响用户浏览器URI显示。</p> 
+ <p class="ziti4">·redirect：返回响应状态码302的临时重定向，返回内容是重定向URI的内容，但浏览器网址仍为请求时的URI。</p> 
+ <p class="ziti4">·permanent：返回响应状态码301的永久重定向，返回内容是重定向URI的内容，浏览器网址变为重定向的URI。</p> 
+ <p class="ziti3"><span class="yanse">2.脚本指令</span></p> 
+ <p class="ziti3">常见的脚本指令如表3-68～表3-71所示。</p> 
+ <p class="middle-img">表3-68　设置变量指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-68.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-68.jpg" class="calibre102"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server{
+        set $test "check";
+    }
+}
+
+http{
+    server {
+        listen 8080;
+        location /foo {
+            set $a hello;
+            rewrite ^ /bar;
+        }
+        location /bar {
+            # 如果这个请求来自“/foo”,$a的值是“hello”。如果直接访问“/bar”，$a的值为空
+            echo “a = [$a]”;  
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">用set指令创建变量后，变量名是Nginx配置全局域可用的，但变量值只在有该变量赋值操作的HTTP处理流程中可用。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http{
+    server {
+        listen 8080;
+        location /foo {
+            set $a hello;
+            rewrite ^ /bar;
+        }
+        location /bar {
+            # 如果这个请求来自“/foo”,$a的值是“hello”。如果直接访问“/bar”，$a的值为空
+            if ( $a = “hello” ){ 
+                rewrite ^ /newbar;
+            }
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">当set指令后只有变量名时，系统会自动创建该变量，变量值为空。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server{
+        set $test;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">变量插值如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server{
+        set $test "check ";
+        if ( "${test}nginx" = "nginx" ){ #${test}nginx的值为"check nginx"
+
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-69　条件判断指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-69.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-69.jpg" class="calibre103"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server {
+        if ($http_cookie ~* "id=([^;]+)(?:;|$)") {
+            set $id $1;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">1）当判断条件为一个变量时，变量值为空或以0开头的字符串都被判断为false。</p> 
+ <p class="ziti3">2）变量内容字符串比较操作运算符为“=”或“!=”。</p> 
+ <p class="ziti3">3）进行正则表达式比较时，有以下4个操作运算符：</p> 
+ <p class="ziti4">·“~”：区分大小写匹配。</p> 
+ <p class="ziti4">·“~*”：不区分大小写匹配。</p> 
+ <p class="ziti4">·“!~”：区分大小写不匹配。</p> 
+ <p class="ziti4">·“!~*”：不区分大小写不匹配。</p> 
+ <p class="ziti3">4）进行文件或目录比较时，有以下4个操作运算符：</p> 
+ <p class="ziti4">·“-f”：判断文件是否存在，可在运算符前加“!”表示反向判断。</p> 
+ <p class="ziti4">·“-d”：判断目录是否存在，可在运算符前加“!”表示反向判断。</p> 
+ <p class="ziti4">·“-e”：判断文件、目录或链接符号是否存在，可在运算符前加“!”表示反向判断。</p> 
+ <p class="ziti4">·“-x”：判断文件是否为可执行文件，可在运算符前加“!”表示反向判断。</p> 
+ <p class="middle-img">表3-70　终止指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-70.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-70.jpg" class="calibre104"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server {
+        if ($slow) {
+            limit_rate 10k;
+            break;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-71　跳转指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-71.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-71.jpg" class="calibre105"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server {
+        if ($request_method = POST) {
+            return 405;
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（1）return的指令值有以下4种方式。</p> 
+ <p class="ziti4">·return code：向客户端返回指定code的状态码，当返回非标准的状态码444时，Nginx直接关闭连接，不发送响应头信息。</p> 
+ <p class="ziti4">·return code text：向客户端发送带有指定code状态码和text内容的响应信息。因要在客户端显示text内容，所以code不能是30×。</p> 
+ <p class="ziti4">·return code URL：这里的URL可以是内部跳转或变量$uri，也可以是有完整scheme标识的URL，将直接返回给客户端执行跳转，code只能是30×。</p> 
+ <p class="ziti4">·return URL：此时默认code为302，URL必须是有完整scheme标识的URL。</p> 
+ <p class="ziti3">（2）return也可以用来调试输出Nginx的变量。</p> 
+</body>
+</html>

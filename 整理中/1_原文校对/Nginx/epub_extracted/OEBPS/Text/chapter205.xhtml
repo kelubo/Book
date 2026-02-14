@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h2 class="p3" id="sigil_toc_id_219">12.1　Kubernetes简介</h2> 
+ <h3 class="p" id="sigil_toc_id_220">12.1.1　Kubernetes架构简述</h3> 
+ <p class="ziti3">Kubernetes是分布式容器管理系统，它提供了对容器快速部署、网络规划、负载调度及宿主机节点自动化更新和维护的管理机制，使容器自动化按照用户期望的方式运行。与大多数分布式系统一样，Kubernetes集群由主节点（Master）和多个从节点（Node）组成，集群中运行多个应用组件，是计算、存储、网络资源的集合，为运行的各种应用提供资源管理、调度和维护等功能。Kubernetes架构如图12-1所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-1.jpg" class="calibre343"/></a> 
+ </div> 
+ <p class="middle-img">图12-1　Kubernetes架构</p> 
+ <p class="ziti3">具体说明如下。</p> 
+ <p class="ziti4">·Kubernetes集群中被操作控制的资源称为资源对象，如Pod、Node、Service都被看作资源对象。</p> 
+ <p class="ziti4">·kubectl是Kubernetes的命令行管理工具，该工具与Web UI一样，可以通过Kuber-netes主节点的接口服务（API Server）查看及进行创建、删除或更新资源对象等操作。</p> 
+ <p class="ziti4">·Kubernetes主节点的核心组件包括接口服务（API Server）、调度服务（Scheduler）、控制管理服务（Controller Manager）和存储服务（etcd）。</p> 
+ <p class="ziti4">·接口服务提供了资源对象操作的统一入口，提供认证、授权、访问控制等功能，以REST API方式对外提供服务，允许各类组件创建、删除、更新或监视资源。</p> 
+ <p class="ziti4">·调度服务按照编排的调度策略将运行容器（Pod）根据集群资源和状态选择合适的Node进行创建。</p> 
+ <p class="ziti4">·控制管理服务负责维护整个集群的状态，包括滚动更新、自动扩缩容、故障检测等。</p> 
+ <p class="ziti4">·存储服务用于存储整个集群各种配置及资源实例的状态，实现配置共享和服务发现等功能。</p> 
+ <p class="ziti3">一个Kubernetes集群可包括多个Node节点，每个Node节点上运行了网络、代理及管理组件。Kubernetes节点架构如图12-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-2.jpg" class="calibre344"/></a> 
+ </div> 
+ <p class="middle-img">图12-2　Kubernetes节点架构</p> 
+ <p class="ziti3">具体说明如下。</p> 
+ <p class="ziti4">·kube-proxy负责为Pod提供网络代理和负载均衡等功能。</p> 
+ <p class="ziti4">·Kubernetes并未提供专门的网络组件实现网络功能，目前常用的是flannel，它通过CNI（Container Network Interface，容器网络接口）方式与Kubernetes集成，提供网络功能。</p> 
+ <p class="ziti4">·kubelet是运行在每个节点上的节点代理服务，可以实现每个节点上的Pod管理及监控，并接收主节点组件下发的各种管理任务。</p> 
+ <p class="ziti4">·Pod是Kubernetes中最基本的管理单位，是在Docker容器上的一层封装，一个Pod可包含多个容器，可以实现内部运行容器的资源共享。</p> 
+ <p class="ziti4">·CRI（Container Runtime Interface，容器运行时接口）是Kubernetes中用来与底层容器（如Docker）进行通信的接口，可对容器执行启停等操作。</p> 
+</body>
+</html>

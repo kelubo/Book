@@ -1,0 +1,328 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_58">3.3.6　数据处理</h3> 
+ <p class="ziti3">用户请求的最终结果是要返回数据，当响应文件在Nginx服务器本地时，需要进行本地文件位置、读或写、返回执行结果的操作。数据处理包括对这些操作进行指令配置。</p> 
+ <p class="ziti3"><span class="yanse">1.文件位置</span></p> 
+ <p class="ziti3">常用的文件位置配置指令如表3-77～表3-80所示。</p> 
+ <p class="middle-img">表3-77　根目录指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-77.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-77.jpg" class="calibre110"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location /flv/ {
+    root /data/web;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·当root指令在location指令域时，root设置的是location匹配访问路径的上一层目录，样例中被请求文件的实际本地路径为/data/web/flv/。</p> 
+ <p class="ziti4">·location中的路径是否带“/”，对本地路径的访问无任何影响。</p> 
+ <p class="middle-img">表3-78　访问路径别名指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-78.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-78.jpg" class="calibre111"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/077-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/077-i.jpg" class="calibre112"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server{
+    listen 8080;
+    server_name www.nginxtest.org;
+    root /opt/nginx-web/www;
+    location /flv/ {
+        alias /opt/nginx-web/flv/;
+    }
+
+    location /js {
+        alias /opt/nginx-web/js;
+    }
+
+    location /img {
+        alias /opt/nginx-web/img/;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">可以用如下命令进行访问测试：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">curl http://127.0.0.1:8080/flv/
+curl -L http://127.0.0.1:8080/js
+curl http://127.0.0.1:8080/js/
+curl -L http://127.0.0.1:8080/img
+curl http://127.0.0.1:8080/img/
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·alias指定的目录是location路径的实际目录。</p> 
+ <p class="ziti4">·其所在location的rewrite指令不能使用break参数。</p> 
+ <p class="middle-img">表3-79　文件判断指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-79.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-79.jpg" class="calibre113"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location /images/ {
+    # $uri存在则执行代理的上游服务器操作，否则跳转到default.gif的location
+    try_files $uri /images/default.gif;
+}
+
+location = /images/default.gif {
+    expires 30s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">跳转的目标也可以是一个location区域，脚本如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http{
+    location / {
+        try_files /system/maintenance.html $uri $uri/index.html $uri.html @mongrel;
+    }
+    location @mongrel {
+        proxy_pass http://mongrel;  
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-80　禁止符号链接文件指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-80.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-80.jpg" class="calibre114"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    disable_symlinks off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·当指令值是off时，允许本地路径中出现符号链接文件。</p> 
+ <p class="ziti4">·当指令值是on时，若本地路径中出现符号链接文件，则拒绝访问。</p> 
+ <p class="ziti4">·当指令值是if_not_owner时，若本地路径中出现符号链接文件，且符号链接文件和源文件的所有者不同，则拒绝访问。</p> 
+ <p class="ziti4">·当指令值是on或if_not_owner时，可通过参数from=part设定检查符号链接文件的起始路径，但不会检查所指定路径本身。</p> 
+ <p class="ziti3"><span class="yanse">2.数据读写及返回</span></p> 
+ <p class="ziti3">常用的数据读写及返回配置指令如表3-81～表3-96所示。</p> 
+ <p class="middle-img">表3-81　预读文件大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-81.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-81.jpg" class="calibre115"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/079-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/079-i.jpg" class="calibre116"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    read_ahead 32k;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-82　打开文件缓存指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-82.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-82.jpg" class="calibre117"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    open_file_cache max=1000 inactive=20s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·开启缓存时，可缓存打开文件的描述符、大小和修改时间，目录的查询结果，文件查找时的错误结果。</p> 
+ <p class="ziti4">·指令值参数max用于设定缓存中元素的最大数量，当缓存溢出时，使用LRU算法删除缓存中的元素。</p> 
+ <p class="ziti4">·缓存中的元素在指令值参数inactive设定的时间内没有被访问，将被从缓存中删除，默认值为60s。</p> 
+ <p class="middle-img">表3-83　打开文件查找错误缓存指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-83.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-83.jpg" class="calibre118"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    open_file_cache     max=1000 inactive=20s;
+    open_file_cache_errors on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-84　打开文件缓存最小访问次数指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-84.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-84.jpg" class="calibre119"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    open_file_cache     max=1000 inactive=20s;
+    open_file_cache_errors on;
+    open_file_cache_min_uses 2;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-85　打开文件缓存有效性检查指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-85.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-85.jpg" class="calibre120"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    open_file_cache     max=1000 inactive=20s;
+    open_file_cache_errors on;
+    open_file_cache_min_uses 2;
+    open_file_cache_valid 30s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-86　零复制指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-86.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-86.jpg" class="calibre121"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    sendfile on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·默认配置下，Nginx读取本地文件后，在进行网络传输时会先将硬盘文件从硬盘中读取到Nginx的文件缓冲区中，操作流程为硬盘→内核文件缓冲区→应用缓冲区。然后将Nginx文件缓冲区的数据写入网络接口，操作流程：应用缓冲区→内核网络缓冲区→网络接口。Nginx的本地文件在进行网络传输的过程中，经历了上述两个操作过程，两次操作都在内核缓冲区中存储了相同的数据。为了提高文件的传输效率，内核提供了零复制技术，该技术支持文件在内核缓冲区内直接交换打开的文件句柄，无须重复复制文件内容到缓冲区，则上述两个操作的流程变为：硬盘→内核文件缓冲区→内核网络缓冲区→网络接口。</p> 
+ <p class="ziti4">·零复制技术减少了文件的读写次数，提升了本地文件的网络传输速度。</p> 
+ <p class="ziti4">·内核缓冲区的默认大小为4096B。</p> 
+ <p class="middle-img">表3-87　零复制最大传输限制指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-87.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-87.jpg" class="calibre122"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    sendfile on;
+    sendfile_max_chunk 1m;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-88　零复制最小传输限制指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-88.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-88.jpg" class="calibre123"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   sendfile on;
+   sendfile_max_chunk 1m;
+   tcp_nopush on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·MSS类似于网络接口的MTU，区别是MSS位于TCP层限定应用层数据包的最大传输大小。</p> 
+ <p class="ziti4">·MSS的默认大小由TCP建立连接的客户端与服务端MTU中的最小值减去40B（IP和TCP首部的固定长度）得出，通常为1460B。</p> 
+ <p class="middle-img">表3-89　直接I/O读取指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-89.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-89.jpg" class="calibre74"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   directio 5m;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-90　直接I/O读取块大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-90.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-90.jpg" class="calibre124"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   directio_alignment 4096;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">CentOS系统下查看当前磁盘的文件系统的指令如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">df -T
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">查看当前文件系统的块大小（block size）的指令如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">tune2fs -l /dev/sda1|grep Block # Ext文件系统
+xfs_info /dev/sda1 # XFS文件系统
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-91　输出文件缓冲区大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-91.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-91.jpg" class="calibre125"/></a> 
+ </div> 
+ <p class="middle-img">表3-92　异步文件I/O指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-92.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-92.jpg" class="calibre35"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    aio on;                         # 启用异步I/O
+    directio 2m;                    # 当文件大小大于2M时，启用直接读取模式
+    directio_alignment 4096;        # 与当前文件系统对齐
+    output_buffers 3 128k;  # 输出缓冲区为384K
+    sendfile on;                    # 小于2M的文件用零复制方式处理
+    sendfile_max_chunk 1m;  # 零复制时最大传输大小为1M
+    tcp_nopush on;          # 零复制时启用最小传输限制功能
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·异步文件传输是通过直接读取硬盘文件的方式实现的，对大文件的传输速度有明显的提升，但对于小文件，仍建议使用零复制的方式实现文件传输。</p> 
+ <p class="ziti4">·当指令值为threads时，不指定pool表示使用默认线程池（参见3.2.2小节），也可以使用自定义线程池。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    thread_pool pool_1 threads=16;
+    aio threads=pool_1;
+    directio   2m;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-93　异步文件I/O写指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-93.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-93.jpg" class="calibre126"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    aio on;
+    aio_write on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-94　发送超时指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-94.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-94.jpg" class="calibre127"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   send_timeout 20s;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-95　推迟发送指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-95.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-95.jpg" class="calibre128"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   postpone_output 2048;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-96　分块传输编码指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-96.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-96.jpg" class="calibre129"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   chunked_transfer_encoding off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

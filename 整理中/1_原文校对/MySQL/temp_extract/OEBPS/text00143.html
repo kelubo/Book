@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">9.5.7　中小企业MySQL Xtrabackup物理增量恢复案例实战</h3>
+<p class="ziti">前文讲解的Xtrabackup增量恢复是不完善的，本节将讲解较为复杂的恢复方法，即内部管理人员通过SQL语句将数据误删除后，所采用的完善恢复方案会涉及为Xtrabackup进行全量与增量备份，以及binlog日志的恢复知识。</p>
+<p class="ziti">在讲解案例之前，思考一下具备什么样的条件才能完整地物理恢复数据库数据。</p>
+<p class="ziti">答案具体如下。</p>
+<p class="ziti6">·具备全量备份（Xtrabckup备份的全备）。</p>
+<p class="ziti6">·具备全量之后的所有增量备份（Xtrabckup备份的增量）。</p>
+<p class="ziti6">·具备最后一次增量备份以后的所有MySQL的binlog增量日志。</p>
+<p class="ziti">现在，准备模拟数据。假设当前数据库内的数据如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; use oldboy
+Database changed
+mysql&gt; truncate table test;
+Query OK, 0 rows affected (0.02 sec)
+mysql&gt; insert into test values(1,'full01');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; insert into test values(2,'full02');
+Query OK, 1 row affected (0.01 sec)
+mysql&gt; insert into test values(3,'full03');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; insert into test values(4,'full04');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; insert into test values(5,'full05');
+Query OK, 1 row affected (0.00 sec)
+mysql&gt; select * from test;
++----+--------+
+| id | name   |
++----+--------+
+|  1 | full01 |
+|  2 | full02 |
+|  3 | full03 |
+|  4 | full04 |
+|  5 | full05 |
++----+--------+
+5 rows in set (0.00 sec)</pre>
+<hr/>
+<p class="ziti">先模拟3月21日0点开始对数据库oldboy数据进行全备：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# date -s "2018/03/21"
+Sun Mar 21 00:00:00 EDT 2018
+[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password= oldboy123 --socket=/application/mysql-5.6.34/tmp/mysql.sock --no-timestamp /server/backup/new_base_full</pre>
+<hr/>
+<p class="ziti">然后模拟3月21日0点全备之后（0：00-24：00点）用户继续写入数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "use oldboy;insert into test values(6,'new_inc_one_1');"
+[root@oldboy ~]# mysql -e "use oldboy;insert into test values(7,'new_inc_one_2');"
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"
++----+---------------+
+| id | name          |
++----+---------------+
+|  1 | full01        |
+|  2 | full02        |
+|  3 | full03        |
+|  4 | full04        |
+|  5 | full05        |
+|  6 | new_inc_one_1 |
+|  7 | new_inc_one_2 |
++----+---------------+</pre>
+<hr/>
+<p class="ziti">之后，在3月22日0点做增量备份（没做全备）：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# date -s "2018/03/22"
+Wed Mar 22 00:00:00 EDT 2018
+[root@oldboy ~]# innobackupex --defaults-file=/etc/my.cnf --user=root --password= oldboy123 --socket=/application/mysql-5.6.34/tmp/mysql.sock --no-timestamp --incremental-basedir=/server/backup/new_base_full --incremental /server/backup/new_one_inc</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 可以按周每天一直增量备份到下一次全备之前，这里就以备份一次增量为例，减少篇幅。</p>
+<p class="ziti">在3月22日0点增备之后（0：00-24：00）用户继续写入数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "use oldboy;insert into test values(8,'binlog_data_1');"
+[root@oldboy ~]# mysql -e "use oldboy;insert into test values(9,'binlog_data_2');"
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"
++----+---------------+
+| id | name          |
++----+---------------+
+|  1 | full01        |
+|  2 | full02        |
+|  3 | full03        |
+|  4 | full04        |
+|  5 | full05        |
+|  6 | new_inc_one_1 |
+|  7 | new_inc_one_2 |
+|  8 | binlog_data_1 |
+|  9 | binlog_data_2 |
++----+---------------+</pre>
+<hr/>
+<p class="ziti">假设3月22日上午10：00点管理人员误删除了oldboy数据库：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# date -s "2018/03/22 10:00"
+Tue Mar 22 10:00:00 EDT 2018
+[root@oldboy ~]# mysql  -e "drop database oldboy;show databases;"
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| oldboy_utf8        |
+| performance_schema |
++--------------------+</pre>
+<hr/>
+<p class="ziti">数据库出问题10分钟后，公司的网站运营人员报网站故障，联系运维人员、DBA解决。此时，DBA或开发人员会查看网站报错（或者查看后台日志），可以看到连不上oldboy数据库的提示，然后登录数据库排查，发现数据库oldboy库已经不存在了，经过询问才知道是管理员10点左右刚刚清除了一个“没有用的”数据库……问题的原因终于找到了。事实上，登录系统分析系统审计日志，以及分析数据库binlog也可以发现库丢失的原因；开发人员通过程序日志判断应该也可以查出来原因。</p>
+<p class="ziti">找到了原因，就可以开始进行恢复前的准备。</p>
+<p class="ziti">1）移走所有binlog增量文件，防止被二次破坏。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cp -a /application/mysql/logs /server/backup/binlog</pre>
+<hr/>
+<p class="ziti">2）开始恢复数据前的增量备份和全备合并。</p>
+<p class="ziti">先合并全备数据到新全备目录，即恢复第一天0点前的所有数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --use-memory=32M --redo-only /server/backup/new_base_full/</pre>
+<hr/>
+<p class="ziti">再合并增量数据到新全备目录，即恢复第二天0点前的所有数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --use-memory=32M --incremental-dir=/server/backup/new_one_inc /server/backup/new_base_full/</pre>
+<hr/>
+<p class="ziti">最后应用所有redo日志，并回滚未提交的数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# innobackupex --apply-log --use-memory=32M /server/backup/new_base_full/</pre>
+<hr/>
+<p class="ziti">3）开始恢复binlog日志数据。</p>
+<p class="ziti">由于3月22日0～10点之前的所有数据并不在全备里，也不在增量里，而是在MySQL的binlog日志里，因此还要进行如下操作来完成恢复。</p>
+<p class="ziti">首先查看3月22日0点最后一次增量的binlog位置信息：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cat /server/backup/new_one_inc/xtrabackup_binlog_info
+oldboy-bin.000006 588</pre>
+<hr/>
+<p class="ziti">这个位置信息以后的binlog才是我们需要的，以前的数据在Xtrabackup的全量和增量里已经有了，然后查看问题出现后第一时间备份的binlog文件信息：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# ll /server/backup/binlog/oldboy-bin*
+-rw-rw----. 1 mysql mysql  143 Mar 20 11:29 /server/backup/binlog/oldboy-bin.000001
+-rw-rw----. 1 mysql mysql  143 Mar 20 12:14 /server/backup/binlog/oldboy-bin.000002
+-rw-rw----. 1 mysql mysql 1058 Mar 20 13:52 /server/backup/binlog/oldboy-bin.000003
+-rw-rw----. 1 mysql mysql  120 Mar 20 13:56 /server/backup/binlog/oldboy-bin.000004
+-rw-rw----. 1 mysql mysql 1941 Mar 21 10:06 /server/backup/binlog/oldboy-bin.000005
+-rw-rw----. 1 mysql mysql  709 Mar 22 10:12 /server/backup/binlog/oldboy-bin.000006
+-rw-rw----. 1 mysql mysql  588 Mar 22 10:18 /server/backup/binlog/oldboy-bin.000007
+-rw-rw----. 1 mysql mysql  294 Mar 22 10:14 /server/backup/binlog/oldboy-bin.index</pre>
+<hr/>
+<p class="ziti">从上面的信息可知，需要使用的两个binlog文件分别为oldboy-bin.000006和oldboy-bin.000007。</p>
+<p class="ziti">现在从oldboy-bin.000006文件的588位置点开始恢复增量数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd /server/backup/binlog
+[root@oldboy binlog]# mysqlbinlog -d oldboy oldboy-bin.000006 oldboy-bin. 000007 --start-position=588 -r bin.sql</pre>
+<hr/>
+<p class="ziti">这里要剔除误删数据库的drop语句，否则，直接恢复就又进入了删库故障的坑：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy binlog]# grep -w drop  bin.sql #&lt;==过滤drop单词的行。
+drop database oldboy
+[root@oldboy binlog]# sed -i '/drop database oldboy/d' bin.sql
+#&lt;==删除drop数据库oldboy的语句。
+[root@oldboy binlog]# grep -w drop  bin.sql</pre>
+<hr/>
+<p class="ziti">需要特别强调的是，本案例是删除数据库了，因此binlog日志就不再增长了，所以可以利用上文第一时间备份的binlog恢复，如果是update操作误改了数据又没有停库，那么，此时最好是在数据库服务器上用Iptables控制应用程序连接数据库之后，再从上述binlog位置点开始读取正式日志目录下的所有binlog日志，一直将Iptables限制访问时的所有binlog日志恢复完。</p>
+<p class="ziti">下面开始正式恢复数据库数据的实战。</p>
+<p class="ziti">1）停止数据库对外访问。因为是使用drop命令删除库，而且后面不会有写入了，所以可以不用额外停止写入，但如果是update导致的数据破坏，那么最好是在发现问题的第一时间就进行停库处理或对外停止写入。这里采用Iptables防火墙屏蔽所有应用程序的写入。</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# iptables -I INPUT -p tcp --dport 3306 ! -s 172.16.1.51 -j DROP
+#&lt;==非172.16.1.51禁止访问数据库3306端口。</pre>
+<hr/>
+<p class="ziti">2）恢复处理好的Xtrabackup备份的全量及增量数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop                #&lt;==恢复时要停库。
+Shutting down MySQL.. SUCCESS!
+[root@oldboy ~]# ss -lnt|grep 3306
+[root@oldboy ~]# mv /application/mysql/data /tmp/data3  #&lt;==移走旧的数据。
+[root@oldboy ~]# mkdir -p /application/mysql/data
+#&lt;==原始数据目录/application/mysql/data要为空。
+[root@oldboy ~]# mv /server/backup/new_base_full/* /application/mysql/data/
+#&lt;==采用mv，而不是xtrabackup的--copy-back参数还原，使用mv的时候，前文的MySQL
+       配置就可以采用了。
+[root@oldboy ~]# chown -R mysql.mysql /application/mysql/data/
+#&lt;==别忘了重新授权。
+[root@oldboy ~]# /etc/init.d/mysqld start           #&lt;==恢复完毕，启动数据库。
+Starting MySQL. SUCCESS!
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"
++----+---------------+
+| id | name          |
++----+---------------+
+|  1 | full01        |
+|  2 | full02        |
+|  3 | full03        |
+|  4 | full04        |
+|  5 | full05        |
+|  6 | new_inc_one_1 |
+|  7 | new_inc_one_2 |
++----+---------------+</pre>
+<hr/>
+<p class="ziti">到此，使用Xtrabackup备份的到3月21日的全备数据和3月22日0点之前增量备份的数据都回来了。</p>
+<p class="ziti">接下来开始恢复3月22日0点到10点的数据库数据。</p>
+<p class="ziti">这时需要恢复binlog数据，即从binlog解析出数据并且清理了drop语句的bin.sql文件：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd /server/backup/binlog
+[root@oldboy binlog]# mysql oldboy&lt;bin.sql #&lt;==恢复binlog数据。
+[root@oldboy binlog]# mysql -e "select * from oldboy.test;"
++----+---------------+
+| id | name          |
++----+---------------+
+|  1 | full01        |
+|  2 | full02        |
+|  3 | full03        |
+|  4 | full04        |
+|  5 | full05        |
+|  6 | new_inc_one_1 |
+|  7 | new_inc_one_2 |
+|  8 | binlog_data_1 |  #&lt;==binlog里记录的数据回来了。
+|  9 | binlog_data_2 |
++----+---------------+</pre>
+<hr/>
+<p class="ziti">到此，就实现了利用Xtrabackup程序进行全备和增量备份的恢复，并且使用binlog进行了完整的数据恢复。</p>
+</body>
+</html>

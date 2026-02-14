@@ -1,0 +1,228 @@
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息
+\input{../../../common/page}
+
+% 设置字体
+\xeCJKsetup{AutoFallBack=true}
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 设置 part 和 chapter 标题格式
+\ctexset{
+	part/name= {第,卷},
+	part/number={\chinese{part}},
+	chapter/name={第,篇},
+	chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 列表项向右偏移
+\usepackage{enumitem}
+% 强制表格位置
+\usepackage{float}
+
+\title{\heiti\zihao{0} 铁氧体材料}
+\author{WangFei}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\frontmatter
+\chapter{前言}
+
+铁氧体材料是收音机等电子设备中不可或缺的重要磁性材料，本章节将详细介绍铁氧体的基本特性、分类、常用型号、应用以及选择原则等内容。
+
+\mainmatter
+
+% 增加空行
+~\\
+
+\chapter{铁氧体材料}
+
+铁氧体（Ferrite）是一种由铁的氧化物与其他金属氧化物（如锰、锌、镍、镁等）组成的复合氧化物陶瓷材料，具有亚铁磁性。在收音机等电子设备中，铁氧体材料有着广泛的应用。
+
+\section{铁氧体的基本特性}
+
+铁氧体材料具有以下基本特性：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{高电阻率}：相比金属磁性材料，铁氧体的电阻率要高得多，通常在 $10^2$ 至 $10^{10} \Omega\cdot cm$ 之间，这使得它在高频应用中具有较低的涡流损耗。
+    \item \textbf{高磁导率}：在一定频率范围内，铁氧体具有较高的磁导率，有利于提高电感元件的性能。
+    \item \textbf{居里温度}：当温度超过居里温度时，铁氧体将失去磁性。不同类型的铁氧体具有不同的居里温度。
+    \item \textbf{频率特性}：铁氧体的磁导率会随着频率的升高而下降，不同类型的铁氧体适用于不同的频率范围。
+\end{itemize}
+
+\section{铁氧体的分类}
+
+根据晶体结构和应用特点，铁氧体可分为以下几类：
+
+\subsection{尖晶石型铁氧体}
+
+尖晶石型铁氧体的化学通式为 $MFe_2O_4$，其中 M 为二价金属离子（如 Mn、Zn、Ni、Mg 等）。这类铁氧体是应用最广泛的一种，主要包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{锰锌铁氧体（MnZn）}：具有高磁导率和低损耗特性，适用于中频和低频范围（1kHz-1MHz），常用于变压器、电感器等。
+    \item \textbf{镍锌铁氧体（NiZn）}：具有较高的电阻率和较好的高频特性，适用于高频范围（1MHz-300MHz），常用于天线磁芯、高频变压器等。
+\end{itemize}
+
+\subsection{石榴石型铁氧体}
+
+石榴石型铁氧体的化学通式为 $M_3Fe_5O_{12}$，其中 M 为三价稀土金属离子（如 Y、Gd、Sm 等）。这类铁氧体具有优良的高频特性和磁光特性，适用于微波领域和光电子技术。
+
+\subsection{磁铅石型铁氧体}
+
+磁铅石型铁氧体的化学通式为 $MFe_{12}O_{19}$，其中 M 为二价金属离子（如 Ba、Sr、Pb 等）。这类铁氧体具有高矫顽力和高剩磁，属于硬磁材料，常用于永磁体。
+
+\section{常用铁氧体型号}
+
+在收音机和其他电子设备中，常用的铁氧体型号及其特性如下：
+
+\subsection{锰锌铁氧体常用型号}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{型号} & \textbf{磁导率} & \textbf{适用频率} & \textbf{主要应用} \\
+        \hline
+        PC40 & 2000-3000 & 1kHz-100kHz & 电源变压器、电感器 \\
+        \hline
+        PC44 & 2300-3300 & 1kHz-100kHz & 开关电源、滤波器 \\
+        \hline
+        PC50 & 1500-2500 & 1kHz-1MHz & 高频变压器、电感器 \\
+        \hline
+        TDK PC95 & 10000 & 1kHz-10kHz & 音频变压器、扼流圈 \\
+        \hline
+        EPCOS N41 & 400 & 1kHz-1MHz & 天线磁棒、中频变压器 \\
+        \hline
+    \end{tabular}
+    \caption{锰锌铁氧体常用型号及特性}
+    \label{tab:mnzn_ferrite}
+\end{table}
+
+\subsection{镍锌铁氧体常用型号}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{型号} & \textbf{磁导率} & \textbf{适用频率} & \textbf{主要应用} \\
+        \hline
+        NX20 & 200 & 1MHz-50MHz & 天线磁芯、高频变压器 \\
+        \hline
+        NX40 & 400 & 1MHz-30MHz & 射频变压器、电感器 \\
+        \hline
+        NX60 & 600 & 1MHz-20MHz & 中频变压器、滤波器 \\
+        \hline
+        TDK YG10 & 120 & 1MHz-100MHz & 高频天线、匹配网络 \\
+        \hline
+        EPCOS N48 & 80 & 1MHz-300MHz & 甚高频天线、谐振电路 \\
+        \hline
+    \end{tabular}
+    \caption{镍锌铁氧体常用型号及特性}
+    \label{tab:nizn_ferrite}
+\end{table}
+
+\subsection{天线磁棒专用铁氧体}
+
+收音机天线磁棒常用的铁氧体型号及其特性：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{MXO-200}：磁导率约 200，适用于中波天线，接收灵敏度适中
+    \item \textbf{MXO-400}：磁导率约 400，适用于中波和长波天线，接收灵敏度较好，是收音机中最常用的天线磁棒材料
+    \item \textbf{MXO-600}：磁导率约 600，适用于中波和长波天线，接收灵敏度高
+    \item \textbf{MXO-1000}：磁导率约 1000，适用于中波和长波天线，接收灵敏度很高
+    \item \textbf{R40C1}：磁导率约 400，适用于中波和长波天线，具有良好的温度稳定性和一致性，是专业收音机常用的天线磁棒材料
+    \item \textbf{NXO-100}：磁导率约 100，适用于短波天线，高频特性好
+\end{itemize}
+
+\paragraph{长波接收专用铁氧体}
+
+对于长波接收（频率范围通常为 30kHz-300kHz），建议使用以下铁氧体材料：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{锰锌铁氧体（MnZn）}：适用于低频范围，是长波接收的理想选择
+    \item \textbf{高磁导率型号}：如 MXO-600 或 MXO-1000，能更有效地集中磁场，提高长波接收能力
+    \item \textbf{专业选择}：R40C1 具有良好的温度稳定性，适合专业级长波接收设备
+\end{itemize}
+
+长波接收时，建议使用较长的磁棒以获得更好的接收效果。
+
+\section{铁氧体在收音机中的应用}
+
+在收音机中，铁氧体材料主要应用于以下部件：
+
+\subsection{天线磁棒}
+
+收音机的中波天线通常采用铁氧体磁棒，其作用是：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 集中空间磁场，提高天线的接收能力
+    \item 增加天线线圈的电感量，减小线圈体积
+    \item 提高天线的选择性
+\end{itemize}
+
+常用的天线磁棒材料为锰锌铁氧体，其磁导率一般在 400-1000 之间。
+
+\subsection{高频变压器磁芯}
+
+在收音机的高频放大电路中，铁氧体磁芯用于制作高频变压器，其作用是：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 耦合信号
+    \item 阻抗匹配
+    \item 隔离直流
+\end{itemize}
+
+高频变压器通常采用镍锌铁氧体磁芯，以适应较高的工作频率。
+
+\subsection{电感元件}
+
+在收音机的调谐电路、滤波电路中，铁氧体磁芯用于制作各种电感元件，如：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 调谐线圈
+    \item 滤波电感
+    \item 扼流圈
+\end{itemize}
+
+\section{铁氧体材料的选择原则}
+
+在选择收音机中使用的铁氧体材料时，应考虑以下因素：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{工作频率}：根据电路的工作频率选择合适类型的铁氧体
+    \item \textbf{磁导率}：根据所需电感量和线圈尺寸选择合适磁导率的铁氧体
+    \item \textbf{损耗特性}：在高频应用中，应选择损耗较小的铁氧体
+    \item \textbf{温度稳定性}：考虑工作温度范围，选择温度稳定性好的铁氧体
+    \item \textbf{成本}：在满足性能要求的前提下，选择成本较低的铁氧体
+\end{itemize}
+
+\section{铁氧体的发展趋势}
+
+随着电子技术的不断发展，铁氧体材料也在不断改进和创新：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{高频化}：开发适用于更高频率的铁氧体材料
+    \item \textbf{低损耗}：降低铁氧体在高频下的损耗
+    \item \textbf{高稳定性}：提高铁氧体的温度稳定性和时间稳定性
+    \item \textbf{小型化}：开发高磁导率的铁氧体，以减小元件体积
+    \item \textbf{多功能化}：开发兼具多种特性的复合铁氧体材料
+\end{itemize}
+
+铁氧体材料作为一种重要的磁性材料，在收音机等电子设备中发挥着不可替代的作用。随着材料科学的进步，铁氧体的性能将不断提高，为电子设备的发展提供有力支持。
+
+\backmatter
+
+\end{document}

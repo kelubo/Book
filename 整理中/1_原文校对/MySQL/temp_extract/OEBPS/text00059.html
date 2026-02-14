@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">4.3　MySQL多实例常见的配置方案</h2>
+<h3 class="p3">
+<a id="b1">4.3.1　单一配置文件、单一启动程序多实例部署方案</a>
+</h3>
+<p class="ziti">下面是MySQL官方文档提到的单一配置文件、单一启动程序多实例部署方案，老男孩老师不推荐此方案，这里仅作为知识点提及，后文不会再涉及此方案。my.cnf配置文件示例（MySQL手册里提到的方法）如下：</p>
+<hr/>
+<pre class="ziti1">[mysqld_multi]
+mysqld     = /usr/bin/mysqld_safe
+mysqladmin = /usr/bin/mysqladmin
+user       = mysql
+[mysqld1]
+socket     = /var/lib/mysql/mysql.sock
+port       = 3306
+pid-file   = /var/lib/mysql/mysql.pid
+datadir    = /var/lib/mysql/
+user       = mysql
+[mysqld2]
+socket     = /mnt/data/db1/mysql.sock
+port       = 3302
+pid-file   = /mnt/data/db1/mysql.pid
+datadir    = /mnt/data/db1/
+user       = mysql
+skip-name-resolve
+server-id=10
+default-storage-engine=innodb
+innodb_buffer_pool_size=512M
+innodb_additional_mem_pool=10M
+default_character_set=utf8
+character_set_server=utf8
+#read-only
+relay-log-space-limit=3G
+expire_logs_day=20</pre>
+<hr/>
+<p class="ziti">启动程序的命令如下：</p>
+<hr/>
+<pre class="ziti1">mysqld_multi --config-file=/data/mysql/my_multi.cnf start 1,2</pre>
+<hr/>
+<p class="ziti">该方案的缺点是耦合度太高，只有一个配置文件，不好管理。工作开发和运维的统一原则是：降低耦合度。</p>
+</body>
+</html>

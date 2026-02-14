@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_196">10.4.1　Prometheus简介</h3> 
+ <p class="ziti3">Prometheus是由SoundCloud开源的监控告警解决方案，其在GitHub上的Star数已经超过3.1万，已成为很多大公司首选的监控解决方案。Prometheus由Prometheus Server、PushGateway、Alertmanager、Exporter等4个组件共同组成。其中，Exporter可以由用户自行开发，只需输出符合Prometheus的规范数据即可；Prometheus Server提供了api接口并支持自定义的PromQL查询语言对外实现监控数据查询输出，结合Grafana强大的图形模板功能，可以非常直观地以监控数据统计图表的形式进行展示。Prometheus结构如图10-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-2.jpg" class="calibre312"/></a> 
+ </div> 
+ <p class="middle-img">图10-2　Prometheus结构</p> 
+ <p class="ziti4">·Prometheus Server：Prometheus的基础服务，其从配置文件中job配置的tagrets目标服务器拉取监控数据，拉取数据周期由配置参数scrape_interval设置，同时开放api接口提供监控数据的对外查询和聚合分析功能。</p> 
+ <p class="ziti4">·PushGateway：Prometheus的推送网关服务。Prometheus默认都是从被监控服务器上拉取监控数据的，但由于网络原因无法直接访问目标服务器时，可在被监控服务器上通过脚本或工具采集监控数据，然后推送给推送网关服务（PushGateway），Prometheus的基础服务则实时地从推送网关服务提供的端口9091拉取监控数据，完成监控操作。</p> 
+ <p class="ziti4">·Alertmanager：Prometheus的告警服务，其对外开放端口9093接收Prometheus Server发送的告警信息，并按照告警规则将告警信息发送给接收目标。</p> 
+ <p class="ziti4">·Exporter：监控数据采集接口服务，该服务可由用户按照Prometheus的数据规范自行开发，只需提供对外访问接口，并能输出Prometheus数据格式的监控数据即可。</p> 
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">14.1.1　MySQL主从复制介绍</h3>
+<p class="ziti">MySQL数据库支持单向、双向、链式级联、环状等不同业务场景的主从复制。在复制过程中，一台服务器（严格来讲是实例）作为主数据库（Master），接收来自用户的、对其内容的更新，而一个或多个其他的服务器则作为从服务器（Slave），接收来自主服务器binlog文件的日志内容，然后将该日志内容解析出的SQL语句重新应用到其他从服务器中，使得主从服务器数据达到一致。</p>
+<p class="ziti">如果设置了链式级联复制，那么，从服务器本身除了作为从服务器之外，也会同时作为其下面从服务器的主数据库服务器。链式级联复制形式类似于A==&gt;B==&gt;C。</p>
+<p class="ziti">图14-1和图14-2均为单向主从复制架构逻辑图，此架构只能在Master服务器端进行数据写入。</p>
+<div class="pic"><img alt="" src="Image00107.jpg" />
+</div>
+<p class="middle-img">图14-1　一主一从逻辑图示例</p>
+<div class="pic"><img alt="" src="Image00108.jpg" />
+</div>
+<p class="middle-img">图14-2　一主多从逻辑图</p>
+<p class="ziti">图14-3为双向主主复制逻辑架构图，此架构可以在Master服务器1端或Master服务器2端进行数据写入，或者在两端同时写入数据（需要经过特殊设置）。</p>
+<div class="pic"><img alt="" src="Image00109.jpg" />
+</div>
+<p class="middle-img">图14-3　双向主主复制逻辑图</p>
+<p class="ziti">图14-4为线性级联单向双主复制逻辑架构图，此架构只能在Master服务器1端进行数据写入，工作场景Master服务器1和Master服务器2作为主主互备，Slave服务器1作为从库，中间的Master服务器2需要进行特殊的设置。</p>
+<div class="pic"><img alt="" src="Image00110.jpg" />
+</div>
+<p class="middle-img">图14-4　线性级联单向双主复制逻辑图</p>
+<p class="ziti">图14-5为环状级联单向多主同步逻辑架构图，任意一个点都可以写入数据，此架构比较复杂，属于极端环境下的“作品”，一般场景应慎用。</p>
+<div class="pic"><img alt="" src="Image00111.jpg" />
+</div>
+<p class="middle-img">图14-5　环状级联单向多主同步逻辑架构图</p>
+<p class="ziti">此外，MySQL官方手册也给出了常见的复制架构图，如图14-6所示。</p>
+<div class="pic"><img alt="" src="Image00112.jpg" />
+</div>
+<p class="middle-img">图14-6　MySQL官方的常见复制架构图</p>
+<p class="ziti">在当前的生产工作环境中，MySQL主从复制默认都是异步的复制方式，即不是严格实时的数据同步，但是在正常情况下带给用户的体验几乎都是实时的（延迟的情况见后文讲解）。</p>
+</body>
+</html>

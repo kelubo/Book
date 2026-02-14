@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_120">6.1.3　HTTP的反向代理</h3> 
+ <p class="ziti3">反向代理是用户客户端访问代理服务器后，被反向代理服务器软件按照一定的规则从一个或多个被代理服务器中获取响应资源并返回给客户端的代理模式，客户端只知道代理服务器的IP，并不知道后端服务器的IP，原因是代理服务器隐藏了被代理服务器的信息。因为编写Nginx的反向代理配置时，被代理服务器通常会被编写在upstream指令域中，所以被代理服务器也被称为上游服务器。实现原理如图6-2所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/6-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/6-2.jpg" class="calibre227"/></a> 
+ </div> 
+ <p class="middle-img">图6-2　反向代理</p> 
+ <p class="ziti3">为方便反向代理的配置，此处把通用的代理配置写在proxy.conf文件中。在使用时，通过主配置文件nginx.conf用include指令引入。文件proxy.conf的内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cat &gt;proxy.conf&lt;&lt;EOF
+
+proxy_buffering on;           # 启用响应数据缓冲区
+proxy_buffers 8 8k;           # 设置每个HTTP请求读取上游服务器响应数据缓冲区的大小为64KB
+proxy_buffer_size 8k;         # 设置每个HTTP请求读取响应数据第一部分缓冲区的大小为8KB
+proxy_busy_buffers_size 16k;  # 接收上游服务器返回响应数据时，同时用于向客户端发送响应的缓
+                              # 冲区的大小为16KB
+proxy_limit_rate 0;           # 不限制每个HTTP请求每秒读取上游服务器响应数据的流量
+proxy_request_buffering on;   # 启用客户端HTTP请求读取缓冲区功能
+proxy_http_version 1.1;       # 使用HTTP 1.1版本协议与上游服务器建立通信
+proxy_connect_timeout 5s;     # 设置与上游服务器建立连接的超时时间为5s
+proxy_intercept_errors on;    # 拦截上游服务器中响应码大于300的响应处理
+proxy_read_timeout 60s;       # 从上游服务器获取响应数据的间隔超时时间为60s
+60sproxy_send_timeout 60s;    # 向上游服务器发送请求的间隔超时时间为60s
+
+# 设置发送给上游服务器的头属性字段Host为客户端请求头头字段Host的值
+proxy_set_header   Host              $host:$server_port;
+
+# 设置发送给上游服务器的头属性字段Referer为客户端请求头头字段的值Host
+proxy_set_header   Referer           $http_referer;
+             
+# 设置发送给上游服务器的头属性字段Cookie为客户端请求头头字段的值Host
+proxy_set_header   Cookie            $http_cookie;
+
+# 设置发送给上游服务器的头属性字段X-Real-IP为客户端的IP
+proxy_set_header   X-Real-IP         $remote_addr;
+
+# 设置发送给上游服务器的头属性字段X-Forwarded-For为客户端请求头的X-Forwarded-For的
+# 值，如果没有该字段，则等于$remote_addr
+proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+
+# 设置发送给上游服务器的头属性字段X-Forwarded-Proto为请求协议的值
+proxy_set_header   X-Forwarded-Proto $scheme;   
+                    
+EOF
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">在nginx.conf的http指令域中引入该文件，配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    ...
+    include proxy.conf
+    include conf.d/*.conf
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Nginx的指令支持在指令域中对上级指令域指令的继承和修改，若对proxy.conf有特殊配置需求的，可在对应的server指令域中添加同名指令。</p> 
+ <p class="ziti3">反向代理的配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen       8088;
+    access_log  logs/proxy.access.log  main;
+    
+    tcp_nodelay off;                 # 因启用缓冲区功能，所以关闭立刻发送功能
+
+    location ~ ^/ {
+        proxy_force_ranges on;       # 强制启用字节范围请求支持
+        proxy_pass   http://192.168.2.145:8082;
+        break;
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

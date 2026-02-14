@@ -1,0 +1,139 @@
+\documentclass[UTF8]{ctexbook}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{url}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{a4paper, left=2.5cm, right=2.5cm, top=3cm, bottom=3cm}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+\begin{document}
+
+\chapter{无线相关技术介绍}
+
+\section{WIFI6技术概述}
+
+Wi-Fi 6（802.11ax）是第六代无线局域网技术，提供更高的带宽、更低的延迟和更好的多设备连接能力。
+
+\section{Wi-Fi 7 下一代无线标准}
+
+Wi-Fi 7（802.11be）是最新的无线局域网技术标准，进一步提升了传输速度和网络容量。
+
+\chapter{AC + AP 组网方案}
+
+\section{AC + AP方案基础概念}
+
+AC + AP方案一直是企业无线网络的首选方案，也是目前唯一能满足企业级稳定和性能需求的方案。家用路由器无法满足大型网络的需求。
+
+\subsection{AC：无线控制器}
+
+负责统一控制整个无线网络，进行网络功能设置，有独立AC和AC一体机两种形式：
+
+\begin{itemize}
+  \item \textbf{独立AC}：一般作为旁路部署，只进行网络配置和无线功能的计算，不参与数据转发，负载较低。
+  \item \textbf{AC网关一体机}：需要进行数据转发，属于网络的主要设备，复杂度高，运算量大。一旦出现问题，整个网络都无法正常运行，但优势是组网成本低，很适合家用。
+\end{itemize}
+
+\subsection{AP：无线访问点}
+
+只负责网络连接，没有其他多余功能，硬件设置主要围绕无线射频进行：
+
+\begin{itemize}
+  \item 负载根据连接的终端数决定
+  \item 使用多AP方案，单个AP覆盖不会很高，依靠数量解决覆盖不足和负载过高问题
+  \item 单个AP出现故障时，终端可以移动到其他AP，影响较小
+\end{itemize}
+
+\subsection{POE交换机}
+
+带有POE供电功能的交换机，为AP提供数据传输和电力供应，是网络中的核心设备。一旦出现故障，上面连接的所有AP都会离线。
+
+家庭使用中，一般可以使用AC + 网关 + POE的一体机，节省成本。如果一体机上网口不足，再增加独立的POE交换机。
+
+\section{AC + AP方案的优势}
+
+在AC+AP网络中，可以实现以下复杂网络功能：
+
+\begin{itemize}
+  \item 调节AP的无线功率，控制AP的无线覆盖范围
+  \item 调整无线终端的漫游体验
+  \item 设置多个SSID，设置多个VLAN
+  \item 设置访客专用无线，设置访客的Portal认证
+  \item VPN设置等
+\end{itemize}
+
+AP的漫游体验更好，这是用户体验最直观的优势。AP只需要网线，不需要电源线，网线同时提供数据传输和电力供应，在部署上更简单和安全，只有弱电工程，没有强电工程。
+
+AP更美观，企业一般使用吸顶AP，家庭一般使用面板AP，没有外露的天线，外形美观小巧。
+
+\section{AC + AP组网拓扑}
+
+\subsection{独立AC组网拓扑}
+
+AC作为独立设备部署，负责AP管理和数据转发。
+
+这种是普遍的组网方式，AC是独立的，即使在企业环境中也是如此。绝大多数AC负责AP管理和集中的数据转发，所以AC在很大程度上决定整个网络的性能。
+
+\subsection{AC与路由一体机拓扑}
+
+将AC功能与路由集成，节省硬件成本。
+
+部分品牌将AC功能与路由做在一起，节省一个硬件AC的费用。也有的品牌使用软件AC，可以安装在软路由或者PC中，只用来管理AP，不进行数据转发，不是网络中的性能瓶颈。
+
+\subsection{路由+ AC + POE一体化设备拓扑}
+
+将三种功能集成在一个设备中，简化网络结构。
+
+有的品牌将AC、路由、POE功能做在一起，节省POE交换机费用，简化网络拓扑，适合小型网络环境。大部分家用AC+AP产品都会采用这种硬件一体机方案。
+
+\section{AP的分类}
+
+\subsection{按工作方式分类}
+
+\begin{itemize}
+  \item \textbf{胖AP（FAT AP）}：独立工作，相当于一个独立的无线路由器，不需要AC。
+  \item \textbf{瘦AP（FIT AP）}：需要搭配AC才能工作，通过AC进行统一管理。一般都使用瘦AP模式。
+\end{itemize}
+
+\subsection{按安装位置分类}
+
+\begin{itemize}
+  \item \textbf{吸顶/壁挂AP}：可以吸顶安装或者壁挂安装，AP周围很少有遮挡，体积较大，性能更强，信号覆盖范围更好。
+  \item \textbf{面板AP}：大小是86面板，可以安装在墙上暗盒中，预留网线和设计点位时需要注意。受限于86面板，性能稍弱，信号覆盖范围较小。
+\end{itemize}
+
+
+吸顶AP：安装在天花板上，无外露天线，覆盖范围广。
+
+
+面板AP：86面板尺寸，安装在墙面上，美观小巧。
+
+\section{AC+AP组网所需设备清单}
+
+在家用环境下，可以选择AC+POE+网关的一体机，这样就可以3个功能合并为1个设备，节省空间和费用。
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{设备类型} & \textbf{说明} \\
+\hline
+AC控制器 & 独立AC或AC一体机 \\
+\hline
+POE交换机 & 为AP提供数据和电力 \\
+\hline
+AP设备 & 吸顶AP或面板AP \\
+\hline
+网线 & 超五类及以上 \\
+\hline
+其他配件 & 水晶头、扎带、标签等 \\
+\hline
+\end{tabular}
+\caption{AC+AP设备清单}
+\end{table}
+
+\end{document}

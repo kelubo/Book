@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">19.5　Atlas配置文件</h2>
+<p class="ziti">Atlas配置文件的代码如下：</p>
+<hr/>
+<pre class="ziti1">#配置文件路径
+/usr/local/mysql-proxy/conf/test.conf
+#配置文件标签
+[mysql-proxy]
+#带#号的为非必需的配置项目
+#管理接口的用户名
+admin-username = user
+#管理接口的密码
+admin-password = pwd
+#Atlas后端连接的MySQL主库的IP和端口，可设置多项，用逗号分隔
+proxy-backend-addresses = 192.168.1.10:3306，192.168.1.11：3306
+#Atlas后端连接的MySQL从库的IP和端口， “@”后面的数字代表权重，用来作负载均衡，若省略则默认为1，可设置多项，用逗号分隔。
+proxy-read-only-backend-addresses = 192.168.1.231:3306
+#用户名与其对应的加密过的MySQL密码，密码使用PREFIX/bin目录下的加密程序encrypt加密，以下行的user1和user2为示例，将其替换为你的MySQL的用户名和加密密码！
+pwds = root: 1N/CNLSgqXuTZ6zxvGQr9A==
+#设置Atlas的运行方式，设为true时为守护进程方式，设为false时为前台方式，一般开发调试时将其设为false，线上运行时设为true,true后面不能有空格。
+daemon = true
+#设置Atlas的运行方式，设为true时Atlas会启动两个进程，一个为monitor，一个为worker，monitor在worker意外退出后会自动将其重启，设为false时只有worker，没有monitor，一般开发调试时设为false，线上运行时设为true,true后面不能有空格。
+keepalive = true
+#工作线程数，对Atlas的性能有很大的影响，可根据情况进行适当设置。
+event-threads = 8
+#日志级别，分为message、warning、critical、error、debug五个级别。
+log-level = message
+#日志存放的路径。
+log-path = /usr/local/mysql-proxy/log
+#SQL日志的开关，可设置为OFF、ON、REALTIME，OFF代表不记录SQL日志，ON代表记录SQL日志，REALTIME代表记录SQL日志且实时写入磁盘，默认为OFF。
+sql-log = ON
+#慢日志输出设置。若设置了该参数，则日志只输出执行时间超过sql-log-slow（单位为ms)的日志记录。若不设置该参数则输出全部日志。
+#sql-log-slow = 10
+#实例名称，用于同一台机器上多个Atlas实例间的区分。
+#instance = test
+#Atlas监听的工作接口IP和端口。
+proxy-address = 0.0.0.0:3307
+#Atlas监听的管理接口IP和端口。
+admin-address = 0.0.0.0:2345
+#分表设置，此例中，person为库名，mt为表名，id为分表字段，3为子表数量，可设置多项，以逗号分隔，若不分表则不需要设置该项。
+#tables = person.mt.id.3
+#默认字符集，设置该项后客户端不再需要执行SET NAMES语句。
+charset = utf8
+#允许连接Atlas的客户端的IP，可以是精确IP，也可以是IP段，以逗号分隔，若不设置该项则允许所有IP连接，否则只允许列表中的IP连接。
+#client-ips = 127.0.0.1, 192.168.1
+#Atlas前面挂接的LVS的物理网卡的IP(注意不是虚IP)，若有LVS且设置了client-ips，则必须设置此项，否则可以不设置。
+#lvs-ips = 192.168.1.1</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 对用户密码加密，在/usr/local/mysql-proxy/bin下有个encrypt工具，执行该工具将需要加密的密码输入在后面即可。</p>
+<hr/>
+<pre class="ziti1">#例：
+#root的密码是oldboy123
+/usr/local/mysql-proxy/bin/encrypt oldboy123
+#执行后会出现如下加密后的密码，写入配置文件即可。
+1N/CNLSgqXuTZ6zxvGQr9A==
+Atlas配置文件示例：
+[mysql-proxy]
+admin-username = user
+admin-password = pwd
+proxy-backend-addresses = 10.0.0.55:3306
+proxy-read-only-backend-addresses = 10.0.0.52:3306,10.0.0.53:3306
+pwds = root: 1N/CNLSgqXuTZ6zxvGQr9A==
+daemon = true
+keepalive = true
+event-threads = 8
+log-level = message
+log-path = /usr/local/mysql-proxy/log
+sql-log=ON
+proxy-address = 0.0.0.0:33060
+admin-address = 0.0.0.0:2345
+charset=utf8</pre>
+<hr/>
+</body>
+</html>

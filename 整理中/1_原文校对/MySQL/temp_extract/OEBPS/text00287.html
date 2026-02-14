@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">18.8.2　配置脚本</h3>
+<hr/>
+<pre class="ziti1">#在配置文件中添加以下内容，指定master_ip_failover脚本的路径
+master_ip_failover_script=/usr/local/bin/master_ip_failover
+#在脚本中添加VIP相关的内容（这个脚本是MHA-Manager自带的）
+my $vip = '10.0.0.55/24';
+my $key = '0';
+my $ssh_start_vip = "/sbin/ifconfig eth0:$key $vip";
+my $ssh_stop_vip = "/sbin/ifconfig eth0:$key down";
+#为脚本添加执行权限（否则MHA会无法启动）
+chmod +x /etc/mha/master_ip_failover
+#然后在主库上手动添加一个VIP
+ifconfig eth0:0 10.0.0.55/24</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 大家可以将MHA与一些读写分离的软件一起结合使用，例如第19章会讲到的Atlas。</p>
+</body>
+</html>

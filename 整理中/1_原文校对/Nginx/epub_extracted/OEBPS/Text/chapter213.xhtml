@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_228">12.2.4　日志管理</h3> 
+ <p class="ziti3">Nginx Ingress是以Pod方式运行的，在默认配置下，Nginx的日志输出到stdout及stderr。Kubernetes下有很多日志收集解决方案，此处推荐使用Filebeat进行容器日志收集，并将容器日志实时发送到ELK集群，ELK环境部署可参见9.2节，日志收集方案逻辑如图12-11所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/12-11.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/12-11.jpg" class="calibre358"/></a> 
+ </div> 
+ <p class="middle-img">图12-11　日志收集方案逻辑</p> 
+ <p class="ziti4">·Docker的默认日志驱动是json-driver，每个容器的日志输出到stdout及stderr中时，Docker的日志驱动会将容器日志以*-json.log的命名方式保存在/var/lib/docker/containers/目录下。</p> 
+ <p class="ziti4">·在Kubernetes集群中以DaemonSet方式部署Filebeat应用，会在每个Node节点运行一个Filebeat应用Pod，进行每个Node节点的容器日志采集。</p> 
+ <p class="ziti4">·Filebeat采集的日志可以直接发送给Logstash服务器，也可以发送给Kafka后由Logstash服务器进行异步获取。</p> 
+ <p class="ziti4">·所有日志被Logstash转到Elasticsearch集群进行存储。</p> 
+ <p class="ziti4">·使用者通过Kibana进行日志查看和分析。</p> 
+ <p class="ziti3">（1）部署Filebeat</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 获取官方的Filebeat资源配置文件
+curl -L -O https://raw.githubusercontent.com/elastic/beats/7.3/deploy/kubernetes/filebeat-kubernetes.yaml
+
+# 修改filebeat输出目标为Logstash
+sed -i "s/   cloud.id/          #cloud.id/g" filebeat-kubernetes.yaml
+sed -i "s/   cloud.auth/        #cloud.auth/g" filebeat-kubernetes.yaml
+
+sed -i "s/    output.elasticsearch:/    output.logstash:/g" filebeat-kubernetes.yaml
+sed -i 's/    hosts:.*/     hosts: ["10\.10\.4\.37:5045"]/g' filebeat-kubernetes.yaml
+sed -i "s/    username/ #username/g" filebeat-kubernetes.yaml
+sed -i "s/    password/ #password/g" filebeat-kubernetes.yaml
+
+kubectl create -f filebeat-kubernetes.yaml
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）配置Logstash</p> 
+ <p class="ziti3">按照kubernetes.labels.app创建容器日志在Elasticsearch中的索引，配置文件内容如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cat&gt;logstash/pipeline/k8s.conf&lt;&lt;EOF
+input {
+    beats {
+        port =&gt; 5045
+        codec =&gt;"json"
+    }
+}
+filter {
+    mutate {
+        # 添加字段kubernetes_apps默认值为kubernetes_noapps
+        add_field =&gt; { "kubernetes_apps" =&gt; "kubernetes_noapps" }
+    }
+    if [kubernetes][labels][app] {
+        mutate {
+            # 当存在kubernetes.labels.app时，将该字段复制为字段kubernetes_apps
+            copy =&gt; { 
+            "[kubernetes][labels][app]" =&gt; "kubernetes_apps"
+            }
+        }
+    }
+}
+output {
+    elasticsearch {
+        # 将log输出到ES服务器
+        hosts =&gt; ["http://10.10.4.37:9200"]
+        # 根据字段kubernetes_apps的值创建ES索引
+        index =&gt; "k8slog-%{kubernetes_apps}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
+    }
+}
+EOF
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Helm默认会为安装的应用添加app标签，通过Helm安装Nginx Ingress的app标签值为nginx-ingress，因此Elasticsearch中自动创建的索引名前缀为k8slog-nginx-ingress-*。</p> 
+</body>
+</html>

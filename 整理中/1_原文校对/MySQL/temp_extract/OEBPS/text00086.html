@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">5.5.1　找回MySQL单实例root用户密码的方法</h3>
+<p class="ziti">首先停止MySQL服务，示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop
+Shutting down MySQL.... SUCCESS!</pre>
+<hr/>
+<p class="ziti">然后，使用mysqld_safe附带的“--skip-grant-tables”（忽略授权登录验证）启动MySQL服务。示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysqld_safe --skip-grant-tables --user=mysql &gt;/dev/null 2&gt;&amp;1 &amp;
+[1] 57303  #&lt;==在启动时加--skip-grant-tables参数，表示忽略授权表验证。
+[root@oldboy ~]# ss -lnt|grep 330
+LISTEN     0      80                       :::3306                    :::*</pre>
+<hr/>
+<p class="ziti">现在，无须密码即可登录MySQL，示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql #&lt;==登录时空密码即可。
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 1
+Server version: 5.6.34 Source distribution
+……省略若干行……
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+mysql&gt; mysqld_safe --skip-grant-tables --user=mysql &gt;/dev/null 2&gt;&amp;1 &amp;
+mysql #&lt;==登录时空密码即可。</pre>
+<hr/>
+<p class="ziti">这时，可以将root密码修改为新密码了，示例如下：</p>
+<hr/>
+<pre class="ziti1">mysql&gt; set password=password('oldboy123'); #&lt;==该方法在此处无效。
+ERROR 1290 (HY000): The MySQL server is running with the --skip-grant-tables option so it cannot execute this statement
+mysql&gt; update mysql.user set password=PASSWORD("oldboy123") where user="root" and host="localhost";
+Query OK, 0 rows affected (0.01 sec)       #&lt;==该方法正合适，mysqladmin的方法
+                                          在这里也是无效的。
+Rows matched: 1  Changed: 0  Warnings: 0
+mysql&gt; flush privileges;                   #&lt;==刷新权限使得修改密码生效。
+Query OK, 0 rows affected (0.01 sec)
+mysql&gt; quit
+Bye</pre>
+<hr/>
+<p class="ziti">重启MySQL服务，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# /etc/init.d/mysqld stop #&lt;==也可以执行mysqladmin -uroot
+                                          -poldboy123 shutdown。
+Shutting down MySQL.. SUCCESS!
+[1]+  Done   mysqld_safe --skip-grant-tables --user=mysql &gt; /dev/null 2&gt;&amp;1
+[root@oldboy ~]# /etc/init.d/mysqld start
+Starting MySQL. SUCCESS!</pre>
+<hr/>
+<p class="ziti">可再登录进行测试，示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -uroot -poldboy  #&lt;==使用错误的密码导致无法登录。
+Warning: Using a password on the command line interface can be insecure.
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+[root@oldboy ~]# mysql -uroot -poldboy123 #&lt;==使用修改过后的密码即可登录了。
+Warning: Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 3
+...省略若干行...
+mysql&gt;</pre>
+<hr/>
+<p class="ziti">需要说明的是，加“--skip-grant-tables”参数登录后，修改完密码一定要重启，然后再对外提供服务。如果你发现重启后使用MySQL不加密码依然可以登录，请查看是不是配置文件设置了密码。此外，在MySQL命令行使用的密码会覆盖my.cnf配置文件中配置的密码。</p>
+</body>
+</html>

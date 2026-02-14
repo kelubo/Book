@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">8.6.3　如何进行分表备份</h3>
+<p class="ziti">分表备份比分库更细，实际上就是先取一个库名，然后循环读取该库里的表进行备份，备份完之后，再取下一个库名，继续循环库里的所有表进行备份，直到所有库里的所有表都备份完毕。</p>
+<p class="ziti">实际脚本如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# cat fenbiao.sh
+#!/bin/bash
+#Author: oldboy
+export PATH=/application/mysql/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+bak_path=/server/bakup/$(date +%F)
+[ ! -d $bak_path ] &amp;&amp; mkdir -p $bak_path
+for dbname in `mysql -e "show databases"|sed '1,2d'|grep -v _schema`
+do
+    for tablename in `mysql -e "show tables from $dbname;"|sed '1d'`
+    do
+        mysqldump -B --master-data=2 |gzip &gt;$bak_path/${dbname}_${tablename} _$(date +%F).sql.gz
+    done
+done</pre>
+<hr/>
+<p class="ziti">下面执行分表脚本并查看备份结果：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy scripts]# sh fenbiao.sh
+[root@oldboy scripts]# ll -lt /server/bakup/2017-03-19/
+total 116
+-rw-r--r--. 1 root root 130 Mar 19 11:28 oldboy_test_2017-03-19.sql.gz
+#&lt;==oldboy库只有test表。
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_user_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_time_zone_transition_type_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_time_zone_transition_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_time_zone_name_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_time_zone_leap_second_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_time_zone_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_tables_priv_2017-03-19.sql.gz
+-rw-r--r--. 1 root root 130 Mar 19 11:28 mysql_slow_log_2017-03-19.sql.gz</pre>
+<hr/>
+<p class="ziti">分表分库虽然对恢复单个库表来说比较方便，但是如果要完整恢复又该怎么呢？</p>
+<p class="ziti">事实上，分库分表的数据尽量不要用于完整恢复，因为binlog有可能会有写入操作，用于单库单表的恢复，如果非要用来做完整恢复，那就通过写脚本来实现吧！</p>
+</body>
+</html>

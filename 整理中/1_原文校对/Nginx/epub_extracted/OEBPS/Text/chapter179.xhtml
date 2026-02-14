@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_193">10.3.2　模块配置指令</h3> 
+ <p class="ziti3">模块nginx-module-sts与nginx-module-stream-sts共同组成了TCP/UDP监控的配置指令集。配置命令如表10-5和表10-6所示。</p> 
+ <p class="ziti3">1）指令stream_server_traffic_status_zone仅可编写在http指令域中。</p> 
+ <p class="ziti3">2）其他指令均可编写在http及其所包含的server、location指令域中。</p> 
+ <p class="middle-img">表10-5　http配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b10-5.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b10-5.jpg" class="calibre310"/></a> 
+ </div> 
+ <p class="middle-img">表10-6　stream配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b10-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b10-6.jpg" class="calibre311"/></a> 
+ </div> 
+ <p class="ziti3">3）指令server_traffic_status_zone及server_traffic_status_histogram_buckets仅可编写在stream指令域中。</p> 
+ <p class="ziti3">4）其他指令均可编写在stream及其所包含的server指令域中。</p> 
+ <p class="ziti3">5）stream_server_traffic_status_display指令启用后，才会启用监控数据输出功能，监控数据包括Nginx服务器连接状态（Server Main）、Nginx stream主机连接状态（Server Zones）、过滤关键字连接状态（Filters）和stream上游服务器组连接状态（Upstreams）4个部分的内容。</p> 
+ <p class="ziti4">·Nginx服务器连接状态：包括Nginx连接状态模块自带的连接状态统计数据。</p> 
+ <p class="ziti4">·Nginx stream主机连接状态：会对当前Nginx服务器配置的每个stream主机端口的请求数（Requests Total）、请求时间（Requests Time）、请求频率（Requests Req/s）、响应（Responses）状态码、响应总数（Responses Total）、流量（Traffic）进行统计。</p> 
+ <p class="ziti4">·过滤关键字连接状态：模块会按照配置指令vhost_traffic_status_filter_by_set_key设置的关键字进行统计，会对包含关键字连接的请求数（Requests Total）、请求时间（Requests Time）、请求频率（Requests Req/s）、响应（Responses）状态码、响应总数（Responses Total）、流量（Traffic）的数据进行统计并显示输出。</p> 
+ <p class="ziti4">·stream上游服务器组连接状态：包括每个上游服务器组的名称及其包含的每个被代理服务器的IP、端口、状态（State）、建立连接时间（Response Time Connect）、首字节时间（Response Time FirstByte）、响应时间（Response Time Response，仅被代理服务器返回响应的时间）、权重（Weight）、最大失败次数（Max Fails）、失败超时时间（Fail Timeout）、请求数（Requests Total）、请求时间（Requests Time）、请求频率（Requests Req/s）、响应（Responses）状态码、响应总数（Responses Total）、流量（Traffic）数据的统计。</p> 
+ <p class="ziti3">6）server_traffic_status_limit_traffic指令的member参数值如表10-7所示。</p> 
+ <p class="middle-img">表10-7　member参数值</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b10-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b10-7.jpg" class="calibre219"/></a> 
+ </div> 
+</body>
+</html>

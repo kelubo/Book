@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_66">4.1.3　根据IP动态获取城市信息</h3> 
+ <p class="ziti3">模块名称：ngx_http_geoip_module</p> 
+ <p class="ziti3">该模块的功能是将客户端的IP地址与MaxMind数据库中的城市地址信息进行比对，然后将对应的城市地址信息赋值给内置变量。该模块的配置指令如表4-6～表4-10所示。</p> 
+ <p class="middle-img">表4-6　国家信息数据库指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-6.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-6.jpg" class="calibre139"/></a> 
+ </div> 
+ <p class="middle-img">表4-7　城市信息数据库指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-7.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-7.jpg" class="calibre140"/></a> 
+ </div> 
+ <p class="middle-img">表4-8　机构信息数据库指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-8.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-8.jpg" class="calibre141"/></a> 
+ </div> 
+ <p class="middle-img">表4-9　上层代理IP指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-9.jpg" class="calibre142"/></a> 
+ </div> 
+ <p class="middle-img">表4-10　代理递归查询IP指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-10.jpg" class="calibre143"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/097-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/097-i.jpg" class="calibre144"/></a> 
+ </div> 
+ <p class="ziti3">geo内置变量如表4-11所示。</p> 
+ <p class="middle-img">表4-11　geo内置变量</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b4-11.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b4-11.jpg" class="calibre145"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">geoip_country     /usr/share/GeoIP/GeoIP.dat;
+geoip_city         /usr/share/GeoIP/GeoIPCity.dat;
+geoip_org         /usr/share/GeoIP/GeoIPASNum.dat;
+geoip_proxy     192.168.2.145;
+geoip_proxy_recursive   on;
+
+server {
+    listen 8081;
+    server_name localhost;
+    charset utf-8;
+    root /opt/nginx-web;
+    default_type text/xml;
+    location / {
+        if ( $geoip_country_code ) {
+            rewrite ^ /$geoip_country_code/ break; # 重定向到$geoip_country_cod目录
+        }
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2 class="p2">9.3　Xtrabackup备份的工作原理流程</h2>
+<p class="p6">1.Xtrabackup恢复的工作原理</p>
+<p class="ziti">Percona Xtrabackup软件是基于InnoDB等事务引擎自带的redo日志和undo日志功能来保持备份和恢复前后数据一致性的，从而确保数据库的数据安全可靠。在InnoDB引擎中存在一个redo日志（事务日志）功能。redo日志文件会存储每一个InnoDB表中的数据修改记录。当InnoDB数据库启动时，会检查数据文件和redo日志文件，将已经提交到事务日志（redo日志文件）中的信息应用（提交）到数据文件并保存，然后根据undo日志信息将修改过但没有提交的数据记录进行回滚（不提交到数据文件）。</p>
+<p class="p6">2.Xtrabackup执行全备份的原理过程说明</p>
+<p class="ziti">当执行Xtrabackup程序开始备份时，Xtrabackup首先会记录当前redo日志的位置（即对应的LSN号），同时还会在后台启动一个进程持续监视redo日志文件的变化，并将变化的信息都记录到xtrabackup_logfile中，之后就会针对所有的InnoDB数据文件进行备份（复制），待InnoDB数据文件备份完成之后，再执行“flush tables with read lock”命令对整个数据库锁表，然后备份（复制）MyISAM等非事务引擎的数据文件。待数据文件全部（包括InnoDB、MyISAM数据文件和redo日志数据记录）都备份完毕之后，获取binlog二进制日志位置点信息，最后执行unlock tables解锁命令，恢复整个数据库的可读写状态。</p>
+<p class="ziti">整个备份过程的原理如图9-2所示。</p>
+<div class="pic"><img alt="" src="Image00069.jpg" />
+</div>
+<p class="middle-img">图9-2　Innobackupex全备份的原理流程</p>
+<div class="pic"><img alt="" src="Image00070.jpg" />
+</div>
+<p class="middle-img">图9-2　（续）</p>
+<p class="p6">3.Xtrabackup执行全备份恢复的过程</p>
+<p class="ziti">当执行Xtrabackup工具恢复数据时，要经过准备恢复（prepare）和实际恢复（restore）两个步骤。在准备恢复过程结束后，InnoDB表的数据（即备份的物理文件）就恢复到了复制InnoDB文件结束时的时间点，这个时间点也是全库锁表复制MyISAM引擎数据时的起点，所以最终恢复的数据和数据库的数据是一致的。全备的数据有两部分，一部分是全备的物理文件，一部分是Xtrabackup log日志文件，整个恢复过程如图9-3所示。</p>
+<div class="pic"><img alt="" src="Image00071.jpg" />
+</div>
+<p class="middle-img">图9-3　准备恢复的基本过程图</p>
+<p class="p6">4.Xtrabackup执行增量备份的过程</p>
+<p class="ziti">Innobackupex增量备份的（仅对InnoDB引擎有效）核心就是复制全备之后的InnoDB中变更的“页”数据，复制时会以全备中xtrabackup_checkpoints文件对应的LSN号为依据，将大于给定的LSN号的页数据（就是增量数据）进行备份，因为要比对全备的LSN号，所以第一次增量备份是基于全备的，以后实施的每一次增量备份都要基于上一次的增量备份，最终实现备份的数据是连续的、无缺失的，针对MyISAM引擎的备份依然是锁表备份。</p>
+<p class="ziti">增量备份的过程具体如下。</p>
+<p class="ziti">首先在全备的xtrabackup_checkpoints logfile中找到并记录最后一个checkpoint（last checkpint LSN），然后从该LSN的位置开始复制InnoDB的redo日志到xtrabackup_logfile，然后开始复制全部的数据文件.ibd，待全部数据复制结束后，就停止复制logfile，增量备份的过程与全备份基本类似，区别就是第二步，仅复制InnoDB中变化的页数据，而非所有物理文件。</p>
+<p class="p6">5.Xtrabackup执行增量恢复的过程</p>
+<p class="ziti">增量数据的恢复过程与全量备份的恢复过程类似，所不同的是增量恢复是以全备份数据为基础的，增量恢复的数据主要涉及全备的数据、增量的数据、Xtrabackup_log日志文件。恢复过程是先将增量备份中变化的页数据应用到全备数据中，然后，读取Xtrabackup_log应用redo数据到全备数据中，同时回滚未提交的事务，整个过程如图9-5所示。</p>
+<div class="pic"><img alt="" src="Image00072.jpg" />
+</div>
+<p class="middle-img">图9-4　增量备份具体过程图</p>
+<div class="pic"><img alt="" src="Image00073.jpg" />
+</div>
+<p class="middle-img">图9-5　Xtrabackup执行增量恢复过程图解</p>
+<p class="ziti">如果读者至此对备份和恢复过程还不是很理解的话，先别惊慌，请继续阅读实践部分，实践完了再回来看这些流程就很简单了。</p>
+</body>
+</html>

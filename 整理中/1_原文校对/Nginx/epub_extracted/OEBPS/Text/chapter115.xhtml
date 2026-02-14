@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_126">6.2.3　TCP/UDP代理</h3> 
+ <p class="ziti3">Nginx并不直接提供TCP/UDP的应用响应，Nginx Stream模块的核心功能是将客户端的TCP/UDP连接反向代理给后端的被代理服务器。</p> 
+ <p class="ziti3">（1）核心配置指令</p> 
+ <p class="ziti3">TCP/UDP代理功能的核心配置指令如表6-21所示。</p> 
+ <p class="middle-img">表6-21　TCP/UDP代理配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b6-21.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b6-21.jpg" class="calibre238"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/195-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/195-i.jpg" class="calibre239"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/196-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/196-i.jpg" class="calibre240"/></a> 
+ </div> 
+ <p class="ziti3">该模块的指令使用的指令域范围为stream、server。</p> 
+ <p class="ziti3">（2）TCP反向代理配置样例</p> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">stream {
+    server {
+        listen 389 ;                          # 设置监听端口为389 
+        proxy_pass 192.168.2.100:389;         # 将连接代理到后端192.168.2.100:389
+        proxy_timeout 5s;                     # 与被代理服务器的连续通信间隔大于5s，
+                                              # 则认为通信超时，将关闭连接
+        proxy_connect_timeout 5s;             # 与被代理服务器建立连接的超时时间为5s
+        access_log logs/ldap_access.log tcp;  # 记录日志文件为logs/ldap_access.log，
+                                              # 日志模板为tcp
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）代理SSL TCP</p> 
+ <p class="ziti3">代理模块stream可以实现基于SSL/TLS协议的被代理服务器的反向代理，部署方式为客户端→Nginx服务器（TCP）→被代理服务器（SSL TCP）。配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">stream {
+    server{
+        listen 636;                            # 设置监听端口为636 
+        access_log  logs/ldap_access.log tcp;
+        proxy_pass  192.168.2.100:636;
+        proxy_ssl   on;                        # 启用SSL/TLS协议，与被代理服务器建立连接
+        proxy_ssl_session_reuse on;            # 与被代理服务器SSL TCP连接的SSL会话重用功能
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）UDP反向代理配置</p> 
+ <p class="ziti3">UDP协议是一种无连接的协议，发送端与接收端传输数据之前不需要建立连接，发送端会尽最大努力把数据发送出去，不能保证安全地传输到接收端。由于传输数据不建立连接，也不需要维持复杂的链路关系（包括连接状态、收发状态等），因此发送端可同时向多个接收端传输相同的消息。虽然UDP的数据传输是不可靠的，但如果有一个数据报丢失，另一个新的数据报会在几秒内替换它发送到接收端。UDP协议通常被用在单向传输无须返回响应及信息分发的场景，如日志收集或在屏幕上的航班信息、股票行情等多媒体场景。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">stream {
+    server {
+        listen 1514 udp;               # 设置监听端口为1514并启用UDP协议
+        proxy_pass 192.168.2.123:1514;
+        proxy_responses 0;             # 会话接收数据报后无须等待返回响应，立即关闭会话
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

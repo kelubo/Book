@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_55">3.3.3　访问路由location</h3> 
+ <p class="ziti3">URI，即统一标识资源符，通用的URI语法格式如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">scheme:[//[user[:password]@]host[:port]][/path][?query][#fragment]
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·在Nginx的应用场景中，URL与URI并无明确区别。URI标准（RFC3986）中约定，URL是URI的一个子集。</p> 
+ <p class="ziti4">·scheme是URI请求时遵守的协议，常见的有HTTP、HTTPS、FTP。</p> 
+ <p class="ziti4">·host[:port]是主机名与端口号，HTTP协议的默认端口是80，HTTPS协议的默认端口是443。</p> 
+ <p class="ziti4">·[/path]是访问路径与访问文件名。</p> 
+ <p class="ziti4">·[?query]是访问参数，访问参数以“?”开始作标识，由多个以“&amp;”连接的key=value形式的字符串组成。</p> 
+ <p class="ziti3"><span class="yanse">1.URI匹配规则</span></p> 
+ <p class="ziti3">location是Nginx对HTTP请求中的URI进行匹配处理的指令，location的语法形式如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location [=|~|~*|^~|@] pattern { ... }
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">其中，“[=|~*|^~|@]”部分称为location修饰语（Modifier），修饰语定义了与URI的匹配方式。pattern为匹配项，可以是字符串或正则表达式。</p> 
+ <p class="ziti3">无修饰语：完全匹配URI中除访问参数以外的内容，匹配项的内容只能是字符串，不能是正则表达式。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location /images {
+    root /data/web;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">修饰语“=”：完全匹配URI中除访问参数以外的内容，Linux系统下会区分大小写，Windows系统下则不会。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location = /images {
+    root /data/web;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">修饰语“~”：完全匹配URI中除访问参数以外的内容，Linux系统下会区分大小写，Windows系统下则会无效。匹配项的内容必须是正则表达式。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location ~ /images/.*\.(gif|jpg|png)$ {
+    root /data/web;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">修饰语“~*”：完全匹配URI中除访问参数以外的内容，不区分大小写。匹配项的内容必须是正则表达式。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location ~* \.(gif|jpg|png)$ {
+    root /data/web;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">修饰语“^~”：完全匹配URI中除访问参数以外的内容，匹配项的内容如果不是正则表达式，则不再进行正则表达式测试。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location ^~ /images {
+    root /data/web;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">修饰语“@”：定义一个只能内部访问的location区域，可以被其他内部跳转指令使用，如try_files或error_page。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location @images {  
+    proxy_pass http://images;  
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">2.匹配顺序</span></p> 
+ <p class="ziti3">1）先检测匹配项的内容为非正则表达式修饰语的location，然后再检测匹配项的内容为正则表达式修饰语的location。</p> 
+ <p class="ziti3">2）匹配项的内容为正则与非正则都匹配的location，按照匹配项的内容为正则匹配的location执行。</p> 
+ <p class="ziti3">3）所有匹配项的内容均为非正则表达式的location，按照匹配项的内容完全匹配的内容长短进行匹配，即匹配内容多的location被执行。</p> 
+ <p class="ziti3">4）所有匹配项的内容均为正则表达式的location，按照书写的先后顺序进行匹配，匹配后就执行，不再做后续检测。</p> 
+ <p class="ziti3"><span class="yanse">3.其他事项</span></p> 
+ <p class="ziti3">当location为正则匹配且内部有proxy_pass指令时，proxy_pass的指令值中不能包含无变量的字符串。修饰语“^~”不受该规则限制。</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">location ~ /images {  
+    proxy_pass http://127.0.0.1:8080;                   # 正确的指令值
+    proxy_pass http://127.0.0.1:8080$request_uri;       # 正确的指令值
+    proxy_pass http://127.0.0.1:8080/image$request_uri; # 正确的指令值
+    proxy_pass http://127.0.0.1:8080/;                  # 错误的指令值
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">4.访问路由指令</span></p> 
+ <p class="ziti3">访问路由指令如表3-59～表3-64所示。</p> 
+ <p class="middle-img">表3-59　合并空斜线指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-59.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-59.jpg" class="calibre94"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    merge_slashes off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-60　跳转主机名指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-60.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-60.jpg" class="calibre95"/></a> 
+ </div> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    server_name_in_redirect on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-61　跳转端口指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-61.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-61.jpg" class="calibre96"/></a> 
+ </div> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    port_in_redirect on;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-62　子请求输出缓冲区大小指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-62.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-62.jpg" class="calibre97"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   subrequest_output_buffer_size 64K;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-63　绝对跳转指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-63.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-63.jpg" class="calibre98"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+    absolute_redirect off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="middle-img">表3-64　响应刷新指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b3-64.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b3-64.jpg" class="calibre99"/></a> 
+ </div> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">http {
+   msie_refresh off;
+}
+</pre> 
+ <hr class="calibre6"/> 
+</body>
+</html>

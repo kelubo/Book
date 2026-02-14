@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" style="font-size:1.250rem;">
+<head><title></title>
+<link href="flow0001.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h3 class="p3">8.5.2　中小企业MySQL增量恢复案例实战</h3>
+<p class="ziti">前文讲解了需要利用备份进行恢复的一些场景，本节将为大家讲解的案例是较为复杂的恢复场景，比如，内部管理人员通过SQL语句误删除数据。</p>
+<p class="ziti">首先，思考一下，具备什么条件才能完整恢复数据库数据？</p>
+<p class="ziti6">·具备全量备份（mysqldump）。</p>
+<p class="ziti6">·除全量备份以外，还有全量备份之后产生的的所有binlog增量日志。</p>
+<p class="ziti">假设当前数据库内的数据如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql  -e "select * from oldboy.test;"
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+</pre>
+<hr/>
+<p class="ziti">模拟0点开始对数据库oldboy数据进行全备，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mkdir /data/backup -p
+[root@oldboy ~]# date -s "2017/03/19"
+Sun Mar 19 00:00:00 EDT 2017
+[root@oldboy ~]# mysqldump -B --master-data=2 --single-transaction oldboy| gzip&gt;/data/backup/oldboy_$(date +%F).sql.gz
+[root@oldboy ~]# ls -l /data/backup/
+total 4
+-rw-r--r--. 1 root root 867 Mar 19 00:00 oldboy_2017-03-19.sql.gz</pre>
+<hr/>
+<p class="ziti">模拟0点全备后用户继续写入数据，示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# mysql -e "use oldboy;insert into test values(6,'bingbing');"
+[root@oldboy ~]# mysql -e "use oldboy;insert into test values(7,'xiaoting');"
+[root@oldboy ~]# mysql -e "select * from oldboy.test;"
++----+----------+
+| id | name     |
++----+----------+
+|  1 | oldboy   |
+|  2 | oldgirl  |
+|  3 | inca     |
+|  4 | zuma     |
+|  5 | kaka     |
+|  6 | bingbing |     #&lt;==全备后写入的数据，实际工作中会写入很多条。
+|  7 | xiaoting |
++----+----------+</pre>
+<hr/>
+<p class="ziti">模拟上午10：00点管理人员删除oldboy数据库，示例如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# date -s "2017/03/19 10:00"
+Sun Mar 19 10:00:00 EDT 2017
+[root@oldboy ~]# mysql  -e "drop database oldboy;show databases;"
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| oldboy_utf8        |
+| performance_schema |
++--------------------+</pre>
+<hr/>
+<p class="ziti">再假设数据库出问题10分钟后，公司的网站运营人员报网站故障，联系运维人员DBA解决。此时，DBA或开发人员会查看网站报错（或者查看后台日志），可以看到连不上oldboy数据库的提示，登录数据库排查，发现数据库oldboy库已经不存在了，突然想起来早晨管理员说要处理下数据库，于是询问管理员是如何处理的，管理员答曰，10点左右刚刚清除了一个“没有用的”数据库……问题的原因终于找到了。事实上，登录系统分析系统审计日志，以及分析数据库binlog也可以发现库丢失的原因；若是开发人员，通过程序日志判断应该也可以查出来。</p>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 数据库的权限管理流程制度很重要，如果能未雨绸缪，就不会这么麻烦地恢复数据了。俗话说得病容易去病难，数据库的恢复也是同样的道理。</p>
+<p class="ziti">找到原因后，就可以开始准备恢复了。恢复前要做如下准备。移走所有binlog增量文件，防止被二次破坏，并确认是否有全备：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cp -a /application/mysql/data/oldboy-bin.* /data/backup/
+[root@oldboy ~]# ls -l /data/backup/
+total 28
+-rw-r--r--. 1 root  root   867 Mar 19 00:00 oldboy_2017-03-19.sql.gz
+#&lt;==全备在这里。
+-rw-rw----. 1 mysql mysql  143 Mar  3 05:50 oldboy-bin.000001
+-rw-rw----. 1 mysql mysql  168 Mar  3 05:57 oldboy-bin.000002
+-rw-rw----. 1 mysql mysql  168 Mar  3 05:57 oldboy-bin.000003
+-rw-rw----. 1 mysql mysql 7737 Mar 19 10:00 oldboy-bin.000004
+-rw-rw----. 1 mysql mysql   80 Mar  3 05:57 oldboy-bin.index</pre>
+<hr/>
+<p class="ziti">下面开始恢复实战。</p>
+<p class="ziti">1）停止数据库对外访问。因为是通过drop命令删除数据库的，后面不会有写入操作，因此，可以不用额外停止写入。但如果是因为update导致的数据破坏，最好是停库处理或对外停止写入。这里采用iptables防火墙屏蔽所有应用程序的写入：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# iptables -I INPUT -p tcp --dport 3306 ! -s 172.16.1.51 -j DROP
+#&lt;==非172.16.1.51禁止访问数据库3306端口。</pre>
+<hr/>
+<p class="ziti">2）解压全备的数据，命令如下：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy ~]# cd /data/backup/
+[root@oldboy backup]# gzip -cd oldboy_2017-03-19.sql.gz &gt;oldboy.sql
+[root@oldboy backup]# ls -lrt oldboy.sql
+-rw-r--r--. 1 root root 2205 Mar 19 10:29 oldboy.sql</pre>
+<hr/>
+<p class="ziti">3）解析binlog文件增量数据。</p>
+<p class="ziti">那么应该从哪个binlog文件的哪个位置开始呢？</p>
+<p class="ziti">我们在全备时增加了--master-data=2参数，还记得这个参数的作用吗？</p>
+<p class="ziti">这个参数就是帮我们记录全备后的binlog文件名以及binlog文件对应的恢复位置点的。这里就可以用到这个参数的作用了：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy backup]# sed -n '22p' oldboy.sql
+-- CHANGE MASTER TO MASTER_LOG_FILE='oldboy-bin.000004', MASTER_LOG_POS=7181;</pre>
+<hr/>
+<p class="ziti">从上面的代码可以看到，要从oldboy-bin.000004文件的7181位置点开始恢复增量数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy backup]# mysqlbinlog -d oldboy oldboy-bin.000004 --start-position= 7181 -r bin.sql</pre>
+<hr/>
+<p class="ziti">工作中除了oldboy-bin.000004文件之外，还可能生成oldboy-bin.000005、oldboy-bin.000006……多个binlog文件，现在可以继续恢复后面的所有binlog文件：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy backup]# mysqlbinlog -d oldboy oldboy-bin.000005 oldboy-bin. 000006 -r bin1.sql</pre>
+<hr/>
+<p class="ziti6"><img alt="" class="formula-1-5em" src="Image00006.jpg" />
+ <span class="yanse">提示：</span>
+ 本节恢复就只有一个binlog文件，即oldboy-bin.000004，因此此条命令就不要再执行了。</p>
+<p class="ziti">4）说到这里，需要剔除误删数据库的drop语句，否则，直接恢复就又进入了删库故障的坑：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy backup]# grep -w drop  bin.sql #&lt;==过滤drop单词的行。
+drop database oldboy
+[root@oldboy backup]# sed -i '/drop database oldboy/d' bin.sql
+#&lt;==删除drop数据库oldboy的语句。
+[root@oldboy backup]# grep -w drop  bin.sql</pre>
+<hr/>
+<p class="ziti">现在，准备彻底完成，开始正式恢复。</p>
+<p class="ziti">先恢复0点以前的全备数据：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy backup]# mysql &lt;/data/backup/oldboy.sql  #&lt;==先恢复全备，即0点
+                                                  以前的备份。
+[root@oldboy backup]# mysql -e "select * from oldboy.test;"
++----+---------+
+| id | name    |
++----+---------+
+|  1 | oldboy  |
+|  2 | oldgirl |
+|  3 | inca    |
+|  4 | zuma    |
+|  5 | kaka    |
++----+---------+</pre>
+<hr/>
+<p class="ziti">看到了吧，0点以前的数据已恢复了，但是0点到出故障时间的增量还没有。</p>
+<p class="ziti">再恢复增量数据，即从binlog中解析出清理了drop语句的bin.sql文件：</p>
+<hr/>
+<pre class="ziti1">[root@oldboy backup]# mysql oldboy&lt;/data/backup/bin.sql   #&lt;==恢复增量文件。
+[root@oldboy backup]# mysql -e "select * from oldboy.test;"
++----+----------+
+| id | name     |
++----+----------+
+|  1 | oldboy   |
+|  2 | oldgirl  |
+|  3 | inca     |
+|  4 | zuma     |
+|  5 | kaka     |
+|  6 | bingbing | #&lt;==增量的数据回来了。
+|  7 | xiaoting | #&lt;==增量的数据回来了。
++----+----------+</pre>
+<hr/>
+<p class="ziti">到此，利用MySQL的全量备份以及MySQL的binlog增量进行恢复的案例就结束了。</p>
+</body>
+</html>

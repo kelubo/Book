@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_203">10.5.2　Zabbix环境搭建</h3> 
+ <p class="ziti3">因为Docker具有灵活部署的特性，所以Zabbix环境可采用Docker化部署，Zabbix官方为每个组件都提供了Docker镜像。在配置样例场景中，Zabbix的Server、Web、java-gateway组件以Docker化方式部署在IP为10.10.10.1的主机系统中，MySQL独立部署在IP为10.10.10.2的主机系统中，部署架构如图10-9所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/10-9.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/10-9.jpg" class="calibre320"/></a> 
+ </div> 
+ <p class="middle-img">图10-9　Zabbix部署图</p> 
+ <p class="ziti3">（1）MySQL部署</p> 
+ <p class="ziti3">主机10.10.10.2的操作系统为CentOS 7.2，安装步骤如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">rpm -ivh http://repo.mysql.com/mysql57-community-release-el7-8.noarch.rpm
+# 安装MySQL的安装源
+yum -y install --nogpgcheck mysql-server                # 安装MySQL服务
+systemctl start mysqld                          # 启动MySQL服务
+cat /var/log/mysqld.log |grep pass |awk -F "host: " '{print $2}'
+# 获取初始化的MySQL root密码
+# 将root的初始化密码修改为fHFUOVj7Iz309r1Z
+mysql -uroot -p -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'10.10.10.1' IDENTIFIED BY 'fHFUOVj7Iz309r1Z' WITH GRANT OPTION;FLUSH PRIVILEGES;"
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">MySQL优化非本书主要内容，优化方法请参考其他相关资料。</p> 
+ <p class="ziti3">（2）Zabbix Docker化部署</p> 
+ <p class="ziti3">主机10.10.10.1的操作系统为CentOS 7.2，初始化Docker环境如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">yum install -y yum-utils                                # 安装yum工具
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo                                   　 　# 安装Docker安装源
+yum install -y docker-ce docker-compose         # 安装Docker和docker-compose
+systemctl enable docker                         # 将Docker注册为自启动服务
+systemctl start docker                          # 启动Docker服务
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Zabbix的Docker化安装使用docker-compose命令及相应的docker-compose脚本即可快速完成，docker-compose脚本如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">cat zabbix-server.yaml
+version: '3.5'
+services:
+    zabbix-server:
+        hostname: zabbix-server                     # 设置容器系统主机名
+        container_name: zabbix-server               # 设置容器名称
+        restart: always                             # 设置系统重启后自动启动
+        image: zabbix/zabbix-server-mysql   # 使用的镜像名称
+        ports:
+            - "10051:10051"                 # 配置容器对外及内部端口
+        links:
+            - zabbix-java-gateway:zabbix-java-gateway
+                                                        # 关联容器名称
+        ulimits:                                    # 容器系统文件打开数设置
+            nproc: 65535
+            nofile:
+                soft: 20000
+                hard: 40000
+        env_file:
+            - .env_db_mysql                 # MySQL相关环境变量文件
+            - .env_srv                              # Zabbix Server运行环境变量文件
+        user: root                                  # 以root用户运行容器
+        depends_on:
+            - zabbix-java-gateway                   # 容器运行时依赖的其他容器
+        stop_grace_period: 30s                      # 关闭容器时等待30s
+        sysctls:                                    # 容器系统内核参数
+            # 容器系统UDP和TCP连接的本地端口取值范围为1024～65000
+            - net.ipv4.ip_local_port_range=1024 65000
+            - net.ipv4.conf.all.accept_redirects=0  # 禁止接收路由重定向报文
+            - net.ipv4.conf.all.secure_redirects=0  # 禁止转发安全ICMP重定向报文
+            - net.ipv4.conf.all.send_redirects=0    # 禁止转发重定向报文
+
+    zabbix-web-nginx-mysql:
+        hostname: zabbix-nginx
+        container_name: zabbix-nginx
+        restart: always
+        image: zabbix/zabbix-web-nginx-mysql
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - zabbix-server:zabbix-server
+        env_file:
+            - .env_db_mysql
+            - .env_web                      # 系统环境变量文件
+        user: root
+        depends_on:
+            - zabbix-server
+        healthcheck:                        # 容器健康检查
+            # 健康检查命令
+            test: ["CMD", "curl", "-f", "http://localhost"]
+            interval: 10s                   # 健康检查周期为10s
+            timeout: 5s                     # 健康检查超时时间为5s
+            retries: 3                      # 健康检查重试3次
+            start_period: 30s               # 容器启动间隔时间为30s
+        stop_grace_period: 10s              # 关闭容器时等待10s
+        sysctls:
+            - net.core.somaxconn=65535      # 允许建立并发连接的最大数为65535
+    zabbix-java-gateway:
+        hostname: zabbix-java-gateway
+        container_name: zabbix-java-gateway
+        restart: always
+        image: zabbix/zabbix-java-gateway
+        ports:
+            - "10052:10052"
+        user: root
+        stop_grace_period: 5s
+
+# MySQL环境变量文件
+cat &gt;.env_db_mysql&lt;&lt;EOF
+DB_SERVER_HOST=10.10.10.2                       # 设置MySQL服务器地址
+# DB_SERVER_PORT=3306
+MYSQL_USER=zabbix                               # 设置访问MySQL的用户名
+MYSQL_PASSWORD=zabbix                   # 设置访问MySQL的密码
+MYSQL_ROOT_PASSWORD=fHFUOVj7Iz309r1Z    # 设置访问MySQL的root密码
+EOF
+
+# zabbix server运行环境变量文件
+cat &gt;.env_srv&lt;&lt;EOF
+ZBX_JAVAGATEWAY_ENABLE=true             # 配置zabbix server启用jmx支持
+ZBX_STARTJAVAPOLLERS=5                  # 设置zabbix server初始pooler进程为5
+EOF
+
+# zabbix-nginx系统环境变量文件
+cat &gt;.env_web&lt;&lt;EOF
+ZBX_SERVER_NAME=Composed installation
+PHP_TZ=Asia/Shanghai            # 设置Zabbix Web的php时区为Asia/Shanghai
+EOF
+
+docker-compose -f zabbix-server.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">配置好DB_SERVER_HOST及MYSQL_ROOT_PASSWORD，zabbix-server容器启动时会自动在MySQL中创建数据库。</p> 
+ <p class="ziti3">（3）数据持久化</p> 
+ <p class="ziti3">Docker镜像（Image）文件存放在只读层，而容器（Container）的文件则存放在可写层，当运行的容器被删除或重建时，该容器变更的文件将会丢失，所以需要通过外挂卷的方式将变更的配置和文件保存到主机系统中。Zabbix中有Server和Nginx两个容器需要实现数据持久化。</p> 
+ <p class="ziti3">持久化zabbix-server容器文件的方法如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建Zabbix Server持久化存储目录
+mkdir -p /opt/data/apps/zabbix/server
+
+# 从容器中复制Zabbix运行的文件到/opt/data/apps/zabbix/server中
+docker cp zabbix-server:/var/lib/zabbix /opt/data/apps/zabbix/server
+
+# 创建配置，监控报警脚本和自定义脚本目录
+mkdir -p /opt/data/apps/zabbix/server/{alertscripts,externalscripts}
+
+# 从容器中复制zabbix_server.conf
+docker cp zabbix-server:/etc/zabbix /opt/data/apps/zabbix/server/config
+
+chown -R 100:1000 /opt/data/apps/zabbix/server
+
+# 创建zabbix-server容器的docker-compose卷挂载命令
+cat &gt;/tmp/tmpfile&lt;&lt;EOF
+    volumes:
+        - /etc/localtime:/etc/localtime:ro  # 本地时间文件
+        - /etc/timezone:/etc/timezone:ro            # 本地时区文件
+        # 挂载告警脚本目录
+        - /opt/data/apps/zabbix/server/alertscripts:/usr/lib/zabbix/alertscripts
+        - /opt/data/apps/zabbix/server/externalscripts:/usr/lib/zabbix/external-scripts                                 # 挂载自定义脚本目录
+        # 挂载Zabbix Server配置文件
+        - /opt/data/apps/zabbix/server/config:/etc/zabbix
+        # 挂载Zabbix目录
+        - /opt/data/apps/zabbix/server/zabbix:/var/lib/zabbix
+EOF
+# 将挂载卷命令添加到zabbix-server.yaml文件中
+sed -i '/"10051:10051"/r /tmp/tmpfile' zabbix-server.yaml
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">持久化zabbix-nginx容器文件的方法如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5"># 创建Zabbix Nginx持久化存储目录
+mkdir -p /opt/data/apps/zabbix/nginx
+
+# 复制Zabbix Web文件目录
+docker cp zabbix-nginx:/usr/share/zabbix /opt/data/apps/zabbix/nginx/web
+
+# 复制Nginx配置文件
+docker cp zabbix-nginx:/etc/nginx /opt/data/apps/zabbix/nginx
+
+# 复制Nginx的Zabbix配置文件
+docker cp zabbix-nginx:/etc/zabbix /opt/data/apps/zabbix/nginx
+
+chown -R 101:101 /opt/data/apps/zabbix/nginx/web
+
+# 创建zabbix-nginx容器的docker-compose卷挂载命令
+cat &gt;/tmp/tmpfile&lt;&lt;EOF
+    volumes:
+        - /etc/localtime:/etc/localtime:ro          # 本地时间文件
+        - /etc/timezone:/etc/timezone:ro                    # 本地时区文件
+        - /opt/data/apps/zabbix/nginx/zabbix:/etc/zabbix    # 挂载Nginx Zabbix配置文件目录
+        - /opt/data/apps/zabbix/nginx/nginx:/etc/nginx      # 挂载Nginx配置文件目录
+        - /opt/data/apps/zabbix/nginx/web:/usr/share/zabbix # 挂载Zabbix Web文件目录
+EOF
+
+# 将挂载卷命令添加到zabbix-server.yaml文件中
+sed -i '/"443:443"/r /tmp/tmpfile' zabbix-server.yaml
+
+docker-compose -f zabbix-server.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti4">·zabbix-server默认以主动轮询（Polling）的方式运行。</p> 
+ <p class="ziti4">·Zabbix默认Web的登录账号是admin，密码是zabbix。</p> 
+ <p class="ziti3">Zabbix运行是需要一定量的内存和磁盘空间的，内存和磁盘空间的大小取决于被监控主机的数量和配置参数。每个Zabbix守护进程都会与数据库建立多个连接，连接占用内存的大小取决于数据库引擎的配置。Zabbix的整体性能取决于为Zabbix Server及数据库分配的CPU性能及内存的大小。</p> 
+</body>
+</html>

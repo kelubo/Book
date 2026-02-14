@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_119">6.1.2　正向代理</h3> 
+ <p class="ziti3">正向代理是客户端设置代理地址后，通过将代理服务器的IP作为源IP访问互联网应用服务的代理方式。通过对正向代理访问设置，可以实现限制客户端的访问行为、下载速度、访问记录统计、隐藏客户端信息等目的。实现原理如图6-1所示。</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/6-1.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/6-1.jpg" class="calibre225"/></a> 
+ </div> 
+ <p class="middle-img">图6-1　正向代理</p> 
+ <p class="ziti3"><span class="yanse">1.HTTP的正向代理</span></p> 
+ <p class="ziti3">Nginx的proxy模块可以实现基础的HTTP代理功能。配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">map $host $deny {
+     hostnames;
+     default 0;
+     www.google.com 1;                             # 禁止访问www.google.com
+}
+
+server {
+    listen 8080;
+    resolver 114.114.114.114;
+    resolver_timeout 30s;
+    access_log logs/proxy_access.log;              # 记录访问日志
+    location / {
+
+        if ( $deny ) {
+            return 403;                            # 被禁止访问的网址返回403错误
+        }
+        proxy_limit_rate    102400;                # 限制客户端的下载速率是100KB/s
+        proxy_buffering on ;                       # 启用代理缓冲
+        proxy_buffers   8 8k;                      # 代理缓冲区大小为64KB
+        proxy_buffer_size   8k;                    # 响应数据第一部分的缓冲区大小为8KB
+        proxy_busy_buffers_size 16k;               # 向客户端发送响应的缓冲区大小16KB
+        proxy_temp_file_write_size  16k;           # 一次写入临时文件的数据大小为16KB
+
+        # 设置所有代理客户端的agent
+        proxy_set_header User-Agent "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14" ;
+
+        proxy_set_header Host $http_host;
+        proxy_connect_timeout   70s;               # 代理连接超时时间
+        proxy_http_version  1.1;                   # 代理协议为http/1.1
+        proxy_pass $scheme://$http_host$request_uri; # 代理到远端服务器
+    }
+}
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3"><span class="yanse">2.HTTPS的正向代理</span></p> 
+ <p class="ziti3">Nginx默认不支持HTTP的CONNECT方法，所以无法实现HTTPS的正向代理的功能，若要实现Nginx的HTTPS的正向代理功能，需要添加一个第三方模块ngx_http_proxy_connect_module，实现HTTPS的正向代理支持。对于该模块，官网提示可支持到Nginx 1.15.8版本，但实测Nginx的1.17.0版本也可以编译通过。模块配置指令如表6-2所示。</p> 
+ <p class="middle-img">表6-2　proxy_connect模块配置指令</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b6-2.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b6-2.jpg" class="calibre226"/></a> 
+ </div> 
+ <p class="ziti3">proxy_connect模块指令使用的指令域范围为server。模块编译如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">yum -y install patch
+git clone https://github.com/chobits/ngx_http_proxy_connect_module.git
+cd nginx
+patch -p1 &lt; ../ngx_http_proxy_connect_module/patch/proxy_connect_rewrite_101504.patch
+./configure --add-module=../ngx_http_proxy_connect_module
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">配置样例如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">server {
+    listen 8080;
+    resolver 114.114.114.114;
+    resolver_timeout 30s;
+    access_log logs/proxy_access.log             # 记录访问日志
+
+    proxy_connect;                               # 启用HTTP的CONNECT方法支持
+    proxy_connect_allow            all;          # 允许所有端口
+    proxy_connect_connect_timeout  60s;          # 与互联网网站建立连接的超时时间
+
+    location / {
+        proxy_buffering on ;                     # 启用代理缓冲
+        proxy_buffers   8 8k;                    # 代理缓冲区的大小为64KB
+        proxy_buffer_size   8k;                  # 响应数据第一部分的缓冲区的大小为8KB
+        proxy_busy_buffers_size 16k;             # 向客户端发送响应的缓冲区的大小16KB
+        proxy_limit_rate    102400;              # 限制客户端的下载速率是100KB/s
+        proxy_temp_file_write_size  16k;         # 一次写入临时文件的数据大小为16KB
+
+        # 设置所有代理客户端的agent
+        proxy_set_header    User-Agent “Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14” ;
+
+        proxy_set_header Host $host;
+        proxy_connect_timeout   70s;             # 代理连接
+        proxy_http_version  1.1;                 # 代理协议为http/1.1
+        proxy_pass $scheme://$http_host$request_uri;# 代理到远端服务器
+    }
+}
+
+## 本地测试
+curl -x 127.0.0.1:8080  https://www.baidu.com
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">各浏览器可以通过代理功能配置使用Nginx代理服务器访问互联网服务器。</p> 
+</body>
+</html>

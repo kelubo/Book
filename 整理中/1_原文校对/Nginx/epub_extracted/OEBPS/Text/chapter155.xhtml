@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre">
+  <h3 class="p" id="sigil_toc_id_168">8.3.8　Memcached负载均衡配置</h3>
+
+  <p class="ziti3">Memcached协议的负载均衡是通过Memcached模块（ngx_http_memcached_module）及上游模块（ngx_http_upstream_module）实现的，配置样例如下：</p>
+  <hr class="calibre6"/>
+  <pre class="ziti5">upstream memcached_backend {
+    server 127.0.0.1:11211;
+    server 10.0.0.2:11211;
+
+    keepalive 32;
+}
+
+server {
+    ...
+
+    location /memcached/ {
+        set $memcached_key $uri;
+        memcached_pass memcached_backend;
+    }
+}
+</pre>
+  <hr class="calibre6"/>
+</body>
+</html>

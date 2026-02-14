@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>未知</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="../../stylesheet.css"/>
+<link rel="stylesheet" type="text/css" href="../../page_styles.css"/>
+</head>
+  <body class="calibre"> 
+ <h3 class="p" id="sigil_toc_id_216">11.2.4　配置发布工具Jenkins</h3> 
+ <p class="ziti3">Jenkins是基于Java开发的一个开源的持续集成项目，其提供了一个可扩展的可对代码持续集成、发布（代码编译、打包、部署）及交付的Web化操作平台。Jenkins拥有超过1000个插件，使其支持包括SVN、Git等多种版本的管理工具（SCM）的代码管理，也可以快速实现Java、Node.js、.Net等语言项目的编译构建，并支持包括Docker在内的多种形式的部署交付。通过Jenkins的Web化管理界面，依赖各种强大的插件功能，可以使Nginx的配置变更管理变得更加便捷和安全。</p> 
+ <p class="ziti3">使用Jenkins官方提供的Docker镜像，可以很方便地搭建Jenkins工作环境，搭建过程如下：</p> 
+ <p class="ziti3">（1）初始化系统环境</p> 
+ <p class="ziti3">主机的操作系统为CentOS 7.6，初始化Docker环境如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">yum install -y yum-utils                        # 安装yum工具
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo                               # 安装Docker安装源
+yum install -y docker-ce docker-compose # 安装Docker和docker-compose
+systemctl enable docker                 # 将Docker注册为自启动服务
+systemctl start docker
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（2）编写docker-compose脚本</p> 
+ <p class="ziti3">将脚本保存为jenkinsci.yaml</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">jenkinsci:
+    image: 'jenkinsci/blueocean'
+    restart: always
+    hostname: 'jenkinsci'
+    container_name: jenkinsci
+    environment:
+        - PATH=/opt/apps/apache-maven-3.5.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        - JAVA_OPTS="-Duser.timezone=Asia/Shanghai"
+        - JENKINS_SLAVE_AGENT_PORT=50000
+    ports:
+        - '8086:8080'
+        - '50000:50000'
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（3）数据持久化</p> 
+ <p class="ziti3">Jenkins需要持久化的是Jenkins的运行目录，该目录包含其运行的所有配置文件，具体如下：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">docker cp jenkinsci:/var/jenkins_home /opt/data/apps/jenkinsci/
+chown -R 1000:1000 /opt/data/apps/jenkinsci/jenkins_home
+echo "
+    volumes:
+        - '/opt/data/apps/jenkinsci/jenkins_home:/var/jenkins_home'
+        - '/opt/data/apps/jenkinsci/apps:/opt/apps'
+" &gt;&gt;jenkinsci.yaml
+
+docker stop jenkinsci
+docker rm jenkinsci
+docker-compose -f jenkinsci.yaml up -d
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">（4）初始化配置及插件</p> 
+ <p class="ziti3">Jenkins启动后，在浏览器中访问http://IP:8086即可进入初始化安装界面，使用初始化密码登录，选择安装推荐插件即可。</p> 
+ <p class="ziti3">通过以下指令获取初始化密码：</p> 
+ <hr class="calibre6"/> 
+ <pre class="ziti5">docker exec -it jenkinsci2 cat /var/jenkins_home/secrets/initialAdminPassword
+</pre> 
+ <hr class="calibre6"/> 
+ <p class="ziti3">Jenkins是以任务（Job）为管理单元的，常用的任务类型有自由风格、Maven项目、文件夹和流水线（pipeline）四种，本样例中仅使用自由风格任务类型。自由风格及流水线任务按照工作流程被划分为多个阶段，Jenkins负责维护和管理任务在每个阶段的执行，并通过工作流的状态，按照任务的设定推动任务工作流的完成。自由风格任务的6个阶段配置如表11-10所示。</p> 
+ <p class="middle-img">表11-10　自由风格任务阶段配置</p> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/b11-10.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/b11-10.jpg" class="calibre341"/></a> 
+ </div> 
+ <div class="pic"> 
+  <a href="http://popImage?src='../Images/340-i.jpg'" class="pcalibre calibre1"><img alt="" src="../Images/340-i.jpg" class="calibre342"/></a> 
+ </div> 
+</body>
+</html>
