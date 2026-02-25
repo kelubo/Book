@@ -41,6 +41,13 @@
 
 % 列表项向右偏移。
 \usepackage{enumitem}
+% 双语左右对照
+\usepackage{paracol}
+\columnratio{0.5,0.5} % 设置左右栏比例各占一半
+\setlength{\columnsep}{1em} % 设置栏间距
+\setlength{\columnseprule}{0.4pt} % 可选：添加栏分隔线
+\globalcounter{section} % 同步计数器
+\sloppy % 避免换行问题
 
 \title{Radio Builder's Book \\ From Detector to Software Defined Radio \\ 收音机制作之书：从检波器到软件定义无线电}
 \author{Burkhard Kainka，DK7JD}
@@ -54,243 +61,395 @@
 
 \frontmatter
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{cover}
+\caption{Cover Image}
+\end{figure}
+
 \chapter{版权页}
 
-%This is an Elektor Publication. Elektor is the media brand of 
-%Elektor International Media B.V.
-%PO Box 11, NL-6114-ZG Susteren, The Netherlands
-%Phone: +31 46 4389444
-%
-%\textbf{中文：这是一本Elektor出版物。Elektor是Elektor International Media B.V.的媒体品牌。地址：PO Box 11, NL-6114-ZG Susteren, 荷兰电话%+31 46 4389444}
-%
-%All rights reserved. No part of this book may be reproduced in any material form, including photocopying, or 
-%storing in any medium by electronic means and whether or not transiently or incidentally to some other use of this 
-%publication, without the written permission of the copyright holder except in accordance with the provisions of the 
-%Copyright Designs and Patents Act 1988 or under the terms of a licence issued by the Copyright Licencing Agency 
-%Ltd., 90 Tottenham Court Road, London, England W1P 9HE. Applications for the copyright holder's permission to 
-%reproduce any part of the publication should be addressed to the publishers.
-%
-%\textbf{中文：● 保留所有权利。未经版权所有者的书面许可，不得以任何物质形式（包括影印）复制本书的任何部分，也不得以电子方式将本书的任何部分存储在%任何介质中，无论是否临时或偶然用于本出版物的其他用途，除非符合1988年版权、设计和专利法的规定或根据版权许可机构有限公司颁发的许可条款，地址90 %Tottenham Court Road, London, England W1P 9HE。申请版权所有者许可复制本出版物的任何部分应致函出版商。}
-%
-%Declaration
-%The author, editor, and publisher have used their best efforts in ensuring the correctness of the information contained 
-%in this book. They do not assume, and hereby disclaim, any liability to any party for any loss or damage caused by 
-%errors or omissions in this book, whether such errors or omissions result from negligence, accident or any other cause.
-%
-%\textbf{中文：● 声明作者、编辑和出版商已尽最大努力确保本书中包含的信息的正确性。他们不承担，并特此声明，对任何方因本书中的错误或遗漏造成的任何损%失或损害承担任何责任，无论此类错误或遗漏是由于疏忽、事故还是任何其他原因造成的。}
-%
-%All the programs given in the book are Copyright of the Author and Elektor International Media. These programs 
-%may only be used for educational purposes. Written permission from the Author or Elektor must be obtained before 
-%any of these programs can be used for commercial purposes.
-%
-%\textbf{中文：本书中提供的所有程序均为作者和Elektor International Media的版权。这些程序只能用于教育目的。在任何这些程序用于商业目的之前，必须%获得作者或Elektor的书面许可。}
-%
-%British Library Cataloguing in Publication Data
-%\textbf{中文：● 英国图书馆出版数据编目}
-%A catalogue record for this book is available from the British Library
-%ISBN 978-3-89576-565-0 Print
-%ISBN 978-3-89576-566-7 eBook
-%© Copyright 2023: Elektor International Media B.V.
-%Translator: Martin Cooke
-%Editor: Jan Buiting
-%Prepress Production: D-Vision, Julian van den Berg
-%
-%\chapter*{Preface 前言}
-%\addcontentsline{toc}{chapter}{Preface}
-%
-%Discover the captivating world of radio technology and unlock the secrets of radio set construction using this comprehensive %guide. From the early days of the humble crystal set to the modern wonders of Software-Defined Radios (SDRs), this book takes you %on a journey through time and technology. With detailed instructions and step-by-step illustrations, you'll learn how to build and %assemble various receivers to understand their various strengths and weaknesses. Practical antenna design and amateur radio rigs %are also covered in this inclusive handbook.
-%
-%\textbf{中文：发现无线电技术的迷人世界，并使用这本综合指南揭开收音机结构的秘密。从早期简陋的矿石机到现代软件定义无线电（SDR）的奇迹，本书将带您%穿越时空和技术。通过详细的说明和分步插图，您将学习如何构建和组装各种接收机，以了解它们各自的优势和劣势。实用的天线设计和业余无线电设备也包含在这%本综合手册中。}
-%
-%For many years in the early history of electronics, the construction of homebrew radio receivers was the most common entry point %to electronics. Nowadays, there are many other routes in, especially through the use of computers, microcontrollers, and digital %technology. The analogue roots of electronics are now often overlooked but radio technology is particularly well suited as an %introduction to electronics because you will be rewarded with early success from even the most basic circuit. The connection to %modern digital technology is also obvious when it comes to modern tuning methods and the use of highly integrated PLL, DDS and DSP %radios.
-%
-%\textbf{中文：在电子学的早期历史中，自制无线电接收机的构建是最常见的入门途径。如今，有许多其他途径，特别是通过计算机、微控制器和数字技术的使用。%电子学的模拟根源现在经常被忽视，但无线电技术特别适合作为电子学的入门，因为即使是最基本的电路，您也会获得早期的成功回报。当涉及到现代调谐方法和高%度集成的PLL、DDS和DSP收音机的使用时，与现代数字技术的联系也是显而易见的。}
-%
-%This book aims to provide an overview and present a collection of simple projects to encourage budding engineers along the path of %discovery. Now in its second edition, many new projects have been added which include important circuits and cover most recent %developments. With this book by your side, you will go on to develop your own ideas and design and test your own receivers.
-%
-%\textbf{本书旨在提供概述并展示一系列简单的项目，以鼓励初学者沿着发现之路前进。现在是第二版，增加了许多新项目，其中包括重要的电路并涵盖了最新的发%展。有了这本书在您身边，您将继续发展自己的想法，并设计和测试自己的接收机。}
-%
-%Wishing you every success and crystal clear reception!
-%\textbf{中文：祝您一切成功，接收清晰！}
-%
-%Burkhard Kainka, DK7JD
-%
-%www.elektronik-labor.de
-%
-%\chapter{Introduction}
-%\textbf{中文：引言}
-%
-%Building radios is an old hobby that has seen something of a renaissance recently. In addition to the classic and dead simple %'Foxhole' crystal radio set and more sophisticated vacuum tube receivers right up to the more recent software-defined radio %projects, there are many aspects to the technology for newcomers to get their teeth into. Recent improvements in semiconductor %technology and integrated circuits have allowed sophisticated features such as Direct Digital Synthesis (DDS) and integrated PLL %technology to be incorporated into home brew receiver designs to produce radios with surprisingly good specifications.
-%
-%\textbf{中文：制作收音机是一个古老的爱好，最近又看到了某种复兴。除了经典的极其简单的"战壕"矿石收音机和更复杂的电子管接收机，直到最近的软件定义无%线电项目，这项技术有许多方面可供新手深入探索。半导体技术和集成电路的最新改进使得直接数字合成（DDS）和集成PLL技术等复杂功能能够被纳入自制接收机设%计中，从而生产出规格惊人的收音机。}
-%
-%This book provides an overview of radio technology and clearly explains the basics of radio receiver design. Using numerous %circuits and building plans it guides you step by step along the way. If you want to cook up a simple crystal set or vacuum tube %regenerative type receiver, you'll find all the recipes here. As your knowledge and confidence grows you will want to develop your %own circuits. That's why the basics of resonant circuits, oscillator configurations and antenna design are all explained clearly %here.
-%
-%\textbf{中文：本书提供了无线电技术的概述，并清楚地解释了无线电接收机设计的基础知识。通过大量的电路和构建计划，它一步步地指导您。如果您想制作一个%简单的矿石机或电子管再生式接收机，您将在这里找到所有的配方。随着您的知识和信心的增长，您将想要开发自己的电路。这就是为什么谐振电路、振荡器配置和%天线设计的基础都在这里清楚地解释。}
-%
-%Tuned Radio Frequency and Audion type receivers are a step up from the basic crystal detector type receiver. They originally used %a single vacuum tube to demodulate the received signal and amplify the resulting baseband output. Receivers like this and simple %transistor radios for medium or shortwave reception can be built quickly and easily. They are a lot of fun to play with and are a %good way to gain knowledge of RF technology. Modern direct mixing concepts using ring mixers and DDS or PLLs, or simple %software-defined radios allow the construction of universal receivers for amateur radio and digital operation. Many things have %become easier to build thanks to highly integrated modern chips, but it helps if you also have the essential background %information. In this book we only use components that are easily obtainable. Elektor magazine has also created board layouts or %finished assemblies and devices that can be sourced from its online store.
-%
-%\textbf{中文：调谐射频和电子管类型的接收机是基本晶体检测器类型接收机的升级。它们最初使用单个电子管来解调接收信号并放大产生的基带输出。像这样的接%收机以及用于中波或短波接收的简单晶体管收音机可以快速轻松地构建。它们很有趣，是获得射频技术知识的好方法。使用环形混频器和DDS或PLL的现代直接混频概%念，或简单的软件定义无线电允许为业余无线电和数字操作构建通用接收机。由于高度集成的现代芯片，许多东西变得更容易构建，但如果您也有基本的背景信息，%这将有所帮助。在本书中，我们只使用容易获得的组件。Elektor杂志还创建了可以从其在线商店采购的电路板布局或成品组件和设备。}
-%
-%My own interest in RF technology comes from an early fascination with amateur radio; I spent many hours in my youth building and %using my own transmitters and receivers. After a long break and following the introduction of new digital broadcasting standards %such as DAB and DRM my interest has been rekindled. The challenge for me now was to design a receiver sufficiently stable to %decode DRM signals reliably on the short and medium wave bands. I spent time tinkering with vacuum tubes and studied how they were %used back in the early days. Although the anode HT was usually high voltage DC, here you experiment with lower anode voltages %starting from just 6 V to simplify experiments and make tinkering less hazardous. Other topics explored here are IQ mixer design %and building a software-defined radio.
-%
-%\textbf{中文：我对射频技术的兴趣来自早期对业余无线电的着迷；我在年轻时花了几个小时构建和使用自己的发射机和接收机。经过长时间的休息，随着DAB和DRM%等新数字广播标准的引入，我的兴趣重新点燃。现在对我来说，挑战是设计一个足够稳定的接收机，以便在短波和中波波段可靠地解码DRM信号。我花了一些时间摆弄%电子管，并研究它们在早期是如何使用的。虽然阳极高压通常是高压直流电，但在这里您可以从仅6V的较低阳极电压开始实验，以简化实验并减少摆弄的危险。这里%探索的其他主题是IQ混频器设计和构建软件定义无线电。}
-%
-%Personally, my interest in ham radio has also undergone a revival. For a long time, I had accepted it would not be feasible to %install a useful amateur radio antenna in the apartment where I live now. With the help of newer techniques and improved %measurement technology, I have been able to build simple and inconspicuous antennas that allow reasonably interference-free %reception and can also be used for low power transmitting.
-%
-%\textbf{中文：就我个人而言，我对业余无线电的兴趣也经历了复兴。很长一段时间以来，我接受了一个事实，即在我现在居住的公寓里安装一个有用的业余无线电%天线是不可行的。在较新技术和改进测量技术的帮助下，我已经能够构建简单且不显眼的天线，这些天线允许相对无干扰的接收，也可以用于低功率发射。}
-%
-%Radio technology has always been a theme of my professional work. More recently I have been involved in the development of kits %for the Kosmos-Verlag and the Franzis-Verlag, as well as articles and projects for \textit{Elektor Magazine}. Work for the AK %Modul-Bus company brought new challenges and resulted in projects for school teaching programs and hobby electronics. Some radio %receiver projects on topics such as vacuum tube technology, DRM reception, software-defined radio and DSP radio have been %developed using AK Modul-Bus products and turned into \textit{Elektor Magazine} projects.
-%
-%\textbf{中文：无线电技术一直是我专业工作的主题。最近，我参与了Kosmos-Verlag和Franzis-Verlag的套件开发，以及Elektor杂志的文章和项目。为AK %Modul-Bus公司的工作带来了新的挑战，并导致了学校教学计划和业余电子学的项目。一些关于电子管技术、DRM接收、软件定义无线电和DSP收音机等主题的无线电%接收机项目已经使用AK Modul-Bus产品开发，并转变为Elektor杂志项目。}
-%
-%\chapter{Detector Radios}
-%\textbf{中文：检测器收音机}
-%
-%Tuning in to radio broadcasts without a battery or any other power source is only possible with a crystal radio receiver. This %simplest of all radio circuits has not lost any of its charm over the decades. In the early days of radio technology, the crystal %radio or Foxhole receiver was a widely used concept. Today, just as 90 years ago, it serves as a great introduction to RF %technology. You don't necessarily have to recreate authentic historical devices or use homemade crystal detectors. Using a %germanium or Schottky diode detector simplifies the process of recovering the baseband signal. You also won't even need an %extremely long antenna or highly sensitive headphones. Using an existing speaker amplifier, such as a set of PC active speakers %makes building your first radio a piece of cake.
-%
-%\textbf{中文：在没有电池或任何其他电源的情况下收听无线电广播，只有矿石收音机才能实现。这是所有无线电电路中最简单的，几十年来并没有失去它的魅力。%在无线电技术的早期，矿石收音机或战壕收音机是一个广泛使用的概念。今天，就像90年前一样，它是射频技术的绝佳入门。您不一定非要复制真实的历史设备或使%用自制的晶体检测器。使用锗或肖特基二极管检测器简化了恢复基带信号的过程。您甚至不需要极长的天线或高灵敏度的耳机。使用现有的扬声器放大器，例如一组%PC有源扬声器，使构建您的第一台收音机变得轻而易举。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.8\textwidth]{cover}
-%\caption{Cover Image}
-%\textbf{中文：封面图片}
-%\end{figure}
-%
-%\section{The Diode Radio}
-%\textbf{中文：二极管收音机}
-%
-%The simplest receiver you can build consists of a long length of wire for use as an antenna, a ground connection, a germanium (Ge) %diode and a high-impedance headphone. The germanium diode may be difficult to source so a modern Schottky diode can be %substituted. The radio needs no external power supply because the signal picked up by the antenna provides all the energy %necessary, which is why it needs to be relatively long. Usually, a 10 meter length of wire will do the job. This design assumes a %high-impedance headphone of 2 kΩ, but it will work just as well with a 600 Ω type. Standard low-impedance headphones of modern %design are usually 32 Ω but they can also be used with a suitable transformer (see section 2.2) to provide impedance matching.
-%
-%\textbf{中文：您可以构建的最简单的接收机由一根长导线作为天线、接地连接、锗（Ge）二极管和高阻抗耳机组成。锗二极管可能很难找到，因此可以用现代肖特%基二极管代替。收音机不需要外部电源，因为天线接收的信号提供了所有必要的能量，这就是为什么它需要相对较长。通常10米长的导线就可以完成这项工作。该设%计假设使用2 kΩ的高阻抗耳机，但它与600 Ω类型的效果一样好。现代设计的标准低阻抗耳机通常32 Ω，但它们也可以与合适的变压器一起使用（2.2节）以提供阻抗%匹配。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.6\textwidth]{fig2-1}
-%\caption{Simple Diode Radio Circuit}
-%\textbf{中文：简单二极管收音机电路}
-%\end{figure}
-%
-%You can use any Ge diodes from type AA112 to AA144 or any Schottky diodes from BAT41 to BAT86. This simple radio is not selective, %which means it receives all strong stations at the same time. Unless a strong local station is overpowering all the others, you %should be able to hear some stations with fluctuating volume, especially at dusk.
-%
-%\textbf{中文：您可以使用从AA112到AA144的任何锗二极管或从BAT41到BAT86的任何肖特基二极管。这个简单的收音机没有选择性，这意味着它同时接收所有强电%台。除非一个强大的本地电台压倒了所有其他电台，否则您应该能够听到一些音量波动的电台，特别是在黄昏时分。}
-%
-%To achieve desired selectivity, a resonant circuit consisting of a coil and tuning capacitor can be added to the circuit. Using a %tuning capacitor of up to 320 pF and a coil of 300 µH, will allow the entire medium-wave band can be covered. The coil consists of %90 turns of wire wound onto a 4 cm diameter cardboard roll to make the necessary air-cored coil.
-%
-%\textbf{中文：为了实现所需的选择性，可以在电路中添加由线圈和调谐电容器组成的谐振电路。使用高320 pF的调谐电容器300 µH的线圈，可以覆盖整个中波波%段。线圈由90圈导线绕4厘米直径的纸板卷上，以制作必要的空心线圈。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.6\textwidth]{fig2-2}
-%\caption{Resonant Circuit for Medium Wave}
-%\textbf{中文：中波谐振电路}
-%\end{figure}
-%
-%This radio is not very selective and doesn't achieve much in terms of output volume. It's important to carefully adjust the %antenna and rectifier; this can be achieved by adding tap or connection points along the receiving coil. In section 2.2, a medium %wave receiver is described which uses adjustable matching.
-%
-%\textbf{中文：这个收音机不是很选择性，在输出音量方面也没有太大成就。重要的是仔细调整天线和整流器；这可以通过沿接收线圈添加抽头或连接点来实现。在%2.2节中，描述了一个使用可调匹配的中波接收机。}
-%
-%You may wonder why a diode is necessary in a receiver circuit. To answer that one you need to delve into a little bit of radio %theory. A transmitter broadcasts high frequency electromagnetic waves into free space via a transmitting mast. The broadcast %radiates in all directions and induces a small signal in an antenna at the receiving location. Transmitters that send on the %medium wave band transfer their information, such as speech and music, in the form of amplitude modulation (AM) of the carrier %frequency. The radio frequency carrier amplitude changes in time with the low-frequency (baseband) voice or music signals.
-%
-%\textbf{中文：您可能想知道为什么接收机电路中需要二极管。要回答这个问题，您需要深入研究一点无线电理论。发射机通过发射塔将高频电磁波广播到自由空%间。广播向各个方向辐射，并在接收位置的天线中感应出一个小信号。在中波波段发送的发射机以载波频率的幅度调制（AM）的形式传输它们的信息，如语音和音%乐。射频载波幅度随低频（基带）语音或音乐信号随时间变化。}
-%
-%The received radio signal remains inaudible even in headphones because our ears are only sensitive to sound pressure waves up to %about 20 kHz. The low-frequency signal carrying the voice and music information needs to be recovered from the radio carrier wave. %This is where the diode comes in; using just one diode you can demodulate the RF signal. The average current of the rectified %signal corresponds to the original modulated AF signal.
-%
-%\textbf{中文：接收到的无线电信号即使在耳机中也是听不见的，因为我们的耳朵只对高达20 kHz的声压波敏感。携带语音和音乐信息的低频信号需要从无线电载波%中恢复。这就是二极管发挥作用的地方；仅使用一个二极管，您就可以解调射频信号。整流信号的平均电流对应于原始调制音频信号。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.6\textwidth]{fig2-3}
-%\caption{Demodulation Process}
-%\textbf{中文：解调过程}
-%\end{figure}
-%
-%The first detector radios used crystal detectors. Lead sulfide (galena) or a piece of pyrite crystal was used for this purpose. %Both are sulfur compounds and occur in nature as ores (lead ore; iron ore).
-%
-%\textbf{中文：最早的检测器收音机使用晶体检测器。硫化铅（方铅矿）或一块黄铁矿晶体用于此目的。两者都是硫化合物，在自然界中以矿石形式存在（铅矿石；%铁矿石）。}
-%
-%The crystal can be used successfully to build a diode radio. Numerous strong stations can be heard without the need for any %additional amplifier. Even today, it is possible to build a detector using these natural minerals. Pyrite forms regular, %gold-colored cuboid crystals in rock. Lead sulfide is black with areas of metallic shiny facets on its surface. A sewing needle %can be used as the cat's whisker detector. You will need to test various points on the crystal surface until contact achieves a %good rectification characteristic.
-%
-%\textbf{中文：晶体可以成功地用于构建二极管收音机。无需任何额外的放大器即可听到许多强电台。即使在今天，也可以使用这些天然矿物构建检测器。黄铁矿在%岩石中形成规则的、金色的长方体晶体。硫化铅是黑色的，表面有金属光泽的切面区域。缝纫针可以用作猫须检测器。您需要测试晶体表面的各个点，直到接触实现%良好的整流特性。}
-%
-%\section{Headphone Adapter}
-%\textbf{中文：耳机适配器}
-%
-%Vintage circuit diagrams for detector radios assume that headphones shown on the circuit will be high-impedance types with 2000 Ω %driver coils. These were standard back then. Nowadays a typical set of headphones will use 32 Ω driver coils which will be too low %to function properly in the original circuit. You can, however, use a small transformer to provide the necessary impedance %matching. A transformer salvaged from a small mains adapter can be used here. If the mains adapter has switchable taps, (3/4.5/6/9/%12 V) on the secondary winding you may be able to use these to optimize the impedance match. Remove the transformer and connect %the secondary winding to the headphones and the primary winding to the circuit where the high impedance phones would normally be %connected.
-%
-%\textbf{中文：检测器收音机的旧电路图假设电路中显示的耳机将是具有2000 Ω驱动线圈的高阻抗类型。这些在当时是标准的。如今，典型的耳机将使用32 Ω驱动%线圈，这在原始电路中太低而无法正常工作。但是，您可以使用一个小变压器来提供必要的阻抗匹配。这里可以使用从小型电源适配器中拆下的变压器。如果电源适%配器在次级绕组上有可切换的抽头（3/4.5/6/9/12 V）），您可能能够使用这些抽头来优化阻抗匹配。拆下变压器，将次级绕组连接到耳机，将初级绕组连接到通常%连接高阻抗耳机的电路。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.6\textwidth]{fig2-4}
-%\caption{Headphone Adapter Circuit}
-%\textbf{中文：耳机适配器电路}
-%\end{figure}
-%
-%In a diode radio, correct antenna matching is the key to success because you cannot afford to waste any of the received RF energy. %The receiver coil, therefore, has several tap points. Using a total of 80 turns of 'Litz' wire on a 10 mm diameter ferrite rod, %makes sure you will be able to cover the entire medium wave band. Long antennas should be connected to a lower tap of the coil to %not overly dampen the resonant circuit at the input. Try connecting the long antenna to each of the winding taps to find which one %gives the best reception. Two coupling capacitors are also shown connected at the coil end. Experiment with the aerial connection, %a higher value of capacitance results in stronger coupling.
-%
-%\textbf{中文：在二极管收音机中，正确的天线匹配是成功的关键，因为您不能浪费任何接收到的射频能量。因此，接收线圈有几个抽头点。在10毫米直径的磁棒上%使用总共80圈利兹线，确保您能够覆盖整个中波波段。长天线应该连接到线圈的较低抽头，以免过度抑制输入端的谐振电路。尝试将长天线连接到每个绕组抽头，找%出哪个提供最佳接收。线圈端还显示了两个耦合电容器。尝试天线连接，较高的电容值会导致更强的耦合。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.6\textwidth]{fig2-5}
-%\caption{Antenna Matching Circuit}
-%\textbf{中文：天线匹配电路}
-%\end{figure}
-%
-%For such a simple radio, a good antenna is crucial. If your house is fitted with metal rainwater guttering, this can make a good %antenna. The guttering should not have a connection to ground potential. A zinc gutter will often be cemented into a drainage pipe %near the ground and thereby will be insulated. All you need now is a connection wire, and that should make a really good antenna. %In case the reception is still too quiet for headphones, you can connect the output to a set of PC's active speakers.
-%
-%\textbf{中文：对于这样一个简单的收音机，一个好的天线至关重要。如果您的房子装有金属雨水槽，这可以成为一个很好的天线。雨水槽不应与地电位有连接。锌%制雨水槽通常会用水泥固定在靠近地面的排水管中，从而被绝缘。现在您只需要一根连接线，这应该能成为一个非常好的天线。如果接收对于耳机来说仍然太安静，%您可以将输出连接到一套PC有源扬声器。}
-%
-%Another good antenna is sometimes the heating system of an apartment. Although the pipes are usually grounded at some point, the %total length of all the piping can effectively act as a loop antenna. In many cases, this can result in high received signal %levels.
-%
-%\textbf{中文：另一个好的天线有时是公寓的供暖系统。虽然管道通常在某处接地，但所有管道的总长度可以有效地充当环形天线。在许多情况下，这会导致高接收%信号电平。}
-%
-%\section{A Detector for Shortwave}
-%\textbf{中文：短波检测器}
-%
-%Looking at old "plans" to build detector radios, they are usually designed to receive signals from local stations in the medium %wave band. These stations are becoming rarer and may even be unavailable now as more countries shut down their medium wave %transmitters. Some countries such as the UK, Italy, France, and Spain however still broadcast in the band. Transmitting on %shortwave has the advantage of covering much greater distances. Many countries have their own international broadcasting services %designed to inform and entertain overseas listeners. The tried-and-true AM radio is, therefore, just as active on shortwave as %ever.
-%
-%\textbf{中文：查看构建检测器收音机的"计划"，它们通常设计用于接收中波波段本地电台的信号。随着越来越多的国家关闭其中波发射机，这些电台变得越来越罕%见，甚至可能现在无法收听。然而，一些国家如英国、意大利、法国和西班牙仍然在该波段广播。在短波上广播具有覆盖更远距离的优势。许多国家都有自己的国际%广播服务，旨在为海外听众提供信息和娱乐。因此，久经考验的AM收音机在短波上仍然和以前一样活跃。}
-%
-%Tuning in to higher frequencies requires smaller coils which are much easier to make. While a good medium wave coil needs a %ferrite rod and a coil wound from hard-to-find 'Litz' wire, on shortwave, you can use standard insulated copper wire. A special %coil former with a ferrite core is not required; you can use any insulated wire.
-%
-%\textbf{中文：调谐到更高的频率需要更小的线圈，这更容易制作。虽然一个好的中波线圈需要磁棒和用难以找到的"利兹"线绕制的线圈，但在短波上，您可以使用%标准的绝缘铜线。不需要带有磁芯的特殊线圈骨架；您可以使用任何绝缘线。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.6\textwidth]{fig2-6}
-%\caption{Shortwave Coil Construction}
-%\textbf{中文：短波线圈构造}
-%\end{figure}
-%
-%For the first attempt, a coil with a total of 25 turns with four taps should be wound. I used the plastic body of a banana plug %which measures 8 mm diameter but you could use a ball-point pen body. Two holes spaced 1 cm apart help to fix the wire ends. Then, %wind 5 turns, make a tap point, and apply the next turns. The finished coil connections can be soldered to a 6-way pinheader strip.
-%
-%\textbf{中文：对于第一次尝试，应该绕制一个总共25圈带有四个抽头的线圈。我使用了直8毫米的香蕉插头的塑料体，但您可以使用圆珠笔的笔身。两个相1厘米的%孔有助于固定导线端。然后，5圈，做一个抽头点，然后绕下一圈。完成的线圈连接可以焊接6路排针条上。}
-%
-%\begin{figure}[htbp]
-%\centering
-%%%\includegraphics[width=0.6\textwidth]{fig2-7}
-%\caption{Shortwave Detector Circuit}
-%\end{figure}
-%
-%The entire radio can be built on an experimental plug board. Pins have been soldered to the variable connections so that it can be %easily plugged into the prototyping plug board. The advantage of this construction method is that it allows for easy %experimentation to try out other circuit mods.
-%
-%\textbf{中文：整个收音机可以在实验插板上构建。引脚已焊接到可变连接上，以便可以轻松插入到原型插板中。这种构建方法的优点是允许轻松实验以尝试其他电%路修改。}
-%
-%The respective taps for the antenna connection and the diode on the coil can be experimentally adjusted. This tuning capacitor is %dual gang with both halves connected in parallel. If only the upper range above 10 MHz is to be received, the lower-valued half of %the tuning capacitor rated at 80 pF will be sufficient.
-%
-%\textbf{中文：天线连接和线圈上二极管的相应抽头可以实验性地调整。这个调谐电容器是双联的，两半并联连接。如果只接收10 MHz以上的较高范围，额定值为%80 pF的调谐电容器的较低值半部分就足够了。}
-%
-%The radio requires a high-impedance headphone, such as a piezoceramic crystal earpiece or dynamic headphones with a 2 kΩ resistor %placed in series with each capsule. Low-impedance 32 Ω types cannot be used directly and require an impedance transformer (see %Section 2.2). Medium-impedance headphones with 600 Ω can also be used directly.
-%
-%\textbf{中文：收音机需要高阻抗耳机，例如压电陶瓷晶体耳机或每个耳机串联2 kΩ电阻的动圈耳机。低阻抗32 Ω类型不能直接使用，需要阻抗变压器（见2.2节）%200 Ω的中等阻抗耳机也可以直接使用。}
-%
-%A germanium or a Schottky diode can be used as the detector. Both of these diodes have a low forward threshold voltage. A %germanium diode also has reasonably low conductivity in the reverse direction, which is important when using a high-impedance %crystal earpiece.
-%
-%\textbf{中文：可以使用锗二极管或肖特基二极管作为检测器。这两种二极管都具有较低的正向阈值电压。锗二极管在反向方向也具有相当低的导电性，这在高阻抗%晶体耳机时很重要。}
-%
+\begin{paracol}{2}
+This is an Elektor Publication. Elektor is the media brand of Elektor International Media B.V.
+
+PO Box 11, NL-6114-ZG Susteren, The Netherlands
+
+Phone: +31 46 4389444
+
+\switchcolumn
+这是一本Elektor出版物。Elektor是Elektor International Media B.V.的媒体品牌。
+
+PO Box 11, NL-6114-ZG Susteren，荷兰
+
+电话：+31 46 4389444
+
+\switchcolumn*
+All rights reserved. No part of this book may be reproduced in any material form, including photocopying, or storing in any medium by electronic means and whether or not transiently or incidentally to some other use of this publication, without the written permission of the copyright holder except in accordance with the provisions of the Copyright Designs and Patents Act 1988 or under the terms of a licence issued by the Copyright Licencing Agency Ltd., 90 Tottenham Court Road, London, England W1P 9HE. Applications for the copyright holder's permission to reproduce any part of the publication should be addressed to the publishers.
+
+\switchcolumn
+保留所有权利。未经版权所有者的书面许可，不得以任何物质形式（包括影印）复制本书的任何部分，也不得以电子方式将本书的任何部分存储在任何介质中，无论是否临时或偶然用于本出版物的其他用途，除非符合1988年版权、设计和专利法的规定或根据版权许可机构有限公司颁发的许可条款，地址90 Tottenham Court Road, London, England W1P 9HE。申请版权所有者许可复制本出版物的任何部分应致函出版商。
+
+\switchcolumn*
+Declaration
+
+The author, editor, and publisher have used their best efforts in ensuring the correctness of the information contained in this book. They do not assume, and hereby disclaim, any liability to any party for any loss or damage caused by errors or omissions in this book, whether such errors or omissions result from negligence, accident or any other cause.
+
+\switchcolumn
+声明
+
+作者、编辑和出版商已尽最大努力确保本书中包含的信息的正确性。他们不承担，并特此声明，对任何方因本书中的错误或遗漏造成的任何损失或损害承担任何责任，无论此类错误或遗漏是由于疏忽、事故还是任何其他原因造成的。
+
+\switchcolumn*
+All the programs given in the book are Copyright of the Author and Elektor International Media. These programs may only be used for educational purposes. Written permission from the Author or Elektor must be obtained before any of these programs can be used for commercial purposes.
+
+\switchcolumn
+本书中提供的所有程序均为作者和Elektor International Media的版权。这些程序只能用于教育目的。在任何这些程序用于商业目的之前，必须获得作者或Elektor的书面许可。
+
+\switchcolumn*
+British Library Cataloguing in Publication Data
+
+A catalogue record for this book is available from the British Library
+
+ISBN 978-3-89576-565-0 Print
+ISBN 978-3-89576-566-7 eBook
+
+Copyright 2023: Elektor International Media B.V.
+
+Translator: Martin Cooke
+Editor: Jan Buiting
+Prepress Production: D-Vision, Julian van den Berg
+
+\switchcolumn
+英国图书馆出版数据编目
+
+本书的目录记录可从英国图书馆获得。
+
+ISBN 978-3-89576-565-0（印刷版）
+ISBN 978-3-89576-566-7（电子版）
+
+版权所有 © 2023: Elektor International Media B.V.
+
+译者：Martin Cooke
+编辑：Jan Buiting
+印前制作：D-Vision, Julian van den Berg
+\end{paracol}
+
+\chapter{前言}
+
+\begin{paracol}{2}
+Discover the captivating world of radio technology and unlock the secrets of radio set construction using this comprehensive guide. From the early days of the humble crystal set to the modern wonders of Software-Defined Radios (SDRs), this book takes you on a journey through time and technology. With detailed instructions and step-by-step illustrations, you'll learn how to build and assemble various receivers to understand their various strengths and weaknesses. Practical antenna design and amateur radio rigs are also covered in this inclusive handbook.
+
+\switchcolumn
+发现无线电技术的迷人世界，并使用这本综合指南揭开收音机结构的秘密。从早期简陋的矿石机到现代软件定义无线电（SDR）的奇迹，本书将带您穿越时空和技术。通过详细的说明和分步插图，您将学习如何构建和组装各种接收机，以了解它们各自的优势和劣势。实用的天线设计和业余无线电设备也包含在这本综合手册中。
+\switchcolumn*
+For many years in the early history of electronics, the construction of homebrew radio receivers was the most common entry point to electronics. Nowadays, there are many other routes in, especially through the use of computers, microcontrollers, and digital technology. The analogue roots of electronics are now often overlooked but radio technology is particularly well suited as an introduction to electronics because you will be rewarded with early success from even the most basic circuit. The connection to modern digital technology is also obvious when it comes to modern tuning methods and the use of highly integrated PLL, DDS and DSP radios.
+
+\switchcolumn
+在电子学的早期历史中，自制无线电接收机的构建是最常见的入门途径。如今，有许多其他途径，特别是通过计算机、微控制器和数字技术的使用。电子学的模拟根源现在经常被忽视，但无线电技术特别适合作为电子学的入门，因为即使是最基本的电路，您也会获得早期的成功回报。当涉及到现代调谐方法和高度集成的PLL、DDS和DSP收音机的使用时，与现代数字技术的联系也是显而易见的。
+
+\switchcolumn*
+This book aims to provide an overview and present a collection of simple projects to encourage budding engineers along the path of discovery. Now in its second edition, many new projects have been added which include important circuits and cover most recent developments. With this book by your side, you will go on to develop your own ideas and design and test your own receivers.
+
+\switchcolumn
+本书旨在提供概述并展示一系列简单的项目，以鼓励初学者沿着发现之路前进。现在是第二版，增加了许多新项目，其中包括重要的电路并涵盖了最新的发展。有了这本书在您身边，您将继续发展自己的想法，并设计和测试自己的接收机。
+
+\switchcolumn*
+Wishing you every success and crystal clear reception!
+
+\switchcolumn
+祝您一切成功，接收清晰！
+
+\switchcolumn*
+Burkhard Kainka, DK7JD
+
+www.elektronik-labor.de
+
+\switchcolumn
+Burkhard Kainka, DK7JD
+
+www.elektronik-labor.de
+\end{paracol}
+
+\mainmatter
+
+\chapter{Introduction 引言}
+
+\begin{paracol}{2}
+Building radios is an old hobby that has seen something of a renaissance recently. In addition to the classic and dead simple 'Foxhole' crystal radio set and more sophisticated vacuum tube receivers right up to the more recent software-defined radio projects, there are many aspects to the technology for newcomers to get their teeth into. Recent improvements in semiconductor technology and integrated circuits have allowed sophisticated features such as Direct Digital Synthesis (DDS) and integrated PLL technology to be incorporated into home brew receiver designs to produce radios with surprisingly good specifications.
+
+\switchcolumn
+制作收音机是一个古老的爱好，最近又看到了某种复兴。除了经典的极其简单的"战壕"矿石收音机和更复杂的电子管接收机，直到最近的软件定义无线电项目，这项技术有许多方面可供新手深入探索。半导体技术和集成电路的最新改进使得直接数字合成（DDS）和集成PLL技术等复杂功能能够被纳入自制接收机设计中，从而生产出规格惊人的收音机。
+
+\switchcolumn*
+This book provides an overview of radio technology and clearly explains the basics of radio receiver design. Using numerous circuits and building plans it guides you step by step along the way. If you want to cook up a simple crystal set or vacuum tube regenerative type receiver, you'll find all the recipes here. As your knowledge and confidence grows you will want to develop your own circuits. That's why the basics of resonant circuits, oscillator configurations and antenna design are all explained clearly here.
+
+\switchcolumn
+本书提供了无线电技术的概述，并清楚地解释了无线电接收机设计的基础知识。通过大量的电路和构建计划，它一步步地指导您。如果您想制作一个简单的矿石机或电子管再生式接收机，您将在这里找到所有的配方。随着您的知识和信心的增长，您将想要开发自己的电路。这就是为什么谐振电路、振荡器配置和天线设计的基础都在这里清楚地解释。
+
+\switchcolumn*
+Tuned Radio Frequency and Audion type receivers are a step up from the basic crystal detector type receiver. They originally used a single vacuum tube to demodulate the received signal and amplify the resulting baseband output. Receivers like this and simple transistor radios for medium or shortwave reception can be built quickly and easily. They are a lot of fun to play with and are a good way to gain knowledge of RF technology. Modern direct mixing concepts using ring mixers and DDS or PLLs, or simple software-defined radios allow the construction of universal receivers for amateur radio and digital operation. Many things have become easier to build thanks to highly integrated modern chips, but it helps if you also have the essential background information. In this book we only use components that are easily obtainable. Elektor magazine has also created board layouts or finished assemblies and devices that can be sourced from its online store.
+
+\switchcolumn
+调谐射频和电子管类型的接收机是基本晶体检测器类型接收机的升级。它们最初使用单个电子管来解调接收信号并放大产生的基带输出。像这样的接收机以及用于中波或短波接收的简单晶体管收音机可以快速轻松地构建。它们很有趣，是获得射频技术知识的好方法。使用环形混频器和DDS或PLL的现代直接混频概念，或简单的软件定义无线电允许为业余无线电和数字操作构建通用接收机。由于高度集成的现代芯片，许多东西变得更容易构建，但如果您也有基本的背景信息，这将有所帮助。在本书中，我们只使用容易获得的组件。Elektor杂志还创建了可以从其在线商店采购的电路板布局或成品组件和设备。
+
+\switchcolumn*
+My own interest in RF technology comes from an early fascination with amateur radio; I spent many hours in my youth building and using my own transmitters and receivers. After a long break and following the introduction of new digital broadcasting standards such as DAB and DRM my interest has been rekindled. The challenge for me now was to design a receiver sufficiently stable to decode DRM signals reliably on the short and medium wave bands. I spent time tinkering with vacuum tubes and studied how they were used back in the early days. Although the anode HT was usually high voltage DC, here you experiment with lower anode voltages starting from just 6 V to simplify experiments and make tinkering less hazardous. Other topics explored here are IQ mixer design and building a software-defined radio.
+
+\switchcolumn
+我对射频技术的兴趣来自早期对业余无线电的着迷；我在年轻时花了几个小时构建和使用自己的发射机和接收机。经过长时间的休息，随着DAB和DRM等新数字广播标准的引入，我的兴趣重新点燃。现在对我来说，挑战是设计一个足够稳定的接收机，以便在短波和中波波段可靠地解码DRM信号。我花了一些时间摆弄电子管，并研究它们在早期是如何使用的。虽然阳极高压通常是高压直流电，但在这里您可以从仅6V的较低阳极电压开始实验，以简化实验并减少摆弄的危险。这里探索的其他主题是IQ混频器设计和构建软件定义无线电。
+
+\switchcolumn*
+Personally, my interest in ham radio has also undergone a revival. For a long time, I had accepted it would not be feasible to install a useful amateur radio antenna in the apartment where I live now. With the help of newer techniques and improved measurement technology, I have been able to build simple and inconspicuous antennas that allow reasonably interference-free reception and can also be used for low power transmitting.
+
+\switchcolumn
+就我个人而言，我对业余无线电的兴趣也经历了复兴。很长一段时间以来，我接受了一个事实，即在我现在居住的公寓里安装一个有用的业余无线电天线是不可行的。在较新技术和改进测量技术的帮助下，我已经能够构建简单且不显眼的天线，这些天线允许相对无干扰的接收，也可以用于低功率发射。
+
+\switchcolumn*
+Radio technology has always been a theme of my professional work. More recently I have been involved in the development of kits for the Kosmos-Verlag and the Franzis-Verlag, as well as articles and projects for \textit{Elektor Magazine}. Work for the AK Modul-Bus company brought new challenges and resulted in projects for school teaching programs and hobby electronics. Some radio receiver projects on topics such as vacuum tube technology, DRM reception, software-defined radio and DSP radio have been developed using AK Modul-Bus products and turned into \textit{Elektor Magazine} projects.
+
+\switchcolumn
+无线电技术一直是我专业工作的主题。最近，我参与了Kosmos-Verlag和Franzis-Verlag的套件开发，以及Elektor杂志的文章和项目。为AK Modul-Bus公司的工作带来了新的挑战，并导致了学校教学计划和业余电子学的项目。一些关于电子管技术、DRM接收、软件定义无线电和DSP收音机等主题的无线电接收机项目已经使用AK Modul-Bus产品开发，并转变为Elektor杂志项目。
+\end{paracol}
+
+\chapter{Detector Radios 检测器收音机}
+
+\begin{paracol}{2}
+Tuning in to radio broadcasts without a battery or any other power source is only possible with a crystal radio receiver. This simplest of all radio circuits has not lost any of its charm over the decades. In the early days of radio technology, the crystal radio or Foxhole receiver was a widely used concept. Today, just as 90 years ago, it serves as a great introduction to RF technology. You don't necessarily have to recreate authentic historical devices or use homemade crystal detectors. Using a germanium or Schottky diode detector simplifies the process of recovering the baseband signal. You also won't even need an extremely long antenna or highly sensitive headphones. Using an existing speaker amplifier, such as a set of PC active speakers makes building your first radio a piece of cake.
+
+\switchcolumn
+在没有电池或任何其他电源的情况下收听无线电广播，只有矿石收音机才能实现。这是所有无线电电路中最简单的，几十年来并没有失去它的魅力。在无线电技术的早期，矿石收音机或战壕收音机是一个广泛使用的概念。今天，就像90年前一样，它是射频技术的绝佳入门。您不一定非要复制真实的历史设备或使用自制的晶体检测器。使用锗或肖特基二极管检测器简化了恢复基带信号的过程。您甚至不需要极长的天线或高灵敏度的耳机。使用现有的扬声器放大器，例如一组PC有源扬声器，使构建您的第一台收音机变得轻而易举。
+\end{paracol}
+
+\section{The Diode Radio 二极管收音机}
+
+\begin{paracol}{2}
+The simplest receiver you can build consists of a long length of wire for use as an antenna, a ground connection, a germanium (Ge) diode and a high-impedance headphone. The germanium diode may be difficult to source so a modern Schottky diode can be substituted. The radio needs no external power supply because the signal picked up by the antenna provides all the energy necessary, which is why it needs to be relatively long. Usually, a 10 meter length of wire will do the job. This design assumes a high-impedance headphone of 2 kΩ, but it will work just as well with a 600 Ω type. Standard low-impedance headphones of modern design are usually 32 Ω but they can also be used with a suitable transformer (see section 2.2) to provide impedance matching.
+
+\switchcolumn
+您可以构建的最简单的接收机由一根长导线作为天线、接地连接、锗（Ge）二极管和高阻抗耳机组成。锗二极管可能很难找到，因此可以用现代肖特基二极管代替。收音机不需要外部电源，因为天线接收的信号提供了所有必要的能量，这就是为什么它需要相对较长。通常10米长的导线就可以完成这项工作。该设计假设使用2 kΩ的高阻抗耳机，但它与600 Ω类型的效果一样好。现代设计的标准低阻抗耳机通常32 Ω，但它们也可以与合适的变压器一起使用（2.2节）以提供阻抗匹配。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-1}
+\caption{The Diode Radio}
+\end{figure}
+
+\begin{paracol}{2}
+You can use any Ge diodes from type AA112 to AA144 or any Schottky diodes from BAT41 to BAT86. This simple radio is not selective, which means it receives all strong stations at the same time. Unless a strong local station is overpowering all the others, you should be able to hear some stations with fluctuating volume, especially at dusk.
+
+\switchcolumn
+您可以使用从AA112到AA144的任何锗二极管或从BAT41到BAT86的任何肖特基二极管。这个简单的收音机没有选择性，这意味着它同时接收所有强电台。除非一个强大的本地电台压倒了所有其他电台，否则您应该能够听到一些音量波动的电台，特别是在黄昏时分。
+
+\switchcolumn*
+To achieve desired selectivity, a resonant circuit consisting of a coil and tuning capacitor can be added to the circuit. Using a tuning capacitor of up to 320 pF and a coil of 300 µH, will allow the entire medium-wave band can be covered. The coil consists of 90 turns of wire wound onto a 4 cm diameter cardboard roll to make the necessary air-cored coil.
+
+\switchcolumn
+为了实现所需的选择性，可以在电路中添加由线圈和调谐电容器组成的谐振电路。使用高320 pF的调谐电容器300 µH的线圈，可以覆盖整个中波波段。线圈由90圈导线绕4厘米直径的纸板卷上，以制作必要的空心线圈。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-2}
+\caption{Diode receiver circuit with resonant circuit.}
+\end{figure}
+
+\begin{paracol}{2}
+This radio is not very selective and doesn't achieve much in terms of output volume. It's important to carefully adjust the antenna and rectifier; this can be achieved by adding tap or connection points along the receiving coil. In section 2.2, a medium wave receiver is described which uses adjustable matching.
+
+\switchcolumn
+这个收音机不是很有选择性，在输出音量方面也没有太大表现。重要的是仔细调整天线和整流器；这可以通过沿接收线圈添加抽头或连接点来实现。在2.2节中，描述了一个使用可调匹配的中波接收机。
+
+\switchcolumn*
+You may wonder why a diode is necessary in a receiver circuit. To answer that one you need to delve into a little bit of radio theory. A transmitter broadcasts high frequency electromagnetic waves into free space via a transmitting mast. The broadcast radiates in all directions and induces a small signal in an antenna at the receiving location. Transmitters that send on the medium wave band transfer their information, such as speech and music, in the form of amplitude modulation (AM) of the carrier frequency. The radio frequency carrier amplitude changes in time with the low-frequency (baseband) voice or music signals.
+
+\switchcolumn
+您可能想知道为什么接收机电路中需要二极管。要回答这个问题，您需要深入研究一点无线电理论。发射机通过发射塔将高频电磁波广播到自由空间。广播向各个方向辐射，并在接收位置的天线中感应出一个小信号。在中波波段发送的发射机以载波频率的幅度调制（AM）的形式传输它们的信息，如语音和音乐。射频载波幅度随低频（基带）语音或音乐信号随时间变化。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-3}
+\caption{Amplitude modulation}
+\end{figure}
+
+\begin{paracol}{2}
+The received radio signal remains inaudible even in headphones because our ears are only sensitive to sound pressure waves up to about 20 kHz. The low-frequency signal carrying the voice and music information needs to be recovered from the radio carrier wave. This is where the diode comes in; using just one diode you can demodulate the RF signal. The average current of the rectified signal corresponds to the original modulated AF signal.
+
+\switchcolumn
+接收到的无线电信号即使在耳机中也是听不见的，因为我们的耳朵只对高达20 kHz的声压波敏感。携带语音和音乐信息的低频信号需要从无线电载波中恢复。这就是二极管发挥作用的地方；仅使用一个二极管，您就可以解调射频信号。整流信号的平均电流对应于原始调制音频信号。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-4}
+\caption{Demodulation using a rectifier}
+\end{figure}
+
+\begin{paracol}{2}
+The first detector radios used crystal detectors. Lead sulfide (galena) or a piece of pyrite crystal was used for this purpose. Both are sulfur compounds and occur in nature as ores (lead ore; iron ore).
+
+\switchcolumn
+最早的检测器收音机使用晶体检测器。硫化铅（方铅矿）或一块黄铁矿晶体用于此目的。两者都是硫化合物，在自然界中以矿石形式存在（铅矿石；铁矿石）。
+
+\switchcolumn*
+Figure 2.5 shows a crystal holder with a lead sulfide crystal from the early days of radio technology. A spiral spring made of steel wire known as a cat’s whisker contacts the crystal surface. The characteristics of the semiconductor junction formed at the crystal surface can be tested with an oscilloscope component tester. You will need to experiment a bit to find a suitable spot on the crystal surface and to recognize a typical diode characteristic curve on the component tester trace.
+
+\switchcolumn
+图2.5展示了无线电技术早期带有硫化铅晶体的晶体支架。由钢丝制成的螺旋弹簧（称为猫须）接触晶体表面。晶体表面形成的半导体结的特性可以用示波器元件测试仪进行测试。您需要稍微实验一下，在晶体表面找到合适的位置，并在元件测试仪的轨迹上识别出典型的二极管特性曲线。
+
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-5}
+\caption{An original detector crystal mount}
+\end{figure}
+
+\begin{paracol}{2}
+The crystal can be used successfully to build a diode radio. Numerous strong stations can be heard without the need for any additional amplifier. Even today, it is possible to build a detector using these natural minerals. Pyrite forms regular, gold-colored cuboid crystals in rock. Lead sulfide is black with areas of metallic shiny facets on its surface. A sewing needle can be used as the cat's whisker detector. You will need to test various points on the crystal surface until contact achieves a good rectification characteristic.
+
+\switchcolumn
+晶体可以成功地用于构建二极管收音机。无需任何额外的放大器即可听到许多强电台。即使在今天，也可以使用这些天然矿物构建检测器。黄铁矿在岩石中形成规则的、金色的长方体晶体。硫化铅是黑色的，表面有金属光泽的切面区域。缝纫针可以用作猫须检测器。您需要测试晶体表面的各个点，直到接触实现良好的整流特性。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-6}
+\caption{Naturally formed Pyrite and Lead sulfide.}
+\end{figure}
+
+\section{Headphone Adapter 耳机适配器}
+
+\begin{paracol}{2}
+Vintage circuit diagrams for detector radios assume that headphones shown on the circuit will be high-impedance types with 2000 Ω driver coils. These were standard back then. Nowadays a typical set of headphones will use 32 Ω driver coils which will be too low to function properly in the original circuit. You can, however, use a small transformer to provide the necessary impedance matching. A transformer salvaged from a small mains adapter can be used here. If the mains adapter has switchable taps, (3/4.5/6/9/12 V) on the secondary winding you may be able to use these to optimize the impedance match. Remove the transformer and connect the secondary winding to the headphones and the primary winding to the circuit where the high impedance phones would normally be connected.
+
+\switchcolumn
+检测器收音机的旧电路图假设电路中显示的耳机将是具有2000 Ω驱动线圈的高阻抗类型。这些在当时是标准的。如今，典型的耳机将使用32 Ω驱动线圈，这在原始电路中太低而无法正常工作。但是，您可以使用一个小变压器来提供必要的阻抗匹配。这里可以使用从小型电源适配器中拆下的变压器。如果电源适配器在次级绕组上有可切换的抽头（3/4.5/6/9/12 V）），您可能能够使用这些抽头来优化阻抗匹配。拆下变压器，将次级绕组连接到耳机，将初级绕组连接到通常连接高阻抗耳机的电路。
+
+\switchcolumn*
+In a diode radio, correct antenna matching is the key to success because you cannot afford to waste any of the received RF energy. The receiver coil, therefore, has several tap points. Using a total of 80 turns of 'Litz' wire on a 10 mm diameter ferrite rod, makes sure you will be able to cover the entire medium wave band. Long antennas should be connected to a lower tap of the coil to not overly dampen the resonant circuit at the input. Try connecting the long antenna to each of the winding taps to find which one gives the best reception. Two coupling capacitors are also shown connected at the coil end. Experiment with the aerial connection, a higher value of capacitance results in stronger coupling.
+
+\switchcolumn
+在二极管收音机中，正确的天线匹配是成功的关键，因为您不能浪费任何接收到的射频能量。因此，接收线圈有几个抽头点。在10毫米直径的磁棒上使用总共80圈利兹线，确保您能够覆盖整个中波波段。长天线应该连接到线圈的较低抽头，以免过度抑制输入端的谐振电路。尝试将长天线连接到每个绕组抽头，找出哪个提供最佳接收。线圈端还显示了两个耦合电容器。尝试天线连接，较高的电容值会导致更强的耦合。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-7}
+\caption{Low impedance headphones with transformer impedance matching.}
+\end{figure}
+
+\begin{paracol}{2}
+For such a simple radio, a good antenna is crucial. If your house is fitted with metal rainwater guttering, this can make a good antenna. The guttering should not have a connection to ground potential. A zinc gutter will often be cemented into a drainage pipe near the ground and thereby will be insulated. All you need now is a connection wire, and that should make a really good antenna. In case the reception is still too quiet for headphones, you can connect the output to a set of PC's active speakers.
+
+\switchcolumn
+对于这样一个简单的收音机，一个好的天线至关重要。如果您的房子装有金属雨水槽，这可以成为一个很好的天线。雨水槽不应与地电位有连接。锌制雨水槽通常会用水泥固定在靠近地面的排水管中，从而被绝缘。现在您只需要一根连接线，这应该能成为一个非常好的天线。如果接收对于耳机来说仍然太安静，您可以将输出连接到一套PC有源扬声器。
+
+\switchcolumn*
+Another good antenna is sometimes the heating system of an apartment. Although the pipes are usually grounded at some point, the total length of all the piping can effectively act as a loop antenna. In many cases, this can result in high received signal levels.
+
+\switchcolumn
+另一个好的天线有时是公寓的供暖系统。虽然管道通常在某处接地，但所有管道的总长度可以有效地充当环形天线。在许多情况下，这会导致高接收信号电平。
+\end{paracol}
+
+\section{A Detector for Shortwave 短波检测器}
+
+\begin{paracol}{2}
+Looking at old "plans" to build detector radios, they are usually designed to receive signals from local stations in the medium wave band. These stations are becoming rarer and may even be unavailable now as more countries shut down their medium wave transmitters. Some countries such as the UK, Italy, France, and Spain however still broadcast in the band. Transmitting on shortwave has the advantage of covering much greater distances. Many countries have their own international broadcasting services designed to inform and entertain overseas listeners. The tried-and-true AM radio is, therefore, just as active on shortwave as ever.
+
+\switchcolumn
+查看构建检测器收音机的"计划"，它们通常设计用于接收中波波段本地电台的信号。随着越来越多的国家关闭其中波发射机，这些电台变得越来越罕见，甚至可能现在无法收听。然而，一些国家如英国、意大利、法国和西班牙仍然在该波段广播。在短波上广播具有覆盖更远距离的优势。许多国家都有自己的国际广播服务，旨在为海外听众提供信息和娱乐。因此，久经考验的AM收音机在短波上仍然和以前一样活跃。
+
+\switchcolumn*
+Tuning in to higher frequencies requires smaller coils which are much easier to make. While a good medium wave coil needs a ferrite rod and a coil wound from hard-to-find 'Litz' wire, on shortwave, you can use standard insulated copper wire. A special coil former with a ferrite core is not required; you can use any insulated wire.
+
+\switchcolumn
+调谐到更高的频率需要更小的线圈，这更容易制作。虽然一个好的中波线圈需要磁棒和用难以找到的"利兹"线绕制的线圈，但在短波上，您可以使用标准的绝缘铜线。不需要带有磁芯的特殊线圈骨架；您可以使用任何绝缘线。
+
+\switchcolumn*
+For the first attempt, a coil with a total of 25 turns with four taps should be wound. I used the plastic body of a banana plug which measures 8 mm diameter but you could use a ball-point pen body. Two holes spaced 1 cm apart help to fix the wire ends. Then, wind 5 turns, make a tap point, and apply the next turns. The finished coil connections can be soldered to a 6-way pinheader strip.
+
+\switchcolumn
+对于第一次尝试，应该绕制一个总共25圈带有四个抽头的线圈。我使用了直8毫米的香蕉插头的塑料体，但您可以使用圆珠笔的笔身。两个相1厘米的孔有助于固定导线端。然后，5圈，做一个抽头点，然后绕下一圈。完成的线圈连接可以焊接6路排针条上。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-8}
+\caption{Dual trimmer capacitor and shortwave coil assembly}
+\end{figure}
+
+\begin{paracol}{2}
+The entire radio can be built on an experimental plug board. Pins have been soldered to the variable connections so that it can be easily plugged into the prototyping plug board. The advantage of this construction method is that it allows for easy experimentation to try out other circuit mods.
+
+\switchcolumn
+整个收音机可以在实验插板上构建。引脚已焊接到可变连接上，以便可以轻松插入到原型插板中。这种构建方法的优点是允许轻松实验以尝试其他电路修改。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-9}
+\caption{Testing using a plug board.}
+\end{figure}
+
+\begin{paracol}{2}
+The respective taps for the antenna connection and the diode on the coil can be experimentally adjusted. This tuning capacitor is dual gang with both halves connected in parallel. If only the upper range above 10 MHz is to be received, the lower-valued half of the tuning capacitor rated at 80 pF will be sufficient.
+
+\switchcolumn
+天线连接和线圈上二极管的相应抽头可以实验性地调整。这个调谐电容器是双联的，两半并联连接。如果只接收10 MHz以上的较高范围，额定值为80 pF的调谐电容器的较低值半部分就足够了。
+\end{paracol}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig2-10}
+\caption{Schematic of the shortwave detector.}
+\end{figure}
+
+\begin{paracol}{2}
+The radio requires a high-impedance headphone, such as a piezoceramic crystal earpiece or dynamic headphones with a 2 kΩ resistor placed in series with each capsule. Low-impedance 32 Ω types cannot be used directly and require an impedance transformer (see Section 2.2). Medium-impedance headphones with 600 Ω can also be used directly.
+
+\switchcolumn
+收音机需要高阻抗耳机，例如压电陶瓷晶体耳机或每个耳机串联2 kΩ电阻的动圈耳机。低阻抗32 Ω类型不能直接使用，需要阻抗变压器（见2.2节）600 Ω的中等阻抗耳机也可以直接使用。
+
+\switchcolumn*
+A germanium or a Schottky diode can be used as the detector. Both of these diodes have a low forward threshold voltage. A germanium diode also has reasonably low conductivity in the reverse direction, which is important when using a high-impedance crystal earpiece.
+
+\switchcolumn
+可以使用锗二极管或肖特基二极管作为检测器。这两种二极管都具有较低的正向阈值电压。锗二极管在反向方向也具有相当低的导电性，这在高阻抗晶体耳机时很重要。
+\end{paracol}
+
+\begin{paracol}{2}
+With a Schottky diode, the earpiece can become electrically charged like a capacitor. As the charge builds up the diode is completely reverse biased. In this case, an additional 100 kΩ resistor should be connected in parallel with the earphone to dissipate any charge build up to ground.
+
+\switchcolumn
+使用肖特基二极管时，耳机可能会像电容器一样带电。随着电荷的积累，二极管会完全反向偏置。在这种情况下，应该在耳机两端并联一个额外的100 kΩ电阻，将积累的电荷释放到地。
+
+\switchcolumn*
+For best reception you need an aerial wire a good 10 m long suspended as high as possible. But even a short 3 m length of wire hooked up high up around a room will provide reasonable signal strength for initial trials. With careful tweaking of the tuning capacitor, several stations will be heard with sufficient volume, especially in the evening. Often you will hear two or three stations at the same time and tuning. The usual fluctuations in field strength on shortwave reception mean that one station may be clearer than another at different times of day. While individual radio bands are clear, nearby stations cannot be clearly separated. The selectivity of this radio design is not yet optimal.
+
+\switchcolumn
+为了获得最佳接收效果，您需要一根至少10米长的天线，尽可能悬挂得高一些。但即使是3米长的短线，挂在房间高处，也能为初步试验提供合理的信号强度。仔细调整调谐电容器，就能听到几个音量足够的电台，尤其是在晚上。通常你会同时听到两三个电台，需要仔细调谐。短波接收时场强的常见波动意味着在一天的不同时间，某个电台可能比另一个更清晰。虽然各个无线电波段是清晰的，但邻近的电台无法清楚分离。这种收音机设计的选择性还不是最佳的。
+
+\switchcolumn*
+The taps to the coil shown in the circuit diagram are only rough guidelines. Here you can try to find the optimum balance between volume and selectivity, which is easily achievable with the plug board construction method used here. The following rules of thumb apply:
+
+• Lower taps points for the antenna and diode improve the receiver’s selectivity but reduce output volume.
+
+• Long antennas should be connected to one of the lower tap points. Connecting to points higher up results in reduced volume and lower selectivity.
+
+These relationships can be easily verified experimentally. Later on you will take a closer look at the theory to support these general rules.
+
+\switchcolumn
+电路图中显示的线圈抽头只是粗略的指导。在这里你可以尝试找到音量和选择性之间的最佳平衡，使用这里的实验插板构建方法很容易实现。适用以下经验法则：
+
+• 天线和二极管的较低抽头点可以提高接收器的选择性，但会降低输出音量。
+
+• 长天线应该连接到较低的抽头点之一。连接到较高的点会导致音量降低和选择性下降。
+
+这些关系可以通过实验轻松验证。稍后你将更深入地了解支持这些通用规则的理论。
+\end{paracol}
+
 %\section{Silicon Diode Detector}
 %\textbf{中文：硅二极管检测器}
 %
