@@ -42,7 +42,10 @@
 % 设置古文原文格式。
 \newenvironment{yuanwen}{\bfseries\zihao{4}}
 
-% 列表项向右偏移。
+% 设置段落间距
+\setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
+
+% 列表格式支持，列表项向右偏移。
 \usepackage{enumitem}
 
 \title{\heiti\zihao{0} 题目}
@@ -64,6 +67,21 @@
 
 % 增加字间间隔，适用于三字经、诗文等。
  \qquad  
+
+% 空心方框
+
+\newcommand{\khfk}{\raisebox{0.8ex}{\framebox[0.6em][c]{}}}
+
+% 定义带间隔的方块序列
+\newcommand{\khfks}[1]{%
+  \ifnum#1>0%
+    \khfk%
+    \ifnum#1>1\,\fi% 方块之间添加小间隔
+    \khfks{\numexpr#1-1\relax}%
+  \fi%
+}
+
+古文中的应用：子曰：\khfks{4}，不亦乐乎？
 
 \chapter{1}
 \section{1}
