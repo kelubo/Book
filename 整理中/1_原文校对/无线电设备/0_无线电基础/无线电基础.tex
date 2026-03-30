@@ -10,6 +10,10 @@
 \xeCJKsetup{AutoFallBack=true}
 \setCJKmainfont{SimSun}[BoldFont=SimHei, ItalicFont=KaiTi, FallBack=SimSun-ExtB]
 
+% 数学符号支持
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
 % 目录 chapter 级别加点（.）。
 \usepackage{titletoc}
 \titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
@@ -27,6 +31,9 @@
 
 % 列表格式支持
 \usepackage{enumitem}
+
+% 数学公式支持
+\usepackage{amsmath}
 
 % 图片相关设置。
 \usepackage{graphicx}
@@ -59,17 +66,28 @@
 
 无线电技术是利用电磁波在空间中传播信息的技术，是现代通信技术的基础。无线电技术基于电磁波理论，通过调制解调技术实现信息的无线传输。
 
-无线电技术的发展经历了从电磁波理论的建立到现代通信技术的漫长历程。从19世纪麦克斯韦的电磁场理论，到赫兹的实验验证，再到现代的数字通信技术，无线电理论不断推动着通信技术的发展。
+无线电技术的发展经历了从电磁波理论的建立到现代通信技术的漫长历程：
+\begin{itemize}[leftmargin=3.5em]
+    \item 19世纪60年代，麦克斯韦建立了电磁场理论，预言了电磁波的存在
+    \item 1887年，赫兹通过实验验证了电磁波的存在
+    \item 1895年，马可尼成功实现了无线电报通信
+    \item 20世纪初，无线电广播开始普及
+    \item 20世纪中期，电视和雷达技术得到发展
+    \item 20世纪后期，数字通信技术迅速发展
+    \item 21世纪初，3G/4G移动通信技术大规模应用
+    \item 2010年代，5G通信技术研发和商用部署
+    \item 2020年代，6G、太赫兹通信、空天地一体化网络等前沿技术研究加速
+\end{itemize}
 
 \section{无线电技术的基本原理}
 
 无线电技术基于以下基本原理：
 
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{电磁波理论}：麦克斯韦方程组描述的电磁场理论
-    \item \textbf{调制解调}：将信息信号调制到载波上的技术
-    \item \textbf{频谱分析}：电磁波在频域的分布特性
-    \item \textbf{传播特性}：电磁波在不同介质中的传播规律
+    \item \textbf{电磁波理论}：麦克斯韦方程组描述的电磁场理论，是无线电技术的理论基础
+    \item \textbf{调制解调}：将信息信号调制到载波上的技术，实现信息的有效传输
+    \item \textbf{频谱分析}：电磁波在频域的分布特性，用于信号的分析和处理
+    \item \textbf{传播特性}：电磁波在不同介质中的传播规律，影响信号的传输质量
 \end{itemize}
 
 \section{无线电技术的基础理论体系}
@@ -77,10 +95,10 @@
 无线电技术的基础理论体系包括：
 
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{电磁场理论}：电磁波的产生、传播和接收
-    \item \textbf{电路理论}：无线电电路的分析和设计
-    \item \textbf{信号处理}：信号的变换、滤波和处理
-    \item \textbf{系统理论}：无线电系统的建模和分析
+    \item \textbf{电磁场理论}：研究电磁波的产生、传播和接收的基本规律
+    \item \textbf{电路理论}：无线电电路的分析和设计方法
+    \item \textbf{信号处理}：信号的变换、滤波和处理技术
+    \item \textbf{系统理论}：无线电系统的建模、分析和优化方法
 \end{itemize}
 
 \chapter{电磁波基础}
@@ -118,14 +136,18 @@
 \end{itemize}
 
 麦克斯韦方程组的数学表达式为：
-\[ \nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0} \]
-\[ \nabla \cdot \mathbf{B} = 0 \]
-\[ \nabla \times \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t} \]
-\[ \nabla \times \mathbf{B} = \mu_0\mathbf{J} + \mu_0\varepsilon_0\frac{\partial \mathbf{E}}{\partial t} \]
+\begin{align}
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
+\nabla \cdot \mathbf{B} &= 0 \\
+\nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}}{\partial t} \\
+\nabla \times \mathbf{B} &= \mu_0\mathbf{J} + \mu_0\varepsilon_0\frac{\partial \mathbf{E}}{\partial t} \\ 
+\end{align}
 
 从麦克斯韦方程组可以推导出电磁波的波动方程：
-\[ \nabla^2 \mathbf{E} = \mu_0\varepsilon_0 \frac{\partial^2 \mathbf{E}}{\partial t^2} \]
-\[ \nabla^2 \mathbf{B} = \mu_0\varepsilon_0 \frac{\partial^2 \mathbf{B}}{\partial t^2} \]
+\begin{align}
+\nabla^2 \mathbf{E} &= \mu_0\varepsilon_0 \frac{\partial^2 \mathbf{E}}{\partial t^2} \\
+\nabla^2 \mathbf{B} &= \mu_0\varepsilon_0 \frac{\partial^2 \mathbf{B}}{\partial t^2} \\ 
+\end{align}
 
 其中波速 $v = \frac{1}{\sqrt{\mu_0\varepsilon_0}} = c$，即光速。
 
@@ -149,19 +171,65 @@
     \item 角频率：$\omega = 2\pi \times 100\times10^6 \approx 6.28\times10^8$ rad/s
 \end{itemize}
 
+另一个示例，对于5G通信中常用的3.5GHz频段：
+\begin{itemize}[leftmargin=3.5em]
+    \item 频率：$f = 3.5$ GHz = $3.5\times10^9$ Hz
+    \item 波长：$\lambda = \frac{3\times10^8}{3.5\times10^9} \approx 0.0857$米 = 8.57厘米
+    \item 周期：$T = \frac{1}{3.5\times10^9} \approx 0.286$纳秒
+    \item 波数：$k = \frac{2\pi}{0.0857} \approx 73.5$ rad/m
+    \item 角频率：$\omega = 2\pi \times 3.5\times10^9 \approx 2.2\times10^{10}$ rad/s
+\end{itemize}
+
 \section{电磁波频谱}
 
 电磁波频谱按照频率从低到高可以分为：
 
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{无线电波}：3kHz-300GHz，用于通信和广播
-    \item \textbf{微波}：300MHz-300GHz，用于雷达和卫星通信
-    \item \textbf{红外线}：300GHz-430THz，用于热成像和遥控
-    \item \textbf{可见光}：430THz-750THz，人眼可见的光波
-    \item \textbf{紫外线}：750THz-30PHz，用于杀菌和荧光检测
-    \item \textbf{X射线}：30PHz-30EHz，用于医疗和材料检测
-    \item \textbf{伽马射线}：30EHz以上，用于核物理和医疗
+    \item \textbf{无线电波}：3kHz-300GHz，用于通信、广播、导航和遥感
+    \item \textbf{微波}：300MHz-300GHz，用于雷达、卫星通信、微波炉和无线局域网
+    \item \textbf{红外线}：300GHz-430THz，用于热成像、遥控、安防和医疗
+    \item \textbf{可见光}：430THz-750THz，人眼可见的光波，用于照明和显示
+    \item \textbf{紫外线}：750THz-30PHz，用于杀菌、荧光检测和医疗消毒
+    \item \textbf{X射线}：30PHz-30EHz，用于医疗诊断、材料检测和安全检查
+    \item \textbf{伽马射线}：30EHz以上，用于核物理研究、医疗治疗和工业探伤
 \end{itemize}
+
+现代无线电技术的重要应用频段：
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{5G通信}：3.5GHz、2.6GHz频段，大规模MIMO技术，超高速率低时延
+    \item \textbf{毫米波通信}：24-100GHz频段，支持太比特级传输速率
+    \item \textbf{Wi-Fi 6/7}：2.4GHz、5GHz、6GHz频段，更高的吞吐量和更低的延迟
+    \item \textbf{卫星互联网}：Ku/Ka频段，实现全球无缝覆盖
+    \item \textbf{物联网}：Sub-GHz、2.4GHz频段，低功耗广域覆盖
+\end{itemize}
+
+\subsection{无线电波的频段划分}
+
+根据国际电信联盟（ITU）的规定，无线电波的频段划分如下：
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{|p{2cm}|p{2cm}|p{3cm}|p{4.5cm}|}
+        \hline
+        \textbf{波段名称} & \textbf{波长范围} & \textbf{频率范围} & \textbf{主要用途} \\
+        \hline
+        超长波 & 10000~100000米 & 3~30kHz & 无线电导航和通讯 \\
+        \hline
+        长波 & 1000~10000米 & 30~300kHz & 无线电导航和通讯 \\
+        \hline
+        中波 & 100~1000米 & 300~3000kHz & 中波广播 \\
+        \hline
+        短波 & 10~100米 & 3~30MHz & 短波广播和国际通讯 \\
+        \hline
+        超短波 & 1~10米 & 30~300MHz & 调频广播、电视和移动通信 \\
+        \hline
+        微波 & 1米以下 & 300MHz~300GHz & 雷达、卫星通信和无线局域网 \\
+        \hline
+    \end{tabular}
+    \caption{传统无线电波段划分表}
+    \label{tab:radio_bands_traditional}
+\end{table}
 
 \chapter{天线基础}
 
@@ -213,7 +281,25 @@
     \item \textbf{超短波天线}：适用于超短波通信和广播
 \end{itemize}
 
-选择合适的天线类型，需要考虑工作频段、通信环境、通信距离、安装条件等多种因素。对于一般通信需求，室内天线或简单的室外天线即可满足需求；对于远距离通信或专业应用，需要使用高性能的定向天线。
+选择合适的天线类型，需要考虑以下因素：
+
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{工作频段}：不同频段需要不同类型的天线，如长波需要大型天线，而微波可以使用小型天线
+    \item \textbf{通信环境}：室内环境适合使用小型天线，室外环境可以使用大型定向天线
+    \item \textbf{通信距离}：短距离通信可以使用低增益天线，长距离通信需要高增益定向天线
+    \item \textbf{安装条件}：空间受限的场合需要小型天线，空间充足的场合可以使用大型天线
+    \item \textbf{成本预算}：不同类型天线的成本差异较大，需要根据预算选择合适的天线
+\end{itemize}
+
+\subsection{天线选择的实际案例}
+
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{家用电视接收}：通常使用八木天线或对数周期天线，安装在屋顶或阳台
+    \item \textbf{移动通信基站}：使用定向天线阵列，实现信号的定向覆盖
+    \item \textbf{卫星通信}：使用抛物面天线，实现与卫星的通信
+    \item \textbf{业余无线电}：根据频段不同选择偶极子、八木或环形天线
+    \item \textbf{车载通信}：使用车载鞭状天线或吸盘天线，方便安装和移动
+\end{itemize}
 
 \section{天线设计与参数计算}
 
@@ -243,6 +329,15 @@
     \item 波长：$\lambda = \frac{3\times10^8}{100\times10^6} = 3$米
     \item 天线长度：$L = \frac{3}{2} = 1.5$米
     \item 如果天线效率为80\%，方向性系数为2.15dBi，则增益为：$G = 0.8 \times 10^{2.15/10} \approx 1.3$
+\end{itemize}
+
+另一个示例，对于5G通信中常用的3.5GHz频段：
+\begin{itemize}[leftmargin=3.5em]
+    \item 频率：$f = 3.5$ GHz
+    \item 波长：$\lambda = \frac{3\times10^8}{3.5\times10^9} \approx 0.0857$米 = 8.57厘米
+    \item 半波偶极子天线长度：$L = \frac{\lambda}{2} \approx 4.29$厘米
+    \item 四分之一波长单极子天线长度：$L = \frac{\lambda}{4} \approx 2.14$厘米
+    \item 有效面积：假设增益为5dBi，则$A_e = \frac{\lambda^2}{4\pi}G \approx \frac{(0.0857)^2}{4\pi} \times 3.16 \approx 0.00018$平方米
 \end{itemize}
 
 天线尺寸计算后，需要通过仿真软件或实验方法优化天线的参数，如增益、方向性、阻抗匹配、带宽等。常用的天线仿真软件有HFSS、CST、NEC等。优化完成后，制作天线原型，进行实际测试，测量天线的性能参数，如增益、方向图、驻波比等。根据测试结果调整天线设计，直到满足设计要求。
@@ -299,27 +394,73 @@
 \[ F(\theta) = \frac{\sin(N\psi/2)}{N\sin(\psi/2)} \]
 其中$\psi = kd\cos\theta + \beta$，$N$为单元数，$d$为单元间距，$\beta$为相位差。
 
+\subsection{现代天线技术}
+
+随着无线通信技术的发展，现代天线技术不断创新：
+
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{大规模MIMO}：基站配备数十甚至上百个天线单元，显著提高频谱效率
+    \item \textbf{毫米波天线}：适用于24GHz以上频段，实现超高速数据传输
+    \item \textbf{可重构智能表面}：通过调控电磁环境，增强信号传输
+    \item \textbf{太赫兹天线}：针对0.1-10THz频段，为6G通信做准备
+    \item \textbf{天线小型化技术}：在保持性能的前提下，减小天线尺寸，适用于移动设备
+\end{itemize}
+
 \part{无线电传播与调制}
 
 \chapter{无线电波传播}
 
-\section{无线电波传播方式}
+\section{无线电波传播基础}
+
+无线电波在空间中的传播遵循麦克斯韦方程组，其传播特性由介质的电磁参数和传播环境决定。了解无线电波的传播特性，对于选择合适的通信方式、天线类型和接收参数非常重要。
+
+\section{主要传播方式}
 
 无线电波在空间中的传播主要有以下几种方式：
 
+\subsection{地波传播}
+地波传播是指无线电波沿地球表面传播的方式，适用于低频和中频信号。
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{地波传播}：沿地球表面传播，适用于低频和中频信号，传播距离较远，但信号强度随距离增加而衰减
-    \item \textbf{天波传播}：通过电离层反射传播，适用于高频信号，可以实现远距离传播，但受电离层变化影响较大
-    \item \textbf{空间波传播}：在空间中直线传播，适用于甚高频和特高频信号，传播距离受地球曲率限制，需要使用中继站或卫星
-    \item \textbf{对流层传播}：通过对流层散射传播，适用于超短波
-    \item \textbf{卫星传播}：通过人造卫星中继传播，适用于全球通信
+    \item \textbf{特点}：信号稳定，受天气影响小，传播距离有限
+    \item \textbf{适用频段}：低频（LF）和中频（MF）
+    \item \textbf{应用场景}：中波广播、导航系统
+    \item \textbf{影响因素}：地面电导率、地形地貌
 \end{itemize}
 
-\textbf{主要传播方式的特点}：
+\subsection{天波传播}
+天波传播是指无线电波通过电离层反射传播的方式，适用于高频信号。
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{地波传播}：信号稳定，受天气影响小，传播距离有限，通常用于中波广播
-    \item \textbf{天波传播}：传播距离远，可以跨越大陆和海洋，信号不稳定，受电离层变化、太阳活动、昼夜变化等因素影响，通常用于短波广播和国际通信
-    \item \textbf{空间波传播}：信号质量好，带宽大，传播距离短，通常用于调频广播、电视广播和移动通信
+    \item \textbf{特点}：传播距离远，可以跨越大陆和海洋，信号不稳定
+    \item \textbf{适用频段}：高频（HF）
+    \item \textbf{应用场景}：短波广播、国际通信
+    \item \textbf{影响因素}：电离层变化、太阳活动、昼夜变化
+\end{itemize}
+
+\subsection{空间波传播}
+空间波传播是指无线电波在空间中直线传播的方式，适用于甚高频和特高频信号。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{特点}：信号质量好，带宽大，传播距离短
+    \item \textbf{适用频段}：甚高频（VHF）和特高频（UHF）
+    \item \textbf{应用场景}：调频广播、电视广播、移动通信
+    \item \textbf{影响因素}：地球曲率、障碍物遮挡
+\end{itemize}
+
+\subsection{对流层传播}
+对流层传播是指无线电波通过对流层散射传播的方式，适用于超短波。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{特点}：传播距离较远，受天气影响较大
+    \item \textbf{适用频段}：超短波（SHF）
+    \item \textbf{应用场景}：远程通信、雷达
+    \item \textbf{影响因素}：对流层不稳定度、水汽含量
+\end{itemize}
+
+\subsection{卫星传播}
+卫星传播是指无线电波通过人造卫星中继传播的方式，适用于全球通信。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{特点}：覆盖范围广，通信质量稳定
+    \item \textbf{适用频段}：微波（SHF、EHF）
+    \item \textbf{应用场景}：卫星通信、卫星电视、全球定位系统
+    \item \textbf{影响因素}：卫星轨道、大气衰减
 \end{itemize}
 
 \section{传播影响因素}
@@ -334,7 +475,16 @@
     \item \textbf{多径效应}：信号通过不同路径到达接收端产生的干扰
 \end{itemize}
 
-了解无线电波的传播特性，对于选择合适的接收地点、天线类型和接收参数非常重要。在接收条件不好的情况下，可以通过调整天线位置、使用定向天线、增加信号放大器等方法来改善接收效果。
+\section{传播改善措施}
+
+在接收条件不好的情况下，可以通过以下方法改善接收效果：
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{调整天线位置}：选择开阔、无遮挡的位置安装天线
+    \item \textbf{使用定向天线}：提高信号接收强度，减少干扰
+    \item \textbf{增加信号放大器}：增强弱信号的接收能力
+    \item \textbf{采用分集接收}：通过多个天线接收信号，减少多径效应的影响
+    \item \textbf{优化接收设备}：使用高性能的接收器和信号处理电路
+\end{itemize}
 
 \chapter{调制技术基础}
 
@@ -347,28 +497,80 @@
     \item \textbf{频谱搬移}：将信号频谱搬移到指定频段
     \item \textbf{多路复用}：在同一频段内传输多路信号
     \item \textbf{抗干扰}：提高信号在传输过程中的抗干扰能力
+    \item \textbf{功率效率}：提高信号的传输效率和功率利用率
 \end{itemize}
 
-\section{主要调制方式}
+\section{调制方式分类}
 
-根据调制参数的不同，调制可以分为：
+根据调制信号的类型和调制参数的不同，调制可以分为以下几类：
 
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{调幅（AM）}：改变载波的振幅
-    \item \textbf{调频（FM）}：改变载波的频率
-    \item \textbf{调相（PM）}：改变载波的相位
-    \item \textbf{数字调制}：使用数字信号进行调制
+    \item \textbf{模拟调制}：使用模拟信号进行调制，如调幅（AM）、调频（FM）、调相（PM）
+    \item \textbf{数字调制}：使用数字信号进行调制，如幅移键控（ASK）、频移键控（FSK）、相移键控（PSK）、正交幅度调制（QAM）
+    \item \textbf{混合调制}：结合模拟和数字调制技术的混合调制方式
 \end{itemize}
 
-\section{调制技术详解}
+\section{模拟调制技术}
 
-\textbf{调幅（Amplitude Modulation，AM）}：改变载波的振幅，使其随信息信号的变化而变化。调幅的优点是电路简单，成本低，占用频带窄；缺点是抗干扰能力差，音质一般。调幅主要用于中波广播和短波广播。
+\subsection{调幅（AM）}
+调幅是改变载波的振幅，使其随信息信号的变化而变化的调制方式。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{工作原理}：载波的振幅随调制信号的变化而变化
+    \item \textbf{优点}：电路简单，成本低，占用频带窄
+    \item \textbf{缺点}：抗干扰能力差，音质一般
+    \item \textbf{应用场景}：中波广播、短波广播
+    \item \textbf{调制指数}：衡量调制深度的参数，通常在0.3-0.8之间
+\end{itemize}
 
-\textbf{调频（Frequency Modulation，FM）}：改变载波的频率，使其随信息信号的变化而变化。调频的优点是抗干扰能力强，音质好；缺点是占用频带宽，电路复杂。调频主要用于超短波广播和电视伴音。
+\subsection{调频（FM）}
+调频是改变载波的频率，使其随信息信号的变化而变化的调制方式。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{工作原理}：载波的频率随调制信号的变化而变化
+    \item \textbf{优点}：抗干扰能力强，音质好
+    \item \textbf{缺点}：占用频带宽，电路复杂
+    \item \textbf{应用场景}：超短波广播、电视伴音、移动通信
+    \item \textbf{调制指数}：衡量频率偏移程度的参数，通常大于1
+\end{itemize}
 
-\textbf{调相（Phase Modulation，PM）}：改变载波的相位，使其随信息信号的变化而变化。调相的特点是抗干扰能力强，但电路复杂，主要用于数字通信。
+\subsection{调相（PM）}
+调相是改变载波的相位，使其随信息信号的变化而变化的调制方式。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{工作原理}：载波的相位随调制信号的变化而变化
+    \item \textbf{优点}：抗干扰能力强，带宽利用率高
+    \item \textbf{缺点}：电路复杂，对相位噪声敏感
+    \item \textbf{应用场景}：数字通信、卫星通信
+\end{itemize}
 
-\textbf{数字调制技术}：除了模拟调制外，还有数字调制方式，如幅移键控（ASK）、频移键控（FSK）、相移键控（PSK）和正交幅度调制（QAM）等。数字调制具有抗干扰能力强、传输效率高、便于加密等优点，广泛应用于数字广播、移动通信和卫星通信等领域。
+\section{数字调制技术}
+
+数字调制是使用数字信号进行调制的方式，具有抗干扰能力强、传输效率高、便于加密等优点。
+
+\subsection{基本数字调制方式}
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{幅移键控（ASK）}：通过改变载波的振幅来传输数字信息
+    \item \textbf{频移键控（FSK）}：通过改变载波的频率来传输数字信息
+    \item \textbf{相移键控（PSK）}：通过改变载波的相位来传输数字信息
+    \item \textbf{正交幅度调制（QAM）}：同时改变载波的振幅和相位来传输数字信息
+\end{itemize}
+
+\subsection{高级数字调制技术}
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{正交频分复用（OFDM）}：将高速数据分成多个低速子载波并行传输，提高频谱利用率
+    \item \textbf{码分多址（CDMA）}：使用扩频技术实现多用户共享信道
+    \item \textbf{正交相移键控（QPSK）}：一种高效的四相调制方式，广泛应用于卫星通信和数字电视
+    \item \textbf{16QAM/64QAM}：高阶调制方式，提高频谱利用率，适用于高速数据传输
+\end{itemize}
+
+\section{调制技术的应用}
+
+不同的调制技术适用于不同的应用场景：
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{广播系统}：中波广播使用AM，调频广播使用FM
+    \item \textbf{移动通信}：2G使用GMSK，3G使用QPSK，4G使用OFDM，5G使用更高级的调制方式
+    \item \textbf{卫星通信}：使用QPSK、8PSK等高效调制方式
+    \item \textbf{数字电视}：使用QAM调制方式
+    \item \textbf{无线局域网}：使用OFDM调制方式
+\end{itemize}
 
 了解无线电波调制的原理和特点，对于理解无线电通信系统的工作原理、选择合适的通信方式和优化通信效果非常重要。
 
@@ -448,42 +650,50 @@ LC谐振电路的阻抗特性随频率变化而变化，形成特定的频率响
 
 \chapter{无线电波传播理论}
 
-\section{电磁波传播的基本原理}
+\section{传播模型与预测}
 
-电磁波在空间中的传播遵循麦克斯韦方程组，其传播特性由介质的电磁参数决定。电磁波传播的基本原理包括：
+无线电波传播模型是预测信号在不同环境中传播特性的数学模型，对于无线通信系统的设计和优化具有重要意义。
 
-\begin{itemize}[leftmargin=3.5em]
-    \item \textbf{波动方程}：描述电磁波在空间中传播的数学表达式
-    \item \textbf{传播常数}：表征电磁波在介质中传播特性的参数
-    \item \textbf{波阻抗}：电磁波电场与磁场的比值，反映介质特性
-    \item \textbf{传播速度}：电磁波在介质中的传播速度，与介质参数相关
-\end{itemize}
+\subsection{自由空间传播模型}
+自由空间传播是电磁波在理想真空或均匀介质中的传播模型，是最简单的传播模型。
 
-\section{自由空间传播模型}
-
-自由空间传播是电磁波在理想真空或均匀介质中的传播模型。自由空间传播损耗的计算公式为：
-
+自由空间传播损耗的计算公式为：
 \begin{equation}
 L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
 \end{equation}
-
 其中，L为传播损耗（dB），f为频率（MHz），d为距离（km）。
 
-自由空间传播模型是分析无线电波传播的基础，实际传播情况需要考虑大气、地形等因素的影响。
-
-\textbf{台站管理}：
+\subsection{地面传播模型}
+地面传播模型考虑了地球表面的影响，适用于地波传播和视距传播。
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{台站设置}：无线电台站的设置规范
-    \item \textbf{使用管理}：台站使用和维护要求
-    \item \textbf{频率管理}：台站频率使用管理
-    \item \textbf{监督检查}：台站运行监督检查
+    \item \textbf{Okumura-Hata模型}：适用于城市环境的传播预测
+    \item \textbf{COST-231模型}：适用于宏蜂窝系统的传播预测
+    \item \textbf{Walfisch-Ikegami模型}：适用于市区微蜂窝系统的传播预测
 \end{itemize}
 
-\section{主要频段分配标准详解}
+\subsection{室内传播模型}
+室内传播模型考虑了建筑物内部的环境影响，适用于室内无线通信系统。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{对数距离路径损耗模型}：基于距离的简单模型
+    \item \textbf{多墙模型}：考虑墙壁和障碍物的影响
+    \item \textbf{射线跟踪模型}：基于电磁波传播的物理原理
+\end{itemize}
 
-国际电信联盟（ITU）将全球划分为三个区域，每个区域的频段分配有所不同：
+\section{频段分配与管理}
 
-\textbf{业余无线电频段}：
+国际电信联盟（ITU）负责全球无线电频率的分配和管理，确保无线电频谱的有效利用。
+
+\subsection{ITU区域划分}
+国际电信联盟将全球划分为三个区域：
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{区域1}：欧洲、非洲、中东和部分亚洲地区
+    \item \textbf{区域2}：美洲地区
+    \item \textbf{区域3}：亚洲和大洋洲地区
+\end{itemize}
+
+\subsection{主要频段分配}
+
+\subsubsection{业余无线电频段}
 \begin{itemize}[leftmargin=3.5em]
     \item 1.8--2.0MHz：160米波段
     \item 3.5--4.0MHz：80米波段
@@ -493,7 +703,7 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
     \item 430--440MHz：70厘米波段
 \end{itemize}
 
-\textbf{广播频段}：
+\subsubsection{广播频段}
 \begin{itemize}[leftmargin=3.5em]
     \item 525--1605kHz：中波广播（AM）
     \item 87--108MHz：调频广播（FM）
@@ -501,7 +711,7 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
     \item 470--862MHz：电视广播UHF频段
 \end{itemize}
 
-\textbf{移动通信频段}：
+\subsubsection{移动通信频段}
 \begin{itemize}[leftmargin=3.5em]
     \item 800MHz：2G/3G/4G通信
     \item 900MHz：GSM通信
@@ -509,13 +719,26 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
     \item 2.1GHz：3G通信
     \item 2.6GHz：4G通信
     \item 3.5GHz：5G通信
+    \item 24GHz：5G毫米波通信
 \end{itemize}
 
-\textbf{ISM频段}：
+\subsubsection{ISM频段}
 \begin{itemize}[leftmargin=3.5em]
     \item 13.56MHz：RFID应用
     \item 2.4GHz：Wi-Fi、蓝牙、微波炉
     \item 5.8GHz：Wi-Fi、雷达
+    \item 60GHz：高速无线通信
+\end{itemize}
+
+\section{台站管理与规范}
+
+无线电台站的管理和规范是确保无线电频谱有序使用的重要保障。
+\begin{itemize}[leftmargin=3.5em]
+    \item \textbf{台站设置}：无线电台站的设置规范和审批流程
+    \item \textbf{使用管理}：台站的日常使用和维护要求
+    \item \textbf{频率管理}：台站频率的分配和使用管理
+    \item \textbf{监督检查}：台站运行的监督和检查机制
+    \item \textbf{干扰处理}：无线电干扰的检测和处理方法
 \end{itemize}
 
 \chapter{无线电信号与系统基础}
@@ -531,16 +754,16 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
     \item \textbf{统计特性}：信号的统计分布规律
 \end{itemize}
 
-\subsection{声音的定义}
+\section{信号处理基础}
 
-声音是一种机械波，是物体振动产生的声波在介质（如空气、水等）中传播的结果。在无线电技术中，声音是一种重要的信息载体，通过麦克风等换能器转换为电信号，再经过调制、传输、解调等过程，最终还原为声音。
+信号处理是无线电技术中的重要环节，包括信号的变换、滤波、调制解调等过程。
 
-声音具有以下基本特性：
+\subsection{信号的时域分析}
+时域分析是研究信号随时间变化的规律，包括信号的幅度、周期、相位等特性。
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{频率}：声音的高低，单位为赫兹（Hz），人耳可听范围约为20Hz-20kHz
-    \item \textbf{振幅}：声音的强弱，决定了声音的响度
-    \item \textbf{音色}：声音的特色，由谐波成分决定
-    \item \textbf{相位}：声音的时间关系，影响声音的空间感
+    \item \textbf{信号的时域表示}：使用时间函数描述信号
+    \item \textbf{信号的基本参数}：幅度、周期、频率、相位
+    \item \textbf{信号的运算}：加法、乘法、卷积等
 \end{itemize}
 
 \subsubsection{频率的历史定义}
@@ -554,7 +777,7 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
 
 这些历史单位在早期无线电技术中被广泛使用，虽然现代标准单位已统一为赫兹（Hz），但了解这些历史单位有助于理解早期无线电技术文献。
 
-\subsection{声音的发生}
+声音是一种机械波，是物体振动产生的声波在介质中传播的结果。在无线电技术中，声音通过换能器转换为电信号，再经过处理和传输。
 
 声音的产生源于物体的振动。当物体振动时，会引起周围介质（如空气）的振动，形成声波，最终被人耳感知为声音。
 
@@ -627,27 +850,27 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
 \begin{table}[htbp]
     \centering
     \small
-    \begin{tabular}{|p{2.5cm}|p{2.5cm}|p{3.5cm}|p{4cm}|}
+    \begin{tabular}{|p{2cm}|p{2cm}|p{3cm}|p{4.5cm}|}
         \hline
         \textbf{波段名称} & \textbf{波长范围} & \textbf{频率范围} & \textbf{主要用途} \\
         \hline
-        超长波 & 10000~100000米 & 30~3千赫 & 无线电导航和通讯 \\
+        超长波 & 10000~100000米 & 3~30kHz & 无线电导航和通讯 \\
         \hline
-        长波 & 3000米以上 & 100千赫以下 & 电报通讯 \\
+        长波 & 3000米以上 & 30~300kHz & 电报通讯 \\
         \hline
-        中波 & 3000~200米 & 100~1500千赫 & 广播 \\
+        中波 & 3000~200米 & 100~1500kHz & 广播 \\
         \hline
-        中短波 & 200~50米 & 1500~6000千赫 & 电报通讯、广播 \\
+        中短波 & 200~50米 & 1500~6000kHz & 电报通讯、广播 \\
         \hline
-        短波 & 50~10米 & 6000~30000千赫 & 电报通讯、广播 \\
+        短波 & 50~10米 & 6000~30000kHz & 电报通讯、广播 \\
         \hline
-        超短波 & 10米以下 & 30,000千赫以上 & 雷达、电视、无线电导航和接力通讯等 \\
+        超短波 & 10米以下 & 30,000kHz以上 & 雷达、电视、无线电导航和接力通讯等 \\
         \hline
-        微波 & 1米以下 & $0.3\times10^6$~$300\times10^6$千赫 & 微波中继通讯、导航、雷达、干燥、加热等 \\
+        微波 & 1米以下 & 300MHz~300GHz & 微波中继通讯、导航、雷达、干燥、加热等 \\
         \hline
     \end{tabular}
     \caption{传统无线电波段划分表}
-    \label{tab:radio_bands_traditional}
+    \label{tab:radio_bands_traditional2}
 \end{table}
 
 以下是现代标准频段分类：
@@ -655,7 +878,7 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
 \begin{table}[htbp]
     \centering
     \small
-    \begin{tabular}{|p{2cm}|p{1.5cm}|p{3cm}|p{2.5cm}|p{4cm}|}
+    \begin{tabular}{|p{1.8cm}|p{1.2cm}|p{2.8cm}|p{2.2cm}|p{4cm}|}
         \hline
         \textbf{频段名称} & \textbf{英文缩写} & \textbf{频率范围} & \textbf{波长范围} & \textbf{主要用途} \\
         \hline
@@ -684,8 +907,8 @@ L = 32.45 + 20\log_{10}(f) + 20\log_{10}(d)
 
 具体来说，收音机一般只用中波和短波：
 \begin{itemize}[leftmargin=3.5em]
-    \item \textbf{中波}：频率范围规定为535千赫至1605千赫（535kHz-1605kHz）
-    \item \textbf{短波}：频率范围规定为2000千赫至24000千赫（2000kHz-24000kHz），但常用3500千赫至18000千赫（3500kHz-18000kHz）
+    \item \textbf{中波}：频率范围规定为535kHz至1605kHz（535kHz-1605kHz）
+    \item \textbf{短波}：频率范围规定为2000kHz至24000kHz（2000kHz-24000kHz），但常用3500kHz至18000kHz（3500kHz-18000kHz）
 \end{itemize}
 
 有的收音机短波又分为短波1和短波2等多个波段，以方便接收不同频率范围的信号。
