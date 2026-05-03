@@ -1,0 +1,452 @@
+% 无线电仪器与仪表
+% 无线电仪器与仪表.tex
+
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息。
+\input{../../../common/page}
+
+% 设置字体，并解决显示难检字问题。
+\xeCJKsetup{AutoFallBack=true}
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）。
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 支持目录点击跳转
+\usepackage[colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% 设置 part 和 chapter 标题格式。
+\ctexset{
+	part/name= {第,卷},
+	part/number={\chinese{part}},
+	chapter/name={第,篇},
+	chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
+
+% 设置古文原文格式。
+\newenvironment{yuanwen}{\bfseries\zihao{4}}
+
+% 设置段落间距
+\setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
+
+% 列表格式支持，列表项向右偏移。
+\usepackage{enumitem}
+
+\begin{document}
+
+\frontmatter
+
+\title{无线电仪器与仪表}
+\author{}
+\date{}
+\maketitle
+
+\tableofcontents
+
+\mainmatter
+
+\part{无线电测量基础}
+
+\chapter{无线电测量概述}
+\section{无线电测量的基本概念}
+\section{无线电测量的重要性}
+\section{无线电测量的发展历程}
+
+\chapter{测量误差与精度}
+\section{测量误差的分类}
+\section{测量精度的评定}
+\section{测量不确定度分析}
+
+\chapter{测量单位与标准}
+\section{无线电测量单位体系}
+\section{国际测量标准}
+\section{国家标准与校准}
+
+\part{基本无线电测量仪器}
+
+\chapter{电压测量仪器}
+\section{模拟电压表}
+\section{数字电压表}
+\section{高频电压表}
+\section{峰值电压表}
+
+\chapter{电流测量仪器}
+\section{模拟电流表}
+\section{数字电流表}
+\section{高频电流探头}
+\section{电流钳形表}
+
+\chapter{功率测量仪器}
+\section{功率计的基本原理}
+\section{射频功率计}
+\section{微波功率计}
+\section{功率传感器}
+
+\chapter{频率测量仪器}
+\section{频率计的基本原理}
+\section{数字频率计}
+\section{频率计数器}
+\section{微波频率计}
+
+\part{信号分析仪器}
+
+\chapter{示波器}
+\section{模拟示波器}
+\section{数字示波器}
+\section{存储示波器}
+\section{混合信号示波器}
+
+\chapter{频谱分析仪}
+\section{频谱分析仪的基本原理}
+\section{扫频式频谱分析仪}
+\section{实时频谱分析仪}
+\section{矢量信号分析仪}
+
+\chapter{网络分析仪}
+\section{网络分析仪的基本原理}
+\section{标量网络分析仪}
+\section{矢量网络分析仪}
+\section{微波网络分析仪}
+
+\chapter{信号发生器}
+\section{函数信号发生器}
+\section{射频信号发生器}
+\section{微波信号发生器}
+\section{任意波形发生器}
+
+\part{专用无线电测量仪器}
+
+\chapter{天线测量仪器}
+\section{天线分析仪}
+\section{天线测试系统}
+\section{近场测试系统}
+\section{远场测试系统}
+
+\chapter{电磁兼容测量仪器}
+\section{EMI接收机}
+\section{电磁场探头}
+\section{传导发射测试系统}
+\section{辐射发射测试系统}
+
+\chapter{通信测试仪器}
+\section{误码率测试仪}
+\section{协议分析仪}
+\section{无线通信测试仪}
+\section{移动通信测试仪}
+
+\section{学生信号源（J2465型）}
+
+J2465型学生信号源是一种专门为教学实验设计的无线电仪器，具有以下特点：
+
+\subsection{主要功能}
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{信号产生}：提供多种波形信号输出
+	\item \textbf{教学用途}：专门为无线电教学实验设计
+	\item \textbf{操作简便}：适合学生实验操作
+	\item \textbf{安全可靠}：符合教学仪器安全标准
+\end{itemize}
+
+\subsection{技术参数}
+J2465型学生信号源是具有高频信号和音频信号输出的简易信号源，主要技术指标如下：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{高频信号频率范围}：400kHz～1700kHz，分两个频段
+	\begin{itemize}[leftmargin=1cm]
+		\item 频段Ⅰ：1500kHz～1700kHz
+		\item 频段Ⅱ：400kHz～580kHz
+	\end{itemize}
+	\item \textbf{低频信号频率范围}：音频信号输出
+	\item \textbf{输出波形}：正弦波为主，适合教学实验
+	\item \textbf{输出幅度}：可调输出电平，适合学生实验
+	\item \textbf{调制功能}：支持调幅（AM）调制
+	\item \textbf{工作电源}：直流电源供电，符合教学安全要求
+	\item \textbf{输出接口}：标准BNC接口或接线柱输出
+\end{itemize}
+
+\subsection{应用领域}
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{无线电基础教学实验}
+	\item \textbf{通信原理课程实验}
+	\item \textbf{电子技术实训}
+	\item \textbf{学生创新项目开发}
+\end{itemize}
+
+\subsection{使用方法}
+J2465学生信号源的使用方法相对简单，适合教学实验：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{频率选择}：通过波段开关选择高频或低频输出
+	\item \textbf{频率调节}：使用频率旋钮在选定频段内调节具体频率
+	\item \textbf{幅度调节}：调节输出信号的电平大小
+	\item \textbf{调制设置}：根据需要设置调幅调制深度
+	\item \textbf{输出连接}：通过标准接口连接到被测设备
+\end{itemize}
+
+\subsection{注意事项}
+使用J2465学生信号源时需要注意以下事项：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{电源安全}：确保使用正确的直流电源电压
+	\item \textbf{接地处理}：注意信号源接地，避免干扰问题
+	\item \textbf{频率稳定}：预热一段时间后频率更加稳定
+	\item \textbf{输出保护}：避免输出短路或过载
+	\item \textbf{教学指导}：建议在教师指导下使用
+\end{itemize}
+
+\subsection{典型应用实验}
+J2465学生信号源适用于以下典型教学实验：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{收音机调试}：用于中波收音机的调试和维修
+	\item \textbf{电路测试}：测试放大电路、滤波电路等
+	\item \textbf{信号观察}：配合示波器观察信号波形
+	\item \textbf{无线实验}：进行简单的无线发射实验
+\begin{itemize}[leftmargin=1cm]
+	\item 调幅无线发射实验
+	\item 无线信号传播特性实验
+	\item 收音机接收实验
+	\item 天线效应实验
+\end{itemize}
+\end{itemize}
+
+J2465作为教学用信号源，在无线电教育领域具有重要地位，是培养学生无线电技术基础能力的重要工具。该信号源虽然功能相对简单，但完全满足基础教学实验的需求，具有操作简便、安全可靠的特点。
+
+\subsection{无线实验详细操作方法}
+使用J2465学生信号源进行无线实验的具体步骤如下：
+
+\subsubsection{调幅无线发射实验}
+\begin{enumerate}[leftmargin=2cm]
+	\item \textbf{设备准备}：J2465信号源、收音机、连接线、天线
+	\item \textbf{频率设置}：将信号源频率设置在收音机中波频段（如1000kHz）
+	\item \textbf{调制设置}：开启调幅功能，设置适当的调制深度
+	\item \textbf{天线连接}：将天线连接到信号源的高频输出端
+	\item \textbf{收音机调谐}：将收音机调谐到对应的频率
+	\item \textbf{信号接收}：在收音机中应能听到调制信号的声音
+\end{enumerate}
+
+\subsubsection{无线信号传播特性实验}
+\begin{enumerate}[leftmargin=2cm]
+	\item \textbf{距离测试}：在不同距离测试信号强度变化
+	\item \textbf{方向性测试}：测试信号在不同方向的传播特性
+	\item \textbf{障碍物影响}：测试墙壁、金属等障碍物对信号的影响
+	\item \textbf{多径效应}：观察信号反射造成的多径效应
+\end{enumerate}
+
+\subsubsection{收音机接收实验}
+\begin{enumerate}[leftmargin=2cm]
+	\item \textbf{灵敏度测试}：测试收音机的最小可接收信号强度
+	\item \textbf{选择性测试}：测试收音机对邻近频率的抑制能力
+	\item \textbf{信噪比测试}：测量接收信号的信噪比
+	\item \textbf{失真度测试}：测试接收信号的失真程度
+\end{enumerate}
+
+\subsubsection{天线效应实验}
+\begin{enumerate}[leftmargin=2cm]
+	\item \textbf{天线长度影响}：测试不同长度天线对信号的影响
+	\item \textbf{天线方向性}：测试天线的方向性特性
+	\item \textbf{接地影响}：测试接地对天线性能的影响
+	\item \textbf{天线匹配}：测试天线与信号源的阻抗匹配
+\end{enumerate}
+
+\subsection{实验注意事项}
+进行无线实验时需要注意以下事项：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{频率选择}：选择合法的实验频率，避免干扰正常广播
+	\item \textbf{功率控制}：控制发射功率，避免过强信号干扰
+	\item \textbf{天线安全}：确保天线安装安全，避免触电危险
+	\item \textbf{环境选择}：选择开阔场地进行实验，减少干扰
+	\item \textbf{法规遵守}：遵守无线电管理法规，仅在允许范围内实验
+\end{itemize}
+
+\subsection{实验数据分析}
+实验过程中需要记录和分析以下数据：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{信号强度}：记录不同距离的信号强度变化
+	\item \textbf{频率稳定性}：记录信号频率的稳定性
+	\item \textbf{调制质量}：评估调幅信号的质量
+	\item \textbf{接收效果}：记录收音机的接收效果
+\end{itemize}
+
+通过以上实验，学生可以深入理解无线电波传播的基本原理，掌握无线通信的基本技术，为后续深入学习打下坚实基础。
+
+\subsection{J24系列教学仪器概述}
+J24系列是专门为中学物理教学设计的实验仪器系列，主要包括以下设备：
+
+\subsubsection{J2464型教学信号源}
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{功能特点}：比J2465功能更丰富的教学信号源
+	\item \textbf{输出波形}：提供多种波形输出，适合复杂实验
+	\item \textbf{应用范围}：适用于高中物理电学实验教学
+	\item \textbf{技术参数}：频率范围更宽，输出更稳定
+\end{itemize}
+
+\subsubsection{J2466型学生示波器}
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{功能特点}：专为学生设计的简易示波器
+	\item \textbf{显示功能}：能够显示信号波形
+	\item \textbf{教学应用}：用于观察电信号波形变化
+	\item \textbf{操作特点}：操作简单，适合学生使用
+\end{itemize}
+
+\subsubsection{J2467型电学实验箱}
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{功能特点}：综合性电学实验装置
+	\item \textbf{版本区别}：有木盒和塑料盒两种版本
+	\item \textbf{实验内容}：包含多种基础电学实验
+	\item \textbf{教学价值}：培养学生电路分析和设计能力
+\end{itemize}
+
+\subsubsection{J2468型其他教学仪器}
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{仪器类型}：可能包括其他专用教学设备
+	\item \textbf{应用领域}：针对特定物理实验设计
+	\item \textbf{教学目的}：满足不同层次的教学需求
+\end{itemize}
+
+\subsection{J24系列仪器的教学意义}
+J24系列教学仪器具有重要的教育价值：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{标准化设计}：统一的教学仪器标准
+	\item \textbf{安全性保障}：符合教学安全要求
+	\item \textbf{操作简便}：适合学生实验操作
+	\item \textbf{教学配套}：与教材内容紧密结合
+	\item \textbf{成本控制}：价格适中，适合学校采购
+\end{itemize}
+
+\subsection{J24系列仪器的发展历程}
+J24系列教学仪器经历了以下发展阶段：
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{初期开发}：20世纪80年代开始研发
+	\item \textbf{标准化进程}：逐步形成统一的技术标准
+	\item \textbf{版本更新}：从木盒版本发展到塑料盒版本
+	\item \textbf{技术改进}：不断优化性能和可靠性
+	\item \textbf{教学应用}：在全国中学广泛使用
+\end{itemize}
+
+J24系列教学仪器作为中国特色的教学设备，在物理教育中发挥了重要作用，为培养学生科学素养和实践能力做出了积极贡献。
+
+\chapter{微波测量仪器}
+\section{微波功率计}
+\section{微波频率计}
+\section{微波网络分析仪}
+\section{微波信号源}
+
+\part{无线电测量系统}
+
+\chapter{自动测试系统}
+\section{自动测试系统的基本组成}
+\section{GPIB总线系统}
+\section{VXI总线系统}
+\section{PXI总线系统}
+
+\chapter{虚拟仪器系统}
+\section{虚拟仪器的基本概念}
+\section{LabVIEW虚拟仪器}
+\section{基于PC的测量系统}
+\section{软件定义无线电测试系统}
+
+\chapter{远程测量系统}
+\section{远程测量系统的组成}
+\section{网络化测量系统}
+\section{分布式测量系统}
+\section{云计算测量系统}
+
+\part{仪器校准与维护}
+
+\chapter{仪器校准技术}
+\section{校准的基本概念}
+\section{校准方法和技术}
+\section{校准标准与设备}
+\section{校准周期与记录}
+
+\chapter{仪器维护与管理}
+\section{仪器的日常维护}
+\section{故障诊断与维修}
+\section{仪器管理信息系统}
+\section{仪器寿命周期管理}
+
+\chapter{测量不确定度评定}
+\section{不确定度的基本概念}
+\section{A类不确定度评定}
+\section{B类不确定度评定}
+\section{合成不确定度计算}
+
+\part{无线电测量应用}
+
+\chapter{通信系统测量}
+\section{调制质量测量}
+\section{误码率测量}
+\section{频谱占用度测量}
+\section{通信系统性能测试}
+
+\chapter{雷达系统测量}
+\section{雷达信号参数测量}
+\section{雷达系统性能测试}
+\section{雷达目标特性测量}
+\section{雷达抗干扰性能测试}
+
+\chapter{导航系统测量}
+\section{卫星导航系统测试}
+\section{惯性导航系统测试}
+\section{无线电导航系统测试}
+\section{组合导航系统测试}
+
+\chapter{广播电视测量}
+\section{广播发射机测试}
+\section{电视信号质量测试}
+\section{数字电视系统测试}
+\section{广播电视覆盖测试}
+
+\part{现代无线电测量技术}
+
+\chapter{软件定义无线电测量}
+\section{软件定义无线电的基本原理}
+\section{SDR测量平台}
+\section{软件定义测量技术}
+\section{SDR在无线电测量中的应用}
+
+\chapter{人工智能在无线电测量中的应用}
+\section{机器学习在信号识别中的应用}
+\section{深度学习在频谱分析中的应用}
+\section{智能故障诊断技术}
+\section{自适应测量技术}
+
+\chapter{物联网测量技术}
+\section{物联网设备测试}
+\section{无线传感器网络测试}
+\section{低功耗无线通信测试}
+\section{物联网系统性能测试}
+
+\chapter{5G及未来通信测量技术}
+\section{5G信号测量技术}
+\section{毫米波通信测试}
+\section{大规模MIMO测试}
+\section{未来通信系统测试展望}
+
+\backmatter
+
+\chapter{参考文献}
+
+\chapter{附录}
+
+\end{document}
