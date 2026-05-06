@@ -31,6 +31,7 @@
 
 % 图片相关设置。
 \usepackage{graphicx}
+\usepackage{float}
 \graphicspath{{Images/}}
 
 % 设置署名格式。
@@ -86,9 +87,9 @@
 
 收音机接收到的电台信号通常有两种，调幅 AM 和调频 FM。波形图如下：
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
-	%\includegraphics[width=0.7\linewidth]{am-fm-waveform.jpg}
+	\includegraphics[width=0.7\linewidth]{am-fm-waveform.jpg}
 	\caption{AM 与 FM 波形图}
 	\label{fig:am-fm}
 \end{figure}
@@ -124,20 +125,18 @@
 
 这是最经典的入门电路，借用前辈书中的插图，最简单的电路和接线图如下：
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
-	%\includegraphics[width=0.7\linewidth]{simple_radio_circuit.png}
-	\caption{矿石收音机电路图}
+	\includegraphics[width=0.7\linewidth]{simple_radio_circuit.png}
+	\caption{矿石收音机电路图。图片来源：朱蔼初编著的《看图学装收音机》}
 	\label{fig:crystal-radio-circuit}
 \end{figure}
-
-图片来源：朱蔼初编著的《看图学装收音机》
 
 图中展示的是矿石收音机的典型结构，它由天线、晶体二极管、耳机、地线 4 个核心部件组成，本质上是一个无源接收装置。它利用半导体材料的整流特性接收无线电信号，不需要外接电源，完全依靠天线接收的无线电波能量工作。适用于接收 AM 电台的信号。
 
 \section{各部件功能}
 
-\subsection{1. 天线}
+\subsection{天线}
 
 接收空间中传播的无线电波，这些电波会在天线中感应出微弱的高频交变电流。
 
@@ -145,24 +144,24 @@
 
 \textbf{特别警示}：架设天线必须高度重视防雷，雷雨天气严禁使用，并应采取必要的避雷措施！
 
-\subsection{2. 晶体二极管}
+\subsection{二极管}
 
 作为检波器，利用半导体的"单向导电性"，对天线接收到的高频信号进行检波（将调幅信号的高频载波去掉，提取音频信号）。
 
 早期使用矿石检波器，这就是矿石收音机中"矿石"二字的来源。有活动矿石和固定矿石两种。活动矿石和固定矿石结构类似，核心就是矿石。常见有黄铁矿、方铅矿、红锌矿、自然铜等的金属矿石，结构如图。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
-	%\includegraphics[width=0.7\linewidth]{mineral-detector.jpg}
+	\includegraphics[width=0.7\linewidth]{mineral-detector.jpg}
 	\caption{矿石检波器}
 	\label{fig:mineral-detector}
 \end{figure}
 
 现在已无此必要，因为矿石价格不菲、调整麻烦且效果不理想。建议采用晶体二极管替代。型号可选 2AP9、1N60P 等，根据经验，1N60P 是个不错的选择。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
-	%\includegraphics[width=0.7\linewidth]{1n60p.jpg}
+	\includegraphics[width=0.7\linewidth]{1n60p.jpg}
 	\caption{1N60P 二极管}
 	\label{fig:1n60p}
 \end{figure}
@@ -171,7 +170,7 @@
 
 \textbf{注}：有资料称部分 1N60P 不适用，但笔者暂未遇到，待有机会再补充。
 
-\subsection{3. 耳机}
+\subsection{耳机}
 
 将晶体二极管输出的微弱音频信号转化为声波，供人耳收听。
 
@@ -181,7 +180,7 @@
 
 更经济的替代方案是，使用阻抗匹配变压器加上普通低阻耳机（如手机耳机）的组合。
 
-\subsection{4. 地线}
+\subsection{地线}
 
 连接到大地，相为天线感应到的电流提供一个完整的回路参考点，同时还能过滤掉一部分杂波干扰。
 
@@ -220,7 +219,7 @@
 
 为了解决这个问题，可在其基础上增加调谐电路。整机电路图如下：
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{带调谐电路的矿石收音机电路图}
@@ -242,7 +241,7 @@
 
 我使用了一个旧的化妆品瓶子，直径约 5cm，截取其中一段作为线圈骨架。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{线圈骨架制作}
@@ -251,7 +250,7 @@
 
 在两端各打了2个小孔用于固定线头。用 0.3mm 的漆包线密绕约 80 匝，实测电感量为 240μH，满足中波波段的要求。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{自制线圈}
@@ -276,7 +275,7 @@
 
 根据业内前辈的经验，电容和电感的选择见下表：
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{LC 元器件参数表}
@@ -291,7 +290,7 @@
 
 这是在资源匮乏年代的无奈之举。可变电容器在当时价格比较高，对于无线电爱好者而言，能省则省，是最理想的方案。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{简化电路}
@@ -403,7 +402,7 @@ LC 谐振频率公式决定谐振频率的公式是：
 
 最原始也是最简单的连接方式，即将天线直接接入谐振回路的顶端。简单的矿石收音机多采用这种方法。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{直接耦合方式}
@@ -420,7 +419,7 @@ LC 谐振频率公式决定谐振频率的公式是：
 
 天线通过一只小容量电容接入谐振回路，利用电容"隔直通交"的特性进行连接。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{电容耦合方式}
@@ -451,7 +450,7 @@ LC 谐振频率公式决定谐振频率的公式是：
 	\item \textbf{抽头耦合（Tap Coupling / Autotransformer Coupling）}：在主线圈 L 上直接引出一个抽头接天线。抽头位置决定了阻抗变换比：接在低端（地端附近）阻抗低、耦合松（选择性好）；接在高端阻抗高、耦合紧（音量大）。效果与互感式类似，但制作更紧凑。
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{电磁耦合方式}
@@ -473,7 +472,7 @@ LC 谐振频率公式决定谐振频率的公式是：
 
 \section{三种耦合方式对比速查表}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
@@ -540,7 +539,7 @@ LC 谐振频率公式决定谐振频率的公式是：
 
 L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。L2（次级线圈）配合 C1 进行精确调谐。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{双回路单调谐收音机电路图}
@@ -572,7 +571,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 第二级调谐：由线圈 L3 和另一个可变电容器 C2 组成。L3 与 L2 紧密耦合，接收第一级选出的信号。再次通过调节电容进行二次选频。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{三回路双调谐收音机电路图}
@@ -592,7 +591,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 \subsection{多回路架构对比速查表}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{|l|l|l|l|l|}
 		\hline
@@ -652,7 +651,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 经典的 140-1 型矿石收音机天线就采用此类结构。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{单层圆筒线圈}
@@ -667,7 +666,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 采用交叉绕法，层间留有空隙。分布电容小、Q 值高，高频特性好。绕制工艺复杂，需专用绕线机。适合短波、高频电路（电子管收音机常用）。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{蜂房线圈}
@@ -680,7 +679,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 长波用蛛网线圈也属于此类。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{花篮/蛛网线圈}
@@ -691,7 +690,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 直径 30–100cm 的大尺寸单圈或多圈线圈。灵敏度最高，可直接接收电波，无需外接天线。但占用空间极大，需固定框架。适合信号极弱地区、无天线环境。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{大环线圈}
@@ -702,7 +701,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 在同一个骨架上绕制多组线圈，或将一组线圈套在另一组外面。工艺稍复杂。适合双回路、三回路矿石机。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{套叠/多组线圈}
@@ -716,7 +715,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 漆包线或李兹线绕在铁氧体磁棒上（常见规格为 $\phi$10×200mm），通常设置多个抽头。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{磁棒线圈}
@@ -738,7 +737,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 绕在铁氧体磁环（直径 20–50mm）上，可单组或双组反绕。
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{磁环线圈}
@@ -795,7 +794,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 从本节开始我们迈入晶体管时代。前面介绍的矿石收音机没有放大功能，耳机发出的音量大小，完全依赖于天线获取的无线电波的能量大小。为了使音量增大，最直接的思路就是增加一级晶体三极管做音频放大，而检波仍由二极管完成。电路图如下：
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{二极管检波+晶体管低放电路图}
@@ -808,7 +807,7 @@ L1（初级线圈）负责宽带接收，将天线信号耦合至调谐回路。
 
 \section{主要元件功能一览}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{|l|l|l|}
 		\hline
@@ -882,7 +881,7 @@ R2 两端的音频电压，经耦合电容 C4 送至晶体管 Q1（如 3AX31、9
 
 晶体三极管（BJT，Bipolar Junction Transistor，双极型晶体管）有三个引脚：基极 b、集电极 c 和发射极 e。分为 NPN 和 PNP 两种类型。符号如下图所示：
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{NPN 与 PNP 三极管符号}
@@ -895,7 +894,7 @@ R2 两端的音频电压，经耦合电容 C4 送至晶体管 Q1（如 3AX31、9
 
 \subsection{电路图}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 	\centering
 	%\includegraphics[width=0.7\linewidth]{Images/}
 	\caption{三极管低频放大电路图}
@@ -904,7 +903,7 @@ R2 两端的音频电压，经耦合电容 C4 送至晶体管 Q1（如 3AX31、9
 
 \subsection{元件功能速查表}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{|l|l|l|}
 		\hline
