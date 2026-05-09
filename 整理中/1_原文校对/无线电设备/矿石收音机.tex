@@ -1,0 +1,92 @@
+% book模板
+% book模板.tex
+
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息。
+\input{../../../common/page}
+
+% 设置字体，并解决显示难检字问题。
+\xeCJKsetup{AutoFallBack=true}
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）。
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 支持目录点击跳转
+\usepackage[colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% 设置 part 和 chapter 标题格式。
+\ctexset{
+	part/name= {第,卷},
+	part/number={\chinese{part}},
+	chapter/name={第,篇},
+	chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
+
+% 设置古文原文格式。
+\newenvironment{yuanwen}{\bfseries\zihao{4}}
+
+% 设置段落间距
+\setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
+
+% 列表格式支持，列表项向右偏移。
+\usepackage{enumitem}
+
+% 数学公式支持
+\usepackage{amsmath}
+
+\title{\heiti\zihao{0} 矿石收音机}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\frontmatter
+\chapter{前言}
+
+矿石收音机是一种最简单、最经济的收音机，需用器材不多，制作容易，不需要维持费用；尤其是适合于在我国广大的农村中使用。这种简单而又经济的收音机，在装置上和检修上都不需要特殊的技术，最合于一般初学的无线电爱好者研究之用。
+
+虽然矿石收音机也有它的缺点，如收程不远、声音小等，但是我国各省现在都已普遍地设立了人民广播电台，故在很大的地区内，矿石收音机仍可使用的。
+
+\mainmatter
+
+\chapter{无线电波的性质}
+
+无线电广播是现代生活中不可或缺的一部分。通过收音机，我们可以听到新闻资讯、音乐娱乐、天气预报等各种节目。所有这些声音都是通过无线电波传递的。
+
+无线电波和水的波浪十分相似，它们都是一种振动。我们在水面抛下一块石子，它就激起水的波浪——振动，一圈圈地向外扩散开去；如果水面正浮着一片树叶，它也就受到水波的影响而跟着上下浮动。广播进行时广播电台向四周发出无线电波，在电波作用的范围内，收音机就收到了同样的电波。
+
+无线电波是一种电磁波。因为它可以不靠电线来传递，所以叫做"无线电波"。
+
+\section{电磁波的产生}
+
+电磁波是怎样发射出去的呢？要知道这个道理，首先得从电流说起。电流在电线里流动的方式有两种：一种叫"直流电"，电流流动的方向和大小都是一直不变的，像手电筒里的电池及其他各种干电池所产生的电流便是；另一种叫"交流电"，电流流动的方向是不停地来回变换，并且强度（即大小）也是忽大忽小变化的，城市中用来照明的电灯，绝大多数是使用交流电的。
+
+电流在导线里面流动时能在导线周围产生电磁现象。性质不同的电流所产生的结果也是不同的，用以产生电磁波的是交流电流。
+
+\section{矿石收音机的基本原理}
+
+矿石收音机利用天然矿石（如方铅矿、黄铁矿等）作为检波器，将调谐电路接收到的高频无线电信号转换为音频信号，通过耳机播放。它不需要电源，完全依靠天线接收到的无线电波能量工作。
+
+\backmatter
+
+\end{document}
