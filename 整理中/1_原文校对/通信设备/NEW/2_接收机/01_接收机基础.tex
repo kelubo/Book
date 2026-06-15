@@ -1,0 +1,232 @@
+% ================================================
+% 文件: 01_接收机基础.tex
+% 章节: 第6章 接收机基础
+% 所属部分: 接收机技术
+% 版本: v1.0
+% ================================================
+% 本章目录结构（树状）:
+% \chapter{接收机基础}
+% ├── \section{接收机基本原理}
+% ├── \section{接收机主要技术指标}
+% ├── \section{接收机类型与分类}
+% ├── \section{直接放大式接收机}
+% ├── \section{外差原理}
+% └── \section{超外差式接收机原理}
+% ================================================
+
+\chapter{接收机基础}
+\label{chap:receiver_fundamentals}
+
+\section{接收机基本原理}
+\label{sec:receiver_principle}
+
+接收机是一种将无线电信号转换为可感知信号（如音频、视频）的电子设备。其基本工作流程为：
+
+\begin{itemize}
+    \item \textbf{接收}：通过天线捕获空间中的无线电波
+    \item \textbf{选择}：通过调谐电路选择特定频率的信号
+    \item \textbf{放大}：通过放大器增强信号强度
+    \item \textbf{解调}：从载波中提取原始调制信号
+    \item \textbf{输出}：将解调后的信号转换为音频或视频输出
+\end{itemize}
+
+接收机的核心任务是在噪声环境中可靠地恢复原始信号。
+
+\section{接收机主要技术指标}
+\label{sec:receiver_specifications}
+
+评价接收机性能的主要指标包括：
+
+\begin{itemize}
+    \item \textbf{灵敏度}：接收机能够检测到的最小信号强度，通常用dBm表示
+    \item \textbf{选择性}：接收机区分相邻信道信号的能力，用带宽或Q值表示
+    \item \textbf{增益}：接收机对信号的放大能力，用dB表示
+    \item \textbf{噪声系数}：接收机自身产生的噪声大小，用dB表示
+    \item \textbf{失真}：信号经过接收机后产生的畸变程度
+    \item \textbf{动态范围}：接收机能够处理的信号强度范围
+\end{itemize}
+
+\section{接收机类型与分类}
+\label{sec:receiver_classification}
+
+接收机可按多种方式分类：
+
+\begin{itemize}
+    \item \textbf{按工作原理}：直接放大式、超外差式、直接转换式
+    \item \textbf{按调制方式}：AM接收机、FM接收机、SSB接收机
+    \item \textbf{按工作频段}：长波、中波、短波、超短波、微波接收机
+    \item \textbf{按用途}：广播接收机、通信接收机、雷达接收机、导航接收机
+\end{itemize}
+
+\section{直接放大式接收机}
+\label{sec:direct_amplification_receiver}
+
+直接放大式接收机直接对射频信号进行放大，然后解调。
+
+直接放大式收音机的工作原理如下：从天线上传下来的各射频信号到达调谐电路，由调谐电路的谐振作用，选择了其中某一个射频信号，经射频放大器放大后，再经调谐电路的调谐，于是输入到检波器，由检波器将射频电压变换为音频电压，再经音频放大器放大，输入到扬声器。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={rectangle, draw, fill=blue!20, 
+            text width=4.5em, text centered, minimum height=2.5em},
+        line/.style={draw, -latex'},
+        signal/.style={coordinate},
+        node distance=0.6cm
+    ]
+    
+    % 节点定义
+    \node[signal] (input) {};
+    \node[block, right=of input] (tuner1) {调谐电路};
+    \node[block, right=of tuner1] (rfamp) {射频放大器};
+    \node[block, right=of rfamp] (tuner2) {调谐电路};
+    \node[block, right=of tuner2] (detector) {检波器};
+    \node[block, right=of detector] (afamp) {音频放大器};
+    \node[signal, right=of afamp] (output) {};
+    
+    % 连线
+    \draw[line] (input) -- (tuner1);
+    \node[above=0.3cm of input] (rf_label) {\small 射频信号};
+    \draw[line] (tuner1) -- (rfamp);
+    \draw[line] (rfamp) -- (tuner2);
+    \draw[line] (tuner2) -- (detector);
+    \draw[line] (detector) -- (afamp);
+    \draw[line] (afamp) -- (output);
+    \node[above=0.3cm of output] (af_label) {\small 音频信号};
+    
+    % 功能说明标签
+    \node[below=0.4cm of tuner1, font=\small] {选择信号};
+    \node[below=0.4cm of rfamp, font=\small] {放大信号};
+    \node[below=0.4cm of tuner2, font=\small] {选择信号};
+    \node[below=0.4cm of detector, font=\small] {解调音频};
+    \node[below=0.4cm of afamp, font=\small] {驱动扬声器};
+    
+    \end{tikzpicture}
+    \caption{直接放大式接收机结构框图}
+    \label{fig:direct_amplification_block}
+\end{figure}
+
+优点：
+\begin{itemize}
+    \item 结构简单
+    \item 成本低
+\end{itemize}
+
+缺点：
+\begin{itemize}
+    \item 选择性差
+    \item 灵敏度低
+    \item 稳定性差
+\end{itemize}
+
+直接放大式接收机主要用于简单的矿石收音机和早期的广播接收机。
+
+\section{外差原理}
+\label{sec:heterodyne_principle}
+
+外差原理（Heterodyne Principle）是无线电通信中的基本原理，由加拿大工程师Reginald Fessenden于1901年提出。该原理是超外差接收机架构的理论基础。
+
+外差原理的核心思想是：将两个不同频率的信号在非线性器件（如二极管、晶体管）中混合，产生新的频率分量。
+
+\subsection{外差原理的数学基础}
+
+假设两个输入信号分别为：
+\[ f_1 = A_1 \cos(2\pi f_1 t) \]
+\[ f_2 = A_2 \cos(2\pi f_2 t) \]
+
+在非线性器件中混合后，输出信号将包含以下频率分量：
+- 原频率分量：\( f_1 \) 和 \( f_2 \)
+- 和频分量：\( f_1 + f_2 \)
+- 差频分量：\( |f_1 - f_2| \)
+
+其中，差频分量是外差原理中最常用的分量。
+
+\subsection{外差原理的应用}
+
+外差原理的主要应用包括：
+
+\begin{itemize}
+    \item \textbf{频率变换}：将高频信号转换为较低的中频信号，便于放大和处理
+    \item \textbf{解调}：通过与本地振荡信号混合，提取调制信号
+    \item \textbf{频率合成}：生成新的频率信号
+\end{itemize}
+
+\subsection{外差与超外差的区别}
+
+\begin{enumerate}
+    \item \textbf{外差接收机}：早期实现，中频不固定，随接收频率变化
+    \item \textbf{超外差接收机}：现代主流架构，使用固定中频，性能更稳定
+\end{enumerate}
+
+"超外差"（Superheterodyne）中的"超"（Super）表示这种架构超越了早期的简单外差技术，通过固定中频实现了更高的灵敏度和选择性。
+
+\section{超外差式接收机原理}
+\label{sec:superheterodyne_principle}
+
+超外差式接收机是目前应用最广泛的接收机架构，其核心原理是将不同频率的射频信号转换为固定的中频信号进行处理。
+
+工作流程：
+1. \textbf{调谐}：选择所需的射频信号
+2. \textbf{变频}：将射频信号与本地振荡器信号混合，产生中频信号
+3. \textbf{中频放大}：对中频信号进行高增益放大
+4. \textbf{解调}：从中频信号中提取音频信号
+5. \textbf{音频放大}：放大音频信号驱动扬声器
+
+中频频率通常选择为455kHz（AM广播）或10.7MHz（FM广播）。
+
+超外差式收音机先将接收到的射频信号电压，由一个所谓变频器变换成为一定的高频，即中频（因为它的频率比原来信号的频率低，比音频高，所以叫做中间频率，简称中频），经中频放大器放大后，再输入到检波器；而且中频放大级是超外差式收音机的主要增益部分。
+
+相比直接放大式接收机，超外差式具有以下优点：
+
+\begin{itemize}
+    \item \textbf{灵敏度高}：中频放大器可工作在最佳频率，获得高增益
+    \item \textbf{选择性好}：固定中频便于使用高性能滤波器
+    \item \textbf{稳定性好}：本振频率相对稳定，避免漂移影响
+    \item \textbf{通用性强}：同一中频放大器可接收不同频率信号
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={rectangle, draw, fill=blue!20, 
+            text width=4.5em, text centered, minimum height=2.5em},
+        line/.style={draw, -latex'},
+        signal/.style={coordinate},
+        node distance=0.6cm
+    ]
+    
+    % 节点定义
+    \node[signal] (input) {};
+    \node[block, right=of input] (tuner) {调谐电路};
+    \node[block, right=of tuner] (mixer) {变频器};
+    \node[block, above=of mixer, node distance=0.8cm] (localosc) {本地振荡器};
+    \node[block, right=of mixer] (ifamp) {中频放大器};
+    \node[block, right=of ifamp] (detector) {检波器};
+    \node[block, right=of detector] (afamp) {音频放大器};
+    \node[signal, right=of afamp] (output) {};
+    
+    % 连线
+    \draw[line] (input) -- (tuner);
+    \node[above=0.3cm of input] (rf_label) {\small 射频信号};
+    \draw[line] (tuner) -- (mixer);
+    \draw[line] (localosc) -- (mixer);
+    \node[right=0.2cm of localosc] (lo_label) {\small 本振信号};
+    \draw[line] (mixer) -- (ifamp);
+    \node[above=0.3cm of mixer] (if_label) {\small 中频信号};
+    \draw[line] (ifamp) -- (detector);
+    \draw[line] (detector) -- (afamp);
+    \draw[line] (afamp) -- (output);
+    \node[above=0.3cm of output] (af_label) {\small 音频信号};
+    
+    % 功能说明标签
+    \node[below=0.4cm of tuner, font=\small] {选择信号};
+    \node[below=0.4cm of mixer, font=\small] {变频为中频};
+    \node[above=0.4cm of localosc, font=\small] {产生本振};
+    \node[below=0.4cm of ifamp, font=\small] {高增益放大};
+    \node[below=0.4cm of detector, font=\small] {解调音频};
+    \node[below=0.4cm of afamp, font=\small] {驱动扬声器};
+    
+    \end{tikzpicture}
+    \caption{超外差式接收机结构框图}
+    \label{fig:superheterodyne_block}
+\end{figure}

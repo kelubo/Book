@@ -1,0 +1,74 @@
+% ================================================
+% 文件: 01_无线电基础.tex
+% 章节: 第1章 无线电基础
+% 所属部分: 基础理论
+% 版本: v1.0
+% ================================================
+% 本章目录结构（树状）:
+% \chapter{无线电基础}
+% ├── \section{无线电波的基本概念}
+% ├── \section{调制与解调}
+% ├── \section{谐振与调谐}
+% ├── \section{天线基础}
+% └── \section{传输线理论}
+% ================================================
+
+\chapter{无线电基础}
+\label{chap:radio_fundamentals}
+
+\section{无线电波的基本概念}
+\label{sec:radio_wave_concept}
+
+无线电波是一种电磁波，它是由振荡电路产生的高频交变电流通过天线辐射到空间形成的。无线电波具有以下特性：
+
+\begin{itemize}
+    \item \textbf{频率范围}：3kHz至300GHz
+    \item \textbf{传播速度}：光速（约$3\times10^8$ m/s）
+    \item \textbf{波长与频率关系}：$\lambda = \frac{c}{f}$，其中$\lambda$为波长，$c$为光速，$f$为频率
+\end{itemize}
+
+无线电波根据频率可分为多个波段：长波、中波、短波、超短波和微波。不同波段的无线电波具有不同的传播特性和应用场景。
+
+\section{调制与解调}
+\label{sec:modulation_demodulation}
+
+调制是将低频信号（如音频信号）加载到高频载波上的过程，解调则是从已调波中恢复出原信号的过程。常见的调制方式有：
+
+\begin{itemize}
+    \item \textbf{调幅（AM）}：载波振幅随调制信号变化
+    \item \textbf{调频（FM）}：载波频率随调制信号变化
+    \item \textbf{调相（PM）}：载波相位随调制信号变化
+\end{itemize}
+
+调幅波的数学表达式为：$u(t) = U_c(1 + m_a\cos\Omega t)\cos\omega_c t$，其中$m_a$为调幅系数。
+
+\section{谐振与调谐}
+\label{sec:resonance_tuning}
+
+谐振是指电路在特定频率下发生的电共振现象。在谐振状态下，电路的阻抗达到极值。RLC串联谐振电路的谐振频率为：
+
+\[ f_0 = \frac{1}{2\pi\sqrt{LC}} \]
+
+调谐是通过改变电路参数（如电容或电感）使电路在特定频率上发生谐振的过程，用于从众多信号中选择所需的信号。
+
+\section{天线基础}
+\label{sec:antenna_fundamentals}
+
+天线是用于辐射和接收无线电波的装置。理想天线应具有以下特性：
+
+\begin{itemize}
+    \item 高效率的能量转换
+    \item 特定的方向性
+    \item 匹配的阻抗
+\end{itemize}
+
+常用天线类型包括：偶极天线、垂直天线、环形天线、抛物面天线等。天线的增益用分贝（dB）表示。
+
+\section{传输线理论}
+\label{sec:transmission_line}
+
+传输线是用于传输高频信号的导体系统，常见类型有平行双线、同轴电缆、微带线等。传输线的特性阻抗$Z_0$是一个重要参数：
+
+\[ Z_0 = \sqrt{\frac{R + j\omega L}{G + j\omega C}} \]
+
+当传输线终端阻抗与特性阻抗匹配时，信号无反射传输。驻波比（SWR）用于衡量匹配程度。
