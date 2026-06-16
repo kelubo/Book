@@ -10,7 +10,9 @@
 % ├── \section{调制与解调}
 % ├── \section{谐振与调谐}
 % ├── \section{天线基础}
-% └── \section{传输线理论}
+% ├── \section{传输线理论}
+% ├── \section{电波传播}
+% └── \section{噪声与干扰}
 % ================================================
 
 \chapter{无线电基础}
@@ -72,3 +74,44 @@
 \[ Z_0 = \sqrt{\frac{R + j\omega L}{G + j\omega C}} \]
 
 当传输线终端阻抗与特性阻抗匹配时，信号无反射传输。驻波比（SWR）用于衡量匹配程度。
+
+\section{电波传播}
+\label{sec:wave_propagation}
+
+无线电波的传播方式主要有以下几种：
+
+\begin{itemize}
+    \item \textbf{地波传播}：沿地球表面传播，适用于长波和中波
+    \item \textbf{天波传播}：通过电离层反射传播，适用于短波
+    \item \textbf{直线传播（视距传播）}：直线传播，适用于超短波和微波
+    \item \textbf{散射传播}：通过对流层或电离层散射传播
+\end{itemize}
+
+电离层是大气层中高度约60-400公里的区域，包含大量带电粒子，能够反射无线电波。电离层分为D、E、F1、F2等层次，其特性随时间、季节和太阳活动变化。
+
+\section{噪声与干扰}
+\label{sec:noise_interference}
+
+在无线电通信中，噪声和干扰是影响通信质量的重要因素。
+
+\subsection{噪声类型}
+
+\begin{itemize}
+    \item \textbf{热噪声}：由导体中电子的热运动产生，功率谱密度均匀（白噪声）
+    \item \textbf{散粒噪声}：由电子或空穴的离散性产生，常见于半导体器件
+    \item \textbf{闪烁噪声}：与频率成反比（1/f噪声），由材料缺陷等引起
+    \item \textbf{宇宙噪声}：来自宇宙空间的电磁辐射
+\end{itemize}
+
+热噪声的功率由以下公式计算：
+\[ P_n = kTB \]
+其中，$k$为玻尔兹曼常数（$1.38\times10^{-23}$ J/K），$T$为绝对温度，$B$为带宽。
+
+\subsection{干扰类型}
+
+\begin{itemize}
+    \item \textbf{同频干扰}：来自相同频率的其他信号
+    \item \textbf{邻频干扰}：来自相邻频道的信号
+    \item \textbf{互调干扰}：由非线性器件产生的新频率分量
+    \item \textbf{阻塞干扰}：强信号使接收机过载
+\end{itemize}

@@ -11,6 +11,10 @@
 % ├── \section{高频功率放大器}
 % ├── \section{调制器与解调器}
 % └── \section{发射机设计与调试}
+%     ├── \subsection{发射机设计要点}
+%     ├── \subsection{频率合成技术}
+%     ├── \subsection{发射机指标测试}
+%     └── \subsection{发射机效率计算}
 % ================================================
 
 \chapter{发射机}
@@ -72,14 +76,48 @@
 \section{发射机设计与调试}
 \label{sec:transmitter_design}
 
-发射机设计要点：
+\subsection{发射机设计要点}
 
 \begin{itemize}
-    \item \textbf{频率合成}：稳定的载波频率源
-    \item \textbf{功率放大}：高效率、高线性度功率放大器
-    \item \textbf{调制电路}：高质量的调制器
-    \item \textbf{滤波网络}：减少谐波辐射
-    \item \textbf{电源供应}：稳定、高效的电源
+    \item \textbf{频率合成}：稳定的载波频率源，可采用晶体振荡器、锁相环（PLL）或直接数字频率合成器（DDS）
+    \item \textbf{功率放大}：高效率、高线性度功率放大器，需考虑散热设计
+    \item \textbf{调制电路}：高质量的调制器，确保调制精度和线性度
+    \item \textbf{滤波网络}：减少谐波辐射，满足电磁兼容（EMC）要求
+    \item \textbf{电源供应}：稳定、高效的电源，考虑纹波和噪声抑制
+    \item \textbf{保护电路}：过压、过流、过热保护
 \end{itemize}
 
-调试项目包括：功率测量、频率校准、调制深度调整、谐波抑制测试等。
+\subsection{频率合成技术}
+
+频率合成器用于产生稳定、准确的载波频率。
+
+\begin{itemize}
+    \item \textbf{晶体振荡器}：高稳定性，固定频率输出
+    \item \textbf{锁相环（PLL）}：通过反馈环路锁定频率，可实现频率捷变
+    \item \textbf{直接数字频率合成器（DDS）}：数字方式生成频率，分辨率高、切换速度快
+\end{itemize}
+
+PLL的基本组成：参考振荡器、鉴相器（PD）、环路滤波器、压控振荡器（VCO）
+
+\subsection{发射机指标测试}
+
+调试项目包括：
+
+\begin{itemize}
+    \item \textbf{功率测量}：输出功率、效率
+    \item \textbf{频率校准}：载波频率准确度和稳定度
+    \item \textbf{调制参数}：调制深度、调制失真
+    \item \textbf{谐波抑制}：二次谐波、三次谐波抑制比
+    \item \textbf{杂散辐射}：非谐波杂散分量
+    \item \textbf{邻道功率}：对相邻频道的干扰
+\end{itemize}
+
+\subsection{发射机效率计算}
+
+发射机总效率：$\eta_{total} = \frac{P_{out}}{P_{dc}}$
+
+其中，$P_{out}$为射频输出功率，$P_{dc}$为直流输入功率。
+
+功率放大器效率：$\eta_{PA} = \frac{P_{RF}}{P_{dc-PA}}$
+
+整体效率取决于功率放大器效率、调制器效率和电源效率等因素。
