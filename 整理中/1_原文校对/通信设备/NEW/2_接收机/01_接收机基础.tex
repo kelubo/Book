@@ -126,14 +126,84 @@
 
 直接放大式接收机主要用于简单的矿石收音机和早期的广播接收机。
 
+\section{调谐电路特性}
+\label{sec:tuning_circuit_characteristics}
+
+调谐电路是接收机的核心组成部分，其特性直接影响接收机的性能。
+
+\subsection{频率特性曲线}
+
+图\ref{fig:tuning_characteristics}展示了两种不同特性的调谐电路：
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        axis/.style={->, >=stealth', line width=0.8pt},
+        curve/.style={line width=1.2pt},
+        node distance=1cm
+    ]
+    
+    % 坐标轴
+    \draw[axis] (0,0) -- (8,0) node[right] {频率};
+    \draw[axis] (0,0) -- (0,5) node[above] {增益};
+    
+    % 高选择性曲线 (尖锐)
+    \draw[curve, red] plot[smooth] coordinates {
+        (1,0.2) (2,0.5) (3,1.5) (4,4.5) (5,1.5) (6,0.5) (7,0.2)
+    } node[above right, red, font=\small] {高选择性};
+    
+    % 低选择性曲线 (平缓)
+    \draw[curve, blue, dashed] plot[smooth] coordinates {
+        (0.5,0.8) (1.5,1.5) (2.5,2.5) (4,3.8) (5.5,2.5) (6.5,1.5) (7.5,0.8)
+    } node[above right, blue, font=\small, dashed] {低选择性};
+    
+    % 标记谐振频率
+    \draw[dashed, gray] (4,0) -- (4,4.5) node[below, gray, font=\small] {$f_c$};
+    \node[below] at (4,0) {谐振频率};
+    
+    % 标记通频带
+    \draw[dashed, gray] (2.5,1) -- (5.5,1);
+    \node[below] at (4,1) {$\Delta f$ 通频带};
+    
+    \end{tikzpicture}
+    \caption{两种调谐电路的频率特性曲线：(a) 高选择性（尖锐曲线）；(b) 低选择性（平缓曲线）}
+    \label{fig:tuning_characteristics}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{高选择性电路（图a）}：曲线非常尖锐，通频带（包括谐振频率左右的一段频带）很窄。优点是选择性很好，能有效区分相邻频率的信号；缺点是通频带过窄会引起频率畸变。
+    
+    \item \textbf{低选择性电路（图b）}：曲线比较平缓，通频带较宽。优点是频率畸变小，信号保真度高；缺点是选择性较差，容易受到相邻频道的干扰。
+\end{itemize}
+
+\subsection{选择性与频率畸变的权衡}
+
+要使直接放大式收音机的选择性优良，调谐电路的通频带必须尽可能窄。然而，通频带越窄，将引起频率畸变越大。这是一个基本的权衡关系。
+
+频率畸变会导致信号的某些频率分量被衰减，造成声音失真。对于音频信号来说，这会使声音变得不自然。
+
+\subsection{直接放大式电路的局限性}
+
+由于直接放大式电路的特性关系，存在以下问题：
+
+\begin{itemize}
+    \item \textbf{放大率不均匀}：对于各频段的放大率极不均匀
+    \item \textbf{短波接收性能差}：接收短波波段的电信时，收音机电路的选择性随着频率的提高而迅速降低
+    \item \textbf{灵敏度下降}：放大级的放大率减退，使收音机的选择性及灵敏度格外低落
+\end{itemize}
+
+这些局限性导致直接放大式接收机逐渐被性能更优越的超外差式接收机所取代。
+
 \section{外差原理}
 \label{sec:heterodyne_principle}
 
 外差原理（Heterodyne Principle）是无线电通信中的基本原理，由加拿大工程师Reginald Fessenden于1901年提出。该原理是超外差接收机架构的理论基础。
 
-外差原理的核心思想是：将两个不同频率的信号在非线性器件（如二极管、晶体管）中混合，产生新的频率分量。
+\subsection{外差原理的原理与示例}
 
-\subsection{外差原理的数学基础}
+外差原理的核心思想是：将两个不同频率的信号在非线性器件（如二极管、晶体管、电子管）中混合，会产生新的频率分量。
+
+\subsubsection{数学基础}
 
 假设两个输入信号的瞬时值分别为：
 \[ v_1(t) = A_1 \cos(2\pi f_1 t) \]
@@ -146,6 +216,12 @@
 
 其中，差频分量是外差原理中最常用的分量。
 
+\subsubsection{通俗解释}
+
+当两个频率不同的电压输入到同一电路时，将得到第三个频率的电压。如果这第三个频率的电压经电子管检波器检波，在检波器阳极电路中将出现两个电压的频率的差数电压，即差频电压。
+
+譬如第一个电压 \( f_1 \) 的频率是24赫兹，第二个电压 \( f_2 \) 的频率是22赫兹，在检波器阳极电路中的差频电压，将为 \( 24 - 22 = 2 \) 赫兹。
+
 \subsection{外差原理的应用}
 
 外差原理的主要应用包括：
@@ -154,7 +230,103 @@
     \item \textbf{频率变换}：将高频信号转换为较低的中频信号，便于放大和处理
     \item \textbf{解调}：通过与本地振荡信号混合，提取调制信号
     \item \textbf{频率合成}：生成新的频率信号
+    \item \textbf{差拍检波}：用于接收CW（连续波）信号，如莫尔斯电码
 \end{itemize}
+
+\subsubsection{差拍检波与CW接收}
+
+差拍检波（Beat Detection）是外差原理在连续波（CW）通信中的经典应用。CW信号是一种单一频率的等幅波，本身不携带音频信息，需要通过差拍原理将其转换为可听信号。
+
+工作原理：
+1. **接收信号**：电台发射的CW信号（如莫尔斯电码的点和划）
+2. **本地振荡器**：接收机内部产生一个频率非常接近接收信号的本地振荡信号
+3. **差拍产生**：两个信号在非线性器件中混合，产生差频信号
+4. **音频输出**：当差频落在音频范围内（如几百赫兹到几千赫兹），就能听到"滴答"声
+
+例如：
+- 接收CW信号频率：\( f_{signal} = 7050 \) kHz
+- 本地振荡频率：\( f_{local} = 7050.8 \) kHz
+- 差拍频率：\( |7050.8 - 7050| = 0.8 \) kHz = 800 Hz
+
+这个800Hz的差拍信号就是我们听到的CW音频信号。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={rectangle, draw, fill=blue!20, 
+            text width=5em, text centered, minimum height=2em},
+        line/.style={draw, -latex'},
+        signal/.style={coordinate},
+        node distance=0.5cm
+    ]
+    
+    \node[signal] (input) {};
+    \node[block, right=of input] (mixer) {混频器};
+    \node[block, above=of mixer] (localosc) {本地振荡器};
+    \node[block, right=of mixer] (filter) {音频滤波器};
+    \node[block, right=of filter] (amp) {音频放大器};
+    \node[signal, right=of amp] (output) {};
+    
+    \draw[line] (input) -- (mixer) node[above, midway, font=\small] {CW信号};
+    \draw[line] (localosc) -- (mixer) node[right, midway, font=\small] {本振信号};
+    \draw[line] (mixer) -- (filter) node[above, midway, font=\small] {差拍信号};
+    \draw[line] (filter) -- (amp);
+    \draw[line] (amp) -- (output) node[above, midway, font=\small] {音频输出};
+    
+    \end{tikzpicture}
+    \caption{差拍检波原理框图}
+    \label{fig:beat_detection}
+\end{figure}
+
+差拍检波的优点：
+\begin{itemize}
+    \item \textbf{灵敏度高}：能检测非常微弱的CW信号
+    \item \textbf{选择性好}：通过调整本振频率精确选择信号
+    \item \textbf{简单实用}：电路结构相对简单
+\end{itemize}
+
+\subsection{差频产生的物理过程}
+
+由于两个不同频率的电压，在某一些时间，因为它们的方向相同而相加（在b点相加最大）；在另一些时间，因为它们的方向相反而相减（在a点和c点相减最大）。因此，合成的电压的波幅就不再相等。波幅在每秒钟内升降的周数，将等于它们的频率的差数。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/beat_frequency_wave.jpg}
+    \caption{两个不同频率信号合成后的差频作用}
+    \label{fig:beat_frequency_wave}
+\end{figure}
+
+由于电子管检波器的阳极平均电流是按第三个频率的电压的波幅而变动的，所以阳极电路出现了差频电压。
+
+\subsubsection{超外差式收音机中的差频应用}
+
+在超外差式收音机中，第一个电压就是输入到变频器的外来广播电台的已调制射频电信电压，第二个电压是由收音机里的高频振荡电路所产生的高频电压。这个高频振荡器所以叫做本机振荡器。
+
+如果外来射频电压的频率为1000千赫，本机振荡器所产生的高频电压的频率为1465千赫，它们同时输入到变频器，由变频器转换后所输出的电压，它的频率将为两个电压的频率的差数，即 \( 1465 - 1000 = 465 \) 千赫。这个差频，就是我们所谓中频。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={rectangle, draw, fill=blue!20, 
+            text width=5em, text centered, minimum height=2em},
+        line/.style={draw, -latex'},
+        signal/.style={coordinate},
+        node distance=0.5cm
+    ]
+    
+    \node[signal] (input) {};
+    \node[block, right=of input] (mixer) {变频器};
+    \node[block, below=of mixer] (localosc) {本机振荡器};
+    \node[block, right=of mixer] (output) {中频输出};
+    
+    \draw[line] (input) -- (mixer) node[above, midway, font=\small] {射频信号 (1000kHz)};
+    \draw[line] (localosc) -- (mixer) node[left, midway, font=\small] {本振信号 (1465kHz)};
+    \draw[line] (mixer) -- (output) node[above, midway, font=\small] {中频信号 (465kHz)};
+    
+    \end{tikzpicture}
+    \caption{变频器工作情形}
+    \label{fig:mixer_operation}
+\end{figure}
 
 \subsection{外差与超外差的区别}
 
@@ -189,6 +361,26 @@
     \item \textbf{稳定性好}：本振频率相对稳定，避免漂移影响
     \item \textbf{通用性强}：同一中频放大器可接收不同频率信号
 \end{itemize}
+
+\subsection{超外差式接收机的核心优势}
+
+超外差式收音机接收任何一个频率的电信，都使它变换成为同一中频，所以超外差式收音机没有直接放大式收音机那些缺点。
+
+\subsubsection{优势一：音质优良}
+
+由于频率已经固定，它的调谐电路的调谐特性就无需十分尖锐。那就是说，它可能获得充分宽广的畅通频带，从而减少频率畸变，所以超外差式收音机的音质比较好。
+
+\subsubsection{优势二：放大效率高}
+
+因为频率降低，中频放大级的放大效率得到了充分的发挥。一级中频放大器的增益要比一级射频放大器高出若干倍，尤其接收短波波段电信，格外显出了它的优越性。
+
+\subsubsection{优势三：放大率均匀}
+
+由于中频放大器只放大一定的中频电压，因此对于各频带的电信都能获得一律的放大率。
+
+\subsubsection{结构优势}
+
+由于这种种原因，所以超外差式收音机能够发挥那些直接放大式收音机所没有的特长；而且即使在超外差式收音机里装置好几级中频放大器，也不会有很大的困难。
 
 \begin{figure}[htbp]
     \centering
