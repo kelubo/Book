@@ -50,7 +50,97 @@
 \subsection{矿石收音机基础}
 \label{sec:crystal_radio_fundamentals}
 
-% 内容待补充
+矿石收音机是最早期的无线电接收装置，无需外接电源即可工作。其性能的优劣很大程度上取决于天线和接地装置的设计与安装。
+
+\subsubsection*{天线和接地的重要性}
+\label{subsubsec:antenna_ground_importance}
+
+矿石收音机靠天线接收空中的无线电波，因此天线和接地装置是其必备的组成部分。良好的天线和接地能够显著提高接收性能。
+
+\textbf{天线}：天线主要是由一根或一组张挂在空中的天线导线、和一根从天线导线引接而下、接到收音机上的引入线合并组成。天线是收音机的必要设备之一。收音机接有天线之后，可以很轻易地将广播电台发送出来的、传播在空中的无线电波接收进来，并把它转变成信号电流。
+
+\textbf{接地装置}：接地装置就是用一根地线（即接地线）将收音机的某一部分接到大地。这种装置主要是为了增进天线的接收性能。
+
+\begin{table}[h]
+    \centering
+    \caption{天线与接地记号对照}
+    \begin{tabular}{lll}
+        \hline
+        \textbf{项目} & \textbf{旧记号（刘同康，1958）} & \textbf{现代标准记号} \\
+        \hline
+        天线 & A & ANT（源自 Antenna，亦常写作 $\mathsf{Y}$） \\
+        接地 & C & GND 或 $\bot$（保护接地为 PE） \\
+        \hline
+    \end{tabular}
+    \label{tab:antenna_ground_symbols}
+\end{table}
+
+\noindent\textbf{记号沿革说明}：刘同康原著中以单个字母 \textbf{A} 表示天线、\textbf{C} 表示接地（取"地"字拼音首字母）。现行国家标准 GB/T 6988《电气技术用文件的编制》及 IEC 60617 电气简图用图形符号标准中：
+\begin{itemize}
+    \item 天线统一记号为 \textbf{ANT}，图形符号可表示为带箭头的辐射状图形或字母组合 $\mathsf{Y}$；
+    \item 接地统一记号为 \textbf{GND}（信号/工作接地），图形符号为经典的三横线渐短符号 $\bot$；安全保护接地则记为 \textbf{PE}（Protective Earthing）。
+\end{itemize}
+
+\noindent 阅读历史文献时需注意：A、C 这类单字母简写在 20 世纪中期国产收音机电路图中较常见，但与国际标准不接轨，在现代电路图和 PCB 设计文件中已不再使用。
+
+\subsubsection*{天线与接地的工作原理}
+
+天线利用电磁感应原理接收空间中的电磁波。当无线电波传播到天线时，会在天线导体中感应出高频电流，该电流经引入线馈送到接收机输入回路。
+
+接地装置则起到以下作用：
+\begin{itemize}
+    \item 作为接收机输入回路的参考点
+    \item 提供低损耗的回路通路
+    \item 减小外界电磁干扰的影响
+    \item 增强天线的有效高度
+\end{itemize}
+
+\subsubsection*{天线与接地对收音效果的影响}
+\label{subsubsec:antenna_ground_effect}
+
+天线与接地对收音机的收音效果影响极大。
+
+\begin{quote}
+\textit{一架构造比较简单的收音机，不论在收听本地的或是远地的电台时，都必需使用天线和接地，否则就无法收到播音。而一架构造繁复的收音机，处（在）某些场合之下，例如置放这架收音机的房间是钢筋混凝土的建筑物，或是用它来收听远地电台的播音等等，也都必需使用天线和接地；不然，收音效率一定会非常低劣。}
+\end{quote}
+
+\noindent\textbf{现代解读}：上述论断与现代无线电接收理论完全一致。即使是高灵敏度、多级放大的现代接收机，在以下场景中仍需良好的天线和接地：
+\begin{itemize}
+    \item \textbf{钢筋混凝土建筑内}：建筑钢筋网对电磁波产生强烈屏蔽与衰减，需要外置天线补偿；
+    \item \textbf{远距离弱信号接收}：信噪比成为限制因素，优良天线能显著提高接收信噪比；
+    \item \textbf{抗干扰需求}：良好的接地可抑制共模干扰和工频干扰。
+\end{itemize}
+
+\subsubsection*{信号电流与频率}
+\label{subsubsec:signal_current_frequency}
+
+由广播电台发送出来的无线电波具有一定的频率（常称周率）。频率的单位是赫兹（常称每秒周），不过普通我们都用赫兹的一千倍即千赫（常称每秒千周）做单位，这样可使计数上比较方便。一般由广播电台发送出来的无线电波，它的频率都在 550 千赫到 1600 千赫之间。在收听广播时，我们常常可以听到报告员说："$\cdots$ 周率 $\times\times$ 千周"，就是指这个，只是把"千周"前面的"每秒"两个字省去了。
+
+\noindent\textbf{术语沿革说明}：
+
+\begin{itemize}
+    \item \textbf{周率 / 周}：20 世纪中期对"频率（frequency）"和"周期数（cycle）"的口语化称呼。"千周"即"千赫兹（kHz）"，"每秒千周"即"千周/秒（kC/s 或 kc/s）"。该用法在 1960 年代前的中文技术文献中较常见，现已统一为"赫兹（Hz）"。
+    \item \textbf{中波广播频段}：刘同康所述 550–1600 kHz 即国际通行的中波广播（MW，Medium Wave）频段，与现今 AM 广播频段 540–1600 kHz（ITU 1 区）/ 540–1700 kHz（ITU 2 区）基本一致，仅低端略有差异。
+    \item \textbf{赫兹（Hz）}：频率的国际单位制（SI）单位，1 Hz = 1 周/秒，以德国物理学家海因里希·赫兹（Heinrich Hertz）命名。该单位在 1960 年第十一届国际计量大会（CGPM）上被正式采纳。
+\end{itemize}
+
+\noindent\textbf{中波广播频段参数（现代标准）}：
+
+\begin{table}[h]
+    \centering
+    \caption{中波 AM 广播频段参数}
+    \begin{tabular}{ll}
+        \hline
+        \textbf{参数} & \textbf{取值} \\
+        \hline
+        频率范围（ITU 1 区，含中国、欧洲） & 526.5 kHz – 1606.5 kHz \\
+        频率范围（ITU 2 区，美洲） & 540 kHz – 1700 kHz \\
+        频道间隔 & 9 kHz（1 区）/ 10 kHz（2 区） \\
+        调制方式 & 调幅（AM，双边带） \\
+        \hline
+    \end{tabular}
+    \label{tab:mw_broadcast_band}
+\end{table}
 
 \subsection{矿石检波器原理}
 \label{sec:crystal_detector_principle}
