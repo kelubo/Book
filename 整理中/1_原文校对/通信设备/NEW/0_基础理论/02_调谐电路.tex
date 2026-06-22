@@ -1,0 +1,936 @@
+% ================================================
+% 文件: 02_调谐电路.tex
+% 章节: 第2章 调谐电路
+% 所属部分: 基础理论
+% 版本: v1.0
+% ================================================
+% 本章目录结构（树状）:
+% \chapter{调谐电路}
+% ├── \section{调谐电路基础}
+% │   ├── \subsection{谐振的基本概念}
+% │   ├── \subsection{调谐电路的性能参数}
+% │   └── \subsection{调谐电路的应用场景}
+% ├── \section{磁棒材料汇总表}
+% │   ├── \subsection{磁棒材料分类}
+% │   ├── \subsection{中波磁棒材料}
+% │   ├── \subsection{短波磁棒材料}
+% │   ├── \subsection{长波磁棒材料}
+% │   └── \subsection{FM频段磁棒材料}
+% ├── \section{LC调谐电路}
+% │   ├── \subsection{串联LC电路}
+% │   ├── \subsection{并联LC电路}
+% │   └── \subsection{LC电路的设计}
+% ├── \section{晶体调谐电路}
+% │   ├── \subsection{晶体振荡器原理}
+% │   ├── \subsection{晶体的特性}
+% │   └── \subsection{晶体调谐电路设计}
+% ├── \section{现代调谐系统}
+% │   ├── \subsection{锁相环调谐系统}
+% │   └── \subsection{数字调谐系统}
+% └── \section{收音机调谐电路应用}
+%     ├── \subsection{中波调谐}
+%     ├── \subsection{短波调谐}
+%     ├── \subsection{长波调谐}
+%     └── \subsection{FM调谐}
+% ================================================
+
+\chapter{调谐电路}
+\label{chap:tuning_circuits}
+
+调谐电路是无线电接收机和发射机中的核心组成部分，用于选择特定频率的信号或产生特定频率的振荡。本章将介绍调谐电路的基础理论、磁棒材料的选择、LC调谐电路、晶体调谐电路以及现代调谐系统的基本原理。
+
+\section{调谐电路基础}
+\label{sec:tuning_basics}
+
+调谐电路（又称谐振电路）是利用电感和电容的谐振特性来实现频率选择的电路。
+
+\subsection{谐振的基本概念}
+\label{sec:resonance_concept}
+
+谐振是指电路中的电感和电容在特定频率下发生能量交换的现象。当电路的激励频率等于固有频率时，电路呈现纯电阻性阻抗，此时电路发生谐振。
+
+串联谐振时电路阻抗最小，并联谐振时电路阻抗最大。谐振频率由电感L和电容C决定：
+
+\begin{equation}
+f_0 = \frac{1}{2\pi\sqrt{LC}}
+\label{eq:resonance_frequency}
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item $f_0$：谐振频率（Hz）
+    \item $L$：电感量（H）
+    \item $C$：电容量（F）
+\end{itemize}
+
+\subsection{调谐电路的性能参数}
+\label{sec:tuning_parameters}
+
+调谐电路的主要性能参数包括：
+
+\begin{itemize}
+    \item \textbf{谐振频率}：电路发生谐振时的频率
+    \item \textbf{品质因数Q}：$Q = \frac{\omega_0 L}{R} = \frac{1}{\omega_0 CR}$，反映电路的选择性，Q值越高选择性越好
+    \item \textbf{通频带宽度}：$BW = \frac{f_0}{Q}$，决定电路能够通过的信号频率范围
+    \item \textbf{阻抗特性}：谐振时电路呈现纯电阻性
+\end{itemize}
+
+Q值与选择性的关系：
+\begin{itemize}
+    \item Q值越高，通频带越窄，选择性越好，但相位失真增大
+    \item Q值越低，通频带越宽，选择性变差，但相位失真减小
+    \item 实际应用中需要在选择性和保真度之间取得平衡
+\end{itemize}
+
+\subsection{调谐电路的应用场景}
+\label{sec:tuning_applications}
+
+调谐电路广泛应用于：
+
+\begin{itemize}
+    \item \textbf{无线电接收机}：选择特定频率的广播或通信信号
+    \item \textbf{无线电发射机}：产生和放大特定频率的载波信号
+    \item \textbf{滤波器}：从复杂信号中提取所需频率成分
+    \item \textbf{振荡器}：产生稳定的射频信号
+    \item \textbf{阻抗匹配}：在特定频率下实现最大功率传输
+\end{itemize}
+
+\section{磁棒材料汇总表}
+\label{sec:magnetic_rod_materials}
+
+磁棒是收音机中波天线的重要材料，选择合适的磁棒材料对接收性能至关重要。不同的磁棒材料具有不同的初始导磁率，适用于不同频率范围的接收。
+
+\subsection{磁棒材料分类}
+\label{sec:magnetic_materials_classification}
+
+常见的磁棒材料主要包括以下几类：
+
+\begin{itemize}
+    \item \textbf{MX系列（锰锌铁氧体）}：初始导磁率范围广（100-6000），适合中波和长波频段
+    \item \textbf{NXO系列（镍锌铁氧体）}：初始导磁率范围宽（10-5500），适合短波和FM频段
+    \item \textbf{R系列（低损耗铁氧体）}：具有低损耗特性，Q值高，适合对选择性要求较高的应用
+    \item \textbf{铁粉芯}：饱和磁通密度高，适合FM高频段
+    \item \textbf{坡莫合金}：极高导磁率（20000-100000），适合高性能应用
+\end{itemize}
+
+材料选择原则：
+\begin{itemize}
+    \item 中波（MW）：使用MX系列或NXO系列低频段材料
+    \item 短波（SW）：使用NXO系列高频段材料或MX系列低导磁率材料
+    \item 长波（LW）：使用MX系列或NXO系列高导磁率材料
+    \item FM：使用NXO系列低导磁率材料、铁粉芯或空心线圈
+\end{itemize}
+
+\subsection{磁棒材料特性说明}
+\label{sec:magnetic_materials_characteristics}
+
+\begin{itemize}
+  \item \textbf{导磁率}：表示材料对磁场的传导能力，越高则相同体积下可获得的电感量越大
+  \item \textbf{Q值}：品质因数，反映材料的损耗特性，越高则损耗越小，选择性越好
+  \item \textbf{频率特性}：不同材料适用于不同的频率范围，高频段需要低导磁率材料
+  \item \textbf{温度稳定性}：好的磁棒材料应具有较小的温度系数，以保证电路性能稳定
+  \item \textbf{尺寸规格}：常见磁棒尺寸有8×100mm、10×120mm、10×48mm等
+\end{itemize}
+
+\subsection{中波磁棒材料}
+\label{sec:mw_magnetic_materials}
+
+中波广播频段范围：530 kHz - 1600 kHz
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{波段} & \textbf{频率范围} & \textbf{推荐磁棒材料} & \textbf{初始导磁率} & \textbf{特性} \\
+\hline
+中波 & 530-1600 kHz & MX-100 & $\sim$100 & 低导磁率，适合高频段 \\
+ & & MX-150 & $\sim$150 & 低导磁率，适合高频段 \\
+ & & MX-200 & $\sim$200 & 低导磁率，适合高频段 \\
+ & & MX-300 & $\sim$300 & 中导磁率，适合中频段 \\
+ & & MX-400 & $\sim$400 & 中导磁率，适合低频段 \\
+ & & MX-600 & $\sim$600 & 中高导磁率，适合低频段 \\
+ & & MX-800 & $\sim$800 & 中高导磁率，适合低频段 \\
+ & & MX-1000 & $\sim$1000 & 高导磁率，适合低频段 \\
+ & & MX-1500 & $\sim$1500 & 高导磁率，适合低频段 \\
+ & & MX-1800 & $\sim$1800 & 高导磁率，适合低频段 \\
+ & & MX-2000 & $\sim$2000 & 高导磁率，适合低频段 \\
+ & & MX-2500 & $\sim$2500 & 超高导磁率，适合低频段 \\
+ & & MX-3000 & $\sim$3000 & 超高导磁率，适合低频段 \\
+ & & MX-3500 & $\sim$3500 & 超高导磁率，适合低频段 \\
+ & & MX-4000 & $\sim$4000 & 超高导磁率，适合低频段 \\
+ & & MX-5000 & $\sim$5000 & 超高导磁率，适合低频段 \\
+\hline
+中波 & 530-1600 kHz & NXO-40 & $\sim$40 & 低导磁率，适合高频段 \\
+ & & NXO-60 & $\sim$60 & 低导磁率，适合高频段 \\
+ & & NXO-100 & $\sim$100 & 低导磁率，适合高频段 \\
+ & & NXO-120 & $\sim$120 & 低导磁率，适合高频段 \\
+ & & NXO-150 & $\sim$150 & 低导磁率，适合高频段 \\
+ & & NXO-200 & $\sim$200 & 中导磁率，适合中频段 \\
+ & & NXO-250 & $\sim$250 & 中导磁率，适合中频段 \\
+ & & NXO-300 & $\sim$300 & 中导磁率，适合中频段 \\
+ & & NXO-400 & $\sim$400 & 中导磁率，适合低频段 \\
+ & & NXO-500 & $\sim$500 & 中高导磁率，适合低频段 \\
+ & & NXO-600 & $\sim$600 & 中高导磁率，适合低频段 \\
+ & & NXO-800 & $\sim$800 & 高导磁率，适合低频段 \\
+ & & NXO-1000 & $\sim$1000 & 高导磁率，适合低频段 \\
+ & & NXO-1200 & $\sim$1200 & 高导磁率，适合低频段 \\
+ & & NXO-1500 & $\sim$1500 & 高导磁率，适合低频段 \\
+ & & NXO-2000 & $\sim$2000 & 高导磁率，适合低频段 \\
+\hline
+中波 & 530-1600 kHz & R40C系列 & 40 & 低损耗，Q值高 \\
+ & & R60C系列 & 60 & 低损耗，Q值高 \\
+ & & R80C系列 & 80 & 低损耗，Q值高 \\
+ & & R100C系列 & 100 & 低损耗，Q值高 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{中波推荐材料}：
+\begin{itemize}
+    \item MX-400、MX-600、MX-800（中高频段）
+    \item MX-1000、MX-2000（中低频段）
+    \item NXO-200、NXO-400、NXO-600（中高频段）
+    \item NXO-1000、NXO-1500、NXO-2000（中低频段）
+    \item R60C、R80C（低损耗、高Q值应用）
+\end{itemize}
+
+\subsection{短波磁棒材料}
+\label{sec:sw_magnetic_materials}
+
+短波广播频段范围：2 MHz - 30 MHz
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{波段} & \textbf{频率范围} & \textbf{推荐磁棒材料} & \textbf{初始导磁率} & \textbf{特性} \\
+\hline
+短波 & 2-30 MHz & MX-20 & $\sim$20 & 极低导磁率，适合高频段 \\
+ & & MX-30 & $\sim$30 & 极低导磁率，适合高频段 \\
+ & & MX-40 & $\sim$40 & 低导磁率，适合高频段 \\
+ & & MX-50 & $\sim$50 & 极低导磁率，适合高频段 \\
+ & & MX-60 & $\sim$60 & 低导磁率，适合中频段 \\
+ & & MX-70 & $\sim$70 & 极低导磁率，适合高频段 \\
+ & & MX-80 & $\sim$80 & 低导磁率，适合中频段 \\
+ & & MX-90 & $\sim$90 & 低导磁率，适合高频段 \\
+ & & MX-100 & $\sim$100 & 低导磁率，适合中频段 \\
+ & & MX-110 & $\sim$110 & 低导磁率，适合中频段 \\
+ & & MX-120 & $\sim$120 & 低导磁率，适合中频段 \\
+ & & MX-130 & $\sim$130 & 低导磁率，适合中频段 \\
+ & & MX-170 & $\sim$170 & 低导磁率，适合中频段 \\
+ & & MX-200 & $\sim$200 & 中导磁率，适合低频段 \\
+ & & MX-230 & $\sim$230 & 中导磁率，适合低频段 \\
+ & & MX-270 & $\sim$270 & 中导磁率，适合低频段 \\
+ & & MX-330 & $\sim$330 & 中导磁率，适合低频段 \\
+ & & MX-370 & $\sim$370 & 中导磁率，适合低频段 \\
+ & & MX-400 & $\sim$400 & 中导磁率，适合低频段 \\
+ & & MX-430 & $\sim$430 & 中导磁率，适合低频段 \\
+ & & MX-470 & $\sim$470 & 中导磁率，适合低频段 \\
+ & & MX-530 & $\sim$530 & 中高导磁率，适合低频段 \\
+ & & MX-570 & $\sim$570 & 中高导磁率，适合低频段 \\
+ & & MX-630 & $\sim$630 & 中高导磁率，适合低频段 \\
+ & & MX-670 & $\sim$670 & 中高导磁率，适合低频段 \\
+ & & MX-730 & $\sim$730 & 中高导磁率，适合低频段 \\
+ & & MX-770 & $\sim$770 & 高导磁率，适合低频段 \\
+ & & MX-830 & $\sim$830 & 高导磁率，适合低频段 \\
+ & & MX-870 & $\sim$870 & 高导磁率，适合低频段 \\
+ & & MX-930 & $\sim$930 & 高导磁率，适合低频段 \\
+ & & MX-1000 & $\sim$1000 & 高导磁率，适合低频段 \\
+ & & MX-1100 & $\sim$1100 & 高导磁率，适合低频段 \\
+ & & MX-1300 & $\sim$1300 & 高导磁率，适合低频段 \\
+ & & MX-1600 & $\sim$1600 & 高导磁率，适合低频段 \\
+ & & MX-1900 & $\sim$1900 & 高导磁率，适合低频段 \\
+ & & MX-2100 & $\sim$2100 & 高导磁率，适合低频段 \\
+ & & MX-2400 & $\sim$2400 & 超高导磁率，适合低频段 \\
+ & & MX-2600 & $\sim$2600 & 超高导磁率，适合低频段 \\
+ & & MX-2900 & $\sim$2900 & 超高导磁率，适合低频段 \\
+ & & MX-3100 & $\sim$3100 & 超高导磁率，适合低频段 \\
+\hline
+短波 & 2-30 MHz & NXO-20 & $\sim$20 & 极低导磁率，适合高频段 \\
+ & & NXO-25 & $\sim$25 & 极低导磁率，适合高频段 \\
+ & & NXO-30 & $\sim$30 & 极低导磁率，适合高频段 \\
+ & & NXO-35 & $\sim$35 & 极低导磁率，适合高频段 \\
+ & & NXO-40 & $\sim$40 & 低导磁率，适合高频段 \\
+ & & NXO-50 & $\sim$50 & 低导磁率，适合高频段 \\
+ & & NXO-60 & $\sim$60 & 低导磁率，适合高频段 \\
+ & & NXO-70 & $\sim$70 & 低导磁率，适合中频段 \\
+ & & NXO-80 & $\sim$80 & 低导磁率，适合中频段 \\
+ & & NXO-90 & $\sim$90 & 低导磁率，适合中频段 \\
+ & & NXO-100 & $\sim$100 & 低导磁率，适合中频段 \\
+ & & NXO-120 & $\sim$120 & 低导磁率，适合中频段 \\
+ & & NXO-150 & $\sim$150 & 低导磁率，适合中频段 \\
+ & & NXO-180 & $\sim$180 & 低导磁率，适合中频段 \\
+ & & NXO-200 & $\sim$200 & 中导磁率，适合低频段 \\
+ & & NXO-250 & $\sim$250 & 中导磁率，适合低频段 \\
+ & & NXO-300 & $\sim$300 & 中导磁率，适合低频段 \\
+ & & NXO-350 & $\sim$350 & 中导磁率，适合低频段 \\
+ & & NXO-400 & $\sim$400 & 中导磁率，适合低频段 \\
+ & & NXO-450 & $\sim$450 & 中导磁率，适合低频段 \\
+ & & NXO-500 & $\sim$500 & 中高导磁率，适合低频段 \\
+ & & NXO-600 & $\sim$600 & 中高导磁率，适合低频段 \\
+ & & NXO-700 & $\sim$700 & 中高导磁率，适合低频段 \\
+ & & NXO-800 & $\sim$800 & 高导磁率，适合低频段 \\
+ & & NXO-900 & $\sim$900 & 高导磁率，适合低频段 \\
+ & & NXO-1000 & $\sim$1000 & 高导磁率，适合低频段 \\
+ & & NXO-1200 & $\sim$1200 & 高导磁率，适合低频段 \\
+ & & NXO-1500 & $\sim$1500 & 高导磁率，适合低频段 \\
+ & & NXO-2000 & $\sim$2000 & 高导磁率，适合低频段 \\
+\hline
+短波 & 2-30 MHz & 空心线圈 & - & 无磁芯，Q值最高 \\
+ & & R40C系列 & 40 & 低损耗，Q值高 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{短波推荐材料}：
+\begin{itemize}
+    \item NXO-20、NXO-40、NXO-60、NXO-80（高频段）
+    \item MX-20、MX-30、MX-40、MX-60（高频段）
+    \item 空心线圈（15 MHz以上高频段，Q值最高）
+    \item R40C（低损耗应用）
+\end{itemize}
+
+短波通常分为多个波段，每个波段使用不同的线圈：
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{波段} & \textbf{频率范围} & \textbf{电感量} & \textbf{匝数} \\
+\hline
+SW1 & 2-4 MHz & 80-120 $\mu$H & 40-60 匝 \\
+SW2 & 4-8 MHz & 30-50 $\mu$H & 20-30 匝 \\
+SW3 & 8-16 MHz & 10-20 $\mu$H & 10-15 匝 \\
+SW4 & 16-30 MHz & 3-8 $\mu$H & 5-8 匝 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{长波磁棒材料}
+\label{sec:lw_magnetic_materials}
+
+长波广播频段范围：150 kHz - 530 kHz
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{波段} & \textbf{频率范围} & \textbf{推荐磁棒材料} & \textbf{初始导磁率} & \textbf{特性} \\
+\hline
+长波 & 150-530 kHz & MX-100 & $\sim$100 & 低导磁率，适合高频段 \\
+ & & MX-200 & $\sim$200 & 中导磁率，适合中频段 \\
+ & & MX-300 & $\sim$300 & 中导磁率，适合中频段 \\
+ & & MX-500 & $\sim$500 & 中高导磁率，适合低频段 \\
+ & & MX-700 & $\sim$700 & 中高导磁率，适合低频段 \\
+ & & MX-900 & $\sim$900 & 高导磁率，适合低频段 \\
+ & & MX-1000 & $\sim$1000 & 高导磁率，适合低频段 \\
+ & & MX-1100 & $\sim$1100 & 高导磁率，适合低频段 \\
+ & & MX-1300 & $\sim$1300 & 高导磁率，适合低频段 \\
+ & & MX-1500 & $\sim$1500 & 高导磁率，适合低频段 \\
+ & & MX-2000 & $\sim$2000 & 高导磁率，适合低频段 \\
+ & & MX-3000 & $\sim$3000 & 超高导磁率，适合低频段 \\
+ & & MX-4000 & $\sim$4000 & 超高导磁率，适合低频段 \\
+ & & MX-4100 & $\sim$4100 & 超高导磁率，适合低频段 \\
+ & & MX-4300 & $\sim$4300 & 超高导磁率，适合低频段 \\
+ & & MX-4500 & $\sim$4500 & 超高导磁率，适合低频段 \\
+ & & MX-5000 & $\sim$5000 & 超高导磁率，适合低频段 \\
+ & & MX-6000 & $\sim$6000 & 超高导磁率，适合低频段 \\
+\hline
+长波 & 150-530 kHz & NXO-200 & $\sim$200 & 中导磁率，适合中频段 \\
+ & & NXO-300 & $\sim$300 & 中导磁率，适合中频段 \\
+ & & NXO-400 & $\sim$400 & 中导磁率，适合低频段 \\
+ & & NXO-500 & $\sim$500 & 中高导磁率，适合低频段 \\
+ & & NXO-600 & $\sim$600 & 中高导磁率，适合低频段 \\
+ & & NXO-700 & $\sim$700 & 中高导磁率，适合低频段 \\
+ & & NXO-800 & $\sim$800 & 高导磁率，适合低频段 \\
+ & & NXO-900 & $\sim$900 & 高导磁率，适合低频段 \\
+ & & NXO-1000 & $\sim$1000 & 高导磁率，适合低频段 \\
+ & & NXO-1200 & $\sim$1200 & 高导磁率，适合低频段 \\
+ & & NXO-1500 & $\sim$1500 & 高导磁率，适合低频段 \\
+ & & NXO-1600 & $\sim$1600 & 高导磁率，适合低频段 \\
+ & & NXO-1800 & $\sim$1800 & 高导磁率，适合低频段 \\
+ & & NXO-1900 & $\sim$1900 & 高导磁率，适合低频段 \\
+ & & NXO-2000 & $\sim$2000 & 高导磁率，适合低频段 \\
+ & & NXO-2500 & $\sim$2500 & 超高导磁率，适合低频段 \\
+ & & NXO-3000 & $\sim$3000 & 超高导磁率，适合低频段 \\
+ & & NXO-3500 & $\sim$3500 & 超高导磁率，适合低频段 \\
+ & & NXO-4000 & $\sim$4000 & 超高导磁率，适合低频段 \\
+ & & NXO-4500 & $\sim$4500 & 超高导磁率，适合低频段 \\
+ & & NXO-5000 & $\sim$5000 & 超高导磁率，适合低频段 \\
+ & & NXO-5500 & $\sim$5500 & 超高导磁率，适合低频段 \\
+\hline
+长波 & 150-530 kHz & 坡莫合金 & 20000-100000 & 极高导磁率，高性能 \\
+ & & 铁粉芯 & - & 饱和磁通密度高 \\
+ & & R80C系列 & 80 & 低损耗，Q值高 \\
+ & & R100C系列 & 100 & 低损耗，Q值高 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{长波推荐材料}：
+\begin{itemize}
+    \item MX-1000、MX-2000、MX-3000、MX-4000、MX-5000、MX-6000（高导磁率，适合低频段）
+    \item NXO-1000、NXO-2000、NXO-3000、NXO-4000、NXO-5000（高导磁率，适合低频段）
+    \item 坡莫合金（极高导磁率，高性能应用）
+    \item R80C、R100C（低损耗应用）
+\end{itemize}
+
+长波磁棒长度通常为150-200mm，直径10-15mm。
+
+\subsection{FM频段磁棒材料}
+\label{sec:fm_magnetic_materials}
+
+FM广播频段范围：87.5 MHz - 108 MHz
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{波段} & \textbf{频率范围} & \textbf{推荐磁棒材料} & \textbf{初始导磁率} & \textbf{特性} \\
+\hline
+FM & 87.5-108 MHz & 空心线圈 & - & 无磁芯，Q值最高，损耗最小 \\
+ & & MX-20 & $\sim$20 & 极低导磁率，适合高频段 \\
+ & & MX-30 & $\sim$30 & 极低导磁率，适合高频段 \\
+ & & MX-60 & $\sim$60 & 极低导磁率，适合高频段 \\
+ & & MX-80 & $\sim$80 & 极低导磁率，适合高频段 \\
+ & & MX-120 & $\sim$120 & 低导磁率，适合频段 \\
+ & & NXO-10 & $\sim$10 & 极低导磁率，适合高频段 \\
+ & & NXO-15 & $\sim$15 & 极低导磁率，适合高频段 \\
+ & & NXO-20 & $\sim$20 & 极低导磁率，适合高频段 \\
+ & & NXO-25 & $\sim$25 & 极低导磁率，适合高频段 \\
+ & & NXO-30 & $\sim$30 & 极低导磁率，适合高频段 \\
+ & & NXO-35 & $\sim$35 & 极低导磁率，适合高频段 \\
+ & & NXO-40 & $\sim$40 & 低导磁率，适合频段 \\
+ & & NXO-45 & $\sim$45 & 低导磁率，适合频段 \\
+ & & NXO-50 & $\sim$50 & 低导磁率，适合频段 \\
+ & & NXO-55 & $\sim$55 & 低导磁率，适合频段 \\
+ & & NXO-60 & $\sim$60 & 低导磁率，适合频段 \\
+ & & NXO-65 & $\sim$65 & 低导磁率，适合频段 \\
+ & & NXO-70 & $\sim$70 & 低导磁率，适合频段 \\
+ & & NXO-75 & $\sim$75 & 低导磁率，适合频段 \\
+ & & NXO-80 & $\sim$80 & 低导磁率，适合频段 \\
+ & & NXO-85 & $\sim$85 & 低导磁率，适合频段 \\
+ & & NXO-90 & $\sim$90 & 低导磁率，适合频段 \\
+ & & NXO-95 & $\sim$95 & 低导磁率，适合频段 \\
+ & & NXO-100 & $\sim$100 & 低导磁率，适合频段 \\
+\hline
+FM & 87.5-108 MHz & 铁粉芯 T-50-6 & - & 适合FM频段，损耗低 \\
+ & & 铁粉芯 T-68-6 & - & 适合FM频段，损耗低 \\
+ & & 铁粉芯 T-50-2 & - & 适合高频段 \\
+ & & 铁粉芯 T-68-2 & - & 适合高频段 \\
+ & & 镍锌铁氧体 43\# & - & 适合20-200 MHz，损耗较小 \\
+ & & 镍锌铁氧体 61\# & - & 适合高频段，损耗较小 \\
+ & & R30C系列 & 30 & 超低损耗，Q值高 \\
+ & & R40C系列 & 40 & 低损耗，Q值高 \\
+ & & R50C系列 & 50 & 低损耗，Q值高 \\
+ & & R60C系列 & 60 & 低损耗，Q值高 \\
+ & & R70C系列 & 70 & 低损耗，Q值高 \\
+ & & R80C系列 & 80 & 低损耗，Q值高 \\
+ & & R90C系列 & 90 & 低损耗，Q值高 \\
+ & & R100C系列 & 100 & 低损耗，Q值高 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{FM推荐材料}：
+\begin{itemize}
+    \item 空心线圈（Q值最高，损耗最小，适合高性能应用）
+    \item 镍锌铁氧体43\#（适合FM频段，损耗较小）
+    \item 铁粉芯T-50-6（成本低，适合一般应用）
+    \item MX-20、MX-30（极低导磁率，适合高频段）
+    \item NXO-10、NXO-20、NXO-40（极低导磁率，适合高频段）
+    \item R30C、R40C（低损耗、高Q值应用）
+\end{itemize}
+
+FM频段铁粉芯直径通常为6-10mm，长度10-15mm。
+
+\section{LC调谐电路}
+\label{sec:lc_tuning_circuits}
+
+LC调谐电路是最基本的调谐电路类型，利用电感和电容的谐振特性来实现频率选择。
+
+\subsection{串联LC电路}
+\label{sec:series_lc_circuit}
+
+串联LC电路由电感L和电容C串联组成。
+
+\textbf{电路特性}：
+\begin{itemize}
+    \item 谐振时阻抗最小，等于纯电阻R
+    \item 电流达到最大值
+    \item 常用于选频放大器和谐振放大器
+\end{itemize}
+
+串联谐振阻抗：
+\begin{equation}
+Z = R + j(\omega L - \frac{1}{\omega C})
+\end{equation}
+
+当$\omega L = \frac{1}{\omega C}$时，电路发生谐振。
+
+\subsection{并联LC电路}
+\label{sec:parallel_lc_circuit}
+
+并联LC电路由电感L和电容C并联组成。
+
+\textbf{电路特性}：
+\begin{itemize}
+    \item 谐振时阻抗最大
+    \item 总电流最小
+    \item 常用于收音机的输入回路和中频变压器
+\end{itemize}
+
+并联谐振阻抗：
+\begin{equation}
+Z = \frac{R + j\omega L}{\frac{1}{R} + j(\omega C - \frac{1}{\omega L})}
+\end{equation}
+
+当$\omega C = \frac{1}{\omega L}$时，电路发生谐振。
+
+\subsection{LC电路的设计}
+\label{sec:lc_circuit_design}
+
+LC调谐电路的设计需要考虑元件选择和参数计算。
+
+\textbf{可变电容器与线圈的匹配关系}：
+
+不同容量的可变电容器需要配合不同电感量的线圈，以实现所需的频率覆盖范围。谐振频率由公式\eqref{eq:resonance_frequency}决定。
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{可变电容器类型} & \textbf{容量范围} & \textbf{适用频率范围} & \textbf{配套线圈电感量} & \textbf{推荐电感值} & \textbf{应用场景} \\
+\hline
+小型薄膜电容器 & 5-30 pF & 87.5-108 MHz & 0.1-0.3 $\mu$H & 0.2 $\mu$H & FM收音机 \\
+中型薄膜电容器 & 30-150 pF & 2-30 MHz & 3-80 $\mu$H & 30 $\mu$H & 短波收音机 \\
+标准空气电容器 & 120-365 pF & 530-1600 kHz & 100-300 $\mu$H & 250 $\mu$H & 中波收音机 \\
+大型空气电容器 & 365-1000 pF & 150-530 kHz & 1-3 mH & 2 mH & 长波收音机 \\
+双联电容器 & 2×120-365 pF & 530-1600 kHz & 2×100-300 $\mu$H & 2×250 $\mu$H & AM收音机 \\
+三联电容器 & 3×120-365 pF & 530-1600 kHz & 3×100-300 $\mu$H & 3×250 $\mu$H & 多波段收音机 \\
+微调电容器 & 3-30 pF & 调整范围±5\% & - & - & 频率微调 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{频率覆盖计算示例}：
+
+以标准空气电容器（120-365 pF）为例：
+
+\begin{itemize}
+  \item 配合250 $\mu$H线圈：
+    \begin{itemize}
+      \item 最小容量（120 pF）：$ f_{max} = \frac{1}{2\pi\sqrt{250\times10^{-6} \times 120\times10^{-12}}} \approx 920 kHz $
+      \item 最大容量（365 pF）：$ f_{min} = \frac{1}{2\pi\sqrt{250\times10^{-6} \times 365\times10^{-12}}} \approx 525 kHz $
+      \item 覆盖范围：525-920 kHz（中波低频段）
+    \end{itemize}
+  \item 配合100 $\mu$H线圈：
+    \begin{itemize}
+      \item 最小容量（120 pF）：$ f_{max} \approx 1.45 MHz $
+      \item 最大容量（365 pF）：$ f_{min} \approx 830 kHz $
+      \item 覆盖范围：830-1450 kHz（中波高频段）
+    \end{itemize}
+\end{itemize}
+
+\section{晶体调谐电路}
+\label{sec:crystal_tuning_circuits}
+
+晶体（石英晶体）具有压电效应，利用晶体的固有频率特性可以实现高稳定度的频率选择。
+
+\subsection{晶体振荡器原理}
+\label{sec:crystal_oscillator_principle}
+
+石英晶体具有压电效应，当在晶体两端施加电压时，晶体会产生机械振动；反之，机械振动会在晶体两端产生电压。晶体的固有振动频率非常稳定，Q值可达数万甚至数十万。
+
+晶体的等效电路为一个串联谐振电路与一个电容并联：
+
+\begin{itemize}
+    \item $C_m$：动态电容（等效串联电容）
+    \item $L_m$：动态电感（等效串联电感）
+    \item $R_m$：动态电阻（等效串联电阻）
+    \item $C_0$：静态电容（晶体两极间的电容）
+\end{itemize}
+
+晶体的谐振频率：
+\begin{equation}
+f_s = \frac{1}{2\pi\sqrt{L_m C_m}} \quad \text{（串联谐振频率）}
+\end{equation}
+\begin{equation}
+f_p = \frac{1}{2\pi\sqrt{L_m \frac{C_m C_0}{C_m + C_0}}} \quad \text{（并联谐振频率）}
+\end{equation}
+
+其中$f_p > f_s$，两者之差取决于$C_0/C_m$的比值。
+
+\subsection{晶体的特性}
+\label{sec:crystal_characteristics}
+
+晶体的主要特性包括：
+
+\begin{itemize}
+    \item \textbf{极高的Q值}：可达10,000-100,000，比LC谐振回路高几个数量级
+    \item \textbf{极好的频率稳定性}：温度系数可低至$\pm10\times10^{-6}$/℃
+    \item \textbf{低损耗}：动态电阻$R_m$很小
+    \item \textbf{频率准确度}：可达$\pm10\times10^{-6}$或更高
+\end{itemize}
+
+晶体的主要缺点是只能工作在很窄的频率范围内，且频率不可调。
+
+\subsection{晶体调谐电路设计}
+\label{sec:crystal_circuit_design}
+
+晶体振荡器电路主要有两种类型：
+
+\textbf{串联型晶体振荡器}：
+\begin{itemize}
+    \item 晶体工作在串联谐振频率$f_s$附近
+    \item 此时晶体阻抗最小，正反馈最强
+    \item 频率由晶体串联谐振频率决定
+\end{itemize}
+
+\textbf{并联型晶体振荡器}：
+\begin{itemize}
+    \item 晶体工作在$f_s$和$f_p$之间
+    \item 晶体呈现感性，与外部电容形成并联谐振
+    \item 频率由晶体和负载电容共同决定
+\end{itemize}
+
+设计注意事项：
+\begin{itemize}
+    \item 选择合适的晶体频率和负载电容
+    \item 注意晶体的激励功率不能过大
+    \item 考虑温度对频率的影响
+    \item 必要时采用温度补偿措施
+\end{itemize}
+
+\section{现代调谐系统}
+\label{sec:modern_tuning_systems}
+
+随着电子技术的发展，传统的LC调谐和晶体调谐逐渐被更为先进的锁相环调谐和数字调谐技术所取代。
+
+\subsection{锁相环调谐系统}
+\label{sec:pll_tuning_system}
+
+锁相环（Phase Locked Loop, PLL）是一种反馈控制系统，可以产生与参考频率同步的高稳定度输出信号。
+
+\textbf{PLL的基本组成}：
+\begin{itemize}
+    \item \textbf{鉴相器（PD）}：比较参考信号与VCO输出信号的相位差
+    \item \textbf{低通滤波器（LPF）}：滤除鉴相器输出的高频成分
+    \item \textbf{压控振荡器（VCO）}：输出频率随控制电压变化
+    \item \textbf{分频器}：将VCO输出分频后送回鉴相器
+\end{itemize}
+
+PLL的工作原理：
+\begin{enumerate}
+    \item 鉴相器检测参考信号与反馈信号的相位差
+    \item 鉴相器输出与相位差成正比的电压信号
+    \item 低通滤波器平滑鉴相器输出
+    \item VCO根据控制电压调整输出频率
+    \item 当系统锁定时，VCO输出频率为参考频率的N倍（N为分频比）
+\end{enumerate}
+
+PLL调谐系统的优点：
+\begin{itemize}
+    \item 频率稳定度高（取决于参考源）
+    \item 可以实现精确的频率步进
+    \item 易于与微处理器接口实现数字化控制
+    \item 可以同时提供多个频率输出
+\end{itemize}
+
+PLL调谐系统的应用：
+\begin{itemize}
+    \item 通信接收机的本振信号源
+    \item 频率合成器
+    \item 电视和广播接收机
+    \item 测量仪器
+\end{itemize}
+
+\subsection{数字调谐系统}
+\label{sec:digital_tuning_system}
+
+数字调谐系统采用数字信号处理技术实现频率选择和信号解调。
+
+\textbf{直接数字频率合成（DDS）}：
+
+DDS是一种数字合成技术，可以直接产生频率可调的模拟信号。
+
+DDS的基本原理：
+\begin{enumerate}
+    \item 频率控制字决定输出频率：$f_{out} = \frac{f_{clock} \times K}{2^N}$
+    \item 相位累加器根据频率控制字累加相位
+    \item 相位-幅度转换器将相位转换为幅度
+    \item 数模转换器将数字幅度转换为模拟信号
+\end{enumerate}
+
+其中：
+\begin{itemize}
+    \item $f_{clock}$：时钟频率
+    \item $K$：频率控制字
+    \item $N$：相位累加器位数
+\end{itemize}
+
+DDS的优点：
+\begin{itemize}
+    \item 频率分辨率极高（可达毫赫兹级）
+    \item 频率切换速度快
+    \item 频率、相位、幅度可以独立控制
+    \item 全数字化，易于集成
+\end{itemize}
+
+DDS的缺点：
+\begin{itemize}
+    \item 输出频率上限受时钟频率限制
+    \item 输出信号中存在杂散分量
+    \item 对时钟信号的相位噪声要求较高
+\end{itemize}
+
+数字调谐系统的应用：
+\begin{itemize}
+    \item 软件定义无线电（SDR）
+    \item 数字广播接收机
+    \item 频率合成器
+    \item 信号源和测量仪器
+\end{itemize}
+
+\section{收音机调谐电路应用}
+\label{sec:radio_tuning_applications}
+
+调谐电路在收音机中有着广泛的应用，根据不同波段和接收要求采用不同的调谐方案。
+
+\subsection{中波调谐}
+\label{sec:mw_tuning_application}
+
+中波广播频段通常为530 kHz至1600 kHz，使用LC调谐电路进行选频。调谐回路由可变电容器和固定电感组成，通过改变可变电容器的容量来选择不同的广播频率。
+
+\textbf{中波线圈的制作方法}：
+
+\subparagraph{材料选择}：
+\begin{itemize}
+  \item \textbf{导线}：单股或多股漆包线（如0.1mm或7×0.08mm），中波频率下趋肤效应较为明显，采用多股线可有效减小趋肤效应带来的导体损耗
+  \item \textbf{磁芯}：通常使用铁氧体磁棒，推荐材料包括MX-400、MX-600、MX-800（中频段）；MX-1000、MX-1200、MX-1500（中低频段）；R60C、R80C（低损耗、高Q值应用）；MXO-400、MXO-2000（特殊应用）；R400、R800（高Q值应用）
+    \begin{itemize}
+        \item 磁棒长度一般为100-150mm，直径8-10mm
+    \end{itemize}
+  \item \textbf{骨架}：塑料或纸质骨架，长度略短于磁芯
+  \item \textbf{绝缘材料}：绝缘纸或胶带，用于层间绝缘
+\end{itemize}
+
+\subparagraph{绕制参数}：
+中波线圈的电感量通常在100-300 $\mu$H之间：
+\begin{itemize}
+    \item 使用100mm长、8mm直径的铁氧体磁棒
+    \item 线圈匝数：约80-120匝
+    \item 导线直径：0.1mm左右
+\end{itemize}
+
+\subparagraph{绕制步骤}：
+\begin{enumerate}
+    \item \textbf{准备磁芯和骨架}：将磁芯插入骨架中
+    \item \textbf{绕制线圈}：从骨架一端开始，紧密均匀地绕制漆包线
+    \item \textbf{引出线处理}：两端留出足够长度的引出线，去除漆皮并上锡
+    \item \textbf{固定线圈}：使用胶带将线圈固定在骨架上
+\end{enumerate}
+
+\subparagraph{调谐范围}：
+使用250 $\mu$H线圈配合365 pF可变电容器：
+\begin{itemize}
+    \item 覆盖频率范围：约530 kHz至1600 kHz
+    \item 适合大多数中波广播频段
+\end{itemize}
+
+\subsection{短波调谐}
+\label{sec:sw_tuning_application}
+
+短波广播频段通常为2 MHz至30 MHz，同样使用LC调谐电路。由于短波频率范围较宽，通常采用多波段设计，每个波段使用不同的电感线圈，以获得更好的调谐性能。
+
+\textbf{短波线圈的制作方法}：
+
+\subparagraph{材料选择}：
+\begin{itemize}
+  \item \textbf{导线}：单股漆包线（如0.08-0.1mm），短波中低频段趋肤效应影响较小；对于15MHz以上的高频段，推荐使用多股利兹线以进一步降低趋肤效应损耗
+  \item \textbf{磁芯}：可使用铁氧体磁棒或空心线圈，推荐材料包括NXO-40、NXO-60、NXO-80（高频段）；空心线圈（15MHz以上高频段，Q值最高）；R40C（低损耗应用）
+    \begin{itemize}
+        \item 磁棒长度通常为50-80mm，直径6-8mm
+    \end{itemize}
+  \item \textbf{骨架}：塑料或纸质骨架，直径较小
+\end{itemize}
+
+\subparagraph{多波段设计}：
+短波通常分为多个波段，每个波段使用不同的线圈，具体参数见上表（节\ref{sec:sw_magnetic_materials}）。
+
+\subparagraph{绕制方法}：
+\begin{enumerate}
+    \item \textbf{波段切换}：使用波段开关切换不同的线圈或抽头
+    \item \textbf{线圈绕制}：
+    \begin{itemize}
+        \item 每个波段单独绕制线圈
+        \item 或在同一骨架上绕制多个线圈，通过抽头切换
+        \item 保持绕线紧密均匀
+    \end{itemize}
+    \item \textbf{屏蔽措施}：短波容易受到干扰，可考虑添加屏蔽罩
+\end{enumerate}
+
+\subparagraph{调谐范围}：
+\begin{itemize}
+    \item 每个波段使用365 pF可变电容器
+    \item 覆盖相应的短波频率范围
+    \item 多波段设计可覆盖整个2-30 MHz短波频段
+\end{itemize}
+
+\subparagraph{屏蔽措施}：
+短波容易受到干扰，可考虑添加屏蔽罩以减少外部干扰。
+
+\subsection{长波调谐}
+\label{sec:lw_tuning_application}
+
+长波广播频段通常为150 kHz至530 kHz，是AM广播的一部分。长波收音机使用的调谐方式主要是LC调谐电路，但与中波和短波相比有其特点：
+
+\begin{itemize}
+  \item \textbf{电感线圈}：长波频率低，需要更大的电感线圈，通常采用多股线绕制，以减少趋肤效应的影响
+  \item \textbf{可变电容器}：长波调谐需要较大容量的可变电容器，通常使用空气可变电容器或大容量的薄膜可变电容器
+  \item \textbf{调谐回路设计}：长波调谐回路的Q值通常较低，需要更宽的带宽来接收足够的信号能量
+  \item \textbf{天线设计}：长波收音机通常需要更长的天线，以提高接收效率
+\end{itemize}
+
+\textbf{长波线圈的制作方法}：
+
+\subparagraph{材料选择}：
+\begin{itemize}
+  \item \textbf{导线}：多股漆包线（如7×0.1mm或10×0.1mm），以减少趋肤效应，提高效率
+  \item \textbf{磁芯}：对于长波，通常使用高导磁率的磁芯，推荐材料包括MX-2000、MX-3000、MX-4000、MX-5000（高导磁率，适合低频段）；坡莫合金（极高导磁率，高性能应用）；R80C、R100C（低损耗应用）
+  \item \textbf{骨架}：绝缘材料制成的线圈骨架，如塑料或纸质骨架
+\end{itemize}
+
+\subparagraph{绕制步骤}：
+\begin{enumerate}
+    \item \textbf{计算线圈参数}：根据所需的电感量和频率范围，计算线圈的匝数和尺寸。长波线圈的电感量通常在几百微亨到几毫亨之间
+    \item \textbf{准备骨架}：如果使用磁芯，将磁芯插入骨架中；如果是空心线圈，直接使用空心骨架
+    \item \textbf{绕制线圈}：
+    \begin{itemize}
+        \item 从骨架的一端开始，将多股漆包线整齐地绕在骨架上
+        \item 保持绕线的紧密和均匀，避免交叉或重叠
+        \item 每绕完一层，可使用绝缘纸或胶带进行层间绝缘
+        \item 根据计算的匝数完成绕制
+    \end{itemize}
+    \item \textbf{引出线处理}：在线圈的两端留出足够长度的引出线，去除漆皮并上锡，以便与电路连接
+    \item \textbf{固定和封装}：使用胶带或热缩管将线圈固定在骨架上，确保线圈在使用过程中不会松动
+\end{enumerate}
+
+\subparagraph{绕制参数}：
+长波线圈的电感量通常在几百微亨到几毫亨之间：
+\begin{itemize}
+    \item 磁棒长度通常为150-200mm，直径10-15mm
+    \item 匝数根据所需的电感量确定
+\end{itemize}
+
+\subparagraph{注意事项}：
+\begin{itemize}
+    \item \textbf{绕线质量}：绕线的均匀性和紧密性直接影响线圈的性能，应尽量保持一致
+    \item \textbf{绝缘处理}：层间绝缘和引出线的绝缘处理要做好，避免短路或漏电
+    \item \textbf{磁芯选择}：不同的磁芯材料对频率的响应不同，应选择适合长波频率的磁芯
+    \item \textbf{线圈屏蔽}：为减少外部干扰，长波线圈可考虑添加屏蔽罩，但要注意屏蔽罩对线圈电感量的影响
+    \item \textbf{测试调整}：绕制完成后，使用电感表测量实际电感量，并根据需要调整匝数以达到设计要求
+\end{itemize}
+
+\subparagraph{示例电路}：
+一个典型的长波调谐回路电路如下：
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{元件} & \textbf{参数} & \textbf{说明} \\
+\hline
+L1 & 1 mH & 长波线圈 \\
+C1 & 120-365 pF & 空气可变电容器 \\
+C2 & 1000 pF & 耦合电容 \\
+R1 & 1 M$\Omega$ & 阻尼电阻 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{工作原理}：
+\begin{enumerate}
+    \item \textbf{调谐原理}：长波线圈L1与可变电容器C1组成并联谐振回路，其谐振频率由公式 $f = \frac{1}{2\pi\sqrt{LC}}$ 决定。通过调节C1的容量，可以改变谐振频率，从而选择不同的长波广播信号
+    \item \textbf{信号耦合}：C2作为耦合电容，将调谐回路选择的信号耦合到后续的放大电路，同时隔离直流分量
+    \item \textbf{阻尼电阻}：R1作为阻尼电阻，用于调整调谐回路的Q值，防止回路Q值过高导致的选择性过窄，同时提高回路的稳定性
+\end{enumerate}
+
+\subparagraph{频率覆盖计算}：
+\begin{itemize}
+  \item 使用1 mH线圈配合365 pF可变电容器：
+    \begin{itemize}
+      \item 最大容量（365 pF）时：$ f_{min} \approx 265 kHz $
+      \item 最小容量（120 pF）时：$ f_{max} \approx 460 kHz $
+    \end{itemize}
+  \item 若需要覆盖更低的频率（如150 kHz），可：
+    \begin{itemize}
+      \item 增加线圈电感量至约3 mH，配合365 pF可变电容器：$ f_{min} = \frac{1}{2\pi\sqrt{3\times10^{-3} \times 365\times10^{-12}}} \approx 153 \text{ kHz} $
+      \item 或使用更大容量的可变电容器（如1000 pF），配合1 mH线圈：$ f_{min} = \frac{1}{2\pi\sqrt{1\times10^{-3} \times 1000\times10^{-12}}} \approx 159 \text{ kHz} $
+    \end{itemize}
+\end{itemize}
+
+\subparagraph{实际应用考虑}：
+\begin{itemize}
+    \item \textbf{天线耦合}：长波信号较弱，通常需要通过天线线圈与调谐回路进行耦合，以提高信号强度。天线线圈与调谐线圈之间的耦合度应适当，避免过耦合导致的选择性下降
+    \item \textbf{前端放大}：由于长波信号较弱，调谐回路后通常需要添加低噪声放大器，以提高信号的信噪比
+    \item \textbf{温度稳定性}：长波线圈的电感量会受温度影响，应选择温度系数小的材料制作线圈骨架和磁芯，以提高电路的温度稳定性
+    \item \textbf{屏蔽措施}：为减少外部电磁干扰，调谐回路应尽量安装在金属屏蔽盒内，屏蔽盒接地
+\end{itemize}
+
+\subsection{FM调谐}
+\label{sec:fm_tuning_application}
+
+FM广播频段通常为87.5 MHz至108 MHz，使用LC调谐电路进行选频。由于频率较高，FM调谐电路与AM调谐电路有所不同。
+
+\textbf{FM线圈的制作方法}：
+
+\subparagraph{材料选择}：
+\begin{itemize}
+  \item \textbf{导线}：单股漆包线（如0.08-0.1mm），FM频率很高，需要细导线
+  \item \textbf{磁芯}：通常使用铁粉芯或空心线圈，推荐材料包括空心线圈（Q值最高，损耗最小）；镍锌铁氧体43\#（适合FM频段，损耗较小）；铁粉芯T-50-6（成本低，适合一般应用）
+  \item \textbf{骨架}：塑料骨架，直径较小（如5-10mm）
+  \item \textbf{绝缘材料}：绝缘纸或胶带，用于层间绝缘
+\end{itemize}
+
+\subparagraph{线圈参数}：
+FM线圈的电感量很小，通常在0.1-0.5 $\mu$H之间：
+\begin{itemize}
+    \item 使用0.1mm漆包线
+    \item 线圈匝数：3-8匝
+    \item 骨架直径：8mm左右
+    \item 线圈长度：5-10mm
+\end{itemize}
+
+\subparagraph{绕制方法}：
+\begin{enumerate}
+    \item \textbf{空心线圈}：直接在骨架上绕制3-8匝
+    \item \textbf{铁粉芯线圈}：在铁粉芯上绕制更少的匝数
+    \item \textbf{微调电容}：FM调谐通常需要并联微调电容（5-10 pF）进行精确调谐
+    \item \textbf{屏蔽措施}：FM容易受到干扰，必须添加金属屏蔽罩
+\end{enumerate}
+
+\subparagraph{设计特点}：
+\begin{itemize}
+    \item FM频率高，铁氧体磁芯损耗较大
+    \item 空心线圈是最常用的方案，Q值最高
+    \item 铁粉芯直径通常为6-10mm，长度10-15mm
+\end{itemize}
+
+\subparagraph{调谐电路}：
+FM调谐回路通常由：
+\begin{itemize}
+    \item FM线圈（0.2-0.3 $\mu$H）
+    \item 可变电容器（10-30 pF）
+    \item 微调电容（5-10 pF）
+    \item 耦合电容（1-5 pF）
+\end{itemize}
+覆盖频率范围：87.5 MHz至108 MHz
+
+\subparagraph{调谐方式}：
+\begin{itemize}
+    \item 使用微调电感（可调空心线圈）进行频率微调
+    \item 或使用可变电容器配合空心线圈
+    \item 调整范围通常为±5\%
+\end{itemize}
+
+FM调谐电路的设计要点：
+\begin{itemize}
+    \item 注意减小寄生电容的影响
+    \item 做好屏蔽和接地
+    \item 注意元件的高频特性
+    \item 选择低损耗的元件和材料
+\end{itemize}
