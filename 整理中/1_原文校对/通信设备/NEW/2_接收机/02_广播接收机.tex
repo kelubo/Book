@@ -12,7 +12,18 @@
 % │   ├── \subsection{矿石检波器原理}
 % │   ├── \subsection{单回路矿石收音机}
 % │   ├── \subsection{多回路矿石收音机}
-% │   └── \subsection{矿石收音机制作实践}
+% │   ├── \subsection{矿石收音机制作实践}
+% │   └── \section{Lyonodyne-17 矿石收音机}
+% │       ├── \subsection{设计原理}
+% │       ├── \subsection{Tuggle 前端}
+% │       ├── \subsection{电路详情}
+% │       ├── \subsection{天线系统}
+% │       ├── \subsection{关键元件}
+% │       ├── \subsection{性能参数}
+% │       ├── \subsection{比赛成绩}
+% │       ├── \subsection{技术要点}
+% │       ├── \subsection{历史背景}
+% │       └── \subsection{参考资料}
 % ├── \section{电子管收音机}
 % │   ├── \subsection{电子管收音机概述}
 % │   ├── \subsection{电子管放大电路}
@@ -50,7 +61,17 @@
 \subsection{矿石收音机基础}
 \label{sec:crystal_radio_fundamentals}
 
-矿石收音机是最早期的无线电接收装置，无需外接电源即可工作。其性能的优劣很大程度上取决于天线和接地装置的设计与安装。
+矿石收音机是最早期的无线电接收装置，无需外接电源即可工作。其性能的优劣很大程度上取决于天线和接地装置的设计与安装，以及调谐电路的品质因数（Q值）等关键参数。
+
+\subsubsection*{关键概念}
+\label{subsubsec:crystal_radio_key_concepts}
+
+\begin{description}
+    \item[Q值] 品质因数，反映调谐电路的选择性和能量损耗特性。Q值越高，选择性越好，但带宽越窄。高Q值线圈是高性能矿石收音机的核心元件。
+    \item[L/C比] 电感与电容的比值，影响电路特性。Lyonodyne-17 等高级矿石收音机采用低 L/C 比设计，配合高Q值元件提高性能。
+    \item[利兹线] 多股绝缘线绞合而成，用于减少高频集肤效应损耗，提高线圈Q值。常见规格如 660/46（660股，每股直径0.046mm）。
+    \item[松耦合] 初级和次级线圈间的弱耦合方式，通过物理距离控制耦合程度，提高选择性并减少相互影响。
+\end{description}
 
 \subsubsection*{天线和接地的重要性}
 \label{subsubsec:antenna_ground_importance}
@@ -161,6 +182,8 @@
 \label{sec:crystal_radio_practice}
 
 % 内容待补充
+
+\input{Lyonodyne-17/Lyonodyne-17.tex}
 
 \section{电子管收音机}
 \label{sec:tube_radio}
