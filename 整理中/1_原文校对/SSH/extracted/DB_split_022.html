@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_42"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos146899" class="calibre7"></a>1.4.1 Secure Remote Logins </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos147057" class="calibre15"></a>Suppose you have login accounts on several computers on the Internet. Common programs like <span><em class="italic">telnet</em></span> let you log into one computer from another, say, from your home PC to your web hosting provider, or from one office computer to another. Unfortunately, <span><em class="italic">telnet</em></span> and similar programs transmit your username and password in plain text over the Internet, where a malicious third party can intercept them.<sup class="calibre20">[<a id="filepos147646" shape="rect" href="DB_split_027.html#filepos164423" class="calibre6">4</a>]</sup> Additionally, your entire <span><em class="italic">telnet</em></span> session is readable by a network snooper. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Terminology: Networking</h3>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Local computer ( local host, local machine)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A computer on which you are logged in and, typically, running an SSH client. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Remote computer (remote host, remote machine)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A second computer you connect to via your local computer. Typically, the remote computer is running an SSH server and is accessed via an SSH client. As a degenerate case, the local and remote computers can be the same machine. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Local user</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A user logged into a local computer.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Remote user</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A user logged into a remote computer.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Server</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">An SSH server program.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Server machine</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A computer running an SSH server program. We sometimes simply write "server" for the server machine when the context makes clear (or irrelevant) the distinction between the running SSH server program and its host machine. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Client</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">An SSH client program.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Client machine</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A computer running an SSH client. As with the server terminology, we simply write "client" when the context makes the meaning clear. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">~ or $HOME</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A user's home directory on a Unix machine, particularly when used in a file path such as ~/<em class="italic"><code class="calibre35">filename</code></em>. Most shells recognize ~ as a user's home directory, with the notable exception of the Bourne shell. <span><em class="italic">$HOME</em></span> is recognized by all shells. </div>
+</blockquote>
+</div>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">SSH completely avoids these problems. Rather than running the insecure <span><em class="italic">telnet</em></span> program, you run the SSH client program <span><em class="italic">ssh</em></span>. To log into an account with the username smith on the remote computer <span><em class="italic">host.example.com</em></span>, use this command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -l smith host.example.com</tt></div></span><p class="calibre4">The client authenticates you to the remote computer's SSH server using an encrypted connection, meaning that your username and password are encrypted before they leave the local machine. The SSH server then logs you in, and your entire login session is encrypted as it travels between client and server. Because the encryption is transparent, you won't notice any differences between <span><em class="italic">telnet</em></span> and the <span><em class="italic">telnet</em></span>-like SSH client. </p>
+</div>
+</body>
+</html>

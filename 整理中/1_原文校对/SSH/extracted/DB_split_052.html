@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos248100" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_81"><span class="calibre2"><a shape="rect" class="calibre7"></a>The SSH Agent </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos248446" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos248485" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos248524" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos248563" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos248602" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos248641" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos248680" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos248719" class="calibre15"></a>Each time you run <span><em class="italic">ssh</em></span> or <span><em class="italic">scp</em></span> with public-key authentication, you have to retype your passphrase. The first few times you might not mind, but eventually this retyping gets annoying. Wouldn't it be nicer to identify yourself just once and have <span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span> remember your identity until further notice (for example, until you log out), not prompting for your passphrase? In fact, this is just what an <span><em class="italic">SSH agent</em></span> does for you. </p>
+<p class="calibre4">An agent is a program that keeps private keys in memory and provides authentication services to SSH clients. If you preload an agent with private keys at the beginning of a login session, your SSH clients won't prompt for passphrases. Instead, they communicate with the agent as needed. The effects of the agent last until you terminate the agent, usually just before logging out. The agent program for both OpenSSH and Tectia is called <span><em class="italic">ssh-agent.</em></span></p>
+<p class="calibre4">Generally, you run a single <span><em class="italic">ssh-agent</em></span> in your local login session, before running any SSH clients. You can run the agent by hand, but people usually edit their login files (for example, <em class="italic">~/.login</em> or <em class="italic">~/.xsession</em>) to run the agent automatically. SSH clients communicate with the agent via a local socket or named pipe whose filename is stored in an environment variable, so all clients (and all other processes) within your login session have access to the agent. <a shape="rect" href="DB_split_203.html#filepos1366708" class="calibre6">[6.3.4]</a> To try the agent, type: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-agent $SHELL</tt></div></span><p class="calibre4">where <code class="calibre35">SHELL</code> is the environment variable containing the name of your login shell. Alternatively, you could supply the name of any other shell, such as <span><em class="italic">sh</em></span>, <span><em class="italic">bash</em></span>, <span><em class="italic">csh</em></span>, <span><em class="italic">tcsh</em></span>, or <span><em class="italic">ksh</em></span>. The agent runs and then invokes the given shell as a child process. The visual effect is simply that another shell prompt appears, but this shell has access to the agent. </p>
+<p class="calibre4">Once the agent is running, it's time to load private keys into it using the <span><em class="italic">ssh-add</em></span> program. By default, <span><em class="italic">ssh-add</em></span> loads the key from your default identity file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-add<br class="calibre19"/>    Enter passphrase for /home/you/.ssh/id_dsa: <strong class="calibre45"><code class="calibre35">********</code></strong><br class="calibre19"/>    Identity added: /home/you/.ssh/id_dsa (/home/you/.ssh/id_dsa)</tt></div></span><p class="calibre4">Now <span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span> can connect to remote hosts without prompting for your passphrase. <a shape="rect" href="#filepos254138" class="calibre6">Figure 2-3</a> shows the process. </p>
+<p class="calibre4"><span><em class="italic">ssh-add</em></span> reads the passphrase from your terminal by default or, optionally, from standard input noninteractively. Otherwise, if you are running the X Window System with the <code class="calibre35">DISPLAY</code> environment variable set, and standard input isn't a terminal, <span><em class="italic">ssh-add</em></span> reads your passphrase using a graphical X program, <span><em class="italic">ssh-askpass</em></span>. This behavior is useful when calling <span><em class="italic">ssh-add</em></span> from X session setup scripts. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">To force <span><em class="italic">ssh-add</em></span> to use X to read the passphrase, type <span><em class="italic">ssh-add &lt; /dev/null</em></span> at a command line. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos254138" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="How the SSH agent works" src="images/00007.jpg" class="calibre47"/></div>
+</div>
+</span><p class="calibre4">Figure 2-3. How the SSH agent works</p></div>
+<p class="calibre4"><span><em class="italic">ssh-add</em></span> has further capabilities and can operate with multiple identity files. <a shape="rect" href="DB_split_202.html#filepos1338539" class="calibre6">[6.3.3]</a> For now, here are a few useful commands. To load a key other than your default identity into the agent, provide the filename as an argument to <span><em class="italic">ssh-add</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-add my-other-key-file</tt></div></span><p class="calibre4">You can also list the keys<a shape="rect" class="calibre15"></a><a id="filepos255241" class="calibre15"></a> the agent currently holds: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-add -l</tt></div></span><p class="calibre4">delete a key from the agent in memory:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-add -d <em class="italic"><code class="calibre35">name-of-key-file</code></em></tt></div></span><p class="calibre4">or delete all keys from the agent in memory:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-add -D</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">When running an SSH agent, don't leave your terminal unattended while logged in<span><em class="italic">.</em></span> While your private keys are loaded in an agent, anyone may use your terminal to connect to any remote accounts accessible via those keys, without needing your passphrase! Even worse, a sophisticated intruder can extract your keys from the running agent and steal them. </p>
+<p class="calibre4">If you use an agent, make sure to lock your terminal if you leave it while logged in. You can also use <span><em class="italic">ssh-add -D</em></span> to clear your loaded keys and reload them when you return. In addition, <span><em class="italic">ssh-agent</em></span> can be "locked" by <span><em class="italic">ssh-add</em></span>, to protect the agent from unauthorized users. <a shape="rect" href="DB_split_202.html#filepos1338539" class="calibre6">[6.3.3]</a></p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>  </body>
+</html>

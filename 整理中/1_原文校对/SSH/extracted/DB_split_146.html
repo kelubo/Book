@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_202"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos787068" class="calibre7"></a>5.3.1 File Locations </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><span><em class="italic">sshd</em></span> expects certain files to exist, containing the server's host key, the random seed, and other data. The server looks for these files in default locations, or you may override them with keywords and command-line options as described later. </p>
+<p class="calibre4">Although you may place these files anywhere you like, we strongly recommend keeping them on a local disk on your server machine, not on a remotely mounted disk (e.g., via NFS). This is for security reasons, as NFS will gleefully transmit your sensitive files unencrypted across the network. This would be especially disastrous for the unencrypted private host key! </p>
+<p class="calibre4">As a running example, we use an invented directory, <em class="italic">/usr/local/ssh</em>, as our preferred (nondefault) location for the SSH server's files. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos788375" class="calibre7"></a>5.3.1.1 Host key files </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos788462" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos788500" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos788538" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos788576" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos788673" class="calibre15"></a>The host key of <span><em class="italic">sshd</em></span> uniquely identifies a server to SSH clients. The host key is stored in a pair of files, one containing the private key and the other the public key. OpenSSH has distinct host keys in DSA (<em class="italic">/etc/ssh/ssh_host_dsa_key</em>) and RSA (<em class="italic">/etc/ssh/ssh_host_rsa_key</em>) formats, as well as a legacy SSH-1 protocol key, <em class="italic">/etc/ssh/ssh_host_key.</em> These private keys are readable only by privileged programs such as the SSH server and clients. Their locations may be changed with the <code class="calibre35">HostKey</code> keyword:<sup class="calibre20">[<a id="filepos789422" shape="rect" href="DB_split_153.html#filepos926671" class="calibre6">49</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    HostKey /usr/local/ssh/my_dsa_key<br class="calibre19"/>    HostKey /usr/local/ssh/my_rsa_key<br class="calibre19"/>    HostKey /usr/local/ssh/my_old_ssh1_key</tt></div></span><p class="calibre4">Each private key has a corresponding public key, stored in a second file with the same name but with <span><em class="italic">.pub</em></span> appended. So, in the above example, the public keys would be <em class="italic">/usr/local/ssh/my_dsa_key.pub</em>, <em class="italic">/usr/local/ssh/my_rsa_key.pub</em>, and <em class="italic">/usr/local/ssh/my_old_ssh1_key.pub.</em></p>
+<p class="calibre4">For Tectia, the default private key file is <em class="italic">/etc/ssh2/hostkey</em> if the server is run by the superuser or <em class="italic">~/.ssh2/hostkey</em> if run by any other user. To specify a different private key file, use the <code class="calibre35">HostKeyFile</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    HostKeyFile /usr/local/ssh/key</tt></div></span><p class="calibre4">The server's public key file, normally <em class="italic">/etc/ssh2/hostkey.pub</em> for superusers or <em class="italic">~/.ssh2/hostkey.pub</em> for others, may be changed independently with the <code class="calibre35">PublicHostKeyFile</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PublicHostKeyFile /usr/local/ssh/pubkey</tt></div></span><p class="calibre4">If you prefer command-line options, <span><em class="italic">sshd</em></span> supports the <span><em class="italic">-h</em></span> command-line option to specify the private key file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ sshd -h /usr/local/ssh/key</tt></div></span><p class="calibre4">Once again, the public key filename is derived by appending <em class="italic">.pub</em> to the private key filename, in this case, <em class="italic">/usr/local/ssh/key.pub.</em></p>
+<p class="calibre4">OpenSSH allows each type of host key to be specified with a separate <span><em class="italic">-h</em></span> option (and detects the type of each key automatically): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ sshd -h /usr/local/ssh/my_dsa_key -h /usr/local/ssh/my_rsa_key -h /usr/local/ssh/<br class="calibre19"/>my_old_ssh1_key</tt></div></span><p class="calibre4">For Tectia, if the <code class="calibre35">-h</code> option is repeated, only the last file is used and all earlier <span><em class="italic">-h</em></span> options are ignored. This is consistent with its usual behavior with command-line options. <a shape="rect" href="DB_split_142.html#filepos769199" class="calibre6">[5.2.3]</a></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos793276" class="calibre7"></a>5.3.1.2 Random seed file </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos793365" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos793403" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos793500" class="calibre15"></a>The SSH server generates pseudo-random numbers for cryptographic operations. <a shape="rect" href="DB_split_083.html#filepos471315" class="calibre6">[3.6.4]</a> It maintains a pool of random data for this purpose, derived either from the operating system if provided (e.g., <em class="italic">/dev/random</em> on Linux) or from various bits of changing machine state (e.g., clock time, statistics on resource use by processes, etc.). This pool is called the <span><em class="italic">random seed</em></span>. </p>
+<p class="calibre4">If running on a system with a random-bit source, such as <em class="italic">/dev/urandom</em>, OpenSSH doesn't create a random seed file<a shape="rect" class="calibre15"></a><a id="filepos794270" class="calibre15"></a>. Tectia stores a random seed in <em class="italic">/etc/ssh2/random_seed</em>, and the location may be overridden with the <code class="calibre35">RandomSeedFile</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    RandomSeedFile /usr/local/ssh/seed2</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos794893" class="calibre7"></a>5.3.1.3 Process ID file </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The OpenSSH server's pid is stored in <em class="italic">/var/run/sshd.pid</em>, and you can override this location with the <code class="calibre35">PidFile</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PidFile /usr/local/ssh/pid</tt></div></span><p class="calibre4">OpenSSH doesn't record the process ID when it runs in debug mode. <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a></p>
+<p class="calibre4">There is no corresponding keyword for Tectia. Its pid file is always named <em class="italic">/var/run/sshd2_</em>
+<span><em class="italic">n</em></span>
+<em class="italic">.pid</em>, or if there is no <em class="italic">/var/run</em> directory, <em class="italic">/etc/ssh2/sshd2_</em>
+<span><em class="italic">n</em></span>
+<em class="italic">.pid</em>, where <span><em class="italic">n</em></span> is the TCP port number of the server.<sup class="calibre20">[<a id="filepos796251" shape="rect" href="DB_split_153.html#filepos927138" class="calibre6">50</a>]</sup> Since the default port is 22, the default pid file is <em class="italic">sshd2_22.pid.</em> If multiple <span><em class="italic">sshd2</em></span> processes are run simultaneously on different ports of the same machine, their pid files can be distinguished by this naming convention. The directory used to store pid files can be changed by the <span><em class="italic">configure</em></span> option <code class="calibre35">--with-piddir</code>. <a shape="rect" href="DB_split_126.html#filepos638127" class="calibre6">[4.3.5.1]</a></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.3.1.4 Server configuration file </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos797218" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos797256" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos797353" class="calibre15"></a>The server configuration file is normally <em class="italic">/etc/ssh/sshd_config</em> for OpenSSH and <em class="italic">/etc/ssh2/sshd2_config</em> for Tectia. An alternative configuration file can be specified with the <span><em class="italic">-f</em></span> command-line option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ sshd -f /usr/local/ssh/config</tt></div></span><p class="calibre4">This is useful when testing a new server configuration: create a new file and instruct <span><em class="italic">sshd</em></span> to read it. It is also necessary if you are running multiple <span><em class="italic">sshd</em></span> s on the same machine and want them to operate with different configurations. </p>
+<p class="calibre4">Only a single configuration file is read. If you provide multiple <span><em class="italic">-f</em></span> options, the last one is used and all others are ignored. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos798757" class="calibre7"></a>5.3.1.5 User SSH directory </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Tectia's <span><em class="italic">sshd</em></span> expects a user's SSH-related files to be in the directory <em class="italic">~/.ssh2</em> by default, but this can be changed with the <code class="calibre35">UserConfigDirectory</code> keyword. (OpenSSH has no such capability.) The directory name may be literal, as in: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    UserConfigDirectory /usr/local/ssh/my_dir</tt></div></span><p class="calibre4">or it may be specified with <code class="calibre35">printf</code>-like patterns, as in: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    UserConfigDirectory %D/.my-ssh</tt></div></span><p class="calibre4">The <code class="calibre35">%D</code> pattern expands to the user's home directory. So, the preceding example expands to <em class="italic">~/.my-ssh.</em> The following table shows the available patterns: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Pattern</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Meaning</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">%D</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">User's home directory</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">%U</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">User's login name</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">%IU</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">User's uid (Unix user ID)</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">%IG</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">User's gid (Unix group ID)</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">If the <code class="calibre35">%</code> character is followed by any other characters, it is left unchanged.<sup class="calibre20">[<a id="filepos802429" shape="rect" href="DB_split_153.html#filepos927702" class="calibre6">51</a>]</sup></p>
+<p class="calibre4">For the system administrator, the <code class="calibre35">UserConfigDirectory</code> keyword provides a quick way to override all users' Tectia preferences. Specifically, you can cause <span><em class="italic">sshd</em></span> to ignore everybody's <em class="italic">~/.ssh2</em> directories, substituting your own instead. For instance, the line: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    UserConfigDirectory /usr/sneaky/ssh/%U</tt></div></span><p class="calibre4">tells <span><em class="italic">sshd</em></span> to seek the preferences for each user in <em class="italic">/usr/sneaky/ssh/</em>
+<span><em class="italic">&lt;username&gt;</em></span> instead of <em class="italic">~/.ssh2</em>. This powerful feature can also be misused if your machine is compromised. If an intruder inserted the following line into <em class="italic">sshd2_config</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    UserConfigDirectory /tmp/hack</tt></div></span><p class="calibre4">and uploaded his own public key file into <em class="italic">/tmp/hack</em>, he would gain SSH access to every user's account. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos804288" class="calibre7"></a>5.3.1.6 Per-account authorization files </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos804392" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos804430" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos804468" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos804565" class="calibre15"></a>The OpenSSH server expects to find a user's public-key authorization file in <em class="italic">~/.ssh/authorized_keys</em>. This location can be changed with the <code class="calibre35">AuthorizedKeysFile</code> keyword, followed by the new location: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    AuthorizedKeysFile .ssh/permitted_keys</tt></div></span><p class="calibre4">Filenames can be absolute or are relative to the user's home directory. Additionally, the location can contain a few special symbols: <code class="calibre35">%h</code> to mean the user's home directory, <code class="calibre35">%u</code> for the username, or <code class="calibre35">%%</code> for a percent sign. So, when user smith authenticated on a server machine with this line in <em class="italic">/etc/ssh/sshd_config</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    AuthorizedKeysFile /usr/local/access/%u</tt></div></span><p class="calibre4">the authorization filename would expand to <em class="italic">/usr/local/access/smith</em>. </p>
+<p class="calibre4">The Tectia server uses a different key file layout than OpenSSH. <a shape="rect" href="DB_split_193.html#filepos1232261" class="calibre6">[6.1.2]</a> Its authorization file, normally <em class="italic">~/.ssh2/authorization</em>, contains names of separate public key files, rather than the keys themselves. <span><em class="italic">sshd</em></span> can be instructed to find the authorization file elsewhere via the keyword <code class="calibre35">AuthorizationFile</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthorizationFile my_public_keys</tt></div></span><p class="calibre4">Filenames can be absolute or are relative to each user's Tectia configuration (<em class="italic">.ssh2</em>) directory. The preceding example specifies the file <em class="italic">~/.ssh2/my_public_keys</em>. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.3.1.7 utmp file structure </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos807335" class="calibre15"></a>The <em class="italic">utmp</em> file (e.g., <em class="italic">/var/run/utmp</em>) contains information about users currently logged in, such as their username, tty, and most notably for us, the hostname from which they've logged in (for remote logins). OpenSSH's <span><em class="italic">sshd</em></span> can limit the length of hostname information written to the <em class="italic">utmp</em> file. (It's inspired by a similar feature in the telnet daemon <span><em class="italic">telnetd</em></span>.) </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ sshd -u 25         <em class="italic"><span>Limit hostnames to 25 characters or less</span></em></tt></div></span><p class="calibre4">If a remote hostname is longer than this limit, the host's IP address will be written instead. Why is this useful? For two reasons: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Hostnames longer than the default length—which may vary on different systems—will normally be truncated in the <em class="italic">utmp</em> file. While you cannot increase the <em class="italic">utmp</em> length with the <span><em class="italic">-u</em></span> option, you can notify <span><em class="italic">sshd</em></span> of the length limitation so that IP addresses get used in place of long hostnames. This way, you'll accurately record the host's identity. See <em class="italic">/usr/include/utmp.h</em> to learn the length limit for your system. </li>
+<li class="calibre18">If you specify <code class="calibre35">-u0</code>, IP addresses will always be used in place of hostnames. This has the side effect of forcing <span><em class="italic">sshd</em></span> not to make DNS requests for these hostname lookups. (It will not entirely suppress DNS, however, since it might be needed for authentication.) </li>
+</ul></div>
+</div>
+</div>
+</body>
+</html>

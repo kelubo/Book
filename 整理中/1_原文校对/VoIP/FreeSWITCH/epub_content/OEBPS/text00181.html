@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.2　写一个新的FreeSWITCH编解码模块</font>
+</font>
+</p>
+<p height="1em" width="2em">我们前面的例子都是在为现有的代码上打补丁，在本节我们看一下如何增加一个新的模块。</p>
+<p height="1em" width="2em">在笔者测试VP8视频编码时，FreeSWITCH还不支持VP8，因而需要自己添加支持。好在，在FreeSWITCH中写一个新模块很简单。而且，由于FreeSWITCH中的视频模块不支持转码，因而大部分回调函数什么也不做。</p>
+<p height="1em" width="2em">我们首先在FreeSWITCH源代码目录中src/mod/codecs下创建mod_vp8目录，并在里面创建mod_vp8.c文件，然后，找一个类似的编解码模块，并把它里面的内容复制过来稍加修改即可。当时笔者发现与VP8最像的模块是mod_theora，因此就直接复制了mod_threora.c里面的内容。修改后的mod_vp8.c内容如下。</p>
+<p height="1em" width="2em">首先，是include和模块声明。在该模块中，我们只需要load函数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+33  #include &lt;switch.h&gt;<br/>
+<br/>
+34<br/>
+<br/>
+35  SWITCH_MODULE_LOAD_FUNCTION(mod_vp8_load);<br/>
+<br/>
+36  SWITCH_MODULE_DEFINITION(mod_vp8, mod_vp8_load, NULL, NULL);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在编解码模块中，当在核心中初始化一个编码时，首先回调的就是init，即这里的switch_vp8_init函数。该函数在此要做的事情不多，基本上直接返回了成功值——SWITCH_STATUS_SUCCESS。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+38  static switch_status_t switch_vp8_init(switch_codec_t *codec, switch_codec_flag_t flags, const switch_codec_settings_t *codec_settings)<br/>
+<br/>
+39  {<br/>
+<br/>
+...<br/>
+<br/>
+51          return SWITCH_STATUS_SUCCESS;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果在调用该模块进行编码时或解码时，将调用这里的encode或decode函数。由于我们并不支持视频的编、解码，因此直接返回SWITCH_STATUS_FALSE。实际上，由于核心本身不支持编解码，因而永远也不会回调到这里。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+55  static switch_status_t switch_vp8_encode(switch_codec_t *codec,<br/>
+<br/>
+...<br/>
+<br/>
+61  {<br/>
+<br/>
+62      return SWITCH_STATUS_FALSE;<br/>
+<br/>
+63  }<br/>
+<br/>
+64<br/>
+<br/>
+65  static switch_status_t switch_vp8_decode(switch_codec_t *codec,<br/>
+<br/>
+...<br/>
+<br/>
+71  {<br/>
+<br/>
+72      return SWITCH_STATUS_FALSE;<br/>
+<br/>
+73  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，最后要释放编解码器的回调函数destroy：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+75  static switch_status_t switch_vp8_destroy(switch_codec_t *codec)<br/>
+<br/>
+76  {<br/>
+<br/>
+77      return SWITCH_STATUS_SUCCESS;<br/>
+<br/>
+78  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其实该模块最重要的就是load函数了。在load函数中，第82行初始化了一个codec_interface，它是一个switch_codec_interface_t类型的指针，说明我们想要创建一个Codec Interface。第84行就紧接着创建了它。第85行，将该codec_interface安装到核心中去。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+80  SWITCH_MODULE_LOAD_FUNCTION(mod_vp8_load)<br/>
+<br/>
+81  {<br/>
+<br/>
+82      switch_codec_interface_t *codec_interface;<br/>
+<br/>
+83      /* connect my internal structure to the blank pointer passed to me */<br/>
+<br/>
+84      *module_interface = switch_loadable_module_create_module_interface(pool, modname);<br/>
+<br/>
+85      SWITCH_ADD_CODEC(codec_interface, "VP8 Video (passthru)");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第87行，在该codec_interface上增加了一个实现（Implementation），并增加了实现的回调函数。具体的参数定义我们在此就不多讲了，总之它定义了4个回调函数，即我们上面讲过的init、encode、decode和destroy（参见20.3.13节的内容）。虽然有些回调函数什么也不做，不过我们也最好写上它们，以便跟现有的其他模块中的代码一致。最后，返回SWITCH_STATUS_SUCCESS以标明模块加载成功(第102行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+87      switch_core_codec_add_implementation(pool, codec_interface,<br/>
+<br/>
+88          SWITCH_CODEC_TYPE_VIDEO, 99, "VP8", NULL, 90000, 90000, 0,<br/>
+<br/>
+89          0, 0, 0, 0, 1, 1, switch_vp8_init, switch_vp8_encode,<br/>
+<br/>
+                              switch_vp8_decode, switch_vp8_destroy);<br/>
+<br/>
+...<br/>
+<br/>
+102     return SWITCH_STATUS_SUCCESS;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">后来，Anthony在做WebRTC时，还用同样的方法增加了red和ulpfec视频编码，不过那就是后话了（见第91行和第96行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+91      SWITCH_ADD_CODEC(codec_interface, "red Video (passthru)");<br/>
+<br/>
+96      SWITCH_ADD_CODEC(codec_interface, "ulpfec Video (passthru)");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有了上述的目录和模块实现文件后，在核心进行configure的时候将会自动生成一个Makefile，不过，我们也可以先自己写一个Makefile用于测试。在Makefile中加入如下内容后就可以编译该模块了。其中第1行指定FreeSWITCH源代码的主目录，第2行装入通用的模块编译规则：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+BASE=../../../..<br/>
+<br/>
+include $(BASE)/build/modmake.rules<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，直接在当前目录下可以使用如下命令编译安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来就可以在FreeSWITCH中直接加载使用了。当然，最后笔者把该模块也提交给官方了，相关Jira的地址是：http://jira.freeswitch.org/browse/FS-4092。</p>
+</body>
+</html>

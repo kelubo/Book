@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_380"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1938828" class="calibre7"></a>9.2.8 Choosing the Target Forwarding Address </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1939004" class="calibre15"></a>Suppose you want to forward a connection from your local machine to <em class="italic">remote.host.net</em>. Both of the following commands work: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -L2001:localhost:143 remote.host.net<br class="calibre19"/>    $ ssh -L2001:remote.host.net:143 remote.host.net</tt></div></span><p class="calibre4">The forwarded connection is made from the remote machine to either the loopback address or <span><em class="italic">remote.host.net</em></span>, and in either case, the connection stays on the remote machine and doesn't go over the network. However, the two connections are perceptibly different to the server receiving the forwarded connection. This is because the <span><em class="italic">source</em></span> sockets of the connections are different. The connection to localhost appears to come from source address 127.0.0.1, whereas the connection to <span><em class="italic">remote.host.net</em></span> is from the address associated with that name. </p>
+<p class="calibre4">Most of the time this difference doesn't matter, but sometimes you must take it into account. The application server (e.g., the IMAP daemon) might be doing access control based on the source address and may not be configured to accept the loopback address. Or it might be running on a multihomed host, and have bound only a subset of the addresses the host has, possibly not including the loopback address. Each of these situations is usually an oversight, but you might not be able to do anything about it. If you're getting "connection refused" from the connecting side of the forwarding, but you've verified that the server appears to be running and responding to normal clients, this might be the problem. If the server machine is running Unix, the command <span><em class="italic">netstat -a -n</em></span> should list all the network connections and listeners on that machine. Look for listeners on the relevant port, and the addresses on which they are listening. </p>
+<p class="calibre4">Sometimes, the problem can be more acute if the server uses the source IP address itself as part of whatever protocol it's speaking. This problem crops up when trying to forward FTP over SSH. <a shape="rect" href="DB_split_332.html#filepos2140512" class="calibre6">[11.2]</a></p>
+<p class="calibre4">In general, we recommend using localhost as the forwarding target whenever possible. This way, you are less likely to set up an insecure off-host forwarding by accident. </p>
+</div>
+</body>
+</html>

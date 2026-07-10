@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.6　在FreeSWITCH中执行长期运行的嵌入式脚本</font>
+</font>
+</p>
+<p height="1em" width="2em">前面我们讲过的Lua脚本都是“短暂”运行的——它们或者存在于一路通话的会话期内，或者是在命令行上执行一个短暂的命令。但在有些情况下，我们可能希望脚本能永远不停地运行，下面我们就来看一个例子。</p>
+<p height="1em" width="2em">几年前，笔者曾经写过一个Lua脚本，用于监控网关的状态。实现的思路是：如果接收到挂机事件，就判断该通话是否是经过一个网关出去的；如果是，就判断通话是否成功；然后记录统计结果，并将统计结果以几种方式呈现：</p>
+<p height="1em" width="2em">·在FreeSWITCH中触发一个事件，由其他程序进行处理；</p>
+<p height="1em" width="2em">·发送到一个远端的HTTP服务器上；</p>
+<p height="1em" width="2em">·直接写入数据库；</p>
+<p height="1em" width="2em">·其他方式，如写入一个文件等。</p>
+<p height="1em" width="2em">其他的程序在收到这些统计结果后再使用Web方式呈现，进而我们可以知道哪些网关（运营商提供的SIP中继）比较好，哪些网关总是出问题。</p>
+<p height="1em" width="2em">笔者是用Lua脚本实现的，我们需要让该脚本一直运行，因此首先想到的就是脚本中必须有一个无限循环。笔者尝试过这样做：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+while true do<br/>
+<br/>
+  -- Sleep for 500 milliseconds<br/>
+<br/>
+  freeswitch.msleep(500);<br/>
+<br/>
+  freeswitch.consoleLog("info", "blah...");<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">但这样的脚本是无法终止的 <sup>
+<small>
+<a href="text00148.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。由于FreeSWITCH使用swig支持这些嵌入式语言，而有些语言没有退出机制，所以所有语言的退出机制都没有在FreeSWITCH中实现，即使卸载（unload）相关的语言模块也不行。也是因为如此，为了避免产生问题，所有语言模块也都不能卸载 <sup>
+<small>
+<a href="text00148.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">读者可能要问，既然是长期运行的脚本，那为什么要停止呢？是的，大部分时间是不需要停止的，但是我们都是开发人员，如果在开发过程中你需要调试和修改脚本，总不能每次都重启FreeSWITCH吧？</p>
+<p height="1em" width="2em">所以，后来笔者想了一个办法，通过使用事件机制构造另一个循环，然后就可以在检测到一个特殊事件后停止该循环。如下面的代码，其中，第1行，freeswitch.EventConsumer定义一个事件消费者。第2行使用一个for循环不断从该事件消费者中取数据，pop(1)是阻塞的，如果需要无阻塞的话，就可以使用pop(0)。我们这里使用阻塞的方式，即直到有一个事件到来后它才执行循环体内的语句。当然，作为一个例子，我们在第3行仅打印收到的事件的内容。代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 con = freeswitch.EventConsumer("all");<br/>
+<br/>
+02 for e in (function() return con:pop(1) end) do<br/>
+<br/>
+03     freeswitch.consoleLog("info", "event\n" .. e:serialize("xml"));<br/>
+<br/>
+04 end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在FreeSWITCH中，事件总会有的。如每个电话初始化、挂机等都会有相应的事件。除此之外，FreeSWITCH内部也会毎20秒发出一个HEARTBEAT事件，这样你就可以根据该事件判断FreeSWITCH是否在正常运行，甚至还可以定时执行一些任务。</p>
+<p height="1em" width="2em">当然，到现在为止，还是不能运行上述脚本，因为它还是无法退出的。为了让它能退出，我们在上述代码的循环体中（第4行之前）再加入如下代码。这段代码的含义就是：当收到一个自定义的CUSTOM事件，并且事件的子类型是lua::stopscript时，便打印一个日志并退出（break）循环。代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event_name = e:getHeader("Event_IVame")<br/>
+<br/>
+event_subclass = e:getHeader("Event-Subclass")<br/>
+<br/>
+if (event_name == "CUSTOM" and event_subclass == "lua::stopscript") then<br/>
+<br/>
+    freeswitch.consoleLog("INFO", "--lua Script [" ..<br/>
+<br/>
+        argv[0] .. "] got stop message, Exiting--\n")<br/>
+<br/>
+    break<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">加入上述代码后，可以放心地去运行一下了。为了能让上面的脚本退出，我们可以再写一个脚本，来触发一个自定义的事件，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+local event = freeswitch.Event("CUSTOM", "lua::stopscript");<br/>
+<br/>
+event:addHeader("Exit-Reason", "Seven said you should stop");<br/>
+<br/>
+event:fire();<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">解决了无限循环的退出问题后，你就可以在循环体内处理各种业务逻辑了。</p>
+<p height="1em" width="2em">脚本写好后，可以在控制台上使用lua和luarun命令执行该脚本。二者的不同就是lua是在当前线程中运行的，所以它会阻塞；而luarun会产生一个新的线程，不会阻塞当前的线程执行。</p>
+<p height="1em" width="2em">脚本后面可以加参数，如“luarun test.lua arg1 arg2”，在脚本中，就可以通过argv[1]、argv[2]来获得参数的值。而argv[0]是脚本的名字。</p>
+<p height="1em" width="2em">另外，也可以将脚本配置到conf/autoload_configs/lua.conf.xml文件中，这样它就能随FreeSWITCH一起启动，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="startup-script" value="test.lua"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">最后，实际的例子可以参考笔者写的gateway_report.lua脚本，具体我们就不详细讲了，完整的代码在http://fisheye.freeswitch.org/browse/freeswitch-contrib.git/seven/lua/gateway_report.lua?hb=true处。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00147.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 理论上，在循环体内通过检测一个FreeSWITCH全局变量的值也是可能终止的，不过笔者没有实验，而是采用了一种这里即将讨论的事件的方案。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00147.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 事实上，是在笔者发现该问题报告给FreeSWITCH社区后各模块才禁止卸载的。参见：http://jira.freeswitch.org/browse/FS-1365。</p>
+</body>
+</html>

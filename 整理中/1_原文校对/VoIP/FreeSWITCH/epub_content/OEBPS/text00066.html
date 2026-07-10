@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">7.5　小结</font>
+</font>
+</p>
+<p height="1em" width="2em">本章没有照本宣科地讲解SIP协议的内容，而是从最简单的注册和呼叫开始，以讲故事的方式由浅入深地介绍了SIP的基本概念以及注册和呼叫等交互流程。希望没有SIP甚至也没有HTTP基础的读者也可以轻松上手。而对于高级的读者，本章也给出了延伸阅读的资料。</p>
+<p height="1em" width="2em">
+<font color="#0468BB">FreeSWITCH</font>
+ 是一个<font color="#0468BB">B2BUA</font>
+ 。读者在了解了FreeSWITCH的架构以后，再结合SIP的详细呼叫流程思考一下，就比较容易理解了。</p>
+<p height="1em" width="2em">本章的协议文本都是从FreeSWITCH中实际抓出来的，看起来比较直观。读者可以在学习的过程中自行练习。获取这些SIP消息的方法是在FreeSWITCH命令行上执行如下命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia global siptrace on<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，打电话看一下能不能在控制台上看到信令。有时候，注册的电话多了以后，信令消息比较多，看起来就比较累。在这种情况下笔者一般是执行fs_cli连接到FreeSWITCH，打开siptrace，打一个测试电话后就立即用Ctrl+D（或/exit）退出fs_cli，然后慢慢分析。当然对初学者而言还是建议找一个清净的环境学习，不要注册太多分机。</p>
+<p height="1em" width="2em">如果需要关闭trace，可执行如下命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia global siptrace off<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">最权威的资料还是RFC 3261，如果你从事这方面的开发，还是需要好好读一读的。当然，如果你觉得RFC比较枯燥的话，网上也有一些有趣的关于SIP的阅读资料，感兴趣的读者不妨去读一读。这些资料有：</p>
+<p height="1em" width="2em">·http://www.freeswitch.org.cn/2012/06/20/guan-yu-voipni-ceng-jing-yi-wei-ni-bu-bi-zhi-dao-de-suo-you-dong-dong.html</p>
+<p height="1em" width="2em">·http://arstechnica.com/business/2010/01/voip-in-depth-an-introduction-to-the-sip-protocol-part-1/</p>
+<p height="1em" width="2em">·http://arstechnica.com/tech-policy/2010/03/voip-in-depth-an-introduction-to-the-sip-protocol-part-2/</p>
+</body>
+</html>

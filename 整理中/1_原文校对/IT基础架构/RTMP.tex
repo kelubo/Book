@@ -1,0 +1,142 @@
+% RTMP协议
+% RTMP.tex
+
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息。
+\input{../../../common/page}
+
+% 设置字体，并解决显示难检字问题。
+\xeCJKsetup{AutoFallBack=true}
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）。
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 设置 part 和 chapter 标题格式。
+\ctexset{
+chapter/name={第,章},
+chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
+
+\title{\heiti\zihao{0} RTMP协议详解}
+\author{佚名}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\frontmatter
+
+\mainmatter
+
+\chapter{RTMP协议概述}
+
+RTMP（Real-Time Messaging Protocol，实时消息协议）是一种用于实时数据传输的网络协议，主要用于音频、视频和数据的实时流式传输。
+
+\section{基本概念}
+
+\begin{itemize}
+  \item \textbf{定义}：RTMP是由Adobe Systems开发的专有协议，最初用于Flash播放器和服务器之间的通信
+  \item \textbf{端口}：默认使用1935端口
+  \item \textbf{传输层}：基于TCP协议，确保可靠传输
+  \item \textbf{应用场景}：主要用于直播流媒体、视频点播等场景
+\end{itemize}
+
+\section{核心功能}
+
+\begin{enumerate}
+  \item \textbf{实时流媒体传输}：支持音频和视频的实时传输
+  \item \textbf{低延迟}：相比其他协议（如HLS），RTMP具有更低的延迟
+  \item \textbf{双向通信}：支持服务器和客户端之间的双向数据传输
+  \item \textbf{多路复用}：在单个TCP连接上传输多个流
+\end{enumerate}
+
+\chapter{技术特点}
+
+\begin{itemize}
+  \item \textbf{协议层次}：位于应用层，基于TCP协议
+  \item \textbf{数据格式}：使用二进制格式，效率较高
+  \item \textbf{编码支持}：支持多种音视频编码格式
+  \item \textbf{安全性}：支持RTMPS（RTMP over SSL/TLS）加密传输
+\end{itemize}
+
+\chapter{工作原理}
+
+\begin{enumerate}
+  \item \textbf{建立连接}：客户端与服务器建立TCP连接
+  \item \textbf{握手过程}：完成RTMP特有的握手流程
+  \item \textbf{创建流}：建立逻辑流通道
+  \item \textbf{数据传输}：传输音视频数据和控制信息
+  \item \textbf{断开连接}：完成会话后断开连接
+\end{enumerate}
+
+\chapter{与其他协议的对比}
+
+\section{RTMP vs HLS}
+
+RTMP延迟更低（1-3秒），HLS延迟较高（10-30秒）但兼容性更好
+
+\section{RTMP vs WebRTC}
+
+WebRTC延迟更低（亚秒级），但RTMP部署更成熟
+
+\section{RTMP vs SRT}
+
+SRT抗网络抖动能力更强，适合不稳定网络环境
+
+\chapter{应用场景}
+
+\begin{itemize}
+  \item \textbf{直播平台}：如Twitch、YouTube Live等
+  \item \textbf{视频会议}：需要低延迟的实时通信
+  \item \textbf{在线教育}：实时互动教学
+  \item \textbf{游戏直播}：游戏画面的实时传输
+\end{itemize}
+
+\chapter{优缺点}
+
+\section{优点}
+
+\begin{itemize}
+  \item 低延迟，适合实时应用
+  \item 成熟稳定，部署广泛
+  \item 支持双向通信
+  \item 带宽利用效率高
+\end{itemize}
+
+\section{缺点}
+
+\begin{itemize}
+  \item 基于TCP，在网络不稳定时可能出现卡顿
+  \item 对防火墙穿透能力有限
+  \item 随着Flash的淘汰，浏览器直接支持度下降
+  \item 是Adobe的专有协议
+\end{itemize}
+
+\chapter{实际应用}
+
+在直播系统中，RTMP通常用于从编码器到服务器的推流环节，服务器再将流转换为HLS等格式分发给观众。例如，主播使用OBS等推流软件通过RTMP协议将视频推送到直播服务器，服务器处理后通过HLS协议分发给浏览器和移动设备的观众。
+
+尽管面临WebRTC等新技术的挑战，RTMP仍然是直播行业的主流协议之一，尤其在专业直播领域有着广泛的应用。
+
+\backmatter
+
+\end{document}

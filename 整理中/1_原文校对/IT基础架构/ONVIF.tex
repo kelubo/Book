@@ -1,0 +1,135 @@
+% ONVIF协议
+% ONVIF.tex
+
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息。
+\input{../../../common/page}
+
+% 设置字体，并解决显示难检字问题。
+\xeCJKsetup{AutoFallBack=true}
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）。
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 设置 part 和 chapter 标题格式。
+\ctexset{
+chapter/name={第,章},
+chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
+
+\title{\heiti\zihao{0} ONVIF协议详解}
+\author{佚名}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\frontmatter
+
+\mainmatter
+
+\chapter{ONVIF协议概述}
+
+ONVIF（Open Network Video Interface Forum，开放网络视频接口论坛）是一个由安防行业领先企业共同建立的国际开放标准，旨在促进网络视频设备之间的互操作性。
+
+\section{基本概念}
+
+\begin{itemize}
+  \item \textbf{定义}：ONVIF是一个非营利性组织，成立于2008年，由Axis Communications、Bosch Security Systems和Sony等公司发起
+  \item \textbf{目标}：制定网络视频设备之间的通信标准，确保不同厂商设备的互操作性
+  \item \textbf{覆盖范围}：涵盖视频监控、访问控制、视频分析等多个安防领域
+\end{itemize}
+
+\section{核心功能}
+
+\begin{enumerate}
+  \item \textbf{设备发现}：自动发现网络中的ONVIF兼容设备
+  \item \textbf{设备管理}：远程配置和管理网络视频设备
+  \item \textbf{媒体流管理}：控制视频流的传输和接收
+  \item \textbf{PTZ控制}：控制云台、变焦等功能
+  \item \textbf{事件处理}：处理和分发设备产生的事件
+  \item \textbf{访问控制}：管理用户权限和认证
+\end{enumerate}
+
+\chapter{技术标准}
+
+\section{技术基础}
+
+\begin{itemize}
+  \item \textbf{网络协议}：基于HTTP、RTSP、SOAP等标准协议
+  \item \textbf{数据格式}：使用XML描述设备能力和配置
+  \item \textbf{API接口}：提供统一的Web Service接口
+  \item \textbf{版本演进}：从1.0版本不断更新，最新版本包含更多功能
+\end{itemize}
+
+\chapter{应用场景}
+
+\begin{itemize}
+  \item \textbf{视频监控系统}：不同品牌摄像头、NVR之间的互操作
+  \item \textbf{智能建筑}：与建筑管理系统集成
+  \item \textbf{智慧城市}：大规模视频监控网络的标准化
+  \item \textbf{工业安防}：工厂、园区的视频监控系统
+  \item \textbf{交通监控}：道路、机场、车站的视频系统
+\end{itemize}
+
+\chapter{与其他标准的关系}
+
+\section{与RTSP}
+
+ONVIF使用RTSP协议传输视频流
+
+\section{与GB/T 28181}
+
+中国国家标准，与ONVIF有部分功能重叠
+
+\section{与PSIA}
+
+另一个安防设备标准，ONVIF的主要竞争对手
+
+\chapter{优缺点}
+
+\section{优势}
+
+\begin{itemize}
+  \item 互操作性：不同厂商设备可以无缝集成
+  \item 降低成本：减少系统集成和维护成本
+  \item 灵活性：用户可以选择不同厂商的最佳产品
+  \item 标准化：促进行业技术标准的统一
+\end{itemize}
+
+\section{局限性}
+
+\begin{itemize}
+  \item 复杂性：标准相对复杂，实现难度较大
+  \item 性能开销：基于SOAP的通信可能带来一定性能开销
+  \item 版本兼容性：不同版本之间可能存在兼容性问题
+\end{itemize}
+
+\chapter{实际应用}
+
+在视频监控系统中，支持ONVIF的摄像头可以被任何支持ONVIF的NVR或平台软件识别和管理，无需为不同品牌设备开发专用驱动。例如，一个Hikvision的NVR可以无缝管理Dahua、Axis等品牌的摄像头，大大简化了系统集成。
+
+ONVIF已经成为安防行业的重要标准，被越来越多的设备厂商采用，为网络视频监控系统的标准化和互操作性做出了重要贡献。
+
+\backmatter
+
+\end{document}

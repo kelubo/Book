@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_251"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1214412" class="calibre7"></a>5.10.1 Security Issues with Tectia's SSH-1 Compatibility Mode </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1214605" class="calibre15"></a>There's one vital thing to keep in mind if you're using the SSH-1 compatibility feature in Tectia: you must maintain two separate SSH server configurations. When <span><em class="italic">sshd2</em></span> starts <span><em class="italic">sshd1</em></span>, it is an entirely new process, with its own SSH-1 server configuration file. No restrictions set in your <span><em class="italic">sshd2</em></span> server configuration apply to it. Even restrictions that could apply, such as <code class="calibre35">AllowHosts</code>, don't, because <span><em class="italic">sshd2</em></span> invokes <span><em class="italic">sshd1</em></span> before performing such checks. </p>
+<p class="calibre4">This means you must keep the two configurations synchronized with respect to your security intent. Otherwise, an attacker can circumvent your carefully crafted <span><em class="italic">sshd2</em></span> configuration simply by connecting with an SSH-1 client. </p>
+<p class="calibre4">A good strategy for automating the synchronization of <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> configurations is to derive the configuration files from a common template file, using a general-purpose macro preprocessor like <span><em class="italic">m4</em></span>. The following list describes the basic idea. </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Invent symbols like <code class="calibre35">TECTIA</code> and <code class="calibre35">OPENSSH</code> to label the implementations for the <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> configurations. </li>
+<li value="2" class="calibre18">Construct the template file using <span><em class="italic">m4</em></span> preprocessor conditionals like <code class="calibre35">ifdef</code> to handle incompatibilities between <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span>, such as syntax differences:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ifdef(TECTIA, 'DenyGroups bad.*, worse')<br class="calibre19"/>    ifdef(OPENSSH,'DenyGroups bad* worse')</tt></div></span><br class="calibre19"/>The template file helps to maintain the configurations because similar constructs are kept together, and duplicate information is minimized. Any common keywords and values can be specified in the template file without conditionals. </li>
+<li value="3" class="calibre18">Generate the <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> configurations from the template by defining the appropriate implementation symbols on the command line using the <span><em class="italic">m4</em></span> preprocessor:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    m4 -DTECTIA sshd_config_template &gt; sshd2_config<br class="calibre19"/>    m4 -DOPENSSH sshd_config_template &gt; sshd1_config</tt></div></span></li>
+<li value="4" class="calibre18">For even more automation, set up a <em class="italic">Makefile</em> containing targets for the <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> configuration files, with <span><em class="italic">m4</em></span> preprocessor commands for each:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    all: sshd2_config sshd1_config<br class="calibre19"/>    sshd2_config: sshd_config_template<br class="calibre19"/>        m4 -DTECTIA $&lt; &gt; $@<br class="calibre19"/>    sshd1_config: sshd_config_template<br class="calibre19"/>        m4 -DOPENSSH $&lt; &gt; $@</tt></div></span></li>
+<li value="5" class="calibre18">To ensure that the real <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> configuration files are up to date whenever the template file changes, regenerating the configuration files if necessary, simply use the command <span><em class="italic">make</em></span>. This can be done at boot time before the Tectia server is started, or subsequently when the configuration file is reread using SIGHUP. <a shape="rect" href="DB_split_143.html#filepos776646" class="calibre6">[5.2.4]</a></li>
+</ol></div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_252"></div></body>
+</html>

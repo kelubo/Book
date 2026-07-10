@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_303"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1547096" class="calibre7"></a>7.4.5 TCP/IP Settings </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH uses TCP/IP as its transport mechanism. Most times you don't need to change the default TCP settings, but in some situations it's necessary: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> Connecting to SSH servers on other TCP ports </li>
+<li class="calibre18"> Connecting via a particular network interface </li>
+<li class="calibre18"> Using privileged versus nonprivileged ports </li>
+<li class="calibre18"> Keeping an idle connection open by sending keepalive messages </li>
+<li class="calibre18"> Enabling the Nagle Algorithm (TCP_NODELAY) </li>
+<li class="calibre18"> Requiring IP addresses to be Version 4 or 6 </li>
+</ul></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1548139" class="calibre7"></a>7.4.5.1 Selecting a remote port </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1548295" class="calibre15"></a>Most SSH servers listen on TCP port 22, so clients connect to this port by default. Nevertheless, sometimes you need to connect to an SSH server on a different port number. For example, if you are a system administrator testing a new SSH server, you might run it on a different port to avoid interference with an existing server. Then your clients need to connect to this alternate port. This can be done with the client's <code class="calibre35">Port</code> keyword, followed by a port number: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Port 2035</tt></div></span><p class="calibre4">or the <span><em class="italic">-p</em></span> command-line option, followed by the port number: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -p 2035 server.example.com</tt></div></span><p class="calibre4">You can also specify an alternative port for <span><em class="italic">scp</em></span>, but the command-line option is <span><em class="italic">-P</em></span> instead of <span><em class="italic">-p</em></span>
+<code class="calibre35">:</code>
+<sup class="calibre20">[<a id="filepos1549743" shape="rect" href="DB_split_239.html#filepos1668742" class="calibre6">109</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp -P 2035 myfile server.example.com:</tt></div></span><p class="calibre4">Tectia also accepts a port number as part of the user and host specification, preceded by a hash sign. For example, the commands: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh server.example.com#2035<br class="calibre19"/>    $ ssh smith@server.example.com#2035<br class="calibre19"/>    $ scp smith@server.example.com#2035:myfile localfile</tt></div></span><p class="calibre4">each connect to remote port 2035. (We don't see much use for this syntax, but it's available.) </p>
+<p class="calibre4">After connecting to the server, <span><em class="italic">ssh</em></span> sets an environment variable in the remote shell to hold the port information. For OpenSSH, the variable is called <code class="calibre35">SSH_CLIENT</code>, and for Tectia it is <code class="calibre35">SSH2_CLIENT</code>. The variable contains a string with three values, separated by a space character: the client's IP address, the client's TCP port, and the server's TCP port. For example, if your client originates from port 1016 on IP address 24.128.23.102, connecting to the server's port 22, the value is: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ echo $SSH_CLIENT<br class="calibre19"/>    ::ffff:24.128.23.102 1016 22<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ echo $SSH2_CLIENT<br class="calibre19"/>    24.128.23.102 1016 22</tt></div></span><p class="calibre4">OpenSSH also sets an environment variable, <code class="calibre35">SSH_CONNECTION</code>, with slightly extended port information, appending the server's IP address and port: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ echo $SSH_CONNECTION<br class="calibre19"/>    ::ffff:24.128.23.102 10969 ::ffff:128.220.67.30 22</tt></div></span><p class="calibre4">These variables are useful for scripting. In your shell's startup file (e.g., <em class="italic">~/.profile</em>, <em class="italic">~/.login</em>), you can test for the variable and, if it exists, take actions. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/sh<br class="calibre19"/>    # Test for an SSH_CLIENT value of nonzero length<br class="calibre19"/>    if [ -n "$SSH_CLIENT" ]<br class="calibre19"/>    then<br class="calibre19"/>    # We logged in via SSH.<br class="calibre19"/>      echo 'Welcome, OpenSSH user!'<br class="calibre19"/>      # Extract the IP address from SSH_CLIENT<br class="calibre19"/>      IP=`echo $SSH_CLIENT | awk '{print $1}'`<br class="calibre19"/>      # Translate it to a hostname.<br class="calibre19"/>      HOSTNAME=`host $IP | grep Name: | awk '{print $2}'`<br class="calibre19"/>      echo "I see you are connecting from $HOSTNAME."<br class="calibre19"/>    else<br class="calibre19"/>      # We logged in not by SSH, but by some other means.<br class="calibre19"/>      echo 'Welcome, O clueless one. Feeling insecure today?'<br class="calibre19"/>    fi</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.5.2 Connecting via a given network interface </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1553895" class="calibre15"></a>If your client machine has more than one network interface or IP address, OpenSSH clients can connect through a particular one with the <code class="calibre35">BindAddress</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    BindAddress 192.168.10.235</tt></div></span><p class="calibre4">or the <span><em class="italic">-b</em></span> command-line option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -b 192.168.10.235 server.example.com</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.5.3 Forcing a nonprivileged local port </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH connections get locally bound to a privileged TCP port, one whose port number is below 1024. If you ever need to override this feature—say, if your connection must pass through a firewall that doesn't permit privileged source ports—use the configuration keyword <code class="calibre35">UsePrivilegedPort</code>. Its values are <code class="calibre35">yes</code> (use a privileged port) and <code class="calibre35">no</code> (use a nonprivileged port, the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    UsePrivilegedPort no</tt></div></span><p class="calibre4">Hostbased authentication requires a privileged port.</p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1556024" class="calibre7"></a>7.4.5.4 Keepalive messages </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1556175" class="calibre15"></a>The <code class="calibre35">TCPKeepAlive</code> (OpenSSH) and <code class="calibre35">KeepAlive</code> (Tectia) keywords instruct the client how to proceed if a TCP connection problem occurs, such as a prolonged network outage or a server machine crash: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    TCPKeepAlive yes<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    KeepAlive yes</tt></div></span><p class="calibre4">The value <code class="calibre35">yes</code> (the default) tells the client to transmit and expect periodic <span><em class="italic">keepalive messages</em></span>. If the client detects a lack of responses to these messages, it shuts down the connection. The value <code class="calibre35">no</code> means not to use keepalive messages. </p>
+<p class="calibre4">Keepalive messages represent a trade-off. If they are enabled, a faulty connection is shut down even if the problem is transient. However, the TCP keepalive timeout on which this feature is based is typically several hours, so this shouldn't be a big problem. If keepalive messages are disabled, an unused faulty connection can persist indefinitely. </p>
+<p class="calibre4">TCP keepalive messages are generally more useful in the SSH server, since a user sitting on the client side will certainly notice if the connection becomes unresponsive. However, SSH can connect two programs together, with the one running the SSH client waiting for input from the other side. In such a situation, it may be necessary to detect dead connections eventually. </p>
+<p class="calibre4"><code class="calibre35">TCPKeepAlive</code> and <code class="calibre35">KeepAlive</code> aren't intended to deal with the problem of SSH sessions being torn down because of firewall, proxying, NAT, or IP masquerading timeouts. <a shape="rect" href="DB_split_148.html#filepos840667" class="calibre6">[5.3.3.4]</a> In these cases, if you don't send any data for some period of time, the firewall (or whatever) closes the TCP connection. Additionally, TCP keepalive messages are not secure, as they don't use any real authentication technique. </p>
+<p class="calibre4">OpenSSH provides a robust and secure solution to keep the connection up, called <span><em class="italic">client-alive</em></span> and <span><em class="italic">server-alive</em></span> messages. OpenSSH clients can send client-alive messages to the server, indicating the client is up. The client also detects server-alive messages sent by the OpenSSH server. <a shape="rect" href="DB_split_148.html#filepos840667" class="calibre6">[5.3.3.4]</a></p>
+<p class="calibre4">If certain criteria are met, the client or server will tear down the connection. You can control this at three levels. First, the client's initial connection to the server can obey a timeout. If the server hasn't responded at all within a certain number of seconds, the client will give up. This is controlled by the <code class="calibre35">ConnectTimeout</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    ConnectTimeout 60         <em class="italic"><span>If no connection with the server within one minute, give up</span></em></tt></div></span><p class="calibre4">Next, the <code class="calibre35">ServerAliveInterval</code> keyword controls how the client sends server-alive messages. Its argument is a length of time in seconds: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    ServerAliveInterval 300   <em class="italic"><span>Send server-alive every 300 seconds, or five minutes</span></em></tt></div></span><p class="calibre4">If your client hasn't heard from the server within the given amount of time, the client will send a server-alive message to the server. It will continue sending these messages at the given interval (in this case, every five minutes) until it receives a response or gives up. You control how it gives up with the third keyword, <code class="calibre35">ServerAliveCountMax</code>, representing the maximum number of consecutive server-alive messages the client will send: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    ServerAliveCountMax 8     <em class="italic"><span>Try eight times, then give up. The default is three times.</span></em></tt></div></span><p class="calibre4">Once this maximum is reached, the client says, "Oh well, I guess the server has gone out for a walk," and terminates the SSH connection. If you don't want the client to send server-alive messages, set <code class="calibre35">ServerAliveInterval</code> to zero. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1561864" class="calibre7"></a>7.4.5.5 Controlling TCP_NODELAY </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1561960" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1561998" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1562036" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1562133" class="calibre15"></a>TCP/IP has a feature called the Nagle Algorithm, an optimization for reducing the number of TCP segments sent with very small amounts of data. <a shape="rect" href="DB_split_148.html#filepos868756" class="calibre6">[5.3.3.9]</a> Tectia clients may also enable or disable the Nagle Algorithm using the <code class="calibre35">NoDelay</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    NoDelay yes</tt></div></span><p class="calibre4">Legal values are <code class="calibre35">yes</code> (to disable the algorithm) and <code class="calibre35">no</code> (to enable it; the default). </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1563097" class="calibre7"></a>7.4.5.6 Requiring IPv4 and IPv6 </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">OpenSSH can force its clients to use Internet Protocol Version 4 (IPv4) or 6 (IPv6) addresses. IPv4 is the current version of IP used on the Internet; IPv6 is the future version, permitting far more addresses than IPv4 can support. For more information on these address formats, visit: </p>
+<div class="calibre3"><span class="calibre27">
+<blockquote class="calibre5"><span class="calibre33">
+<div class="calibre3"><a href="http://www.ipv6.org/" shape="rect" class="calibre6">http://www.ipv6.org/</a></div>
+</span></blockquote>
+</span></div>
+<p class="calibre4">To force IPv4 addressing, use the <span><em class="italic">-4</em></span> flag: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -4 server.example.com</tt></div></span><p class="calibre4">or likewise for IPv6, use <span><em class="italic">-6</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -6 server.example.com</tt></div></span><p class="calibre4">You can also control these settings with the <code class="calibre35">AddressFamily</code> keyword, with the values <code class="calibre35">inet</code> (IPv4 only), <code class="calibre35">inet6</code> (IPv6 only), or <code class="calibre35">any</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    AddressFamily inet6      <em class="italic"><span>Use IPv6 only</span></em></tt></div></span></div>
+</div>
+</body>
+</html>

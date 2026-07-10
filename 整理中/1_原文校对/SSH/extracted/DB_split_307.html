@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_399"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2051021" class="calibre7"></a>9.5.2 Notes About TCP-Wrappers </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Here are a few things to remember when using TCP-wrappers: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> You can't distinguish between ports forwarded by SSH-1 and SSH-2: the "sshdfwd" rules refer to both simultaneously. You can work around this limitation by linking each against a different <em class="italic">libwrap.a</em>, compiled with different filenames for the allow and deny files, or by patching the <span><em class="italic">ssh</em></span> and <span><em class="italic">sshd</em></span> executables directly, but then you have to keep track of these changes and extra files. </li>
+<li class="calibre18"> The big drawback to TCP-wrappers is that it affects all users simultaneously. An individual user can't specify custom access rules for himself; there's just the single set of global configuration files for the machine. This limits its usefulness on multiuser machines. </li>
+<li class="calibre18"> If you compile SSH with the <code class="calibre35">--with-libwrap</code> option, it is automatically and always turned on; there's no configuration or command-line option to disable the TCP-wrappers check. Remember that SSH does this check not only for forwarded ports and X connections, but also for connections to the main SSH server! As soon as you install a version of <span><em class="italic">sshd</em></span> with TCP-wrappers, you must ensure that the TCP-wrappers configuration allows connections to the server—for instance, with the rule <code class="calibre35">sshd : ALL</code> in <em class="italic">/etc/hosts.allow.</em>
+</li>
+<li class="calibre18"> Using hostnames instead of addresses in the TCP-wrappers rule set involves the usual security trade-off. Names are more convenient, and their use avoids breakage in the future if a host address changes. On the other hand, an attacker can potentially subvert the naming service and circumvent the access control. If the host machine is configured to use <span><em class="italic">only</em></span> its <em class="italic">/etc/hosts</em> file for name lookup, this may be acceptable even in a highly secure environment. </li>
+<li class="calibre18"> The TCP-wrappers package includes a program called <span><em class="italic">tcpdchk</em></span>. This program examines the wrapper control files and reports inconsistencies that might signal problems. Many sites run this periodically as a safety check. Unfortunately, <span><em class="italic">tcpdchk</em></span> is written only with explicit wrapping via <em class="italic">inetd.conf</em> in mind. It doesn't have any way of knowing about programs that refer to the control files via the <span><em class="italic">libwrap</em></span> routines, as does <span><em class="italic">sshd</em></span>. When <span><em class="italic">tcpdchk</em></span> reads control files with SSH rules, it finds uses of the service names "sshd1," "sshdfwd-<em class="italic"><code class="calibre35">n</code></em>," etc., but no corresponding wrapped services in <em class="italic">inetd.conf</em>, and it generates a warning. Unfortunately, we know of no workaround. </li>
+</ul></div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_400"></div></body>
+</html>

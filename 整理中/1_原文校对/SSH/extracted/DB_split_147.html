@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_203"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos809806" class="calibre7"></a>5.3.2 File Permissions </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos809960" class="calibre15"></a>As security products, OpenSSH and Tectia require certain files and directories on the server machine to be protected from unwanted access. Imagine if your <em class="italic">authorized_keys</em> or <em class="italic">.rhosts</em> file were world-writable; anyone on that host could modify them and gain convenient access to your account. <span><em class="italic">sshd</em></span> has several configuration keywords for reducing this risk. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos810666" class="calibre7"></a>5.3.2.1 Acceptable permissions for user files </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Users aren't always careful to protect important files and directories in their accounts, such as their <em class="italic">.rhosts</em> file or personal SSH directory. Such lapses can lead to security holes and compromised accounts. To combat this, you can configure <span><em class="italic">sshd</em></span> to reject connections to any user account that has unacceptable permissions. </p>
+<p class="calibre4">The <code class="calibre35">StrictModes</code> keyword, with a value of <code class="calibre35">yes</code> (the default), causes <span><em class="italic">sshd</em></span> to check the permissions of important files and directories. They must be owned by the account owner or by root, and group and world write permission must be disabled. For OpenSSH, <code class="calibre35">StrictModes</code> checks: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">The user's home directory</li>
+<li class="calibre18">The user's <em class="italic">~/.rhosts</em> and <em class="italic">~/.shosts</em> file </li>
+<li class="calibre18">The user's SSH configuration directory, <em class="italic">~/.ssh</em></li>
+<li class="calibre18">The user's SSH <em class="italic">~/.ssh/authorized_keys</em> file </li>
+<li class="calibre18">The user and system "known hosts" files</li>
+</ul></div>
+<p class="calibre4">For Tectia, the list is smaller and is checked only for hostbased authentication:<a shape="rect" href="DB_split_076.html#filepos393737" class="calibre6">[3.4.3.6]</a></p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">The user's home directory</li>
+<li class="calibre18">The user's <em class="italic">~/.rhosts</em> and <em class="italic">~/.shosts</em> file </li>
+</ul></div>
+<p class="calibre4">If any check fails, the server rejects SSH connection attempts to the account. If <code class="calibre35">StrictModes</code> is given the value <code class="calibre35">no</code>, these checks aren't performed: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    StrictModes no</tt></div></span><p class="calibre4">However, we strongly suggest you leave these checks enabled. </p>
+<p class="calibre4">Tectia recognizes an undocumented keyword, <code class="calibre35">StrictModes.UserDirMaskBits</code>, to control the checks more precisely. The value is an octal number representing the file permission bits that must be disabled. For example, to require that files grant no group or world access (read, write, or execute): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    StrictModes.UserDirMaskBits 077</tt></div></span><p class="calibre4">The default value is 022, indicating that group and world write permission must be disabled. </p>
+<p class="calibre4">Even if <code class="calibre35">StrictModes</code> is enabled, it can be defeated by using POSIX access control lists (ACLs), which are supported in Solaris and some other flavors of Unix, to set file permissions with greater precision. <span><em class="italic">sshd</em></span> doesn't check ACLs, so one could argue that <code class="calibre35">StrictModes</code> is an incomplete test. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Boolean Values in Configuration Files</h3>
+<p class="calibre4">Many keywords, such as <code class="calibre35">StrictModes</code>, require Boolean values. OpenSSH and Tectia have different standards for these values. </p>
+<p class="calibre4">OpenSSH recognizes either <code class="calibre35">yes</code> or <code class="calibre35">true</code> to enable the behavior described by a keyword, as well as the opposite values <code class="calibre35">no</code> or <code class="calibre35">false</code> to disable. These values cannot be abbreviated, and must be lowercase. </p>
+<p class="calibre4">Tectia is much more lenient: it recognizes any word starting with the letters <code class="calibre35">y</code> (yes), <code class="calibre35">t</code> (true), or <code class="calibre35">k</code> (<span><em class="italic">kyllä</em></span>: Finnish for "yes") in lowercase or uppercase to enable, and anything else to disable. </p>
+<p class="calibre4">We use <code class="calibre35">yes</code> and <code class="calibre35">no</code> in our examples because they are accepted by both products, and we recommend you do the same. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">6.5　在Dialplan中使用API命令</font>
+</font>
+</p>
+<p height="1em" width="2em">Dialplan中一般执行的是App，而且我们在第4章中介绍App与API的区别时也讲到过，API本身与Channel或Session是不相关的，其是一个“第三者”。不过，在某些特殊情况下，在Dialplan中也需要调用某些API提供的能力，这可以通过类似变量引用的方法来实现，如：${status()}，它与变量引用的区别就是多了一对“()”，看起来类似于函数调用，括号内可以填写API命令的参数。</p>
+<p height="1em" width="2em">这些API调用一般是通过set来执行的，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="api_result=${status()}"/&gt;<br/>
+<br/>
+&lt;action application="set" data="api_result=${version()}"/&gt;<br/>
+<br/>
+&lt;action application="set" data="api_result=${strftime()}"/&gt;<br/>
+<br/>
+&lt;action application="set" data="api_result=${expr(1+1)}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上命令都很直观，它们都是执行一个API，并将API输出的结果作为变量的值。其中，最后一行中的expr类似于UNIX中的expr命令，它计算一个表达式并输出结果，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; expr 1+1<br/>
+<br/>
+2<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+</body>
+</html>

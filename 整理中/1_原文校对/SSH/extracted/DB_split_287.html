@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_376"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1912587" class="calibre7"></a>9.2.4 Forwarding Off-Host </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1912744" class="calibre15"></a>In all our discussions of port forwarding so far, the application client and server have been located on the machines on the ends of the SSH session. This is reflected in our always using "localhost" in naming the target socket of a forwarding: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -L2001:localhost:143 server.example.com</tt></div></span><div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1913276" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Remote forwarding" src="images/00038.jpg" class="calibre71"/></div>
+</div>
+</span><p class="calibre4">Figure 9-7. Remote forwarding</p></div>
+<p class="calibre4">Since the application server is located on the same machine as the connecting side of the SSH port forwarding, the target host can be "localhost." But the connections between the application client and the SSH listening side, and between the application server and the SSH connecting side, are themselves TCP connections. For convenience, TCP implementations allow programs to make connections between two sockets on the same host. The connection data is simply transferred from one process to another without actually being transmitted on any real network interface. However, in principle, either the application client or server—or both—could be on different machines, potentially involving as many as four hosts in a single forwarding (<a shape="rect" href="#filepos1914573" class="calibre6">Figure 9-8</a>). </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1914573" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Off-host port forwarding" src="images/00039.jpg" class="calibre73"/></div>
+</div>
+</span><p class="calibre4">Figure 9-8. Off-host port forwarding</p></div>
+<p class="calibre4">Although this situation is possible, you generally don't want to do it for security reasons—namely, privacy and access control. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.2.4.1 Privacy </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">As shown in <a shape="rect" href="#filepos1914573" class="calibre6">Figure 9-8</a>, the complete path followed by forwarded data includes three TCP connections. But only the second connection, between the two SSH processes, is protected as a channel inside the SSH session. The other two connections are just simple TCP connections. Normally, each of these is on a single host, and is therefore protected from network snooping or interference, so the entire forwarding path is secure. But if either of these two connections is between different hosts, its data is vulnerable in transit. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.2.4.2 Access control and the loopback address </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The other security problem of off-host forwarding concerns the listening side. In short, the listening side of a forwarding has no access control, so intruders may gain access to it. To explain this problem, we must first discuss the <span><em class="italic">loopback address</em></span> of a host. </p>
+<p class="calibre4">In addition to physical network interfaces, a host running IP also has a virtual interface called the <span><em class="italic">loopback</em></span> interface. This is a software construct, not corresponding to any network hardware. Nonetheless, the loopback appears and responds like a real interface. Under Unix, it is often named <em class="italic">lo0</em> and is listed by <span><em class="italic">ifconfig</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ifconfig -a<br class="calibre19"/>    ...<br class="calibre19"/>    lo0: flags=849&lt;UP,LOOPBACK,RUNNING,MULTICAST&gt; mtu 8232<br class="calibre19"/>            inet 127.0.0.1 netmask ff000000</tt></div></span><p class="calibre4">The loopback interface leads back to the host itself. A datagram "transmitted" on the loopback interface immediately appears as an incoming packet on the loopback interface and is picked up and processed by IP as being destined for the local host. </p>
+<p class="calibre4">The loopback interface is always assigned the same IP address—127.0.0.1, the <span><em class="italic">loopback address</em></span>
+<sup class="calibre20">[<a id="filepos1918189" shape="rect" href="DB_split_294.html#filepos1961046" class="calibre6">134</a>]</sup>—and the local naming service provides the name "localhost" for that address. This mechanism gives a reliable way for processes to communicate with one another on the local host via IP, regardless of what IP addresses the host may have on real connected networks, or indeed if the host has no real network connections at all. You can always refer to your local host using the well-known loopback address. </p>
+<p class="calibre4">By design, a loopback address is local to its host. One machine can't contact the loopback address of another. Since the loopback address 127.0.0.1 is standard on all IP hosts, any connection to 127.0.0.1 leads a machine to talk to itself. (Plus, the loopback network isn't routed on the Internet.) </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1919252" class="calibre7"></a>9.2.4.3 Listening on ("binding") an interface </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">When a host listens on a TCP port, it establishes a potential endpoint for a TCP connection. But the endpoints of a TCP connection are sockets, and a socket is an (address,port) pair, not a (host,port) pair. Listening must take place on a particular socket and thus be associated with a particular address, hence a particular interface on the host. This is called <span><em class="italic">binding</em></span> the interface.<sup class="calibre20">[<a id="filepos1919899" shape="rect" href="DB_split_294.html#filepos1961597" class="calibre6">135</a>]</sup> Unless otherwise specified, when asked to listen on a particular port, TCP binds all the host's interfaces and accepts connections on any of them. This is generally the right behavior for a server. It doesn't care how many network interfaces the local host has: it just accepts any connection made to its listening port, regardless of which host address was requested. </p>
+<p class="calibre4">Consider, however, what this means in the case of SSH port forwarding. There is no authentication or access control at all applied to the listening side of a forwarding; it simply accepts any connection and forwards it. If the listening side binds all the host's interfaces for the forwarded port, this means that <span><em class="italic">anyone</em></span> with network connectivity to the listening host—possibly the whole Internet—can use your forwarding. This is obviously not a good situation. To address it, SSH by default binds only the loopback address for the listening side of a forwarding. This means that only other programs on the same host may connect to the forwarded socket. This makes it reasonably safe to use port forwarding on a PC or other single-user machine, but is still a security problem on multiuser hosts. On most Unix machines, for example, a knowledgeable user can connect to any listening sockets and see what's on them. Keep this in mind when using port forwarding on a Unix machine! </p>
+<p class="calibre4">If you want to allow off-host connections to your forwarded ports, you can use the <span><em class="italic">-g</em></span> switch or <code class="calibre35">GatewayPorts</code> option to have the listening side bind all interfaces, as we did in an earlier example: <a shape="rect" href="#filepos1912587" class="calibre6">[9.2.4]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -g -L P:S:W B</tt></div></span><p class="calibre4">But be aware of the security implications! You may want to exercise more control over the use of forwarded ports in this situation by using TCP-wrappers, which we discuss later in this chapter. </p>
+</div>
+</div>
+</body>
+</html>

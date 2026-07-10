@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_567"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2788766" class="calibre7"></a>16.11.3 Commands and Interactive Sessions </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">When a command has been specified by an SSH client, it is run directly by the Tectia server. For commands<a shape="rect" class="calibre15"></a><a id="filepos2789044" class="calibre15"></a> that are built into the Windows command interpreter <span><em class="italic">cmd.exe</em></span>, specify <span><em class="italic">cmd</em></span> explicitly for the <span><em class="italic">ssh</em></span> command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh winserver.example.com cmd /c type readme.txt</tt></div></span><div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2789634" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Server configuration with ssh2admin" src="images/00075.jpg" class="calibre100"/></div>
+</div>
+</span><p class="calibre4">Figure 16-15. Server configuration with ssh2admin</p></div>
+<p class="calibre4">Otherwise, if no command is given, then the server runs <span><em class="italic">cmd.exe</em></span> by default for the interactive session. An alternate program can be specified by the <code class="calibre35">TerminalProvider</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    TerminalProvider    "some-other-cmd.exe"</tt></div></span><p class="calibre4">This provides the same functionality as the login shell for Unix systems, except that it applies to all users. User-specific subconfiguration files can specify different programs for individual users. <a shape="rect" href="DB_split_356.html#filepos2364262" class="calibre6">[11.6.2]</a></p>
+<p class="calibre4">Users can run graphical applications from SSH sessions, but the applications have no access to the display, so this has limited usefulness. Full-screen text applications don't work correctly, because they expect to run in a real console window, and the SSH connection doesn't provide information about the window dimensions, etc. </p>
+<p class="calibre4">By default, the Tectia server creates terminals for interactive sessions in a fully private window station. This is controlled by the <code class="calibre35">PrivateWindowStation</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PrivateWindowStation    yes</tt></div></span><p class="calibre4">The <code class="calibre35">DoubleBackSpace</code> keyword copes with Japanese Windows systems, which require double backspaces to be sent by the server in response to single backspaces from the client, for each two-byte Japanese character. The value is either <code class="calibre35">yes</code> (to enable this behavior) or <code class="calibre35">no</code> (the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    DoubleBackSpace     yes</tt></div></span><p class="calibre4">Child processes that are launched from SSH sessions are not automatically terminated when the session ends. This could be construed as a bug or a feature, depending on the circumstances: beware. </p>
+<p class="calibre4">The user profile folder is used as the home folder for commands and interactive sessions. </p>
+</div>
+</body>
+</html>

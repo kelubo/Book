@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2887197" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_621"><span class="calibre2"><a shape="rect" class="calibre7"></a>Key Management </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2887544" class="calibre15"></a>If you'd like to use public-key authentication to connect to remote hosts <a shape="rect" href="DB_split_047.html#filepos219814" class="calibre6">[2.4]</a>, PuTTY includes a key generator program, called PuTTYgen. It has a simple graphical user interface for creating and editing RSA and DSA keys, as shown in <a shape="rect" href="#filepos2888022" class="calibre6">Figure 18-2</a>. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2888022" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="PuTTYgen, the key generator" src="images/00081.jpg" class="calibre104"/></div>
+</div>
+</span><p class="calibre4">Figure 18-2. PuTTYgen, the key generator</p></div>
+<p class="calibre4">To create a new key, simply click the Generate button. You'll be asked to waggle your mouse around to supply random numbers to the generator, then to supply a passphrase. To edit an existing key, just click the Load button. </p>
+<p class="calibre4">You might remember that OpenSSH and Tectia use different file formats for their keys. PuTTYgen uses the SECSH format for public keys <a shape="rect" href="DB_split_193.html#filepos1232261" class="calibre6">[6.1.2]</a>, but its own unique format for private keys. The private key is stored in a file with the suffix <em class="italic">.ppk</em> and looks like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    PuTTY-User-Key-File-2: ssh-rsa<br class="calibre19"/>    Encryption: aes256-cbc<br class="calibre19"/>    Comment: Your comment here<br class="calibre19"/>    Public-Lines: 4<br class="calibre19"/>    AAAAB3NzaC1yc2EAAAABJQAAAIBltDpO1wC9qJ98peVr5y9C7N9vdOh+OrCNwbIh<br class="calibre19"/>    lba1oSf94rrDl1TQXKXxgIHSd1ICgh7wkdxFWbyDRXSuWdur6kreTGRaw9XgCzQt<br class="calibre19"/>    LyANMtKAPpDYVE1g8jb6jA1bOMtK8b+pGPmetbvdyBDmFcQ/oPwYyrZIjfbd8IdK<br class="calibre19"/>    FxxJvw==<br class="calibre19"/>    Private-Lines: 8<br class="calibre19"/>    3ryAyuTLEnYuLGsetfNvazRYOhxQmzBWSyMLyT2i+zt7QqArlPglY1Um3NBJlYgS<br class="calibre19"/>    caHDiLyH95tV2onEeBThJzYFAvgrr7UlXVjQTDLr29fe2FTS/bNm4OahTaKzTNV4<br class="calibre19"/>    0EojvG1yafCucaZMVwsndB4djpm4otJja+xDVLN7Wj3ibzUT+SfodSJyazMAjB0y<br class="calibre19"/>    Q3ndbcqcIPPg4OM3sL8c09KTVdcuLkkyKMSV5yEgTAP0RG0M+T8/ChHLFLHswwV+<br class="calibre19"/>    /tlb0GLZRa1w3KsnzHHFKxMsM2zOdHXnSG8TX0kecdpT2p8PT3UGw2+SMESD8umc<br class="calibre19"/>    GLai7g/o03lMJVSOezrooDC06p8J8OXk8h84gYeJbBIyXdELh10E3fnDSkTy5jS4<br class="calibre19"/>    w2SCNzXX67ggWjIFtsefsx6VJ4WwJUYtNbKY35M59xMug/GRBL07QPLu+xSh8/RB<br class="calibre19"/>    yM/rWtUvGwXG3ygW/TVm7A==<br class="calibre19"/>    Private-MAC: a0f9fa2204172fc6df9e0f6d5b918c8790d88611</tt></div></span><p class="calibre4">But never fear: PuTTYgen can read and write public and private keys for both OpenSSH and Tectia: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">To read an OpenSSH or Tectia key, simply click the Load button and select the key file. (In the file dialog, be sure to set the file type to "All Files (*.*)" so that your non-PuTTY keys show up.) </li>
+<li class="calibre18">To write an OpenSSH or Tectia private key, use the Conversion menu and select "Export OpenSSH key" or "Export ssh.com key." </li>
+<li class="calibre18">To write an OpenSSH public key, copy and paste the key shown at the top of the window, under "Public key for pasting into OpenSSH authorized_keys file." To write a Tectia public key, do nothing: PuTTY's public keys are already in SECSH format. </li>
+</ul></div>
+</div>  </body>
+</html>

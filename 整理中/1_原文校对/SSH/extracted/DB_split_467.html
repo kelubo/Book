@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_623"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2892726" class="calibre7"></a>18.4.2 Pageant, an SSH Agent </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">An SSH agent goes hand in hand with public-key authentication. <a shape="rect" href="DB_split_199.html#filepos1311823" class="calibre6">[6.3]</a> PuTTY has an agent, called Pageant, that caches private keys (stores them in memory) and responds to authentication-related queries from PuTTY, PSCP, and other clients in the suite. In short, Pageant is a timesaver, so you don't have to keep retyping your passphrase. </p>
+<p class="calibre4">To run Pageant, just double-click it or invoke it from the command line. (Even better, add <em class="italic">pageant.exe</em> to your system startup so that it's always available when you boot or log in.) An icon will appear in the Windows System Tray on the taskbar. Right-click the icon and you can load keys into the agent, view your keys, or perform other operations, as shown in <a shape="rect" href="#filepos2894074" class="calibre6">Figure 18-3</a>. (To add a key, you'll need to know its passphrase.) Once a key is loaded into Pageant, the various PuTTY clients will use the key transparently, and you won't have to retype its passphrase. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2894074" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Pageant, the PuTTY agent" src="images/00082.jpg" class="calibre105"/></div>
+</div>
+</span><p class="calibre4">Figure 18-3. Pageant, the PuTTY agent</p></div>
+<p class="calibre4">You can also run Pageant on the command line. Just follow it with one or more keys you'd like to load, e.g.: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; pageant key1 key2 key3</tt></div></span><p class="calibre4">and it will dutifully load them.</p>
+<p class="calibre4">Speaking of agents, PuTTY also supports agent forwarding <a shape="rect" href="DB_split_204.html#filepos1377375" class="calibre6">[6.3.5]</a>, but only for OpenSSH servers, not Tectia servers. Just make sure the option "Allow agent forwarding" is checked in PuTTY's configuration window; or if you're using Plink, add the <span><em class="italic">-A</em></span> option to enable agent forwarding or <span><em class="italic">-a</em></span> to disable it. </p>
+</div>
+<div class="mbppagebreak" id="calibre_pb_624"></div></body>
+</html>

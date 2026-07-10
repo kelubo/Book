@@ -1,0 +1,345 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_484"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2576692" class="calibre7"></a>12.2.5 Client Problems </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.5.1 General client problems </h3>
+</div>
+</div>
+</div>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A feature of ssh or scp isn't working, but I'm sure I'm using it correctly. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The feature might have been disabled by a system administrator, either when the SSH software was compiled (<a shape="rect" href="DB_split_107.html#filepos564313" class="calibre6">Chapter 4</a>) or during serverwide configuration (<a shape="rect" href="DB_split_135.html#filepos724225" class="calibre6">Chapter 5</a>). Compile-time flags cannot be checked easily, but serverwide configurations are found in the files <em class="italic">/etc/ssh/sshd_config</em> (OpenSSH) or <em class="italic">/etc/ssh2/sshd2_config</em> (Tectia). Ask your system administrator for assistance. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.5.2 Client configuration file </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2579185" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2579223" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">ssh or scp is behaving unexpectedly, using features I didn't request. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The program might be responding to keywords specified in your client configuration file. <a shape="rect" href="DB_split_217.html#filepos1429166" class="calibre6">[7.1.2]</a> Remember that multiple sections of the <em class="italic">config</em> file apply if multiple <code class="calibre35">Host</code> lines match the remote machine name you specified on the command line. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">My OpenSSH ~/.ssh/config file doesn't seem to work right. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Remember that after the first use of a <code class="calibre35">Host</code> directive in the <em class="italic">config</em> file, all statements are inside some <code class="calibre35">Host</code> block (because one <code class="calibre35">Host</code> block is terminated only by the start of another). The <span><em class="italic">ssh</em></span> manpage suggests that you put defaults at the end of the <em class="italic">config</em> file, which is correct; when looking up a directive in the <span><em class="italic">config</em></span> file, <span><em class="italic">ssh</em></span> uses the first match it finds, so defaults should go after any <code class="calibre35">Host</code> blocks. But don't let your own indentation or whitespace fool you. The end of your file might look like this: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # last Host block<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     User linda<br class="calibre19"/><br class="calibre19"/>    # defaults<br class="calibre19"/>    User smith</tt></div></span><p class="calibre4">You intend that the username for logging into <span><em class="italic">server.example.com</em></span> is "linda", and the default username for hosts not explicitly listed earlier is "smith". However, the line <code class="calibre35">User smith</code> is still inside the <code class="calibre35">Host server.example.com</code> block. And since there's an earlier <code class="calibre35">User</code> statement for <span><em class="italic">server.example.com</em></span>, <code class="calibre35">User smith</code> never matches anything, and <span><em class="italic">ssh</em></span> appears to ignore it. The right thing to do is this: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # last Host block<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     User linda<br class="calibre19"/><br class="calibre19"/>    # defaults<br class="calibre19"/>    Host *<br class="calibre19"/>     User smith</tt></div></span></span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">My Tectia ~/.ssh2/ssh2_config file doesn't seem to work right. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">See our answer to the previous question for OpenSSH. However, Tectia has the opposite precedence rule: if multiple configurations match your target, then the <span><em class="italic">last</em></span>, not the first, prevails. Therefore, your defaults go at the beginning of the file. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.5.3 ssh </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2585644" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2585682" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I want to suspend ssh with the escape sequence but I am running more than two levels of ssh (machine to machine to machine). How do I suspend an intermediate ssh? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">One method is to start each <span><em class="italic">ssh</em></span> with a different escape character; otherwise, the earliest <span><em class="italic">ssh</em></span> client in the chain interprets the escape character and suspends. </p>
+<p class="calibre4">Or you can be clever. Remember that if you type the escape character twice, that's the meta-escape: it allows you to send the escape character itself, circumventing its usual special function. So, if you have several chained <span><em class="italic">ssh</em></span> sessions all using the default escape character ~, you can suspend the <em class="italic"><code class="calibre35">n</code></em> th one by pressing the Return key, then <em class="italic"><code class="calibre35">n</code></em> tildes, then <span>Control-Z</span>. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I ran an ssh command in the background on the command line, and it suspended itself, not running unless I "<span><em class="italic">fg</em></span>" it. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use the <span><em class="italic">-n</em></span> command-line option, which instructs <span><em class="italic">ssh</em></span> not to read from stdin (actually, it reopens stdin on <em class="italic">/dev/null</em> instead of your terminal). Otherwise, the shell's job-control facility suspends the program if it reads from stdin while in the background. Or better: use <span><em class="italic">ssh -f</em></span> (possibly with <span><em class="italic">-N</em></span>). <a shape="rect" href="DB_split_289.html#filepos1926475" class="calibre6">[9.2.6]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">ssh prints "Compression level must be from 1 (fast) to 9 (slow, best)" and exits. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Your <code class="calibre35">CompressionLevel</code> is set to an illegal value for this host, probably in your <em class="italic">~/.ssh/config</em> file. It must be an integer between 1 and 9, inclusive. <a shape="rect" href="DB_split_235.html#filepos1653420" class="calibre6">[7.4.14]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">ssh prints "Cannot fork into background without a command to execute" and exits. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">You used the <span><em class="italic">-f</em></span> flag of <span><em class="italic">ssh</em></span>, didn't you? This tells the client to put itself into the background as soon as authentication completes, and then execute whatever remote command you requested. But, you didn't provide a remote command. You typed something like: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # This is wrong<br class="calibre19"/>    $ ssh -f server.example.com</tt></div></span><p class="calibre4">The <span><em class="italic">-f</em></span> flag makes sense only when you give <span><em class="italic">ssh</em></span> a command to run after it goes into the background: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh -f server.example.com /bin/who</tt></div></span></span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">ssh prints "No host key is known for &lt;server name&gt; and you have requested strict checking (or 'cannot confirm operation when running in batch mode')," and exits. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The client can't find the server's host key in its known-hosts list, and it is configured not to add it automatically (or is running in batch mode, so it can't prompt you about adding it). You must add it manually to your per-account or systemwide known-hosts files. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">ssh prints "Selected cipher type...not supported by server" and exits. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">You requested that <span><em class="italic">ssh</em></span> use a particular encryption cipher, but the SSH server doesn't support it. Normally, the SSH client and server negotiate to determine which cipher to use, so you probably forced a particular cipher by providing the <span><em class="italic">-c</em></span> flag on the <span><em class="italic">ssh</em></span> command line or by using the <code class="calibre35">Cipher</code> keyword in the configuration file. Either don't specify a cipher and let the client and server work it out, or select a different cipher. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">ssh prints "channel_request_remote_forwarding: too many forwards" and exits. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4"><span><em class="italic">ssh</em></span> has a static limit of 100 forwardings per session, and you've requested more. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2597098" class="calibre7"></a>12.2.5.4 scp </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2597175" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2597213" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp printed an error message: "Write failed flushing stdout buffer. write stdout: Broken pipe." or "packet too long". </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Your shell startup file (e.g., <em class="italic">~/.cshrc</em>, <em class="italic">~/.bashrc</em>), which is run when <span><em class="italic">scp</em></span> connects, might be writing a message on standard output. These interfere with the communication between the two <span><em class="italic">scp</em></span> programs. If you don't see any obvious output commands, look for <span><em class="italic">stty</em></span> or <span><em class="italic">tset</em></span> commands that might be printing something. </p>
+<p class="calibre4">Either remove the offending statement from the startup file, or suppress it for noninteractive sessions: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    if ($?prompt) then<br class="calibre19"/>      echo 'Here is the message that screws up scp.'<br class="calibre19"/>    endif</tt></div></span></span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp printed an error message, "Not a regular file." </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Are you trying to copy a directory? Use the <span><em class="italic">-r</em></span> option for a recursive copy. Otherwise, you may be trying to copy a special file that it doesn't make sense to copy, such as a device node, socket, or named pipe. If you do an <span><em class="italic">ls -l</em></span> of the file in question and the first character in the file description is something other than "<code class="calibre35">-</code>" (for a regular file) or "d" (for a directory), this is probably what's happening. You didn't really want to copy that file, did you? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Why don't wildcards or shell variables work on the scp command line? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Remember that wildcards and variables are expanded by the <span><em class="italic">local</em></span> shell first, not on the remote machine. This happens even before <span><em class="italic">scp</em></span> runs. So if you type: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ scp server.example.com:a* .</tt></div></span><p class="calibre4">the local shell attempts to find local files matching the pattern <code class="calibre35">server.example.com:a*</code>. This is probably not what you intended. You probably wanted files matching <code class="calibre35">a*</code> on <span><em class="italic">server.example.com</em></span> to be copied to the local machine. </p>
+<p class="calibre4">Some shells, notably the C shell and its derivatives, simply report "No match" and exit. The Bourne shell and its derivatives (<span><em class="italic">sh</em></span>, <span><em class="italic">ksh</em></span>, <span><em class="italic">bash</em></span>), finding no match, will actually pass the string <code class="calibre35">server.example.com:a*</code> to the server as you'd hoped. </p>
+<p class="calibre4">Similarly, if you want to copy your remote mail file to the local machine, the command: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ scp server.example.com:$MAIL .</tt></div></span><p class="calibre4">might not do what you intend. <code class="calibre35">$MAIL</code> is expanded locally before <span><em class="italic">scp</em></span> executes. Unless (by coincidence) <code class="calibre35">$MAIL</code> is the same on the local and remote machines, the command won't behave as expected. </p>
+<p class="calibre4">Don't rely on shell quirks and coincidences to get your work done. Instead, escape your wildcards and variables so that the local shell won't attempt to expand them: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ scp server.example.com:a\* .<br class="calibre19"/>    $ scp 'server.example.com:$MAIL' .</tt></div></span></span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I used scp to copy a file from the local machine to a remote machine. It ran without errors. But when I logged into the remote machine, the file wasn't there! </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">By any chance, did you omit a colon? Suppose you want to copy the file <em class="italic">myfile</em> from the local machine to <span><em class="italic">server.example.com</em></span>. A correct command is: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ scp myfile server.example.com:</tt></div></span><p class="calibre4">but if you forget the final colon:</p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">      # This is wrong!<br class="calibre19"/>      $ scp myfile server.example.com</tt></div></span><p class="calibre4"><em class="italic">myfile</em> gets copied locally to a file called "<span><em class="italic">server.example.com</em></span>". Check for such a file on the local machine. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How can I give somebody access to my account by scp to copy files, but not give full login permissions? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Bad idea. Even if you can limit the access to <span><em class="italic">scp</em></span>, this doesn't protect your account. Your friend could run: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ scp evil_authorized_keys you@your.host:.ssh/authorized_keys</tt></div></span><p class="calibre4">Oops, your friend has just replaced your <em class="italic">authorized_keys</em> file, giving himself full login permissions. Maybe you can accomplish what you want with a clever forced command, limiting the set of programs your friend may run in your account. <a shape="rect" href="DB_split_272.html#filepos1800106" class="calibre6">[8.2.3.3]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp <code class="calibre35">-</code>p preserves file timestamps and modes. Can it preserve file ownership? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No. Ownership of remote files is determined by SSH authentication. Suppose user smith has accounts on local computer L and remote computer R. If the local smith copies a file by <span><em class="italic">scp</em></span> to the remote smith account, authenticating by SSH, then the remote file is owned by the <span><em class="italic">remote</em></span> smith. If you want the file to be owned by a different remote user, <span><em class="italic">scp</em></span> must authenticate as that different user. <span><em class="italic">scp</em></span> has no other knowledge of users and uids, and besides, only root can change file ownership (on most modern Unix variants, anyway). </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OK, scp -p doesn't preserve file ownership information. But I am the superuser, and I'm trying to copy a directory hierarchy between machines (scp -r) and the files have a variety of owners. How can I preserve the ownership information in the copies? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Don't use <span><em class="italic">scp</em></span> for this purpose. There are better ways, with <span><em class="italic">tar</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # tar cpf - <em class="italic"><code class="calibre35">local_dir</code></em> | (ssh <em class="italic"><code class="calibre35">remote_machine</code></em> "cd <em class="italic"><code class="calibre35">remote_dir</code></em>; tar xpf -")</tt></div></span><p class="calibre4">or <span><em class="italic">rsync</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # rsync -ra -e ssh local_dir remote_machine:/remote_dir</tt></div></span><p class="calibre4">The <span><em class="italic">rsync</em></span> method has the advantage of being interruptible and resumable without retransferring files. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.5.5 sftp </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2612677" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">sftp reports "Cipher &lt;name&gt; is not supported. Connection lost." </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Internally, <span><em class="italic">sftp</em></span> invokes an <span><em class="italic">ssh</em></span> command to contact <span><em class="italic">sftp-server</em></span>. <a shape="rect" href="DB_split_088.html#filepos500053" class="calibre6">[3.7.3]</a> It searches the user's PATH to locate the <span><em class="italic">ssh</em></span> executable rather than a hardcoded location. If you have more than one SSH product installed on your system, <span><em class="italic">sftp</em></span> might invoke the wrong <span><em class="italic">ssh</em></span> program. This can produce the error message shown. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">sftp reports "ssh_packet_wrapper_input: invalid packet received." </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Although this error appears mysterious, its cause is mundane. A command in the remote account's shell startup file is printing something to standard output, even though stdout isn't a terminal in this case, and <span><em class="italic">sftp</em></span> is trying to interpret this unexpected output as part of the SFTP packet protocol. It fails and dies. </p>
+<p class="calibre4">You see, <span><em class="italic">sshd</em></span> uses the shell to start the <span><em class="italic">sftp-server</em></span> subsystem. The user's shell startup file prints something, which the SFTP client tries to interpret as an SFTP protocol packet. This fails, and the client exits with the error message; the first field in a packet is the length field, which is why it's always that message. </p>
+<p class="calibre4">To fix this problem, be sure your shell startup file doesn't print anything unless it's running interactively. <span><em class="italic">tcsh</em></span>, for example, sets the variable <code class="calibre35">$interactive</code> if stdin is a terminal. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2617098" class="calibre7"></a>12.2.5.6 Port forwarding </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2617187" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I'm trying to do port forwarding, but ssh complains: "bind: Address already in use." </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The port you're trying to forward is already being used by another program on the listening side (the local host if it's a <span><em class="italic">-L</em></span> forwarding or the remote host if it's a <span><em class="italic">-R</em></span>). Try using the <span><em class="italic">netstat -a</em></span> command, available on most Unix implementations and some Windows platforms. If you see an entry for your port in the <code class="calibre35">LISTEN</code> state, you know that something else is using that port. Check to see whether you've inadvertently left another <span><em class="italic">ssh</em></span> command running that's forwarding the same port. Otherwise, just choose another, unused port to forward. </p>
+<p class="calibre4">This problem can occur when there doesn't appear to be any other program using your port, especially if you've been experimenting with the forwarding feature and have repeatedly used the same <span><em class="italic">ssh</em></span> to forward the same port. If the last one of these died unexpectedly (you interrupted it, or it crashed, or the connection was forcibly closed from the other side, etc.), the local TCP socket may have been left in the <code class="calibre35">TIME_WAIT</code> state (you may see this if you used the <span><em class="italic">netstat</em></span> program as described earlier). When this happens, you have to wait a few minutes for the socket to time out of this state and become free for use again. Of course, you can just choose another port number if you're impatient. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How do I secure FTP with port forwarding?</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">This is a complex topic. <a shape="rect" href="DB_split_332.html#filepos2140512" class="calibre6">[11.2]</a> FTP has two types of TCP connections: control and data. The control connection carries your login name, password, and FTP commands; it is on TCP port 21 and can be forwarded by the standard method. In two windows, run: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh -L2001:name.of.server.com:21 name.of.server.com<br class="calibre19"/>    $ ftp localhost 2001</tt></div></span><p class="calibre4">Your FTP client probably needs to run in passive mode (execute the <code class="calibre35">passive</code> command). FTP data connections carry the files being transferred. These connections occur on randomly selected TCP ports and can't be forwarded in general, unless you enjoy pain. If firewalls or NAT (network address translation) are involved, you may need additional steps (or it may not be possible). </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">X forwarding isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use <span><em class="italic">ssh -v</em></span>, and see if the output points out an obvious problem. If not, check the following: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Make sure you have X working before using SSH. Try running a simple X client such as <span><em class="italic">xlogo</em></span> or <span><em class="italic">xterm</em></span> first. Your local <code class="calibre35">DISPLAY</code> variable must be set, or SSH doesn't attempt X forwarding. </li>
+<li class="calibre18">X forwarding must be turned on in the client and server, and not disallowed by the target account (that is, with <code class="calibre35">no-X11-forwarding</code> in the <em class="italic">authorized_keys</em> file). </li>
+<li class="calibre18"><span><em class="italic">sshd</em></span> must be able to find the <span><em class="italic">xauth</em></span> program to run it on the remote side. If it can't, this should show up when running <span><em class="italic">ssh -v</em></span>. You can fix this on the server side with the <code class="calibre35">XAuthLocation</code> directive (OpenSSH), or by setting a PATH (that contains <span><em class="italic">xauth</em></span>) in your remote shell startup file. </li>
+<li class="calibre18">Don't set the <code class="calibre35">DISPLAY</code> variable yourself on the remote side. <span><em class="italic">sshd</em></span> automatically sets this value correctly for the forwarding session. If you have commands in your login or shell startup files that unconditionally set <code class="calibre35">DISPLAY</code>, change the code to set it only if X forwarding isn't in use. </li>
+<li class="calibre18">OpenSSH sets the remote <code class="calibre35">XAUTHORITY</code> variable as well, placing the <span><em class="italic">xauth</em></span> credentials file under <em class="italic">/tmp</em>. Make sure you haven't overridden this setting, which should look like:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ echo $XAUTHORITY<br class="calibre19"/>    /tmp/ssh-maPK4047/cookies</tt></div></span><br class="calibre19"/>Some flavors of Unix actually have code in the standard shell startup files (e.g., <em class="italic">/etc/bashrc, /etc/csh.login</em>) that unconditionally sets <code class="calibre35">XAUTHORITY</code> to <em class="italic">~/.Xauthority</em>. If that's the problem, you must ask the sysadmin to fix it; the startup file should set <code class="calibre35">XAUTHORITY</code> only if the variable is unset. </li>
+<li class="calibre18">If you are using an SSH startup file (<em class="italic">/etc/ssh/sshrc</em> or <em class="italic">~/.ssh/rc</em>), <span><em class="italic">sshd</em></span> doesn't run <span><em class="italic">xauth</em></span> for you on the remote side to add the proxy key; one of these startup files must do it, receiving the proxy key type and data on standard input from <span><em class="italic">sshd</em></span>. </li>
+<li class="calibre18">Try <span><em class="italic">ssh -Y</em></span> (OpenSSH) or <span><em class="italic">ssh2 +X</em></span> (Tectia) to make forwarded X clients "trusted" by the display server. <a shape="rect" href="DB_split_303.html#filepos2004951" class="calibre6">[9.4.5.3]</a></li>
+</ul></div>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_485"></div></body>
+</html>

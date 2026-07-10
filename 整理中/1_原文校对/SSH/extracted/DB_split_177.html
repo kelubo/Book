@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_236"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1091997" class="calibre7"></a>5.6.3 Initialization Scripts </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">When a user logs in, her Unix shell runs one or more initialization scripts<a shape="rect" class="calibre15"></a><a id="filepos1092232" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1092271" class="calibre15"></a>, such as <em class="italic">/etc/profile.</em> In addition, <span><em class="italic">sshd</em></span> runs the script <em class="italic">/etc/ssh/sshrc</em> (OpenSSH) or <em class="italic">/etc/ssh2/sshrc</em> (Tectia) for each SSH-based login. This feature lets the system administrator run special commands for SSH logins that don't occur for ordinary logins. For example, you can do some additional logging of SSH connections, print welcome messages for SSH users only, etc. </p>
+<p class="calibre4">The <em class="italic">/etc/ssh/sshrc</em> or <em class="italic">/etc/ssh2/sshrc</em> script is always processed by the Bourne shell ( <em class="italic">/bin/sh</em>), rather than the user's shell, so it can run reliably for all accounts regardless of their various shells. It is run for logins (e.g., <span><em class="italic">ssh my-host</em></span>) and remote commands (<span><em class="italic">ssh my-host /bin/who</em></span>), just before the user's shell or command is invoked but after environment variables are initialized. The script runs in a separate shell, which exits after the script finishes, so it cannot initialize environment variables for the session. The script runs under the target account's uid, so it can't take privileged actions. If the script exits due to an error (say, a syntax error), the SSH session continues normally. </p>
+<p class="calibre4">Note that this file is run as input to the Bourne shell: <span><em class="italic">sshd</em></span> runs <span><em class="italic">/bin/sh /etc/ssh/sshrc</em></span>, not <span><em class="italic">/bin/sh -c /etc/ssh/sshrc</em></span>. This means that it can't be an arbitrary program; it must be a file containing Bourne-shell commands (and it doesn't need the execute mode bit set). </p>
+<p class="calibre4"><em class="italic">/etc/ssh/sshrc</em> or <em class="italic">/etc/ssh2/sshrc</em> operates machinewide: it is run for every incoming SSH connection. For more fine-grained control, users may create the script <em class="italic">~/.ssh/rc</em> (OpenSSH) or <em class="italic">~/.ssh2/rc</em> (Tectia) to be run instead of the machinewide script <em class="italic">/etc/ssh/sshrc</em> or <em class="italic">/etc/ssh2/sshrc</em>, respectively. <a shape="rect" href="DB_split_279.html#filepos1861368" class="calibre6">[8.4]</a> The machinewide script isn't executed if the user-specific script exists in the target account, but a user script can run the machinewide script directly. OpenSSH always runs <em class="italic">~/.ssh/rc</em> using the Bourne shell (like <em class="italic">/etc/ssh/sshrc</em>), but Tectia runs <em class="italic">~/.ssh2/rc</em> using each user's shell (in contrast to <em class="italic">/etc/ssh2/sshrc</em>). OpenSSH ignores user scripts if a subsystem is used, but Tectia does not. <a shape="rect" href="DB_split_182.html#filepos1123002" class="calibre6">[5.8]</a></p>
+<p class="calibre4">Note that SSH <span><em class="italic">rc</em></span> files interact with X authentication. <a shape="rect" href="DB_split_303.html#filepos2003429" class="calibre6">[9.4.5.2]</a></p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1096015" shape="rect" href="DB_split_175.html#filepos1084283" class="calibre6">76</a>] </sup>SSH clients are not required (by the SSH-2 protocol) to display the message. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1096330" shape="rect" href="DB_split_176.html#filepos1087545" class="calibre6">77</a>] </sup>And also before the user <em class="italic">rc</em> script, <em class="italic">~/.ssh/rc</em> (OpenSSH) or <em class="italic">~/.ssh2/rc</em> (Tectia). <a shape="rect" href="#filepos1091997" class="calibre6">[5.6.3]</a></p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_237"></div></body>
+</html>

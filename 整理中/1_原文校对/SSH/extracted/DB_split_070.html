@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_105"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos302323" class="calibre7"></a>3.2.2 Public-and Secret-Key Cryptography </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos302495" class="calibre15"></a>Encryption algorithms as described so far are called <span><em class="italic">symmetric</em></span> or <span><em class="italic">secret-key</em></span> ciphers; the same key is used for encrypting and decrypting. Examples are Blowfish, AES, 3DES, and RC4. Such a cipher immediately introduces the key-distribution problem<a shape="rect" class="calibre15"></a><a id="filepos302907" class="calibre15"></a>: how do you get the key to your intended recipient? If you can meet in person every once in a while and exchange a list of keys, that's all well and good, but for dynamic communication over computer networks, this doesn't work. </p>
+<p class="calibre4"><span><em class="italic">Public-key</em></span>, or <span><em class="italic">asymmetric</em></span>, cryptography replaces the single key with a pair of related keys: public and private. They are related in a mathematically clever way: data encrypted with one key may be decrypted only with the other member of the pair, and it is infeasible to derive the private key from the public one. You keep your private key, well, private, and give the public key to anyone who wants it, without worrying about disclosure. Ideally, you publish it in a directory next to your name, like a telephone book. When someone wants to send you a secret message, they encrypt it with your public key. Other people may have your public key, but that won't allow them to decrypt the message; only you can do that with the corresponding private key. Public-key cryptography goes a long way toward solving the key-distribution problem.<sup class="calibre20">[<a id="filepos304231" shape="rect" href="DB_split_071.html#filepos313308" class="calibre6">13</a>]</sup></p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Public-key methods are also the basis for <span><em class="italic">digital signatures<a shape="rect" class="calibre15"></a><a id="filepos304662" class="calibre15"></a>:</em></span> extra information attached to a digital document to provide evidence that a particular person has seen and agreed to it, much as a pen-and-ink signature does with a paper document. Any asymmetric cipher (RSA, ElGamal, Elliptic Curve, etc.) may be used for digital signatures, though the reverse isn't true. For instance, the DSA algorithm is a signature-only public-key scheme and is not intended to be used for encryption. (That's the idea, anyway, although it's easy to use a general DSA implementation for both RSA and ElGamal encryption. That was not the intent, however.) </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Secret-and public-key encryption algorithms differ in another way: performance. All common public-key algorithms are enormously slower than secret-key ciphers—by orders of magnitude. It is simply infeasible to encrypt large quantities of data using a public-key cipher. For this reason, modern data encryption uses both methods together. Suppose you want to send some data securely to your friend Bob Bitflipper. Here's what a modern encryption program does: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Generate a random key, called the <span><em class="italic">bulk key</em></span>, for a fast, secret-key algorithm like 3DES (a.k.a. the <span><em class="italic">bulk cipher</em></span>). </li>
+<li value="2" class="calibre18">Encrypt the plaintext with the bulk key.</li>
+<li value="3" class="calibre18">Secure the bulk key by encrypting it with Bob Bitflipper's public key, so only Bob can decrypt it. Since secret keys are small (a few hundred bits long at most), the speed of the public-key algorithm isn't an issue. </li>
+</ol></div>
+<p class="calibre4">To reverse the operation, Bob's decryption program first decrypts the bulk key, and then uses it to decrypt the ciphertext. This method yields the advantages of both kinds of encryption technology, and in fact, SSH uses this technique. User data crossing an SSH connection is encrypted using a fast secret-key cipher, the key for which is shared between the client and server using public-key methods. </p>
+</div>
+</body>
+</html>

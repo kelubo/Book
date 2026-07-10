@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_218"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos988501" class="calibre7"></a>5.4.7 Kerberos Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos988662" class="calibre15"></a>Kerberos, the well-known secure authentication system, can be used by OpenSSH and Tectia. We summarize the Kerberos-related configuration keywords here and defer a more detailed treatment of the topic. <a shape="rect" href="DB_split_345.html#filepos2253558" class="calibre6">[11.4]</a></p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.4.7.1 Kerberos and OpenSSH </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Kerberos authentication<a shape="rect" class="calibre15"></a><a id="filepos989335" class="calibre15"></a> is supported only if enabled at compile time by the configuration option <code class="calibre35">--with-kerberos5</code>. Assuming the SSH server was built in this manner, Kerberos authentication can be used in two ways: directly, and as a verifier for password authentication. </p>
+<p class="calibre4">Direct Kerberos authentication is enabled by the <code class="calibre35">GSSAPIAuthentication</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    GSSAPIAuthentication yes</tt></div></span><p class="calibre4">This allows normal, ticket-based Kerberos user authentication: it requires that the usual service principal <span><a href="mailto:host/server@REALM" shape="rect" class="calibre6">host/server@REALM</a></span> be added to the Kerberos KDC, and that principal's key added to the server host <em class="italic">keytab</em>, usually <em class="italic">/etc/krb5.keytab</em>. By default, the Kerberos principal <span><a href="mailto:foo@REALM" shape="rect" class="calibre6">foo@REALM</a></span> will be allowed access to server account "foo"; you can allow others by adding them to <em class="italic">~foo/.k5login</em> (along with <span><a href="mailto:foo@REALM" shape="rect" class="calibre6">foo@REALM</a></span> itself, which would otherwise lose access!). There is also the default: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    GSSAPICleanupCredentials yes</tt></div></span><p class="calibre4">which means <span><em class="italic">sshd</em></span> will delete a user's forwarded Kerberos credentials on logout; this is usually a good idea and should be left on. <a shape="rect" href="DB_split_353.html#filepos2324476" class="calibre6">[11.5.2]</a></p>
+<p class="calibre4">The second method, password verification, is indirect. It does not require any Kerberos support on the client at all: it simply means that for regular SSH password authentication, <span><em class="italic">sshd</em></span> will verify a user's password against Kerberos. This mode is enabled or disabled by the keyword <code class="calibre35">KerberosAuthentication</code> with the value <code class="calibre35">yes</code> or <code class="calibre35">no</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    KerberosAuthentication yes</tt></div></span><p class="calibre4">Instead of checking against the local login password, <span><em class="italic">sshd</em></span> requests a Kerberos ticket-granting ticket (TGT) for the user and allows login if the ticket matches the password.<sup class="calibre20">[<a id="filepos992563" shape="rect" href="DB_split_164.html#filepos1007769" class="calibre6">67</a>]</sup> It also stores that TGT in the user's credentials cache, eliminating the need to do a separate <span><em class="italic">kinit</em></span>. Note that for technical reasons, the server also requires a service principal in this case, even though it might not seem necessary: there's an extra step involved that protects against a KDC spoofing attack. </p>
+<p class="calibre4">If Kerberos fails to validate a password, the server optionally validates the same password by ordinary password authentication. This is convenient in an environment where not everyone uses Kerberos. To enable this option, use the keyword <code class="calibre35">KerberosOrLocalPasswd</code> with a value of <code class="calibre35">yes</code>; the default is <code class="calibre35">no</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    KerberosOrLocalPasswd yes</tt></div></span><p class="calibre4">Finally, since password authentication via Kerberos may also result in stored Kerberos user credentials, there's a <code class="calibre35">KerberosTicketCleanup</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    KerberosTicketCleanup yes</tt></div></span><p class="calibre4">Similar to <code class="calibre35">GSSAPICleanupCredentials</code>, this has the server delete such credentials upon logout. </p>
+<p class="calibre4">OpenSSH also used to support Kerberos TGT passing via the <code class="calibre35">KerberosTgtPassing</code> keyword, but at press time the support has been removed. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.4.7.2 Kerberos and Tectia </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos994840" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos994878" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos994916" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos994954" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos994992" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos995030" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos995127" class="calibre15"></a>Kerberos is used with Tectia via GSSAPI authentication. You can allow or require GSSAPI authentication by adding the value <code class="calibre35">gssapi</code>
+<a shape="rect" class="calibre15"></a><a id="filepos995329" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos995368" class="calibre15"></a> to the lists for <code class="calibre35">AllowedAuthentications</code> or <code class="calibre35">RequiredAuthentications</code>, respectively: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications gssapi</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">GSSAPI authentication was added in Tectia Version 4.2. The older <span><a href="mailto:kerberos-2@ssh.com" shape="rect" class="calibre6">kerberos-2@ssh.com</a></span> and <span><a href="mailto:kerberos-tgt-2@ssh.com" shape="rect" class="calibre6">kerberos-tgt-2@ssh.com</a></span> authentication methods are still available if they were enabled when Tectia was configured, but they are unsupported. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The <code class="calibre35">GSSAPI.AllowedMethods</code> keyword specifies a list of allowed GSSAPI methods. Currently, only <code class="calibre35">kerberos</code> is supported: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    GSSAPI.AllowedMethods kerberos</tt></div></span><p class="calibre4">The <code class="calibre35">kerberos</code> GSSAPI method is allowed by default, so there is currently no reason to use the <code class="calibre35">GSSAPI.AllowedMethods</code> keyword, unless you want to be explicit. </p>
+<p class="calibre4">Tectia's GSSAPI authentication attempts to use the MIC. If the keyword <code class="calibre35">GSSAPI.AllowOldMethodWhichIsInsecure</code> is enabled, then Tectia is willing to fall back to using GSSAPI without MIC: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    GSSAPI.AllowOldMethodWhichIsInsecure yes</tt></div></span><p class="calibre4">The default is <code class="calibre35">yes</code>, since GSSAPI with MIC is not yet widely supported. If the value <code class="calibre35">no</code> is used, then GSSAPI authentication requires MIC: another way to specify this is to use <code class="calibre35">gssapi-with-mic</code> instead of <code class="calibre35">gssapi</code> as the authentication method. </p>
+<p class="calibre4">The <code class="calibre35">GSSAPI.Dlls</code> keyword identifies the location of the GSSAPI libraries, as a comma-separated list of full pathnames: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    GSSAPI.Dlls /usr/local/gssapi/lib/libgssapi.so</tt></div></span><p class="calibre4">By default, Tectia searches a list of common locations for the libraries, including: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"><em class="italic">/usr/lib/libgssapi_krb5.so</em></li>
+<li class="calibre18"><em class="italic">/usr/lib/libkrb5.so</em></li>
+<li class="calibre18"><em class="italic">/usr/lib/libgss.so</em></li>
+<li class="calibre18"><em class="italic">/usr/local/gss/gl/mech_krb5.so</em></li>
+<li class="calibre18"><em class="italic">/usr/local/lib/libgssapi_krb5.so</em></li>
+<li class="calibre18"><em class="italic">/usr/local/lib/libkrb5.so</em></li>
+<li class="calibre18"><em class="italic">/usr/kerberos/lib/libgssapi_krb5.so</em></li>
+<li class="calibre18"><em class="italic">/usr/kerberos/lib/libkrb5.so</em></li>
+<li class="calibre18"><em class="italic">/usr/lib/gss/libgssapi_krb5.so</em></li>
+</ul></div>
+<p class="calibre4">The <em class="italic">.so</em> suffix varies for different Unix platforms. </p>
+</div>
+</div>
+</body>
+</html>

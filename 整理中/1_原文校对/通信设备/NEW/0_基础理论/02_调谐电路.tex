@@ -492,19 +492,21 @@ LC调谐电路的设计需要考虑元件选择和参数计算。
 不同容量的可变电容器需要配合不同电感量的线圈，以实现所需的频率覆盖范围。谐振频率由公式\eqref{eq:resonance_frequency}决定。
 
 \begin{center}
-\begin{tabular}{|c|c|c|c|c|c|}
+\small
+\begin{tabularx}{\textwidth}{|X|X|X|X|X|X|}
 \hline
-\textbf{可变电容器类型} & \textbf{容量范围} & \textbf{适用频率范围} & \textbf{配套线圈电感量} & \textbf{推荐电感值} & \textbf{应用场景} \\
+\textbf{类型} & \textbf{容量范围} & \textbf{频率范围} & \textbf{配套电感} & \textbf{推荐值} & \textbf{应用} \\
 \hline
-小型薄膜电容器 & 5-30 pF & 87.5-108 MHz & 0.1-0.3 $\mu$H & 0.2 $\mu$H & FM收音机 \\
-中型薄膜电容器 & 30-150 pF & 2-30 MHz & 3-80 $\mu$H & 30 $\mu$H & 短波收音机 \\
-标准空气电容器 & 120-365 pF & 530-1600 kHz & 100-300 $\mu$H & 250 $\mu$H & 中波收音机 \\
-大型空气电容器 & 365-1000 pF & 150-530 kHz & 1-3 mH & 2 mH & 长波收音机 \\
-双联电容器 & 2×120-365 pF & 530-1600 kHz & 2×100-300 $\mu$H & 2×250 $\mu$H & AM收音机 \\
-三联电容器 & 3×120-365 pF & 530-1600 kHz & 3×100-300 $\mu$H & 3×250 $\mu$H & 多波段收音机 \\
-微调电容器 & 3-30 pF & 调整范围±5\% & - & - & 频率微调 \\
+小型薄膜电容 & 5-30 pF & 87.5-108 MHz & 0.1-0.3 $\mu$H & 0.2 $\mu$H & FM收音机 \\
+中型薄膜电容 & 30-150 pF & 2-30 MHz & 3-80 $\mu$H & 30 $\mu$H & 短波收音机 \\
+标准空气电容 & 120-365 pF & 530-1600 kHz & 100-300 $\mu$H & 250 $\mu$H & 中波收音机 \\
+大型空气电容 & 365-1000 pF & 150-530 kHz & 1-3 mH & 2 mH & 长波收音机 \\
+双联电容 & 2×120-365 pF & 530-1600 kHz & 2×100-300 $\mu$H & 2×250 $\mu$H & AM收音机 \\
+三联电容 & 3×120-365 pF & 530-1600 kHz & 3×100-300 $\mu$H & 3×250 $\mu$H & 多波段收音机 \\
+微调电容 & 3-30 pF & ±5\%调整 & - & - & 频率微调 \\
 \hline
-\end{tabular}
+\end{tabularx}
+\normalsize
 \end{center}
 
 \textbf{频率覆盖计算示例}：
@@ -858,8 +860,10 @@ R1 & 1 M$\Omega$ & 阻尼电阻 \\
     \end{itemize}
   \item 若需要覆盖更低的频率（如150 kHz），可：
     \begin{itemize}
-      \item 增加线圈电感量至约3 mH，配合365 pF可变电容器：$ f_{min} = \frac{1}{2\pi\sqrt{3\times10^{-3} \times 365\times10^{-12}}} \approx 153 \text{ kHz} $
-      \item 或使用更大容量的可变电容器（如1000 pF），配合1 mH线圈：$ f_{min} = \frac{1}{2\pi\sqrt{1\times10^{-3} \times 1000\times10^{-12}}} \approx 159 \text{ kHz} $
+      \item 增加线圈电感量至约3 mH，配合365 pF可变电容器：\\
+            \small $ f_{min} = \frac{1}{2\pi\sqrt{3\times10^{-3} \times 365\times10^{-12}}} \approx 153 \text{ kHz} $\normalsize
+      \item 或使用更大容量的可变电容器（如1000 pF），配合1 mH线圈：\\
+            \small $ f_{min} = \frac{1}{2\pi\sqrt{1\times10^{-3} \times 1000\times10^{-12}}} \approx 159 \text{ kHz} $\normalsize
     \end{itemize}
 \end{itemize}
 

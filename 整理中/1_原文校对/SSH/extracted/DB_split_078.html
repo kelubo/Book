@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos422321" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_116"><span class="calibre2"><a shape="rect" class="calibre7"></a>Inside SSH-1 </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos422666" class="calibre15"></a>With a solid understanding of the current SSH protocol behind us, we now quickly summarize SSH-1<a shape="rect" class="calibre15"></a><a id="filepos422800" class="calibre15"></a> in terms of its differences, weaknesses, and shortcomings in comparison with SSH-2: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Non-modular</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH-1 is defined as a single monolithic protocol, rather than the modular approach taken with the SSH-2 suite. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Less negotiation</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH-1 has more fixed parameters; in fact, only the bulk cipher is negotiated. The integrity algorithm, host key type, key-exchange methods, etc., are all fixed. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Ad hoc naming</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH-1 lacks the well-defined naming syntax for SSH-2 entities which allows for smooth, implementation-specific extensions. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Single authentication</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH-1's user authentication process allows only one method to succeed; the server can't require multiple methods. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">RhostsRSA authentication</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH-1's RhostsRSA authentication, analogous to hostbased, is in principle limited to using a network address as the client host identifier. This limits its usefulness in the face of network issues such as NAT, proxying, mobile clients, etc. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Less flexible remote forwarding</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH-1 remote forwarding specifies only a port, not a full socket, so can't be bound to different addresses on multihomed servers, and the <span><em class="italic">gatewayhosts</em></span> option must be set globally for all remote forwardings rather than per port. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Weaker integrity checking</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH-1 uses a weak integrity check, the CRC-32 algorithm. CRC-32 is not cryptographically strong, and its weakness is the basis of the Futoransky/Kargieman "insertion attack"; see <a href="http://seclists.org/lists/firewall-wizards/1998/Jun/0095.html." shape="rect" class="calibre6">http://seclists.org/lists/firewall-wizards/1998/Jun/0095.html.</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Server keys</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The fixed key exchange of SSH-1 employs an extra asymmetric key called the <span><em class="italic">server key</em></span>, not to be confused with a host key. <a shape="rect" href="DB_split_080.html#filepos428689" class="calibre6">[3.6.1]</a> The server key is an ephemeral public/private key pair, regenerated once per hour and used to provide forward secrecy for the session key. Forward secrecy means that even if long-term secrets such as user or host private keys are compromised later, these can't be used to decrypt SSH sessions recorded earlier; the use of an extra key which is never written to disk assures this. The Diffie-Hellman algorithm which is the basis of all the SSH-2 key exchanges provides forward secrecy by itself, and so an extra "server key" is not needed. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Weak key exchange</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The SSH-1 key exchange is weak in that the client alone determines the session key, and simply sends it to the server. A Trojaned client can easily use weak keys to compromise all its sessions undetectably. </div>
+</blockquote>
+</div>
+</div>  <div class="mbppagebreak" id="calibre_pb_117"></div></body>
+</html>

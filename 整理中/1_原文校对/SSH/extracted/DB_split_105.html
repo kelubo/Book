@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos559755" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_149"><span class="calibre2"><a shape="rect" class="calibre7"></a>Threats Caused by SSH </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos560109" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos560148" class="calibre15"></a>We can hear the chorus now..."What? I'm using SSH to improve security; what do you mean it <span><em class="italic">causes</em></span> threats!?" Calm down, we're just being complete here. There are no new threats that SSH causes per se, but there are existing issues that it perhaps exacerbates. </p>
+<p class="calibre4">To employ SSH, your users must be able to make outbound TCP connections: and really, that gives them the power to do just about anything. Think you can restrict which Internet hosts they can contact? Think again: all they need is a proxy on a host they <span><em class="italic">can</em></span> reach to redirect their traffic. Think they can only use TCP because that's all the firewall lets through? Not at all: there are freely available tools that can operate a full-blown VPN over a TCP (e.g., OpenVPN). Think you're safe from inbound attacks because you allow only outbound connections? Don't be naive: that "outbound" connection is a two-way street once established and can be connected to anything at all. </p>
+<p class="calibre4">The only things that keep people from violating your security policy with this access, aside from respecting the policy itself, are ignorance and inconvenience. Your users might not know how to play any of the preceding tricks, or it might be too much trouble if they do. SSH, however, makes some of these things very easy: tunneling outbound connections to "forbidden" TCP ports, reverse forwarding to tunnel <span><em class="italic">back</em></span> through your firewall and circumvent it, etc...and everything nicely encrypted so that you can't see what's happening! </p>
+<p class="calibre4">The important lesson here is not that SSH is dangerous, but that truly limiting network access is a very difficult proposition: usually impossible, in fact, with any kind of reasonable effort (and if you want to get any other work done). When there are convenient tools like SSH lying around tempting people to get around annoying limitations, you can no longer rely on ignorance and inconvenience to enforce your security policy. Ultimately, you must gain the trust and cooperation of your users to have an effective security policy. </p>
+</div>  <div class="mbppagebreak" id="calibre_pb_150"></div></body>
+</html>

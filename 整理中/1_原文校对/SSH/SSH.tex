@@ -1,0 +1,2049 @@
+\documentclass[12pt]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{tocloft}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\rightmark}
+\fancyhead[RE]{\leftmark}
+
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftchapfont}{\bfseries}
+
+\title{\Huge SSH, the Secure Shell\\[0.5em]
+       \Large The Definitive Guide\\[0.2em]
+       \Large 2nd Edition}
+\author{Daniel J. Barrett, Richard E. Silverman, Robert G. Byrnes}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\frontmatter
+
+\tableofcontents
+
+\chapter{Preface}
+
+Welcome to the second edition of our book on SSH, one of the world's most popular approaches to computer network security. Here's a sampling of what's new in this edition:
+
+\begin{itemize}
+    \item Over 100 new features, options, and configuration keywords from the latest versions of OpenSSH and SSH Tectia (formerly known as SSH Secure Shell or SSH2 from ssh.com)
+    \item Expanded material on the SSH-2 protocol and its internals, including a step-by-step tour through the transport, authentication, and connection phases
+    \item Running OpenSSH on Microsoft Windows and Macintosh OS X
+    \item All-new chapters on Windows software such as Tectia, SecureCRT, and PuTTY
+    \item Scalable authentication techniques for large installations, including X.509 certificates
+    \item Single sign-on between Linux and Windows via Kerberos/GSSAPI
+    \item Logging and debugging in greater depth
+    \item Tectia's metaconfiguration, subconfiguration, and plugins, with examples
+\end{itemize}
+
+\ldots and much more! You might be surprised at how much is changed, but in the past four years, SSH has significantly evolved.
+
+\section{SSH-2 Protocol Triumphant}
+
+Back in 2001, only a handful of SSH products supported the relatively new SSH-2 protocol, and the primary implementation was commercial. Today, the old SSH-1 protocol is dying out and all modern SSH products, free and commercial, use the more secure and flexible SSH-2 protocol. We now recommend that everyone avoid SSH-1.
+
+\section{The Rise of OpenSSH}
+
+This little upstart from the OpenBSD world has become the dominant implementation of SSH on the Internet, snatching the crown from the original, SSH Secure Shell (now called SSH Tectia, which we abbreviate as Tectia). Tectia is still more powerful than OpenSSH in important ways; but as OpenSSH is now included as standard with Linux, Solaris, Mac OS X, and beyond, it dominates in pure numbers.
+
+\section{The Death of Telnet and the R-Tools}
+
+The insecure programs \textit{telnet}, \textit{rsh}, \textit{rcp}, and \textit{rlogin}--long the standards for communication between computers---are effectively extinct.\footnote{FTP is also on the way out, except when operated behind firewalls or over private lines.}
+
+\section{An Explosion of Windows Products}
+
+In 2001, there were a handful of SSH implementations for Windows; now there are dozens of GUI clients and several robust servers, not to mention a full port of the free OpenSSH.
+
+\section{Increased Attacks}
+
+The Internet has experienced a sharp rise in computer intrusions. Now more than ever, your servers and firewalls should be configured to block all remote accesses except via SSH (or other secure protocols).
+
+\chapter{Introduction to This Book}
+
+\section{Protect Your Network with SSH}
+
+SSH (Secure Shell) is a protocol for secure remote login and other secure network services over an insecure network. SSH provides strong authentication, encrypted communications, and secure file transfer capabilities.
+
+\section{Intended Audience}
+
+This book is written for two main audiences:
+
+\subsection{End-User Audience}
+
+If you use SSH occasionally to log into remote machines or transfer files, this book will help you understand what SSH does, how to use its various features, and how to configure it for your needs.
+
+\subsection{System-Administrator Audience}
+
+If you're responsible for setting up and maintaining SSH servers and clients, this book provides comprehensive coverage of server configuration, security best practices, and troubleshooting.
+
+\section{Reading This Book}
+
+We recommend that beginners start with Chapter 1 to understand what SSH is and what it does. From there, you can move to Chapter 2 for hands-on client usage, then explore the more advanced topics as needed.
+
+\mainmatter
+
+\chapter{Introduction to SSH}
+
+Many people today have multiple computer accounts. If you're a reasonably savvy user, you might have a personal account with an Internet service provider (ISP), a work account on your employer's local network, and a few computers at home. You might also have permission to use other accounts owned by family members or friends.
+
+If you have multiple accounts, it's natural to want to make connections between them. For instance, you might want to copy files between computers over a network, log into one account remotely from another, or transmit commands to a remote computer for execution. Various programs exist for these purposes, such as \textit{ftp} for file transfers, \textit{telnet} for remote logins, and \textit{rsh} for remote execution of commands.
+
+Unfortunately, many of these network-related programs have a fundamental problem: they lack security. If you transmit a sensitive file via the Internet, an intruder can potentially intercept and read the data. Even worse, if you log onto another computer remotely using a program such as \textit{telnet}, your username and password can be intercepted as they travel over the network. Yikes!
+
+How can these serious problems be prevented? You can use an \textit{encryption program} to scramble your data into a secret code nobody else can read. You can install a \textit{firewall}, a device that shields portions of a computer network from intruders, and keep all your communications behind it. Or you can use a wide range of other solutions, alone or combined, with varying complexity and cost.
+
+\section{What Is SSH?}
+
+SSH is a secure replacement for the insecure remote login programs like \textit{telnet}, \textit{rsh}, and \textit{rlogin}. It provides:
+
+\begin{itemize}
+    \item \textbf{Secure Remote Login}: Log into remote machines with encrypted passwords
+    \item \textbf{Secure File Transfer}: Transfer files securely using \textit{scp} or \textit{sftp}
+    \item \textbf{Secure Remote Execution}: Execute commands on remote machines securely
+    \item \textbf{Port Forwarding}: Forward network connections securely
+\end{itemize}
+
+\section{What SSH Is Not}
+
+SSH is not:
+
+\begin{itemize}
+    \item A complete security solution by itself
+    \item A replacement for firewalls
+    \item A guarantee against all security threats
+\end{itemize}
+
+\section{The SSH Protocol}
+
+The SSH protocol operates in three layers:
+
+\begin{enumerate}
+    \item \textbf{Transport Layer}: Provides encryption, compression, and server authentication
+    \item \textbf{Authentication Layer}: Handles client authentication
+    \item \textbf{Connection Layer}: Manages multiple channels over a single SSH connection
+\end{enumerate}
+
+\subsection{Protocols, Products, Clients, and Confusion}
+
+SSH has evolved through two major protocol versions: SSH-1 and SSH-2. SSH-2 is the current standard and is more secure than SSH-1.
+
+\section{Overview of SSH Features}
+
+SSH provides a wide range of features that make it essential for secure network administration.
+
+\subsection{Secure Remote Logins}
+
+SSH encrypts all data transmitted between client and server, preventing eavesdropping and tampering.
+
+\subsection{Secure File Transfer}
+
+SSH includes two protocols for secure file transfer:
+\begin{itemize}
+    \item \textit{scp}: Secure copy, based on RCP
+    \item \textit{sftp}: Secure FTP, a more modern protocol
+\end{itemize}
+
+\subsection{Secure Remote Command Execution}
+
+Execute commands on remote machines with the same security as interactive logins.
+
+\subsection{Keys and Agents}
+
+SSH supports public-key authentication, which is more secure than password authentication. The SSH agent manages private keys and eliminates the need to re-enter passphrases.
+
+\subsection{Access Control}
+
+SSH provides fine-grained access control through configuration files like \textit{sshd\_config} and \textit{authorized\_keys}.
+
+\subsection{Port Forwarding}
+
+SSH can forward network ports, allowing secure access to services on remote machines.
+
+\section{History of SSH}
+
+SSH was originally developed by Tatu Ylönen in 1995 in response to a password-sniffing attack at the University of Helsinki. Since then, it has become the de facto standard for secure remote access.
+
+\section{Related Technologies}
+
+Several technologies are related to SSH and are often used together with it.
+
+\subsection{Rsh Suite (R-Commands)}
+
+The r-commands (\textit{rsh}, \textit{rlogin}, \textit{rcp}) were the predecessors to SSH but are now considered insecure.
+
+\subsection{Pretty Good Privacy (PGP) and GNU Privacy Guard (GnuPG)}
+
+PGP and GnuPG are encryption tools used for secure email and file encryption.
+
+\subsection{Kerberos}
+
+Kerberos is a network authentication protocol that can be integrated with SSH for single sign-on.
+
+\subsection{IPSEC and Virtual Private Networks}
+
+IPSEC provides network-layer encryption, often used for VPNs.
+
+\subsection{Secure Remote Password (SRP)}
+
+SRP is an authentication protocol that allows password-based authentication without transmitting the password.
+
+\subsection{Secure Socket Layer (SSL) Protocol}
+
+SSL is used for secure web communications (HTTPS).
+
+\subsection{SSL-Enhanced Telnet and FTP}
+
+SSL can be used to secure traditional protocols like Telnet and FTP.
+
+\subsection{Stunnel}
+
+Stunnel is a program that encrypts arbitrary TCP connections inside SSL.
+
+\subsection{Firewalls}
+
+Firewalls filter network traffic and are often used together with SSH for enhanced security.
+
+\chapter{Basic Client Use}
+
+This chapter covers the basics of using SSH clients for secure remote access.
+
+\section{A Running Example}
+
+Let's start with a simple example of connecting to a remote machine using SSH:
+
+\begin{lstlisting}[language=bash]
+$ ssh user@remotehost.example.com
+\end{lstlisting}
+
+This command connects to \textit{remotehost.example.com} as the user \textit{user}.
+
+\section{Remote Terminal Sessions with ssh}
+
+The \textit{ssh} command is used for remote terminal sessions:
+
+\begin{lstlisting}[language=bash]
+$ ssh hostname
+$ ssh user@hostname
+$ ssh -p port user@hostname
+\end{lstlisting}
+
+\subsection{File Transfer with scp}
+
+The \textit{scp} command is used for secure file transfer:
+
+\begin{lstlisting}[language=bash]
+$ scp file.txt user@hostname:/path/to/destination
+$ scp user@hostname:/path/to/file.txt .
+\end{lstlisting}
+
+\section{Adding Complexity to the Example}
+
+SSH provides many options to customize your connection.
+
+\subsection{Known Hosts}
+
+SSH maintains a list of known hosts in \textit{~/.ssh/known\_hosts} to prevent man-in-the-middle attacks.
+
+\subsection{The Escape Character}
+
+The default escape character is \textit{~}, which can be used to send special commands to the SSH client.
+
+\section{Authentication by Cryptographic Key}
+
+Public-key authentication is more secure than password authentication.
+
+\subsection{A Brief Introduction to Keys}
+
+SSH uses asymmetric cryptography, where each user has a public key and a private key.
+
+\subsection{Generating Key Pairs with ssh-keygen}
+
+\begin{lstlisting}[language=bash]
+$ ssh-keygen -t rsa
+$ ssh-keygen -t dsa
+\end{lstlisting}
+
+\subsection{Installing a Public Key on an SSH Server Machine}
+
+\begin{lstlisting}[language=bash]
+$ ssh-copy-id user@hostname
+\end{lstlisting}
+
+\subsection{If You Change Your Key}
+
+If you change your key, you need to update the \textit{authorized\_keys} file on the server.
+
+\section{The SSH Agent}
+
+The SSH agent manages private keys and caches passphrases.
+
+\begin{lstlisting}[language=bash]
+$ eval `ssh-agent`
+$ ssh-add
+\end{lstlisting}
+
+\subsection{Agents and Automation}
+
+The agent is particularly useful for automated scripts and cron jobs.
+
+\subsection{A More Complex Passphrase Problem}
+
+For scripts that need to run without user interaction, you can use:
+\begin{itemize}
+    \item Agent forwarding
+    \item Keys without passphrases (not recommended)
+    \item Keychain tools
+\end{itemize}
+
+\subsection{Agent Forwarding}
+
+Agent forwarding allows you to use your local keys on remote machines:
+
+\begin{lstlisting}[language=bash]
+$ ssh -A user@hostname
+\end{lstlisting}
+
+\section{Connecting Without a Password or Passphrase}
+
+To connect without entering a password, you need to:
+\begin{enumerate}
+    \item Generate a key pair
+    \item Install the public key on the server
+    \item Ensure proper file permissions
+\end{enumerate}
+
+\section{Miscellaneous Clients}
+
+SSH includes several other client programs.
+
+\subsection{sftp}
+
+SFTP is a secure file transfer protocol:
+
+\begin{lstlisting}[language=bash]
+$ sftp user@hostname
+\end{lstlisting}
+
+\subsection{slogin}
+
+\textit{slogin} is an alias for \textit{ssh} on some systems.
+
+\chapter{Inside SSH}
+
+This chapter explores the inner workings of SSH, including its architecture and security mechanisms.
+
+\section{Overview of Features}
+
+SSH provides several key security features:
+
+\subsection{Privacy (Encryption)}
+
+SSH encrypts all data using strong cryptographic algorithms.
+
+\subsection{Integrity}
+
+SSH ensures data integrity using message authentication codes (MACs).
+
+\subsection{Authentication}
+
+SSH supports multiple authentication methods:
+\begin{itemize}
+    \item Password authentication
+    \item Public-key authentication
+    \item Hostbased authentication
+    \item Keyboard-interactive authentication
+\end{itemize}
+
+\subsection{Authorization}
+
+SSH controls access based on configuration files and user permissions.
+
+\subsection{Forwarding (Tunneling)}
+
+SSH can forward ports and create secure tunnels.
+
+\section{A Cryptography Primer}
+
+Understanding SSH requires some knowledge of cryptography.
+
+\subsection{How Secure Is Secure?}
+
+Security is a relative concept. SSH provides strong security but is not invulnerable.
+
+\subsection{Public-and Secret-Key Cryptography}
+
+SSH uses both symmetric and asymmetric cryptography:
+\begin{itemize}
+    \item Symmetric: Same key for encryption and decryption
+    \item Asymmetric: Different keys for encryption and decryption
+\end{itemize}
+
+\subsection{Hash Functions}
+
+Hash functions like MD5 and SHA-1 are used for data integrity.
+
+\section{The Architecture of an SSH System}
+
+An SSH system consists of:
+\begin{itemize}
+    \item SSH client
+    \item SSH server
+    \item Key management
+    \item Configuration files
+\end{itemize}
+
+\section{Inside SSH-2}
+
+SSH-2 is the current standard protocol.
+
+\subsection{Protocol Summary}
+
+SSH-2 operates in three phases:
+\begin{enumerate}
+    \item Transport layer negotiation
+    \item Authentication
+    \item Connection establishment
+\end{enumerate}
+
+\subsection{SSH Transport Layer Protocol (SSH-TRANS)}
+
+The transport layer provides:
+\begin{itemize}
+    \item Server authentication
+    \item Encryption
+    \item Compression
+\end{itemize}
+
+\subsection{SSH Authentication Protocol (SSH-AUTH)}
+
+Handles client authentication using various methods.
+
+\subsection{SSH Connection Protocol (SSH-CONN)}
+
+Manages multiple channels over a single SSH connection.
+
+\section{Inside SSH-1}
+
+SSH-1 is the older protocol version and is now deprecated.
+
+\section{Implementation Issues}
+
+Several implementation details affect SSH security.
+
+\subsection{Host Keys}
+
+Host keys identify SSH servers and prevent man-in-the-middle attacks.
+
+\subsection{Authorization in Hostbased Authentication}
+
+Hostbased authentication allows hosts to authenticate each other.
+
+\subsection{SSH-1 Backward Compatibility}
+
+Most SSH implementations still support SSH-1 for backward compatibility, but it's recommended to disable it.
+
+\subsection{Randomness}
+
+SSH requires a good source of randomness for generating keys.
+
+\subsection{Privilege Separation in OpenSSH}
+
+OpenSSH uses privilege separation to reduce the risk of security vulnerabilities.
+
+\section{SSH and File Transfers (scp and sftp)}
+
+SSH provides two protocols for secure file transfer.
+
+\subsection{What's in a Name?}
+
+\textit{scp} and \textit{sftp} are both secure file transfer protocols, but \textit{sftp} is more modern.
+
+\subsection{scp Details}
+
+\textit{scp} uses the SSH protocol to copy files between machines.
+
+\subsection{scp2/sftp Details}
+
+\textit{sftp} provides a more flexible file transfer interface.
+
+\section{Algorithms Used by SSH}
+
+SSH supports various cryptographic algorithms.
+
+\subsection{Public-Key Algorithms}
+\begin{itemize}
+    \item RSA
+    \item DSA
+    \item ECDSA
+    \item Ed25519
+\end{itemize}
+
+\subsection{Secret-Key Algorithms}
+\begin{itemize}
+    \item AES
+    \item 3DES
+    \item Blowfish
+    \item Twofish
+\end{itemize}
+
+\subsection{Hash Functions}
+\begin{itemize}
+    \item MD5
+    \item SHA-1
+    \item SHA-256
+\end{itemize}
+
+\subsection{Compression Algorithms: zlib}
+
+SSH supports zlib compression for improved performance.
+
+\section{Threats SSH Can Counter}
+
+SSH protects against several types of attacks.
+
+\subsection{Eavesdropping}
+
+SSH encrypts all data, preventing eavesdropping.
+
+\subsection{Name Service and IP Spoofing}
+
+SSH authenticates servers, preventing IP spoofing attacks.
+
+\subsection{Connection Hijacking}
+
+SSH's integrity checks prevent connection hijacking.
+
+\subsection{Man-in-the-Middle Attacks}
+
+SSH uses host keys to detect man-in-the-middle attacks.
+
+\section{Threats SSH Doesn't Prevent}
+
+SSH is not a complete security solution.
+
+\subsection{Password Cracking}
+
+Weak passwords can still be cracked.
+
+\subsection{IP and TCP Attacks}
+
+SSH doesn't protect against network-level attacks.
+
+\subsection{Traffic Analysis}
+
+SSH can't prevent traffic analysis.
+
+\subsection{Covert Channels}
+
+Covert channels can be used to bypass SSH security.
+
+\subsection{Carelessness}
+
+Human error can compromise SSH security.
+
+\section{Threats Caused by SSH}
+
+SSH can introduce security risks if not configured properly.
+
+\chapter{Installation and Compile-Time Configuration}
+
+This chapter covers installing and configuring SSH servers and clients.
+
+\section{Overview}
+
+Installing SSH involves several steps:
+
+\begin{enumerate}
+    \item Install prerequisites
+    \item Obtain the source code
+    \item Verify the signature
+    \item Extract the source files
+    \item Configure and compile
+    \item Install the binaries
+\end{enumerate}
+
+\subsection{Install the Prerequisites}
+
+SSH requires:
+\begin{itemize}
+    \item A C compiler
+    \item OpenSSL or equivalent
+    \item zlib for compression
+\end{itemize}
+
+\subsection{Obtain the Sources}
+
+Sources can be downloaded from:
+\begin{itemize}
+    \item OpenSSH: \url{http://www.openssh.com}
+    \item Tectia: \url{http://www.ssh.com}
+\end{itemize}
+
+\subsection{Verify the Signature}
+
+Always verify the digital signature of downloaded files.
+
+\subsection{Extract the Source Files}
+
+\begin{lstlisting}[language=bash]
+$ tar xzf openssh-X.Y.Z.tar.gz
+$ cd openssh-X.Y.Z
+\end{lstlisting}
+
+\subsection{Perform Compile-Time Configuration}
+
+\begin{lstlisting}[language=bash]
+$ ./configure --prefix=/usr/local --with-ssl-dir=/usr/local/ssl
+\end{lstlisting}
+
+\subsection{Compile Everything}
+
+\begin{lstlisting}[language=bash]
+$ make
+\end{lstlisting}
+
+\subsection{Install the Programs and Configuration Files}
+
+\begin{lstlisting}[language=bash]
+$ make install
+\end{lstlisting}
+
+\section{Installing OpenSSH}
+
+OpenSSH is the most widely used SSH implementation.
+
+\subsection{Prerequisites}
+
+OpenSSH requires:
+\begin{itemize}
+    \item OpenSSL
+    \item zlib
+    \item PAM (optional)
+    \item Kerberos (optional)
+\end{itemize}
+
+\subsection{Downloading and Extracting the Files}
+
+\begin{lstlisting}[language=bash]
+$ wget http://mirror.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-X.Y.Z.tar.gz
+$ tar xzf openssh-X.Y.Z.tar.gz
+\end{lstlisting}
+
+\subsection{Building and Installing}
+
+\begin{lstlisting}[language=bash]
+$ ./configure
+$ make
+$ make install
+\end{lstlisting}
+
+\subsection{Configuration Options}
+
+OpenSSH supports many configuration options:
+\begin{itemize}
+    \item \texttt{--prefix}: Installation directory
+    \item \texttt{--with-ssl-dir}: OpenSSL directory
+    \item \texttt{--with-pam}: Enable PAM support
+    \item \texttt{--with-kerberos5}: Enable Kerberos support
+\end{itemize}
+
+\section{Installing Tectia}
+
+Tectia is a commercial SSH implementation.
+
+\subsection{Prerequisites}
+
+Tectia has specific requirements for each platform.
+
+\subsection{Obtaining and Extracting the Files}
+
+Download from \url{http://www.ssh.com}
+
+\subsection{Verifying with md5sum}
+
+\begin{lstlisting}[language=bash]
+$ md5sum tectia-X.Y.Z.tar.gz
+\end{lstlisting}
+
+\subsection{Building and Installing}
+
+Follow the vendor's installation instructions.
+
+\subsection{Configuration Options}
+
+Tectia provides advanced configuration options for enterprise environments.
+
+\subsection{SSH-1 Compatibility Support for Tectia}
+
+Tectia can be configured to support SSH-1 for legacy systems.
+
+\section{Software Inventory}
+
+After installation, you'll have:
+\begin{itemize}
+    \item \textit{ssh}: SSH client
+    \item \textit{sshd}: SSH server
+    \item \textit{scp}: Secure copy
+    \item \textit{sftp}: Secure FTP
+    \item \textit{ssh-keygen}: Key generation
+    \item \textit{ssh-agent}: Key agent
+    \item \textit{ssh-add}: Key management
+\end{itemize}
+
+\section{Replacing r-Commands with SSH}
+
+SSH can replace insecure r-commands.
+
+\subsection{Concurrent Versions System (CVS)}
+
+CVS can use SSH for secure connections.
+
+\subsection{GNU Emacs}
+
+Emacs can use SSH for remote file editing.
+
+\subsection{Pine}
+
+Pine can use SSH for secure email retrieval.
+
+\subsection{rsync, rdist}
+
+These tools can use SSH for secure file synchronization.
+
+\chapter{Serverwide Configuration}
+
+This chapter covers configuring SSH servers for optimal security and performance.
+
+\section{Running the Server}
+
+The SSH server (\textit{sshd}) can be run in different ways.
+
+\subsection{Running sshd as the Superuser}
+
+Most SSH servers run as root to bind to privileged ports.
+
+\subsection{Running sshd as an Ordinary User}
+
+For added security, some installations run sshd as a non-root user.
+
+\section{Server Configuration: An Overview}
+
+SSH server configuration is done through \textit{sshd\_config}.
+
+\subsection{Server Configuration Files}
+
+\begin{itemize}
+    \item \textit{/etc/ssh/sshd\_config}: Main configuration file
+    \item \textit{/etc/ssh/ssh\_host\_key}: Host key
+    \item \textit{/etc/ssh/ssh\_host\_rsa\_key}: RSA host key
+    \item \textit{/etc/ssh/ssh\_host\_dsa\_key}: DSA host key
+\end{itemize}
+
+\subsection{Checking Configuration Files}
+
+\begin{lstlisting}[language=bash]
+$ sshd -t
+\end{lstlisting}
+
+\subsection{Command-Line Options}
+
+\begin{lstlisting}[language=bash]
+$ sshd -p 2222 -d
+\end{lstlisting}
+
+\subsection{Changing the Configuration}
+
+Edit \textit{sshd\_config} and restart the server:
+
+\begin{lstlisting}[language=bash]
+$ service ssh restart
+\end{lstlisting}
+
+\subsection{A Tricky Reconfiguration Example}
+
+Changing the SSH port requires updating firewall rules.
+
+\section{Getting Ready: Initial Setup}
+
+Initial server setup involves several steps.
+
+\subsection{File Locations}
+
+Know where SSH stores its configuration files.
+
+\subsection{File Permissions}
+
+Critical files must have restrictive permissions:
+\begin{lstlisting}[language=bash]
+$ chmod 600 ~/.ssh/authorized_keys
+$ chmod 700 ~/.ssh
+\end{lstlisting}
+
+\subsection{TCP/IP Settings}
+
+Configure TCP/IP options in \textit{sshd\_config}.
+
+\subsection{Key Regeneration}
+
+Regularly regenerate host keys for security.
+
+\subsection{Encryption Algorithms}
+
+Choose strong encryption algorithms.
+
+\subsection{Integrity-Checking (MAC) Algorithms}
+
+Select secure MAC algorithms.
+
+\subsection{SSH Protocol Settings}
+
+Disable SSH-1 and use SSH-2 only.
+
+\subsection{Compression}
+
+Enable compression for improved performance.
+
+\section{Authentication: Verifying Identities}
+
+Configure authentication methods.
+
+\subsection{Authentication Syntax}
+
+Authentication methods are specified in \textit{sshd\_config}.
+
+\subsection{Password Authentication}
+
+Enable or disable password authentication.
+
+\subsection{Public-Key Authentication}
+
+Configure public-key authentication options.
+
+\subsection{Hostbased Authentication}
+
+Enable hostbased authentication for trusted hosts.
+
+\subsection{Keyboard-Interactive Authentication}
+
+Support for challenge-response authentication.
+
+\subsection{PGP Authentication}
+
+PGP-based authentication (rarely used).
+
+\subsection{Kerberos Authentication}
+
+Integrate with Kerberos for single sign-on.
+
+\subsection{PAM Authentication}
+
+Use PAM for flexible authentication.
+
+\subsection{Privilege Separation}
+
+Enable privilege separation for enhanced security.
+
+\subsection{Selecting a Login Program}
+
+Configure the login shell for users.
+
+\section{Access Control: Letting People In}
+
+Configure who can access the SSH server.
+
+\subsection{Account Access Control}
+
+Control access based on user accounts.
+
+\subsection{Group Access Control}
+
+Control access based on user groups.
+
+\subsection{Hostname Access Control}
+
+Control access based on client hostnames.
+
+\subsection{shosts Access Control}
+
+Use shosts files for host-based access control.
+
+\subsection{Root Access Control}
+
+Restrict or allow root access via SSH.
+
+\subsection{External Access Control}
+
+Integrate with external authentication systems.
+
+\subsection{Restricting Directory Access with chroot}
+
+Use chroot to restrict users to specific directories.
+
+\section{User Logins and Accounts}
+
+Configure user login environment.
+
+\subsection{Welcome Messages for the User}
+
+Customize welcome messages for SSH users.
+
+\subsection{Setting Environment Variables}
+
+Set environment variables for SSH sessions.
+
+\subsection{Initialization Scripts}
+
+Configure scripts to run on login.
+
+\section{Forwarding}
+
+Configure various forwarding options.
+
+\subsection{Port Forwarding}
+
+Enable and configure port forwarding.
+
+\subsection{X Forwarding}
+
+Enable X11 forwarding for graphical applications.
+
+\subsection{Agent Forwarding}
+
+Enable agent forwarding for key management.
+
+\section{Subsystems}
+
+Configure SSH subsystems like SFTP.
+
+\section{Logging and Debugging}
+
+Configure logging and debugging options.
+
+\subsection{OpenSSH Logging and Debugging}
+
+Logging configuration for OpenSSH.
+
+\subsection{Tectia Logging and Debugging}
+
+Logging configuration for Tectia.
+
+\subsection{Debugging Under inetd or xinetd}
+
+Debugging when running under super-server.
+
+\section{Compatibility Between SSH-1 and SSH-2 Servers}
+
+Configure protocol compatibility.
+
+\subsection{Security Issues with Tectia's SSH-1 Compatibility Mode}
+
+Security considerations for backward compatibility.
+
+\section{Summary}
+
+This chapter covered serverwide configuration of SSH servers, including authentication, access control, forwarding, and logging.
+
+\chapter{Key Management and Agents}
+
+This chapter covers managing SSH keys and using the SSH agent.
+
+\section{What Is an Identity?}
+
+An SSH identity consists of a private key and corresponding public key.
+
+\subsection{OpenSSH Identities}
+
+OpenSSH stores identities in \textit{~/.ssh/id\_rsa}, \textit{~/.ssh/id\_dsa}, etc.
+
+\subsection{Tectia Identities}
+
+Tectia uses different identity file formats and locations.
+
+\section{Creating an Identity}
+
+Generate SSH key pairs for authentication.
+
+\subsection{Generating Keys for OpenSSH}
+
+\begin{lstlisting}[language=bash]
+$ ssh-keygen -t rsa -b 4096
+$ ssh-keygen -t ed25519
+\end{lstlisting}
+
+\subsection{Generating Keys for Tectia}
+
+Tectia uses its own key generation tools.
+
+\subsection{Selecting a Passphrase}
+
+Choose a strong passphrase to protect your private key.
+
+\section{SSH Agents}
+
+The SSH agent manages private keys and caches passphrases.
+
+\subsection{Agents Do Not Expose Keys}
+
+Agents hold keys in memory and never write them to disk.
+
+\subsection{Starting an Agent}
+
+\begin{lstlisting}[language=bash]
+$ eval `ssh-agent`
+$ ssh-agent bash
+\end{lstlisting}
+
+\subsection{Loading Keys with ssh-add}
+
+\begin{lstlisting}[language=bash]
+$ ssh-add ~/.ssh/id_rsa
+$ ssh-add -l
+\end{lstlisting}
+
+\subsection{Agents and Security}
+
+Agent security considerations and best practices.
+
+\subsection{Agent Forwarding}
+
+Forward the agent to remote machines:
+
+\begin{lstlisting}[language=bash]
+$ ssh -A user@hostname
+\end{lstlisting}
+
+\section{Multiple Identities}
+
+Manage multiple SSH identities.
+
+\subsection{Switching Identities Manually}
+
+Use the -i option to specify an identity file:
+
+\begin{lstlisting}[language=bash]
+$ ssh -i ~/.ssh/my_other_key user@hostname
+\end{lstlisting}
+
+\subsection{Switching Identities with an Agent}
+
+Load multiple identities into the agent.
+
+\subsection{Tailoring Sessions Based on Identity}
+
+Configure different session settings based on the identity used.
+
+\section{PGP Authentication in Tectia}
+
+Tectia supports PGP-based authentication.
+
+\section{Tectia External Keys}
+
+Tectia supports external key storage and hardware tokens.
+
+\section{Summary}
+
+This chapter covered SSH key management, agents, and identity handling.
+
+\chapter{Advanced Client Use}
+
+This chapter covers advanced SSH client configuration and usage.
+
+\section{How to Configure Clients}
+
+SSH clients can be configured in multiple ways.
+
+\subsection{Command-Line Options}
+
+Pass options directly on the command line.
+
+\subsection{Client Configuration Files}
+
+Configure clients via \textit{~/.ssh/config} or \textit{/etc/ssh/ssh\_config}.
+
+\subsection{Environment Variables}
+
+Use environment variables to configure SSH behavior.
+
+\section{Precedence}
+
+Configuration sources are applied in specific order:
+\begin{enumerate}
+    \item Command-line options
+    \item User configuration file (~/.ssh/config)
+    \item System configuration file (/etc/ssh/ssh_config)
+    \item Environment variables
+\end{enumerate}
+
+\section{Introduction to Verbose Mode}
+
+Use verbose mode for debugging:
+
+\begin{lstlisting}[language=bash]
+$ ssh -v user@hostname
+$ ssh -vvv user@hostname
+\end{lstlisting}
+
+\section{Client Configuration in Depth}
+
+Detailed client configuration options.
+
+\subsection{Remote Account Name}
+
+Specify the remote username.
+
+\subsection{User Identity}
+
+Select which identity to use.
+
+\subsection{Host Keys and Known-Hosts Databases}
+
+Manage known hosts and host key verification.
+
+\subsection{SSH Protocol Settings}
+
+Configure protocol version and compatibility.
+
+\subsection{TCP/IP Settings}
+
+Configure TCP connection options.
+
+\subsection{Making Connections}
+
+Connection establishment options.
+
+\subsection{Proxies and SOCKS}
+
+Configure proxy connections.
+
+\subsection{Forwarding}
+
+Enable various forwarding options.
+
+\subsection{Encryption Algorithms}
+
+Select encryption algorithms.
+
+\subsection{Integrity-Checking (MAC) Algorithms}
+
+Select MAC algorithms for data integrity.
+
+\subsection{Session Rekeying}
+
+Configure automatic session rekeying.
+
+\subsection{Host Key Types}
+
+Specify which host key types to accept.
+
+\subsection{Authentication}
+
+Configure authentication methods.
+
+\subsection{Data Compression}
+
+Enable compression for improved performance.
+
+\subsection{Program Locations}
+
+Specify paths to SSH-related programs.
+
+\subsection{Subsystems}
+
+Configure SSH subsystems like SFTP.
+
+\subsection{Logging and Debugging}
+
+Configure logging and debugging options.
+
+\subsection{Random Seeds}
+
+Configure random seed sources.
+
+\section{Secure Copy with scp}
+
+Advanced scp usage.
+
+\subsection{Full Syntax of scp}
+
+\begin{lstlisting}[language=bash]
+$ scp [-12346BCpqrv] [-c cipher] [-F ssh_config] [-i identity_file]
+      [-l limit] [-o ssh_option] [-P port] [-S program]
+      [[user@]host1:]file1 ... [[user@]host2:]file2
+\end{lstlisting}
+
+\subsection{Handling of Wildcards}
+
+Use wildcards with scp:
+
+\begin{lstlisting}[language=bash]
+$ scp user@host:~/documents/*.txt .
+\end{lstlisting}
+
+\subsection{Recursive Copy of Directories}
+
+\begin{lstlisting}[language=bash]
+$ scp -r user@host:~/documents/ .
+\end{lstlisting}
+
+\subsection{Preserving Permissions}
+
+\begin{lstlisting}[language=bash]
+$ scp -p user@host:file.txt .
+\end{lstlisting}
+
+\subsection{Automatic Removal of Original File}
+
+Remove source files after successful transfer.
+
+\subsection{Safety Features}
+
+scp includes safety features to prevent accidental overwrites.
+
+\subsection{Batch Mode}
+
+Run scp in batch mode without interactive prompts:
+
+\begin{lstlisting}[language=bash]
+$ scp -B user@host:file.txt .
+\end{lstlisting}
+
+\subsection{User Identity}
+
+Specify the user identity for scp connections.
+
+\subsection{SSH Protocol Settings}
+
+Configure SSH protocol options for scp.
+
+\subsection{TCP/IP Settings}
+
+Configure TCP/IP options for scp connections.
+
+\subsection{Encryption Algorithms}
+
+Select encryption algorithms for scp.
+
+\subsection{Controlling Bandwidth}
+
+Limit bandwidth usage:
+
+\begin{lstlisting}[language=bash]
+$ scp -l 1000 user@host:file.txt .
+\end{lstlisting}
+
+\subsection{Data Compression}
+
+Enable compression for scp transfers:
+
+\begin{lstlisting}[language=bash]
+$ scp -C user@host:file.txt .
+\end{lstlisting}
+
+\subsection{File Conversion}
+
+Convert files during transfer.
+
+\subsection{Optimizations}
+
+Optimize scp performance for different network conditions.
+
+\section{Secure, Interactive Copy with sftp}
+
+SFTP provides interactive file transfer.
+
+\begin{lstlisting}[language=bash]
+$ sftp user@hostname
+sftp> ls
+sftp> get file.txt
+sftp> put localfile.txt
+sftp> quit
+\end{lstlisting}
+
+\subsection{Interactive Commands}
+
+SFTP supports various interactive commands: ls, cd, get, put, rm, mkdir, etc.
+
+\section{Summary}
+
+This chapter covered advanced SSH client configuration and file transfer techniques.
+
+\chapter{Per-Account Server Configuration}
+
+This chapter covers per-user SSH configuration.
+
+\section{Limits of This Technique}
+
+Per-account configuration has certain limitations.
+
+\subsection{Overriding Serverwide Settings}
+
+Users can override some server settings.
+
+\subsection{Authentication Issues}
+
+Considerations for per-account authentication.
+
+\section{Public-Key-Based Configuration}
+
+Configure access via authorized keys.
+
+\subsection{OpenSSH Authorization Files}
+
+Edit \textit{~/.ssh/authorized\_keys} to grant access.
+
+\subsection{Tectia Authorization Files}
+
+Tectia uses different authorization file formats.
+
+\subsection{Forced Commands}
+
+Restrict a key to run only specific commands:
+
+\begin{lstlisting}[language=bash]
+command="echo 'Restricted access'" ssh-rsa AAAAB3Nza...
+\end{lstlisting}
+
+\subsection{Restricting Access by Host or Domain}
+
+Allow access only from specific hosts.
+
+\subsection{Setting Environment Variables}
+
+Set environment variables for specific keys.
+
+\subsection{Setting Idle Timeout}
+
+Configure idle timeout for specific keys.
+
+\subsection{Disabling or Limiting Forwarding}
+
+Restrict forwarding for specific keys.
+
+\section{Hostbased Access Control}
+
+Configure access based on client host identity.
+
+\section{The User rc File}
+
+Run commands on SSH login via \textit{~/.ssh/rc}.
+
+\section{Summary}
+
+This chapter covered per-account SSH server configuration options.
+
+\chapter{Port Forwarding and X Forwarding}
+
+This chapter covers SSH port forwarding and X11 forwarding.
+
+\section{What Is Forwarding?}
+
+SSH forwarding creates secure tunnels for network connections.
+
+\section{Port Forwarding}
+
+Forward network ports through an SSH connection.
+
+\subsection{Local Forwarding}
+
+Forward a local port to a remote host:
+
+\begin{lstlisting}[language=bash]
+$ ssh -L local_port:remote_host:remote_port user@gateway
+\end{lstlisting}
+
+\subsection{Remote Forwarding}
+
+Forward a remote port to a local host:
+
+\begin{lstlisting}[language=bash]
+$ ssh -R remote_port:local_host:local_port user@remote_host
+\end{lstlisting}
+
+\subsection{Bypassing a Firewall}
+
+Use port forwarding to bypass firewall restrictions.
+
+\subsection{Port Forwarding Without a Remote Login}
+
+Forward ports without opening a shell:
+
+\begin{lstlisting}[language=bash]
+$ ssh -f -N -L 8080:localhost:80 user@remote_host
+\end{lstlisting}
+
+\section{Dynamic Port Forwarding}
+
+Create a SOCKS proxy for dynamic port forwarding:
+
+\begin{lstlisting}[language=bash]
+$ ssh -D 1080 user@remote_host
+\end{lstlisting}
+
+\subsection{SOCKS v4, SOCKS v5, and Names}
+
+SSH supports SOCKS v4 and SOCKS v5 protocols.
+
+\section{X Forwarding}
+
+Forward X11 graphical applications over SSH.
+
+\subsection{How X Forwarding Works}
+
+X11 traffic is encrypted and forwarded through SSH.
+
+\subsection{Enabling X Forwarding}
+
+\begin{lstlisting}[language=bash]
+$ ssh -X user@remote_host
+$ ssh -Y user@remote_host
+\end{lstlisting}
+
+\subsection{Configuring X Forwarding}
+
+Configure X forwarding in sshd_config and ssh_config.
+
+\section{Forwarding Security: TCP-Wrappers and libwrap}
+
+Use TCP-Wrappers for additional access control.
+
+\section{Summary}
+
+This chapter covered port forwarding, dynamic forwarding, and X forwarding.
+
+\chapter{A Recommended Setup}
+
+This chapter provides recommendations for a secure SSH setup.
+
+\section{The Basics}
+
+Start with secure fundamentals.
+
+\section{Compile-Time Configuration}
+
+Configure options at compile time for security.
+
+\section{Serverwide Configuration}
+
+Recommended sshd_config settings.
+
+\subsection{Disable Other Means of Access}
+
+Disable telnet, rsh, and other insecure services.
+
+\subsection{sshd_config for OpenSSH}
+
+Key configuration options for secure OpenSSH setup.
+
+\subsection{sshd2_config for Tectia}
+
+Key configuration options for Tectia.
+
+\section{Per-Account Configuration}
+
+Configure individual user accounts securely.
+
+\section{Key Management}
+
+Establish secure key management practices.
+
+\section{Client Configuration}
+
+Recommended client configuration practices.
+
+\section{Remote Home Directories (NFS, AFS)}
+
+Consider security implications of remote home directories.
+
+\subsection{NFS Security Risks}
+
+NFS can introduce security vulnerabilities.
+
+\subsection{NFS Access Problems}
+
+Potential access issues with NFS home directories.
+
+\section{Summary}
+
+This chapter provided recommendations for a secure SSH deployment.
+
+\chapter{Case Studies}
+
+This chapter presents real-world SSH usage scenarios.
+
+\section{Unattended SSH: Batch or cron Jobs}
+
+Automate SSH for batch processing.
+
+\subsection{Password Authentication}
+
+Avoid password authentication for batch jobs.
+
+\subsection{Public-Key Authentication}
+
+Use public-key authentication for automation.
+
+\subsection{Hostbased Authentication}
+
+Consider hostbased authentication for trusted environments.
+
+\subsection{Kerberos}
+
+Use Kerberos for enterprise-wide authentication.
+
+\subsection{General Precautions for Batch Jobs}
+
+Security considerations for automated SSH jobs.
+
+\section{SSH and Firewalls}
+
+Configure SSH to work with firewalls.
+
+\subsection{Firewall Rules for SSH}
+
+Allow SSH traffic through firewalls.
+
+\subsection{Port Forwarding Through Firewalls}
+
+Use SSH to bypass firewall restrictions.
+
+\section{SSH in Large-Scale Environments}
+
+Deploy SSH in enterprise environments.
+
+\subsection{Centralized Key Management}
+
+Manage SSH keys across many servers.
+
+\subsection{Audit and Compliance}
+
+Maintain audit trails for SSH access.
+
+\section{Summary}
+
+This chapter covered real-world SSH deployment scenarios.
+
+\chapter{Windows SSH}
+
+This chapter covers SSH on Microsoft Windows.
+
+\section{Windows SSH Clients}
+
+SSH clients available for Windows.
+
+\subsection{PuTTY}
+
+Popular Windows SSH client.
+
+\subsection{Tectia for Windows}
+
+Commercial SSH client for Windows.
+
+\subsection{OpenSSH for Windows}
+
+OpenSSH port for Windows.
+
+\section{Windows SSH Servers}
+
+SSH servers for Windows.
+
+\subsection{OpenSSH Server for Windows}
+
+Native OpenSSH server.
+
+\subsection{Cygwin SSH}
+
+SSH via Cygwin.
+
+\section{Integration with Windows Features}
+
+Integrate SSH with Windows services.
+
+\subsection{Active Directory Integration}
+
+Use Active Directory for authentication.
+
+\subsection{Windows Firewall Configuration}
+
+Configure Windows Firewall for SSH.
+
+\section{Summary}
+
+This chapter covered SSH on Windows platforms.
+
+\chapter{Troubleshooting}
+
+This chapter helps diagnose and fix SSH problems.
+
+\section{Common Problems and Solutions}
+
+Diagnose typical SSH issues.
+
+\subsection{Connection Refused}
+
+Troubleshoot connection problems.
+
+\subsection{Authentication Failed}
+
+Fix authentication issues.
+
+\subsection{Host Key Verification Failed}
+
+Resolve host key problems.
+
+\subsection{Permission Denied}
+
+Fix permission issues.
+
+\section{Debugging Techniques}
+
+Use debugging tools to diagnose issues.
+
+\subsection{Verbose Mode}
+
+Use verbose output for debugging.
+
+\subsection{Server Logs}
+
+Check server logs for errors.
+
+\subsection{Network Analysis}
+
+Use network tools to trace connections.
+
+\section{Summary}
+
+This chapter covered SSH troubleshooting techniques.
+
+\chapter{Appendices}
+
+Reference material for SSH.
+
+\section{SSH Protocol Reference}
+
+Detailed protocol specifications.
+
+\section{Configuration File Reference}
+
+Complete configuration options.
+
+\subsection{sshd_config Options}
+
+All server configuration options.
+
+\subsection{ssh_config Options}
+
+All client configuration options.
+
+\subsection{authorized_keys Options}
+
+Key-based authorization options.
+
+\section{Command Reference}
+
+Quick reference for SSH commands.
+
+\subsection{ssh Command}
+
+Complete ssh command syntax.
+
+\subsection{sshd Command}
+
+SSH server command options.
+
+\subsection{scp Command}
+
+Secure copy command options.
+
+\subsection{sftp Command}
+
+SFTP command options.
+
+\subsection{ssh-keygen Command}
+
+Key generation options.
+
+\subsection{ssh-agent Command}
+
+Agent management options.
+
+\subsection{ssh-add Command}
+
+Key management options.
+
+\section{Glossary}
+
+Definitions of SSH-related terms.
+
+\begin{description}
+    \item[SSH] Secure Shell protocol
+    \item[SSL] Secure Sockets Layer
+    \item[TLS] Transport Layer Security
+    \item[RSA] Rivest-Shamir-Adleman algorithm
+    \item[DSA] Digital Signature Algorithm
+    \item[ECDSA] Elliptic Curve Digital Signature Algorithm
+    \item[Ed25519] Edwards-curve Digital Signature Algorithm
+    \item[MAC] Message Authentication Code
+    \item[PAM] Pluggable Authentication Modules
+    \item[Kerberos] Network authentication protocol
+    \item[SFTP] Secure File Transfer Protocol
+    \item[SCP] Secure Copy Protocol
+\end{description}
+
+\backmatter
+
+\appendix
+
+\chapter{Useful SSH Commands}
+
+\section{Client Commands}
+
+\begin{description}
+    \item[\texttt{ssh}] Remote login
+    \item[\texttt{scp}] Secure copy
+    \item[\texttt{sftp}] Secure FTP
+    \item[\texttt{ssh-keygen}] Generate keys
+    \item[\texttt{ssh-agent}] Key agent
+    \item[\texttt{ssh-add}] Add keys to agent
+\end{description}
+
+\section{Server Commands}
+
+\begin{description}
+    \item[\texttt{sshd}] SSH server
+    \item[\texttt{sshd-keygen}] Generate host keys
+\end{description}
+
+\chapter{Configuration File Reference}
+
+\section{sshd\_config Options}
+
+Key configuration options for the SSH server.
+
+\begin{description}
+    \item[\texttt{Port}] Specifies the port number that sshd listens on. Default is 22.
+    \item[\texttt{Protocol}] Specifies the protocol versions to support. Use \texttt{2} for SSH-2 only.
+    \item[\texttt{HostKey}] Specifies the host private key file.
+    \item[\texttt{PermitRootLogin}] Specifies whether root can log in.
+    \item[\texttt{PasswordAuthentication}] Enable or disable password authentication.
+    \item[\texttt{PubkeyAuthentication}] Enable or disable public-key authentication.
+    \item[\texttt{AuthorizedKeysFile}] Specifies the file containing authorized keys.
+    \item[\texttt{ChallengeResponseAuthentication}] Enable keyboard-interactive authentication.
+    \item[\texttt{GSSAPIAuthentication}] Enable GSSAPI authentication.
+    \item[\texttt{PermitEmptyPasswords}] Allow login with empty passwords.
+    \item[\texttt{AllowUsers}] Specify which users can log in.
+    \item[\texttt{DenyUsers}] Specify which users cannot log in.
+    \item[\texttt{AllowGroups}] Specify which groups can log in.
+    \item[\texttt{DenyGroups}] Specify which groups cannot log in.
+    \item[\texttt{X11Forwarding}] Enable X11 forwarding.
+    \item[\texttt{AllowTcpForwarding}] Enable TCP forwarding.
+    \item[\texttt{GatewayPorts}] Allow remote hosts to connect to forwarded ports.
+    \item[\texttt{ClientAliveInterval}] Send keepalive messages to the client.
+    \item[\texttt{ClientAliveCountMax}] Number of keepalive messages before disconnecting.
+    \item[\texttt{UsePAM}] Enable PAM authentication.
+    \item[\texttt{UseDNS}] Enable DNS lookups.
+    \item[\texttt{Banner}] Display a banner before authentication.
+\end{description}
+
+\section{ssh\_config Options}
+
+Key configuration options for the SSH client.
+
+\begin{description}
+    \item[\texttt{Host}] Specifies for which hosts this section applies.
+    \item[\texttt{HostName}] Specifies the real host name to log into.
+    \item[\texttt{Port}] Specifies the port number to connect to.
+    \item[\texttt{User}] Specifies the user name to log in as.
+    \item[\texttt{IdentityFile}] Specifies the identity file to use.
+    \item[\texttt{IdentitiesOnly}] Only use the specified identity files.
+    \item[\texttt{PreferredAuthentications}] Specify authentication method order.
+    \item[\texttt{ForwardAgent}] Enable agent forwarding.
+    \item[\texttt{ForwardX11}] Enable X11 forwarding.
+    \item[\texttt{ForwardX11Trusted}] Enable trusted X11 forwarding.
+    \item[\texttt{Compression}] Enable compression.
+    \item[\texttt{ServerAliveInterval}] Send keepalive messages to the server.
+    \item[\texttt{Cipher}] Specify the encryption cipher.
+    \item[\texttt{MACs}] Specify message authentication codes.
+    \item[\texttt{StrictHostKeyChecking}] Control host key verification.
+    \item[\texttt{UserKnownHostsFile}] Specify the known hosts file.
+\end{description}
+
+\section{authorized\_keys Options}
+
+Options for the authorized keys file. Each line in authorized_keys can have options:
+
+\begin{description}
+    \item[\texttt{command}] Forced command to execute.
+    \item[\texttt{no-port-forwarding}] Disable port forwarding.
+    \item[\texttt{no-X11-forwarding}] Disable X11 forwarding.
+    \item[\texttt{no-agent-forwarding}] Disable agent forwarding.
+    \item[\texttt{no-pty}] Disable PTY allocation.
+    \item[\texttt{permitopen}] Limit port forwarding destinations.
+    \item[\texttt{from}] Restrict access to specific hosts.
+    \item[\texttt{environment}] Set environment variables.
+    \item[\texttt{tunnel}] Permit tun device forwarding.
+\end{description}
+
+\chapter{Glossary}
+
+\begin{description}
+    \item[SSH] Secure Shell protocol
+    \item[SSL] Secure Sockets Layer
+    \item[TLS] Transport Layer Security
+    \item[RSA] Rivest-Shamir-Adleman algorithm
+    \item[DSA] Digital Signature Algorithm
+    \item[ECDSA] Elliptic Curve Digital Signature Algorithm
+    \item[Ed25519] Edwards-curve Digital Signature Algorithm
+    \item[MAC] Message Authentication Code
+    \item[PAM] Pluggable Authentication Modules
+    \item[Kerberos] Network authentication protocol
+    \item[SFTP] Secure File Transfer Protocol
+    \item[SCP] Secure Copy Protocol
+    \item[GSSAPI] Generic Security Services Application Program Interface
+    \item[X.509] Public key certificate standard
+    \item[chroot] Change root directory
+    \item[PTY] Pseudoterminal
+    \item[TCP/IP] Transmission Control Protocol/Internet Protocol
+\end{description}
+
+\chapter{Command Reference}
+
+\section{ssh Command}
+
+The \textit{ssh} command is used for secure remote login.
+
+\begin{lstlisting}[language=bash]
+ssh [options] [user@]hostname [command]
+\end{lstlisting}
+
+Common options:
+\begin{description}
+    \item[\texttt{-1}] Force SSH-1 protocol
+    \item[\texttt{-2}] Force SSH-2 protocol
+    \item[\texttt{-4}] Use IPv4 only
+    \item[\texttt{-6}] Use IPv6 only
+    \item[\texttt{-A}] Enable agent forwarding
+    \item[\texttt{-a}] Disable agent forwarding
+    \item[\texttt{-b bind\_address}] Bind to specific address
+    \item[\texttt{-C}] Enable compression
+    \item[\texttt{-c cipher}] Specify cipher
+    \item[\texttt{-D port}] Dynamic port forwarding (SOCKS)
+    \item[\texttt{-e escape\_char}] Set escape character
+    \item[\texttt{-F configfile}] Specify configuration file
+    \item[\texttt{-i identity\_file}] Specify identity file
+    \item[\texttt{-L port:host:hostport}] Local port forwarding
+    \item[\texttt{-l login\_name}] Specify login name
+    \item[\texttt{-m mac\_spec}] Specify MAC algorithm
+    \item[\texttt{-N}] Do not execute remote command
+    \item[\texttt{-n}] Redirect stdin from /dev/null
+    \item[\texttt{-o option}] Pass configuration option
+    \item[\texttt{-p port}] Specify port number
+    \item[\texttt{-q}] Quiet mode
+    \item[\texttt{-R port:host:hostport}] Remote port forwarding
+    \item[\texttt{-s}] Request subsystem
+    \item[\texttt{-T}] Disable pseudo-tty allocation
+    \item[\texttt{-t}] Force pseudo-tty allocation
+    \item[\texttt{-v}] Verbose mode
+    \item[\texttt{-V}] Display version
+    \item[\texttt{-X}] Enable X11 forwarding
+    \item[\texttt{-x}] Disable X11 forwarding
+    \item[\texttt{-Y}] Enable trusted X11 forwarding
+\end{description}
+
+\section{sshd Command}
+
+The \textit{sshd} command is the SSH server daemon.
+
+\begin{lstlisting}[language=bash]
+sshd [options]
+\end{lstlisting}
+
+Common options:
+\begin{description}
+    \item[\texttt{-4}] Use IPv4 only
+    \item[\texttt{-6}] Use IPv6 only
+    \item[\texttt{-D}] Run in foreground
+    \item[\texttt{-d}] Debug mode
+    \item[\texttt{-e}] Send debug output to stderr
+    \item[\texttt{-f configfile}] Specify configuration file
+    \item[\texttt{-g grace\_time}] Set login grace time
+    \item[\texttt{-h hostkey}] Specify host key file
+    \item[\texttt{-o option}] Pass configuration option
+    \item[\texttt{-p port}] Specify port number
+    \item[\texttt{-t}] Test configuration
+    \item[\texttt{-T}] Dump configuration
+\end{description}
+
+\section{ssh-keygen Command}
+
+The \textit{ssh-keygen} command generates SSH key pairs.
+
+\begin{lstlisting}[language=bash]
+ssh-keygen [options]
+\end{lstlisting}
+
+Common options:
+\begin{description}
+    \item[\texttt{-b bits}] Specify key length
+    \item[\texttt{-c}] Change comment
+    \item[\texttt{-D reader}] Download public key from smartcard
+    \item[\texttt{-e}] Export OpenSSH key to PKCS8
+    \item[\texttt{-f filename}] Specify key file
+    \item[\texttt{-i}] Import SSH2 key
+    \item[\texttt{-l}] Show fingerprint
+    \item[\texttt{-N new\_passphrase}] Specify new passphrase
+    \item[\texttt{-p}] Change passphrase
+    \item[\texttt{-q}] Quiet mode
+    \item[\texttt{-t type}] Specify key type (rsa, dsa, ecdsa, ed25519)
+    \item[\texttt{-v}] Verbose mode
+    \item[\texttt{-A}] Generate all host keys
+    \item[\texttt{-B}] Show bubblebabble digest
+    \item[\texttt{-C comment}] Add comment
+\end{description}
+
+\section{scp Command}
+
+The \textit{scp} command copies files securely.
+
+\begin{lstlisting}[language=bash]
+scp [options] source destination
+\end{lstlisting}
+
+Common options:
+\begin{description}
+    \item[\texttt{-1}] Use SSH-1 protocol
+    \item[\texttt{-2}] Use SSH-2 protocol
+    \item[\texttt{-4}] Use IPv4 only
+    \item[\texttt{-6}] Use IPv6 only
+    \item[\texttt{-B}] Batch mode
+    \item[\texttt{-C}] Enable compression
+    \item[\texttt{-c cipher}] Specify cipher
+    \item[\texttt{-F configfile}] Specify configuration file
+    \item[\texttt{-i identity\_file}] Specify identity file
+    \item[\texttt{-l limit}] Limit bandwidth
+    \item[\texttt{-o option}] Pass configuration option
+    \item[\texttt{-P port}] Specify port number
+    \item[\texttt{-p}] Preserve permissions
+    \item[\texttt{-q}] Quiet mode
+    \item[\texttt{-r}] Recursive copy
+    \item[\texttt{-S program}] Specify SSH program
+    \item[\texttt{-v}] Verbose mode
+\end{description}
+
+\section{sftp Command}
+
+The \textit{sftp} command provides secure interactive file transfer.
+
+\begin{lstlisting}[language=bash]
+sftp [options] [user@]hostname
+\end{lstlisting}
+
+Common options:
+\begin{description}
+    \item[\texttt{-1}] Use SSH-1 protocol
+    \item[\texttt{-b batchfile}] Batch mode
+    \item[\texttt{-C}] Enable compression
+    \item[\texttt{-F configfile}] Specify configuration file
+    \item[\texttt{-i identity\_file}] Specify identity file
+    \item[\texttt{-o option}] Pass configuration option
+    \item[\texttt{-P port}] Specify port number
+    \item[\texttt{-R num}] Specify max requests
+    \item[\texttt{-s subsystem}] Specify subsystem
+    \item[\texttt{-v}] Verbose mode
+\end{description}
+
+SFTP interactive commands:
+\begin{description}
+    \item[\texttt{cd path}] Change directory
+    \item[\texttt{chgrp grp path}] Change group
+    \item[\texttt{chmod mode path}] Change permissions
+    \item[\texttt{chown own path}] Change owner
+    \item[\texttt{exit}] Exit SFTP
+    \item[\texttt{get remote [local]}] Download file
+    \item[\texttt{help}] Show help
+    \item[\texttt{lcd path}] Change local directory
+    \item[\texttt{lls}] List local files
+    \item[\texttt{lmkdir path}] Create local directory
+    \item[\texttt{ln oldpath newpath}] Create link
+    \item[\texttt{ls [path]}] List files
+    \item[\texttt{mkdir path}] Create directory
+    \item[\texttt{put local [remote]}] Upload file
+    \item[\texttt{pwd}] Print working directory
+    \item[\texttt{quit}] Exit SFTP
+    \item[\texttt{rename old new}] Rename file
+    \item[\texttt{rm path}] Remove file
+    \item[\texttt{rmdir path}] Remove directory
+    \item[\texttt{symlink oldpath newpath}] Create symlink
+    \item[\texttt{version}] Show SFTP version
+\end{description}
+
+\section{ssh-agent Command}
+
+The \textit{ssh-agent} command manages private keys.
+
+\begin{lstlisting}[language=bash]
+ssh-agent [options] [command [args]]
+\end{lstlisting}
+
+Common options:
+\begin{description}
+    \item[\texttt{-a bind\_address}] Bind to specific address
+    \item[\texttt{-c}] C-shell syntax
+    \item[\texttt{-d}] Debug mode
+    \item[\texttt{-k}] Kill agent
+    \item[\texttt{-s}] Bourne-shell syntax
+    \item[\texttt{-t lifetime}] Set key lifetime
+    \item[\texttt{-v}] Verbose mode
+\end{description}
+
+\section{ssh-add Command}
+
+The \textit{ssh-add} command adds keys to the agent.
+
+\begin{lstlisting}[language=bash]
+ssh-add [options] [file ...]
+\end{lstlisting}
+
+Common options:
+\begin{description}
+    \item[\texttt{-c}] Confirm before using key
+    \item[\texttt{-d}] Delete key from agent
+    \item[\texttt{-D}] Delete all keys from agent
+    \item[\texttt{-e reader}] Remove key from smartcard
+    \item[\texttt{-f filename}] Specify key file
+    \item[\texttt{-l}] List fingerprints
+    \item[\texttt{-L}] List public keys
+    \item[\texttt{-s reader}] Add smartcard key
+    \item[\texttt{-t lifetime}] Set key lifetime
+    \item[\texttt{-v}] Verbose mode
+    \item[\texttt{-X}] Lock agent
+    \item[\texttt{-x}] Unlock agent
+\end{description}
+
+\chapter{Index}
+
+\index{SSH}
+\index{Secure Shell}
+\index{OpenSSH}
+\index{Tectia}
+\index{Encryption}
+\index{Authentication}
+\index{Public-key}
+\index{Private-key}
+\index{scp}
+\index{sftp}
+\index{sshd}
+
+\end{document}

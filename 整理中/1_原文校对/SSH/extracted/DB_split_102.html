@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_145"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos551461" class="calibre7"></a>3.10.3 Traffic Analysis </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Even if an attacker can't read your network traffic, he can glean a great deal of useful information by simply watching it—noting the amount of data, the source and destination addresses, and timing. A sudden increase in traffic with another company might tip him off that an impending business deal is in the works. Traffic patterns can also indicate backup schedules or times of day most vulnerable to denial-of-service attacks. Prolonged silence on an SSH connection from a sysadmin's desktop might indicate that she's stepped out, and that now is a good time to break in, electronically or physically. </p>
+<p class="calibre4">SSH doesn't address traffic-analysis attacks. SSH connections are easily identifiable as they generally go to a well-known port, and the SSH protocol makes no attempt to obfuscate traffic analysis<a shape="rect" class="calibre15"></a><a id="filepos552482" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos552521" class="calibre15"></a>. An SSH implementation could conceivably send random, no-op traffic over a connection when it's otherwise idle, to frustrate activity correlation. OpenSSH, in fact, sends no-op packets in response to keystrokes when a program turns off tty echo (e.g., the <span><em class="italic">su</em></span> program prompting for a password). This makes it harder for an attacker to identify the keystrokes of value in a session. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Although the SSH protocol doesn't specifically deal with traffic analysis, some implementations take steps against it. OpenSSH, for example, hides the fact that terminal echoing has been turned off by sending fake echo packets, making it harder to recognize signatures of non-echoing commands, such as typing the root password after an <span><em class="italic">su</em></span> prompt. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">A more serious concern regarding traffic analysis arises from recent work by U.C. Berkeley researchers Dawn Song, David Wagner, and Xuqing Tian. At the 10th Usenix Security Symposium (Washington D.C., August 2001), they presented a paper titled "Timing Analysis of Keystrokes and Timing Attacks on SSH": </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><a href="http://www.usenix.org/publications/library/proceedings/sec01/song.html" shape="rect" class="calibre6">http://www.usenix.org/publications/library/proceedings/sec01/song.html</a></span></td>
+</tr></span></table><p class="calibre4">The paper applies traffic-analysis techniques to interactive SSH connections to infer information about the encrypted contents. The authors conclude that the keystroke timing data observable from existing SSH implementations reveals a dangerously significant amount of information about user terminal sessions—enough to locate typed passwords in the session data stream and reduce the computational work involved in guessing those passwords by a factor of 50. While this work describes a very sophisticated attack which has yet to yield any practical exploits (that we know of!), this area bears watching. </p>
+</div>
+</body>
+</html>

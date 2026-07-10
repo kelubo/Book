@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2723369" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_548"><span class="calibre2"><a shape="rect" class="calibre7"></a>Advanced Client Use </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2723721" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2723760" class="calibre15"></a>Most of the time, the Tectia GUI applications effectively act as configuration editors, allowing users and administrators to change and save the configuration without worrying about the location or format of configuration files. In some other circumstances, however, an understanding of these details is useful, so we'll provide a brief guided tour through the internal structure of Tectia's configuration on Windows. </p>
+<p class="calibre4">The system client configuration file <em class="italic">ssh2_config</em> is stored in the Tectia client installation folder. This file has the same format and function as the <em class="italic">/etc/ssh2/ssh2_config</em> file on Unix systems.<a shape="rect" href="DB_split_217.html#filepos1436813" class="calibre6">[7.1.2.2]</a></p>
+<p class="calibre4">Most other parts of the configuration are separately maintained for each user, and are stored in the user profile folder<sup class="calibre20">[<a id="filepos2724815" shape="rect" href="#filepos2735946" class="calibre6">173</a>]</sup> in the application data subfolder.<sup class="calibre20">[<a id="filepos2724973" shape="rect" href="#filepos2736495" class="calibre6">174</a>]</sup> Tectia configuration files are collected in a subfolder named <em class="italic">SSH</em>. This folder is analogous to the user configuration folder on Unix systems (typically <em class="italic">~/.ssh2</em>, but ultimately determined by the <code class="calibre35">UserConfigDirectory</code> keyword), although the specific files and folder layout are different for Windows, as we'll see. <a shape="rect" href="DB_split_146.html#filepos798757" class="calibre6">[5.3.1.5]</a></p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">If roaming profiles are used, then the user profile folder is replicated on a server, and files are transmitted to client machines via the network, where they can be seen by anyone who is able to sniff traffic en route. To prevent this, either disable roaming profiles for Tectia users, or store the Tectia configuration files in a different, local folder. If the <code class="calibre35">SSHCLIENT_USERPROFILE</code> environment variable is set, its value specifies an alternate location to be used for the Tectia configuration files, instead of the user profile folder. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The Tectia user configuration folder contains:</p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">RandomSeed</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A pool of random data. <a shape="rect" href="DB_split_239.html#filepos1667246" class="calibre6">[7.4.18]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">HostKeys</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A subfolder to store public keys for known hosts. <a shape="rect" href="DB_split_224.html#filepos1513526" class="calibre6">[7.4.3]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">UserKeys</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A subfolder for storing user identities.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">identification</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A list of keys used by the command-line client, <span><em class="italic">ssh2.exe</em></span>. This file can be produced automatically by the GUI client. <a shape="rect" href="DB_split_412.html#filepos2712508" class="calibre6">[16.3]</a> If the <em class="italic">identification</em> file is missing, then all keys in the <em class="italic">UserKeys</em> folder are used. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">*.ssh2</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Profile settings for the GUI client, which are used to store configuration information based on the connection target (discussed shortly). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">global.dat</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Global settings for the GUI client, which apply to all connections (discussed shortly). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">SSH Accession\config.cfg</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The configuration settings for Accession Lite, stored in XML format. </div>
+</blockquote>
+</div>
+<p class="calibre4">The <em class="italic">All Users</em> profile folder is conceptually merged with each user profile folder.<sup class="calibre20">[<a id="filepos2729210" shape="rect" href="#filepos2737009" class="calibre6">175</a>]</sup> Host keys and profile settings can be copied from a user profile folder to the <em class="italic">All Users</em> profile folder to provide systemwide access. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">The <em class="italic">All Users</em> profile folder isn't available on older platforms such as Windows 98 or Me. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">To provide a systemwide default configuration for Accession Lite, copy a suitably crafted <em class="italic">config.cfg</em> file from a user profile folder to the Accession Lite installation folder. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Accession Lite doesn't use the <em class="italic">All Users</em> profile folder. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The <em class="italic">*.ssh2</em> files for profile settings and the <em class="italic">global.dat</em> configuration file are usually updated by the GUI client (discussed shortly). However, they are ordinary text files that use the venerable DOS <em class="italic">*.ini</em> format and are easy to edit directly. </p>
+<p class="calibre4">Settings are grouped in sections that are identified by names with square brackets, on separate lines. Each setting is a keyword and value, separated by an equals sign, with one pair per line. Values have prefixes to indicate the type of data: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">N:</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Decimal number</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">H:</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Hexadecimal number</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">S:</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">String</div>
+</blockquote>
+</div>
+<p class="calibre4">Boolean values are represented as decimal numbers, with zero and one indicating false and true, respectively. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    [Security]<br class="calibre19"/>    ...<br class="calibre19"/>    FIPS mode=N:0</tt></div></span><p class="calibre4">Direct editing of these files is required to update a few settings that are not displayed by the GUI client: e.g., the FIPS mode setting. It is also occasionally convenient to use a script to generate a large number of profile setting files that differ only by a few settings. </p>
+<p class="calibre4">The files <em class="italic">default.ssh2</em> and <em class="italic">defaultsftp.ssh2</em> contain default settings for the GUI client's terminal and SFTP modes, respectively. If these files are missing, then hardwired default settings are used. </p>
+<p class="calibre4">Profile settings files can be used in several ways:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Double-click on <em class="italic">*.ssh2</em> files in Windows Explorer. This works because the installer arranges to associate the <em class="italic">.ssh2</em> file suffix with the GUI client. </li>
+<li class="calibre18">Create desktop shortcuts to the profile settings files, and then double-click on the desktop icons. The Tectia client installer automatically creates desktop shortcuts for the default profiles using the terminal and SFTP modes. </li>
+<li class="calibre18">Click on the Profiles toolbar icon, and then select one of the defined profile settings from the drop-down menu. </li>
+<li class="calibre18">Use the File/Profiles menu item to present the same drop-down menu. </li>
+</ul></div>
+<p class="calibre4">The drop-down profiles menu also contains items that allow new profiles to be added, and existing profiles to be edited. When new connections are initiated using unsaved profile settings, a dialog is briefly displayed that allows the new profile settings to be added. The Settings toolbar icon or the Edit/Settings menu item provides access to the Profile Settings page of the Settings dialog for editing the current profile. </p>
+<p class="calibre4">Use the File/Save Settings menu item to save the current profile settings, as well as the global settings. The File/Save Layout menu item performs the same function, but also records the current position of all the GUI client's windows. </p>
+<p class="calibre4">Profile settings include connection parameters (e.g., the remote hostname, username, and port number), encryption and MAC algorithms, authentication methods, optional port forwarding (which is discussed in the next section), and <span><em class="italic">sftp</em></span> file transfer modes. </p>
+<p class="calibre4">Global settings include key pairs (which we've discussed previously: see <a shape="rect" href="DB_split_412.html#filepos2715918" class="calibre6">Figure 16-4</a>), host keys, other <span><em class="italic">sftp</em></span> options, and SOCKS firewall specifications. </p>
+<p class="calibre4">Except for settings that are related to the appearance or behavior of the GUI client itself, all of the profile and global settings correspond to keywords discussed in <a shape="rect" href="DB_split_214.html#filepos1423419" class="calibre6">Chapter 7</a>. </p>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2735946" shape="rect" href="#filepos2724815" class="calibre6">173</a>] </sup>The user profile folder can be determined by examining the value of the <code class="calibre35">USERPROFILE</code> environment variable. It is typically <em class="italic">C:\Documents and Settings\username.hostname</em> or (on older systems) <em class="italic">C:\WINNT\Profiles\username</em>. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2736495" shape="rect" href="#filepos2724973" class="calibre6">174</a>] </sup>The full pathname for the application data folder, including the user profile folder components, can be found in the value of the <code class="calibre35">APPDATA</code> environment variable. The subfolder is typically named <em class="italic">Application Data</em>. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2737009" shape="rect" href="#filepos2729210" class="calibre6">175</a>] </sup>The <em class="italic">All Users</em> profile folder can be determined by examining the value of the <code class="calibre35">ALLUSERSPROFILE</code> environment variable. It is typically <em class="italic">C:\Documents and Settings\All Users</em> or (on older systems) <em class="italic">C:\WINNT\Profiles\All Users</em>. </p>
+</div>
+</div>
+</div>  <div class="mbppagebreak" id="calibre_pb_549"></div></body>
+</html>

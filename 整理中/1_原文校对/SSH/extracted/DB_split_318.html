@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2094123" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_418"><span class="calibre2"><a shape="rect" class="calibre7"></a>Client Configuration </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2094476" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2094515" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2094554" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2094593" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2094632" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2094671" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2094710" class="calibre15"></a>Most SSH security pertains to the server, but SSH clients have security-related settings too. Here are a few tips: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Whenever you leave a computer while SSH clients are running, lock the computer's display with a password-protected screen locker. This is particularly important if you're running an agent that permits an intruder to access your remote accounts without a passphrase. </li>
+<li class="calibre18">In your client configuration<a shape="rect" class="calibre15"></a><a id="filepos2095284" class="calibre15"></a> file, turn on some safety features as mandatory values:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    # Put at the top of your configuration file<br class="calibre19"/>    Host *<br class="calibre19"/>      GatewayPorts no<br class="calibre19"/>      StrictHostKeyChecking ask<br class="calibre19"/>     ForwardX11Trusted no<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    # Put at the bottom of your configuration file<br class="calibre19"/>    *:<br class="calibre19"/>     GatewayPorts no<br class="calibre19"/>     StrictHostKeyChecking ask<br class="calibre19"/>     TrustX11Applications no</tt></div></span><br class="calibre19"/>The <code class="calibre35">GatewayPorts</code> value forbids remote clients from connecting to locally forwarded ports. Finally, rather than blindly connect, the <code class="calibre35">StrictHostKeyChecking</code> value warns you of any changed host keys and asks what you want to do. For X11 forwarding we elect to generate a new, untrusted <span><em class="italic">xauth</em></span> key rather than inherit the trust already in effect. <a shape="rect" href="DB_split_303.html#filepos2004951" class="calibre6">[9.4.5.3]</a></li>
+</ul></div>
+</div>  <div class="mbppagebreak" id="calibre_pb_419"></div></body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_381"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1942071" class="calibre7"></a>9.2.9 Termination </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1942220" class="calibre15"></a>What happens to forwardings when an SSH connection terminates? The ports simply cease being forwarded; that is, SSH is no longer listening on them, and connection attempts to those ports will fail with the error "connection refused." </p>
+<p class="calibre4">What happens if you try to terminate an SSH session while it still has active forwarded connections? SSH notices and waits for them to disconnect before stopping the session. The details of this behavior differ among implementations. </p>
+<p class="calibre4">In Tectia, if you log out of a session that has an active forwarded connection, the session stays open but sends itself into the background: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    remote$ logout<br class="calibre19"/>    warning: ssh[7021]: number of forwarded channels still open, forked to background to<br class="calibre19"/>    wait for completion.<br class="calibre19"/>    local$</tt></div></span><p class="calibre4">The <span><em class="italic">ssh</em></span> process now waits in the background until the forwarded connections terminate, and then it exits. In contrast, with OpenSSH, if you disconnect a session with active forwardings, you get a warning, but the session stays in the foreground: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    remote$ logout<br class="calibre19"/>    Waiting for forwarded connections to terminate...<br class="calibre19"/>    The following connections are open:<br class="calibre19"/>      port 2002, connection from localhost port 1465</tt></div></span><p class="calibre4">To send it into the background and return to your local shell prompt, type the escape sequence Return-tilde-ampersand: <a shape="rect" href="DB_split_227.html#filepos1587776" class="calibre6">[7.4.6.8]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">      ~&amp; [backgrounded]<br class="calibre19"/>      local$</tt></div></span><p class="calibre4">and as with Tectia, the connection exits only after its forwarded connections terminate. Be careful not to use the SSH <span>^Z</span> escape for this purpose. That sends <span><em class="italic">ssh</em></span> into the background, but in a suspended state, unable to accept TCP connections to its forwarded ports. If you do this accidentally, use your shell's job control commands (e.g., <span><em class="italic">fg</em></span> and <span><em class="italic">bg</em></span>) to resume the process. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1945359" class="calibre7"></a>9.2.9.1 The TIME_WAIT problem </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1945453" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1945491" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1945588" class="calibre15"></a>Sometimes a forwarded port mysteriously hangs around after the forwarding SSH session has gone away. You try a command you've used successfully several times in a row and suddenly get an error message: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -L2001:localhost:21 server.example.com<br class="calibre19"/>    Local: bind: Address already in use</tt></div></span><p class="calibre4">(This happens commonly if you're experimenting with port forwarding<a shape="rect" class="calibre15"></a><a id="filepos1946195" class="calibre15"></a>, trying to get something to work.) You know that you have no active SSH command listening on port 2001, so what's going on? If you use the <span><em class="italic">netstat</em></span> command to look for other listeners on that port, you may see a connection hanging around in the TIME_WAIT state: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ netstat -an | grep 2001<br class="calibre19"/>    tcp    0   0   127.0.0.1:2001   127.0.0.1:1472    TIME_WAIT</tt></div></span><p class="calibre4">The TIME_WAIT state is an artifact of the TCP protocol. In certain situations, the teardown of a TCP connection can leave one of its socket endpoints unusable for a short period of time, usually only a few minutes. As a result, you can't reuse the port for TCP forwarding (or anything else) until the teardown completes. If you're impatient, choose another port for the time being (say, 2002 instead of 2001) and get on with your work, or wait a short time for the port to become usable again. </p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.4　DTMF</font>
+</font>
+</p>
+<p height="1em" width="2em">DTMF（Double Tone Multiple Frequecy，双音多频）是一种通话过程中的号码传输方式，特别是在IVR类的应用中，一般的电话菜单都是通过按键控制的。在传统的TDM电话网络中，如果通话中的用户按下了话机上的一个键，话机就会产生一个DTMF的音频信号送到远端的交换机上，交换机会将该信号送到对端的用户那里，如果对端也是一个用户，则他就能听到一些“嘀嘀”的按键音；如果对端是一个IVR，它就能检测这种信号，并还原成用户按键的数字，进而知道用户选择了哪个菜单。</p>
+<p height="1em" width="2em">在SIP通话中，传输按键信息的方式相对较多。虽然有些信息可以完全不用双音多频的信号来表示，但沿用传统的叫法，我们仍然把按键信息称为DTMF。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.4.1　带内DTMF</font>
+</font>
+</p>
+<p height="1em" width="2em">在基于SIP/RTP的通话中，如果跟传统的TDM电话对接，直接把TDM电话设备产生的双音频信号按与音频编码同样的方式进行编码并放到RTP数据中传输，则这种DTMF称为带内DTMF（Inband）。FreeSWITCH默认不使用带内DTMF。因为，检测带内DTMF必须要实时检测RTP包中的内容，会多耗费很多CPU。不过，传统的TDM设备只支持这种方式，因而如果要跟传统的PSTN网络的交换机进行SIP对接，则往往默认会使用这种方式。由于PSTN网络上的交换机一般不会使用到DTMF，它们只需要对DTMF信号进行简单的透传，而不需要进行深入检测，因而对它们来说无所谓是否耗费资源。</p>
+<p height="1em" width="2em">如果在FreeSWITCH中使用带内DTMF，则需要在对应的Profile中（如“internal”或“external”）中设置如下参数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="dtmf-type" value="inband"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或者在通话时，在Dialplan中通过设置如下的通道变量实现：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="dtmf_type=inband"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，设置了上述变量并不能使FreeSWITCH检测到带内的DTMF，还必须在Dialplan中明确使用start_dtmf这个App打开DTMF检测。比如，对于来话而言，就需可以使用如下的Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="dtmf_type=inband"/&gt;<br/>
+<br/>
+&lt;action application="start_dtmf"/&gt;<br/>
+<br/>
+&lt;action application="ivr" data="some_ivr"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">对于去话，则可以通过设置一个钩子通道变量 <sup>
+<small>
+<a href="text00125.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ “execute_on_answer”实现，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="export" data="nolocal:execute_on_answer=start_dtmf"/&gt;<br/>
+<br/>
+&lt;action application="bridge"data="sofia/gateway/pstn/${destination_number}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上述Dialplan中，我们使用“export”设置了一个变量“execute_on_answer”，该变量是以“nolocal:”开头的，因此，它将只在b-leg上生效。在执行到“bridge”时，将产生b-leg。本例中的b-leg通过一个pstn网关呼叫被叫号码，当对端接听后，FreeSWITCH就会执行execute_on_answer钩子变量所指定的App，即start_dtmf，它用于开启带内DTMF检测。</p>
+<p height="1em" width="2em">当然，如果对export”这个App以及其原理比较熟悉的话（参见6.1.9节），便知道上述Dialplan跟如下的写法是等价的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge"<br/>
+<br/>
+data="{execute_on_answer=start_dtmf}sofia/gateway/pstn/${destination_number}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.4.2　RFC2833</font>
+</font>
+</p>
+<p height="1em" width="2em">RFC2833 <sup>
+<small>
+<a href="text00125.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 中定义了在RTP中传输DTMF信息的另一种方式。该方式通过特殊的RTP Payload进行标志，标志出包含DTMF信息的RTP包，因而不需要对所有的RTP包进行深度的频率检测就可以很容易认出包含DTMF信息的包，而这种包里的DTMF信息是以文本表示的，因而也不需要计算。与Inband检测相比，RFC2833方式大大节省了CPU。这种方式是现行的VoIP通话中比较常用的方式，也是FreeSWITCH中默认的方式。</p>
+<p height="1em" width="2em">RTP包中DTMF的Payload Type值是在SDP消息中使用“telephone-event”协商的，如下面的SDP消息中，表示Payload Type为101的RTP包为包含DTMF消息的包。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+v=0<br/>
+<br/>
+o=FreeSWITCH 1371848118 1371848119 IN IP4 192.168.1.9<br/>
+<br/>
+s=FreeSWITCH<br/>
+<br/>
+c=IN IP4 192.168.1.9<br/>
+<br/>
+t=0 0<br/>
+<br/>
+m=audio 31988 RTP/AVP 8 101<br/>
+<br/>
+a=rtpmap:8 PCMA/8000<br/>
+<br/>
+a=rtpmap:101 telephone-event/8000<br/>
+<br/>
+a=fmtp:101 0-16<br/>
+<br/>
+a=silenceSupp:off - - - -<br/>
+<br/>
+a=ptime:20<br/>
+<br/>
+m=video 19008 RTP/AVP 123<br/>
+<br/>
+a=rtpmap:123 H264/90000<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果在媒体协商时看不到“telephone-event”，则证明它不支持DTMF2833模式。 <img align="baseline" height="42" width="36" src="Image00173.jpg" />
+ <font color="#0468BB">注意</font>
+</p>
+<p height="1em" width="2em">由于RTP底层使用了不可靠的UDP传输协议，因此RFC2833规定包含同一DTMF信息的包要按一定的规则重发，以减少可能的丢包带来的影响。而且，DTMF的RTP包跟音频RTP包是在一个媒体流（相同的“IP地址:端口号”）中传输的，因此包含DTMF的RTP包中的时间戳以及Marker标志还需要跟普通音频正确配合才能使用。这就带来了该协议的一些复杂性。比较令人遗憾的是，有很多设备的DTMF2833实现都有Bug，而且几年甚至十几年都不改。为了能够跟这些“顽固”的设备对接，FreeSWITCH内部也进行了相应的妥协，针对某些设备提供了一些专门的配置参数。当然，如何使用这些具体的参数超出了本书的范围，如果在与这样的设备对接时发现不符合RFC2833规定的实现，可以查阅有关资料尝试在FreeSWITCH中设置相关参数进行解决 <sup>
+<small>
+<a href="text00125.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.4.3　SIP INFO</font>
+</font>
+</p>
+<p height="1em" width="2em">DTMF也可以在SIP的INFO消息中传送。INFO消息跟一路通话有关，用于通话中的双方传送一些消息，其中一种消息就是传输DTMF消息。</p>
+<p height="1em" width="2em">使用SIP INFO消息甚至比使用RFC2833更有效，但是，有一个缺点是由于SIP消息跟用于传送声音的RTP流使用不同的UDP IP地址和端口，在实际传输中可以经过完全不同的路由设备，因而用SIP INFO传送的DTMF可能会与实际听到的声音不同步。</p>
+<p height="1em" width="2em">如果在SDP协商时没有找到“telephone-event”（即不能使用RFC2833），则FreeSWITCH就会默认启用INFO来收发DTMF。当然，也可以在Profile中使用如下参数明确指定使用INFO来传送DTMF：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="dtmf-type" value="info"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或者在Dialplan中针对某一路通话决定是否使用INFO：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="dtmf_type=info"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">关于DTMF的知识我们就介绍这么多，请读者根据自己的需要多加练习。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00124.html">
+<font color="#FF6600">[1]</font>
+</a>
+ FreeSWITCH中有一系列的以execute_on_开头的通道变量，这些变量在系统中设置一些钩子，当Channel执行到一定状态时，便会执行这些钩子指定的App，比如此处的execute_on_answer就会在相关的Channel被应答时执行指定的App。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00124.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://tools.ietf.org/html/rfc6455。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00125.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 参见http://wiki.freeswitch.org/wiki/RTP_Issues。</p>
+</body>
+</html>

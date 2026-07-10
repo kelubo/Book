@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_319"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1672209" class="calibre7"></a>7.5.1 Full Syntax of scp </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">So far, we've described the syntax of <span><em class="italic">scp</em></span> only in general: <a shape="rect" href="DB_split_043.html#filepos199489" class="calibre6">[2.2.1]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    scp <em class="italic"><code class="calibre35">name-of-source</code></em> <em class="italic"><code class="calibre35">name-of-destination</code></em></tt></div></span><p class="calibre4">Each of the two names, or <span><em class="italic">path specifications</em></span>, on the command line represents files or directories in the following manner (it is fairly consistent with the behavior of Unix <span><em class="italic">cp</em></span> or <span><em class="italic">rcp</em></span>): </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">If <span><em class="italic">name-of-source</em></span> is a file, <span><em class="italic">name-of-destination</em></span> may be a file (existing or not) or a directory (which must exist). In other words, a single file may be copied to another file or into a directory. </li>
+<li class="calibre18">If <span><em class="italic">name-of-source</em></span> is two or more files, one or more directories, or a combination, <span><em class="italic">name-of-destination</em></span> must be an existing directory into which the copy takes place.<sup class="calibre20">[<a id="filepos1674074" shape="rect" href="DB_split_260.html#filepos1728456" class="calibre6">115</a>]</sup> In other words, multiple files and directories may be copied only into a directory. </li>
+</ul></div>
+<p class="calibre4">Both <span><em class="italic">name-of-source</em></span> and <span><em class="italic">name-of-destination</em></span> may have the following form from left to right: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">The <span><em class="italic">username</em></span> of the account containing the file or directory, followed by @. This part is optional, and if omitted, the value is the username of the user invoking <span><em class="italic">scp</em></span>. </li>
+<li class="calibre18">The <span><em class="italic">hostname</em></span> of the host containing the file or directory, followed by a colon. This part is optional, if the path is present, and the username isn't; if omitted, the value is <span><em class="italic">localhost</em></span>. Tectia permits an optional <span><em class="italic">TCP port number</em></span> for the SSH connection to be inserted between the hostname and the colon, preceded by a hash sign. </li>
+<li class="calibre18">The <span><em class="italic">directory path</em></span> to the file or directory. (Optional if the hostname is present.) Relative pathnames are assumed relative to the <span><em class="italic">default directory</em></span>, which is the current directory (for local paths) or the user's home directory (for remote paths). If omitted entirely, the path is assumed to be the default directory. </li>
+</ul></div>
+<p class="calibre4">Although each field is optional, you can't omit them all at the same time, yielding the empty string. Either the hostname (•) or the directory path (•) must be present. Some examples: </p>
+<div class="calibre3">
+<div class="calibre3"><span><em class="italic">MyFile</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The file <em class="italic">. /MyFile</em> on <span><em class="italic">localhost</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">MyDirectory</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The directory <em class="italic">./MyDirectory</em> on <em class="italic"/>
+<span><em class="italic">localhost</em></span></div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">.</code>
+<em class="italic">(period)</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The current directory on <span><em class="italic">localhost</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">server.example.com:</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The directory <em class="italic">~username</em> on <span><em class="italic">server.example.com</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">server.example.com</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A local file named "server.example.com" (Oops: did you forget the trailing colon? This is a common mistake.) </div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">server.example.com:MyFile</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The file <em class="italic">MyFile</em> in the remote user's home directory on <span><em class="italic">server.example.com</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">
+<span><a href="mailto:bob@server.example.com" shape="rect" class="calibre6">bob@server.example.com</a></span>:</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The directory <em class="italic">~bob</em> on <span><em class="italic">server.example.com</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">
+<span><a href="mailto:bob@server.example.com" shape="rect" class="calibre6">bob@server.example.com</a></span>
+</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A local file named "<span><a href="mailto:bob@server.example.com" shape="rect" class="calibre6">bob@server.example.com</a></span>" (oops; forgot the trailing colon again) </div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">
+<span><a href="mailto:bob@server.example.com" shape="rect" class="calibre6">bob@server.example.com</a></span>:MyFile</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The file <em class="italic">~bob/MyFile</em> on <span><em class="italic">server.example.com</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">server.example.com:dir/MyFile</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The file <em class="italic">dir/MyFile</em> in the remote user's home directory on <span><em class="italic">server.example.com</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">server.example.com:/dir/MyFile</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The file <em class="italic">/dir/MyFile</em> on <em class="italic"/>
+<span><em class="italic">server.example.com</em></span> (note the absolute path) </div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">
+<span><a href="mailto:bob@server.example.com:dir/MyFile" shape="rect" class="calibre6">bob@server.example.com:dir/MyFile</a></span>
+</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The file <em class="italic">~bob/dir/MyFile</em> on <span><em class="italic">server.example.com</em></span></div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">
+<span><a href="mailto:bob@server.example.com:/dir/MyFile" shape="rect" class="calibre6">bob@server.example.com:/dir/MyFile</a></span>
+</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The file <em class="italic">/dir/MyFile</em> on <span><em class="italic">server.example.com</em></span> (although you authenticate as bob, the path is absolute) </div>
+</blockquote>
+<div class="calibre3"><span><em class="italic">server.example.com#2000:</em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The remote user's home directory on <span><em class="italic">server.example.com</em></span>, via TCP port 2000 (Tectia only) </div>
+</blockquote>
+</div>
+<p class="calibre4">Here are a few complete examples:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp myfile myfile2                   <em class="italic"><span>A local copy just like cp</span></em><br class="calibre19"/>    $ scp myfile bob@host1:                <em class="italic"><span>Copy . /myfile to ~bob on host1</span></em><br class="calibre19"/>    $ scp bob@host1:myfile .               <em class="italic"><span>Copy ~bob/myfile on host1 to . /myfile</span></em><br class="calibre19"/>    $ scp host1:file1 host2:file2          <em class="italic"><span>Copy file1 from host1 to file2 on host2</span></em><br class="calibre19"/>    $ scp bob@host1:file1 jen@host2:file2  <em class="italic"><span>Same as above, but copying from bob's to jen's account</span></em></tt></div></span><p class="calibre4"><a shape="rect" href="#filepos1683191" class="calibre6">Table 7-3</a> summarizes the syntax of an <span><em class="italic">scp</em></span> path. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1683191" class="calibre15"></a></span><p class="calibre4">Table 7-3. scp path specifications</p>
+<div class="calibre3">
+<table summary="scp path specifications" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Field</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Other syntax</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Optional?</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Default for local host </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Default for remote host </span></p></span></th>
+</tr></thead><tfoot class="calibre63"><tr class="calibre31"><th colspan="5" rowspan="1" class="calibre51"><span class="calibre33"><span class="bold"><a shape="rect" class="calibre15"></a><a id="filepos1684710" class="calibre15"></a></span><p class="calibre4">
+<sup class="calibre34">a</sup> Tectia only. </p></span></th>
+</tr></tfoot><tbody class="calibre30"><tr valign="top" class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Username</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Followed by @</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Invoking user's username </p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Invoking user's username </p>
+</span></td>
+</tr><tr valign="top" class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Hostname</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Followed by :</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Only if username is omitted and path is present </p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">None, file is accessed locally </p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">N/A</p>
+</span></td>
+</tr><tr valign="top" class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Port number <a shape="rect" href="#filepos1684710" class="calibre6">
+<sup class="calibre34">a</sup></a>
+</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Preceded by #</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">22</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">22</p>
+</span></td>
+</tr><tr valign="top" class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Directory path</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">N/A</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Only if hostname is present </p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Current (invoking) directory </p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Username's remote home directory </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+</body>
+</html>

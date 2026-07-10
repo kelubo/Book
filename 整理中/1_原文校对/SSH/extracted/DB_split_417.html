@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_553"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2746343" class="calibre7"></a>16.7.1 General Settings </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The Connector engine itself is configured by the General Settings view of the Administration dialog (<a shape="rect" href="#filepos2746788" class="calibre6">Figure 16-9</a>), which applies to all outgoing connections. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2746788" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Configuring the Connector engine" src="images/00069.jpg" class="calibre39"/></div>
+</div>
+</span><p class="calibre4">Figure 16-9. Configuring the Connector engine</p></div>
+<p class="calibre4">Sometimes it is necessary or convenient to bypass Connector and allow applications to initiate their own connections directly: this is known as pass-through mode. An option is provided to allow pass-through if the engine is disabled or shut down. If this pass-through option is disabled, then connections will be blocked, which might be appropriate if security policies mandate that only secure connections are allowed. A comma-separated list of applications can also be exempted from interference by Connector. Typically these applications are for network diagnostics (e.g., <span><em class="italic">nslookup</em></span> or <span><em class="italic">ping</em></span>) or related to direct use of SSH (e.g., the Tectia client, Accession Lite, etc.). </p>
+<p class="calibre4">Applications frequently need to connect to secure servers within internal networks from outside of firewalls. External hostname lookups are commonly prevented, to avoid leaking information about the internal network, and because direct access to the secure servers is blocked by the firewall anyway. In such cases, Connector can be configured to return dynamically assigned pseudo (or fake) IP addresses to applications in response to hostname lookups. When the connection is forwarded across the firewall via SSH, the hostname lookup is done internally. This is similar to the naming support provided by SOCKS5. </p>
+<p class="calibre4">A base address must be identified for the pseudo IP addresses. This should be chosen carefully to avoid conflicts with real addresses of machines that applications might need to contact. It is natural to use reserved addresses (e.g., the 10.0.0.0/8 network) for this purpose, but if applications detect the use of such reserved addresses and misbehave, then it may be necessary to use a suitable range of otherwise unused real addresses. </p>
+<p class="calibre4">As we have seen, Connector works by modifying the Windows TCP/IP protocol stack. Other, unrelated packages that also modify the protocol stack (such as firewalls and VPN software) can interfere with the operation of Connector, and require that Connector's protocol stack modifications be reinstalled, which in turn requires a reboot. An option is provided to automate this; no user confirmation is needed. </p>
+<p class="calibre4">Connector's SSH implementation supports FIPS mode, which can be selected by an option. <a shape="rect" href="DB_split_150.html#filepos881924" class="calibre6">[5.3.5]</a></p>
+<p class="calibre4">In most cases, Connector operates silently, and behind the scenes. However, SSH servers can be configured to send banner messages to clients, and Connector has an option for displaying them. <a shape="rect" href="DB_split_175.html#filepos1083129" class="calibre6">[5.6.1]</a> In addition, Connector can display a splash screen as a brief security notification when new forwarded connections are created for applications. </p>
+<p class="calibre4">The tray icon menu can be configured to control access to functions that affect the engine, to prevent unprivileged users from circumventing security policies. Of course, the Connector configuration file should only be writable by privileged users. </p>
+</div>
+</body>
+</html>

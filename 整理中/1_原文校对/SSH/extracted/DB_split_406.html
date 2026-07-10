@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_534"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2684961" class="calibre7"></a>15.2.3 Control by xinetd </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">In most Unix-like operating systems, the OpenSSH server runs as a daemon, listening for SSH connections. On Mac OS X, however, <span><em class="italic">sshd</em></span> is controlled by the super-server daemon, <span><em class="italic">xinetd</em></span>. <a shape="rect" href="DB_split_148.html#filepos826611" class="calibre6">[5.3.3.2]</a> Whenever an SSH client attempts to contact <span><em class="italic">sshd</em></span> on TCP port 22, <span><em class="italic">xinetd</em></span> notices the attempt and invokes a single instance of <span><em class="italic">sshd</em></span> (specifically, <span><em class="italic">sshd -i</em></span>) to serve that connection. </p>
+<p class="calibre4">The <span><em class="italic">xinetd</em></span> configuration file for <span><em class="italic">sshd</em></span> is <em class="italic">/etc/xinetd.d/ssh</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # /etc/xinetd.d/ssh:<br class="calibre19"/>    service ssh<br class="calibre19"/>    {<br class="calibre19"/>            disable = no<br class="calibre19"/><br class="calibre19"/>            socket_type     = stream<br class="calibre19"/>            wait            = no<br class="calibre19"/>            user            = root<br class="calibre19"/>            server          = /usr/libexec/sshd-keygen-wrapper<br class="calibre19"/>            server_args     = -i<br class="calibre19"/>            groups          = yes<br class="calibre19"/>            flags           = REUSE IPv6<br class="calibre19"/>            session_create  = yes<br class="calibre19"/>    }</tt></div></span><p class="calibre4">Note the use of the wrapper script <span><em class="italic">sshd-keygen-wrapper</em></span>: it will generate new host keys if they are missing, as after a fresh OS install. </p>
+</div>
+</body>
+</html>

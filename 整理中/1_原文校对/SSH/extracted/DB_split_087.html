@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_127"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos495012" class="calibre7"></a>3.7.2 scp Details </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">When you run <span><em class="italic">scp</em></span> to copy a file from client to server, it invokes <span><em class="italic">ssh</em></span> with various options, like so: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    /usr/bin/ssh -x -o ForwardAgent=no -o ClearAllForwardings=yes server-host scp ...</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Earlier versions of <span><em class="italic">scp</em></span> actually searched your <code class="calibre35">PATH</code> for the <span><em class="italic">ssh</em></span> program rather than specifying it completely. This was a problem if multiple SSH software packages were installed, since it could run mismatched pieces of software together. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">This runs another copy of <span><em class="italic">scp</em></span> on the remote host. That copy is invoked with the undocumented switches <span><em class="italic">-t</em></span> and <span><em class="italic">-f</em></span> (for "to" and "from"), putting it into SCP server mode. This next table shows some examples; <a shape="rect" href="DB_split_090.html#filepos505802" class="calibre6">Figure 3-3</a> shows the details. </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+This client scp command: </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Runs this remote command: </span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp foo server:bar</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp -t bar</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp server:bar foo</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp -f bar</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp *.txt server:dir</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">scp -d -t dir</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">If you run <span><em class="italic">scp</em></span> to copy a file between two remote hosts, it simply executes another <span><em class="italic">scp</em></span> client on the source host to copy the file to the target. For example, this command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    scp source:music.au target:playme</tt></div></span><p class="calibre4">runs this in the background:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh -x -o ClearAllForwardings=yes -n source scp music.au target:playme</tt></div></span><p class="calibre4">Note that the options are changed appropriately: agent forwarding is not turned off, as that may be needed by the remote <span><em class="italic">scp</em></span> client in order to contact the target host. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_554"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2750897" class="calibre7"></a>16.7.2 Servers for Outgoing SSH Connections </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Settings for each server used for an outgoing SSH connection must be defined by the Servers view of the Administration dialog in <a shape="rect" href="#filepos2751627" class="calibre6">Figure 16-10</a>. </p>
+<p class="calibre4">A display name is assigned to the collection of settings for the server. Connections to a server can be routed via a previously defined server, to set up chains of port forwardings, if required for nested firewalls. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2751627" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Defining settings for outgoing SSH connections" src="images/00070.jpg" class="calibre39"/></div>
+</div>
+</span><p class="calibre4">Figure 16-10. Defining settings for outgoing SSH connections</p></div>
+<p class="calibre4">The most important characteristics of the SSH connection can be specified for the server. The special token <code class="calibre35">%USERNAME%</code> means that the local Windows username is used for the remote username as well. </p>
+<p class="calibre4">By default, Connector initiates SSH connections only when required to forward connections from applications, but an option is provided to initiate the connection when the Connector engine starts. Idle SSH connections are terminated by Connector after a specified timeout interval elapses.<sup class="calibre20">[<a id="filepos2752710" shape="rect" href="DB_split_420.html#filepos2764987" class="calibre6">176</a>]</sup> Normally, SSH connections are retained (even when idle) if any forwarding channels are still active, but Connector can be configured to ignore active channels when it closes idle connections. </p>
+<p class="calibre4">The allowed authentication methods are specified as a comma-separated list, chosen from the set: <code class="calibre35">gssapi-with-mic</code>, <code class="calibre35">publickey</code>, <code class="calibre35">keyboard-interactive</code>, and <code class="calibre35">password</code>. Public-key authentication is especially convenient with Accession Lite acting as an authentication agent. <a shape="rect" href="DB_split_413.html#filepos2716769" class="calibre6">[16.4]</a> Accession Lite is included with the Tectia Connector package, and the agent can be started using the Connector tray icon menu. A predefined response can be stored in the Connector configuration for password authentication. This is insecure, since the password saved in the configuration file is not encrypted in any way, and the predefined response is intended only for situations when the application handles its own authentication using some other secure mechanism. </p>
+<p class="calibre4">A proxy server URL can be specified using the same syntax as for the Tectia client's <code class="calibre35">SocksServer</code> keyword or the <code class="calibre35">SSH_SOCKS_SERVER</code> environment variable. <a shape="rect" href="DB_split_228.html#filepos1625272" class="calibre6">[7.4.7.2]</a> HTTP forwarding is also supported, using a similar syntax. SOCKS4 is used by default, but an option is provided to use SOCKS5 instead. </p>
+<p class="calibre4">A filename should be chosen to store the host key for the server. The key can be fetched automatically by the Connector administration program, but the fingerprint should be verified using <span><em class="italic">ssh-keygen -F</em></span>. <a shape="rect" href="DB_split_196.html#filepos1259950" class="calibre6">[6.2.2]</a> Host keys are commonly stored in the <em class="italic">All Users</em> profile folder. </p>
+</div>
+</body>
+</html>

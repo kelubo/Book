@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_379"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1935973" class="calibre7"></a>9.2.7 The Listening Port Number </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Earlier, we suggested selecting any unused port for the listening side of a forwarding. Port numbers are encoded in a 16-bit field and can have any value from 1 to 65535 (port 0 is reserved). On multiuser operating systems such as Unix, ports 1 through 1023 are called <span><em class="italic">privileged</em></span> and are reserved for processes run by the superuser (user ID zero). If a nonprivileged process tries to bind a privileged port for listening, it fails with an error message such as "insufficient permission."<sup class="calibre20">[<a id="filepos1936714" shape="rect" href="DB_split_294.html#filepos1962001" class="calibre6">136</a>]</sup></p>
+<p class="calibre4">When setting up the listening side of a tunnel, you generally must select a port number between 1024 and 65535, inclusive. This is because an SSH program running under your user ID, not the superuser's, is responsible for listening on that port. If SSH reports that your chosen port is already in use, just choose another; it shouldn't be hard to find a free one. </p>
+<p class="calibre4">For the target side of the tunnel, you can specify any port number, privileged or not. You are attempting to <span><em class="italic">connect to</em></span> the port, not listen on it. In fact, most of the time the target side is a privileged port, since the most common TCP services have ports in the privileged range. </p>
+<p class="calibre4">If you are the superuser on a machine with SSH clients, you can perform local forwarding with a privileged port. Likewise, you can forward a remote privileged port if your remote account has superuser privileges. </p>
+<p class="calibre4">Some TCP applications hardcode the server port numbers and don't permit them to be changed. These applications aren't usable with port forwarding if the operating system has a privileged port restriction. For example, suppose you have an FTP client that's hardwired to connect to the server on the standard FTP control port, 21. To set up port forwarding, you have to forward the local port 21 to the remote port 21. But since port 21 is privileged, you can't use it as a listening port number unless you are the superuser. Fortunately, most Unix TCP-based programs let you set the destination port number for connections. </p>
+</div>
+</body>
+</html>

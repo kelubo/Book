@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">8.2　媒体协商</font>
+</font>
+</p>
+<p height="1em" width="2em">世界是丰富多彩的，不同的SIP终端有不同的特性。支持不同的语音编码。所以不同的SIP终端进行通信时需要先与支持的编码进行“协商”，以便双方互相能够“理解”对方发来的媒体流中的数据。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">8.2.1　协商过程</font>
+</font>
+</p>
+<p height="1em" width="2em">我们来看一个最简单的编码协商过程。如果在FreeSWITCH中，按F8打开详细的Log，打一个电话，就会在Log中看到如下类似的协商过程：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+Audio Codec Compare [iLBC:97:8000:60:0]/[G722:9:8000:20:64000]<br/>
+<br/>
+Audio Codec Compare [iLBC:97:8000:60:0]/[G729:18:8000:20:8000]<br/>
+<br/>
+Audio Codec Compare [iLBC:97:8000:60:0]/[PCMU:0:8000:20:64000]<br/>
+<br/>
+Audio Codec Compare [iLBC:97:8000:60:0]/[PCMA:8:8000:20:64000]<br/>
+<br/>
+Audio  Codec Compare  [iLBC:97:8000:60:0]/[GSM:3:8000:20:13200]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上面的例子中，SIP客户端呼入时使用iLBC编码，打包周期是60ms，Payload Type是97；而服务器端提供G722、PCMU、PCMA、GSM等选择，但都是20ms的。所以我们在上述Log中可以看出FreeSWITCH会将客户端提供的编码与本地提供的编码逐一比较。由于客户端与服务器提供的编码没有交集，故上面的协商是不成功的，在这种情况下，FreeSWITCH会返回SIP 488消息，失败原因INCOMPATIBLE_DESTINATION（目的地不兼容）说明找不到兼容的编码。</p>
+<p height="1em" width="2em">SIP采用Offer/Answer（请求/应答）机制来协商。请求发起的一方提供（Offer）自己支持的媒体编码列表，被请求的一方比较自己支持的媒体列表最终选择一种（或几种）编码以应答（Answer）方式通知请求者，然后它们就可以使用兼容的编码进行通信了。下面是一次成功的协商Log（客户端使用PCMA，最终成功协商PCMA）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+Audio Codec Compare [PCMA:8:8000:20:64000]/[G722:9:8000:20:64000]<br/>
+<br/>
+Audio Codec Compare [PCMA:8:8000:20:64000]/[PCMU:0:8000:20:64000]<br/>
+<br/>
+Audio Codec Compare [PCMA:8:8000:20:64000]/[PCMA:8:8000:20:64000]<br/>
+<br/>
+switch_core_media.c:3213 Audio Codec Compare [PCMA:8:8000:20:64000] <br/>
+<br/>
+++++ is saved as a match<br/>
+<br/>
+Set Codec sofia/internal/1006@192.168.7.6 PCMA/8000 20 ms 160 samples 64000<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从上面的协商Log中可以看到，它也是将客户端的编码与服务器端的编码进行逐一比较，最后一行的“Set Codec…PCMA”表示本次协商成功并把该Channel的编码设为PCMA编码。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">8.2.2　SDP及其在编码协商中的作用</font>
+</font>
+</p>
+<p height="1em" width="2em">为了更直观地理解SIP协议中的编码协商过程，下面我们来详细看一下相关的SIP信令。</p>
+<p height="1em" width="2em">由第7章我们知道，SIP信令格式类似HTTP协议，由请求/应答行、消息头及消息体构成。一般的SIP INVITE消息体都包含SDP <sup>
+<small>
+<a href="text00070.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，我们来看一个INVITE请求（为节省篇幅，消息头部分做了删节），消息如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+INVITE sip:3000@192.168.1.102 SIP/2.0<br/>
+<br/>
+To: &lt;sip:3000@192.168.1.102&gt;<br/>
+<br/>
+From: "1000"&lt;sip:1000@192.168.1.102&gt;;tag=53604628<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+Content-Length: 222<br/>
+<br/>
+v=0<br/>
+<br/>
+o=- 1364745810658806 1 IN IP4 192.168.1.102<br/>
+<br/>
+s=Bria 3 release 3.5.0b stamp 69410<br/>
+<br/>
+c=IN IP4 192.168.1.102<br/>
+<br/>
+b=AS:2064<br/>
+<br/>
+t=0 0<br/>
+<br/>
+m=audio 59820 RTP/AVP 8 18 101<br/>
+<br/>
+a=rtpmap:101 telephone-event/8000<br/>
+<br/>
+a=fmtp:101 0-15<br/>
+<br/>
+a=sendrecv<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，媒体类型是由SDP消息（Session Description Protocol，会话描述协议）描述的，SDP消息的MIME类型是application/sdp，它是在SIP头中以Content-Type标志，并在SIP消息的正文（Body，又称消息体，消息头中的Content-Length指示Body的长度）中携带。以下我们将忽略SIP消息头部分，只讨论SDP消息。</p>
+<p height="1em" width="2em">SDP消息从v=0一行开始。“C=IN”一行表示媒体所在机器的IP地址。“m=audio”一行描述音频数据，其中59820就是RTP的端口号，该端口用于收、发RTP数据；RTP/AVP表示使用RTP承载的Audio/Video Profile <sup>
+<small>
+<a href="text00070.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ ；8和101表示音频编码的代号，它是由IANA <sup>
+<small>
+<a href="text00070.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 负责分配和管理的，因而又称为IANA代码，在此8代表PCMA，18代表G729。a=sendrecv表示双向收发，其他的还有sendonly（只发）、recvonly（只收）及inactive（不发不收）等。</p>
+<p height="1em" width="2em">当FreeSWITCH收到后，即启动协商过程。如上一节的Log所示，服务器端提供PCMU和PCMA，因此当比较到PCMA时协商成功，FreeSWITCH将返回如下SIP消息：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+SIP/2.0 200 OK<br/>
+<br/>
+... <br/>
+<br/>
+（略）<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+Content-Length: 249<br/>
+<br/>
+v=0<br/>
+<br/>
+o=FreeSWITCH 1364717298 1364717299 IN IP4 192.168.1.102<br/>
+<br/>
+s=FreeSWITCH<br/>
+<br/>
+c=IN IP4 192.168.1.102<br/>
+<br/>
+t=0 0<br/>
+<br/>
+m=audio 28512 RTP/AVP 8 101<br/>
+<br/>
+a=rtpmap:8 PCMA/8000<br/>
+<br/>
+a=rtpmap:101 telephone-event/8000<br/>
+<br/>
+a=fmtp:101 0-16<br/>
+<br/>
+a=silenceSupp:off - - - -<br/>
+<br/>
+a=ptime:20<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上消息中的SDP说明FreeSWITCH这端的RTP端口号是28512，使用PCMA编码。至此，协商完毕，双方互相知道了对方的IP地址和端口号，就可以互发音频RTP包了。</p>
+<p height="1em" width="2em">注意，在本例中，FreeSWITCH回复的是200消息以此作为对Offer的Answer，当然具体回复的消息要视具体情况而定，如果在早期媒体的情况下则需要先回复，这时可能是183消息。我们第7章已经讲过，1xx消息是呼叫进展消息。当UA发出一个请求后，如果对方回复的是180，证明呼叫进展顺利，主叫这一端即自己产生回铃音给用户一个有效的反馈。如果对方回复的是183，则183是可以携带SDP的，从而可以在协商成功后把自己个性化的媒体也传送过来，如彩铃或呼叫失败之前播放的录音通知等，这些媒体称为早期媒体（即Early Media，与正常的通话数据相比，它来得早了那么一点点）。对方在回送180或183时，自己的话机开始振铃，如果有人接听，则切断回铃音，并发送200 OK消息，一般来说交换机会在此时开始计费，因为正常的通话开始了。</p>
+<p height="1em" width="2em">另外，上面SDP消息中有一行“a=rtpmap:8 PCMA/8000”，它是对其上一行中音频代码列表中“8”的描述，在本例中，这一行不是必需的。但是IANA代码只规定了96以下的代码的一一对应关系，大于或等于96的称为动态编码，动态编码不能只用代码来区分，还必须同时使用其名称，因而，对于动态编码来讲，rtpmap行就是必需的。而UA在进行编码协商时，对于大于或等于96的编码，必须使用其名称来对比（如iLBC）。也许更糟糕的是，若双方约定了iLBC，一方的代码是96，另一方的代码是98，那么在RTP中，它们就必须使用自己的代码来发送，却需要以对方指定的代码来接收。当然，虽然代码不同，但双方都知道这是iLBC，所以编码和解码都没有问题。很遗憾的是，有一些UA没有充分理解这一点，因而在互联互通时可能会出问题。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">8.2.3　协商时机与策略</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH的协商可分为早协商和晚协商。当呼叫到达一个SIP Profile时，即某端口收到INVITE请求而未到达路由阶段时，就先行协商的，称为早协商。而如果等到路由阶段，到达拨号计划时再进行协商的，称为晚协商（Later Negotiation）。通过使用晚协商，用户可以有更多的自由去确定协商策略。</p>
+<p height="1em" width="2em">系统默认为晚协商，如果要使用早协商，可以在SIP Profile中设置以下参数 <sup>
+<small>
+<a href="text00070.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ ：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="inbound-late-negotiation" value="false"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里需要注意的是，如果启用了inbound-zrtp-passthru（默认），则隐含设置inbound-late-negotiation为true。</p>
+<p height="1em" width="2em">FreeSWITCH支持如下协商策略：generous、greedy和scrooge。</p>
+<p height="1em" width="2em">我们先看generous（普通的），它是默认的协商策略。假设客户端提供的编码列表为PCMA、G729，而FreeSWITCH支持的列表优先顺序为G729、PCMU、PCMA。那么当FreeSWITCH收到请求时将优先考虑客户端的感受，因而优先使用PCMA编码。</p>
+<p height="1em" width="2em">如果协商策略设为greedy（贪婪的），则上面的例子中FreeSWITCH会优先考虑自己的编码，因而会选择G729。</p>
+<p height="1em" width="2em">如果设置成scrooge（吝啬的），则FreeSWITCH会更加强势，它除了具有greedy所有的特性外，还将强制使用自己的采样率。</p>
+<p height="1em" width="2em">上面提到的是UA跟FreeSWITCH进行单腿协商的情况。我们总是提到FreeSWITCH是一个B2BUA。在预计通话会有两条腿的情况下，启用晚协商会得到更好的效果。比如，在SIP Profile中设置disable-transcoding为true时，FreeSWITCH将首先呼叫bleg，并仅Offer aleg提供的编码，从而可以避免转码，以节约CPU资源。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00069.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 如在3PCC应用中，有些INVITE消息中可能没有SDP。参见7.4.3节。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00069.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://en.wikipedia.org/wiki/RTP_audio_video_profile。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00069.html">
+<font color="#FF6600">[3]</font>
+</a>
+ the Internet Assigned Numbers Authority，互联网号码分配局。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00070.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 我们将在下一章深入讲解mod_sofia中Profile中的配置。</p>
+</body>
+</html>

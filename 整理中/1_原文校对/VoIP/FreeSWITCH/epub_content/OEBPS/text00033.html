@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.3　配置FreeSWITCH</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH配置文件默认放在conf/下，它由一系列XML配置文件组成。最顶层的文件是freeswitch.xml，系统启动时它依次装入其他一些XML文件并最终组成一个大的XML文件。基本的目录结构和主要配置文件如表3-2所示。</p>
+<p height="1em" width="0pt" align="center">表3-2　配置文件的目录结构</p>
+<p height="4pt" width="0pt" align="center"><img align="baseline" height="550" width="1212" src="Image00119.jpg" />
+</p>
+<p height="4pt" width="0pt" align="center"><img align="baseline" height="551" width="1212" src="Image00126.jpg" />
+</p>
+<p height="1em" width="2em">下面我们先通过学习添加一个新的FreeSWITCH用户来简单熟悉一下FreeSWITCH的配置文件。</p>
+<p height="1em" width="2em">FreeSWITCH默认设置了20个用户（1000～1019），如果你需要更多的用户，或者想通过添加一个用户来学习FreeSWITCH配置，只需要简单执行以下三步：</p>
+<p height="1em" width="2em">1）在conf/directory/default/中增加一个用户配置文件。</p>
+<p height="1em" width="2em">2）修改拨号计划（Dialplan）使其他用户可以呼叫到它。</p>
+<p height="1em" width="2em">3）重新加载配置使其生效。</p>
+<p height="1em" width="2em">例如我们想添加用户Jack，分机号是1234。只需要到conf/directory/default目录下，将1000.xml复制到1234.xml中。打开1234.xml，将所有1000都改为1234。并把effective_caller_id_name的值改为Jack，然后存盘退出，命令如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;variable name="effective_caller_id_name" value="Jack"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，打开conf/dialplan/default.xml，找到下面一行</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;condition field="destination_number" expression="^(10[01][0-9])$"&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将其改为</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;condition field="destination_number" expression="^(10[01][0-9]|1234)$"&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">熟悉正则表达式的读者应该知道，“^(10[01][0-9])$”匹配被叫号码1000～1019。因此我们修改之后的表达式就多匹配了一个1234。FreeSWITCH使用Perl兼容的正则表达式（PCRE）。</p>
+<p height="1em" width="2em">现在，回到控制台或启动fs_cli，执行reloadxml命令或按快捷F6，使新的配置生效。</p>
+<p height="1em" width="2em">找到刚才注册为1001的软电话（或启动一个新的，如果你有足够的机器的话），把1001都改为1234然后重新注册，这时就可以与1000相互进行拨打测试了。如果没有多台机器，在同一台机器上运行多个软电话可能有冲突，这时可以直接进入FreeSWITCH控制台使用如下命令进行测试：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia status profile internal reg      (<br/>
+<br/>
+显示多少用户已注册)<br/>
+<br/>
+freeswitch&gt; originate user/1000 &amp;echo            (<br/>
+<br/>
+同上)<br/>
+<br/>
+freeswitch&gt; originate user/1000 9999             (<br/>
+<br/>
+相当于在软电话1000<br/>
+<br/>
+上拨打9999)<br/>
+<br/>
+freeswitch&gt; originate user/1000 9999 XML default (<br/>
+<br/>
+同上)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，echo程序是一个很简单的程序（App），它只是将你说话的内容原样再放给你听，在测试时很有用，在本书中我们会经常用它来测试。</p>
+</body>
+</html>

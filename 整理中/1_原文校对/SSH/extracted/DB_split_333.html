@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_438"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2143455" class="calibre7"></a>11.2.1 FTP-Specific Tools for SSH </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2143620" class="calibre15"></a>As we will describe, the FTP protocol is not amenable to standard SSH port forwarding. There are SSH clients, however, with features tailored specifically for dealing with FTP. We describe two of them here. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.2.1.1 VanDyke's SecureFX </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">VanDyke Software (<a href="http://www.vandyke.com/" shape="rect" class="calibre6">http://www.vandyke.com/</a>) has a useful Windows product, specifically designed to forward FTP over SSH, data connections and all: SecureFX. It is a specialized combination of SSH-2 and FTP clients. SecureFX acts as a GUI FTP client, first creating an SSH connection, then logging into the remote FTP server via an SSH channel. Whenever it needs an FTP data connection, it dynamically creates the needed <span><em class="italic">tcpip-direct</em></span> channels (for passive mode) or remote forwardings (active mode); to the remote FTP server, SecureFX looks like an FTP client connecting from the same host. SecureFX works very smoothly and we recommend the product. </p>
+<p class="calibre4">SecureFX is a great solution if you can choose your client. However, perhaps you need to secure FTP traffic in an existing system, where you can't replace the client side. In this case, Tectia has a feature that will help. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.2.1.2 Tectia client </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2145621" class="calibre15"></a>The Tectia software has a special FTP-aware port-forwarding mode. In the GUI Windows client, when configuring tunneling in the Add New Outgoing Tunnel dialog box, set <code class="calibre35">Type = FTP</code>. In the command-line version, FTP forwarding works this way: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh -L ftp/1234:localhost:21 server</tt></div></span><p class="calibre4">This forwards local port 1234 to an FTP server running on the standard FTP port (21), on the same machine as the SSH server. After connecting with a regular FTP client to the forwarded port, FTP data-transfer commands such as <span><em class="italic">ls</em></span>, <span><em class="italic">get</em></span>, <span><em class="italic">put</em></span>, etc., should work normally, in either FTP's "active" or "passive" mode. Tectia intercepts and alters FTP command traffic, particularly the <code class="calibre35">PORT</code> and <code class="calibre35">PASV</code> commands and their responses. It does this to "fool" the FTP client and server into using SSH-forwarded ports it creates for data channels, instead of the direct connections each side intends to make. </p>
+</div>
+</div>
+</body>
+</html>

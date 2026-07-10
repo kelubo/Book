@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_99"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos289467" class="calibre7"></a>3.1.3 Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Authentication means verifying someone's identity. Suppose I claim to be Richard Silverman, and you want to authenticate that claim. If not much is at stake, you might just take my word for it. If you're a little concerned, you might ask for my driver's license or other photo ID. If you're a bank officer deciding whether to open a safe-deposit box for me, you might also require that I possess a physical key, and so on. It all depends on how sure you want to be. The arsenal of high-tech authentication<a shape="rect" class="calibre15"></a><a id="filepos290124" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos290163" class="calibre15"></a> techniques is growing constantly and includes DNA-testing microchips, retina and hand scanners, and voice-print analyzers. </p>
+<p class="calibre4">Every SSH connection involves two authentications: the client verifies the identity of the SSH server (<span><em class="italic">server authentication</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos290578" class="calibre15"></a>), and the server verifies the identity of the user requesting access (<span><em class="italic">user authentication</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos290771" class="calibre15"></a>). Server authentication ensures that the SSH server is genuine, not an impostor, guarding against an attacker's redirecting your network connection to a different machine. Server authentication also protects against man-in-the-middle attacks, wherein the attacker sits invisibly between you and the server, pretending to be the client on one side and the server on the other, fooling both sides and reading all your traffic in the process! </p>
+<p class="calibre4">User authentication is traditionally done with passwords, which unfortunately are a weak authentication scheme. To prove your identity you have to reveal the password, exposing it to possible theft. Additionally, in order to remember a password, people are likely to keep it short and meaningful, which makes the password easier for third parties to guess. For longer passwords, some people choose words or sentences in their native languages, and these passwords are likely to be crackable. From the standpoint of information theory, grammatical sentences contain little real information (technically known as <span><em class="italic">entropy</em></span>): generally less than two bits per character in English text, far less than the 8 -16 bits per character found in computer encodings. </p>
+<p class="calibre4">SSH supports authentication by password, encrypting the password as it travels over the network. This is a vast improvement over other common remote-access protocols (Telnet, FTP) which generally send your password in the clear (i.e., unencrypted) over the network, where anyone with sufficient network access can steal it! Nevertheless, it's still only simple password authentication, so SSH provides other stronger and more manageable mechanisms: per-user public-key signatures, and an improved <span><em class="italic">rlogin</em></span>-style authentication with host identity verified by public key. In addition, various SSH implementations support some other systems, including Kerberos, RSA Security's SecurID tokens, S/Key one-time passwords, and the Pluggable Authentication Modules (PAM) system. An SSH client and server negotiate to determine which authentication mechanism to use, based on their configurations, and a server can even require multiple forms of authentication. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_54"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos176080" class="calibre7"></a>1.6.3 Kerberos </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Kerberos<a shape="rect" class="calibre15"></a><a id="filepos176234" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos176273" class="calibre15"></a> is a secure authentication system for environments where networks may be monitored, and computers aren't under central control. It was developed as part of Project Athena, a wide-ranging research and development effort at the Massachusetts Institute of Technology (MIT). Kerberos authenticates users by way of <span><em class="italic">tickets</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos176694" class="calibre15"></a>, small sequences of bytes with limited lifetimes, while user passwords remain secure on a central machine. </p>
+<p class="calibre4">Kerberos and SSH solve similar problems but are quite different in scope. SSH is lightweight and easily deployed, designed to work on existing systems with minimal changes. To enable secure access from one machine to another, simply install an SSH client on the first and a server on the second, and start the server. Kerberos, in contrast, requires significant infrastructure to be established before use, such as administrative user accounts, a heavily secured central host, and software for networkwide clock synchronization. In return for this added complexity, Kerberos ensures that users' passwords travel on the network as little as possible and are stored only on the central host. SSH sends passwords across the network (over encrypted connections, of course) on each login and stores keys on each host from which SSH is used. Kerberos also serves other purposes beyond the scope of SSH, including a centralized user account database, access control lists, and a hierarchical model of trust. </p>
+<p class="calibre4">Another difference between SSH and Kerberos is the approach to securing client applications. SSH can easily secure most TCP/IP-based programs via a technique called port-forwarding. Kerberos, on the other hand, contains a set of programming libraries for adding authentication and encryption to other applications. Developers can integrate applications with Kerberos by modifying their source code to make calls to the Kerberos libraries. The MIT Kerberos distribution comes with a set of common services that have been "kerberized," including secure versions of <span><em class="italic">telnet</em></span>, <span><em class="italic">ftp</em></span>, and <span><em class="italic">rsh</em></span>. </p>
+<p class="calibre4">If the features of both Kerberos and SSH sound good, you're in luck: they've been integrated. <a shape="rect" href="DB_split_353.html#filepos2324476" class="calibre6">[11.5.2]</a> More information on Kerberos can be found at <a href="http://web.mit.edu/kerberos/www/." shape="rect" class="calibre6">http://web.mit.edu/kerberos/www/.</a></p>
+</div>
+</body>
+</html>

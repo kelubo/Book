@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_394"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1999506" class="calibre7"></a>9.4.5 X Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">We've mentioned in passing that X performs its own authentication when X clients connect to X servers. Now we're going to dive into technical detail on the inner workings of X authentication, why it's insecure, and how SSH X forwarding builds on it to create a secure solution. </p>
+<p class="calibre4">In most cases, X forwarding simply works, and you don't have to think about it. The following material is to aid your understanding and satisfy any intense cravings for tech talk (both yours and ours). </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.5.1 How X authentication works </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">When an X client requests a connection to an X server, the server authenticates the client. That is, the X server determines the client's identity to decide whether to allow a connection to the server's display<a shape="rect" class="calibre15"></a><a id="filepos2000763" class="calibre15"></a>. The current release of the X Window System (X11R6) provides two categories of authentication: host-based and key-based: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Host-based X authentication</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The simpler method. Using the program <span><em class="italic">xhost</em></span>, you indicate a list of hosts that may connect to your X display. Notice that connections are authenticated only by hostname, not by username. That is, <span><em class="italic">any</em></span> user on a listed host may connect to your display. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Key-based X authentication</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Uses the <span><em class="italic">xauth</em></span> program to maintain a list of X authentication keys, or <span><em class="italic">display keys</em></span>, for X clients. Keys are kept in a file, usually <em class="italic">~/.Xauthority</em>, along with other data associated with the various displays the client wants to access. When an X client connects to a server requiring authentication, the client supplies the appropriate credentials for that display from the <span><em class="italic">xauth</em></span> data. If authentication is successful, the X client can then connect to the display managed by the X server. </div>
+</blockquote>
+</div>
+<p class="calibre4">Display keys are obtained from the X server in various ways depending on the environment. For example, if you start the server directly on the console of a machine using <span><em class="italic">xinit</em></span> or <span><em class="italic">startx</em></span>, these programs invoke an X server and insert a copy of the server's key directly into your <span><em class="italic">xauth</em></span> data. Alternatively, if you connect to a remote machine that runs the X Display Manager (XDM), the key is sent to your remote account when establishing your XDM session. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2003429" class="calibre7"></a>9.4.5.2 xauth and the SSH rc files </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH has startup files that can be set to execute on the server side when a client logs in. These are the systemwide <em class="italic">/etc/sshrc</em> and the per-account <em class="italic">~/.ssh/rc</em> files. These can be shell scripts or any kind of executable program. </p>
+<p class="calibre4">An important thing to note is that <span><em class="italic">sshd</em></span> runs <span><em class="italic">xauth</em></span> only to add the proxy display key if it doesn't run an <span><em class="italic">rc</em></span> program. If it does run an <span><em class="italic">rc</em></span> program, it feeds the key type and data to the program on a single line to its standard input, and it is up to the <span><em class="italic">rc</em></span> program to store the display key. This feature provides a way to customize handling the display key, in case just running <span><em class="italic">xauth</em></span> isn't the right thing to do in your situation. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2004951" class="calibre7"></a>9.4.5.3 Trusted X forwarding </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2005044" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2005141" class="calibre15"></a>The X Windows protocol was not designed with much security in mind. Usually, once an application has access to an X display, it pretty much has the run of it. A malicious X client can easily read all keyboard input, see all screen contents, add or modify keystrokes, and so on. This is why X forwarding is risky and should generally be turned on only when you need it, and only for hosts you trust. </p>
+<p class="calibre4">There is a security extension to the X Windows protocol that allows at least some further granularity, partitioning X clients into "trusted" and "untrusted" groups. Programs like the X Window Manager must be trusted, since they have to manipulate the windows of other applications and perform other global operations on the display. Other programs may be left untrusted, though, with more limited access to the display and less opportunity for mischief. </p>
+<p class="calibre4">Both OpenSSH and Tectia support this trust distinction in X forwarding. OpenSSH has the <code class="calibre35">ForwardX11Trusted</code> client option and Tectia has <code class="calibre35">TrustX11Applications</code>. Set to <code class="calibre35">yes</code> or <code class="calibre35">no</code>, these keywords control whether remote X clients accessing the local display via SSH X forwarding will be considered trusted or untrusted by the X server. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    ForwardX11Trusted yes<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    TrustX11Applications yes</tt></div></span><p class="calibre4">The default setting is <code class="calibre35">no</code>, meaning "untrusted." You can override this setting per connection with <span><em class="italic">ssh -Y</em></span> (OpenSSH) or <span><em class="italic">ssh +X</em></span> (Tectia): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -Y ...              <em class="italic"><span>Equivalent to ssh -X -o ForwardX11Trusted=yes</span></em><br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ ssh +X ...              <em class="italic"><span>Equivalent to ssh +x -o TrustX11Applications=yes</span></em></tt></div></span><p class="calibre4">Technically, for trusted forwarding, the client uses the existing <span><em class="italic">xauth</em></span> key to access the display: that is, it inherits whatever trust is already in effect. For untrusted forwarding it generates a new, specifically untrusted key using the command <span><em class="italic">xauth generated ... untrusted</em></span>, and uses the new key with forwarded X connections. In either case, the local key never goes to the remote host; that is always a throwaway key used only for authenticating the connection within SSH. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.5.4 Problems with X authentication </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">If you've used X, the authentication was probably transparent and seemed to work fine. Behind the scenes, however, the mechanism is insecure. Here are the major problems: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">xhost is insecure</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Once you give permission for a remote host to connect to your display, <span><em class="italic">any user</em></span> on that host can connect. As with the r-commands, this authentication method depends on the network address of the connecting host, which can be easy for an attacker to usurp. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Key transfer may be manual and insecure</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Some remote-login protocols, such as <span><em class="italic">telnet</em></span>, don't assist with X authentication. If your display keys aren't available on a remote machine, you have to transfer them yourself, either manually or by automating the transfer, perhaps in your login script. This isn't only a nuisance but also insecure, since you're sending the key in plaintext over the network. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">The most common key-based method, MIT-MAGIC-COOKIE-1, is insecure</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Although it uses a random string of bits, or <span><em class="italic">cookie</em></span>, as the <span><em class="italic">xauth</em></span> display key, this key is transmitted in plaintext at the beginning of every connection, where it can be intercepted and read. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">The remote host might not support your chosen X authentication method</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">X11R6 supports other, more secure authentication methods. SUN-DES-1 employs Sun's secure RPC system, XDM-AUTHORIZATION-1 uses DES, and MIT-KERBEROS-5 involves Kerberos user-to-user authentication.<sup class="calibre20">[<a id="filepos2011346" shape="rect" href="DB_split_304.html#filepos2033454" class="calibre6">138</a>]</sup> Unfortunately, these methods are often not available in particular instances of the X software. Sometimes they aren't compiled into X installations due to cryptographic export restrictions; other times, the X version is too old to support the more secure methods. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">If the remote host is insecure, your display key can be compromised</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">In the best scenario, where the X server supports strong authentication and your key can be copied securely to the remote machine, you still have to store your sensitive display key there. If that machine is untrustworthy, your key can be at risk. (SSH doesn't have this problem, since only your public key is stored on the SSH server machine.) </div>
+</blockquote>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.5.5 SSH and authentication spoofing </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Through X forwarding, SSH provides transparent, secure authentication and key transfer for X sessions. This is done by a technique called <span><em class="italic">authentication spoofing</em></span>, as depicted in <a shape="rect" href="#filepos2013421" class="calibre6">Figure 9-11</a>. Authentication spoofing involves a fake display key, which we call the <span><em class="italic">proxy key</em></span>, that authenticates to the SSH X proxy server on the remote side. When relaying X traffic containing a key, SSH cleverly substitutes the real display key. Here's how it works. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2013421" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Authentication of forwarded X connections" src="images/00042.jpg" class="calibre76"/></div>
+</div>
+</span><p class="calibre4">Figure 9-11. Authentication of forwarded X connections</p></div>
+<p class="calibre4">The players begin in the following positions. You are logged into a local machine with a local display. The local machine runs an X server and SSH clients. On the other side of the network connection, an SSH server is running on a remote machine, where you invoke X clients. The goal is for the remote X clients to appear on your local display by way of SSH. </p>
+<p class="calibre4">First, you run a local SSH client, asking it to set up X forwarding. The SSH client requests X forwarding from the remote SSH server, and it also reads your local display key from your <em class="italic">.Xauthority</em> file. </p>
+<p class="calibre4">Next, the SSH client generates a proxy key. This is a string of random data of the same length as your local display key. The SSH client then sends the proxy key and its key type (e.g., MIT-MAGIC-COOKIE-1) to the remote machine, and the SSH server runs the <span><em class="italic">xauth</em></span> program on your behalf to associate the proxy key with your local display. The stage is now set for X forwarding. </p>
+<p class="calibre4">When you start a remote X client, your local SSH client connects to your local X display. It then watches for the first X protocol message sent over the forwarded connection and treats it specially. Specifically, the SSH client parses the message, finds the X authentication key inside it, and compares it to the proxy key. If the keys don't match, the SSH client rejects and closes the connection. Otherwise, if the keys match, the SSH client substitutes the real display key in place of the proxy key and relays the modified message to your local X server. The X server, blissfully unaware that a key switch has taken place, reads the display key and proceeds normally with X authentication. The forwarded X connection is now established. </p>
+<p class="calibre4">X forwarding with authentication spoofing solves all but one of the X authentication problems we raised earlier: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">xhost</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">X forwarding doesn't use <span><em class="italic">xhost</em></span>. (By the way, make sure to disable all <span><em class="italic">xhost</em></span> permissions when using X forwarding, or you'll undermine the X security provided by SSH.) </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Key transfer</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SSH transfers the X display key automatically and runs <span><em class="italic">xauth</em></span> on your behalf to install it on the remote side. The transfer is secure since the key travels over the encrypted SSH connection. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">MIT-MAGIC-COOKIE-1 insecurity</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The key transmitted at the beginning of every X session is now encrypted, along with the rest of the X traffic, inside the SSH session. This greatly increases the operational security of this common X authentication scheme. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Untrustworthy remote hosts</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">With authentication spoofing, only the proxy key, not the true display key, is sent to the remote host. The proxy key is good only for connecting to your display through SSH, not for connecting to your display directly. As soon as your SSH session ends, the proxy key becomes useless. Since SSH sessions come and go, but some people leave their X sessions up (with the same key) for days, X forwarding can be a great improvement. </div>
+</blockquote>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.5.6 Improving authentication spoofing </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The remaining problem with X forwarding is the possibility of unsupported X authentication mechanisms. The local side can use a more sophisticated authentication method that a remote host might not support. </p>
+<p class="calibre4">In theory, SSH X forwarding can solve this problem by always installing a proxy key of type MIT-MAGIC-COOKIE-1, no matter what local authentication method is actually in use. After the SSH client has checked the X client's key against the proxy key for a match, its client could then generate and substitute whatever local authenticator is required using the true authentication type and key. </p>
+<p class="calibre4">Unfortunately, SSH implementations don't go this far. The server compares keys literally as bit strings, and the SSH client substitutes keys verbatim, regardless of the key types. As a result, if you use a stronger X authentication method such as XDM-AUTHORIZATION-1, <span><em class="italic">sshd</em></span> blindly compares an encrypted authenticator with the proxy key, rightly determines that they don't match, and invalidly rejects the connection. The failure is silent and mysterious; we wish the software would detect the presence of an unsupported mode and issue a warning when setting up the connection. </p>
+<p class="calibre4">If SSH knew the details of all X authentication modes, it could check the proxy authenticators on one side and generate correct ones for the X server on the other. However, this can be a significant development effort, though perhaps one could link SSH against the X11 libraries to obtain the necessary algorithms. SSH would also have to deal with differing key data lengths, constructing a new X message to hold the proxy key instead of copying it to an existing message. </p>
+<p class="calibre4">It would also be useful if X forwarding could be used without authentication spoofing. Then you could arrange your own security for the connection by, say, using <span><em class="italic">xhost</em></span> to allow any connection from your local machine (and hence the SSH X proxy), while still applying key-based authentication to X connections originating from elsewhere. You can accomplish this with general port forwarding, as discussed in the next section, but direct support is more convenient. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.5.7 Nonstandard X clients </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">X clients generally do X <span><em class="italic">xauth</em></span>-style authentication by virtue of having been linked against Xlib, the common X programming library. Occasionally, though, you run across particular X client programs that don't use Xlib and simply ignore authentication issues. Since you can't turn off SSH X authentication spoofing, you can't use such programs across SSH X forwarding; you get this message: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    X11 connection requests different authentication protocol: 'MIT-MAGIC-COOKIE-1' vs.<br class="calibre19"/>    ''</tt></div></span><p class="calibre4">You can, however, use a general port forwarding instead. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    foo% ssh -R6010:localhost:6000 bar<br class="calibre19"/>    bar% setenv DISPLAY bar:10</tt></div></span><p class="calibre4">Note that this bypasses the discipline imposed by X forwarding, of requiring <span><em class="italic">xauth</em></span> authentication on forwarded X connections. If your real X server is using <span><em class="italic">xhost</em></span> for access control, this port forwarding allows anyone on host foo to connect to your X server. Use this sort of thing with caution. </p>
+</div>
+</div>
+</body>
+</html>

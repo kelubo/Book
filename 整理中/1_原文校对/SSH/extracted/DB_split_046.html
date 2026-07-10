@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_73"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos215743" class="calibre7"></a>2.3.2 The Escape Character </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos215901" class="calibre15"></a>Let us return to the <span><em class="italic">shell.isp.com</em></span> example, just after you'd discovered the attachment in your remote email message and saved it to the remote file <em class="italic">printme.pdf</em>. In our original example, you then logged out of <span><em class="italic">shell.isp.com</em></span> and ran <span><em class="italic">scp</em></span> to transfer the file. But what if you don't want to log out? If you're using a workstation running a window system, you can open a new window and run <span><em class="italic">scp</em></span>. But if you're using a lowly text terminal, or you're not familiar with the window system running on your friend's computer, there is an alternative. You can temporarily interrupt the SSH connection, transfer the file (and run any other local commands you desire), and then resume the connection. </p>
+<p class="calibre4"><span><em class="italic">ssh</em></span> supports an <span><em class="italic">escape character</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos217136" class="calibre15"></a>, a designated character that gets the attention of the SSH client. Normally, <span><em class="italic">ssh</em></span> sends every character you type to the server, but the escape character is caught by the client, alerting it that special commands may follow. By default, the escape character is the tilde (~), but you can change it. To reduce the chances of sending the escape character unintentionally, that character must be the first character on the command line, i.e., following a newline (<span>Control-J</span>) or return (<span>Control-M</span>) character. If not, the client treats it literally, not as an escape character. </p>
+<p class="calibre4">After the escape character gets the client's attention, the next character entered determines the effect of the escape. For example, the escape character followed by a <code class="calibre35">Control-Z</code> suspends <span><em class="italic">ssh</em></span> like any other shell job, returning control to the local shell. Such a pair of characters is called an <span><em class="italic">escape sequence.</em></span> We cover these in detail in a later chapter. <a shape="rect" href="DB_split_227.html#filepos1587776" class="calibre6">[7.4.6.8]</a></p>
+<p class="calibre4">To change the <span><em class="italic">ssh</em></span> escape character, use the -<span><em class="italic">e</em></span> command-line option. For example, type the following to make the percent sign (<code class="calibre35">%</code>) the escape character when connecting to <span><em class="italic">shell.isp.com</em></span> as user pat: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -e "%" -l pat shell.isp.com</tt></div></span></div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos219412" shape="rect" href="DB_split_045.html#filepos209600" class="calibre6">7</a>] </sup>Depending on your client configuration, <span><em class="italic">ssh</em></span> might print a different message and automatically accept or reject the connection. <a shape="rect" href="DB_split_224.html#filepos1515347" class="calibre6">[7.4.3.1]</a></p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_74"></div></body>
+</html>

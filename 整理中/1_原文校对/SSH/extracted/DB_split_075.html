@@ -1,0 +1,206 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_112"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos340187" class="calibre7"></a>3.4.2 SSH Transport Layer Protocol (SSH-TRANS) </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.2.1 Connection </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We begin by running an SSH client in verbose mode, requesting a connection to <span><em class="italic">host.foo.net</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -vv host.foo.net<br class="calibre19"/>    OpenSSH_3.6.1p1+CAN-2003-0693, SSH protocols 1.5/2.0, OpenSSL 0x0090702f<br class="calibre19"/>    debug1: Reading configuration data /Users/res/.ssh/config<br class="calibre19"/>    debug1: Applying options for com<br class="calibre19"/>    debug1: Applying options for *<br class="calibre19"/>    debug1: Reading configuration data /etc/ssh/ssh_config<br class="calibre19"/>    debug1: Connecting to host.foo.net [10.1.1.1] port 22.<br class="calibre19"/>    debug1: Connection established.</tt></div></span><p class="calibre4">The client is a version of OpenSSH running on a Macintosh. It reads its configuration files, then makes a TCP connection to the remote side, which succeeds. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.2.2 Protocol version selection </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">As soon as the server accepts the connection, the SSH protocol begins. The server announces its protocol version using a text string: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: Remote protocol version 2.0, remote software version 4.1.0.34 SSH Secure Shell</tt></div></span><p class="calibre4">You can see this string yourself by simply connecting to the server socket, e.g., with <span><em class="italic">telnet</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ telnet host.foo.net 22<br class="calibre19"/>    Trying 10.1.1.1...<br class="calibre19"/>    Connected to host.foo.net<br class="calibre19"/>    Escape character is '^]'.<br class="calibre19"/>    SSH-2.0-4.1.0.34 SSH Secure Shell<br class="calibre19"/>    <strong class="calibre45"><code class="calibre35">^]</code></strong><br class="calibre19"/>    telnet&gt; <strong class="calibre45"><code class="calibre35">quit</code></strong><br class="calibre19"/>    Connection closed.</tt></div></span><p class="calibre4">The format of the announcement is:</p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">SSH-<em class="italic"><code class="calibre35">&lt;protocol version&gt;</code></em>-<em class="italic"><code class="calibre35">&lt;comment&gt;</code></em></span></td>
+</tr></span></table><p class="calibre4">In this case, the server implements the SSH-2 protocol, and the software version is 4.1.0.34 of SSH Secure Shell from SSH Communications Security. Although the comment field can contain anything at all, SSH servers commonly put their product name and version there. This is useful, as clients often recognize specific servers in order to work around known bugs or incompatibilities. Some people don't like this practice on security grounds, and try to remove or change the comment. Be aware that if you do, you may cause more trouble than it's worth, since previously working SSH sessions may suddenly start failing if they had relied on such workarounds. </p>
+<p class="calibre4">The protocol version number "1.99" has special significance: it means the server supports both SSH-1 and SSH-2, and the client may choose either one. </p>
+<p class="calibre4">Next, OpenSSH parses the comment:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: no match: 4.1.0.34 SSH Secure Shell<br class="calibre19"/>    debug1: Enabling compatibility mode for protocol 2.0<br class="calibre19"/>    debug1: Local version string SSH-2.0-OpenSSH_3.6.1p1+CAN-2003-0693</tt></div></span><p class="calibre4">but does not find a match in its list of known problems to work around. It elects to proceed with SSH-2 (the only choice in this case), and sends its own version string to the server, in the same format. If the client and server agree that their versions are compatible, the connection process continues; otherwise, either party may decide to terminate the connection. </p>
+<p class="calibre4">At this point, if the connection proceeds, both sides switch to a nontextual, record-oriented protocol for further communication, which is the basis of SSH transport. This is often referred to as the SSH <span><em class="italic">binary packet protocol</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos345846" class="calibre15"></a>, and is defined in SSH-TRANS. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos346112" class="calibre7"></a>3.4.2.3 Parameter negotiation </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos346206" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos346244" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos346282" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos346320" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos346358" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos346396" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos346493" class="calibre15"></a>Having established a connection and agreed on a protocol version, the first real function of SSH-TRANS is to arrange for the basic security properties of SSH: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Privacy (encryption)</li>
+<li class="calibre18">Integrity (nonmodifiability and origin assurance)</li>
+<li class="calibre18">Server authentication (man-in-the-middle and spoofing resistance) </li>
+<li class="calibre18">Compression (not a security property per se, but included in this negotiation) </li>
+</ul></div>
+<p class="calibre4">But first, the two sides must agree on session parameters, including the methods to achieve these properties. The whole process happens in the protocol phase called the <span><em class="italic">key exchange</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos347417" class="calibre15"></a>, even though the first part also negotiates some parameters unrelated to the key exchange per se. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: SSH2_MSG_KEXINIT sent<br class="calibre19"/>    debug1: SSH2_MSG_KEXINIT received</tt></div></span><p class="calibre4">The client sends its KEXINIT ("key exchange initialization") message, and receives one from the server. Here are the choices it gives to the server: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: kex_parse_kexinit: gss-group1-sha1-toWM5Slw5Ew8Mqkay+al2g==,<br class="calibre19"/>                     gss-group1-sha1-A/vxljAEU54gt9a48EiANQ==,<br class="calibre19"/>                     diffie-hellman-group-exchange-sha1,<br class="calibre19"/>                     diffie-hellman-group1-sha1</tt></div></span><p class="calibre4">These are the key exchange algorithms the client supports, which are: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">diffie-hellman-group1-sha1</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">This algorithm is defined and required by SSH-TRANS; this specifies the well-known Diffie-Hellman procedure for key agreement, together with specific parameters (Oakley Group 2 [RFC-2409] and the SHA-1 hash algorithm). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">diffie-hellman-group-exchange-sha1</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Similar, but allows the client to choose from a list of group parameters, addressing concerns about possible attacks based on a fixed group; defined in the IETF draft document "secsh-dh-group-exchange."<sup class="calibre20">[<a id="filepos349606" shape="rect" href="DB_split_077.html#filepos420469" class="calibre6">15</a>]</sup></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">gss-group1-sha1-toWM5Slw5Ew8Mqkay+al2g==</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19"></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">gss-group1-sha1-A/vxljAEU54gt9a48EiANQ==</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">These odd-looking names are partially encoded in Base64--they represent two variants of a Kerberos-authenticated Diffie-Hellman exchange as defined in IETF draft "secsh-gsskeyex." These are useful where a Kerberos infrastructure is available, providing automatic and flexible server authentication without maintaining separate SSH host keys and known-hosts files. The Kerberos authentication proceeds by way of GSSAPI, and the name suffixes are the Base64 encoding of the MD5 hash of the ASN.1 DER encoding of the underlying GSSAPI mechanism's OID. Say that five times fast. </div>
+</blockquote>
+</div>
+<p class="calibre4">In terms of abstract requirements, an SSH key exchange algorithm has two outputs: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">A shared secret, <em class="italic"><code class="calibre35">K</code></em></li>
+<li class="calibre18">An "exchange hash," <em class="italic"><code class="calibre35">H</code></em></li>
+</ul></div>
+<p class="calibre4"><em class="italic"><code class="calibre35">K</code></em> is the master secret for the session: SSH-TRANS defines a method for deriving from secret <em class="italic"><code class="calibre35">K</code></em> the various keys and other cryptographic parameters needed for specific encryption and integrity algorithms used in the SSH connection. The exchange hash <em class="italic"><code class="calibre35">H</code></em> does not have to be secret, although it should not be divulged unnecessarily. It should be unique to each session, and computed in such a way that neither side can force a particular value of hash <em class="italic"><code class="calibre35">H</code></em>. We'll see the significance of that later. </p>
+<p class="calibre4">The key exchange should also perform server authentication, in order to guard against spoofing and <span><em class="italic">man-in-the-middle</em></span> (MITM) attacks. There is an inherent asymmetry in the SSH client/server relationship: the server accepts connections from as-yet unknown parties, whereas a client always has a particular server as the target of its connection. The server may demand secret information as part of user authentication (e.g., password). The client is the first party to rely on the identity of the other side, and hence server authentication comes first. Without server authentication, an attacker might redirect the client's TCP connection to a host of his choice (perhaps by subverting the DNS or network routing) and trick the user into logging into the wrong host; this is called <span><em class="italic">spoofing</em></span>. Or, he might interpose himself between the client and the (legitimate) server, executing the SSH protocol as server on one side and client on the other, passing messages back and forth and reading all the traffic! This is a <span><em class="italic">man-in-the-middle attack</em></span>. </p>
+<p class="calibre4">The key exchange phase of SSH-TRANS may be repeated later in a connection, in order to replace an aging master secret or re-authenticate the server. In fact, the draft recommends that a connection be re-keyed after each gigabyte of transmitted data or after each hour of connection time, whichever comes sooner. However, the hash output <em class="italic"><code class="calibre35">H</code></em> of the very first key exchange is used as the "session identifier" for this SSH connection; we'll see its use later. </p>
+<p class="calibre4">Next, the client offers a choice of SSH host key types it can accept: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: kex_parse_kexinit: ssh-rsa,ssh-dss,null</tt></div></span><p class="calibre4">In this case, it offers RSA, DSA, and "null," for no key at all. It includes "null" because of its support of Kerberos for host authentication; if a Kerberos key exchange is used, no SSH-specific host key is needed for server authentication. </p>
+<p class="calibre4">After that, the client lists the bulk data encryption ciphers it supports: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: kex_parse_kexinit: aes128-cbc,3des-cbc,blowfish-cbc,cast128-cbc,arcfour,<br class="calibre19"/>                     aes192-cbc,aes256-cbc,rijndael-cbc@lysator.liu.se</tt></div></span><p class="calibre4">The selected cipher is used for privacy of data flowing over the connection. Bulk data is never enciphered directly with public-key methods such as RSA or DSA because they are far too slow. Instead, we use a symmetric cipher such as those listed, protecting the session key for that cipher with public-key methods if appropriate. The names here indicate particular algorithms and associated cryptographic parameters; for instance, <code class="calibre35">aes128-cbc</code> refers to the Advanced Encryption Standard algorithm, with a 128-bit key in cipher-block-chaining mode. </p>
+<p class="calibre4">Note the use of a private algorithm name as well: <code class="calibre35">
+<span><a href="mailto:rijndael-cbc@lysator.liu.se" shape="rect" class="calibre6">rijndael-cbc@lysator.liu.se</a></span>
+</code>. This email-address-like syntax is defined in the SSH Architecture draft ("secsh-architecture"), and allows any individuals or organizations to define and use their own algorithms or other SSH protocol identifiers without going through the IETF to have them approved. Identifiers that don't contain an @ sign are global and must be centrally registered. </p>
+<p class="calibre4">The draft also defines the "none" cipher, meaning no encryption is to be applied. While there are legitimate reasons for wanting such a connection (including debugging!), some SSH implementations do not support it, at least in their default configuration. Often, recompiling the software from source with different flags, or hacking the code itself, is needed to turn on support for "none" encryption<a shape="rect" class="calibre15"></a><a id="filepos356789" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos356828" class="calibre15"></a>.<sup class="calibre20">[<a id="filepos356894" shape="rect" href="DB_split_077.html#filepos420937" class="calibre6">16</a>]</sup> The reason is that it's deemed just too dangerous. If a user can easily turn off encryption, so can an attacker who gains access to a user's account, even briefly. Imagine surreptitiously adding this to an OpenSSH user's client configuration file, <em class="italic">~/.ssh/config</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host *<br class="calibre19"/>     Ciphers none</tt></div></span><p class="calibre4">or simply replacing the <span><em class="italic">ssh</em></span> program on a compromised machine with one that uses the "none" cipher, and issues no warnings about it. Bingo! All the user's SSH sessions become transparent, until he notices the change (if ever). If the client doesn't support "none," then this simple config file hack won't work; if the server doesn't, then the client-side Trojan horse won't work, either. </p>
+<p class="calibre4">Next, the client presents its list of available integrity algorithms: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: kex_parse_kexinit: hmac-md5,hmac-sha1,hmac-ripemd160,<br class="calibre19"/>                     hmac-ripemd160@openssh.com,hmac-sha1-96,hmac-md5-96</tt></div></span><p class="calibre4">The integrity algorithm is applied to each message sent by the SSH record protocol, together with a sequence number and session key, to produce a <span><em class="italic">message authentication code</em></span> (MAC) appended to each message. The receiver can use the MAC and its own copy of the session key to verify that the message has not been altered in transit, is not a replay, and came from the other holder of the session key; these are the message integrity properties. </p>
+<p class="calibre4">SSH-TRANS defines several MAC algorithms, and requires support for one: "hmac-sha1," a 160-bit hash using the standard keyed HMAC construction with SHA-1 (see RFC-2104, "HMAC: Keyed-Hashing for Message Authentication"). </p>
+<p class="calibre4">Finally, the client indicates which data-compression techniques it supports: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: kex_parse_kexinit: none,zlib</tt></div></span><p class="calibre4">The draft does not require any compression to be available (i.e., "none" is the required type). It does define "zlib": LZ77 compression as described in RFC-1950 and in RFC-1951. Although it does not appear here, SSH speakers also at this point also can negotiate a <span><em class="italic">language tag</em></span> for the session (as described in RFC-3066), e.g., to allow a server to provide error messages in a language appropriate to the user. </p>
+<p class="calibre4">Having sent its negotiation message, the client also receives one from the server, listing the various parameters it supports in the same categories: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: kex_parse_kexinit: diffie-hellman-group1-sha1<br class="calibre19"/>    debug2: kex_parse_kexinit: ssh-dss,x509v3-sign-rsa<br class="calibre19"/>    debug2: kex_parse_kexinit: aes128-cbc,3des-cbc,twofish128-cbc,cast128-cbc,<br class="calibre19"/>                     twofish-cbc, blowfish-cbc,aes192-cbc,aes256-cbc,<br class="calibre19"/>                     twofish192-cbc,twofish256-cbc,arcfour<br class="calibre19"/>    debug2: kex_parse_kexinit: hmac-sha1,hmac-sha1-96,hmac-md5,hmac-md5-96<br class="calibre19"/>    debug2: kex_parse_kexinit: none,zlib</tt></div></span><p class="calibre4">Note that this server supports a much smaller set of key exchange algorithms: only the required one, in fact. It has two host key types to offer: plain DSS, and RSA with X.509 public-key certificate attached. It does not support a null host key since its single key exchange algorithm requires one. </p>
+<p class="calibre4">Next, each side chooses a cipher/integrity/compression combination from the other side's set of supported algorithms: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: kex: server-&gt;client aes128-cbc hmac-md5 none<br class="calibre19"/>    debug1: kex: client-&gt;server aes128-cbc hmac-md5 none</tt></div></span><p class="calibre4">In this case, the choices in both directions are the same; however, they need not be. The choice of these mechanisms is entirely independent, and they are independently keyed, as well. Data flowing in one direction might be encrypted with AES and compressed, while the return stream could be encrypted with 3DES without compression. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos362549" class="calibre7"></a>3.4.2.4 Key exchange and server authentication </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos362660" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos362698" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos362795" class="calibre15"></a>At this point, we are ready to engage in the actual key exchange: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: dh_gen_key: priv key bits set: 131/256<br class="calibre19"/>    debug2: bits set: 510/1024<br class="calibre19"/>    debug1: sending SSH2_MSG_KEXDH_INIT</tt></div></span><p class="calibre4">The client chooses an exchange algorithm from the server's advertised set; in this case, the server offers only one, and we go with it. We generate an ephemeral key as part of the Diffie-Hellman algorithm, and send the initial message of the <code class="calibre35">diffie-hellman-group1-sha1</code> exchange, simultaneously letting the server know which method we're using, and actually starting it. </p>
+<p class="calibre4">Next the client expects, and the server sends, its reply to our KEXDH_INIT message: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: expecting SSH2_MSG_KEXDH_REPLY<br class="calibre19"/>    debug1: Host 'host.foo.net' is known and matches the DSA host key.<br class="calibre19"/>    debug1: Found key in /Users/res/.ssh/known_hosts:169<br class="calibre19"/>    debug2: bits set: 526/1024<br class="calibre19"/>    debug1: ssh_dss_verify: signature correct</tt></div></span><p class="calibre4">Contained in the reply is the server's SSH public host key, of a type we said we'd accept in the earlier parameter negotiation (DSA), along with a signature proving it holds the corresponding private key. The signature is verified, of course, but that by itself is meaningless; for all we know, the server just generated this key. The crucial step here is to check that the public key identifies the server we wanted to contact. In this case, the client finds a record associating the name <span><em class="italic">foo.host.net</em></span> with the key supplied by the server, at line 169 in the user's OpenSSH <em class="italic">known_hosts</em> file. </p>
+<p class="calibre4">Note that the approach used to verify the host key is entirely unspecified by the SSH protocol; it's completely implementation-dependent. Most SSH products provide some version of the known-hosts file method used here: simple, but limiting and cumbersome for large numbers of hosts, users, or different SSH implementations. A client could do anything that makes sense to verify the host key, perhaps taking advantage of some existing secure infrastructure, for example; look it up in a trusted LDAP directory. </p>
+<p class="calibre4">Of course, the problem of verifying the owner of a public key is hardly a new one; that's what Public Key Infrastructure (PKI)<a shape="rect" class="calibre15"></a><a id="filepos365769" class="calibre15"></a> systems are for, such as the X.509 standard for public-key certificates. SSH-2 supports PKI, defining a number of key types which include attached certificates: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ssh-rsa</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Plain RSA key</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ssh-dss</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Plain DSS key</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">x509v3-sign-rsa</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">X.509 certificates (RSA key) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">x509v3-sign-dss</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">X.509 certificates (DSS key) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">spki-sign-rsa</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SPKI certificates (RSA key) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">spki-sign-dss</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SPKI certificates (DSS key) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">pgp-sign-rsa</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenPGP certificates (RSA key) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">pgp-sign-dss</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenPGP certificates (DSS key) </p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">Many SSH products handle only plain DSS/RSA keys, but some (such as Tectia) offer PKI support as well. Recall that earlier, the server offered a key type of <code class="calibre35">x509v3-sign-rsa</code> along with plain DSS. Our OpenSSH client does not support certificates, and so selected the DSS key. However, with PKI support, the client could verify the host key by its accompanying certificate. New hosts could be added and existing keys changed, without having to push out new known-hosts files to all clients every time—often a practical impossibility anyway, when you consider laptops, many different SSH clients with different ways of storing host keys, etc. Instead, clients only need a single key; that of the authority issuing your host key certificates. We'll cover PKI in more detail in a case study. <a shape="rect" href="DB_split_351.html#filepos2287452" class="calibre6">[11.5]</a></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.2.5 Server authentication and antispoofing: some gory details </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos371042" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos371139" class="calibre15"></a>As noted earlier, we're avoiding diving too deeply into protocol details, instead attempting a technical overview that covers the issues SSH administrators most need to understand to deploy effective systems. However, it's worth going a little deeper here regarding the actual mechanism of server authentication, since our description begs the question. Simply saying that the server "provides a signature" to prove its identity doesn't cut it. Here's a naive protocol: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Client sends a challenge.</li>
+<li value="2" class="calibre18">Server returns challenge signed with its host key.</li>
+<li value="3" class="calibre18">Client verifies the signature and the server/key binding and takes this as proof of the server's identity. </li>
+</ol></div>
+<p class="calibre4">We're being at least moderately clever here; by using a random challenge, we assure that the response can't be replayed by an attacker, i.e., is not a reply from an earlier session. Not bad, but no cigar: this simple procedure does not prevent MITM attacks! An MITM attacker can simply pass along the challenge to the server, get the signature, and pass it back to the client. All this protocol really proves to the client is that the entity at the other end of its connection can <span><em class="italic">talk</em></span> to the real server, when what the client wants to verify is that entity actually <span><em class="italic">is</em></span> the real server. So, here's how it's done: instead of a random challenge, the server signs the SSH session identifier, which we described earlier. Recall that the identifier is unique to each session, and that neither side can force a particular value for it. In order to do MITM, our attacker has to execute the SSH protocol independently on two sides: once with the client, and again with the server. The identifiers for those two connections are guaranteed to be different, no matter what the attacker does. He needs to produce the client-side identifier signed by the server in order to fool the client, but all he can get is the server-side identifier; he can't force the server to sign the wrong identifier. </p>
+<p class="calibre4">Cryptographers are devious people. We like them.</p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.2.6 Wonder security powers, activate! </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Back to our debug trace example: we've sent and received a single key-exchange message on each side now, and this key-exchange method in fact only requires the two messages. Other exchange mechanisms could take any number and form of messages, but ours is now complete. Based on the contents of these messages, both sides compute the needed shared master secret <em class="italic"><code class="calibre35">K</code></em> and exchange hash <em class="italic"><code class="calibre35">H</code></em>, in such a way that an observer can't feasibly discover them (we leave the mathematical details to your perusal of the actual draft document, if you're that curious). Having authenticated the exchange using the server's host key, we are convinced that we have shared keys with the server we really wanted to talk to, and now everything is in place to turn on security in the form of encryption and integrity checking. </p>
+<p class="calibre4">Using a procedure defined in the draft, the client derives appropriate encryption and integrity keys from the master secret; the server does the same to produce matching keys: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: kex_derive_keys<br class="calibre19"/>    debug2: set_newkeys: mode 1<br class="calibre19"/>    debug1: SSH2_MSG_NEWKEYS sent<br class="calibre19"/>    debug1: expecting SSH2_MSG_NEWKEYS<br class="calibre19"/>    debug2: set_newkeys: mode 0<br class="calibre19"/>    debug1: SSH2_MSG_NEWKEYS received</tt></div></span><p class="calibre4">Both sides then send the NEWKEYS<a shape="rect" class="calibre15"></a><a id="filepos375674" class="calibre15"></a> message, each which marks taking the new keys into effect in its own direction; all messages after NEWKEYS are protected using the new set of keys just negotiated. With a functioning SSH-TRANS session at hand, the client now requests the first service it wants access over the connection: user authentication. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: SSH2_MSG_SERVICE_REQUEST sent<br class="calibre19"/>    debug2: service_accept: ssh-userauth<br class="calibre19"/>    debug1: SSH2_MSG_SERVICE_ACCEPT received</tt></div></span></div>
+</div>
+</body>
+</html>

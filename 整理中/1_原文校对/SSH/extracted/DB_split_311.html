@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2059107" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_407"><span class="calibre2"><a shape="rect" class="calibre7"></a>Compile-Time Configuration </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2059466" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2059505" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2059544" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2059583" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2059622" class="calibre15"></a>In <a shape="rect" href="DB_split_107.html#filepos564313" class="calibre6">Chapter 4</a>, we covered many compile-time flags for building SSH distributions. Several flags should be carefully set to make your server machine maximally secure: </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">--sysconfdir=</code>... <span><em class="italic">(OpenSSH, Tectia)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Make sure your <em class="italic">etc</em> directory is on a local disk, not an NFS-mounted partition. If the SSH server reads a file via NFS, the contents are transmitted in the clear across the network, violating security. This is especially true of the host key, which is stored unencrypted in this directory. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">--bindir</code>=... <span><em class="italic">(OpenSSH, Tectia)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19"></div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">--sbindir</code>=... <span><em class="italic">(OpenSSH, Tectia)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Likewise, make sure your SSH executables are installed on a local disk, as they can be spoofed if loaded over NFS.<sup class="calibre20">[<a id="filepos2061173" shape="rect" href="#filepos2063199" class="calibre6">139</a>]</sup></div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">--disable-suid-ssh-signer</code>
+<span><em class="italic">(Tectia)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Our recommended serverwide configuration<a shape="rect" class="calibre15"></a><a id="filepos2061585" class="calibre15"></a> disables hostbased authentication, so there's no need for setuid permissions for <span><em class="italic">ssh-signer</em></span>. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">--with-tcp-wrappers</code>
+<span><em class="italic">(OpenSSH)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19"></div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">--with-libwrap</code>
+<span><em class="italic">(Tectia)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19"><span><em class="italic">libwrap</em></span> affords more precise control over which client machines are allowed to connect to your server. It also makes port and X forwarding more flexible, since otherwise local forwardings are available either only to the local host or from anywhere at all. With <code class="calibre35">GatewayPorts</code> (or <span><em class="italic">ssh -g</em></span>) and <span><em class="italic">libwrap</em></span>, you can limit forwarding access to specific hosts. <a shape="rect" href="DB_split_284.html#filepos1889694" class="calibre6">[9.2.1.1]</a></div>
+</blockquote>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2063199" shape="rect" href="#filepos2061173" class="calibre6">139</a>] </sup>Or use <code class="calibre35">--prefix</code> to root all SSH system directories together. </p>
+</div>
+</div>
+</div>  <div class="mbppagebreak" id="calibre_pb_408"></div></body>
+</html>

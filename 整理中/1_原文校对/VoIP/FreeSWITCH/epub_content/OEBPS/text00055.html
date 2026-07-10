@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">6.2　inline Dialplan</font>
+</font>
+</p>
+<p height="1em" width="2em">inline Dialplan称为内联拨号计划。首先，它与6.1.8节讲的XML Dialplan Action中的inline属性（内联执行）是完全不同的概念，如果读者觉得容易混，那么在这里可以暂时先把前面讲的inline的概念忘掉，等熟悉了本节的知识以后，再翻到6.1.8节进行比较。</p>
+<p height="1em" width="2em">XML Dialplan支持非常丰富的功能，但在测试或编写程序时，我们经常用到一些临时的或者很简单的Dialplan，如果每次都需要修改XML，不仅麻烦，而且执行效率也会有所降低。所以，我们需要一种短小、轻便的Dialplan以便更高效地完成任务，inline Diaplan便是因此而生的。而且，通过使用inline Dialplan，可以很方便地在脚本中生成动态的Dialplan而无须使用复杂的reloadxml以及mod_xml_curl技术等。</p>
+<p height="1em" width="2em">与XML Dialplan不同，inline Dialplan没有Extension，也没有复杂的Condition，只是像XML Dialplan中那样简单地叠加Action。它有一种很紧凑的语法格式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+app1:arg1,app2:arg2,app3:arg3<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从语法可以看出，它只是多个App以及其参数组成的字符串，App之间用逗号分隔，而App与参数之间用冒号分隔。如果参数中有空格，则整个字符串都需要使用单引号引起来。在我们上面的例子中，通过拨打9196来找到对应的XML dialplan，在这里我们可以直接在命令行上写出对应的inline Dialplan的形式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 echo inline<br/>
+<br/>
+originate user/1000 answer,echo inline<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">读到这里，你可能要问，它与originate user/1000&amp;echo有什么区别呢？在回答这个问题之前，我们需要先看一下originate的语法：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate &lt;call_url&gt; &lt;exten&gt;|&amp;&lt;application_name&gt;(&lt;app_args&gt;)<br/>
+<br/>
+[&lt;dialplan&gt;] [&lt;context&gt;] [&lt;cid_name&gt;] [&lt;cid_num&gt;] [&lt;timeout_sec&gt;]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">首先，它的第一个参数call_url是呼叫字符串。第二个参数可以是一个exten（这个一会再讲），或者&amp;加上一个App，App的参数要放到括号里，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 &amp;echo<br/>
+<br/>
+originate user/1000 &amp;playback(/tmp/sound.wav)<br/>
+<br/>
+originate user/1000 &amp;record(/tmp/recording.wav)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这是最简单的形式，首先，originate会产生一个Channel，它会呼叫user/1000这个用户。请注意，这是一个单腿的通话，因此只有一个Channel。但一个Channel有两端，一端是1000这个用户，另一端是FreeSWITCH（我们上面已经说过，实现上是1000在跟FreeSWITCH的某个App通话，如这里的echo、playback或record）。</p>
+<p height="1em" width="2em">在user/1000接电话后（严格说是收到它的earlymedia后），FreeSWITCH即开始在该Channel上执行&amp;后面的App。但这种形式只能执行一个App，如果要执行多个，就需要将电话转入Dialplan，可以使用下面的形式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 9196<br/>
+<br/>
+originate user/1000 9196 XML default<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面两个命令的效果是一样的。它们的作用是，在user/1000接听电话后，电话的另一端（也就是FreeSWITCH）需要对电话进行路由，在这里它要将电话路由到9196这个Extension上，第一条命令由于没有指定是哪个Dialplan，因此它会在默认的XML Dialplan中查找，同时XML Dialplan需要一个Context，它默认就是default。它的效果跟直接用软电话拨打9196这个分机一样（不同的是呼叫方向的问题，这种情况相当于回拨）。</p>
+<p height="1em" width="2em">当然，除此之外，它还可以加一些可选的参数，用于指定来电显示（Caller ID）的名字（cid_name）和号码（cid_number），以及呼叫超时的秒数，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 9196 XML default 'Seven Du' 9196 30<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，我们这里学了inline Dialplan，所以你也可以用下面这种形式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 echo inline<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">请注意，在XML Dialplan中，9196是一个分机号，而inline Dialplan中的echo是一个App，当然你也可以顺序执行多个App。如下列第一条originate命令分别执行answer（应答）、playback（播放语音）、record（录音），第二条则分别执行playback和bridge：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 answer,playback:/tmp/pleace_leave_a_message.wav,record:/tmp/recording.wav inline<br/>
+<br/>
+originate user/1000 playback:/tmp/beep.wav,bridge:user/1001 inline<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有时候，App的参数中可能会有逗号，因而会与默认的App间的逗号分隔符相冲突，以下的m语法形式将默认的逗号改为^分隔（相当于转义：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 <br/>
+<br/>
+'m:^:playback/tmp/beep.wav^bridge:{ignore_early_media=true,originate_caller_id_number=1000}user/1001' <br/>
+<br/>
+inline<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“m:^”表示将App间的分隔符临时改为了“^”，所以后面的bridge中的参数中的逗号就不会误认为是App间的分隔符了。</p>
+<p height="1em" width="2em">当然你也可以把inlineDialplan用在任何需要Dialplan的地方，如（以下两行实为一行）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+uuid_transfer 2bde6598-0f1a-48fe-80bc-a457a31b0055<br/>
+<br/>
+'set:test_var=test_value,info,palyback:/tmp/beep.wav,record:/tmp/recording.wav'<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述命令会将一个Channel转入一个inline Dialplan，它首先执行set以设置一个test_var的通道变量，然后执行info在日志中打印当前Channel的详细情况，接下来播放一个声音文件（如beep应该是“嘀”的一声），然后开始录音。</p>
+</body>
+</html>

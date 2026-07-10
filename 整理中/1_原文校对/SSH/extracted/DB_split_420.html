@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_556"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2760276" class="calibre7"></a>16.7.4 Configuration File </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The Connector engine uses the configuration file <em class="italic">sshcorpoeng.cfg</em> in the installation folder. The Connector administration program saves its settings in the configuration file automatically, and is the usual way to change the configuration. </p>
+<p class="calibre4">However, the configuration file uses a straightforward format and is easy to edit directly. Settings are grouped in hierarchical sections that are delimited by curly braces. Each setting is a keyword and value, separated by an equals sign, with one pair per line. Values are Boolean (<code class="calibre35">FALSE</code> or <code class="calibre35">TRUE</code>), decimal numbers, or quoted strings, which use C-language conventions for backslash escape sequences. This convention is unfortunate, because all backslashes for Windows filename separators must be doubled. </p>
+<p class="calibre4">Some features can only be used by editing the configuration file, and are not available via the GUI-based administrative interface. For example, the filter rules shown in <a shape="rect" href="DB_split_419.html#filepos2755751" class="calibre6">Figure 16-11</a> correspond to the configure file section: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Filters = {<br class="calibre19"/>      secure_mail = {<br class="calibre19"/>        DNSNameRegexp = ".*\\.mail\\.example\\.com$"<br class="calibre19"/>        Application = "C:\\\\Program Files\\\\WhizBangMail\\\\MailClient\\.exe"<br class="calibre19"/>        RealIP = FALSE<br class="calibre19"/>        Connections = {<br class="calibre19"/>          connection1 = {<br class="calibre19"/>            Via = "mail"<br class="calibre19"/>            Port = "25,143"<br class="calibre19"/>          }<br class="calibre19"/>          connection2 = {<br class="calibre19"/>            Via = "DIRECT"<br class="calibre19"/>            Port = "0-65536"<br class="calibre19"/>          }<br class="calibre19"/>        }<br class="calibre19"/>      }<br class="calibre19"/>    }</tt></div></span><p class="calibre4">Regular expressions or literal values can be selected independently for DNS hostnames and IP addresses by using any combination of the following keywords: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"><code class="calibre35">DNSNameRegexp</code></li>
+<li class="calibre18"><code class="calibre35">DNSName</code></li>
+<li class="calibre18"><code class="calibre35">IPAddressRegexp</code></li>
+<li class="calibre18"><code class="calibre35">IPAddress</code></li>
+</ul></div>
+<p class="calibre4">The <code class="calibre35">RealIP</code> keyword controls assignment of pseudo IP addresses for each rule. </p>
+<p class="calibre4">A separate application can be specified for each filter rule. The application pathname is actually a pattern, using the <span><em class="italic">egrep</em></span> regular expression syntax. The combination of C-language conventions for strings and regular expressions leads to an abundance of backslashes. For the setting: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Application = "C:\\\\Program Files\\\\WhizBangMail\\\\MailClient\\.exe"</tt></div></span><p class="calibre4">the C-language string corresponds (collapsing the doubled backslashes) to the regular expression: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\\Program Files\\WhizBangMail\\MailClient\.exe</tt></div></span><p class="calibre4">which matches the pathname:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\Program Files\WhizBangMail\MailClient.exe</tt></div></span></div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2764987" shape="rect" href="DB_split_418.html#filepos2752710" class="calibre6">176</a>] </sup>The timeout interval is expressed as a number of seconds. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2765285" shape="rect" href="DB_split_419.html#filepos2757104" class="calibre6">177</a>] </sup>If pseudo IP addresses are disabled in the General Settings, then the actual IP address of the server is used. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2765636" shape="rect" href="DB_split_419.html#filepos2759966" class="calibre6">178</a>] </sup>You can specify multiple applications if you use Tectia Manager to configure Connector. The restriction also does not apply if you edit the configuration file directly. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_557"></div></body>
+</html>

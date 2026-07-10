@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2033901" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_397"><span class="calibre2"><a shape="rect" class="calibre7"></a>Forwarding Security: TCP-Wrappers and libwrap </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">At several points in this chapter, we have talked about security issues and limitations of forwarding. So far, we've seen very little control over who can connect to a forwarded port. The OpenSSH default is to allow connections only from the local host, which is reasonably secure for a single-user machine. But if you need to allow connections from elsewhere, you have a problem, since it's all or nothing: to allow connections from elsewhere (using <span><em class="italic">-g</em></span> or <code class="calibre35">GatewayPorts yes</code>), you must allow them from <span><em class="italic">anywhere</em></span>. And with Tectia it's worse: forwarded ports <span><em class="italic">always</em></span> accept connections from anywhere. X forwarding is in a slightly better position, since the X protocol has its own authentication, but you might still prefer to restrict access, preventing intruders from exploiting an unknown security flaw or performing a denial-of-service attack. SSH on the Unix platform provides an optional feature for access control based on the client address, called "TCP-wrappers." </p>
+<p class="calibre4">The term "TCP-wrappers" refers to software written by Wietse Venema. If it isn't already installed in your Unix distribution, you can get it at: </p>
+<div class="calibre3"><span class="calibre27">
+<blockquote class="calibre5"><span class="calibre33">
+<div class="calibre3"><a href="ftp://ftp.porcupine.org/pub/security/index.html" shape="rect" class="calibre6">ftp://ftp.porcupine.org/pub/security/index.html</a></div>
+</span></blockquote>
+</span></div>
+<p class="calibre4">TCP-wrappers are a global access control mechanism that integrates with other TCP-based servers, such as <span><em class="italic">sshd</em></span> or <span><em class="italic">telnetd</em></span>. Access control is based on the source address of incoming TCP connections. That is, a TCP-wrapper permits or denies connections based on their origin, as specified in the configuration files <em class="italic">/etc/hosts.allow</em> and <em class="italic">/etc/hosts.deny.</em>
+<a shape="rect" href="DB_split_306.html#filepos2039871" class="calibre6">Figure 9-12</a> shows where TCP-wrappers fit into the scheme of SSH configuration. </p>
+<p class="calibre4">There are two ways to use TCP-wrappers. The most common method, <span><em class="italic">wrapping</em></span>, is applied to TCP servers that are normally invoked by <span><em class="italic">inetd</em></span>. You "wrap" the server by editing <em class="italic">/etc/inetd.conf</em> and modifying the server's configuration line. Instead of invoking the server directly, you invoke the TCP-wrapper daemon, <span><em class="italic">tcpd</em></span>, which in turn invokes the original server. Then, you edit the TCP-wrapper configuration files to specify your desired access control. <span><em class="italic">tcpd</em></span> makes authorization decisions based on the their contents. </p>
+<p class="calibre4">The <span><em class="italic">inetd</em></span> technique applies access control without having to modify the TCP server program. This is nice. However, <span><em class="italic">sshd</em></span> is usually not invoked by <span><em class="italic">inetd</em></span>
+<a shape="rect" href="DB_split_148.html#filepos826611" class="calibre6">[5.3.3.2]</a>, so the second method, <span><em class="italic">source code modification</em></span>, must be applied. To participate in TCP-wrapper control, the SSH server must be compiled with the flag <code class="calibre35">--with-tcp-wrappers</code>
+<a shape="rect" href="DB_split_120.html#filepos623396" class="calibre6">[4.2.4.5]</a> or <code class="calibre35">--with-libwrap</code>
+<a shape="rect" href="DB_split_126.html#filepos645317" class="calibre6">[4.3.5.3]</a> to enable internal support for TCP-wrappers. <span><em class="italic">sshd</em></span> then invokes TCP-wrapper library functions to do explicit access-control checks according to the rules in <em class="italic">/etc/hosts.allow</em> and <em class="italic">/etc/hosts.deny.</em> So, in a sense, the term "wrapper" is misleading since <span><em class="italic">sshd</em></span> is modified, not wrapped, to support TCP-wrappers. <a shape="rect" href="DB_split_306.html#filepos2042182" class="calibre6">Figure 9-13</a> illustrates the process. </p>
+</div>  </body>
+</html>

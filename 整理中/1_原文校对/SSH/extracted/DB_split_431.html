@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_571"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2796589" class="calibre7"></a>16.11.7 SFTP Server </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">To support SFTP, the Tectia server configuration must include the <span><em class="italic">sftp</em></span> subsystem definition: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Subsystem-sftp      "sftp_server2.exe"</tt></div></span><p class="calibre4">No internal implementation is built into the SSH server, as it is for the Tectia servers on Unix systems. </p>
+<p class="calibre4">The SFTP server<a shape="rect" class="calibre15"></a><a id="filepos2797332" class="calibre15"></a> restricts access to a set of folders. This is controlled by the <code class="calibre35">Sftp-DirList</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Sftp-DirList    "HOME=%D, SCRATCH=S:\scratch\%U"</tt></div></span><p class="calibre4">The value is a comma-separated list (with optional whitespace), where each element has the format <span><em class="italic">virtual</em></span>=<span><em class="italic">real</em></span>. Virtual folder names are arbitrary, and are presented to the SFTP clients. These are mapped to the specified real folders on the server. The folder names can contain the patterns <code class="calibre35">%D</code> and <code class="calibre35">%U</code>, representing the user profile folder and the username, respectively. The default value is <code class="calibre35">HOME=%D</code>. </p>
+<p class="calibre4">A set of administrative (or power) users can be defined to use an alternate list of folders: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Sftp-AdminUsers     "administrator, backup.*, rebecca"<br class="calibre19"/>    Sftp-AdminDirList   "HOME=%D, BACKUP=Z:\backup, C:=C:, D:=D:"</tt></div></span><p class="calibre4">The value for <code class="calibre35">Sftp-AdminUsers</code> is a comma-separated list (with optional whitespace) of username patterns. By default, only the administrator account is included. </p>
+<p class="calibre4">The <code class="calibre35">Sftp-AdminDirList</code> value has the same format as for <code class="calibre35">Sftp-DirList</code>. The default is <code class="calibre35">HOME=%D, C:=C:, D:=D:</code>. </p>
+<p class="calibre4">SFTP sessions start in a home folder, which is specified by the <code class="calibre35">Sftp-Home</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Sftp-Home           "S:\sftp\%U"</tt></div></span><p class="calibre4">The SFTP home folder must be accessible, according to <code class="calibre35">Sftp-DirList</code> or <code class="calibre35">Sftp-AdminDirList</code>. The folder can use the same patterns, <code class="calibre35">%D</code> and <code class="calibre35">%U</code>. The default is <code class="calibre35">%D</code> (the user profile folder). </p>
+</div>
+</body>
+</html>

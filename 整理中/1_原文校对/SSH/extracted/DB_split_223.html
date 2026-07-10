@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_300"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1501465" class="calibre7"></a>7.4.2 User Identity </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1501616" class="calibre15"></a>SSH identifies you by an <span><em class="italic">identity</em></span> represented by a key pair (OpenSSH) or a collection of key pairs (Tectia). <a shape="rect" href="DB_split_191.html#filepos1224036" class="calibre6">[6.1]</a> Normally, SSH clients use your default key file (OpenSSH) or default identification file (Tectia) to establish an authenticated connection. However, if you've created other keys, you may instruct SSH clients to use them to establish your identity. A command-line option (<span><em class="italic">-i</em></span> ) and configuration keyword (<code class="calibre35">IdentityFile</code>) are available for this purpose. </p>
+<p class="calibre4">In OpenSSH, for example, if you have a private-key file called <em class="italic">my-key</em>, you can make clients use it with the commands: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -i my-key server.example.com<br class="calibre19"/>    $ scp -i my-key myfile server.example.com:</tt></div></span><p class="calibre4">or with the configuration keyword:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    IdentityFile my-key</tt></div></span><p class="calibre4">The file location is assumed to be relative to the current directory, i.e., in these cases the file is <em class="italic">./my-key</em>. </p>
+<p class="calibre4">Tectia also has <span><em class="italic">-i</em></span> and <code class="calibre35">IdentityFile</code>, but their meanings are slightly different from those of OpenSSH. Instead of a key file, you supply the name of an identification file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh -i my-id-file server.example.com<br class="calibre19"/><br class="calibre19"/>    # Tectia configuration file<br class="calibre19"/>    IdentityFile my-id-file</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">If Tectia complains about your identity file:</p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    warning: /home/smith/.ssh2/id_dsa_2048_a: 4: parsing line failed.</tt></div></span><p class="calibre4">you probably handed <span><em class="italic">ssh</em></span> a key file (<em class="italic">id_dsa_2048_a</em>) instead of an identity file like <em class="italic">~/.ssh2/identification</em>. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Multiple identities can be quite useful. <a shape="rect" href="DB_split_207.html#filepos1397634" class="calibre6">[6.4]</a> For example, you can set up your remote account to run specific programs when a second key is used. The ordinary command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com</tt></div></span><p class="calibre4">initiates a regular login session, but:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -i other_identity server.example.com</tt></div></span><p class="calibre4">can run a complex batch process on <span><em class="italic">server.example.com</em></span>. Using configuration keywords, you can accomplish the same effect by specifying an alternative identity, as shown in this table: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host SomeComplexAction</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">SomeComplexAction:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> HostName server.example.com</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Host server.example.com</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> IdentityFile other_identity</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> IdentityFile other_identity</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ...</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ...</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">You can then invoke:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh SomeComplexAction</tt></div></span><p class="calibre4">OpenSSH can specify multiple identities in a single command:<sup class="calibre20">[<a id="filepos1508698" shape="rect" href="DB_split_239.html#filepos1668071" class="calibre6">107</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -i id1 -i id2 -i id3 server.example.com</tt></div></span><p class="calibre4">or:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     IdentityFile id1<br class="calibre19"/>     IdentityFile id2<br class="calibre19"/>     IdentityFile id3</tt></div></span><p class="calibre4">Multiple identities are tried in order until one successfully authenticates. However, OpenSSH limits you to 100 identities per command.<sup class="calibre20">[<a id="filepos1509612" shape="rect" href="DB_split_239.html#filepos1668407" class="calibre6">108</a>]</sup></p>
+<p class="calibre4">If you plan to use multiple identities frequently, remember that an SSH agent can eliminate hassle. Simply load each identity's key into the agent using <span><em class="italic">ssh-add</em></span>, and you won't have to remember multiple passphrases while you work. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1510258" class="calibre7"></a>7.4.2.1 Using identities </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1510347" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1510444" class="calibre15"></a>
+<code class="calibre35">IdentityFile</code> specifies an identity you'd like to use for authentication, but it does not <span><em class="italic">restrict</em></span> authentication to that identity. Suppose your client configuration file says: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     IdentityFile wendy<br class="calibre19"/>     IdentityFile abby</tt></div></span><p class="calibre4">and you run:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh server.example.com</tt></div></span><p class="calibre4"><span><em class="italic">ssh</em></span> will dutifully try to authenticate using identities <em class="italic">wendy</em> and <em class="italic">abby</em>; but if it fails, <span><em class="italic">ssh</em></span> will try other identities held in your SSH agent, in case one of them might succeed. You can change this behavior with the <code class="calibre35">IdentitiesOnly</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     IdentityFile wendy<br class="calibre19"/>     IdentityFile abby<br class="calibre19"/>     IdentitiesOnly yes      <em class="italic"><span>Restrict authentication only to listed identity files</span></em></tt></div></span><p class="calibre4">Now if <span><em class="italic">ssh</em></span> fails to authenticate by identities <em class="italic">wendy</em> and <em class="italic">abby</em>, it will stop trying (and move on to other non-public-key techniques, if configured to do so). </p>
+<p class="calibre4">This feature is particularly useful with a server that limits the number of public-key authentication attempts, such as OpenSSH. If you have many keys in your agent, only a few can be tried before the server disconnects you for "too many failures." The configuration shown avoids this problem by indicating exactly which keys to use for a given host. Even though the <code class="calibre35">IdentityFile</code> keyword refers to files, the OpenSSH client will try those keys from the agent if they've been loaded. You are prompted for a passphrase only if the needed key isn't in the agent and is encrypted on disk. </p>
+</div>
+</div>
+</body>
+</html>

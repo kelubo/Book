@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.2　mod_commands</font>
+</font>
+</p>
+<p height="1em" width="2em">在mod_commands中，实现了大部分的API命令，如常用的version、status、originate等。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.2.1　模块框架</font>
+</font>
+</p>
+<p height="1em" width="2em">下面我们先从mod_commands模块的load函数看起。</p>
+<p height="1em" width="2em">load函数是在第6388行定义的，它也是定义了一个switch_api_interface_t类型的指针（第6390行），用于实现API Interface，于第6393行向核心注册本模块，于第6420行、第6444行、第6460行等向核心注册相关命令实现的回调函数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+6388  SWITCH_MODULE_LOAD_FUNCTION(mod_commands_load)<br/>
+<br/>
+6389  {<br/>
+<br/>
+6390      switch_api_interface_t *commands_api_interface;<br/>
+<br/>
+...<br/>
+<br/>
+6393      *module_interface = switch_loadable_module_create_module_<br/>
+<br/>
+             interface(pool, modname);<br/>
+<br/>
+6394<br/>
+<br/>
+...<br/>
+<br/>
+6420      SWITCH_ADD_API(commands_api_interface, "version", ...<br/>
+<br/>
+...<br/>
+<br/>
+6444      SWITCH_ADD_API(commands_api_interface, "originate", ...<br/>
+<br/>
+...<br/>
+<br/>
+6460      SWITCH_ADD_API(commands_api_interface, "status", ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，它使用switch_console_set_complete添加命令补全信息（如第6603、6604行），以便用户在控制台上输入命令时可以使用Tab键进行补全。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+6603      switch_console_set_complete("add show calls");<br/>
+<br/>
+6604      switch_console_set_complete("add show channels");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">最后，第6388行定义的那个函数返回SWITCH_STATUS_NOUNLOAD。与其他模块返回SWITCH_STATUS_SUCCESS不同，这里的返回值表示该模块是无法被卸载的（由于unload命令本身是在该模块内实现的）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+6690      return SWITCH_STATUS_NOUNLOAD;<br/>
+<br/>
+6691  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.2.2　originate</font>
+</font>
+</p>
+<p height="1em" width="2em">本节我们以originate命令为例来进行讲解。originate命令是在originate_function中实现的。它在第4067行使用SWITCH_STANDARD_API进行声明。该声明也是一个在switch_types.h:2016行定义的一个宏，该宏的定义在笔者的电脑上展开的结果如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+static switch_status_t originate_function ( const char *cmd,<br/>
+<br/>
+    switch_core_session_t *session, switch_stream_handle_t *stream)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从上面的展开结果可以看出，该宏有3个输入参数：第一个是输入的命令参数；第二个是一个session，但由于大多数的API命令都跟Session无关，因此该参数一般是一个空指针；第三个参数是一个stream，它是一个流，写入该流中的数据（命令输出）将可作为命令的结果返回。</p>
+<p height="1em" width="2em">第4089行复制了命令字符串。由于originate命令的参数众多，因此它使用一个switch_separate_string对命令字符串进行分隔。该函数将分割后的结果放到一个argv数组中，并返回数组中参数的个数argc（在这一点上，类似于C语言中经典的main函数的参数）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4067  SWITCH_STANDARD_API(originate_function)<br/>
+<br/>
+4068  {<br/>
+<br/>
+...<br/>
+<br/>
+4089      mycmd = strdup(cmd);<br/>
+<br/>
+4090      switch_assert(mycmd);<br/>
+<br/>
+4091      argc = switch_separate_string(mycmd, ' ', argv, (sizeof(argv) / sizeof(argv[0])));<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在对输入参数进行分析后，它便在第4128行调用switch_ivr_originate发起一个呼叫。读者可以看到，bridge App也是调用了该函数发起呼叫，但不同的是，在这里它的第一个参数是一个空指针（NULL），因而这是一个单腿的呼叫。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4128      if (switch_ivr_originate(NULL, &amp;caller_session, &amp;cause, aleg,<br/>
+<br/>
+                timeout, NULL, cid_name, cid_num, ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外一个与bridge App中调用方法不同的地方在于，在这里它的大部分参数都不是空指针，因而可以在外呼的同时指定其他参数，如超时（timeout）、主叫名称（cid_name）、主叫号码（cid_num）等。</p>
+<p height="1em" width="2em">如果我们在发起呼叫时使用“&amp;”指定了一个App，如originate user/1000&amp;echo命令，则它在对方接听后（严格来说是收到媒体后，如收到SIP 183消息后），即开始执行第4153行，执行app_name（如echo）所指定的函数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4153          if ((extension = switch_caller_extension_new(caller_session, app_name, arg)) == 0) {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">否则（第4160行）就在第4161行转移到相应的Dialplan。如用户输入“originate user/1000 9196 XML default”命令则执行下面的代码。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4160      } else {<br/>
+<br/>
+4161          switch_ivr_session_transfer(caller_session, exten, dp,<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在第4165行，调用输出流stream的write_function输出命令的反馈信息，如“+OK UUID”。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4165          stream-&gt;write_function(stream, "+OK %s\n",<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">使用switch_ivr_originate所产生的Session也是加锁的，因而，我们也要明确地释放它：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4170      switch_core_session_rwunlock(caller_session);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+</body>
+</html>

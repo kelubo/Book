@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_155"><span class="calibre2"><a shape="rect" class="calibre7"></a><a id="filepos566490" class="calibre7"></a>Overview </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos566630" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos566669" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos566708" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos566747" class="calibre15"></a>The first question to consider when installing any implementation of SSH is whether to use a binary or source distribution. </p>
+<p class="calibre4"><span><em class="italic">Binary distributions</em></span> are already configured and compiled, and are therefore easy to use. They are available for popular SSH implementations like OpenSSH and Tectia on a variety of common platforms. The packaging technology and installation instructions vary according to the target system—consult the documentation provided by your vendor for details. For example, on Linux systems, binary distributions are usually shipped as RPM packages, and can be installed using a single command like: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ rpm -Uhv openssh-3.9p1-1.i386.rpm</tt></div></span><p class="calibre4">Installation on Unix systems typically requires root access, to install files in system directories, and to update the databases that keep track of installed packages. </p>
+<p class="calibre4">Binary distributions are often cryptographically signed, to ensure that no one has tampered with the files. Signatures can be provided as separate files, or (depending on the package format) embedded within the binary distribution files, and the technique to verify the signature depends on how the files were signed. For example, on RPM-based Linux systems, first import the vendor's public key, which is distributed by keyservers or the vendor's web site: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ rpm --import http://www.redhat.com/security/db42a60e.txt</tt></div></span><p class="calibre4">Then use the public key to check the signature:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ rpm --checksig -v openssh-3.9p1-1.i386.rpm</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Always check the signatures of binary distributions before installing. Imagine the havoc that could be caused if a maliciously hacked version of SSH was unwittingly used on your system. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4"><span><em class="italic">Source distributions</em></span> require more work to install, but allow many more configuration options. They can also be used on platforms for which no binary distributions are available. </p>
+<p class="calibre4">To install from sources, perform the following general steps; we'll cover specific details for OpenSSH and Tectia in subsequent sections. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_307"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1632486" class="calibre7"></a>7.4.9 Encryption Algorithms </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">When establishing a connection, an SSH client and server have a little conversation about encryption. The server says, "Hello client, here are the encryption algorithms<a shape="rect" class="calibre15"></a><a id="filepos1632813" class="calibre15"></a> I support." In return, the client says, "Hi there server, I'd like to choose this particular algorithm, please." Normally, they reach agreement, and the connection proceeds. If they can't agree on an encryption algorithm, the connection fails. </p>
+<p class="calibre4">Most users let the client and server work things out themselves. But if you like, you may instruct the client to request particular encryption algorithms in its conversation with the server. This is done with the <code class="calibre35">Ciphers</code> keyword followed by a comma-separated list of encryption algorithms of choice: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Ciphers blowfish,3des</tt></div></span><p class="calibre4">or the <span><em class="italic">-c</em></span> command-line option, either followed by a comma-separated list (OpenSSH) or specified multiple times (Tectia): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -c blowfish,3des server.example.com<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ ssh -c blowfish -c 3des server.example.com</tt></div></span><p class="calibre4">indicating that any of these algorithms is acceptable.</p>
+<p class="calibre4">All ciphers acceptable by a server may be specified for the client. <a shape="rect" href="DB_split_150.html#filepos881924" class="calibre6">[5.3.5]</a> Check the latest SSH documentation for a current list of supported ciphers. </p>
+</div>
+</body>
+</html>

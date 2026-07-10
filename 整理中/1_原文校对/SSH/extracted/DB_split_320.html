@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_421"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2098378" class="calibre7"></a>10.7.1 NFS Security Risks </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2098535" class="calibre15"></a>The security of shared home directories is often not very high. Although the NFS protocol has versions and implementations that afford greater security, it is woefully insecure in most installations. Often, it employs no reliable form of authentication whatsoever, but rather, uses the same scheme as <span><em class="italic">rsh</em></span>: the source IP address and DNS identify clients, and a privileged source port is proof of trustworthiness. It then simply believes the uid number encoded in NFS requests and grants access as that user. Breaking into a home directory can be as simple as: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Discover the uid, and create an account with that uid on a laptop running Unix. </li>
+<li value="2" class="calibre18">Connect that machine to the network, borrowing the IP address of a trusted host. </li>
+<li value="3" class="calibre18">Issue a <span><em class="italic">mount</em></span> command, <span><em class="italic">su</em></span> to the account with the uid, and start rifling through the files. </li>
+</ol></div>
+<p class="calibre4">At this point, an intruder can easily add another public key to <em class="italic">authorized_keys</em>, and the account is wide open. The moral is that when designing a system, keep in mind that the security of SSH is no stronger than that of the home directories involved. You need at least to be aware of the trade-off between security and convenience involved here. If you are using an insecure NFS and want to avoid this weakness, you can: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Use Tectia, which has the <code class="calibre35">UserConfigDirectory</code> option to place the per-user SSH configuration files, normally in <em class="italic">~/.ssh2</em>, elsewhere—say, in <em class="italic">/var/ssh/</em>
+<span><em class="italic">&lt;username&gt;</em></span>. You can still set the permissions so their owners can control them, but they won't be shared via NFS and thus not vulnerable. You can do the same with OpenSSH, but as it lacks such a configuration option, you need to edit the source code. </li>
+<li class="calibre18">Turn off hostbased authentication, since the <em class="italic">~/.shosts</em> control file is vulnerable, and you can't change its location. Or, if you want to use hostbased authentication, set the <code class="calibre35">IgnoreRhosts</code> option. This causes <span><em class="italic">sshd</em></span> to ignore <em class="italic">~/.shosts</em>, relying instead solely on the systemwide <em class="italic">/etc/shosts.equiv</em> file. </li>
+<li class="calibre18">If you are truly paranoid, disable swapping on your Unix machine. Otherwise, sensitive information such as server, host, and user keys, or passwords, may be written to disk as part of the normal operation of the Unix virtual memory system (should the running <span><em class="italic">sshd</em></span> be swapped out to disk). Someone with root access (and a lot of knowledge and luck) could read the swap partition and tease this information out of the mess there—though it's a difficult feat. Another option is to use an operating system that encrypts swap pages on disk, such as OpenBSD. </li>
+</ul></div>
+</div>
+</body>
+</html>

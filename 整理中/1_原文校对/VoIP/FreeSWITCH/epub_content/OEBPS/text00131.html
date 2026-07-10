@@ -1,0 +1,556 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.11　集群及分布式部署</font>
+</font>
+</p>
+<p height="1em" width="2em">在上一节我们讨论了HA，与HA相对的另一个概念是HP（High Performance），即高性能。它原先主要指大规模的并行计算，现在延伸到互联网域，就是大规模的集群。大规模的集群也是当下一个更时毛的词——“云”——的基础。由于这种方式一般采用多节点负载分担的方式工作，因而又称为负载均衡（Load Balance，LB）。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.11.1　大规模集群的总体结构</font>
+</font>
+</p>
+<p height="1em" width="2em">图15-14显示了一个基于互联网的大规模的集群的拓扑结构。一般来说，用户通过客户端（Client）访问网络上的服务。客户端会使用DNS查询找到它要访问的主机。DNS服务一般使用轮循的方法，通过返回多个IP地址，将客户端的访问流量分散到不同的IP地址上。另外，有的DNS服务也可以根据用户的来源（地理位置）返回不同的IP，以将用户分配到就近的数据中心的服务器上。</p>
+<p height="1em" width="0pt" align="center"><img align="baseline" height="508" width="1197" src="Image00068.jpg" />
+</p>
+<p height="4pt" width="0pt" align="center">图15-14　大规模集群总体结构示意图</p>
+<p height="1em" width="2em">当客户的请求到达某一数据中心后，前端的路由器设备（或以太网交换机）会根据访问的服务进行合理的分发，将请求发到后端的代理服务器（Proxy）上。这些路由器比较有代表性的有硬件的F5或软件的LVS <sup>
+<small>
+<a href="text00132.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 等，它们都是在IP层（或应用层）进行转发分配的。</p>
+<p height="1em" width="2em">当请求到达某一个代理服务器后，它会检查本地的设置，将请求数据再转发到某一个计算节点（Node）上。而后端的计算节点间也可以通过内部的网络进行通信，或访问共享的数据等。最后，计算节点将执行相关的服务程序对收到的请求进行服务，有必要的话，它也可能查询数据库或与其他系统交互。</p>
+<p height="1em" width="2em">总之，互联网上海量用户的请求就是这样通过前端的DNS、路由器以及代理服务器分配到不同的计算节点上，并由其对用户进行服务的。</p>
+<p height="1em" width="2em">具体来讲，对于支撑整个互联网基础的Web应用，比较典型的代理服务器有HA-Proxy、Nginx、Apache等；后端的计算节点可以认为是Apache/PHP、Tomcat（Java）、Thin/Mongrel/Unicorn（Ruby/Rails）、Python等（当然，实际的情况还涉及后面的数据库、消息队列、大型存储等，比这里讲的要复杂得多）；而对于我们关心的VoIP应用来说，常用的代理服务器有OpenSIPS和Kamailio等，后端的节点可能是FreeSWITCH或Asterisk。当然，VoIP通信与Web服务不同的是，VoIP对于实时性的要求也比较高，而且信令跟媒体也是可以分离的（因而也有专门代理媒体的代理服务器，如RTPProxy）。</p>
+<p height="1em" width="2em">在实际的应用中，这些代理服务器应该足够“聪明”，即首先它能够比较智能地分配客户端的请求，力求使后端的计算节点负载比较均衡；其次，如果后端的计算节点出现故障，它也能很快探测到，并停止向其分发客户端的请求 <sup>
+<small>
+<a href="text00132.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。当然，为了最大程度地保持稳定，代理服务器甚至前端的路由器及网交换机等都可以进行成对配置。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.11.2　负载均衡配置实例</font>
+</font>
+</p>
+<p height="1em" width="2em">上一节，我们讲了大规模的集群的总体结构。具体到FreeSWITCH，它最典型的应用就是作为集群中的一个节点提供具体的服务，而前面的DNS、路由器以及各种代理服务等则主要是负责将相应的注册和呼叫等请求分配到相应的FreeSWITCH服务器上进行处理。</p>
+<p height="1em" width="2em">下面我们来做一个负载均衡的实验。如图15-15所示，以一台OpenSIPS和两个FreeSWITCH（A、B）节点为例 <sup>
+<small>
+<a href="text00132.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。OpenSIPS位于前端，做Proxy；FreeSWITCH在后端，进行话务处理；它们都共享同一个数据库。OpenSIPS用于分发SIP请求，而后面的FreeSWITCH节点负责处理实际的通话，RTP媒体流仍然在用户UA和FreeSWITCH之间直接传送 <sup>
+<small>
+<a href="text00132.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="0pt" align="center"><img align="baseline" height="240" width="744" src="Image00070.jpg" />
+</p>
+<p height="4pt" width="0pt" align="center">图15-15　OpenSIPS与FreeSWITCH负载均衡示意图</p>
+<p height="1em" width="2em">OpenSIPS是著名的SIP Proxy，它的前身是OpenSER，而OpenSER的前身是SER（SIP Express Router）。后来，由于版权的原因OpenSER更名为OpenSIPS，而同时开发团队中的一部分人则开发出了另外一个分支，这一分支称为Kamailio。我们无意讨论它们之间的差别与优劣，总之它们的根是一样的，配置使用起来也差不多。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.配置FreeSWITCH</font>
+</font>
+</p>
+<p height="1em" width="2em">在配置OpenSIPS之前，我们应该配置两台一样的FreeSWITCH（A和B），分别测试注册和打电话并保证都没问题。然后，两个FreeSWITCH要连接一个共享的数据库，数据库可以参照12.3.2节中的ODBC配置，也可以使用原生的PostgreSQL驱动。简单起见，我们把数据库放到跟OpenSIPS相同的机器上，当然数据库也可以放到独立的数据库服务器上。</p>
+<p height="1em" width="2em">重要的一点是，两台FreeSWITCH要连接同一个数据库，并且设置vars.xml中的domain参数为一个同一个名称，如sip.example.com，将该DNS指向OpenSIPS服务器的IP地址。</p>
+<p height="1em" width="2em">修改domain，将vars.xml中的</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="domain=$${local_ip_v4}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">改为：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="domain=sip.example.com"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">所以，这里需要用到DNS服务器支持。如果没有DNS服务器，也可以尝试将这里的domain设为OpenSIPS服务器的IP地址，或者使用15.7.1节介绍的Domain知识进行相关配置。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.安装配置OpenSIPS</font>
+</font>
+</p>
+<p height="1em" width="2em">笔者在实验的时候用的是OpenSIPS 1.8.2版，如果版本号不同，配置文件也略有出入，其中“#”是注释起始符。</p>
+<p height="1em" width="2em">OpenSIPS的安装应该很简单，笔者在这里使用的是PostgreSQL数据库，如果你使用MySQL，也可以进行相应的替换。</p>
+<p height="1em" width="2em">使用如下命令进行OpenSIPS的安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+cd opensips-1.8.2-tls<br/>
+<br/>
+make all include_modules="db_postgres"<br/>
+<br/>
+make include_modules="db_postgres" prefix="/usr/local" install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（1）创建数据库</p>
+<p height="1em" width="2em">可以使用opensipsctl命令创建数据库。在使用之前需要修改如下配置文件/usr/local/etc/opensips/opensipsctlrc，以提供相应的参数。参数名称都很直观，在此就不多讲了，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# SIP_DOMAIN=opensips.org<br/>
+<br/>
+DBENGINE=PGSQL<br/>
+<br/>
+DBHOST=localhost<br/>
+<br/>
+DBNAME=opensips<br/>
+<br/>
+DBRWUSER=opensips<br/>
+<br/>
+DBRWPW="opensips"<br/>
+<br/>
+DBROOTUSER="opensips"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后运行以下命令创建数据库：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# opensipsdbctl create<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在配置好所有参数之前，我们先将OpenSIPS启动到前台，这样便于调试。配置文件及解释如下，首先是基本的参数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+debug=5                        # <br/>
+<br/>
+输出详细的日志<br/>
+<br/>
+memlog=1<br/>
+<br/>
+fork=no                        # <br/>
+<br/>
+启动到前台，fork=yes<br/>
+<br/>
+则启动到后台<br/>
+<br/>
+children=2                     # <br/>
+<br/>
+在前台不起作用，如果fork=yes<br/>
+<br/>
+，则控制启动多个进程<br/>
+<br/>
+log_stderror=yes               # <br/>
+<br/>
+将LOG<br/>
+<br/>
+输出到标准错误（控制台）<br/>
+<br/>
+log_facility=LOG_LOCAL0        # <br/>
+<br/>
+日志输出，后台模式有用<br/>
+<br/>
+disable_tcp=yes                # <br/>
+<br/>
+简单起见，我们只用udp<br/>
+<br/>
+disable_dns_blacklist = yes<br/>
+<br/>
+auto_aliases=no<br/>
+<br/>
+check_via=no<br/>
+<br/>
+dns=off<br/>
+<br/>
+rev_dns=off<br/>
+<br/>
+listen=udp:192.168.1.118:7060    <br/>
+<br/>
+＃监听的IP<br/>
+<br/>
+地址和端口，可以是多行，但前台模式只支持第一行<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后是加载模块配置，在这里，我们使用OpenSIPS中的两个模块来做负载均衡，一个是dispatcher，它用于均衡注册消息；另一个是load_balancer，它用于均衡呼叫相关的消息。其他模块的详细说明参见相关文档。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+mpath="/usr/local/lib64/opensips/modules/" # <br/>
+<br/>
+加载模块的路径<br/>
+<br/>
+loadmodule "maxfwd.so"<br/>
+<br/>
+loadmodule "sl.so"<br/>
+<br/>
+loadmodule "db_postgres.so"<br/>
+<br/>
+loadmodule "tm.so"<br/>
+<br/>
+loadmodule "uri.so"<br/>
+<br/>
+loadmodule "rr.so"<br/>
+<br/>
+loadmodule "dialog.so"<br/>
+<br/>
+loadmodule "mi_fifo.so"<br/>
+<br/>
+loadmodule "signaling.so"<br/>
+<br/>
+loadmodule "textops.so"<br/>
+<br/>
+loadmodule "siptrace.so"<br/>
+<br/>
+loadmodule "sipmsgops.so"                   # 1.8 <br/>
+<br/>
+版本以后才有<br/>
+<br/>
+loadmodule "dispatcher.so"                  # <br/>
+<br/>
+注册消息均衡(REGISTER)<br/>
+<br/>
+loadmodule "load_balancer.so"               # <br/>
+<br/>
+呼叫相关消息均衡(INVITE)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面的模块的配置参数。模块参数配置一般是用modparam来指定的，其中第一个参数是模块名，第二个是参数名，不同的模块有不同的参数，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# <br/>
+<br/>
+默认的数据库的连接参数<br/>
+<br/>
+db_default_url="postgres://opensips:opensips@localhost/opensips"<br/>
+<br/>
+#fifo<br/>
+<br/>
+模块的配置参数，其他模块类似<br/>
+<br/>
+modparam("mi_fifo", "fifo_name", "/tmp/opensips_fifo")<br/>
+<br/>
+modparam("dialog", "db_mode", 1)<br/>
+<br/>
+&lt;!-- modparam("dialog", "db_url", "postgres://opensips:opensips@localhost/opensips") --&gt;<br/>
+<br/>
+modparam("rr","enable_double_rr",1)<br/>
+<br/>
+modparam("rr","append_fromtag",1)<br/>
+<br/>
+modparam("siptrace", "trace_on", 1)<br/>
+<br/>
+&lt;!-- modparam("load_balancer", "db_url","postgres://opensips:opensips@localhost/opensips") --&gt;<br/>
+<br/>
+&lt;!-- modparam("dispatcher", "db_url", "postgres://opensips:opensips@localhost/opensips") --&gt;<br/>
+<br/>
+# dispatcher<br/>
+<br/>
+模块的配置参数<br/>
+<br/>
+modparam("dispatcher", "ds_ping_method", "OPTIONS")<br/>
+<br/>
+modparam("dispatcher", "ds_ping_interval", 5)<br/>
+<br/>
+modparam("dispatcher", "ds_probing_threshhold", 2)<br/>
+<br/>
+modparam("dispatcher", "ds_probing_mode", 1)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是路由的配置。路由的配置策略使用了类似C语言的脚本语言，看起来也比较直观，在此我们就不多解释了。路由配置内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+route{<br/>
+<br/>
+    if (!mf_process_maxfwd_header("10")) {<br/>
+<br/>
+        sl_send_reply("483","Too Many Hops");<br/>
+<br/>
+        exit;<br/>
+<br/>
+    }<br/>
+<br/>
+    if (!has_totag()) { # <br/>
+<br/>
+初始请求<br/>
+<br/>
+        record_route();<br/>
+<br/>
+    } else { # <br/>
+<br/>
+后续请求—遵循指定的路由<br/>
+<br/>
+        loose_route();<br/>
+<br/>
+        t_relay();<br/>
+<br/>
+        exit;<br/>
+<br/>
+    }<br/>
+<br/>
+    if ( is_method("CANCEL" )) { # <br/>
+<br/>
+处理CANCEL<br/>
+<br/>
+及重传<br/>
+<br/>
+        if ( t_check_trans() ) t_relay();<br/>
+<br/>
+        exit;<br/>
+<br/>
+    }<br/>
+<br/>
+    # <br/>
+<br/>
+从现在开始，我们就只有初始请求了<br/>
+<br/>
+    if (is_method("INVITE")) {<br/>
+<br/>
+        # <br/>
+<br/>
+如果是 INVITE <br/>
+<br/>
+消息，则将调用load_balance<br/>
+<br/>
+函数选择一个可用的后端节点<br/>
+<br/>
+        if (!load_balance("1","pstn","1")) {<br/>
+<br/>
+            send_reply("503","Service Unavailable");<br/>
+<br/>
+            exit;<br/>
+<br/>
+        }<br/>
+<br/>
+    } else if (is_method("REGISTER")) {<br/>
+<br/>
+        # <br/>
+<br/>
+如果是注册消息，则调用dispatcher<br/>
+<br/>
+模块的ds_select_dst<br/>
+<br/>
+函数分发请求<br/>
+<br/>
+        # record_route();<br/>
+<br/>
+        if (!ds_select_dst("1", "0")) {<br/>
+<br/>
+            send_reply("503","Service Unavailable");<br/>
+<br/>
+            exit;<br/>
+<br/>
+        }<br/>
+<br/>
+    } else { # <br/>
+<br/>
+我们暂时不转发其他消息<br/>
+<br/>
+        send_reply("405","Method Not Allowed");<br/>
+<br/>
+        exit;<br/>
+<br/>
+    }<br/>
+<br/>
+    if (!t_relay()) { # <br/>
+<br/>
+转发请求<br/>
+<br/>
+        sl_reply_error();<br/>
+<br/>
+    }<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将上面的配置文件存为lb.conf（名字和路径可以任意，反正我们是测试），然后运行如下命令启动OpenSIPS：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# opensips -f lb.conf<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接着就可以看到很多日志，启动另一个终端，在数据库中增加分发的目的服务器。opensipsctl程序可以动态控制各模块的行为，如可以用如下命令在dispatcher中增加服务器：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# opensipsctl dispatcher addgw 1 sip:192.168.1.118 0 'FS1'<br/>
+<br/>
+# opensipsctl dispatcher addgw 1 sip:192.168.1.119 0 'FS2'<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后启动一个SIP客户端注册到sip.example.com上，如果一切顺利则可以在FreeSWITCH A或B上收到注册消息。使用如下命令可以列出已注册的分机：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia status profile internal reg<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">由于两个FreeSWITCH都使用了同一个数据库，因此可以看到，在两台服务器上显示的信息都是一样的，就如同是在一台上一样 <sup>
+<small>
+<a href="text00132.html">
+<font size="2">
+<font color="#FF6600">[5]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">另外，上面我们说到，对于呼叫相关的消息，由load_balancer这个模块来处理，这里可以直接将负载均衡配置数据直接写入数据库：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+psql&gt; insert into load_balancer (group_id, dst_uri, resources, description)<br/>
+<br/>
+values (1,'sip:192.168.1.118', 'pstn=32', 'FS1');<br/>
+<br/>
+psql&gt; insert into load_balancer (group_id, dst_uri, resources, description)<br/>
+<br/>
+values (1,'sip:192.168.1.119', 'pstn=32', 'FS1');<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，pstn=32为服务器所能提供的资源，可以写成'pstn=32;conf=20'等，与lb.conf中load_balance()函数的第二个参数对应。</p>
+<p height="1em" width="2em">假设有1000和1001两个分机都已经成功注册。我们可以做一个测试，呼叫流程如下：</p>
+<p height="1em" width="2em">1）1000发INVITE请求到OpenSIPS，OpenSIPS转发INVITE到A，A查询数据库，找到1001的Contact地址，由于A是一个B2BUA，因此重新发起一个新的INVITE请求直接到1001所在的地址，1001接听后电话接通。</p>
+<p height="1em" width="2em">2）如果又有1002呼叫1003，则load_balance模块会将INVITE路由到B（因为A上已经有一路通话了），B呼叫1003，呼叫接通。</p>
+<p height="1em" width="2em">这样就达到了负载均衡的目的。</p>
+<p height="1em" width="2em">所有配置都测试无误后可以把lb.conf改到/usr/local/etc/opensips.conf，并把其中的fork参数改为yes以使OpenSIPS启动到后台。</p>
+<p height="1em" width="2em">另外一个好处是，如果我们使用这种配置，可以随时添加或去掉一台FreeSWITCH服务器，而不影响使用。比方说在系统升级的时候，我们可以把所有的话务都定向到其中一台上，等待另一台负载为0后，进行升级。升级完成后，再将所有新的话务指到升级后的机器上，待旧机器话务降到0后即可升级旧的FreeSWITCH。</p>
+<p height="1em" width="2em">在本例中，我们只是简单地介绍了OpenSIPS与FreeSWITCH配合使用的原理及基本配置，更多的示例可以参考http://wiki.freeswitch.org/wiki/Enterprise_deployment_OpenSIPS，在此不再赘述。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00131.html">
+<font color="#FF6600">[1]</font>
+</a>
+ LVS的全称是Linux Virtual Server，它是一个在Linux内核中实现的高度可伸缩、高可用的负载均衡服务器，详见http://www.linuxvirtualserver.org/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00131.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 不过，这里一般不能像HA那样，如果一个计算节点失败，则将它正在计算的任务转给另外的服务器。对于Web服务来讲，如果客户在上浏览网页时不幸遇到这么一个坏的节点，则重新刷新一下页面就行了，对于VoIP应用来讲，则可以重新打一次电话。当然，对于FreeSWITCH来讲，比较终极的应用还可以是对于后端的每个节点都改成两台机器配对的HA方案，或者配置N+M方案。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00131.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 典型的，在生产应用中，OpenSIPS也应该用双机做HA，以避免单点故障。同理，后面的数据库也应该有相应的HA机制保证可靠。关于OpenSIPS及数据库的HA超出了本书的范围，在此我们假设这些服务是可靠的。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00131.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 当然OpenSIPS也有配合RTPProxy的RTP代理方案，在此我们就不讨论了。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00132.html">
+<font color="#FF6600">[5]</font>
+</a>
+ SIP注册的流程是：SIP客户端发REGISTER到OpenSIPS，然后OpenSIPS发到A或B，A或B将SIP客户端的Contact地址写入数据库。由于数据库是共享的，因此在A和B上看起来都一样。</p>
+</body>
+</html>

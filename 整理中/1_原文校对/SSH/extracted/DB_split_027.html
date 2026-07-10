@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_47"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos161550" class="calibre7"></a>1.4.6 Port Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH can increase the security of other TCP/IP-based applications such as <span><em class="italic">telnet</em></span>, <span><em class="italic">ftp</em></span>, and the X Window System. A technique called <span><em class="italic">port forwarding</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos162041" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos162080" class="calibre15"></a> or <span><em class="italic">tunneling</em></span> reroutes a TCP/IP connection to pass through an SSH connection, transparently encrypting it end to end. Port forwarding can also pass such applications through network firewalls that otherwise prevent their use. </p>
+<p class="calibre4">Suppose you are logged into a machine away from work and want to access the internal news server at your office, <span><em class="italic">news.yoyodyne.com</em></span>. The Yoyodyne network is connected to the Internet, but a network firewall blocks incoming connections to most ports, particularly port 119, the news port. The firewall does allow incoming SSH connections, however, since the SSH protocol is secure enough that even Yoyodyne's rabidly paranoid system administrators trust it. SSH can establish a secure tunnel on an arbitrary local TCP port—say, port 3002--to the news port on the remote host. The command might look a bit cryptic at this early stage, but here it is: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -L 3002:localhost:119 news.yoyodyne.com</tt></div></span><p class="calibre4">This says "<span><em class="italic">ssh</em></span>, please establish a secure connection from TCP port 3002 on my local machine to TCP port 119, the news port, on <span><em class="italic">news.yoyodyne.com</em></span>." So, in order to read news securely, configure your news-reading program to connect to port 3002 on your local machine. The secure tunnel created by <span><em class="italic">ssh</em></span> automatically communicates with the news server on <span><em class="italic">news.yoyodyne.com</em></span>, and the news traffic passing through the tunnel is protected by encryption. <a shape="rect" href="DB_split_282.html#filepos1870392" class="calibre6">[9.1]</a></p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos164423" shape="rect" href="DB_split_022.html#filepos147646" class="calibre6">4</a>] </sup>This is true of standard Telnet, but some implementations add security features. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_48"></div></body>
+</html>

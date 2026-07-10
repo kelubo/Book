@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_52"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos169819" class="calibre7"></a>1.6.1 rsh Suite (r-Commands) </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The Unix programs <span><em class="italic">rsh</em></span>, <span><em class="italic">rlogin</em></span>, and <span><em class="italic">rcp</em></span>--collectively known as the <span><em class="italic">r-commands</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos170312" class="calibre15"></a>--are the direct ancestors of the SSH clients <span><em class="italic">ssh</em></span>, <span><em class="italic">slogin</em></span>, and <span><em class="italic">scp</em></span>. The user interfaces and visible functionality are nearly identical to their SSH counterparts, except that SSH clients are secure. The r-commands, in contrast, don't encrypt their connections and have a weak, easily subverted authentication model. </p>
+<p class="calibre4">An r-command server relies on two mechanisms for security: a network naming service and the notion of "privileged" TCP ports. Upon receiving a connection from a client, the server obtains the network address of the originating host and translates it into a hostname. This hostname must be present in a configuration file on the server, typically <em class="italic">/etc/hosts.equiv</em>, for the server to permit access. The server also checks that the source TCP port number is in the range 1-1023, since these port numbers can be used only by the Unix superuser (or root uid). If the connection passes both checks, the server believes it is talking to a trusted program on a trusted host and logs in the client as whatever user it requests! </p>
+<p class="calibre4">These two security checks are easily subverted. The translation of a network address to a hostname is done by a naming service such as Sun's Network Information Service (NIS)<a shape="rect" class="calibre15"></a><a id="filepos171908" class="calibre15"></a> or the Internet Domain Name System (DNS). Most implementations and/or deployments of NIS and DNS services have security holes, presenting opportunities to trick the server into trusting a host it shouldn't. Then, a remote user can log into someone else's account on the server simply by having the same username. </p>
+<p class="calibre4">Likewise, blind trust in privileged TCP ports represents a serious security risk. A cracker who gains root privilege on a trusted machine can simply run a tailored version of the <span><em class="italic">rsh</em></span> client and log in as any user on the server host. Overall, reliance on these port numbers is no longer trustworthy in a world of desktop computers whose users have administrative access as a matter of course, or whose operating systems don't support multiple users or privileges (such as Windows 9x and Macintosh OS 9). </p>
+<p class="calibre4">If user databases on trusted hosts were always synchronized with the server, installation of privileged programs (setuid root) strictly monitored, root privileges guaranteed to be held by trusted people, and the physical network protected, the r-commands would be reasonably secure. These assumptions made sense in the early days of networking, when hosts were few, expensive, and overseen by a small and trusted group of administrators, but they have far outlived their usefulness. </p>
+<p class="calibre4">Given SSH's superior security features and that <span><em class="italic">ssh</em></span> is backward-compatible with <span><em class="italic">rsh</em></span> (and <span><em class="italic">scp</em></span> with <span><em class="italic">rcp</em></span>), we see no compelling reason to run the r-commands anymore. Install SSH and be happy. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_337"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1724861" class="calibre7"></a>7.5.19 For Internal Use Only </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><span><em class="italic">scp</em></span> for OpenSSH has two undocumented options, <span><em class="italic">-t</em></span> and <span><em class="italic">-f</em></span>, for internal use. Most likely you will never need to use them explicitly. They inform <span><em class="italic">scp</em></span> of the direction of the copy: from the local to the remote machine, or from remote to local. The <span><em class="italic">-t</em></span> option means copying to a remote machine and <span><em class="italic">-f</em></span> means copying from a remote machine. </p>
+<p class="calibre4">Whenever you invoke <span><em class="italic">scp</em></span>, it invisibly runs a second <span><em class="italic">scp</em></span> process on the remote host that includes either <span><em class="italic">-t</em></span> or <span><em class="italic">-f</em></span> on its command line. You can see this if you run <span><em class="italic">scp</em></span> in verbose mode. If copying from the local to the remote machine, you see: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp -v myfile server.example.com:<br class="calibre19"/>    Executing: host server.example.com, ..., command scp -v -t .<br class="calibre19"/>    ...</tt></div></span><p class="calibre4">On the other hand, if you copy from the remote to the local machine, you see: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp -v server.example.com:myfile .<br class="calibre19"/>    Executing: host server.example.com, ..., command scp -v -f .<br class="calibre19"/>    ...</tt></div></span><p class="calibre4">Again, it's likely you'll never use these options, but they're useful to know when reading <span><em class="italic">scp</em></span>'s output in verbose mode. </p>
+</div>
+</body>
+</html>

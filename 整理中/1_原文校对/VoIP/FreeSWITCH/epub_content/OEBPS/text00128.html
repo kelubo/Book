@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.8　使用loopback Endpoint外呼</font>
+</font>
+</p>
+<p height="1em" width="2em">如果要在FreeSWITCH中向外发起呼叫，需要一个呼叫字符串。在前面的章节中，我们学习过几种呼叫字符串，如user/1000、sofia/gateway/gw1/xx、ftdm/1/a/1000等。</p>
+<p height="1em" width="2em">但有些情况下，找到呼叫字符串不是那么容易。比方说，我们做了一套企业应用，该企业比较大，有很多分支机构，而且由于历史原因号码分配比较乱，因此我们需要在Dialplan中设置了几百个Extension，以匹配不同号码段正确路由，比如下面的代码：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;condition field="destination_number" expression="^0(.*)$"&gt;<br/>
+<br/>
+&lt;condition field="destination_number" expression="^11(2.*)$"&gt;<br/>
+<br/>
+&lt;condition field="destination_number" expression="^1234(852.*)$"&gt;<br/>
+<br/>
+&lt;condition field="destination_number" expression="^1234(52.*)$"&gt;<br/>
+<br/>
+&lt;condition field="destination_number" expression="^1234(.*)$"&gt;<br/>
+<br/>
+......<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果在我们的应用中，在某些场合下（如自动传真、催缴费等）需要在FreeSWITCH中主动呼叫这些号码，则我们可以使用originate进行外呼，但在外呼时需根据不同的号段我们生成不同的呼叫字符串。这样我们的程序中就需要另外一套路由数据，这不仅与Dialplan中的数据重复，而且不利于维护。因此，我们就考虑能否在用originate外呼的时候也使用Dialplan呢？答案是肯定的，这里我们使用一个新的Endpoint，称为loopback。在理解它的实用原理之前，我们先来看一个简单的例子。</p>
+<p height="1em" width="2em">我们知道，路由到9664后会播放保持音乐，而路由到9196后会执行echo。以前只有有了一个Channel以后才能进入Dialplan，并路由到9664，而现在我们可以使用loopback提前进入Dialplan进行路由。如下面的命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate loopback/9664 &amp;bridge(loopback/9196)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这些Channel都是在FreeSWITCH内部发生的，运行完毕后可以使用下列命令看到，上述命令建立了4个Channel（由于输出行太长，我们简单了输出，仅列出有代表性的字段）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; show channels<br/>
+<br/>
+22937c99-7710-4f64-869f-4f441cc15b54,inbound,loopback/9664-b ...<br/>
+<br/>
+66f83997-5115-43e9-b1b1-b786ac64a9d2,outbound,loopback/9664-a ...<br/>
+<br/>
+d91f7824-b314-4996-acc4-e27fb846e66a,outbound,loopback/9196-a ...<br/>
+<br/>
+57416b98-702b-4d38-bc1b-084966fd04e3,inbound,loopback/9196-b ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">那么为什么它有4个Channel呢？我们知道在普通情况下，如果执行如下呼叫，将只产生两个Channel：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1000 &amp;bridge(user/1001)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">loopback这个Endpoint的关键就在这里，当然它的实现原理很简单但讲起来却很复杂。为了能让让呼叫先到达Dialplan查找路由，它首先创建一个假的腿（即Channel，称为loopback-a，我们称为第一条腿），然后让该腿进入Dialplan进行路由，执行playback播放保持音乐，然后再创建另一条腿（称为loopback-b，我们称为第二条腿），以继续下一步的动作。在此，它执行bridge。我们在bridge中也使用了loopback，因而会发生同样的事情，先创建一条假腿（另一个loopback-a，第三条腿）到Dialplan中找到适当的路由，执行echo，然后又创建一条腿（第四条腿）再与原先的那个腿bridge起来。如果还是不理解的话，可以查看一下刚才呼叫的日志，就能比较清楚了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[NOTICE] switch_channel.c:1044 New Channel loopback/9664-a [66f83997-...<br/>
+<br/>
+[NOTICE] switch_channel.c:1042 Rename Channel loopback/9664-a-&gt;loopback/9664-a<br/>
+<br/>
+[NOTICE] switch_channel.c:1044 New Channel loopback/9664-b [22937c99-...<br/>
+<br/>
+[NOTICE] mod_loopback.c:946 Channel [loopback/9664-a] has been answered<br/>
+<br/>
+[NOTICE] mod_dptools.c:1225 Channel [loopback/9664-b] has been answered<br/>
+<br/>
+[NOTICE] switch_channel.c:1044 New Channel loopback/9196-a [d91f7824-...<br/>
+<br/>
+[NOTICE] switch_channel.c:1042 Rename Channel loopback/9196-a-&gt;loopback/9196-a<br/>
+<br/>
+[NOTICE] switch_channel.c:1044 New Channel loopback/9196-b [57416b98-...<br/>
+<br/>
+[NOTICE] mod_loopback.c:946 Channel [loopback/9196-a] has been answered<br/>
+<br/>
+[NOTICE] mod_dptools.c:1225 Channel [loopback/9196-b] has been answered<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从日志中可以看到，一共有4条腿（4个Channel）参与到该通话中，它们的名字分别是loopback/9664-a、loopback/9664-b、loopback/9196-a、loopback/9196-b。</p>
+<p height="1em" width="2em">当然，你也可以执行以下的例子，它将先呼叫1000，再呼叫1002，仍然会产生4条腿：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate loopback/1000 &amp;bridge(loopback/1001)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面的命令的效果是一样的，但只会产生3条腿。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate loopback/1000 1001<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这是因为，1001那一端没有使用loopback，在1001那一端产生了两条腿以后，呼叫进入Dialplan进行路由，然后又“bridge”到1001，产生了第三条腿。</p>
+<p height="1em" width="2em">理解了这些之后，就可以对本节最开始的时候提出的那些号码进行呼叫了，而不用管它们是具体怎么路由的，如呼叫某个号码并自动发送传真：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate loopback/123485234xxx &amp;txfax(/tmp/test.tiff)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">需要注意的是，由于使用loopback将比普通的呼叫多产生一条腿，因而话单可能受影响。为此，所有的loopback的Channel中都设置了一个is_loopback变量，以方便其他程序（如计费等）进行后续处理。</p>
+<p height="1em" width="2em">为了最大限度地减少因额外的腿产生的影响，也可以通过一个通道变量让这条额外的腿在完成它的使命之后尽快释放（或者说两条腿合并为一条），如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch originate {loopback_bowout=true}loopback/1000 &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述命令将先建立两条腿，呼叫1000，在成功执行echo命令时，两条腿将条合并为一条。读者可以使用show Channels命令进行查看。</p>
+<p height="1em" width="2em">本节我们花了很大篇幅给大家讲解了loopback，之所以这么做除了因为它在某些场合确实有用外，还因为我们为了给大家讲清楚默认Dialplan中的Local_Extension部分的路由。在6.1.9节中，我们为了方便讲解，把默认Dialplan中呼叫失败后自动入进入Voicemail的Dialplan Action改写成了如下的形式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="voicemail" data="default ${domain_name} ${dialed_extension}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">但实际上，它是如下的形式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="loopback/app=voicemail:default ${domain_name} ${dialed_extension}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">后面这种方式使用了loopback。在大多数情况下，两者的效果是一样的。只不过，后者因为能在进入Voicemail后能产生一个Channel，因而还可以配合att-xfer（见第15.1.2节）一起使用。</p>
+<p height="1em" width="2em">在这里，与前面讲的loopback会先进入Dialplan进行路由不同，它直接使用“app=”这样的语法执行一个App，相当于loopback Dialplan的inline形式（关于inline Dialplan参见6.2节）。</p>
+</body>
+</html>

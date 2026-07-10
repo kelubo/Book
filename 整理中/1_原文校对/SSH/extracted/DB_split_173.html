@@ -1,0 +1,221 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_231"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1065274" class="calibre7"></a>5.5.8 Summary of Authentication and Access Control </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1065456" class="calibre15"></a>SSH provides several ways to permit or restrict connections to particular accounts or from particular hosts. <a shape="rect" href="#filepos1065824" class="calibre6">Tables 5-5</a> and <a shape="rect" href="#filepos1071680" class="calibre6">5-6</a> summarize the available options. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1065824" class="calibre15"></a></span><p class="calibre4">Table 5-5. OpenSSH summary of authentication and access control</p>
+<div class="calibre3">
+<table summary="OpenSSH summary of authentication and access control" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+If you are...</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+And you want to allow or restrict... </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Then use...</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections to your account by public-key authentication </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">authorized_keys</em>
+<a shape="rect" href="DB_split_270.html#filepos1776655" class="calibre6">[8.2.1]</a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections to an account </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowUsers</code>, <code class="calibre35">DenyUsers</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections by a host</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">from</code> option in <em class="italic">authorized_keys</em>
+<a shape="rect" href="DB_split_273.html#filepos1814678" class="calibre6">[8.2.4.1]</a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections by a host</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowUsers</code>, <code class="calibre35">DenyUsers</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections to your account by hostbased authentication </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">.shosts</em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Hostbased authentication </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostbasedAuthentication</code>, <code class="calibre35">IgnoreRhosts</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Root logins</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PermitRootLogin</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1071680" class="calibre15"></a></span><p class="calibre4">Table 5-6. Tectia summary of authentication and access control</p>
+<div class="calibre3">
+<table summary="Tectia summary of authentication and access control" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+If you are...</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+And you want to allow or restrict... </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Then use...</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections to your account by public-key authentication </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">authorization</em> file <a shape="rect" href="DB_split_271.html#filepos1781583" class="calibre6">[8.2.2]</a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections to an account </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowUsers</code>, <code class="calibre35">DenyUsers</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections by a host</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">allow-from</code>, <code class="calibre35">deny-from</code> options in the <em class="italic">authorization</em> file <a shape="rect" href="DB_split_273.html#filepos1821482" class="calibre6">[8.2.4.2]</a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections by a host</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowHosts</code>, <code class="calibre35">DenyHosts</code> (or <code class="calibre35">AllowUsers</code>, <code class="calibre35">DenyUsers</code>) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connections to your account by hostbased authentication </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">.shosts</em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Hostbased authentication </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowedAuthentications</code>, <code class="calibre35">AllowSHosts</code>, <code class="calibre35">DenySHosts</code>, <code class="calibre35">IgnoreRhosts</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Root logins</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PermitRootLogin</code>, <code class="calibre35">IgnoreRootRhosts</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1078018" shape="rect" href="DB_split_165.html#filepos1009980" class="calibre6">68</a>] </sup>This concept is true for the configuration keywords discussed in this section but not for hostbased control files, e.g., <em class="italic">~/.rhosts</em> and <em class="italic">/etc/hosts.equiv</em>. Each of these may in fact override the other. <a shape="rect" href="DB_split_076.html#filepos393737" class="calibre6">[3.4.3.6]</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1078585" shape="rect" href="DB_split_166.html#filepos1016429" class="calibre6">69</a>] </sup>Our general discussion of metaconfiguration might also be of help. <a shape="rect" href="DB_split_355.html#filepos2356359" class="calibre6">[11.6.1]</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1078959" shape="rect" href="DB_split_166.html#filepos1020441" class="calibre6">70</a>] </sup>In this notation, the mask specifies the number of 1 bits in the most-significant portion of the netmask. You might be more familiar with the older, equivalent notation giving the entire netmask, e.g., 10.1.1.0/255.255.255.0. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1079423" shape="rect" href="DB_split_168.html#filepos1039897" class="calibre6">71</a>] </sup>Finer-grained control is provided by the <code class="calibre35">from</code> option in <em class="italic">authorized_keys</em>. <a shape="rect" href="DB_split_273.html#filepos1814003" class="calibre6">[8.2.4]</a> Each public key may be tagged with a list of acceptable hosts that may connect via that key. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1079960" shape="rect" href="DB_split_169.html#filepos1043318" class="calibre6">72</a>] </sup>Even though the keywords have "SHosts" in their names, they apply also to <span><em class="italic">.rhosts</em></span> and <span><em class="italic">/etc/hosts.equiv</em></span> files<span><em class="italic">.</em></span></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1080499" shape="rect" href="DB_split_171.html#filepos1053165" class="calibre6">73</a>] </sup>If the specified program cannot be run, then access is denied. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1080800" shape="rect" href="DB_split_171.html#filepos1053738" class="calibre6">74</a>] </sup>The external authorization program is similar in function to a keyboard-interactive plugin that is used for authentication, except that access control does not need interaction with the remote user, because the user has already authenticated successfully before the program is run. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1081320" shape="rect" href="DB_split_172.html#filepos1064461" class="calibre6">75</a>] </sup>We discuss this in more detail in our other O'Reilly book, <span><em class="italic">Linux Security Cookbook</em></span>. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_232"></div></body>
+</html>

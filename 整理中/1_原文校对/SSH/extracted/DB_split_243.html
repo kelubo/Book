@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_321"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1692185" class="calibre7"></a>7.5.3 Recursive Copy of Directories </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Sometimes you want to copy not just a single file, but a directory hierarchy. In this case, use the <span><em class="italic">-r</em></span> option, which stands for <span><em class="italic">recursive</em></span>. For example, to securely copy the directory <em class="italic">/usr/local/bin</em> and all its files and subdirectories to another machine: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp -r /usr/local/bin server.example.com:</tt></div></span><p class="calibre4">If you forget the <code class="calibre35">-r</code> option when copying directories, <span><em class="italic">scp</em></span> complains: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp /usr/local/bin server.example.com:<br class="calibre19"/>    /usr/local/bin: not a regular file</tt></div></span><p class="calibre4">Although <span><em class="italic">scp</em></span> can copy directories, it isn't necessarily the best method. If your directory contains hard links or soft links, they won't be duplicated. Links are copied as plain files (the link targets). Other types of special files, such as named pipes, also aren't copied correctly.<sup class="calibre20">[<a id="filepos1693842" shape="rect" href="DB_split_260.html#filepos1729003" class="calibre6">116</a>]</sup> A better solution is to use <span><em class="italic">tar</em></span>, which handles special files correctly, and send it to the remote machine to be untarred, via SSH: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ tar cf - /usr/local/bin | ssh server.example.com tar xf -</tt></div></span><p class="calibre4">or <span><em class="italic">rsync</em></span>, tunneled through SSH: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ rsync -e ssh /usr/local/bin server.example.com:</tt></div></span></div>
+</body>
+</html>

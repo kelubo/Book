@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_140"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos539371" class="calibre7"></a>3.9.4 Man-in-the-Middle Attacks </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos539534" class="calibre15"></a>A <span><em class="italic">man-in-the-middle attack</em></span> is a particularly subtle type of active attack and is illustrated in <a shape="rect" href="#filepos540881" class="calibre6">Figure 3-5</a>. An adversary sits between you and your real peer (i.e., between the SSH client and server), intercepting all traffic and altering or deleting messages at will. Imagine that you try to connect to an SSH server, but Malicious Mary intercepts your connection. She behaves just like an SSH server, though, so you don't notice, and she ends up sharing a session key with you. Simultaneously, she also initiates her own connection to your intended server, obtaining a separate session key with the server. She can log in as you because you used password authentication and thus conveniently handed her your password. You and the server both think you have a connection to each other, when in fact you both have connections to Mary instead. Then she just sits in the middle, passing data back and forth between you and the server (decrypting on one side with one key and re-encrypting with the other for retransmission). Of course, she can read everything that goes by and undetectably modify it if she chooses. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos540881" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Man-in-the-middle attack" src="images/00014.jpg" class="calibre55"/></div>
+</div>
+</span><p class="calibre4">Figure 3-5. Man-in-the-middle attack</p></div>
+<p class="calibre4">SSH counters this attack in two ways. The first is server host authentication. Unless Mary has broken into the server host, she is unable to effect her impersonation, because she doesn't have the server's private host key. Note that for this protection to work, it is crucial that the client actually check the server-supplied public host key against its known hosts list; otherwise, there is no guarantee that the server is genuine. If you connect for the first time to a new server and let <span><em class="italic">ssh</em></span> accept the host key, you are actually open to a man-in-the-middle attack. However, assuming you aren't spoofed that one time, future connections to this server are safe as long as the server host key isn't stolen. </p>
+<p class="calibre4">The second protection SSH affords is via certain user authentication methods. The password method is obviously vulnerable, but publickey and hostbased authentication resist MITM attacks. Mary can't discover the session key simply by observing the key exchange; she must perform an active attack in which she carries out separate exchanges with each side, obtaining separate keys of her own with the client and server. In both SSH-1 and SSH-2, the key exchange is designed so that if she does this, the session identifiers for each side are different. When a client provides a digital signature for either public-key or hostbased authentication, it includes the session identifier in the data signed. Thus, Mary can't just pass on the client-supplied authenticator to the server, nor does she have any way of coercing the client into signing the other session ID.<sup class="calibre20">[<a id="filepos543035" shape="rect" href="#filepos543734" class="calibre6">36</a>]</sup></p>
+<p class="calibre4">If you don't verify the server name/key correspondence, Mary can still perform the man-in-the-middle attack, even though she can't log in as you on the server side. Perhaps she can log into her own account or another she has cracked. With some cleverness, she might still deceive you long enough to do damage. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos543734" shape="rect" href="#filepos543035" class="calibre6">36</a>] </sup>This is not true of the older SSH-1 protocol, however. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_141"></div></body>
+</html>

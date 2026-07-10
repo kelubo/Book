@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">18.4　事件</font>
+</font>
+</p>
+<p height="1em" width="2em">在本章结束之前，我们再来讨论一些常用的事件。在第5章，我们曾简单讲过事件的一些基本知识。其实有了前面的基本知识，再加上本章的内容，笔者觉得已经讲得足够多了。讲得再多也代替不了读者自己的练习和实践，毕竟，笔者在学习这些知识的时候就是一点一点积累起来的。然而，笔者还是经常被问到这样的问题：FreeSWITCH都会产生哪些事件啊？这些事件都是在什么情况下产生的？FreeSWITCH的事件那么“长”，里面的都是什么意思啊？</p>
+<p height="1em" width="2em">所谓“授人以鱼不如授人以渔”，在此笔者不想直接回答这几个问题，而是先就这几个问题谈一下自己的看法。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">18.4.1　事件的学习方法</font>
+</font>
+</p>
+<p height="1em" width="2em">首先，FreeSWITCH事件的机制就是在特定的情况下产生特定的事件。这些事件都是在源代码的switch_types.h文件中定义的 <sup>
+<small>
+<a href="text00158.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。从定义一般能很直观地看到事件的含义。但要直观地看到事件含义需要两个基础：</p>
+<p height="1em" width="2em">·<font color="#0468BB">英语要过关。</font>
+ 事件的定义都是很直观的英文单词，只要认识，一般就能知道该事件是什么意思。</p>
+<p height="1em" width="2em">·<font color="#0468BB">FreeSWITCH使用要熟练。</font>
+ 只有熟练掌握了前面章节中讲到的各种知识，多多进行实际的配置练习和拨打测试，才能比较好的理解这些事件。否则，即使源代码中所有的事件定义或注释是中文的，你也看不懂。</p>
+<p height="1em" width="2em">其次，只要了解了这些事件的含义，那么可能在什么情况下产生什么样的事件就能大体猜出，剩下的只需要去实践中验证。比如，跟踪所有的事件，然后打个电话看一下产生的事件是否跟你想的一样。</p>
+<p height="1em" width="2em">再次，要大胆。对陌生的东西不要存畏惧心理。FreeSWITCH中的某些事件确实很长，Channel相关的事件动辄几百行。但是，正如毛主席所说——一切反动派全是纸老虎。其实，Channel相关的事件中比较重要的字段跟info App的输出都是相同的，且它们的含义我们在表6-2中就已写清楚了。理解了这些字段的含义，举一反三，就能很容易理解其他的了。</p>
+<p height="1em" width="2em">最后，踏实。多动手实验。爱因斯坦说过：天才是百分之一的灵感加百分之九十九的汗水。一定不要好高骛远。好多人刚学习FreeSWITCH几天就想编个呼叫中心的系统出来；还没学会用FreeSWITCH，就看FreeSWITCH的源代码想进行二次开发。笔者认为这些做法都是不可取的。</p>
+<p height="1em" width="2em">总之，笔者推荐的学习方法是——利用自己学到的知识，跟踪所有的事件，然后打一个电话看看在不同的阶段都会产生哪些不同的事件，试着去理解事件内部内容的含义。积少成多，慢慢就理解了。另外，为了帮助读者跟踪调试这些事件，笔者也在FreeSWITCH中写了一些图形化的跟踪调试的工具，它们的使用方法将在下一章最讲到。</p>
+<p height="1em" width="2em">学而不思则罔，思而不学则殆。到这里，读者不妨合上书，思考一下我们刚刚谈到的这些有没有道理？你是否其中具备上面提到的两个基础？你都是如何学习的？其实，即使英语水平不好也无妨，多查查字典，所有事件加起来也没有多少单词；但是，如果FreeSWITCH使用不熟练的话，就说明你没有好好下工夫了。学习的态度永远比能力重要。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">18.4.2　常用事件简介</font>
+</font>
+</p>
+<p height="1em" width="2em">上面啰啰嗦嗦讲了那么多，我们还是言归正传。简单介绍一下事件的种类和产生的场景。</p>
+<p height="1em" width="2em">我们曾在第5章讲到FreeSWITCH中的事件分为主事件和CUSTOM事件，但其实FreeSWITCH中也没有严格的分类方法。下面我们就以CUSTOM事件、CHANNEL事件、CHANNEL相关的事件、系统事件和其他事件这种分类来进行说明。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.CUSTOM事件</font>
+</font>
+</p>
+<p height="1em" width="2em">CUSTOM事件主要是用于跟系统内部核心逻辑关系不大的一些事件，一般用于模块内部，且便于扩展。它的Event-Name永远是CUSTOM，不同事件的类型使用Event-Subclass区分。Event-Subclass可以是任意的字符串，可以任意定义，但FreeSWITCH中也有约定俗成的命名空间，如mod_sofia模块中常用的sofia::register、sofia::unregister等，都使用以“::”隔开、以sofia开头的命名空间。类似的还有，会议模块（mod_conference）中的conference::maintenaince、FIFO模块（mod_fifo）中的fifo:info等。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.Channel事件</font>
+</font>
+</p>
+<p height="1em" width="2em">有一部分事件是以Channel开头的，它主要跟Channel的状态（状态机）有关。下从以Channel的生命周期来大体讲一下。</p>
+<p height="1em" width="2em">首先，系统中有来话或去话时，将生成一个新的Channel，并产生一个CHANNEL_CREATE事件。该事件中会包含该Channel的UUID（其对应的字段名字是Unique-ID）、主叫号码、被叫号码、Channel的创建时间等。</p>
+<p height="1em" width="2em">接下来，如果Channel正常继续进行，则会产生CHANNEL_PROGRESS事件（如在SIP中收到对方的100或180消息）。如果在应答之前能收到Early Media（如在SIP中收到对方的）183消息，则会产生CHANNEL_PROGRESS_MEDIA事件。</p>
+<p height="1em" width="2em">如果一个Channel被应答，就会产生Channel Answer事件。</p>
+<p height="1em" width="2em">如果一个Channel与另外一个Channel bridge成功，则会产生CHANNEL_BRIGE事件。注意，bridge是由两个Channel参与的，其中两个Channel分别称为a-leg和b-leg。在SIP中，如果使用bridge这个App等待bridge的Channel收到对端Channel发来的Early Media消息（如SIP中的183消息）即bridge成功，可以在Channel创建时使用ignore_early_media通道变量延迟bridge的返回（直到应答，如收到SIP中的200消息。但结果是a-leg，则听不到b-leg发来的Early Media（回铃音）。</p>
+<p height="1em" width="2em">另外，CHANNEL_BRIDGE事件只在一个Channel上发生，即只发生在主动的那个leg上。例如，终端A通过FreeSWITCH呼叫B，A端的呼叫到达FreeSWITCH后产生一个新的Channel，FreeSWITCH使用bridge App去呼叫B，又产生一个新的Channel。如果B应答，则b-leg上会产生一个CHANNEL_ANSWER消息，同时，该应答信号通过bridge App传递到A上，a-leg上也会产生一个CHANNEL_ANSWER消息。bridge成功后（假设没有Early Media参与，因此会直到应答bridge才完成），a-leg上会产生CHANNEL_BRIGE事件，而b-leg上不会。</p>
+<p height="1em" width="2em">CHANNEL_BRIGE事件与上面单腿的事件不同的地方在于它里面包含了b-leg的信息，如Other-Leg-Unique-ID是b-leg的Channel UUID，Other-Channel-Caller-ID-Number是b-leg上的主叫号码等。</p>
+<p height="1em" width="2em">挂机后将产生CHANNEL_HANGUP事件和CHANNEL_HANGUP_COMPLETE事件，其中，后者比前者内容丰富一些，比如后者带有variable_duration（通话时长，从Channel创建开始计时）及variable_billsec（计费时长，从应答后开始计时）。因此，一般使用该事件取计费信息。</p>
+<p height="1em" width="2em">最后还将产生CHANNEL_DESTROY事件，表示该Channel已经完全释放（销毁）了。</p>
+<p height="1em" width="2em">在Channel生存期间，在执行App的时候，将产生CHANNEL_EXECUTE事件，表示一个App已开始执行。有的App执行非常快，如set；有的则可能比较慢，如playback（要等声音文件播放完毕）。在App执行完毕后，会产生CHANNEL_EXECUTE_COMPLETE事件。在使用异步方式进行ESL编程时可以在收到该事件后执行下一个App。其中，这两个事件都会包含一个Application字段，标志当前正在执行或已完成的App的名字。</p>
+<p height="1em" width="2em">对于大部分的Channel事件，与Channel相关的Channel Variable都会附加在Channel相关的事件上。与系统内部的字段名字不同（大写字母开头加中横线方式命名，如Unique-ID），这些Channel Variable都是以“variable_”开头的，如variable_effective_caller_id_name。</p>
+<p height="1em" width="2em">某些Channel事件默认没有variable_开头的字段，如CHANNEL_CALLSTATE。这主要是为了减少消息量。如果希望这些消息中也包含所有的variable，则可以在Dialplan中使用verbose_events App来打开，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="verbose_events" data="true"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.Channel相关事件</font>
+</font>
+</p>
+<p height="1em" width="2em">有一部分事件虽然与Channel相关的，但是它们的名字不是以CHANNEL_开头的，例如PLAYBACK_START（放音开始）、PLAYBACK_STOP（放音结束）、RECORD_START（录音开始）、RECORD_STOP（录音结束）、DTMF（双音多频按键信息）等。</p>
+<p height="1em" width="2em">这类事件也有Channel UUID（Unique-ID），但它们一般与Channel的状态无关。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.系统事件</font>
+</font>
+</p>
+<p height="1em" width="2em">系统事件包含STARTUP（系统启动）、SHUTDOWN（系统关闭）、MODULE_LOAD（模块加载）、MODULE_UNLOAD（模块卸载）等。另外，系统每隔20秒会产生一个HEARTBEAT（心跳）事件，可以用于检测FreeSWITCH是否正常运行。</p>
+<p height="1em" width="2em">其他还有许多事件，如API（执行API时产生）、BACKGROUND_JOB（使用bgapi后台执行API时产生）等，在此我们就不多介绍了。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00157.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 考虑到使用ESL的开发者并不一定需要去读源代码，因此，本书在附录中列出了所有的事件。并对一些关键的事件和常用事件添加了中文注释。</p>
+</body>
+</html>

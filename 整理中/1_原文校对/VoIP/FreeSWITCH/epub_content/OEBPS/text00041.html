@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.4　控制台与命令客户端</font>
+</font>
+</p>
+<p height="1em" width="2em">系统不带参数会启动到控制台，在控制台上可以输入各种命令以控制或查询FreeSWITCH的状态。可以尝试输入以下命令（注意，“--”后面是笔者加的注释，它们是相关命令的功能说明，不需要输入）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+version           -- <br/>
+<br/>
+显示当前版本<br/>
+<br/>
+status            -- <br/>
+<br/>
+显示当前状态<br/>
+<br/>
+sofia status       -- <br/>
+<br/>
+显示 sofia <br/>
+<br/>
+状态<br/>
+<br/>
+help              -- <br/>
+<br/>
+显示帮助<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">示例如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; version<br/>
+<br/>
+FreeSWITCH Version 1.5.2b+git~20130622T184626Z~a38ea77fa3 (git a38ea77 2013-06-22 18:46:26Z)<br/>
+<br/>
+注：这里显示系统版本号为1.5.2b<br/>
+<br/>
+，后面更详细的信息说明git<br/>
+<br/>
+版库中对应的版本及提交时间<br/>
+<br/>
+freeswitch&gt; status<br/>
+<br/>
+UP 0 years, 0 days, 12 hours, 23 minutes, 4 seconds, 711 milliseconds, 696 microseconds<br/>
+<br/>
+FreeSWITCH (Version 1.5.2b git a38ea77 2013-06-22 18:46:26Z) is ready<br/>
+<br/>
+7 session(s) since startup<br/>
+<br/>
+0 session(s) - 0 out of max 30 per sec <br/>
+<br/>
+1000 session(s) max<br/>
+<br/>
+min idle cpu 0.00/100.00<br/>
+<br/>
+Current Stack Size/Max 240K/8192K<br/>
+<br/>
+注：该命令显示系统状态。第1<br/>
+<br/>
+行说明系统启动了多长时间；第2<br/>
+<br/>
+行主要显示了版本号；第3<br/>
+<br/>
+行说明系统自启动以来已经处理了7<br/>
+<br/>
+个Session<br/>
+<br/>
+；第4<br/>
+<br/>
+行说明当前一个有多少Session<br/>
+<br/>
+，其中，“0 out of max 30 per sec<br/>
+<br/>
+”说明系统最大支持每秒钟处理30<br/>
+<br/>
+个Session<br/>
+<br/>
+（也就是通常所说的cps <br/>
+<br/>
+– Call Per Second<br/>
+<br/>
+，这个值可以在配置文件中更改），目前每秒的Session<br/>
+<br/>
+数为0<br/>
+<br/>
+；第5<br/>
+<br/>
+行说明系统最大允许多少个并发的Session<br/>
+<br/>
+（类似cps<br/>
+<br/>
+，该值也可以修改）；第6<br/>
+<br/>
+行显示最小及当前的空闲CPU<br/>
+<br/>
+；第7<br/>
+<br/>
+行显示当前使用的堆栈空间以及系统预留的堆栈地址空间。<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">为了调试方便，FreeSWITCH还在conf/autoload_configs/switch.conf.xml中定义了一些控制台快捷键。可以通过F1~F12这几个按键来使用它们（不过，在某些操作系统上，有些快捷键可能与操作系统相冲突，这时你就只能直接输入这些命令或重新定义它们了），也可以修改配置文件加入比较常用的命令（修改完毕后记着运行reloadxml命令使之生效），默认的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;cli-keybindings&gt;<br/>
+<br/>
+    &lt;key name="1" value="help"/&gt;<br/>
+<br/>
+    &lt;key name="2" value="status"/&gt;<br/>
+<br/>
+    &lt;key name="3" value="show channels"/&gt;<br/>
+<br/>
+    &lt;key name="4" value="show calls"/&gt;<br/>
+<br/>
+    &lt;key name="5" value="sofia status"/&gt;<br/>
+<br/>
+    &lt;key name="6" value="reloadxml"/&gt;<br/>
+<br/>
+    &lt;key name="7" value="console loglevel 0"/&gt;<br/>
+<br/>
+    &lt;key name="8" value="console loglevel 7"/&gt;<br/>
+<br/>
+    &lt;key name="9" value="sofia status profile internal"/&gt;<br/>
+<br/>
+    &lt;key name="10" value="sofia profile internal siptrace on"/&gt;<br/>
+<br/>
+    &lt;key name="11" value="sofia profile internal siptrace off"/&gt;<br/>
+<br/>
+    &lt;key name="12" value="version"/&gt;<br/>
+<br/>
+&lt;/cli-keybindings&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">FreeSWITCH是一个典型的Client/Server结构，不管FreeSWITCH运行在前台还是后台，你都可以使用客户端软件fs_cli连接FreeSWITCH。</p>
+<p height="1em" width="2em">fs_cli是一个类似Telnet的客户端（也类似于Asterisk中的“asterisk-r”命令），它使用FreeSWITCH的ESL（Event Socket Library）协议与FreeSWITCH通信。当然，使用该协议需要加载模块mod_event_socket，该模块是默认加载的。</p>
+<p height="1em" width="2em">正常情况下，直接输入bin/fs_cli即可连接到FreeSWITCH上，并出现系统提示符。如果出现类似：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[ERROR] libs/esl/fs_cli.c:652 main() Error Connecting [Socket Connection Error]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这样的错误，说明FreeSWITCH没有启动或mod_event_socket没有正确加载，请检查TCP的8021端口是否处于监听状态或被其他进程占用。</p>
+<p height="1em" width="2em">fs_cli也支持很多命令行参数，值得一提的是-x参数，它允许执行一条命令后退出，这在编写脚本程序时非常有用（如果它能支持管道会更有用，但是它不支持）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ bin/fs_cli -x "version"                                  # <br/>
+<br/>
+显示版本号<br/>
+<br/>
+$ bin/fs_cli -x "status"                                   # <br/>
+<br/>
+显示状态<br/>
+<br/>
+$ bin/fs_cli -x "originate user/1000 &amp;bridge(user/1001)"       # <br/>
+<br/>
+回拨<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面让我们看一个使用示例：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ fs_cli -x "version"<br/>
+<br/>
+FreeSWITCH Version 1.5.2b+git~20130622T184626Z~a38ea77fa3 (git a38ea77 2013-06-22 18:46:26Z)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其他的参数都可以通过配置文件来实现，在这里就不多说了。可以参见http://wiki.freeswitch.org/wiki/Fs_cli。</p>
+<p height="1em" width="2em">使用fs_cli，不仅可以连接到本机的FreeSWITCH，也可以连接到其他机器的FreeSWITCH上（或本机另外的FreeSWITCH实例上），通过在用户主目录下编辑配置文件.fs_cli_conf（注意前面的点“.”），可以定义要连接的多个机器：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[server1]<br/>
+<br/>
+host     =&gt; 192.168.1.10<br/>
+<br/>
+port     =&gt; 8021<br/>
+<br/>
+password =&gt; secret_password<br/>
+<br/>
+debug    =&gt; 7<br/>
+<br/>
+[server2]<br/>
+<br/>
+host     =&gt; 192.168.1.11<br/>
+<br/>
+port     =&gt; 8021<br/>
+<br/>
+password =&gt; someother_password<br/>
+<br/>
+debug    =&gt; 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">注意，如果要连接到其他机器，要确保目标机器的FreeSWITCH的Event Socket是监听在真实网卡的IP地址上，而不是127.0.0.1，这可以通过将conf/autoload_configs/event_socekt.conf.xml中的IP地址改成为服务器IP或“0.0.0.0”实现，当然，这可能带来潜在的安全性问题。如果你的服务器运行在公网上，则需要考虑你是否确实需要这样做，或者至少考虑设置一下ACL或防火墙规则只允许特定的IP地址访问。当然，记得改完后在控制台上要执行“reload mod_event_socket”。另外，在UNIX中，以点开头的文件是隐藏文件，普通的“ls”命令是不能列出它的，可以使用“ls-a”列出这些文件。</p>
+<p height="1em" width="2em">一旦配置好，就可以这样使用它：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ fs_cli server1<br/>
+<br/>
+$ fs_cli server2<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在fs_cli中，有几个特殊的命令，它们是以“/”开头的，这些命令并不直接发送到FreeSWITCH，而是先由fs_cli处理。/quit、/bye、/exit、Ctrl+D都可以退出fs_cli；/help是帮助。</p>
+<p height="1em" width="2em">其他一些以“/”开头的指令与Event Socket中相关的命令相同，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+/event       -- <br/>
+<br/>
+开启事件接收<br/>
+<br/>
+/noevents    -- <br/>
+<br/>
+关闭事件接收<br/>
+<br/>
+/nixevent    -- <br/>
+<br/>
+除了特定一种外，开启所有事件<br/>
+<br/>
+/log         -- <br/>
+<br/>
+设置 log <br/>
+<br/>
+级别，如 /log info <br/>
+<br/>
+或 /log debug <br/>
+<br/>
+等<br/>
+<br/>
+/nolog       -- <br/>
+<br/>
+关闭 log<br/>
+<br/>
+/filter       -- <br/>
+<br/>
+过滤事件<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">除此之外，其他命令都与直接在FreeSWITCH控制台上执行是一样的。在fs_cli中也支持快捷键，最常用的快捷键是F6（reloadxml）、F7（关闭log输出）、F8（开启debug级别的log输出）。</p>
+<p height="1em" width="2em">在UNIX类平台上，FreeSWITCH控制台和fs_cli两者都通过libeditline支持命令行编辑功能。可以通过上、下箭头查看历史命令。</p>
+</body>
+</html>

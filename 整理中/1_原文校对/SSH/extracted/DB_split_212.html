@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1418425" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_283"><span class="calibre2"><a shape="rect" class="calibre7"></a>Tectia External Keys </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1418778" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1418817" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1418856" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1418895" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1418934" class="calibre15"></a>Tectia clients can use external key providers that distribute keys, somewhat like authentication agents. These are typically part of a more general solution for PKI (Public Key Infrastructure). The <span><em class="italic">ssh -E</em></span> command-line option identifies the name of the provider, and Tectia currently supports two of them: </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">entrust</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Entrust products, such as the Entrust Authority Security Manager; see <a href="http://www.entrust.com/authority" shape="rect" class="calibre6">http://www.entrust.com/authority</a>. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">pkcs11</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">PKCS#11-compliant dynamic libraries.</div>
+</blockquote>
+</div>
+<p class="calibre4">An initialization string must be sent to the external key provider using the <span><em class="italic">-I</em></span> option. The format of this string depends on the provider. It typically includes authentication information and identifies the desired key. Sometimes you also need a DLL supplied by the provider. Consult the documentation for specific providers, and the <em class="italic">ssh-externalkeys</em> manpage, for details about the initialization string. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ENTRUST_INIT="dll(libentrust.so)"<br class="calibre19"/>    $ ENTRUST_INIT="$ENTRUST_INIT password(blartz)"<br class="calibre19"/>    $ ENTRUST_INIT="$ENTRUST_INIT ini-file($HOME/solo.ini)"<br class="calibre19"/>    $ ENTRUST_INIT="$ENTRUST_INIT profile-file($HOME/solo_user.epf)"<br class="calibre19"/>    $ ENTRUST_INIT="$ENTRUST_INIT login-options(entrust)""<br class="calibre19"/>    $ ssh -E entrust -I "$ENTRUST_INIT"</tt></div></span><p class="calibre4">The external key provider and initialization string can also be specified in the client configuration file, using the keywords <code class="calibre35">EkProvider</code> and <code class="calibre35">EkInitString</code>, respectively: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    EkProvider      pkcs11<br class="calibre19"/>    EkInitString    "lib=libpcks11.so password=blurfl key=laptop"</tt></div></span><p class="calibre4">The keywords are usually more convenient than the command-line options, especially for long initialization strings, but beware of storing sensitive authentication information in configuration files. Be sure to quote the initialization string if it contains characters with special meaning to the shell (e.g., wildcards) or to the configuration file itself. </p>
+</div>  <div class="mbppagebreak" id="calibre_pb_284"></div></body>
+</html>

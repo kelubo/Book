@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_457"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2282942" class="calibre7"></a>11.4.5 Comparing the Techniques </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2283105" class="calibre15"></a>We've presented several methods of SSH access through a gateway. There are various trade-offs, but overall we think tunneling is usually the best way to go. Here's why. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.4.5.1 Smoothness </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The tunneling methods are smoother end-to-end: the interaction between client C and server S is simpler because they talk directly to one another. This is especially true if you need to request additional services via SSH, such as any kind of forwarding. On the other hand, the setup for tunneled connections using port forwarding is more cumbersome with its extra SSH process. <code class="calibre35">ProxyCommand</code> tunneling, though, is both smoother than chaining and at least no slower—and may be sped up if the OpenSSH connection server is available. The speedup is again at the cost of an extra SSH process, but its startup could be automated, and coordinating the control socket is easier than picking ad hoc ports and dealing with possible <code class="calibre35">TIME_WAIT</code> problems. Overall, tunneling via <code class="calibre35">ProxyCommand</code> wins. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.4.5.2 Security </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2284811" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2284908" class="calibre15"></a>A chained connection has a serious security problem: the gateway G. All data is decrypted on G in between the two SSH sessions; if G is compromised, then all is lost. There is simply no end-to-end security in this scenario, because there is no actual SSH session from client C to server S. In contrast, a compromise of G poses no extra threat to the security of a tunneled SSH connection from C to S. The break-in simply puts the attacker on G in the position of altering or diverting the data path between C and S—but SSH already has mechanisms for countering exactly that threat. In other words, the top SSH connection does not trust the lower one at all. It treats it as it would any other connection method, and thus is no more vulnerable to attacks on it than if a simple TCP connection were in use. Tunneling in either form is the clear winner here. </p>
+</div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2286039" shape="rect" href="DB_split_346.html#filepos2260670" class="calibre6">149</a>] </sup>The same method should work with Tectia: just adapt the client configuration to Tectia syntax. <a shape="rect" href="DB_split_217.html#filepos1438620" class="calibre6">[7.1.2.3]</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2286446" shape="rect" href="DB_split_346.html#filepos2263300" class="calibre6">150</a>] </sup>Note that if you want to use this setup for an interactive connection, you need to use the <span><em class="italic">-t</em></span> option to <span><em class="italic">ssh</em></span>, to force it to allocate a tty on <em class="italic"><code class="calibre35">G</code></em>. It doesn't normally do that, because it doesn't have any way to know that the remote command—in this case, another instance of <span><em class="italic">ssh</em></span>—needs one. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2287232" shape="rect" href="DB_split_346.html#filepos2265011" class="calibre6">151</a>] </sup>For Tectia use <code class="calibre35">SSH2_ORIGINAL_COMMAND</code>. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_458"></div></body>
+</html>

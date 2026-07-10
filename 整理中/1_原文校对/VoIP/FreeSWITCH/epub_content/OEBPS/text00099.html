@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.1　使用mod_fifo实现简单呼叫队列</font>
+</font>
+</p>
+<p height="1em" width="2em">在呼叫中心应用中，有一个很常用的功能——ACD（Automatic Call Distributioin，自动电话分配）。一般来说，我们这里所说的呼叫中心都是客服型呼叫中心，即有一组话务员（称为座席，英文称为Agent）在等待为用户服务。当有电话呼入时，先将用户放入一个队列进行排队（因为可能同时有大量用户呼入），然后按一定的策略选择一个空闲的座席为用户服务（将来话从队列中取出并与该座席通话）。这种通过一定策略为来话分配空闲座席的功能就称为ACD。</p>
+<p height="1em" width="2em">mod_fifo模块实现了一些简单的ACD功能，下面我们来看一下。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.1.1　呼叫停泊与取回</font>
+</font>
+</p>
+<p height="1em" width="2em">一般来说，普通的电话呼叫会使用bridge App来桥接两条腿。但在电话分配中，一般采用停泊与取回的方式进行电话搭接。顾名思义，停泊跟泊车类似，即在有来话时，先将来话停靠在一个泊位上（一般还会放点音乐），然后通过某种算法找到一个空闲的座席，该座席拨打一个与该泊位相关的号码，就可以将该泊位上的电话取回，双方进行通话。</p>
+<p height="1em" width="2em">FreeSWITCH默认的Dialplan中提供了使用这种方式进行电话分配的例子。我们先来看停泊的部分，Dialplan设置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="park"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^5900$"&gt;<br/>
+<br/>
+        &lt;action application="set" data="fifo_music=$${hold_music}"/&gt;<br/>
+<br/>
+        &lt;action application="fifo" data="5900@${domain_name} in"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">拿起电话拨打5900，就可以将电话停在一个泊位上。从上面的Dialplan中可以看出：首先，它使用set设置了一个fifo_music的通道变量，该变量指定电话停靠在泊位上时播放的音乐。然后，使用fifo App将电话放入一个先入先出的队列中（fifo的意思就是First In,First Out，即先入先出），该队列的名字是5900@${domain_name}，一般来说${domain_name}变量的值是FreeSWITCH所在服务器的IP地址。参数in表示是入队。</p>
+<p height="1em" width="2em">当有电话呼入时，可以使用fifo list命令显示当前队列的状态，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; fifo list<br/>
+<br/>
+&lt;fifo_report&gt;<br/>
+<br/>
+    &lt;fifo name="5900@192.168.7.9" consumer_count="0"<br/>
+<br/>
+    caller_count="1" waiting_count="1" importance="0"<br/>
+<br/>
+    outbound_per_cycle="0" ring_timeout="0" default_lag="0"<br/>
+<br/>
+    outbound_priority="5" outbound_strategy="ringall"&gt;<br/>
+<br/>
+        &lt;outbound&gt;&lt;/outbound&gt;<br/>
+<br/>
+        &lt;callers&gt;<br/>
+<br/>
+            &lt;caller uuid="a8cbbbd0-91a8-4f3f-be6e-1741e25deb1d"<br/>
+<br/>
+                    status="WAITING" caller_id_name="1002"<br/>
+<br/>
+                    caller_id_number="1002"<br/>
+<br/>
+                    timestamp="2013-10-14 21:10:18"<br/>
+<br/>
+                    position="1" slot="0"&gt;<br/>
+<br/>
+            &lt;/caller&gt;<br/>
+<br/>
+        &lt;/callers&gt;<br/>
+<br/>
+    &lt;consumers&gt;&lt;/consumers&gt;<br/>
+<br/>
+    &lt;bridges&gt;&lt;/bridges&gt;<br/>
+<br/>
+    &lt;/fifo&gt;<br/>
+<br/>
+    ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该列表是以XML格式显示的。其中，我们可以看到一个fifo标签，它的名字是5900@192.168.7.9，它里面有一个caller（即主叫），并显示了该caller的当前的状态是WAITING（即在队列中等待服务）。</p>
+<p height="1em" width="2em">fifo是一个“生产者——消费者”模型，即来话（Caller）相当于生产者（Producer），而座席（Agent）则称为消费者（Consumer），它对来话进行服务即相当于“消费”生产者生产的内容。</p>
+<p height="1em" width="2em">我们接着来看下列的Dialplan，它也是来自默认的配置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="unpark"&gt;<br/>
+<br/>
+    &lt;condition field="Destination_number" expression="^5901$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="fifo" data="5900@${domain_name} out nowait"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过上述Dialplan，如果座席端通过某种方式（如业务界面上的通知，可以使用HTML等其他消息通知机制实现）知道队列里有一个来电需要服务，座席话务员就可以（手工或自动）拨打5901将该来电从队列里出取来，然后双方进行通话。可以看出，这里Dialplan的配置与前面入队时是类似的，所不同的是使用了out参数代表出队，另外有一个附加的nowait参数，它表示如果队列中没有电话在等待（可能这时候主叫已经等不及而挂机了），即没有人需要服务时，座席端的电话就没必要在这里等待了。当然，如果把该参数改成wait，或者不加该参数（默认值为wait），那么座席端会在这里继续等待，直到队列里来了一路通话，它便可以立即得到服务。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.1.2　配置座席</font>
+</font>
+</p>
+<p height="1em" width="2em">本节我们来介绍座席的具体配置方法。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.静态座席的配置</font>
+</font>
+</p>
+<p height="1em" width="2em">上一节我们讲了fifo入队及出队的简单原理。一般情况下，fifo是不需要配置的，如果在呼叫中需要一个fifo，FreeSWITCH就会自动创建（如上面的fifo名字可以改成任意的其他字符串）。但有时候，我们也可能希望配置一些静态的座席用于呼叫分配。</p>
+<p height="1em" width="2em">mod_fifo的配置文件是conf/autoload_configs/fifo.conf.xml。它默认的配置中有一个cool_fifo的例子，为了简单起见，我们自己配置一个fifo队列，命名为book，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;fifos&gt;<br/>
+<br/>
+    &lt;fifo name="book" importance="0"&gt;<br/>
+<br/>
+        &lt;member timeout="60" simo="1" lag="5"&gt;user/1005&lt;/member&gt;<br/>
+<br/>
+        &lt;member timeout="60" simo="1" lag="5"&gt;user/1006&lt;/member&gt;<br/>
+<br/>
+    &lt;/fifo&gt;<br/>
+<br/>
+&lt;/fifos&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，我们为book队列配置了两个member（1005和1006），每个member相当于一个座席。user/1005为该member的呼叫字符串，即队列中有来话时怎么呼叫该座席；timeout表示呼叫超时值；simo表示最大能服务的呼叫的数量；lag表示该座席在接听一个呼叫后，隔多长时间（秒）才可以再接收下一个呼叫。</p>
+<p height="1em" width="2em">使用如下命令可以使刚才的配置生效：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; reloadxml<br/>
+<br/>
+freeswitch&gt; fifo reparse<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，可以使用fifo list book查看一下配置的结果。该命令显示的结果比我们配置的会多出一些参数，这里我们就不详细介绍了。</p>
+<p height="1em" width="2em">我们可以使用如下Dialplan将来话路由到我们刚刚配置的fifo。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="fifo-test"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^(1234)$"&gt;<br/>
+<br/>
+        &lt;action application="set" data="hold_music=$${hold_music}"/&gt;<br/>
+<br/>
+        &lt;action application="fifo" data="book in"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当有用户拨打1234时，便进入我们刚才配置的fifo，听等待音乐。然后，1005和1006就会轮流振铃（笔者在试验中，拒接其中一个，另一个就振铃）。</p>
+<p height="1em" width="2em">当将队列中的来话分配到座席时，fifo使用轮循的方式分配，因而它是“公平”的，即不会出现某些座席“忙死”而其他座席“饿死” <sup>
+<small>
+<a href="text00100.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 的情况。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.动态座席的配置</font>
+</font>
+</p>
+<p height="1em" width="2em">在实际的呼叫中心应用中，座席的配置往往是动态的，即一个话务员上班时，会执行一个“签入”的动作，说明他（她）上班了，准备好接电话了；而在中途休息时，或者下班时执行“签出”，这样队列里再有电话进来就不会分配到该座席了。</p>
+<p height="1em" width="2em">mod_fifo提供了一个fifo_member命令可以动态增加和删除座席，如我们可以用如下命令再增加两个座席：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; fifo_member add user/1007<br/>
+<br/>
+freeswitch&gt; fifo_member add user/1008<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果删除座席，则可以使用如下命令（注意，最后一个参数呼叫字符串必须与增加的时候严格相同）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; fifo_member del user/1008<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">熟悉了这些命令后，就可以使用Lua脚本或Event Socket等与其他系统集成了，如可以在业务系统的网页上集成一些按钮，按这些按钮就可以进行签入或签出了。</p>
+<p height="1em" width="2em">当然，在一些简单的呼叫中心中可能没有业务系统，甚至没有条件做网页。在这种情况下，也可以用我们学过的知识，使用话机签入签出。如下面的Dialplan就可以做到：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Agent Login"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^5902$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="set" data="result=${fifo_member(add book user/ ${user_name})}"/&gt;<br/>
+<br/>
+        &lt;action application="playback" data="ivr/ivr-you_are_now_logged_in.wav"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+&lt;extension name="Agent Logout"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^5903$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="set" data="result=${fifo_member(del book user/ ${user_name})}"/&gt;<br/>
+<br/>
+        &lt;action application="playback" data="ivr/ivr-you_are_now_logged_out.wav"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过使用上述Dialplan，就可以在上班时在自己话机上拨打5902进行签入，下班时拨打进行5903签出，它们都是使用了我们上面讲过的fifo_member API命令实现的。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.offhook座席</font>
+</font>
+</p>
+<p height="1em" width="2em">以上配置的座席中，不管是静态配置的还是动态配置的，都称为onhook（挂机）座席。这种座席的特点是当队列中来了电话后再去呼叫座席。而与之相对的另一种座席称为offhook（摘机）座席，这种座席会事先呼入队列并等待（一般听等待音乐），当有来电时就可以立即接听，省去了呼叫座席的时间，因而能更迅速为客户提供服务。这在比较繁忙的呼叫中心中也有助于提高效率。</p>
+<p height="1em" width="2em">其实我们把12.1.1节从队列中取回电话的例子稍作修改，就可以支持offhook座席。比如，我们建立下面的Dialplan，当座席呼叫5902时，就会执行fifo App，它会尝试从队列中取出一个呼叫。而此时如果队列中没有呼叫在等待服务，则由于此处我们使用了wait参数（对比一下12.1.1节中使用的是wait），因此该座席会一直停在这里等待，直到队列中有新的电话进入。该Dialplan的设置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="unpark"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^5902$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="fifo" data="5900@${domain_name} out wait"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当服务完成后，该座席就又变成等待状态，继续等待下一个呼叫的到来。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.1.3　fifo</font>
+</font>
+</p>
+<p height="1em" width="2em">本节我们来详细介绍一下fifo。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.相关的通信变量</font>
+</font>
+</p>
+<p height="1em" width="2em">在mod_fifo中，有许多相关的通道变量可以改变它的行为。通过有效地使用这些通道变量，往往能配置出比较实用的功能。</p>
+<p height="1em" width="2em">如每个fifo都有10个优先级队列，在进行入fifo前，可以使用fifo_priority变量指定来话的优先级，高优先级的来话将排在队列的前面（默认的优先级是5）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="fifo_priority=1" /&gt;<br/>
+<br/>
+&lt;action application="fifo" data="book in" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在队列中有多个电话排队时，座席这一端也可以随意取出一个电话进行接听。当然，如果达到这种效果需要通过其他手段获取到队列中所有成员的UUID，如下面的设置中，我们在从队列中取出（out）电话前先把fifo_bridge_uuid变量设置为想取出的Channel的UUID，然后就可以取出与特定的UUID相关联的通话了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="fifo_bridge_uuid=9c3a1fee-fae2-4355-bceb-5064f2107983" /&gt;<br/>
+<br/>
+&lt;action application="fifo" data="book out" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在下面的例子中，我们使用了很多的通道变量。该例子基于多年前笔者实现的一个呼叫中心应用。我们先看看Dialplan中的配置（为了方便讲解，我们增加了行号）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 &lt;action application="answer"/&gt;<br/>
+<br/>
+02 &lt;action application="set" data="fifo_music=$${hold_music}"/&gt;<br/>
+<br/>
+03 &lt;action application="set" data="tts_engine=tts_commandline"/&gt;<br/>
+<br/>
+04 &lt;action application="set" data="tts_voice=Ting-Ting"/&gt;<br/>
+<br/>
+05 &lt;action application="set" data="fifo_chime_list=say:<br/>
+<br/>
+座席全忙，继续等待请按1<br/>
+<br/>
+，转其他服务请按2"/&gt;<br/>
+<br/>
+06 &lt;action application="set" data="fifo_chime_freq=15"/&gt;<br/>
+<br/>
+07 &lt;action application="set" data="fifo_orbit_exten=1007:45"/&gt;<br/>
+<br/>
+08 &lt;action application="set" data="fifo_orbit_dialplan=XML"/&gt;<br/>
+<br/>
+09 &lt;action application="set" data="fifo_orbit_context=default"/&gt;<br/>
+<br/>
+10 &lt;action application="set" data="fifo_orbit_announce=say:<br/>
+<br/>
+为保证服务质量，您的电话可能被录音"/&gt;<br/>
+<br/>
+11 &lt;action application="set" data="fifo_caller_exit_key=2"/&gt;<br/>
+<br/>
+12 &lt;action application="set" data="fifo_caller_exit_to_orbit=true"/&gt;<br/>
+<br/>
+13 &lt;action application="set"<br/>
+<br/>
+      data="fifo_override_announce=say:tts_commandline:Ting-Ting:<br/>
+<br/>
+来电号码${caller_id_number}"/&gt;<br/>
+<br/>
+14 &lt;action application="fifo" data="book in"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当有来电进来时，我们会将电话路由到这里的Dialplan处理。其中，第1行先对来话进行应答；第2行设置来话在队列中听到的保持音乐；第3行和第4行设置TTS引擎的参数（因为使用TTS比使用声音文件讲起来更方便一些）；第5行设置一个声音，它会每隔15秒（在第6行设置）播放一次，以给用户比较好的体验 <sup>
+<small>
+<a href="text00100.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ ；第7行，设置一个分机号，如果等待超时（冒号后面指定超时时间，即45秒），会转到该号码；第8行和第9行分别是与第7行配合的Dialplan和Context；第10行，设置一个声音，如果座席接听，则先给来话用户播放一段提示音；第11行，设置一个按键，配置第5行；第12行，实现在用户按了第11行的按键的情况下，转到第7行的号码上（否则的话将会退出fifo）；第13行，是在座席接听电话后，在与来电客户通话前播放给座席的，这里我们播放了来电的号码 <sup>
+<small>
+<a href="text00100.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ ；第14行，这里是最重要的，即将来话送入book这个fifo队列中（如果没有这一行的话上面所有的设置就都白费了）。</p>
+<p height="1em" width="2em">还有一些其他变量是在fifo是执行过程中自动产生的，如fifo_position表示来话在当前队列中的位置；fifo_serviced_by或fifo_serviced_by表示来话被哪个Channel（通过UUID可以进而找到相关的座席）服务了。</p>
+<p height="1em" width="2em">当然，该模块还有其他相关的变量，限于篇幅，我们就不一一讲解了。有需要的读者可以参阅http://wiki.freeswitch.org/wiki/Mod_fifo。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.相关事件</font>
+</font>
+</p>
+<p height="1em" width="2em">当fifo相关的状态发生变化，会产生一些Subclass为fifo::info的CUSTOM事件。通过这些事件，可以获取fifo中的详细信息，如哪个座席为哪个来话进行了服务等。</p>
+<p height="1em" width="2em">事件消息中，有一个FIFO-Action消息头标志了事件实际的动作。在笔者的试验中，一通来话从入队到挂机，大致经过以下几个事件：</p>
+<p height="1em" width="2em">·push：来话入队时产生。</p>
+<p height="1em" width="2em">·pre-dial：呼叫座席之前产生。</p>
+<p height="1em" width="2em">·post-dial：呼叫座席之后产生。</p>
+<p height="1em" width="2em">·consumer_start：消费者（即座席）开始。</p>
+<p height="1em" width="2em">·caller_pop：主叫出队。</p>
+<p height="1em" width="2em">·consumer_pop：消费者出队。</p>
+<p height="1em" width="2em">·bridge-consumer-start：消费者Channel开始bridge。</p>
+<p height="1em" width="2em">·bridge-caller-start：主叫Channel开始bridge。</p>
+<p height="1em" width="2em">·bridge-consumer-stop：消费者Channel停止bridge。</p>
+<p height="1em" width="2em">·bridge-caller-stop：主叫Channel停止bridge。</p>
+<p height="1em" width="2em">·consumer_stop：消费者停止。</p>
+<p height="1em" width="2em">·channel-consumer-start：消费者Channel开始。</p>
+<p height="1em" width="2em">·channel-consumer-stop：消费者Channel结束。</p>
+<p height="1em" width="2em">具体的事件我们就不赘述了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.其他</font>
+</font>
+</p>
+<p height="1em" width="2em">在fifo应用中，通话中的两条腿都是独立建立的，只有这样才能进行桥接（即bridge）。因而，在普通的通话中靠a-leg上的变量去影响b-leg的做法（如，使用export将变量设置到未来的b-leg上）在这里就不适用了。</p>
+<p height="1em" width="2em">那么，为了在b-leg上设置我们想要的通道变量，可以在向b-leg发起呼叫的呼叫字符串上做文章。如下面的设置可以在呼叫1007时将主叫号码改为7777：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;member&gt;{origination_call_id_name=7777}user/1007&lt;/member&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以设置与其他业务系统中的座席工号进行关联，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;member&gt;{my_worker_number=1234}user/1007&lt;/member&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，这里的座席成员除了是本地用户外，也可以是外部系统的号码，如通过某网关能打通的一个手机号：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;member&gt;sofia/gateway/pstn/139xxxxxxxx&lt;/member&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">对于PSTN网络来讲，它们一般会在呼叫进展阶段返回回铃音或彩铃（对应SIP中会收到183消息），这会让FreeSWITCH认为电话已经接通。因此，为了消除这种影响，一般来说会增加ignore_early_media参数，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;member&gt;{ignore_early_media=true}sofia/gateway/pstn/139xxxxxxxx&lt;/member&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">注意，FreeSWITCH在拨打PSTN网络中的电话之前是无法知道对方是否正常空闲的（也可能是无法接通或被叫忙），它只能按正常的策略去呼出。如果碰巧出现被叫忙或不在服务区之类的情况，PSTN网络中通常会播放相关的提示音，而不是正常的返回信令消息，这会令接续到下一个座席的时间延长。这是与PSTN网络中的电话对接固有的问题。在具体应用时可能还需要注意设置恰当的超时（timeout）等参数，在此我们就不多讲了。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00099.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 闲着没事干的情况称为“饥饿”。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00100.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 注意，在本例中，我们仅设置了按键“2”对应的动作，没有设置按键“1”，但提示音中包含了“1”。实际上，“1”本自是不存在的，即按与不按结果都一样。但如果这里提示“转其他服务请按2，继续等待请不按”的话，显得有点别扭。当然，也可以把这里的提示音改成“请继续等待，或按2转其他服务”。总之，这是一个用户体验问题，而不是技术问题。我们在此主要是以这些例子来讲解各变量的含义，实际的提示音可以在实际应用场景中根据需要进行调整。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00100.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 注意由于该TTS是在座席的Channel上播放的，因而上述使用set设置的TTS引擎变量就不起作用了，所以我们在该行单独设置。</p>
+</body>
+</html>

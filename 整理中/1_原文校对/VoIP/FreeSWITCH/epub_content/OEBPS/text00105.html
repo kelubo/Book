@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.7　计费</font>
+</font>
+</p>
+<p height="1em" width="2em">严格来说，计费并不是FreeSWITCH要做的工作。FreeSWITCH只需要忠实地产生正确的话单，实际的计费工作可以由专门的系统去处理。实际的电信运营商也是有专门的计费中心用于话费处理的（因为现在的情况更多的不是以时长（如分钟）计费，而是有各种形式的套餐，在交换机中是不可能知道五花八门的套餐信息的）。</p>
+<p height="1em" width="2em">不过，在这里我们还是简单介绍一下FreeSWITCH相关的计费方案，以供读者参考。</p>
+<p height="1em" width="2em">mod_nibblebill是一个预付费的计费模块。可以在FreeSWITCH源代码目录中使用如下命令配置安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make mod_nibblebill-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它需要配合一个外部数据库才能工作，外部数据库可以是通过ODBC或内置的PostgreSQL原生模式连接。本例中，笔者使用的是PostgreSQL数据库。我们先来创建一个数据库表用于存储账户：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+pgsql&gt; create table accounts (<br/>
+<br/>
+    id bigserial not null,<br/>
+<br/>
+    name varchar( 256 ),<br/>
+<br/>
+    cash double precision not null<br/>
+<br/>
+);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">插入一个账户，给我们自己充值100元钱：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+pgsql&gt; insert into accounts (name, cash) values ('Seven', 100);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，修改模块配置，指向我们的数据库：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="odbc-dsn" value="pgsql://hostaddr=127.0.0.1 dbname=freeswitch"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">查询一下数据库中的账户及余额：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+pgsql&gt; select * from accounts;<br/>
+<br/>
+ id | name  | cash<br/>
+<br/>
+----+-------+------<br/>
+<br/>
+  1 | Seven |  100<br/>
+<br/>
+(1 row)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，我们也可以看出我们账户的id是“1”，后面我们将根据该id计费。</p>
+<p height="1em" width="2em">在用户目录中（如1002.xml），加入以下参数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;variable name="nibble_rate" value="0.01"/&gt;<br/>
+<br/>
+&lt;variable name="nibble_account" value="1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，nibble_rate是每分钟的费率；nibble_account对应accounts表中的id字段的值，即对哪个账号进行计费。这样只要该用户打电话，它的费率就是每分钟1分钱。</p>
+<p height="1em" width="2em">当然，我们也可以改变，账号对应的字段，如，我们可以通过accounts表中的name字段引用账号：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="db_column_account" value="name"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，上述的配置就可以改成这样了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;variable name="nibble_rate" value="0.01"/&gt;<br/>
+<br/>
+&lt;variable name="nibble_account" value="Seven"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">配置完成后，加载该模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_nibblebill<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，以后每次分机1002打电话，它的账户上就每分钟扣1分钱。</p>
+<p height="1em" width="2em">当然，我们也可以根据不同的被叫号码设置不同的费率。如我们可以在Dialplan中设置，如果是长途呼叫，则每分钟0.3元：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Toll Bill"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^(0.*)$"&gt;<br/>
+<br/>
+    &lt;action application="set" data="nibble_rate=0.3"/&gt;<br/>
+<br/>
+    &lt;action application="bridge" data="sofia/gateway/.....<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">为了保证计费安全，在用户通话过程中该模块将每隔一定时间就从账户上扣一次钱。比如，以下设置实现了每分钟写一次数据库：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="global_heartbeat" value="60"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">此外，该模块可以允许设置账号的最低余额、低余额提醒等。通过设置负数的最低余额或者往账号中预充一定的金额，也可以支持后付费的应用。</p>
+<p height="1em" width="2em">除了该模块外，还有一个开源的专门用于FreeSWITCH计费的产品——vBilling。这款产品笔者没有用过，有兴趣的读者也可以参考官方网站http://vbilling.org/，在此我们就不再赘述了。</p>
+</body>
+</html>

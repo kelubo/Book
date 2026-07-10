@@ -1,0 +1,1280 @@
+% 核能
+% 核能.tex
+
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息。
+\input{../../../common/page}
+
+% 设置字体，并解决显示难检字问题。
+\xeCJKsetup{AutoFallBack=true}
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）。
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabelhspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 支持目录点击跳转
+\usepackage[colorlinks,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+% 设置 part 和 chapter 标题格式。
+\ctexset{
+	part/name= {第,篇},
+	part/number={\chinese{part}},
+	chapter/name={第,章},
+	chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
+
+% 设置段落间距
+\setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
+
+% 列表格式支持，列表项向右偏移。
+\usepackage{enumitem}
+
+% 数学公式支持
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% 代码块支持
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    captionpos=b,
+    tabsize=4
+}
+
+\title{\heiti\zihao{0} 核能}
+\author{WangFei}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\part{核能基础}
+
+\chapter{原子结构与核反应}
+
+\section{原子结构}
+
+原子由原子核和核外电子组成。原子核位于原子中心，由质子和中子组成。质子带正电荷，中子不带电。电子带负电荷，在核外绕核运动。原子的质量主要集中在原子核，而原子核的体积仅占原子体积的极小部分。
+
+原子核的质子数称为原子序数（Z），质子数与中子数之和称为质量数（A）。相同质子数不同中子数的原子称为同位素。例如，氢有三种同位素：氕（$^1$H）、氘（$^2$H）和氚（$^3$H）。
+
+\section{核力与结合能}
+
+核力是维持原子核稳定的基本力。它是一种短程强相互作用力，作用范围约为$10^{-15}$米。核力能克服质子之间的库仑斥力，将核子紧密结合在一起。
+
+结合能是指将原子核分解成自由核子所需的能量。根据爱因斯坦质能方程$E=mc^2$，原子核的质量小于组成它的核子质量之和，这个质量差称为质量亏损，转化为结合能释放出来。结合能越大，原子核越稳定。
+
+\section{核反应类型}
+
+核反应是指原子核之间或原子核与粒子之间的相互作用引起的原子核变化。主要类型包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{核裂变}：重核分裂成两个或多个较轻核的反应
+    \item \textbf{核聚变}：轻核聚合成较重核的反应
+    \item \textbf{核衰变}：原子核自发地释放粒子或能量的过程
+    \item \textbf{核反应}：原子核与其他粒子的碰撞反应
+\end{itemize}
+
+\chapter{放射性}
+
+\section{放射性的发现}
+
+放射性现象于1896年由法国物理学家贝克勒尔发现。他发现铀盐能自发地发出一种看不见的射线，这种射线能穿透黑纸使照相底片感光。随后，居里夫妇对放射性进行了深入研究，发现了钋和镭等放射性元素。
+
+放射性的发现开创了原子核物理学的新纪元，为核能的开发利用奠定了基础。
+
+\section{衰变类型}
+
+放射性衰变主要有三种类型：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{$\alpha$衰变}：原子核放出$\alpha$粒子（氦核），原子序数减少2，质量数减少4
+    \item \textbf{$\beta$衰变}：原子核放出$\beta$粒子（电子或正电子），原子序数改变1，质量数不变
+    \item \textbf{$\gamma$衰变}：原子核放出$\gamma$射线（高能光子），原子序数和质量数均不变
+\end{itemize}
+
+\section{半衰期与衰变定律}
+
+半衰期是指放射性物质的原子核数目减少到原来一半所需的时间。不同放射性同位素的半衰期差异很大，从微秒到数十亿年不等。
+
+衰变定律描述放射性物质随时间的变化规律：$N(t) = N_0 e^{-\lambda t}$，其中$N(t)$为$t$时刻的原子核数目，$N_0$为初始数目，$\lambda$为衰变常数。
+
+\section{放射性同位素}
+
+放射性同位素是具有放射性的同位素。它们在工业、农业、医疗、科研等领域有广泛应用：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{工业应用}：无损检测、辐射加工
+    \item \textbf{农业应用}：辐射育种、食品辐照保鲜
+    \item \textbf{医疗应用}：放射性治疗、医学影像
+    \item \textbf{科研应用}：同位素示踪、中子活化分析
+\end{itemize}
+
+\part{核裂变}
+
+\chapter{核裂变原理}
+
+\section{裂变反应}
+
+核裂变是指重原子核分裂成两个或多个较轻原子核的过程。1938年，奥托·哈恩和弗里茨·斯特拉斯曼发现了铀核的裂变现象。当铀-235原子核吸收一个中子后，会分裂成两个中等质量的原子核，并释放出2-3个中子和大量能量。
+
+裂变反应的典型例子是铀-235的裂变：$^{235}$U + n → $^{141}$Ba + $^{92}$Kr + 3n + 能量
+
+\section{裂变产物}
+
+裂变产物是核裂变产生的中等质量原子核。这些产物通常是放射性的，会经历一系列衰变过程。裂变产物的质量分布呈现双峰分布，峰值分别在质量数95和139附近。
+
+常见的裂变产物包括：
+\begin{itemize}[leftmargin=2cm]
+    \item 钡-141、氪-92
+    \item 氙-135、锶-90
+    \item 铯-137、碘-131
+\end{itemize}
+
+\section{裂变能量释放}
+
+每次铀-235裂变大约释放200 MeV的能量，其中约85\%以裂变碎片的动能形式存在，其余以$\gamma$射线和中子动能形式释放。1千克铀-235完全裂变释放的能量约相当于2500吨标准煤燃烧释放的能量。
+
+能量释放的原因是裂变产物的总质量小于反应物的质量，根据质能方程$E=mc^2$，质量亏损转化为能量。
+
+\chapter{链式反应}
+
+\section{链式反应原理}
+
+链式反应是指核裂变产生的中子继续引发其他原子核裂变，形成持续的反应过程。维持链式反应需要满足一定条件：每次裂变产生的中子中至少有一个能引发新的裂变。
+
+链式反应是核能发电和核武器的基础。在核电站中，链式反应被精确控制，以稳定释放能量；在核武器中，链式反应则被设计为快速失控，瞬间释放巨大能量。
+
+\section{临界质量}
+
+临界质量是指维持链式反应所需的最小核燃料质量。当燃料质量小于临界质量时，中子逃逸率大于产生率，链式反应无法维持；当燃料质量等于或大于临界质量时，链式反应可以自持。
+
+临界质量取决于燃料的种类、纯度、形状以及周围环境的反射条件。例如，铀-235的临界质量约为52千克（球形，无反射层）。
+
+\section{缓发中子}
+
+缓发中子是指在裂变产物衰变过程中延迟释放的中子。虽然缓发中子占总中子数的比例很小（约0.65\%），但它们对反应堆的控制至关重要。
+
+缓发中子的存在使得反应堆的响应时间变长，允许操作员有足够的时间进行控制操作。如果没有缓发中子，反应堆将难以稳定控制。
+
+\chapter{核燃料}
+
+\section{铀资源}
+
+铀是目前最主要的核燃料。铀在自然界中主要以三种同位素形式存在：铀-238（约99.27\%）、铀-235（约0.72\%）和铀-234（约0.01\%）。其中只有铀-235是易裂变核素。
+
+铀资源主要分布在澳大利亚、哈萨克斯坦、加拿大等国家。铀矿的开采和加工需要经过复杂的工艺流程。
+
+\section{钚的获取}
+
+钚-239是另一种重要的易裂变核素，它是通过铀-238吸收中子后经过两次$\beta$衰变产生的。钚-239可以作为核燃料使用，也可以用于制造核武器。
+
+钚主要在核反应堆中产生，通过对辐照过的燃料棒进行后处理可以提取钚。
+
+\section{核燃料循环}
+
+核燃料循环包括铀矿开采、铀浓缩、燃料制造、反应堆使用、乏燃料后处理和废物处置等环节。
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{前端}：铀矿开采、铀转化、铀浓缩、燃料元件制造
+    \item \textbf{中端}：反应堆运行
+    \item \textbf{后端}：乏燃料后处理、核废物处置
+\end{itemize}
+
+核燃料循环的选择取决于国家的能源政策和技术能力。
+
+\part{核聚变}
+
+\chapter{核聚变原理}
+
+\section{聚变反应条件}
+
+核聚变是指轻原子核聚合成较重原子核的过程。要实现核聚变，需要满足极端的条件：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{高温}：需要达到数千万度甚至数亿度的高温，使原子核获得足够的动能克服库仑斥力
+    \item \textbf{高密度}：需要足够高的等离子体密度，增加原子核碰撞的概率
+    \item \textbf{约束时间}：需要将高温等离子体约束足够长的时间，使聚变反应能够持续进行
+\end{itemize}
+
+\section{聚变燃料}
+
+核聚变的主要燃料是氢的同位素：氘（重氢）和氚（超重氢）。氘可以从海水中提取，氚可以通过锂的中子照射产生。
+
+最主要的聚变反应是氘-氚反应：$^2$H + $^3$H → $^4$He + n + 17.6 MeV
+
+其他可能的聚变反应包括：
+\begin{itemize}[leftmargin=2cm]
+    \item 氘-氘反应：$^2$H + $^2$H → $^3$He + n + 3.27 MeV
+    \item 氘-氦-3反应：$^2$H + $^3$He → $^4$He + p + 18.3 MeV
+\end{itemize}
+
+\section{能量输出}
+
+核聚变释放的能量比核裂变更为巨大。1千克氘-氚混合物完全聚变释放的能量约相当于11000吨标准煤燃烧释放的能量。
+
+与核裂变相比，核聚变具有以下优点：
+\begin{itemize}[leftmargin=2cm]
+    \item 燃料来源丰富（氘来自海水）
+    \item 产生的放射性废物少
+    \item 安全性更高（不会发生失控反应）
+\end{itemize}
+
+\chapter{可控核聚变技术}
+
+\section{磁约束}
+
+磁约束是利用强磁场将高温等离子体约束在真空容器内，防止其与容器壁接触。磁场可以有效地限制带电粒子的运动。
+
+磁约束的关键是建立一个闭合的磁场结构，使等离子体能够被长时间稳定约束。
+
+\section{惯性约束}
+
+惯性约束是利用激光或粒子束瞬间加热和压缩燃料靶丸，使其在惯性作用下维持足够高的密度和温度，从而引发核聚变。
+
+惯性约束的典型实现方式是使用高功率激光照射含有氘-氚燃料的靶丸。
+
+\section{托卡马克装置}
+
+托卡马克是目前最成熟的磁约束装置。它采用环形磁场和螺旋磁场相结合的方式，将等离子体约束在环形真空室内。
+
+托卡马克的工作原理是：
+\begin{itemize}[leftmargin=2cm]
+    \item 利用变压器原理在等离子体中感应产生大电流
+    \item 电流产生的磁场与外部磁场共同作用，形成约束等离子体的磁场结构
+    \item 通过射频波或中性束注入等方式加热等离子体
+\end{itemize}
+
+\section{仿星器}
+
+仿星器是另一种磁约束装置，其磁场主要由外部线圈产生。与托卡马克不同，仿星器不需要等离子体电流来维持磁场。
+
+仿星器的优点是运行更稳定，缺点是结构更复杂，建造成本更高。
+
+\chapter{国际热核聚变实验反应堆（ITER）}
+
+\section{项目概述}
+
+ITER是一个国际合作项目，旨在建造和运行一个大型托卡马克装置，验证核聚变作为能源的可行性。
+
+ITER项目由中国、欧盟、印度、日本、韩国、俄罗斯和美国共同参与，是目前全球最大的核聚变研究项目。
+
+\section{技术方案}
+
+ITER的主要技术参数：
+\begin{itemize}[leftmargin=2cm]
+    \item 等离子体体积：840立方米
+    \item 等离子体电流：15兆安
+    \item 聚变功率：500兆瓦
+    \item 脉冲持续时间：400秒
+\end{itemize}
+
+\section{研究进展}
+
+ITER项目于2010年正式启动，目前正在法国卡达拉舍进行建设。预计2035年首次等离子体实验，2040年实现氘-氚聚变反应。
+
+ITER的成功将为未来的核聚变示范堆（DEMO）奠定基础。
+
+\part{核电站}
+
+\chapter{核反应堆类型}
+
+\section{压水堆（PWR）}
+
+压水堆是目前全球最广泛使用的核反应堆类型。其工作原理是使用水作为冷却剂和慢化剂，一回路水在高压（约15.5MPa）下保持液态，流经堆芯被加热后通过蒸汽发生器将二回路水转化为蒸汽驱动涡轮发电。
+
+\textbf{主要特点：}
+\begin{itemize}[leftmargin=2cm]
+    \item 技术成熟，运行经验丰富
+    \item 安全性高，放射性物质不易泄漏
+    \item 结构复杂，建造成本高
+    \item 一回路水需高压处理
+\end{itemize}
+
+\textbf{应用：} 中国大亚湾、秦山核电站，美国大部分核电站均采用压水堆。
+
+\section{沸水堆（BWR）}
+
+沸水堆的特点是水同时作为冷却剂和慢化剂，水在反应堆内直接沸腾产生蒸汽，蒸汽直接驱动涡轮发电。
+
+\textbf{主要特点：}
+\begin{itemize}[leftmargin=2cm]
+    \item 结构相对简单，效率较高
+    \item 不需要蒸汽发生器
+    \item 蒸汽带有放射性，涡轮系统需屏蔽
+    \item 堆芯压力较低（约7MPa）
+\end{itemize}
+
+\textbf{应用：} 美国大量使用，如福岛第一核电站。
+
+\section{重水堆（CANDU）}
+
+重水堆使用重水（D$_2$O）作为慢化剂，普通水或重水作为冷却剂，可以使用天然铀作为燃料，采用压力管式设计，可在线换料。
+
+\textbf{主要特点：}
+\begin{itemize}[leftmargin=2cm]
+    \item 燃料利用率高
+    \item 无需浓缩铀，燃料获取方便
+    \item 可不停堆换料
+    \item 重水价格昂贵
+\end{itemize}
+
+\textbf{应用：} 加拿大、印度等国使用。
+
+\section{气冷堆}
+
+气冷堆使用二氧化碳或氦气作为冷却剂，石墨作为慢化剂，镁诺克斯合金或不锈钢作为燃料包壳。
+
+\textbf{主要特点：}
+\begin{itemize}[leftmargin=2cm]
+    \item 出口温度高，效率高
+    \item 安全性好
+    \item 体积庞大
+    \item 建造成本高
+\end{itemize}
+
+\textbf{应用：} 英国早期核电站主要采用。
+
+\section{快中子堆（FBR）}
+
+快中子堆不使用慢化剂，利用快中子引发裂变，使用液态钠作为冷却剂，可以增殖燃料（将U-238转化为Pu-239）。
+
+\textbf{主要特点：}
+\begin{itemize}[leftmargin=2cm]
+    \item 燃料利用率极高
+    \item 可处理核废料
+    \item 实现核燃料增殖
+    \item 技术复杂，安全性要求高
+    \item 钠冷却剂存在火灾风险
+\end{itemize}
+
+\textbf{应用：} 法国凤凰堆、中国实验快堆。
+
+\section{高温气冷堆（HTGR）}
+
+高温气冷堆是第四代核反应堆技术，使用氦气作为冷却剂，石墨作为慢化剂，采用陶瓷燃料颗粒（TRISO）。
+
+\textbf{主要特点：}
+\begin{itemize}[leftmargin=2cm]
+    \item 出口温度高（950°C以上）
+    \item 固有安全性好
+    \item 可用于制氢等工业应用
+    \item 技术难度大
+\end{itemize}
+
+\textbf{应用：} 中国石岛湾示范工程。
+
+\section{核反应堆技术对比}
+
+\begin{table}[htbp]
+    \centering
+    \caption{核反应堆技术对比}
+    \label{tab:reactor_comparison}
+    \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    \textbf{反应堆类型} & \textbf{冷却剂} & \textbf{慢化剂} & \textbf{燃料} & \textbf{特点} \\ \hline
+    压水堆 & 水 & 水 & 低浓铀 & 技术成熟，安全性高 \\ \hline
+    沸水堆 & 水 & 水 & 低浓铀 & 结构简单，效率较高 \\ \hline
+    重水堆 & 重水/水 & 重水 & 天然铀 & 燃料利用率高，可在线换料 \\ \hline
+    气冷堆 & CO$_2$/He & 石墨 & 天然铀/低浓铀 & 温度高，效率高 \\ \hline
+    快中子堆 & 液态钠 & 无 & 高浓铀/钚 & 增殖燃料，利用率极高 \\ \hline
+    高温气冷堆 & 氦气 & 石墨 & 高浓铀/钍 & 高温，固有安全 \\ \hline
+    \end{tabular}
+\end{table}
+
+\chapter{核电站系统}
+
+\section{一回路系统}
+
+一回路系统是核电站的核心系统，负责将反应堆产生的热量传递出来。以压水堆为例，一回路系统主要包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{反应堆堆芯}：核燃料所在位置，产生裂变能量
+    \item \textbf{蒸汽发生器}：将一回路水的热量传递给二回路水，产生蒸汽
+    \item \textbf{主循环泵}：驱动一回路水循环流动
+    \item \textbf{稳压器}：维持一回路系统的压力稳定
+\end{itemize}
+
+一回路水在高压下保持液态，流经堆芯被加热后，通过蒸汽发生器将热量传递给二回路。
+
+\section{二回路系统}
+
+二回路系统负责将蒸汽发生器产生的蒸汽转化为电能。主要组成部分包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{汽轮机}：利用蒸汽的动能驱动叶轮旋转
+    \item \textbf{发电机}：将机械能转化为电能
+    \item \textbf{冷凝器}：将汽轮机排出的蒸汽冷凝成水
+    \item \textbf{给水泵}：将冷凝水送回蒸汽发生器
+\end{itemize}
+
+二回路系统与一回路系统完全隔离，确保放射性物质不会进入发电系统。
+
+\section{汽轮发电机系统}
+
+汽轮发电机系统是将热能转化为电能的关键设备。汽轮机由高压缸和低压缸组成，蒸汽依次通过高压缸和低压缸膨胀做功。
+
+发电机与汽轮机同轴连接，当汽轮机旋转时，发电机产生三相交流电。发电机输出的电能经过变压器升压后，通过输电线路输送到电网。
+
+\section{冷却系统}
+
+冷却系统用于带走核电站运行过程中产生的余热，确保设备安全运行。主要包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{循环冷却水系统}：冷却冷凝器中的蒸汽
+    \item \textbf{应急冷却系统}：在事故情况下冷却反应堆堆芯
+    \item \textbf{乏燃料池冷却系统}：冷却存放的乏燃料
+\end{itemize}
+
+冷却系统通常使用海水、河水或冷却塔进行冷却。
+
+\chapter{核电站安全}
+
+\section{安全设计原则}
+
+核电站的安全设计遵循以下基本原则：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{纵深防御}：设置多层安全屏障，即使一层失效，其他层仍能保障安全
+    \item \textbf{固有安全性}：设计上使反应堆在事故情况下能够自然趋向安全状态
+    \item \textbf{多样性}：关键系统采用不同技术实现，避免单一故障导致系统失效
+    \item \textbf{可靠性}：设备和系统设计具有高可靠性和冗余度
+\end{itemize}
+
+\section{多重屏障}
+
+核电站设置了多重屏障来防止放射性物质泄漏：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{第一道屏障}：燃料包壳，通常由锆合金制成，包裹核燃料芯块
+    \item \textbf{第二道屏障}：反应堆压力容器，承受高温高压
+    \item \textbf{第三道屏障}：安全壳，一个坚固的混凝土结构，包围整个反应堆
+\end{itemize}
+
+这些屏障确保即使发生事故，放射性物质也不会释放到环境中。
+
+\section{应急冷却系统}
+
+应急冷却系统是核电站的重要安全设施，用于在事故情况下冷却反应堆堆芯：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{紧急堆芯冷却系统（ECCS）}：在失去冷却剂事故时向堆芯注入冷却水
+    \item \textbf{安全注入系统}：向一回路注入高压冷却水
+    \item \textbf{余热排出系统}：带走堆芯的衰变热
+\end{itemize}
+
+应急冷却系统通常采用重力驱动或备用电源驱动，确保在断电情况下仍能工作。
+
+\section{辐射监测}
+
+辐射监测系统用于监测核电站内外的辐射水平：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{区域监测}：监测核电站各区域的辐射剂量
+    \item \textbf{个人剂量监测}：监测工作人员的辐射暴露
+    \item \textbf{环境监测}：监测核电站周边环境的辐射水平
+\end{itemize}
+
+辐射监测数据实时传输到控制室，确保及时发现异常情况。
+
+\part{核武器}
+
+\chapter{原子弹}
+
+\section{枪式结构}
+
+枪式结构是最早的原子弹设计方案。其原理是将两块次临界质量的裂变材料（通常是铀-235）分开存放，引爆时通过常规炸药将其中一块高速射向另一块，使其合并达到临界质量，引发链式反应。
+
+枪式结构的优点是设计简单、可靠性高，但缺点是燃料利用率低，约只有1-2\%的燃料发生裂变。美国第一颗原子弹"小男孩"就是采用枪式结构。
+
+\section{内爆式结构}
+
+内爆式结构是一种更高效的原子弹设计。其原理是将一块接近临界质量的裂变材料（通常是钚-239）用常规炸药包围，引爆时通过精确控制的爆炸波将材料压缩，使其密度增加达到临界状态。
+
+内爆式结构的优点是燃料利用率高（约10-20\%），可以使用钚作为燃料。美国第一颗钚弹"胖子"就是采用内爆式结构。
+
+\chapter{氢弹}
+
+\section{热核聚变原理}
+
+氢弹是利用核聚变反应释放能量的武器。其原理是首先用原子弹引爆产生高温高压，使氘-氚混合物发生聚变反应，释放出巨大能量。
+
+氢弹的威力远大于原子弹，可达数百万吨甚至数千万吨TNT当量。
+
+\section{多级弹设计}
+
+现代氢弹通常采用多级设计：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{初级}：一个小型原子弹，用于引爆聚变燃料
+    \item \textbf{次级}：包含氘-氚燃料的聚变组件
+    \item \textbf{辐射内爆}：利用原子弹爆炸产生的X射线压缩次级
+\end{itemize}
+
+多级设计可以实现极高的爆炸威力。
+
+\chapter{核试验}
+
+\section{大气层核试验}
+
+大气层核试验是在地球表面或大气层中进行的核试验。这种试验方式会产生巨大的蘑菇云，并向环境释放大量放射性物质。
+
+大气层核试验对环境和人类健康造成严重影响，因此已被国际社会禁止。
+
+\section{地下核试验}
+
+地下核试验是在地下深处进行的核试验。这种试验方式可以减少放射性物质向环境的释放，但仍然会产生地震波和地下放射性污染。
+
+地下核试验是目前唯一被允许的核试验方式，但也受到国际条约的严格限制。
+
+\section{核禁试条约}
+
+为了限制核武器的发展和扩散，国际社会签署了一系列核禁试条约：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{部分禁止核试验条约（PTBT）}：1963年签署，禁止在大气层、外层空间和水下进行核试验
+    \item \textbf{全面禁止核试验条约（CTBT）}：1996年签署，禁止所有形式的核试验
+\end{itemize}
+
+目前，CTBT尚未完全生效，但大多数国家已暂停核试验。
+
+\part{核辐射防护}
+
+\chapter{辐射类型与剂量}
+
+\section{辐射类型}
+
+辐射根据其性质可分为电离辐射和非电离辐射。与核能相关的主要是电离辐射：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{$\alpha$粒子}：氦原子核，穿透能力弱，一张纸即可阻挡，但在体内危害大
+    \item \textbf{$\beta$粒子}：高速电子，穿透能力较强，可被铝箔或几毫米厚的塑料阻挡
+    \item \textbf{$\gamma$射线}：高能光子，穿透能力极强，需要厚铅或混凝土屏蔽
+    \item \textbf{中子}：不带电粒子，穿透能力强，需要含氢材料（如水、石蜡）屏蔽
+\end{itemize}
+
+\section{剂量单位}
+
+辐射剂量是衡量辐射对人体影响的物理量：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{戈瑞（Gy）}：吸收剂量单位，表示单位质量物质吸收的辐射能量
+    \item \textbf{希沃特（Sv）}：当量剂量单位，考虑了不同辐射类型的生物效应
+    \item \textbf{毫希沃特（mSv）}：1 Sv = 1000 mSv
+\end{itemize}
+
+\section{剂量限值}
+
+国际辐射防护委员会（ICRP）制定了辐射剂量限值：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{职业照射}：年有效剂量不超过20 mSv（5年内平均值）
+    \item \textbf{公众照射}：年有效剂量不超过1 mSv
+    \item \textbf{特殊照射}：在特殊情况下可适当提高限值，但需严格控制
+\end{itemize}
+
+\chapter{辐射防护原则}
+
+\section{时间防护}
+
+时间防护是指尽量减少人员在辐射场中的停留时间。辐射剂量与暴露时间成正比，缩短时间可有效降低剂量。
+
+在放射性工作中，应制定合理的工作计划，提高工作效率，减少不必要的停留时间。
+
+\section{距离防护}
+
+距离防护是指尽量增大与辐射源的距离。辐射强度与距离的平方成反比，距离增加一倍，辐射强度降低为原来的四分之一。
+
+在操作放射性物质时，应使用长柄工具或遥控设备，保持安全距离。
+
+\section{屏蔽防护}
+
+屏蔽防护是指在人员与辐射源之间设置屏蔽材料，减弱辐射强度。不同辐射类型需要不同的屏蔽材料：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{$\alpha$辐射}：纸张、手套即可
+    \item \textbf{$\beta$辐射}：铝箔、塑料板
+    \item \textbf{$\gamma$辐射}：铅板、混凝土墙
+    \item \textbf{中子辐射}：水、石蜡、聚乙烯
+\end{itemize}
+
+\chapter{辐射监测}
+
+\section{个人剂量监测}
+
+个人剂量监测用于评估工作人员的辐射暴露水平：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{个人剂量计}：佩戴在胸前，测量累积剂量
+    \item \textbf{热释光剂量计（TLD）}：常用的个人剂量监测设备
+    \item \textbf{胶片剂量计}：利用胶片感光测量剂量
+\end{itemize}
+
+个人剂量监测数据应定期记录和分析，确保不超过剂量限值。
+
+\section{环境监测}
+
+环境监测用于评估放射性物质向环境的释放情况：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{空气监测}：监测空气中的放射性气溶胶
+    \item \textbf{水监测}：监测水体中的放射性浓度
+    \item \textbf{土壤监测}：监测土壤中的放射性污染
+\end{itemize}
+
+环境监测数据是评估核电站周边环境安全的重要依据。
+
+\section{去污技术}
+
+去污技术用于去除物体表面的放射性污染：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{物理去污}：擦拭、冲洗、打磨
+    \item \textbf{化学去污}：使用去污剂溶解污染物
+    \item \textbf{电化学去污}：利用电解原理去除污染
+\end{itemize}
+
+去污操作应遵循相关安全规程，防止二次污染。
+
+\part{核废料处理}
+
+\chapter{核废料分类}
+
+\section{高水平放射性废料}
+
+高水平放射性废料是指放射性强度极高的废料，主要来自核反应堆的乏燃料和核燃料后处理过程。
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{来源}：乏燃料、核燃料后处理产生的高放废液
+    \item \textbf{特点}：放射性强、发热量大、半衰期长（数千年至数百万年）
+    \item \textbf{处理要求}：需要长期安全隔离，防止放射性泄漏
+\end{itemize}
+
+\section{中水平放射性废料}
+
+中水平放射性废料的放射性强度介于高水平和低水平之间。
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{来源}：反应堆部件、化学处理废液、离子交换树脂
+    \item \textbf{特点}：放射性中等、发热量较低
+    \item \textbf{处理要求}：需要适当的屏蔽和隔离
+\end{itemize}
+
+\section{低水平放射性废料}
+
+低水平放射性废料是指放射性强度较低的废料。
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{来源}：放射性实验室废弃物、防护用品、去污废物
+    \item \textbf{特点}：放射性低、危害较小
+    \item \textbf{处理要求}：可进行浓缩、固化后浅地层处置
+\end{itemize}
+
+\chapter{废料处理方法}
+
+\section{固化处理}
+
+固化处理是将液态或气态放射性废物转化为固体形式，以便于储存和处置。
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{玻璃固化}：将高放废液与玻璃原料混合，高温熔融后形成玻璃固化体
+    \item \textbf{水泥固化}：将中低放废物与水泥混合，形成稳定的水泥块
+    \item \textbf{沥青固化}：将废物与沥青混合，形成沥青固化体
+\end{itemize}
+
+\section{深地层处置}
+
+深地层处置是将高放废物永久隔离在地下深处的地质层中。
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{处置深度}：通常在地下500-1000米
+    \item \textbf{地质选择}：选择稳定的地质层，如花岗岩、粘土岩、盐层
+    \item \textbf{屏障设计}：设置多层屏障，包括废物包装、缓冲材料、地质层
+\end{itemize}
+
+深地层处置是目前国际上公认的高放废物最终处置方案。
+
+\section{核废料储存}
+
+核废料储存包括短期储存和长期储存：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{短期储存}：乏燃料在反应堆现场的水池中储存，冷却一段时间
+    \item \textbf{中期储存}：将乏燃料转移到专用的储存设施
+    \item \textbf{长期储存}：最终处置到深地层repository
+\end{itemize}
+
+核废料储存需要考虑散热、屏蔽和安全监测。
+
+\part{核能发展史}
+
+\chapter{核物理的发现}
+
+\section{放射性研究}
+
+1896年，法国物理学家亨利·贝克勒尔发现了放射性现象，这是人类首次观察到原子核的变化。随后，玛丽·居里和皮埃尔·居里对放射性进行了深入研究，发现了钋和镭等放射性元素。
+
+1911年，欧内斯特·卢瑟福通过$\alpha$粒子散射实验提出了原子核结构模型，证明了原子中心存在一个质量大、体积小的原子核。
+
+\section{核裂变的发现}
+
+1938年，奥托·哈恩和弗里茨·斯特拉斯曼发现了铀核的裂变现象。他们观察到铀核在吸收中子后分裂成两个较轻的原子核，并释放出大量能量。
+
+莉泽·迈特纳和奥托·弗里施对这一现象进行了解释，提出了核裂变理论，并计算出裂变释放的巨大能量。
+
+\chapter{曼哈顿计划}
+
+\section{计划背景}
+
+第二次世界大战期间，美国担心纳粹德国会率先研制出核武器，于是启动了曼哈顿计划，旨在研制原子弹。
+
+1942年，曼哈顿计划正式启动，由罗伯特·奥本海默领导，汇集了当时世界上最顶尖的科学家。
+
+\section{主要成就}
+
+曼哈顿计划取得了重大成就：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 1945年7月16日，第一颗原子弹在新墨西哥州试爆成功
+    \item 1945年8月6日和9日，美国在广岛和长崎投下两颗原子弹
+    \item 奠定了核物理和核工程的基础
+\end{itemize}
+
+曼哈顿计划标志着人类进入了核时代。
+
+\chapter{核能和平利用}
+
+\section{核电站的发展}
+
+1954年，苏联建成了世界上第一座商用核电站——奥布宁斯克核电站，开启了核能和平利用的新纪元。
+
+此后，核电站在全球范围内迅速发展：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 1957年，美国建成希平港核电站
+    \item 1960年代，核电技术逐渐成熟
+    \item 1970-1980年代，全球核电快速发展
+    \item 2011年福岛事故后，核电发展进入调整期
+\end{itemize}
+
+\section{核动力舰艇}
+
+除了发电，核能还被用于驱动舰艇：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{核潜艇}：美国"鹦鹉螺"号是世界上第一艘核潜艇，1954年下水
+    \item \textbf{核动力航母}：美国"企业"号是世界上第一艘核动力航母
+    \item \textbf{核动力破冰船}：苏联"列宁"号是世界上第一艘核动力破冰船
+\end{itemize}
+
+核动力舰艇具有续航能力强、速度快等优点。
+
+\part{核能现状与展望}
+
+\chapter{世界核能发展现状}
+
+\section{核电比例}
+
+截至2023年，全球共有约440座运行中的核反应堆，总装机容量约400吉瓦，约占全球发电量的10\%。
+
+主要核电国家包括：
+\begin{itemize}[leftmargin=2cm]
+    \item 美国：约92座反应堆，占全球核电容量的30\%
+    \item 法国：约56座反应堆，核电占国内发电量的70\%以上
+    \item 中国：约55座反应堆，是全球核电发展最快的国家
+    \item 日本：约33座反应堆（福岛事故后大部分停运）
+\end{itemize}
+
+\section{技术路线}
+
+目前全球核电主要采用的技术路线包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{压水堆}：最成熟的技术，占全球核电容量的约60\%
+    \item \textbf{沸水堆}：主要在美国和日本使用
+    \item \textbf{重水堆}：加拿大、印度等国使用
+    \item \textbf{快中子堆}：处于示范阶段
+\end{itemize}
+
+\section{核安全事件}
+
+历史上发生过几次重大核安全事件：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{1979年三里岛事故}：美国，堆芯部分熔化，无人员伤亡
+    \item \textbf{1986年切尔诺贝利事故}：苏联，严重事故，造成大量人员伤亡和环境破坏
+    \item \textbf{2011年福岛事故}：日本，海啸导致冷却系统失效，放射性泄漏
+\end{itemize}
+
+这些事故促使国际社会加强核安全标准。
+
+\chapter{核能未来展望}
+
+\section{第四代核电站}
+
+第四代核电站是新一代核反应堆技术，具有更高的安全性和经济性：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{高温气冷堆}：固有安全性好，可用于制氢
+    \item \textbf{快中子堆}：可实现核燃料增殖
+    \item \textbf{熔盐堆}：使用液态燃料，安全性高
+\end{itemize}
+
+\section{小型模块化反应堆}
+
+小型模块化反应堆（SMR）是近年来发展的新方向：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 容量较小（通常小于300兆瓦）
+    \item 模块化设计，便于批量生产
+    \item 建设周期短，投资风险低
+    \item 适用于分布式能源系统
+\end{itemize}
+
+\section{核聚变商业化}
+
+核聚变被认为是未来能源的终极解决方案：
+
+\begin{itemize}[leftmargin=2cm]
+    \item ITER项目正在建设中，预计2040年实现氘-氚聚变
+    \item 商业化示范堆（DEMO）预计2050年左右建成
+    \item 核聚变具有燃料丰富、清洁、安全等优点
+\end{itemize}
+
+\chapter{中国的核能发展}
+
+\section{核电发展历程}
+
+中国的核电发展经历了几个阶段：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{起步阶段（1980-1990年代）}：建成秦山和大亚湾核电站
+    \item \textbf{发展阶段（2000-2010年代）}：大规模建设压水堆
+    \item \textbf{创新阶段（2020年至今）}：发展自主技术，建设华龙一号
+\end{itemize}
+
+\section{技术路线选择}
+
+中国选择了压水堆为主的技术路线，并发展自主知识产权：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{华龙一号}：中国自主研发的第三代压水堆
+    \item \textbf{高温气冷堆}：石岛湾示范工程
+    \item \textbf{快中子堆}：实验快堆和示范快堆
+\end{itemize}
+
+\section{未来规划}
+
+中国计划在2030年前将核电装机容量提升至120吉瓦，2060年前达到200吉瓦以上。
+
+未来发展方向包括：
+\begin{itemize}[leftmargin=2cm]
+    \item 继续发展压水堆
+    \item 推进第四代核电技术
+    \item 参与核聚变研究
+\end{itemize}
+
+\part{核安全与监管}
+
+\chapter{核安全监管体系}
+
+\section{国际原子能机构}
+
+国际原子能机构（IAEA）是负责全球核安全与和平利用核能的国际组织：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 成立于1957年，总部位于维也纳
+    \item 制定核安全标准和导则
+    \item 开展核安全评估和审查
+    \item 促进核技术合作与信息交流
+\end{itemize}
+
+IAEA通过《核安全公约》和《乏燃料管理安全和放射性废物管理安全联合公约》等国际公约推动全球核安全合作。
+
+\section{各国监管机构}
+
+各国都建立了专门的核安全监管机构：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{美国}：核管理委员会（NRC）
+    \item \textbf{法国}：核安全局（ASN）
+    \item \textbf{中国}：国家核安全局
+    \item \textbf{日本}：原子力规制委员会
+\end{itemize}
+
+这些机构负责颁发许可证、监督运行、处理事故等。
+
+\chapter{核事故}
+
+\section{三里岛事故}
+
+1979年3月28日，美国宾夕法尼亚州三里岛核电站发生事故：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 由于冷却系统故障，堆芯部分熔化
+    \item 放射性物质少量泄漏
+    \item 无人员死亡，辐射暴露剂量较低
+\end{itemize}
+
+事故后美国加强了核电安全标准。
+
+\section{切尔诺贝利事故}
+
+1986年4月26日，苏联切尔诺贝利核电站发生严重事故：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 由于操作失误和设计缺陷，反应堆爆炸
+    \item 大量放射性物质释放到环境中
+    \item 直接死亡约31人，长期影响估计数万人
+\end{itemize}
+
+切尔诺贝利事故是历史上最严重的核事故。
+
+\section{福岛核事故}
+
+2011年3月11日，日本福岛第一核电站发生事故：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 东日本大地震引发海啸，淹没了核电站
+    \item 冷却系统失效，导致堆芯熔化
+    \item 放射性物质泄漏到海洋和大气
+\end{itemize}
+
+福岛事故导致日本大部分核电站停运。
+
+\section{经验教训}
+
+从历次核事故中吸取的经验教训：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 加强安全设计，考虑极端自然灾害
+    \item 完善应急响应机制
+    \item 提高操作员培训水平
+    \item 加强国际合作与信息共享
+\end{itemize}
+
+\chapter{核应急预案}
+
+\section{应急响应体系}
+
+核应急预案包括多个层次：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{场内应急}：核电站内部的应急响应
+    \item \textbf{场外应急}：地方政府的应急响应
+    \item \textbf{国家应急}：国家级的应急协调
+\end{itemize}
+
+应急响应体系包括预警、评估、决策、执行等环节。
+
+\section{疏散计划}
+
+疏散计划是核应急预案的重要组成部分：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 确定疏散范围和路线
+    \item 准备疏散交通工具
+    \item 安排临时安置点
+    \item 通知和引导公众疏散
+\end{itemize}
+
+疏散计划需要定期演练和更新。
+
+\section{应急设施}
+
+应急设施包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{应急指挥中心}：协调应急响应
+    \item \textbf{监测站}：监测辐射水平
+    \item \textbf{去污设施}：处理污染
+    \item \textbf{医疗设施}：救治受伤人员
+\end{itemize}
+
+这些设施需要保持良好状态，随时可用。
+
+\part{核能经济与环境}
+
+\chapter{核能经济性}
+
+\section{建设成本}
+
+核电站的建设成本较高，主要包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{设备成本}：反应堆、汽轮机、发电机等核心设备
+    \item \textbf{土建成本}：安全壳、厂房等建筑
+    \item \textbf{融资成本}：建设周期长，利息支出大
+    \item \textbf{许可和监管成本}：安全审查、环境评估等
+\end{itemize}
+
+建设成本通常占核电站全生命周期成本的大部分。
+
+\section{运行成本}
+
+核电站的运行成本相对较低，主要包括：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{燃料成本}：核燃料的采购和处理
+    \item \textbf{运维成本}：设备维护、人员工资等
+    \item \textbf{废物处理成本}：放射性废物的处理和处置
+\end{itemize}
+
+由于燃料成本低，核电站的运行成本远低于化石燃料电站。
+
+\section{退役成本}
+
+核电站退役是一个复杂而昂贵的过程：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{拆除成本}：拆除反应堆和厂房
+    \item \textbf{去污成本}：去除放射性污染
+    \item \textbf{废物处置成本}：处理退役产生的废物
+\end{itemize}
+
+退役成本需要提前预留，通常计入电价。
+
+\chapter{核能与环境}
+
+\section{温室气体排放}
+
+核能是一种低碳能源，在发电过程中几乎不产生温室气体：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 核燃料循环的温室气体排放主要来自采矿和加工
+    \item 相比化石燃料，核能的碳强度非常低
+    \item 发展核能有助于应对气候变化
+\end{itemize}
+
+\section{土地利用}
+
+核电站的土地利用效率较高：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 一座1000兆瓦核电站占地约1-2平方公里
+    \item 相比太阳能和风能，单位发电量占地更少
+    \item 核废料储存需要一定的土地
+\end{itemize}
+
+\section{环境影响评价}
+
+核电站建设前需要进行全面的环境影响评价：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 评估对生态系统的影响
+    \item 评估放射性物质释放的风险
+    \item 评估水资源利用和排放
+\end{itemize}
+
+环境影响评价是核电站审批的重要环节。
+
+\part{核技术应用}
+
+\chapter{核技术在工业的应用}
+
+\section{无损检测}
+
+无损检测是利用辐射检测材料内部缺陷而不损坏材料的技术：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{射线检测}：使用X射线或$\gamma$射线检测焊缝、铸件等
+    \item \textbf{中子检测}：检测厚金属部件和复合材料
+    \item \textbf{工业CT}：三维成像检测复杂结构
+\end{itemize}
+
+无损检测广泛应用于航空航天、核电、石油化工等领域。
+
+\section{辐射加工}
+
+辐射加工是利用电离辐射处理材料的技术：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{辐射灭菌}：医疗用品、食品的消毒灭菌
+    \item \textbf{材料改性}：改变聚合物的性能
+    \item \textbf{废水处理}：降解有机污染物
+\end{itemize}
+
+辐射加工具有高效、环保的特点。
+
+\chapter{核技术在医疗的应用}
+
+\section{放射性治疗}
+
+放射性治疗是利用放射性物质治疗疾病的方法：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{外照射治疗}：使用$\gamma$射线或电子束照射肿瘤
+    \item \textbf{内照射治疗}：将放射性药物注入体内
+    \item \textbf{放射性碘治疗}：治疗甲状腺疾病
+\end{itemize}
+
+放射性治疗是癌症治疗的重要手段之一。
+
+\section{医学影像}
+
+医学影像技术利用放射性物质生成人体内部图像：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{X光摄影}：骨骼和肺部检查
+    \item \textbf{CT扫描}：断层成像
+    \item \textbf{核医学成像}：PET、SPECT等功能成像
+\end{itemize}
+
+医学影像帮助医生准确诊断疾病。
+
+\chapter{核技术在农业的应用}
+
+\section{辐射育种}
+
+辐射育种是利用辐射诱变培育新品种的技术：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 利用$\gamma$射线、中子等照射种子
+    \item 诱发基因突变，筛选优良性状
+    \item 培育高产、抗病、优质的作物品种
+\end{itemize}
+
+辐射育种已培育出许多优良农作物品种。
+
+\section{食品辐照}
+
+食品辐照是利用辐射处理食品的技术：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 杀灭细菌、寄生虫等有害生物
+    \item 延长食品保质期
+    \item 抑制发芽（如土豆、洋葱）
+\end{itemize}
+
+食品辐照是一种安全有效的食品处理方法。
+
+\chapter{核技术在科研的应用}
+
+\section{同位素示踪}
+
+同位素示踪是利用放射性同位素追踪物质运动的技术：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 在化学、生物学中追踪反应过程
+    \item 在环境科学中追踪污染物迁移
+    \item 在医学中研究药物代谢
+\end{itemize}
+
+同位素示踪是一种灵敏度极高的分析方法。
+
+\section{中子散射}
+
+中子散射是研究物质结构的重要手段：
+
+\begin{itemize}[leftmargin=2cm]
+    \item 利用中子与物质的相互作用研究结构
+    \item 研究材料的微观结构和动态过程
+    \item 应用于材料科学、凝聚态物理等领域
+\end{itemize}
+
+中子散射需要使用核反应堆或散裂中子源。
+
+\section{粒子加速器}
+
+粒子加速器是加速带电粒子的设备：
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{直线加速器}：直线加速粒子
+    \item \textbf{回旋加速器}：利用磁场回旋加速
+    \item \textbf{同步加速器}：高能物理研究
+\end{itemize}
+
+粒子加速器广泛应用于科研、医疗和工业领域。
+
+\appendix
+
+\chapter{核物理基本常数}
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{光速}：$c = 2.99792458 \times 10^8$ m/s
+    \item \textbf{普朗克常数}：$h = 6.62607015 \times 10^{-34}$ J·s
+    \item \textbf{玻尔半径}：$a_0 = 0.529177210903 \times 10^{-10}$ m
+    \item \textbf{电子质量}：$m_e = 9.1093837015 \times 10^{-31}$ kg
+    \item \textbf{质子质量}：$m_p = 1.67262192369 \times 10^{-27}$ kg
+    \item \textbf{中子质量}：$m_n = 1.67492749804 \times 10^{-27}$ kg
+    \item \textbf{阿伏伽德罗常数}：$N_A = 6.02214076 \times 10^{23}$ mol$^{-1}$
+    \item \textbf{玻尔兹曼常数}：$k = 1.380649 \times 10^{-23}$ J/K
+    \item \textbf{精细结构常数}：$\alpha \approx 1/137.035999084$
+    \item \textbf{电子电荷}：$e = 1.602176634 \times 10^{-19}$ C
+\end{itemize}
+
+\chapter{核安全重要术语}
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{ALARA原则}：As Low As Reasonably Achievable，合理可行尽量低原则
+    \item \textbf{纵深防御}：多层安全屏障设计理念
+    \item \textbf{临界质量}：维持链式反应所需的最小燃料质量
+    \item \textbf{乏燃料}：使用过的核燃料
+    \item \textbf{安全壳}：包围反应堆的坚固结构
+    \item \textbf{衰变热}：核燃料衰变产生的热量
+    \item \textbf{剂量限值}：允许的最大辐射剂量
+    \item \textbf{多重屏障}：防止放射性泄漏的多层防护
+    \item \textbf{应急冷却系统}：事故情况下冷却堆芯的系统
+    \item \textbf{辐射监测}：监测辐射水平的系统
+\end{itemize}
+
+\chapter{相关法规标准}
+
+\section{国际公约}
+\begin{itemize}[leftmargin=2cm]
+    \item 《核安全公约》
+    \item 《乏燃料管理安全和放射性废物管理安全联合公约》
+    \item 《全面禁止核试验条约》
+    \item 《不扩散核武器条约》
+\end{itemize}
+
+\section{国际标准}
+\begin{itemize}[leftmargin=2cm]
+    \item IAEA安全标准系列
+    \item ISO核安全相关标准
+    \item ICRP辐射防护建议书
+\end{itemize}
+
+\section{中国法规}
+\begin{itemize}[leftmargin=2cm]
+    \item 《中华人民共和国核安全法》
+    \item 《放射性污染防治法》
+    \item 《核动力厂设计安全规定》
+    \item 《核电厂辐射防护规定》
+\end{itemize}
+
+\begin{thebibliography}{99}
+\bibitem{IAEA} International Atomic Energy Agency. Nuclear Safety Standards.
+\bibitem{ICRP} International Commission on Radiological Protection. Recommendations.
+\bibitem{NRC} U.S. Nuclear Regulatory Commission. Regulatory Guides.
+\bibitem{CNNC} China National Nuclear Corporation. Technical Reports.
+\end{thebibliography}
+
+\end{document}

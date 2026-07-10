@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">6.4　常用的Dialplan App</font>
+</font>
+</p>
+<p height="1em" width="2em">通过前面几节我们熟悉了各种Dialplan，并知道Dialplan最终会找到并返回一组App，实际的呼叫行为全部是由这些App来控制的。FreeSWITCH中有超过140个App，不过最常用的不是很多，在此我们对几个常用的、有代表性App进行讲解。</p>
+<p height="1em" width="2em">（1）set</p>
+<p height="1em" width="2em">set用于设置一个通道变量，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="my_var=123456"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（2）echo</p>
+<p height="1em" width="2em">echo即回声，这个我们已经很熟悉了，它在调试的时候比较有用，例如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action applicatioin="echo"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（3）info</p>
+<p height="1em" width="2em">info在调试的时候也比较有用，它会在日志中打印全部的通道变量，例如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action applicaiton="info"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（4）answer</p>
+<p height="1em" width="2em">answer用于应答一路呼叫。FreeSWITCH做被叫时，如果想给主叫方放音，则必须应答后才可以（在SIP中是200消息，第7章会讲到），例如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="answer"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有些App（如conference或fifo等）会隐含应答，因而不需要明确的应答。但有些App（如playback和ivr等）则不会隐含应答，因而需要明确的应答（answer）。</p>
+<p height="1em" width="2em">在前面的章节我们也了解到，bridge是一个比较特殊的App，它会再发起一路呼叫b-leg，如果b-leg应答，它会将b-leg的应答传递给a-leg，进而给主叫用户发送应答消息。</p>
+<p height="1em" width="2em">一般来说，运营商都把应答时间作为计费的开始时间。所以在上面的例子中，如果A呼叫B，只有B应答后，应答消息才会发给A，因此只有B应答了才开始计费。</p>
+<p height="1em" width="2em">（5）bridge</p>
+<p height="1em" width="2em">bridge负责桥接另一条腿（b-leg），它的参数是一个呼叫字符串：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="user/1000"&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">bridge操作是阻塞的，它会一直等到b-leg释放后才继续往下走。</p>
+<p height="1em" width="2em">（6）playback</p>
+<p height="1em" width="2em">playback用于给Channel放音。比如，如果需要对主叫放音，我们可以这样使用playback：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="playback" data="/tmp/test.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它的参数是声音文件的路径。一般的声音文件是.wav格式的。如果要播放多个文件，可以串联操作，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="playback" data="/tmp/test1.wav"/&gt;<br/>
+<br/>
+&lt;action application="playback" data="/tmp/test2.wav"/&gt;<br/>
+<br/>
+&lt;action application="playback" data="/tmp/test3.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以通过file_string <sup>
+<small>
+<a href="text00058.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 协议来串联，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="playback" <br/>
+<br/>
+data="file_string:///tmp/test1.wav!/tmp/test2.wav!/tmp/test3.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“!”是文件名的分隔符，如果想使用其他分隔符，可以在playback之前使用以下Chan Var指定。另外，也可以指定多个文件间播放的时间间隔，如下代码会将文件名分隔符改成“|”，并把时间间隔改为500毫秒：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="playback_delimiter=!"/&gt;<br/>
+<br/>
+&lt;action application="set" data="playback_sleep_val=500"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，通过mod_shout模块，也可以支持本地或远程HTTP或Shout Cast服务器上的.mp3格式的文件，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="playback" data="/tmp/test.mp3"/&gt;<br/>
+<br/>
+&lt;action application="playback" data="http://localhost/test.mp3"/&gt;<br/>
+<br/>
+&lt;action application="playback" data="shout://localhost/test.mp3"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在播放过程中，用户可以按“*”号键停止播放，或在播放前通过Chan Var选择其他按键完成此功能：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="playback_terminators=1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以使用如下方法取消按键中断的方式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="playback_terminators=none"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（7）sleep</p>
+<p height="1em" width="2em">sleep用于设置可以等待/暂停的一段时间，单位默为毫秒：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="sleep" data="1000"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（8）ring_ready</p>
+<p height="1em" width="2em">ring_ready用于在SIP中给对方回180消息，即通知对方可以振铃了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="ring_ready" data="1000"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（9）pre_answer</p>
+<p height="1em" width="2em">pre_answer用于在SIP中给对方回183消息，后续的playback之类的动作将作为早期媒体（Early Media）给对方发过去，如彩铃音：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="ring_ready" data="1000"/&gt;<br/>
+<br/>
+&lt;action application="playback" data="/tmp/music.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">注意，虽然FreeSWITCH可以把媒体发给对方，但如果在一定时间内（通常60秒）没有应答，对端通常也会挂断该通话。</p>
+<p height="1em" width="2em">（10）read</p>
+<p height="1em" width="2em">read用于实现播放声音并且等待接收DTMF按键，它的格式是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;min&gt; &lt;max&gt; &lt;sound file&gt; &lt;variable name&gt; &lt;timeout&gt; &lt;terminators&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中：</p>
+<p height="1em" width="2em">·min：最少收号位数。</p>
+<p height="1em" width="2em">·max：最大收号位数。</p>
+<p height="1em" width="2em">·sound file：要播放的声音文件。</p>
+<p height="1em" width="2em">·variable name：收到用户按键后存到哪个变量里。</p>
+<p height="1em" width="2em">·timeout：等待每一位的输入超时毫秒数。</p>
+<p height="1em" width="2em">·terminators：收号小于min位时，按该键可以提前结束，通常是“#”。</p>
+<p height="1em" width="2em">例如，我们可以播放“您好，请输入身份证号，以#号结束（身份证号是15或18位的）”：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="answer"/&gt;<br/>
+<br/>
+&lt;action application="read" data="15 18 /tmp/input-id-card.wav <br/>
+<br/>
+id_card_num 5000 #"/&gt;<br/>
+<br/>
+&lt;action application="log" data="INFO ID Card Number: ${id_card_num}"/&gt;<br/>
+<br/>
+&lt;action application="info"/&gt;<br/>
+<br/>
+&lt;action application="hangup"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">（11）play_and_get_digits</p>
+<p height="1em" width="2em">play_and_get_digits与read类似，但它比read更高级，我们先来看一下它的参数（其中，方括号内是可选参数）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;min&gt; &lt;max&gt; &lt;tries&gt; &lt;timeout&gt; &lt;terminators&gt; &lt;file&gt; &lt;invalid_file&gt;<br/>
+<br/>
+&lt;var_name&gt; &lt;regex&gt;<br/>
+<br/>
+[&lt;digit_timeout&gt;] ['&lt;failure_ext&gt; [failure_dp[failure_context]]']<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它的作用也是播放一段语音等待收号，与read不同的是，它收到后会跟正则表达式比较，如果不匹配，则播放invalid_file所指定的声音（如“输入错误，请重新输入”），然后重新等待输入。重试次数由tries参数指定。</p>
+<p height="1em" width="2em">play_and_get_digits大部分参数都与read的类似，具体如下：</p>
+<p height="1em" width="2em">·min：最少收号位数。</p>
+<p height="1em" width="2em">·max：最大收号位数。</p>
+<p height="1em" width="2em">·tries：重试次数。</p>
+<p height="1em" width="2em">·timeout：收齐全部位数的超时。</p>
+<p height="1em" width="2em">·terminators：结束符。</p>
+<p height="1em" width="2em">·file：要播放的声音文件。</p>
+<p height="1em" width="2em">·invalid_file：输入错误时播放的提示音文件。</p>
+<p height="1em" width="2em">·var_name：变量名。</p>
+<p height="1em" width="2em">·regex：正则表达式。</p>
+<p height="1em" width="2em">·digit_timeout（可选）：位间间隔。</p>
+<p height="1em" width="2em">·failure_ext（可选）：若最后输入错误则转到该Extension。</p>
+<p height="1em" width="2em">·failure_dp（可选）：输入错误时转到的Dialplan。</p>
+<p height="1em" width="2em">·failure_context（可选）：输入错误时转到的Dialplan Context。</p>
+<p height="1em" width="2em">如上面输入身份证明的例子，我们可以允许用户重试3次，使用play_and_get_digits实现的方法如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="play_and_get_digits"<br/>
+<br/>
+    data="15 18 3 10000 # /tmp/input-id-card.wav /tmp/invalid_num.wav<br/>
+<br/>
+    id_card_num (^\d{15}$)|(^\d{17}([0-9]|X)$)"/&gt;<br/>
+<br/>
+&lt;action application="log" data="INFO ID Card Number: ${my_digits}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="10pt" width="0pt" align="justify">
+<a href="text00057.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 参见https://wiki.freeswitch.org/wiki/Mod_file_string</p>
+</body>
+</html>

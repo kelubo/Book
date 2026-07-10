@@ -1,0 +1,850 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">7.3　SIP呼叫流程</font>
+</font>
+</p>
+<p height="1em" width="2em">上一节，我们讨论了SIP注册。SIP UA向FreeSWITCH注册的主要是为了在呼叫时FreeSWITCH能够找到它。SIP的主要意义也是“处理会话的发起和终结”，通俗地讲就是处理和控制呼叫。下面我们就来讨论几个典型的SIP呼叫流程。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">7.3.1　UA间直接呼叫</font>
+</font>
+</p>
+<p height="1em" width="2em">前面我们讲过，SIP的UA都是平等的，如果一方知道另一方的地址，就可以通信。我们先来做一个实验。在笔者的机器上，启动了两个软电话（UA），一个是Bob的X-Lite（左），另一个是Alice的Zoiper。它们的IP地址都是192.168.4.4，而端口号分别是26000和5090，当Bob呼叫Alice时，它只需直接呼叫Alice的SIP地址sip:Alice@192.168.4.4:5090 <sup>
+<small>
+<a href="text00065.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。如图7-5所示，Alice的电话正在振铃。</p>
+<p height="1em" width="0pt" align="center"><img align="baseline" height="510" width="813" src="Image00016.jpg" />
+</p>
+<p height="4pt" width="0pt" align="center">图7-5　SIP UA间直接呼叫</p>
+<p height="1em" width="2em">详细的呼叫流程如图7-6所示。</p>
+<p height="1em" width="0pt" align="center"><img align="baseline" height="443" width="765" src="Image00017.jpg" />
+</p>
+<p height="4pt" width="0pt" align="center">图7-6　SIP UA间直接呼叫流程图</p>
+<p height="1em" width="2em">首先Bob向Alice发送INVITE消息请求建立SIP会话。Alice的UA回100 Trying消息，意思是说我收到你的请求了，先等一会儿。接着Alice的电话开始振铃，并给对方回消息180 Ringing，说我这边已经振铃了，Alice听到后可能一会就过来接电话。Bob的UA收到该消息后即可以播放回铃音，以提示Bob对方的话机正在振铃。接着Alice接了电话，她发送200 OK消息给Bob，该消息是对INVITE消息的最终响应（所有大于1的状态码都是最终响应），而先前的100和180消息都是临时状态，只是表明呼叫进展的情况。Bob收到200后向Alice回复ACK证实消息。INVITE-200-ACK完成“三次握手”的操作，保证了呼叫可以正常进行。其中，INVITE-1xx-200等消息合在一起称为一个事务（Transaction）。这时候Bob已经在跟Alice通话了，他们通话的内容（语音数据）是在SIP之外的RTP包中传递的，我们后面再详细讨论RTP。</p>
+<p height="1em" width="2em">最后，Alice挂断电话，向Bob发送BYE消息，Bob收到BYE后回送200 OK，通话完毕。其中BYE和200 OK也是一个事务，而上面的所有消息，则称为一个对话（Dialog，也译作会话）。</p>
+<p height="1em" width="2em">反过来也一样，Alice可以直接呼叫Bob的地址sip:Bob@192.168.4.4:26000进行通话。</p>
+<p height="1em" width="2em">上面描述了一个最简单的SIP呼叫流程。实际上，SIP还有其他一些消息。SIP消息大致可分为请求和响应两类。请求由UAC发出，到达UAS后，UAS回送响应消息。某些响应消息需要证实（ACK），以完成三次握手。其中请求消息包括基本的INVITE、ACK、OPTIOS、BYE、CANCEL、REGISTER，以及re-INVITE、PRACK、SUBSCRIBE、NOTIFY、UPDATE、MESSAGE、REFER等一些扩展。而响应消息则都包含一个状态码和一个原因短语（Reason Phrase）。与HTTP响应类似，状态码由三位数字组成：</p>
+<p height="1em" width="2em">·1xx组的响应为临时状态，表明呼叫进展的情况；</p>
+<p height="1em" width="2em">·2xx表明请求已被成功收到、理解和接受；</p>
+<p height="1em" width="2em">·3xx为重定向，表明SIP请求需要转向到另一个UAS处理；</p>
+<p height="1em" width="2em">·4xx表明请求失败，这种失败一般是由客户端或网络引起的，如密码错误、空号等，客户端应该重新修改请求，然后重发；</p>
+<p height="1em" width="2em">·5xx为服务器内部错误，表明服务器出错，不能响应合法的请求；</p>
+<p height="1em" width="2em">·6xx为全局性错误，如600 Busy Everywhere。</p>
+<p height="1em" width="2em">状态码后面跟着一个原因短语（如200 OK中的OK及刚才讲到的Busy Everywhere），它是对前面的状态码的一个简单解释。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">7.3.2　通过B2BUA呼叫</font>
+</font>
+</p>
+<p height="1em" width="2em">在真实世界中，Bob和Alice可以会经常改变位置，那么它们的SIP地址也会相应改变，并且，如果他们之中有一个或两个处于NAT的网络中时，直接通信就更困难了。所以，他们通常会借助于一个服务器来实现通信。这样Bob和Alice通过注册到服务器上即可获得一个服务器上的公有SIP地址。注册服务器的地址一般是不变的，因此他们的SIP地址就不会发生变化，他们也就总是能够进行通信了。</p>
+<p height="1em" width="2em">现在，作为例子，我们让他们两个都注册到FreeSWITCH上。上面已经说过，FreeSWITCH监听的端口是SIP默认的5060端口。Bob和Alice注册后，他们分别获得了一个服务器的地址（SIP URI）：sip:Bob@192.168.4.4和sip:Alice@192.168.4.4（默认的端口号5060可以省略）。</p>
+<p height="1em" width="2em">下面是Bob呼叫Alice的流程。需要指出，如果Bob只是发起呼叫而不接收呼叫，他并不需要向FreeSWITCH注册（有些软交换服务器规定需要先注册才能发起呼叫，但SIP是不强制这么做的）。</p>
+<p height="1em" width="2em">首先，Bob向FreeSWITCH发送INVITE消息，请求建立一个呼叫，发送的INVITE消息如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 1118 bytes from udp/[192.168.4.4]:26000 at 13:31:39.938891:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+INVITE sip:Alice@192.168.4.4 SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-56adad736231f024-1---d8754z-;rport<br/>
+<br/>
+Max-Forwards: 70<br/>
+<br/>
+Contact: &lt;sip:Bob@192.168.4.4:26000&gt;<br/>
+<br/>
+To: "Alice"&lt;sip:Alice@192.168.4.4&gt;<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 1 INVITE<br/>
+<br/>
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+User-Agent: X-Lite release 1014k stamp 47051<br/>
+<br/>
+Content-Length: 594<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面的消息中省略了SDP的内容，关于SDP的部分我们将留到本章后面再探讨。在此，Bob的UAC通过INVITE消息向FreeSWITCH发起请求。Bob的UAC用的是X-Lite（User-Agent），它运行在端口26000上（由Contact字段给出。实际上，它默认的端口也是5060，但由于在笔者的实验环境下它与FreeSWITCH运行在一台机器上，5060端口已被FreeSWITCH占用，因此需要选择另一个端口）。其中，From为主叫用户的地址，To为被叫用户的地址。此时FreeSWITCH作为一个UAS接受请求并进行响应。但在此之前，它先通过100 Trying消息通知Bob它已经收到了他的请求，消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 345 bytes to udp/[192.168.4.4]:26000 at 13:31:39.940278:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 100 Trying<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-56adad736231f024-1---d8754z-;rport=26000<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+To: "Alice"&lt;sip:Alice@192.168.4.4&gt;<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 1 INVITE<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Content-Length: 0           <br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">FreeSWITCH通过100 Trying消息告诉Bob：“我已经收到你的消息了，别着急，我正在设法联系Alice……”，该消息称为呼叫进展消息。</p>
+<p height="1em" width="2em">但就在此时，FreeSWITCH发现它还不认识Bob，即它还不确定Bob是否有权通过它发起呼叫，因而它需要确认Bob的身份。在SIP中，它通过回送带有Digest验证信息（Proxy-Authenticate头）的407消息来通知Bob（类似于注册流程中的401），消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 826 bytes to udp/[192.168.4.4]:26000 at 13:31:39.943392:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 407 Proxy Authentication Required<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-56adad736231f024-1---d8754z-;rport=26000<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+To: "Alice" &lt;sip:Alice@192.168.4.4&gt;;tag=B4pem31jHgtHS<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 1 INVITE<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Accept: application/sdp<br/>
+<br/>
+Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, UPDATE, INFO, REGISTER, REFER,<br/>
+<br/>
+    NOTIFY, PUBLISH, SUBSCRIBE<br/>
+<br/>
+Supported: timer, precondition, path, replaces<br/>
+<br/>
+Allow-Events: talk, presence, dialog, line-seize, call-info, sla,<br/>
+<br/>
+    include-session-description, presence.winfo, message-summary, refer<br/>
+<br/>
+Proxy-Authenticate: Digest realm="192.168.4.4",<br/>
+<br/>
+nonce="31c5c3e0-cc6e-46c8-a661-599b0c7f87d8",<br/>
+<br/>
+algorithm=MD5, qop="auth"<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Bob回送ACK证实消息向FreeSWITCH证实已收到认证要求，至此，从INVITE开始发起的事务就结束了。下面是FreeSWITCH收到的ACK消息：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 319 bytes from udp/[192.168.4.4]:26000 at 13:31:39.945314:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+ACK sip:Alice@192.168.4.4 SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-56adad736231f024-1---d8754z-;rport<br/>
+<br/>
+To: "Alice" &lt;sip:Alice@192.168.4.4&gt;;tag=B4pem31jHgtHS<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 1 ACK<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，Bob重新发送INVITE请求。这次还附带了Proxy-Authorization验证信息，该信息是根据上次收到的Proxy-Authenticate中的信息与Bob提供的认证用户名和密码计算出的结果。该INVITE重新开始了一个事务，消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 1376 bytes from udp/[192.168.4.4]:26000 at 13:31:39.945526:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+INVITE sip:Alice@192.168.4.4 SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-87d60b47b6627c3a-1---d8754z-;rport<br/>
+<br/>
+Max-Forwards: 70<br/>
+<br/>
+Contact: &lt;sip:Bob@192.168.4.4:26000&gt;<br/>
+<br/>
+To: "Alice"&lt;sip:Alice@192.168.4.4&gt;<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 2 INVITE<br/>
+<br/>
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+Proxy-Authorization: Digest username="Bob",realm="192.168.4.4",<br/>
+<br/>
+nonce="31c5c3e0-cc6e-46c8-a661-599b0c7f87d8",<br/>
+<br/>
+uri="sip:Alice@192.168.4.4",response="327887635344405bcd545da06763c466",<br/>
+<br/>
+cnonce="c164b74f625ff2161bd8d47dba3a0ee2",<br/>
+<br/>
+nc=00000001,qop=auth,<br/>
+<br/>
+algorithm=MD5<br/>
+<br/>
+User-Agent: X-Lite release 1014k stamp 47051<br/>
+<br/>
+Content-Length: 594<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里也省略了SDP消息正文。</p>
+<p height="1em" width="2em">FreeSWITCH收到INVITE请求后，重新回送100 Trying，通知Bob呼叫进展情况，消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 345 bytes to udp/[192.168.4.4]:26000 at 13:31:39.946349:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 100 Trying<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-87d60b47b6627c3a-1---d8754z-;rport=26000<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+To: "Alice"&lt;sip:Alice@192.168.4.4&gt;<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 2 INVITE<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后FreeSWITCH对Bob发来的认证信息进行验证，发现Bob是本地的授权用户，因而呼叫可以继续进行。</p>
+<p height="1em" width="2em">至此，Bob与FreeSWITCH之间的通信已经初步建立，这种通信的逻辑通道称为一个Channel。该Channel是由Bob的UA和FreeSWITCH的一个UA构成的，我们称之为FreeSWITCH的一条腿，又称a-leg。</p>
+<p height="1em" width="2em">接下来，呼叫进入路由阶段，FreeSWITCH根据路由，发现Bob要呼叫Alice，由于FreeSWITCH是一个B2BUA，因而它需要要建立另外一条腿去呼叫Alice，与a-leg相对，这条新腿就称为b-leg。</p>
+<p height="1em" width="2em">FreeSWITCH通过查找本地数据库，得到了Alice的位置（Alice的联系地址，Alice必须事先已经向它注册），接着启动一个UA（用作UAC），向Alice发送一个新的INVITE消息，内容如下（注意，这完全是一个新的事务，理论上与a-leg没有任何关系）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 1340 bytes to udp/[192.168.4.4]:5090 at 13:31:40.028988:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+INVITE sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4;rport;branch=z9hG4bKey90QUyHZQXNN<br/>
+<br/>
+Route: &lt;sip:Alice@192.168.4.4:5090&gt;;rinstance=e7d5364c81f2b879;transport=UDP<br/>
+<br/>
+Max-Forwards: 69<br/>
+<br/>
+From: "Bob" &lt;sip:Bob@192.168.4.4&gt;;tag=Dp9ZQS3SB26pg<br/>
+<br/>
+To: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;<br/>
+<br/>
+Call-ID: 0d74ac35-cca4-122d-81a2-2990e5b2bd3e<br/>
+<br/>
+CSeq: 130069214 INVITE<br/>
+<br/>
+Contact: &lt;sip:mod_sofia@192.168.4.4:5060&gt;<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, UPDATE, INFO, REGISTER, REFER,<br/>
+<br/>
+    NOTIFY, PUBLISH, SUBSCRIBE<br/>
+<br/>
+Supported: timer, precondition, path, replaces<br/>
+<br/>
+Allow-Events: talk, presence, dialog, line-seize, call-info, sla,<br/>
+<br/>
+    include-session-description, presence.winfo, message-summary, refer<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+Content-Disposition: session<br/>
+<br/>
+Content-Length: 313<br/>
+<br/>
+X-FS-Support: update_display<br/>
+<br/>
+Remote-Party-ID: "Bob" &lt;sip:Bob@192.168.4.4&gt;;party=calling;screen=yes;privacy=off<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看到，该INVITE的Call-ID与上一次INVITE消息中的不同，说明这是另一个SIP对话（Dialogue）。另外，消息中还多了一个Remote-Party-ID，它主要是用来支持主叫号码显示功能（俗称来电显示，有了这个功能，Alice的话机上就可以显示Bob的号码，知道是Bob打来的）。与普通的POTS通话不同，在SIP通话话中，不仅能显示电话号码（这里是Bob），还能显示一个可选的名字（Bob）。这也说明了FreeSWITCH这个B2BUA本身是一个整体，它虽然是以一个单独的UA呼叫Alice，但还是跟负责Bob的那个UA有联系——就是这种背靠背的串联关系，使得Alice这一侧的Channel（b-leg）知道Bob那一侧（a-leg）的一些信息（如这里的主叫号码）。</p>
+<p height="1em" width="2em">同理，Alice会回送100 Trying消息通知FreeSWITCH它已经正常接收到该INVITE请求，正准备进行下一步处理。消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 309 bytes from udp/[192.168.4.4]:5090 at 13:31:40.193634:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 100 Trying<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4;rport=5060;branch=z9hG4bKey90QUyHZQXNN<br/>
+<br/>
+To: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;<br/>
+<br/>
+From: "Bob" &lt;sip:Bob@192.168.4.4&gt;;tag=Dp9ZQS3SB26pg<br/>
+<br/>
+Call-ID: 0d74ac35-cca4-122d-81a2-2990e5b2bd3e<br/>
+<br/>
+CSeq: 130069214 INVITE<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">虽然我们曾经说过，所有的SIP UA都是对等的。但Alice的身份与FreeSWITCH不同，它作为一个被叫用户，不需要对FreeSWITCH发起的呼叫进行认证，因而，Alice的话机直接振铃，并向FreeSWITCH回送180 Ringing消息，通知FreeSWITCH Alice的话机已经开始振铃了。FreeSWITCH收到的180消息如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 431 bytes from udp/[192.168.4.4]:5090 at 13:31:40.193816:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 180 Ringing<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4;rport=5060;branch=z9hG4bKey90QUyHZQXNN<br/>
+<br/>
+Contact: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;<br/>
+<br/>
+To: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;;tag=3813e926<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=Dp9ZQS3SB26pg<br/>
+<br/>
+Call-ID: 0d74ac35-cca4-122d-81a2-2990e5b2bd3e<br/>
+<br/>
+CSeq: 130069214 INVITE<br/>
+<br/>
+User-Agent: Zoiper rev.5415<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述代码中，180也是呼叫进展消息，它说明Alice的电话已经开始振铃了，如果Alice听到了，则过一会她可能会接听电话。FreeSWITCH在收到180以后，有以下两个选择。</p>
+<p height="1em" width="2em">·直接给Bob回180消息。Bob的话机收到180后，知道Alice那边已经振铃了。注意，这里只是Bob的话机知道，Bob并不知道收到了180。因而Bob的话机会自己产生一个回铃音，播放给Bob听，以提示Bob对方正在振铃。</p>
+<p height="1em" width="2em">·给Bob回183消息。与180不同，183消息包含媒体SDP。这时，FreeSWITCH就有机会产生一个回铃音，通过RTP发送给Bob。Bob的话机就不需要自己再产生回铃音。通过这种技术，FreeSWITCH可以为呼叫Alice的用户产生个性化的回铃音，也称彩铃。</p>
+<p height="1em" width="2em">不过，在此我们先不深入讨论。不管是180还是183，Bob都会听到回铃音。FreeSWITCH默认是183，消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+send 1125 bytes to udp/[192.168.4.4]:26000 at 13:31:40.270533:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 180 Ringing<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-87d60b47b6627c3a-1---d8754z-;rport=26000<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+To: "Alice" &lt;sip:Alice@192.168.4.4&gt;;tag=cDg7NyjpeSg4m<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 2 INVITE<br/>
+<br/>
+Contact: &lt;sip:Alice@192.168.4.4:5060;transport=udp&gt;<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Accept: application/sdp<br/>
+<br/>
+Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, UPDATE, INFO, REGISTER, REFER,<br/>
+<br/>
+    NOTIFY, PUBLISH, SUBSCRIBE<br/>
+<br/>
+Supported: timer, precondition, path, replaces<br/>
+<br/>
+Allow-Events: talk, presence, dialog, line-seize, call-info, sla,<br/>
+<br/>
+    include-session-description, presence.winfo, message-summary, refer<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+Content-Disposition: session<br/>
+<br/>
+Content-Length: 267<br/>
+<br/>
+Remote-Party-ID: "Alice" &lt;sip:Alice@192.168.4.4&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里省略了SDP消息。</p>
+<p height="1em" width="2em">再看Alice这端，她听到电话响了，一看主叫号码是Bob，心里非常甜蜜，便迫不及待地接起电话。在她接起电话的一刹那，她的SIP话机给FreeSWITCH回送了200 OK消息，表示Alice已经接听了。消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 768 bytes from udp/[192.168.4.4]:5090 at 13:31:43.251980:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 200 OK<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4;rport=5060;branch=z9hG4bKey90QUyHZQXNN<br/>
+<br/>
+Contact: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;<br/>
+<br/>
+To: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;;tag=3813e926<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=Dp9ZQS3SB26pg<br/>
+<br/>
+Call-ID: 0d74ac35-cca4-122d-81a2-2990e5b2bd3e<br/>
+<br/>
+CSeq: 130069214 INVITE<br/>
+<br/>
+Allow: INVITE, ACK, CANCEL, BYE, NOTIFY, REFER, MESSAGE, OPTIONS, INFO, SUBSCRIBE<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+User-Agent: Zoiper rev.5415<br/>
+<br/>
+Content-Length: 226<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里省略了SDP消息。</p>
+<p height="1em" width="2em">FreeSWITCH向Alice回送ACK证实消息，证实它已经收到200 OK了。至此，FreeSWITCH与Alice这一端的通话已建立完毕。ACK消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 436 bytes to udp/[192.168.4.4]:5090 at 13:31:43.256692:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+ACK sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4;rport;branch=z9hG4bKF72SSpFNv0K8g<br/>
+<br/>
+Max-Forwards: 70<br/>
+<br/>
+From: "Bob" &lt;sip:Bob@192.168.4.4&gt;;tag=Dp9ZQS3SB26pg<br/>
+<br/>
+To: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;;tag=3813e926<br/>
+<br/>
+Call-ID: 0d74ac35-cca4-122d-81a2-2990e5b2bd3e<br/>
+<br/>
+CSeq: 130069214 ACK<br/>
+<br/>
+Contact: &lt;sip:mod_sofia@192.168.4.4:5060&gt;<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，FreeSWITCH作为中间人也不敢怠慢，它立即向Bob的话机发送200 OK消息，并切断原先自动产生的回铃音，把Alice甜美的声音接进来。200 OK消息如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 1135 bytes to udp/[192.168.4.4]:26000 at 13:31:43.293311:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 200 OK<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-87d60b47b6627c3a-1---d8754z-;rport=26000<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+To: "Alice" &lt;sip:Alice@192.168.4.4&gt;;tag=cDg7NyjpeSg4m<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 2 INVITE<br/>
+<br/>
+Contact: &lt;sip:Alice@192.168.4.4:5060;transport=udp&gt;<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, UPDATE, INFO, REGISTER, REFER,<br/>
+<br/>
+    NOTIFY, PUBLISH, SUBSCRIBE<br/>
+<br/>
+Supported: timer, precondition, path, replaces<br/>
+<br/>
+Allow-Events: talk, presence, dialog, line-seize, call-info, sla,<br/>
+<br/>
+    include-session-description, presence.winfo, message-summary, refer<br/>
+<br/>
+Session-Expires: 120;refresher=uas<br/>
+<br/>
+Min-SE: 120<br/>
+<br/>
+Content-Type: application/sdp<br/>
+<br/>
+Content-Disposition: session<br/>
+<br/>
+Content-Length: 267<br/>
+<br/>
+Remote-Party-ID: "Alice" &lt;sip:Alice@192.168.4.4&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里省略了SDP消息。</p>
+<p height="1em" width="2em">多半这时Alice已经开始说话了：“Hi,Bob，你好……”，Bob的UA在收到200消息后也启动本地的麦克风，至此，他们两个就可以对话了。当然，Bob作为一个有责任的男人，他还顺便通过ACK消息通知FreeSWITCH他确实收到了上面的200消息。ACK消息如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 697 bytes from udp/[192.168.4.4]:26000 at 13:31:43.413025:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+ACK sip:Alice@192.168.4.4:5060;transport=udp SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:26000;branch=z9hG4bK-d8754z-ef53864320037c04-1---d8754z-;rport<br/>
+<br/>
+Max-Forwards: 70<br/>
+<br/>
+Contact: &lt;sip:Bob@192.168.4.4:26000&gt;<br/>
+<br/>
+To: "Alice"&lt;sip:Alice@192.168.4.4&gt;;tag=cDg7NyjpeSg4m<br/>
+<br/>
+From: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 2 ACK<br/>
+<br/>
+Proxy-Authorization: Digest username="Bob",realm="192.168.4.4",<br/>
+<br/>
+    nonce="31c5c3e0-cc6e-46c8-a661-599b0c7f87d8",<br/>
+<br/>
+    uri="sip:Alice@192.168.4.4",response="327887635344405bcd545da06763c466",<br/>
+<br/>
+    cnonce="c164b74f625ff2161bd8d47dba3a0ee2",nc=00000001,qop=auth,<br/>
+<br/>
+    algorithm=MD5<br/>
+<br/>
+User-Agent: X-Lite release 1014k stamp 47051<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，a-leg和b-leg的通话分别建立完毕，FreeSWITCH作为一个中间人将两个leg桥接起来，使得双方可以正常通话，通话进入稳定阶段。</p>
+<p height="1em" width="2em">一般来说，在需要计费的场合，FreeSWITCH可以对Bob进行计费。计费的开始时间是以FreeSWITCH给Bob发送200的时间为准的。当然，FreeSWITCH本身并不做任何计费处理，它只是记录通话的起止时间，实际的费率和计费工作由其他软件完成。</p>
+<p height="1em" width="2em">通话进入稳定阶段后，一般不再有SIP消息交互，所有的语音数据都在RTP中传送。</p>
+<p height="1em" width="2em">“电话粥”也不能煲太久，终于Alice挂断了电话，它的话机会给FreeSWITCH发送BYE消息，通知FreeSWITCH要再见（拆线）了。消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 484 bytes from udp/[192.168.4.4]:5090 at 13:31:49.949240:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+BYE sip:mod_sofia@192.168.4.4:5060 SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:5090;branch=z9hG4bK-d8754z-2146ae0ddd113efe-1---d8754z-;rport<br/>
+<br/>
+Max-Forwards: 70<br/>
+<br/>
+Contact: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;<br/>
+<br/>
+To: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=Dp9ZQS3SB26pg<br/>
+<br/>
+From: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;;tag=3813e926<br/>
+<br/>
+Call-ID: 0d74ac35-cca4-122d-81a2-2990e5b2bd3e<br/>
+<br/>
+CSeq: 2 BYE<br/>
+<br/>
+User-Agent: Zoiper rev.5415<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">FreeSWITCH回送200 OK，并释放b-leg。消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 543 bytes to udp/[192.168.4.4]:5090 at 13:31:49.950425:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 200 OK<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4:5090;branch=z9hG4bK-d8754z-2146ae0ddd113efe-1---d8754z-;rport=5090<br/>
+<br/>
+From: &lt;sip:Alice@192.168.4.4:5090;rinstance=e7d5364c81f2b879;transport=UDP&gt;;ta<br/>
+<br/>
+           g=3813e926<br/>
+<br/>
+To: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=Dp9ZQS3SB26pg<br/>
+<br/>
+Call-ID: 0d74ac35-cca4-122d-81a2-2990e5b2bd3e<br/>
+<br/>
+CSeq: 2 BYE<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, UPDATE, INFO, REGISTER, REFER,<br/>
+<br/>
+    NOTIFY, PUBLISH, SUBSCRIBE<br/>
+<br/>
+Supported: timer, precondition, path, replaces<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">同时，FreeSWITCH也给Bob发送BYE消息，通知Bob要拆线了。在下面的消息中，它还包含了挂机原因（Hangup Cause，在Reason头中给出），此处NOMAL_CLEARING表示正常释放。BYE消息内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+send 630 bytes to udp/[192.168.4.4]:26000 at 13:31:50.003165:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+BYE sip:Bob@192.168.4.4:26000 SIP/2.0<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4;rport;branch=z9hG4bKggvjUH0rS99tc<br/>
+<br/>
+Max-Forwards: 70<br/>
+<br/>
+From: "Alice" &lt;sip:Alice@192.168.4.4&gt;;tag=cDg7NyjpeSg4m<br/>
+<br/>
+To: "Bob" &lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 130069219 BYE<br/>
+<br/>
+Contact: &lt;sip:Alice@192.168.4.4:5060;transport=udp&gt;<br/>
+<br/>
+User-Agent: FreeSWITCH-mod_sofia/1.0.trunk-16981M<br/>
+<br/>
+Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, UPDATE, INFO, REGISTER, REFER,<br/>
+<br/>
+    NOTIFY, PUBLISH, SUBSCRIBE<br/>
+<br/>
+Supported: timer, precondition, path, replaces<br/>
+<br/>
+Reason: Q.850;cause=16;text="NORMAL_CLEARING"<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Bob的话机回送200 OK消息，FreeSWITCH收到后，也释放a-leg，通话结束。FreeSWITCH收到的200 OK消息如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+recv 367 bytes from udp/[192.168.4.4]:26000 at 13:31:50.111765:<br/>
+<br/>
+------------------------------------------------------------------------<br/>
+<br/>
+SIP/2.0 200 OK<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.4.4;rport=5060;branch=z9hG4bKggvjUH0rS99tc<br/>
+<br/>
+Contact: &lt;sip:Bob@192.168.4.4:26000&gt;<br/>
+<br/>
+To: "Bob"&lt;sip:Bob@192.168.4.4&gt;;tag=15c8325a<br/>
+<br/>
+From: "Alice"&lt;sip:Alice@192.168.4.4&gt;;tag=cDg7NyjpeSg4m<br/>
+<br/>
+Call-ID: YWEwYjNlZTZjOWZjNDg3ZjU3MjQ3MTA1ZmQ1MDM5YmQ.<br/>
+<br/>
+CSeq: 130069219 BYE<br/>
+<br/>
+User-Agent: X-Lite release 1014k stamp 47051<br/>
+<br/>
+Content-Length: 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面描述的是一个典型的通过FreeSWITCH进行呼叫的流程。虽然有点长，但是并不复杂，图7-7所示可以很形象地描述出了FreeSWITCH的两条“腿”——a-leg和b-leg。</p>
+<p height="1em" width="0pt" align="center"><img align="baseline" height="225" width="767" src="Image00069.jpg" />
+</p>
+<p height="4pt" width="0pt" align="center">图7-7　B2BUA的两条腿</p>
+<p height="1em" width="2em">完整的呼叫流程如图7-8所示。</p>
+<p height="1em" width="0pt" align="center"><img align="baseline" height="774" width="685" src="Image00018.jpg" />
+</p>
+<p height="4pt" width="0pt" align="center">图7-8　SIP B2BUA接呼叫流程图</p>
+<p height="1em" width="2em">从图7-8可以看出，右半部分与图7-6是一样的，而左半部分也与图7-6类似。这就更好的说明了实际上有4个UA（两对）参与到了通信中，4个UA组成了通信中的两条腿。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00064.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 注意，在最新版的X-Lite上（如X-Lite 4.5.4），不允许直接使用SIP地址进行呼叫，解决办法是添加一个SIP账号，其中Domain中填写对方的SIP地址，如本例中的192.168.4.4:5090。其他参数可以随便填，最后记住去掉“Register with domain and receive calls”前面的复选框的选中状态。保存后，就可以呼叫Alice了，这跟上述流程一样。</p>
+</body>
+</html>

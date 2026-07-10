@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_555"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2755199" class="calibre7"></a>16.7.3 Filter Rules for Dynamic Port Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2755378" class="calibre15"></a>The Connector engine consults a list of filter rules to decide how to forward outgoing connections by applications. These are configured by the Filters view of the Administration dialog in <a shape="rect" href="#filepos2755751" class="calibre6">Figure 16-11</a>. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2755751" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Filter rules for forwarding outgoing connections" src="images/00071.jpg" class="calibre39"/></div>
+</div>
+</span><p class="calibre4">Figure 16-11. Filter rules for forwarding outgoing connections</p></div>
+<p class="calibre4">A display name is assigned to each filter rule. The filter rules are matched according to the DNS hostname or IP address requested by an application, and the first matching filter rule is used for the connection. DNS hostnames and IP addresses can be specified either literally or as patterns using the <span><em class="italic">egrep</em></span> regular expression syntax. DNS hostnames are case-insensitive. </p>
+<p class="calibre4">In the usual case when an application connects using a DNS hostname, Connector scans the filter rule list. If a hostname match is found, then the first matching filter rule is used. The IP address returned to the application is taken from the filter rule if one is specified, or is otherwise dynamically assigned from the pool of pseudo IP addresses.<sup class="calibre20">[<a id="filepos2757104" shape="rect" href="DB_split_420.html#filepos2765285" class="calibre6">177</a>]</sup> If no matching filter rule is found, then the connection is initiated directly, with no port forwarding. </p>
+<p class="calibre4">When an application connects using an IP address, Connector similarly scans the filter rule list, looking for a filter rule with a matching address, and uses the first filter rule that is found. Otherwise, if there is no matching filter rule, then Connector does a reverse hostname lookup using the IP address. If this lookup succeeds, then Connector performs a DNS hostname match, as described previously. Otherwise, if the reverse hostname lookup failed, then Connector blocks the connection. Any hostname specified for the filter rule is passed to the other side of the forwarded connection so that the server can perform the hostname lookup for the real IP address on an internal network. </p>
+<p class="calibre4">Connections are forwarded based on the target port requested by the application, according to a list of connection rules for each filter rule. Each connection rule consists of a comma-separated list of ports, or the special value <code class="calibre35">All</code>, plus one of the following actions: </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">DIRECT</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Initiate a connection directly, without port forwarding. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">BLOCK</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Block the connection, so the application will see the error "connection refused." </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">server</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Initiate an SSH connection, according to the settings for the named server. </div>
+</blockquote>
+</div>
+<p class="calibre4">The first matching connection rule for the requested port is used. If no connection rule matches, then a direct connection is initiated. </p>
+<p class="calibre4">Connections are also forwarded according to the full pathname for the application. The Connector administrative interface allows the specification of only a single application. This restriction was imposed as of Version 4.2, and is actually a reduction in functionality. Earlier versions of <span><em class="italic">SSHConnectorAdmin</em></span> allowed the specification of an application for each filter rule.<sup class="calibre20">[<a id="filepos2759966" shape="rect" href="DB_split_420.html#filepos2765636" class="calibre6">178</a>]</sup></p>
+</div>
+</body>
+</html>

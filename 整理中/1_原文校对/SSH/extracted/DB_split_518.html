@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_689"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos3038157" class="calibre7"></a>Client Configuration </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The <span><em class="italic">ssh -1t</em></span> option runs an SSH-1 client program, and <span><em class="italic">ssh -1i</em></span> uses built-in SSH-1 emulation. See "<a shape="rect" href="DB_split_225.html#filepos1536822" class="calibre6">Choosing a protocol version</a>" in <a shape="rect" href="DB_split_214.html#filepos1423419" class="calibre6">Chapter 7</a>. </p>
+<p class="calibre4">The following keywords in the <em class="italic">/etc/ssh2/ssh2_config</em> file control SSH-1 compatibility mode: </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">Ssh1Compatibility</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Use SSH-1 if the server supports only supports the older protocol (if <code class="calibre35">yes</code>), or otherwise fail (if <code class="calibre35">no</code>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">Ssh1InternalEmulation</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Use the Tectia client's built-in SSH-1 functionality (if <code class="calibre35">yes</code>), or otherwise run an external SSH-1 program (if <code class="calibre35">no</code>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">Ssh1Path</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The pathname for the external SSH-1 program.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">Ssh1MaskPasswordLength</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Send SSH_MSG_IGNORE packets with SSH-1 sessions to obscure the length of the password (if yes, the default). Otherwise, the unencrypted length fields used by SSH-1 can be easily intercepted. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">Ssh1AgentCompatibility</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Specifies whether and how to do agent forwarding. The value is one of: </div>
+<div class="calibre3">
+<blockquote class="calibre5">
+<div class="calibre3"><span><code class="calibre35">none</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Don't forward SSH-1 agent connections (the default). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">traditional</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Forward SSH-1 agent connections with no information about the forwarding path. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">ssh2</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Forward SSH-1 agent connections, and add information about the forwarding path as for SSH-2. This requires using the Tectia agent in SSH-1 compatibility mode. </div>
+</blockquote>
+</blockquote>
+</div>
+</blockquote>
+</div>
+</div>
+</body>
+</html>

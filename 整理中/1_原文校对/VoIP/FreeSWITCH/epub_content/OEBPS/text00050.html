@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">5.4　XML用户目录</font>
+</font>
+</p>
+<p height="1em" width="2em">我们在5.3.4节提到XML用户目录决定了哪些用户可以注册到FreeSWITCH上。在此，我们再深入分析一下。</p>
+<p height="1em" width="2em">SIP并不要求一定要注册才可以打电话，但是通话前的用户认证参数仍需要在用户目录中进行配置。</p>
+<p height="1em" width="2em">用户目录的默认配置文件在conf/directory/下，系统自带的配置文件为default.xml，其实现代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;domain name="$${domain}"&gt;<br/>
+<br/>
+  &lt;params&gt;<br/>
+<br/>
+    &lt;param name="dial-string"<br/>
+<br/>
+      value="{^^:sip_invite_domain=${dialed_domain}:presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(*/${dialed_user}@${dialed_domain})}"/&gt;<br/>
+<br/>
+  &lt;/params&gt;<br/>
+<br/>
+  &lt;variables&gt;<br/>
+<br/>
+    &lt;variable name="record_stereo" value="true"/&gt;<br/>
+<br/>
+    &lt;variable name="default_gateway" value="$${default_provider}"/&gt;<br/>
+<br/>
+    &lt;variable name="default_areacode" value="$${default_areacode}"/&gt;<br/>
+<br/>
+    &lt;variable name="transfer_fallback_extension" value="operator"/&gt;<br/>
+<br/>
+  &lt;/variables&gt;<br/>
+<br/>
+&lt;/domain&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该配置文件决定了哪些用户能注册到FreeSWITCH中。一般来说，所有用户都应该属于同一个domain（除非想使用多个domain，后面我们会有例子）。这里的$${domain}这个全局变量是在vars.xml中设置的，它默认是主机的IP地址，可以修改为使用一个域名。params中定义了该Domain中所有用户的公共参数。在这里只定义了一个dial-string，这是一个至关重要的参数。在使用user/username或sofia/internal/username@domain这样的呼叫字符串时，FreeSWITCH会根据username（以及domain）找到该dial-string，并最终扩展成用户实际的SIP地址 <sup>
+<small>
+<a href="text00051.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。其中sofia_contact是一个API命令，它会根据用户的注册地址扩展成相应的呼叫字符串。</p>
+<p height="1em" width="2em">variables则定义了一些公共变量，在用户主叫或被叫时，这些变量会绑定到相应的Channel上形成Channel Variable。</p>
+<p height="1em" width="2em">在domain中还定义了许多组（group），组里面包含很多用户（user）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;groups&gt;<br/>
+<br/>
+  &lt;group name="default"&gt;<br/>
+<br/>
+    &lt;users&gt;<br/>
+<br/>
+      &lt;X-PRE-PROCESS cmd="include" data="default/*.xml"/&gt;<br/>
+<br/>
+    &lt;/users&gt;<br/>
+<br/>
+  &lt;/group&gt;<br/>
+<br/>
+&lt;/groups&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在这里，组名default并没有什么特殊的意义，它只是随便起的，可以将其修改成任何值。在用户标签中，使用预处理指令装入了default目录中的所有XML文件。可以看到，在default目录中，每个用户都对应一个文件。</p>
+<p height="1em" width="2em">也可以定义其他的用户组，组中的用户并不需要是完整的XML节点，也可以是一个指向已存在用户的“指针”，如下代码就是使用type="pointer"定义的指针。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;group name="sales"&gt;<br/>
+<br/>
+  &lt;users&gt;<br/>
+<br/>
+    &lt;user id="1000" type="pointer"/&gt;<br/>
+<br/>
+    &lt;user id="1001" type="pointer"/&gt;<br/>
+<br/>
+    &lt;user id="1002" type="pointer"/&gt;<br/>
+<br/>
+  &lt;/users&gt;<br/>
+<br/>
+&lt;/group&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">虽然这里设置了组，但使用组并不是必需的。如果不打算使用组，将用户节点（users）直接放到domain的下一级也是可以的。但使用组可以比较方便地支持像群呼、代接之类的业务。例如，使用group_call可以同时或顺序呼叫某个组的用户。</p>
+<p height="1em" width="2em">其实与用户相关的设置很直观，下面显示了Alice这个用户的设置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;user id="alice"&gt;<br/>
+<br/>
+  &lt;params&gt;<br/>
+<br/>
+    &lt;param name="password" value="$${default_password}"/&gt;<br/>
+<br/>
+    &lt;param name="vm-password" value="alice"/&gt;<br/>
+<br/>
+  &lt;/params&gt;<br/>
+<br/>
+  &lt;variables&gt;<br/>
+<br/>
+    &lt;variable name="toll_allow" value="domestic,international,local"/&gt;<br/>
+<br/>
+    &lt;variable name="accountcode" value="alice"/&gt;<br/>
+<br/>
+    &lt;variable name="user_context" value="default"/&gt;<br/>
+<br/>
+    &lt;variable name="effective_caller_id_name" value="Alice"/&gt;<br/>
+<br/>
+    &lt;variable name="effective_caller_id_number" value="1000"/&gt;<br/>
+<br/>
+    &lt;variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/&gt;<br/>
+<br/>
+    &lt;variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/&gt;<br/>
+<br/>
+    &lt;variable name="callgroup" value="techsupport"/&gt;<br/>
+<br/>
+  &lt;/variables&gt;<br/>
+<br/>
+&lt;/user&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">由上面代码可知，实际上params和variables可以出现在user节点中，也可以出现在group或domain中。当它们有重复时，优先级顺序由高到低依次为user、group、domain。</p>
+<p height="1em" width="2em">当然，用户目录还有一些更高级的设置，我们留待以后研究。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00050.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 这个呼叫字符串比较复杂，需要许多知识才能理解它，因此我们留到本书的第二部分来详细研究。</p>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.2　使用外部工具抓包</font>
+</font>
+</p>
+<p height="1em" width="2em">虽然在FreeSWITCH内部也可以抓包，但有时候需要对IP包进行更全面的分析，或者存档，因此经常需要使用外部的工具抓包。</p>
+<p height="1em" width="2em">现有的大部分工具都是基于libpcap实现的，它们在不同的场景下各有优势，这里我们来简单介绍一下 <sup>
+<small>
+<a href="text00082.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。由于抓包是一种非常底层的操作，因此在大多数平台上通常需要用root或管理员用户来执行。他们大部分也都支持将抓包结果存储在本地PCAP格式的文件中，这种格式的文件后续可以使用其他工具（如rtpplay和Wireshark等）进行重放和分析。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.2.1　tcpdump</font>
+</font>
+</p>
+<p height="1em" width="2em">tcpdump <sup>
+<small>
+<a href="text00082.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 是经典的抓包工具。比如下面的命令可以仅抓取5060端口上的SIP包：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tcpdump -nq -s 0 -A -vvv -i eth0 port 5060<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，-n、-q表示不进行域名翻译及减少输出内容；-s 0表示不限制包长，即争取抓最大的长度；-A表示以ASCII方式输出，这样用眼看起来比较直观；-v表示显示的详细程度，“v”越多则越详细；-i表示使用指定的网卡；port 5060表示过滤器，这里我们只关心5060端口上的SIP包。</p>
+<p height="1em" width="2em">另外，可以使用-w将结果写入文件中，如下列命令将结果写入/tmp/dump.pcap文件中：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tcpdump -nq -s 0 -i eth0 -w /tmp/dump.pcap port 5060<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当还需要分析RTP流时，可以将port 5060简单改成udp，这样就可以抓取所有的UDP包：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tcpdump -nq -s 0 -i eth0 -w /tmp/dump.pcap udp<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有时候，如果你是在服务器上抓包，并想只抓某个用户的包，可以根据用户的IP地址来进行过滤。当然这需要先找到用户实际的IP地址，通过如下命令可以找到用户1002的Contact地址：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitchlocalhost&gt; sofia status profile internal reg 1002<br/>
+<br/>
+Registrations:<br/>
+<br/>
+==============================================================================<br/>
+<br/>
+Call-ID:        ZjUwMGY3ODM5M2E2ZGM0MWFiZGRiNDhkNThkZjk3NzQ<br/>
+<br/>
+User:           1002@192.168.7.5<br/>
+<br/>
+Contact:        "Seven" &lt;sip:1002@192.168.7.5:65272;rinstance=2d4d57704e73155d&gt;<br/>
+<br/>
+Agent:          Bria 3 release 3.5.0b stamp 69410<br/>
+<br/>
+Status:         Registered(UDP)(unknown) EXP(2013-07-23 15:17:51) EXPSECS(616)<br/>
+<br/>
+Host:           seven.local<br/>
+<br/>
+IP:             192.168.7.5<br/>
+<br/>
+Port:           65272<br/>
+<br/>
+Auth-User:      1002<br/>
+<br/>
+Auth-Realm:     192.168.7.5<br/>
+<br/>
+MWI-Account:    1002@192.168.7.5<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后就可以只针对该用户抓包了（从Contact地址中我们知道它的IP和端口号分别是192.168.7.5和65272）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+tcpdump -i eth0 -s 0 -A host 192.168.7.5 and port 65272<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有时候，我们也需要抓取所有的RTP包进行分析。在FreeSWITCH中，默认的端口号范围是16384～32768，因此我们可以使用如下命令抓包：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+tcpdump -i eth0 -w /tmp/sip-rtp.pcap "udp and (port 5060 or port 5080 or portrange 16384-32768)"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面的命令中，使用or（或）定义了多个过滤器参数，它分别代表抓5060、5080以及端口范围在16384至32768之间的包。</p>
+<p height="1em" width="2em">更详细的说明参见http://wiki.freeswitch.org/wiki/Packet_Capture。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.2.2　tshark</font>
+</font>
+</p>
+<p height="1em" width="2em">tshark <sup>
+<small>
+<a href="text00082.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 是Wireshark的命令行版。使用方法与tcpdump类似，如可以直接在命令行上运行tshark。下面是笔者电脑上的输出结果：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tshark<br/>
+<br/>
+Capturing on en0<br/>
+<br/>
+  0.000000 192.168.1.119 -&gt; 123.125.115.179 TCP 54 61729 &gt; http [FIN, ACK] Seq=1 Ack=1 Win=16384 Len=0<br/>
+<br/>
+  0.153641 173.194.79.109 -&gt; 192.168.1.119 TLSv1 164 Application Data<br/>
+<br/>
+  0.153644 173.194.79.109 -&gt; 192.168.1.119 TLSv1 247 Application Data<br/>
+<br/>
+  0.153645 173.194.79.109 -&gt; 192.168.1.119 TLSv1 130 Application Data<br/>
+<br/>
+  0.153672 173.194.79.109 -&gt; 192.168.1.119 TLSv1 568 Application Data<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，Capturing on en0表示从第一块网卡上抓包（注意，笔者用的是Mac系统，Mac上的en0相当于Linux上的eth0）。它等价于以下命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tshark -i en0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，也可以将抓包结果写入pcap文件中，如在Linux上可以这样用：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tshark -i eth0 -w /tmp/dump.pcap<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">与tcpdump比较起来，tshark能“认识”更多的协议，比如下面的命令可以很直观地看到收发的SIP包：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tshark host 192.168.1.9 and port 5060<br/>
+<br/>
+Capturing on en0<br/>
+<br/>
+  0.000000 192.168.1.119 -&gt; 192.168.1.9<br/>
+<br/>
+  SIP 571 Request: REGISTER sip:192.168.1.9    (fetch bindings)<br/>
+<br/>
+  0.010322  192.168.1.9 -&gt; 192.168.1.119<br/>
+<br/>
+  SIP 709 Status: 401 Unauthorized    (0 bindings)<br/>
+<br/>
+  0.010972 192.168.1.119 -&gt; 192.168.1.9<br/>
+<br/>
+  SIP 817 Request: REGISTER sip:192.168.1.9    (fetch bindings)<br/>
+<br/>
+  0.030214  192.168.1.9 -&gt; 192.168.1.119<br/>
+<br/>
+  SIP 587 Status: 403 Forbidden    (0 bindings)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述的SIP包是笔者在调试的时候在本机上抓到的，笔者在注册一个远程服务器时由于密码错误，认证失败，因而收到了403 Forbidden消息。</p>
+<p height="1em" width="2em">当然，tshark还有很多其他的命令行参数，我们在这里就不多介绍了。我们将在10.3.1节讲解它对应的图形界面版本的用法。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.2.3　ngrep</font>
+</font>
+</p>
+<p height="1em" width="2em">ngrep <sup>
+<small>
+<a href="text00082.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 也是一个非常好用的抓包工具（类似于经典的UNIX命令行工具grep），它可以提供类似于FreeSWITCH内部的抓包输出的显示方式，显示比较直观。笔者常用的选项组合是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ngrep -p -q -W byline port 5060<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，-p表示不使用混杂模式 <sup>
+<small>
+<a href="text00082.html">
+<font size="2">
+<font color="#FF6600">[5]</font>
+</font>
+</a>
+</small>
+</sup>
+ ；-q表示使用安静模式，仅输出包头和相关包的载荷（如果有的话）；-W表示选择一种显示输出方式，对于基本文本的协议来说，使用byline可以按换行符进行换行，显示比较直观；最后的port 5060是一个过滤器，即我们只想看我们关心的包。下面是与上一节最后一个例子对应的ngrep抓包的结果：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ngrep -p -q -W byline host 192.168.1.9 and port 5060<br/>
+<br/>
+interface: en0 (192.168.1.0/255.255.255.0)<br/>
+<br/>
+filter: (ip) and ( host 192.168.1.9 and port 5060 )<br/>
+<br/>
+U 192.168.1.119:3454 -&gt; 192.168.1.9:5060<br/>
+<br/>
+REGISTER sip:192.168.1.9 SIP/2.0.<br/>
+<br/>
+Via: SIP/2.0/UDP 192.168.1.119:3454;branch=z9hG4bK-d8754z-4d3eaa270f669f7b-1---d8754z-;rport.<br/>
+<br/>
+Max-Forwards: 70.<br/>
+<br/>
+Contact: &lt;sip:607@192.168.1.119:3454;rinstance=9066826f34316cd5&gt;.<br/>
+<br/>
+To: "607"&lt;sip:607@192.168.1.9&gt;.<br/>
+<br/>
+From: "607"&lt;sip:607@192.168.1.9&gt;;tag=42c9367f.<br/>
+<br/>
+Call-ID: NTcwNDJhOWE3MDE0OTAwMmQzZDFkNjdlYTZjOGVhMDk.<br/>
+<br/>
+CSeq: 1 REGISTER.<br/>
+<br/>
+Expires: 3600.<br/>
+<br/>
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO.<br/>
+<br/>
+User-Agent: Bria 3 release 3.5.0b stamp 69410.<br/>
+<br/>
+Content-Length: 0.<br/>
+<br/>
+.<br/>
+<br/>
+U 192.168.1.9:5060 -&gt; 192.168.1.119:3454<br/>
+<br/>
+SIP/2.0 401 Unauthorized.<br/>
+<br/>
+U 192.168.1.119:3454 -&gt; 192.168.1.9:5060<br/>
+<br/>
+REGISTER sip:192.168.1.9 SIP/2.0.<br/>
+<br/>
+U 192.168.1.9:5060 -&gt; 192.168.1.119:3454<br/>
+<br/>
+SIP/2.0 403 Forbidden.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em"><img align="baseline" height="42" width="36" src="Image00089.jpg" />
+ <font color="#0468BB">注意</font>
+</p>
+<p height="1em" width="2em">上面的抓包结果中，为了节省篇幅，我们仅保留了第一个完整的SIP消息，其他的仅保留了起始行。</p>
+<p height="1em" width="2em">从上面的抓包结果中可以很清楚地看出数据包的传输方向以及SIP协议的具体内容。</p>
+<p height="1em" width="2em">除了host、port这样的过滤器外，ngrep还支持针对内容的过滤。这在比较繁忙的服务器上（比如有大量SIP包的情况下）比较有用。下面的命令可以过滤仅含有139xxxxxxxx（可能是个手机号码）字符串的内容：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ngrep -p -q '139xxxxxxxx' -W byline port 5060<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">具体的过滤后的结果输出与上面讲到的类似，在这里我们就不多讲了。更多的选项可以查看ngrep的帮助信息。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.2.4　pcapsipdump</font>
+</font>
+</p>
+<p height="1em" width="2em">与上面的抓包工具不同，pcapsipdump <sup>
+<small>
+<a href="text00082.html">
+<font size="2">
+<font color="#FF6600">[6]</font>
+</font>
+</a>
+</small>
+</sup>
+ 有一个很好的特性，它能将不同通话IP包存到不同的文件里，其中某一路通话所有的SIP和RTP数据都存到同一个文件中。这样在同时有大量通话的时候抓包分析比较有用。使用方法如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+pcapsipdump -i eth0 -d /tmp/sipdump/<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述命令将抓到的包文件都以PCAP格式存放到/tmp/sipdump这个目录中。后续可以使用其他工具针对个别的呼叫进行分析。这在服务器话务量比较高的时候比较有用。</p>
+<p height="1em" width="2em">pcapsipdump工具也有其他参数，在这里我们就不多介绍了。建议读者把这里介绍的各种工具都试一下，这样在遇到问题时就可以比较熟练地使用合适的工具查找并解决问题了。</p>
+<p height="1em" width="2em">总之，本节介绍的4种抓包工具中，前两种除了语法稍有不同外，在功能上是差不多的，它们都能抓包并存为PCAP格式的文件，供以后分析。而ngrep主要的特点是类似于UNIX grep，在文本界面下实时看起来比较方便。最后的pcapsipdump是专门针对SIP的抓包工具，在抓包的同时能将不同的通话分别存放到不同文件中。在使用时，可根据需要选用合适的工具。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00081.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 我们在以后的章节中更专注于具体应用，因而各种工具的具体安装步骤在此就不多费笔墨了。一般来说，在Linux系统上，都是yum install（CentOS/Redhat）或apt-get install（Ubuntu/Debian）后面加上软件包的名字即可。其他情况也读者也可以根据软件包的名字自行搜索相关的安装资料。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00081.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://www.tcpdump.org/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00081.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 参见http://www.wireshark.org。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00082.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 参见http://ngrep.sourceforge.net/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00082.html">
+<font color="#FF6600">[5]</font>
+</a>
+ 混杂模式即Promiscuous Mode，如果将网卡设置成混杂模式便可以在一台主机上接收局域网上所有主机的包（当然这也取决于Hub或交换机的设置），也就是说有可能抓到发往其他主机的包。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00082.html">
+<font color="#FF6600">[6]</font>
+</a>
+ 参见：http://sourceforge.net/projects/pcapsipdump/。</p>
+</body>
+</html>

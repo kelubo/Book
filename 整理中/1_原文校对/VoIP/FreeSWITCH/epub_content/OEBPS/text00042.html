@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.5　呼叫</font>
+</font>
+</p>
+<p height="1em" width="2em">呼叫是FreeSWITCH最基本的功能，下面我们一起来看一下FreeSWITCH中与呼叫相关的命令和概念。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.5.1　发起呼叫</font>
+</font>
+</p>
+<p height="1em" width="2em">可以在FreeSWITCH中使用originate命令发起一次呼叫。下面我们看个例子。假设用户1000已经注册，那么可以运行如下命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1000 &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述命令在呼叫1000这个用户后，便执行echo这个程序。echo是一个回音程序，即它会把任何它“听到”的声音（或视频）再返回（说/播）给对方。因此，如果这时候用户1000接了电话，无论说什么都会听到自己的声音。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.5.2　呼叫字符串</font>
+</font>
+</p>
+<p height="1em" width="2em">在4.5.1节的例子中，“user/1000”称为呼叫字符串（Dial String，有时也叫Call URL）。“user”是一种特殊的呼叫字符串，在后面我们还会看到其他的呼叫字符串。</p>
+<p height="1em" width="2em">下面让我们来看一个例子。假设FreeSWITCH UA的地址为192.168.4.4:5050，alice UA的地址为192.168.4.4:5090，bob UA的地址为192.168.4.4:26000。若alice已向FreeSWITCH注册，在FreeSWITCH中就可以看到alice的注册信息：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia status profile internal reg<br/>
+<br/>
+Registrations:<br/>
+<br/>
+==============================================================================<br/>
+<br/>
+Call-ID:        ZTRkYjdjYzY0OWFhNDRhOGFkNDUxMTdhMWJhNjRmNmE.<br/>
+<br/>
+User:           alice@192.168.4.4<br/>
+<br/>
+Contact:        "Alice" &lt;sip:alice@192.168.4.4:5090;rinstance=a86a656037ccfaba;transport=UDP&gt;<br/>
+<br/>
+Agent:          Zoiper rev.5415<br/>
+<br/>
+Status:         Registered(UDP)(unknown) EXP(2010-05-02 18:10:53)<br/>
+<br/>
+Host:           du-sevens-mac-pro.local<br/>
+<br/>
+IP:             192.168.4.4<br/>
+<br/>
+Port:           5090<br/>
+<br/>
+Auth-User:      alice<br/>
+<br/>
+Auth-Realm:     192.168.4.4<br/>
+<br/>
+MWI-Account:    alice@192.168.4.4<br/>
+<br/>
+==============================================================================<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">FreeSWITCH根据Contact字段知道alice的SIP地址：sip:alice@192.168.4.4:5090。当使用originate命令呼叫user/alice这个呼叫字符串时，FreeSWITCH便会在用户目录中查找alice这个用户，找到她的dial-string参数 <sup>
+<small>
+<a href="text00043.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，dial-string参数通常包含alice实际Contact地址的查找方法，FreeSWITCH进而找到alice的Contact地址sip:alice@192.168.4.4:5090并向其发送INVITE请求。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00043.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 该参数可以在默认配置文件中的conf/directory/default.xml中找到，当然它比较复杂，我们将在后面的章节中再深入讨论。</p>
+</body>
+</html>

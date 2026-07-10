@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1410709" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_281"><span class="calibre2"><a shape="rect" class="calibre7"></a>PGP Authentication in Tectia </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1411070" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1411109" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1411148" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1411187" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1411226" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1411265" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1411304" class="calibre15"></a>Pretty Good Privacy (PGP) is another security product employing public-key authentication. <a shape="rect" href="DB_split_031.html#filepos174160" class="calibre6">[1.6.2]</a> PGP keys and SSH keys are implemented differently and aren't interchangeable, however, Tectia can perform authentication by PGP key, following the OpenPGP standard.<sup class="calibre20">[<a id="filepos1411693" shape="rect" href="#filepos1418067" class="calibre6">101</a>]</sup> Yes, you can use your favorite PGP key to prove your identity to a Tectia server (as long as the key file is OpenPGP-compatible; some PGP keys, especially those produced by older software versions, aren't). At press time, this feature is only sketchily documented. Here's how to make it work. </p>
+<p class="calibre4">First, you need Tectia installed on both the client and server machines. Also, both implementations must be compiled with PGP support included, using the compile-time flag <code class="calibre35">--with-pgp</code>. <a shape="rect" href="DB_split_126.html#filepos657628" class="calibre6">[4.3.5.7]</a></p>
+<p class="calibre4">On the client machine, you need to make your PGP secret key ring and the desired secret key for authentication available to Tectia clients. Here's how: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Copy your PGP secret key ring to your account's Tectia directory, <em class="italic">~/.ssh2.</em> Suppose it is called <em class="italic">secring.pgp</em>. </li>
+<li value="2" class="calibre18">In an identification file, either <em class="italic">~/.ssh2/identification</em> or another of your choice, indicate the secret key ring with the keyword <code class="calibre35">PgpSecretKeyFile</code>:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PgpSecretKeyFile secring.pgp</tt></div></span></li>
+<li value="3" class="calibre18">Identify the PGP key you wish to use for authentication. This may be done with any of three keywords: <div class="calibre3">
+<ul class="calibre44"><li class="calibre18">To identify the key by name, use <code class="calibre35">IdPgpKeyName</code>:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    IdPgpKeyName mykey</tt></div></span></li>
+<li class="calibre18">To identify the key by its PGP fingerprint, use <code class="calibre35">IdPgpKeyFingerprint</code>:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    IdPgpKeyFingerprint 48 B5 EA 28 80 5E 29 4D 03 33 7D 17 5E 2E CD 20</tt></div></span></li>
+<li class="calibre18">To identify the key by its key ID, use <code class="calibre35">IdPgpKeyId</code>:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    IdPgpKeyId 0xD914738D</tt></div></span></li>
+</ul></div>
+</li>
+</ol></div>
+<p class="calibre4">For <code class="calibre35">IdPgpKeyId</code>, the leading <code class="calibre35">0x</code> is necessary, indicating that the value is in hexadecimal. You can give the value in decimal instead, without the leading <code class="calibre35">0x</code>, but since PGP displays the value in hex already, it's unlikely you'd want to do this. </p>
+<p class="calibre4">On the server machine, you need to make your PGP public-key ring and the desired public key for authentication available to the Tectia server: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Copy your public-key ring from the client machine to the server machine. (Note that this is a key ring, not a lone public key.) Place the ring into your <em class="italic">~/.ssh2</em> directory on the server. Suppose it is called <em class="italic">pubring.pgp</em>. </li>
+<li value="2" class="calibre18">In your authorization file, <em class="italic">~/.ssh2/authorization</em>, identify the public-key ring with the keyword <code class="calibre35">PgpPublicKeyFile</code>:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PgpPublicKeyFile pubring.pgp</tt></div></span></li>
+<li value="3" class="calibre18">Identify the public key by name, fingerprint, or key ID, as in the client's identification file. The relevant keywords are slightly different: <code class="calibre35">PgpKeyName</code>, <code class="calibre35">PgpKeyFingerprint</code>, and <code class="calibre35">PgpKeyId</code>, respectively. (The keywords for the identification file begin with "Id".)<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: use any ONE of these<br class="calibre19"/>    PgpKeyName mykey<br class="calibre19"/>    PgpKeyFingerprint 48 B5 EA 28 80 5E 29 4D 03 33 7D 17 5E 2E CD 20<br class="calibre19"/>    PgpKeyId 0xD914738D</tt></div></span></li>
+</ol></div>
+<p class="calibre4">You are done! From the client, initiate a Tectia SSH session. Suppose you create an alternative identification file to use PGP authentication, called <em class="italic">~/.ssh2/idpgp</em>, containing your <code class="calibre35">PgpSecretKeyFile</code> and other lines. Use the <span><em class="italic">-i</em></span> flag to indicate this file, and initiate a connection: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh -i idpgp server.example.com</tt></div></span><p class="calibre4">If everything is set up properly, you are prompted for your PGP passphrase: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Passphrase for pgp key "mykey":</tt></div></span><p class="calibre4">Enter your PGP passphrase, and authentication should succeed. </p>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1418067" shape="rect" href="#filepos1411693" class="calibre6">101</a>] </sup>According to SSH Communications Security, PGP authentication in Tectia<a shape="rect" class="calibre15"></a><a id="filepos1418241" class="calibre15"></a> is not officially supported, nor is any other feature that is enabled by recompiling the source code. </p>
+</div>
+</div>
+</div>  <div class="mbppagebreak" id="calibre_pb_282"></div></body>
+</html>

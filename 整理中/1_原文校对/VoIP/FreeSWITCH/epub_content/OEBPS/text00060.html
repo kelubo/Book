@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">6.7　小结</font>
+</font>
+</p>
+<p height="1em" width="2em">本章讲了FreeSWITCH中的几种拨号计划并重点讲解了XML拨号计划。XML的描述能力很强，因而便于写出比较复杂的拨号计划。事实上，FreeSWITCH默认的配置在这里已经发挥得淋漓尽致了。读者如果有时间可以好好地看一看。另外，在以后的章节中我们也会用到默认拨号计划中的例子。</p>
+<p height="1em" width="2em">拨号计划有三个核心要素：<font color="#0468BB">Dialplan</font>
+ 、<font color="#0468BB">Context</font>
+ 和<font color="#0468BB">Extension</font>
+ 。系统中有一些Endpoint模块，这些模块一般都能配置相关的拨号计划以便对来话进行处理和路由。某些App或API，如transfer和uuid_transfer等，需要的参数也是Dialplan。在不同的场景下这些参数也会有默认值，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="transfer" data="1234"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">则表示transfer到1234这个Extension，使用XML Dialplan，Context为default，实际上它等价于：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="transfer" data="1234 XML default"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">理解了这些要素和参数，就可以举一反三，写出更强大的呼叫流程了。</p>
+<p height="1em" width="2em">通过对本章的学习中大家可以看到，不管是XML Dialplan还是inline Dialplan，拨号计划的最终目的就是为了给我们返回一组App以及它们的参数。一旦返回，拨号计划就完成了它的使命，实际呼叫的应答、放音、收号，录音等行为全部是由这些App后续控制的。当然，这些App也可以在适当的时候进行转移（transfer），从而要求重新进行路由（见图6-1中的Transfer部分），以获取一组新的App，进而执行新的动作。</p>
+<p height="1em" width="2em">execute_extension与transfer类似，都需要Dialplan的“三要素”作为参数，但不同的是，前者是临时执行一些Dialplan指定的App，它不会重新进入ROUTING阶段。</p>
+<p height="1em" width="2em">另外，我们也讲了Dialplan中一些常用的App以及在Dialplan中执行API的方法和技巧，灵活掌握这些可以使你在以后的配置维护和应用开发中事半功倍。</p>
+<p height="1em" width="2em">最后，我们深入讲解了通道变量的相关知识以及在Dialplan中对Channel Variable的一些常用操作方法，学完本章后读者可以自行尝试一下。</p>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_565"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2780115" class="calibre7"></a>16.11.1 Server Operation </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The Tectia server is implemented by a program, <span><em class="italic">ssh2master</em></span>, that runs as a daemon and listens for incoming connections. A separate program, <span><em class="italic">ssh2server</em></span>, is run to handle each connection when it is accepted. The <span><em class="italic">sftp</em></span> server is implemented by the program <span><em class="italic">sftp_server2</em></span>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">If you run a Tectia server on a Windows system configured with a firewall, be sure to allow access to the port(s) used to accept SSH connections, typically port 22. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Stopping the <span><em class="italic">ssh2master</em></span> program doesn't affect existing connections, since <span><em class="italic">ssh2server</em></span> continues to run. The Tectia server can even be restarted by a session that uses an SSH connection! </p>
+<p class="calibre4">Normally, the Tectia server is run as a Windows service that is automatically started whenever the system boots. Several mechanisms can be used to start or stop the service manually: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Use the Tectia server administration program (discussed shortly). </li>
+<li class="calibre18">Select either the Start Server or Stop Server item within the menu Start/Programs/SSH Tectia Server/Tools. </li>
+<li class="calibre18">Access the Control Panel, and use the dialogs for Administrative Tools/Services to select the display name SSH Tectia Server, and then click Start, Stop, or Restart the service. </li>
+<li class="calibre18">Run the <span><em class="italic">start-ssh.bat</em></span> or <span><em class="italic">stop-ssh.bat</em></span> scripts in the installation folder. </li>
+<li class="calibre18">Start or stop the service using the command <span><em class="italic">net start SSHSecureShell2Server</em></span> or <span><em class="italic">net stop SSHSecureShell2Server</em></span>, respectively. </li>
+<li class="calibre18">Run <span><em class="italic">ssh2master -start or ssh2master -stop</em></span>. </li>
+</ul></div>
+<p class="calibre4"><span><em class="italic">ssh2master</em></span> also understands the options <span><em class="italic">-install</em></span> and <span><em class="italic">-remove</em></span> to add or delete the Tectia server from the list of Windows services. </p>
+<p class="calibre4">In addition, <span><em class="italic">ssh2master</em></span> accepts a few options that we have discussed previously for <span><em class="italic">sshd2</em></span> on Unix platforms: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">-p port</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Listen to the specified port. <a shape="rect" href="DB_split_148.html#filepos816851" class="calibre6">[5.3.3.1]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-f config-file</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Use an alternate server configuration file. <a shape="rect" href="DB_split_140.html#filepos748785" class="calibre6">[5.2.1]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-d level</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Run in debug mode, and specify the debug level. <a shape="rect" href="DB_split_185.html#filepos1164478" class="calibre6">[5.9.2]</a></div>
+</blockquote>
+</div>
+</div>
+</body>
+</html>

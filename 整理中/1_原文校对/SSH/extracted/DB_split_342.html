@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_448"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2224126" class="calibre7"></a>11.3.1 Securing IMAP Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2224293" class="calibre15"></a>Like SSH, IMAP is a client/server protocol. Your email program (e.g., Pine) is the client, and an IMAP server process (e.g., <span><em class="italic">imapd</em></span> ) runs on a remote machine, the <span><em class="italic">IMAP host</em></span>, to control access to your remote mailbox. Also like SSH, IMAP generally requires you to authenticate before accessing your mailbox, typically by password. Unfortunately, in some cases this password is sent to the IMAP host in the clear over the network; this represents a security risk (see <a shape="rect" href="#filepos2225195" class="calibre6">Figure 11-8</a>).<sup class="calibre20">[<a id="filepos2225025" shape="rect" href="DB_split_344.html#filepos2253321" class="calibre6">148</a>]</sup></p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2225195" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="A normal IMAP connection" src="images/00052.jpg" class="calibre85"/></div>
+</div>
+</span><p class="calibre4">Figure 11-8. A normal IMAP connection</p></div>
+<p class="calibre4">There's no longer any good reason for this. Years ago, security options were rarely available in IMAP software; these days, however, they're common and should be used! There are standard ways to secure IMAP traffic using SSL or Kerberos. With SSL, the entire IMAP session is protected, so even plain password authentication can be used relatively securely. Kerberos can provide secure authentication and single-signon with or without session encryption; for example, the Apple Mail client implements both. Pine uses Kerberos only for authentication, not encryption—but you can combine Kerberos with SSL to get both single-signon and privacy. Note the power of having multiple independent and standards-based options available! </p>
+<p class="calibre4">Nonetheless, it is still all too common to encounter IMAP servers with no security features; here, we show you how to address this problem with SSH. </p>
+<p class="calibre4">If your mail server is <span><em class="italic">sealed</em></span>--that is, your only access to it is via the IMAP protocol—then there's nothing you can do to improve security using SSH. However, if you can also log into the IMAP server host via SSH, you have options. Because IMAP is a TCP/IP-based protocol, one approach is to use SSH port forwarding between the machine running Pine and the IMAP host (see <a shape="rect" href="#filepos2227278" class="calibre6">Figure 11-9</a>). <a shape="rect" href="DB_split_284.html#filepos1877654" class="calibre6">[9.2.1]</a></p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2227278" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Forwarding an IMAP connection" src="images/00053.jpg" class="calibre86"/></div>
+</div>
+</span><p class="calibre4">Figure 11-9. Forwarding an IMAP connection</p></div>
+<p class="calibre4">However, this technique has two drawbacks:</p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Security risk</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">On a multiuser machine, any other user can connect to your forwarded port. <a shape="rect" href="DB_split_287.html#filepos1919252" class="calibre6">[9.2.4.3]</a> If you use forwarding only to protect your password, this isn't a big deal, since at worst, an interloper could access a separate connection to the IMAP server having nothing to do with your connection. On the other hand, if port forwarding is permitting you to access an IMAP server behind a firewall, an interloper can breach the firewall by hijacking your forwarded port, a more serious security risk. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Inconvenience</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">In this setup, you must authenticate twice: first to the SSH server on the IMAP host (to connect and to create the tunnel) and then to the IMAP server by password (to access your mailbox). This is redundant and annoying. </div>
+</blockquote>
+</div>
+<p class="calibre4">Fortunately, we can address both of these drawbacks and run Pine over SSH securely and conveniently. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.3.1.1 Pine and preauthenticated IMAP </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">There are two broad types of Unix-based IMAP servers, exemplified by the University of Washington (UW) <span><em class="italic">imapd</em></span> and the Carnegie Mellon Cyrus software. Cyrus is a self-contained system: it uses an internal database to hold user mail, and the only access to it is via the IMAP protocol or particular programs for mail delivery or administration. In particular, there is no relationship between Unix accounts on the server host, and IMAP accounts; they are completely separate. </p>
+<p class="calibre4">The UW <span><em class="italic">imapd</em></span>, on the other hand, is a lighter-weight affair: it simply provides an IMAP view of the traditional Unix mail store: files in <em class="italic">/var/spool/mail</em> or elsewhere, owned by the Unix accounts of the mail recipients. Thus, its notion of user account and access control is tied to that of the host. If your mail is stored in a spool file owned by you, and you can log into the host via SSH, then you've already proven you have access to that file—why should you have to prove it <span><em class="italic">again</em></span> to the IMAP server? In fact, with the UW server, you don't have to. We now discuss how to do this with UW <span><em class="italic">imapd</em></span>, or another IMAP server with similar behavior. </p>
+<p class="calibre4">The IMAP protocol defines two modes in which an IMAP server can start: normal and preauthenticated (see <a shape="rect" href="#filepos2231607" class="calibre6">Figure 11-10</a>). Normally, <span><em class="italic">imapd</em></span> runs with special privileges to access any user's mailbox (as when started as root by <span><em class="italic">inetd</em></span>), and hence it requires authentication from the client. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2231607" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Pine/IMAP over SSH, preauthenticated" src="images/00054.jpg" class="calibre87"/></div>
+</div>
+</span><p class="calibre4">Figure 11-10. Pine/IMAP over SSH, preauthenticated</p></div>
+<p class="calibre4">Here's a sample session that invokes an IMAP server, <span><em class="italic">imapd</em></span>, through <span><em class="italic">inetd</em></span> so that it runs as root: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    server% telnet localhost imap<br class="calibre19"/>    * OK localhost IMAP4rev1 v12.261 server ready<br class="calibre19"/>    0 login res <em class="italic"><code class="calibre35">password'</code></em><br class="calibre19"/>    1 select inbox<br class="calibre19"/>    * 3 EXISTS<br class="calibre19"/>    * 0 RECENT<br class="calibre19"/>    * OK [UIDVALIDITY 964209649] UID validity status<br class="calibre19"/>    * OK [UIDNEXT 4] Predicted next UID<br class="calibre19"/>    * FLAGS (\Answered \Flagged \Deleted \Draft \Seen)<br class="calibre19"/>    * OK [PERMANENTFLAGS (\* \Answered \Flagged \Deleted \Draft \Seen)] Permanent flags<br class="calibre19"/>    1 OK [READ-WRITE] SELECT completed<br class="calibre19"/>    2 logout<br class="calibre19"/>    * BYE imap.example.com IMAP4rev1 server terminating connection<br class="calibre19"/>    2 OK LOGOUT completed</tt></div></span><p class="calibre4">Alternatively, in preauthenticated mode, the IMAP server assumes that authentication has already been done by the program that started the server and that it already has the necessary rights to access the user's mailbox. If you invoke <span><em class="italic">imapd</em></span> on the command line under a nonroot uid, <span><em class="italic">imapd</em></span> skips the authentication phase and simply opens the mailbox file of the current account (which must be accessible via the existing Unix permissions structure). You can then type IMAP commands and access your mailbox without authentication: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    server% /usr/local/sbin/imapd<br class="calibre19"/>    * PREAUTH imap.example.com IMAP4rev1 v12.261 server ready<br class="calibre19"/>    0 select inbox<br class="calibre19"/>    * 3 EXISTS<br class="calibre19"/>    * 0 RECENT<br class="calibre19"/>    * OK [UIDVALIDITY 964209649] UID validity status<br class="calibre19"/>    * OK [UIDNEXT 4] Predicted next UID<br class="calibre19"/>    * FLAGS (\Answered \Flagged \Deleted \Draft \Seen)<br class="calibre19"/>    * OK [PERMANENTFLAGS (\* \Answered \Flagged \Deleted \Draft \Seen)] Permanent flags<br class="calibre19"/>    0 OK [READ-WRITE] SELECT completed<br class="calibre19"/>    1 logout<br class="calibre19"/>    * BYE imap.example.com IMAP4rev1 server terminating connection<br class="calibre19"/>    1 OK LOGOUT completed</tt></div></span><p class="calibre4">Notice the <code class="calibre35">PREAUTH</code> response at the beginning of the session, indicating preauthenticated mode. It is followed by the command <span><em class="italic">select inbox</em></span>, which causes the IMAP server implicitly to open the inbox of the current user without demanding authentication. </p>
+<p class="calibre4">Now, how does all this relate to Pine? Pine has a built-in feature whereby, instead of using a direct IMAP connection, it logs into the IMAP host using <span><em class="italic">ssh</em></span> and runs a preauthenticated instance of <span><em class="italic">imapd</em></span> directly. If this succeeds, Pine then converses with the IMAP server over the SSH connection, and has automatic access to the remote inbox without further authentication. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.3.1.2 Making Pine use SSH </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2236196" class="calibre15"></a>Pine's SSH feature is controlled by three configuration variables in the <em class="italic">~/.pinerc</em> file: <code class="calibre35">ssh-path</code>, <code class="calibre35">ssh-command</code>, and <code class="calibre35">ssh-open-timeout</code>. <code class="calibre35">ssh-path</code> stores the program name for opening a Unix remote shell connection. The default should point to a usable SSH program, but you may have to set it yourself: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh-path=/usr/bin/ssh</tt></div></span><p class="calibre4"><code class="calibre35">ssh-command</code> represents the Unix command line for opening the SSH connection. The value is a <code class="calibre35">printf</code>-style format string with four "%s" conversion specifications that are automatically filled in at runtime. From first to last, these four specifications stand for: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">The value of <code class="calibre35">ssh-path</code></li>
+<li value="2" class="calibre18">The remote hostname</li>
+<li value="3" class="calibre18">The remote username</li>
+<li value="4" class="calibre18">The connection method; in this case, "imap"</li>
+</ol></div>
+<p class="calibre4">The default value of <code class="calibre35">ssh-command</code> is: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    "%s %s -l %s exec /etc/r%sd"</tt></div></span><p class="calibre4">To access the mailbox on <span><em class="italic">imap.example.com</em></span> for user smith via SSH, Pine would then run the command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    /usr/bin/ssh imap.example.com -l smith exec /etc/rimapd</tt></div></span><p class="calibre4">This follows a convention, somewhat antiquated nowadays, of having links named <em class="italic">/etc/r&lt;</em>
+<em class="italic"><code class="calibre35">protocol</code></em>
+<em class="italic">&gt;d</em> that point to servers for various protocols that operate in this preauthenticated fashion. In modern systems such links are usually not available, so you may need to alter the <span><em class="italic">ssh-command</em></span> to run <span><em class="italic">imapd</em></span>. You can also use it to add other options, like so: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh-command="%s %s -l %s -o BatchMode=yes -axq exec /usr/sbin/imapd"</tt></div></span><p class="calibre4">With this setting, Pine would end up running this command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    /usr/bin/ssh imap.example.com -l -o BatchMode=yes -axq exec /usr/sbin/imapd</tt></div></span><p class="calibre4">The <span><em class="italic">-q</em></span> (<code class="calibre35">Quiet</code>) option is advisable so that <span><em class="italic">ssh</em></span> doesn't emit warning messages that may confuse Pine, which would try to interpret them as part of the IMAP protocol. The options <span><em class="italic">-ax</em></span> turns off agent and X Windows forwarding, which might be on by default but are not necessary for this connection. <code class="calibre35">BatchMode</code> lets <span><em class="italic">ssh</em></span> know that it can't prompt the user for a password on the terminal, since Pine is using it. </p>
+<p class="calibre4">The third variable, <code class="calibre35">ssh-open-timeout</code>, sets the number of seconds Pine will wait for the SSH connection to succeed; its default value is 15. A value of 0 disables SSH entirely, which may be useful if the feature is on by default and you do not want to use it. </p>
+<p class="calibre4">So, finally, the Pine configuration is:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh-path=/usr/bin/ssh<br class="calibre19"/>    ssh-command="%s %s -l %s -o BatchMode=yes -axq exec /usr/sbin/imapd"<br class="calibre19"/>    ssh-open-timeout=15</tt></div></span><p class="calibre4">Generally, you want to use an SSH authentication method that doesn't require typing a password or passphrase, such as hostbased or public-key with an agent. SSH is run behind the scenes by Pine and doesn't have access to the terminal to prompt you. If you're running the X Window System, <span><em class="italic">ssh</em></span> can instead pop up an X widget -- </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Remote Usernames in Pine</h3>
+<p class="calibre4">By the way, it's not mentioned in the <span><em class="italic">Pine</em></span> manpage or configuration file comments, but if you need to specify a different username for connecting to a remote mailbox, the syntax is: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    {hostname/user=jane}mailbox</tt></div></span><p class="calibre4">This causes Pine to call the <code class="calibre35">ssh-command</code> with "jane" as the remote username (i.e., the third %s substitution). </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4"><span><em class="italic">ssh-askpass</em></span>--to get input, but you probably don't want that either. Pine may make several separate IMAP connections in the course of reading your mail, even if it's all on the same server, and this will cause repeated queries for your password. </p>
+<p class="calibre4">With the given settings in your <em class="italic">~/.pinerc</em> file and the right kind of SSH authentication in place, you're ready to try Pine over SSH. Just start Pine and open your remote mailbox; if all goes well, it will open without prompting for a password. </p>
+</div>
+</div>
+</body>
+</html>

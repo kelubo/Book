@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.7　API命令帮助</font>
+</font>
+</p>
+<p height="1em" width="2em">在本章的最后，我们来学习一下如何使用FreeSWITCH的API命令帮助。使用help可以列出所有命令的帮助信息，具体示例如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; help<br/>
+<br/>
+Valid Commands:<br/>
+<br/>
+...,,Shutdown,mod_commands<br/>
+<br/>
+acl,&lt;ip&gt;&lt;list_name&gt;,Compare an ip to an acl list,mod_commands<br/>
+<br/>
+alias,[add|stickyadd] &lt;alias&gt;&lt;command&gt; | del [&lt;alias&gt;|*],Alias,mod_commands<br/>
+<br/>
+banner,,Return the system banner,mod_commands<br/>
+<br/>
+bg_system,&lt;command&gt;,Execute a system command in the background,mod_commands<br/>
+<br/>
+bgapi,&lt;command&gt;[ &lt;arg&gt;],Execute an api command in a thread,mod_commands<br/>
+<br/>
+break,&lt;uuid&gt; [all],uuid_break,mod_commands<br/>
+<br/>
+chat,&lt;proto&gt;|&lt;from&gt;|&lt;to&gt;|&lt;message&gt;|[&lt;content-type&gt;],chat,mod_dptools<br/>
+<br/>
+cluechoo,syntax,Cluechoo API,mod_cluechoo<br/>
+<br/>
+complete,add &lt;word&gt;|del [&lt;word&gt;|*],Complete,mod_commands<br/>
+<br/>
+cond,&lt;expr&gt; ? &lt;true val&gt; : &lt;false val&gt;,Evaluate a conditional,mod_commands<br/>
+<br/>
+conference ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以bgapi为例，它的作用是把命令放到后台执行（命令执行都是阻塞的，有些命令需要执行相对较长的时间才能返回，因而有时我们会把某些命令放到后台执行）。其后面的&lt;command&gt;表示是一个必选参数，它的值可以是除bgapi以外的任何其他命令；[&lt;arg&gt;]放到方括号中，表示是一个可选参数，该参数是实际的&lt;command&gt;的参数，由于有些命令是没有参数的，因而它是可选的。</p>
+<p height="1em" width="2em">某些命令也有自己更详细的帮助信息，如sofia：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia help<br/>
+<br/>
+USAGE:<br/>
+<br/>
+--------------------------------------------------------------------------------<br/>
+<br/>
+sofia help<br/>
+<br/>
+sofia profile &lt;profile_name&gt; [[start|stop|restart|rescan]<br/>
+<br/>
+    [reloadxml]|flush_inbound_reg [&lt;call_id&gt;] [reboot]|[register|unregister]<br/>
+<br/>
+....<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，用尖括号（&lt;&gt;）括起来的表示是要输入的参数；而用方括号（[]）括起来的则表示为可选项，该参数可以有也可以没有；用竖线（|）分开的参数列表表示“或”的关系，即只能选其一。</p>
+<p height="1em" width="2em">FreeSWITCH的命令参数没有统一的解析函数，都是由命令本身的函数负责解析的，因而不是很规范，不同的命令可能有不同的风格，所以使用时，除使用帮助信息外，最好还是查阅一下Wiki上的帮助。</p>
+</body>
+</html>

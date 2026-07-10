@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_518"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2667160" class="calibre7"></a>14.3.1 Opening Remote Windows on the Desktop </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2667336" class="calibre15"></a>If you want to run graphical applications via <span><em class="italic">ssh</em></span> that open windows, such as <span><em class="italic">notepad</em></span> or <span><em class="italic">regedit</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; ssh my-pc-name notepad</tt></div></span><p class="calibre4">this will not work unless you grant <span><em class="italic">sshd</em></span> permission to do so. Here's how to do it on Windows XP and 2000: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Open the Services control panel.</li>
+<li value="2" class="calibre18">Stop the <span><em class="italic">Cygwin sshd</em></span> service. </li>
+<li value="3" class="calibre18">Double-click the <span><em class="italic">Cygwin sshd</em></span> service to view its properties. </li>
+<li value="4" class="calibre18">Select the Log On tab.</li>
+<li value="5" class="calibre18">Under "Log on as," select the Local System account and check the box "Allow service to interact with desktop." </li>
+<li value="6" class="calibre18">Click OK and restart the <span><em class="italic">Cygwin sshd</em></span> service. </li>
+</ol></div>
+<p class="calibre4">Before doing this, however, carefully consider the security implications. You're permitting <span><em class="italic">any</em></span> user with SSH privileges—not just the logged-in user, not just administrators—to open windows on the desktop remotely. </p>
+</div>
+<div class="mbppagebreak" id="calibre_pb_519"></div></body>
+</html>

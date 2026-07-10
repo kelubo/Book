@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1861368" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_364"><span class="calibre2"><a shape="rect" class="calibre7"></a>The User rc File </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1861717" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1861756" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1861795" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1861834" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1861873" class="calibre15"></a>The shell script <em class="italic">/etc/ssh/sshrc</em> is invoked by the SSH server for each incoming SSH connection. <a shape="rect" href="DB_split_177.html#filepos1091997" class="calibre6">[5.6.3]</a> You may define a similar script in your account, <em class="italic">~/.ssh/rc</em> (OpenSSH) or <em class="italic">~/.ssh2/rc</em> (Tectia), to be invoked for every SSH connection to your account. If this file exists, <em class="italic">/etc/ssh/sshrc</em> isn't run. </p>
+<p class="calibre4">The SSH <em class="italic">rc</em> file is much like a shell startup file (e.g., <em class="italic">~/.profile</em> or <em class="italic">~/.cshrc</em>), but it executes only when your account is accessed by SSH. It is run for both interactive logins and remote commands. Place any commands in this script that you would like executed when your account is accessed by SSH, rather than an ordinary login. For example, you can run and load your <span><em class="italic">ssh-agent</em></span> in this file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.ssh/rc, assuming your login shell is the C shell<br class="calibre19"/>    if ( ! $?SSH_AUTH_SOCK  ) then<br class="calibre19"/>      eval `ssh-agent`<br class="calibre19"/>      /usr/bin/tty | grep 'not a tty' &gt; /dev/null<br class="calibre19"/>      if ( ! $status ) then<br class="calibre19"/>        ssh-add<br class="calibre19"/>      endif<br class="calibre19"/>    endif</tt></div></span><p class="calibre4">Like <em class="italic">/etc/ssh/sshrc</em>, your personal <em class="italic">rc</em> file is executed just before the shell or remote command requested by the incoming connection. OpenSSH always uses the Bourne shell (<em class="italic">/bin/sh</em>) for <em class="italic">~/.ssh/rc</em>, as it does for <em class="italic">/etc/ssh/sshrc</em>. In contrast, Tectia uses your login shell for <em class="italic">~/.ssh2/rc</em>, unlike <em class="italic">/etc/ssh2/sshrc</em>. </p>
+</div>  <div class="mbppagebreak" id="calibre_pb_365"></div></body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_45"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos156993" class="calibre7"></a>1.4.4 Keys and Agents </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Suppose you have accounts on many computers on a network. For security reasons, you prefer different passwords on all accounts; but remembering so many passwords is difficult. It's also a security problem in itself. The more often you type a password, the more likely you'll mistakenly type it in the wrong place. (Have you ever accidentally typed your password instead of your username, visible to the world? Ouch! And on many systems, such mistakes are recorded in a system log file, revealing your password in plain text.) Wouldn't it be great to identify yourself only once and get secure access to all the accounts without continually typing passwords? </p>
+<p class="calibre4">SSH has various authentication mechanisms, and the most secure is based on <span><em class="italic">keys</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos158012" class="calibre15"></a> rather than passwords. Keys are discussed in great detail in <a shape="rect" href="DB_split_190.html#filepos1221117" class="calibre6">Chapter 6</a>, but for now we define a key as a small blob of bits that uniquely identifies an SSH user. For security, a key is kept encrypted; it may be used only after entering a secret <span><em class="italic">passphrase</em></span> to decrypt it. </p>
+<p class="calibre4">Using keys, together with a program called an <span><em class="italic">authentication agent</em></span>, SSH can authenticate you to all your computer accounts securely without requiring you to memorize many passwords or enter them repeatedly. It works like this: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">In advance (and only once), place special, nonsecure files called <span><em class="italic">public key files</em></span> into your remote computer accounts. These enable your SSH clients (<span><em class="italic">ssh</em></span>, <span><em class="italic">scp</em></span>) to access your remote accounts. </li>
+<li value="2" class="calibre18">On your local machine, invoke the <span><em class="italic">ssh-agent</em></span> program, which runs in the background. </li>
+<li value="3" class="calibre18">Choose the key (or keys) you will need during your login session. </li>
+<li value="4" class="calibre18">Load the keys into the agent with the <span><em class="italic">ssh-add</em></span> program. This requires knowledge of each key's secret passphrase. </li>
+</ol></div>
+<p class="calibre4">At this point, you have an <span><em class="italic">ssh-agent</em></span> program running on your local machine, holding your secret keys in memory. You're now done. You have passwordless access to all your remote accounts that contain your public key files. Say goodbye to the tedium of retyping passwords! The setup lasts until you log out from the local machine or terminate <span><em class="italic">ssh-agent</em></span>. </p>
+</div>
+</body>
+</html>

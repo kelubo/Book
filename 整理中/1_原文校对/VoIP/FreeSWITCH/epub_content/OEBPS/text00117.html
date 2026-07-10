@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.5　对接Asterisk</font>
+</font>
+</p>
+<p height="1em" width="2em">Asterisk是老牌的开源VoIP软件。事实上，FreeSWITCH的作者Anthony Minessale在早些年也是Asterisk的开发者，后来由于对Asterisk的架构设计和性能问题有意见，提议开发了一个新的Asterisk分支，但是开发新分支的想法却未得到Asterisk社区主要负责人的支持，因此便从头开发了FreeSWITCH <sup>
+<small>
+<a href="text00118.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">由于Asterisk比FreeSWITCH资格老，因此在国内有大量的用户群，在很多情况下都需要与FreeSWITCH进行对接。因此，这里我们也来看一下Asterisk与FreeSWITCH对接的例子。</p>
+<p height="1em" width="2em">在本例中，我们仅使用中继方式（在Asterisk中称为peer，即对等的连接方式）与Asterisk进行对接，其他的对接方式如相互向对方注册等留给读者练习。我们假定读者已经熟悉Asterisk。先在Asterisk上添加一个分机6000，并用一个SIP客户端注册上去，为下面的测试做准备。另外，下面的测试中FreeSWITCH的IP地址为192.168.7.5，而Asterisk的IP地址为192.168.7.99。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.5.1　从FreeSWITCH呼叫Asterisk</font>
+</font>
+</p>
+<p height="1em" width="2em">首先，我们已经很熟悉如何在FreeSWITCH中将电话送出，通过使用下列命令可以呼叫Asterisk上的6000：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate sofia/external/6000@192.168.7.99 &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或者，使用如下的Dialplan，当FreeSWITCH上的用户拨打6000时，也可以送到Asterisk上：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="sofia/external/6000@192.168.7.99"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">呼叫到达Asterisk上后，就可以在Asterisk的控制台上看到类似如下的日志：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+NOTICE[3684][C-0000000d]: chan_sip.c:25381 handle_request_invite:<br/>
+<br/>
+Call from '' (192.168.7.5:5080) to extension '6000' rejected<br/>
+<br/>
+    because extension not found in context 'public'.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">出现上述提示的原因是我们没有在Asterisk上配置入局路由，因而我们的呼叫被拒绝（rejected）了。接下来，我们只需打开Asterisk的配置文件extension.conf，在public Context中增加如下的设置就可以了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+exten =&gt; 6000,1,Dial(SIP/6000)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“6000”匹配被叫号码；“1”是一个优先级标志；“Dial”是一个Application，类似FreeSWITCH中的bridge；最后“SIP/6000”是一个呼叫字符串。</p>
+<p height="1em" width="2em">在Asterisk的控制台上使用dialplan reload命令使用之生效，然后，再一次在FreeSWITCH中发起呼叫，Asterisk上的分机6000就可以振铃了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.5.2　从Asterisk上呼叫FreeSWITCH</font>
+</font>
+</p>
+<p height="1em" width="2em">我们也可以很容易在Asterisk中使用如下Dialplan将电话送到FreeSWITCH上。</p>
+<p height="1em" width="2em">exten=&gt;_01X.,1,Dial(SIP/${EXTEN:1}@192.168.7.5:5080)</p>
+<p height="1em" width="2em">其中，“_01X.”是Asterisk中的模式匹配规则，它匹配以“01”开头的被叫号码；“1”为优先级标志；而后面的Dial相当于FreeSWITCH中的bridge App；再后面是一个以SIP开头的呼叫字符串；“${EXTEN}”即模式匹配中的被叫号码，而“${EXTEN:1}”即去掉最前面的一位（即“吃掉0”），然后把剩下的号码作为被叫号码并将呼叫送到FreeSWITCH的地址192.168.7.5:5080上去。</p>
+<p height="1em" width="2em">因此，使用上述Dialplan在Asterisk上使用分机6000呼叫号码01000时，Asterisk就会“吃”掉被叫号码中最前面的“0”，并将呼叫送达FreeSWITCH，然后FreeSWITCH上的分机1000就会振铃。</p>
+<p height="1em" width="2em">上述呼叫在FreeSWITCH中能够正确路由是因为FreeSWITCH中默认的publicDialplan包含了到用户1000的路由。当然，如果是呼叫其他号码，则也可以根据实际情况在FreeSWITCH中配置相关的入局路由。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.5.3　其他</font>
+</font>
+</p>
+<p height="1em" width="2em">在上面的例子中，我们仅介绍了使用中继对接的最简单的情形。电话是可以呼通了，但出于用于生产环境中的安全性考虑，就需使用账号或IP地址对来话进行验证了，这部分内容就留给读者自行练习了。当然，读者也可以参考以下Wiki页面上的对接说明https://wiki.freeswitch.org/wiki/Connecting_Freeswitch_and_Asterisk。</p>
+<p height="1em" width="2em">另外，从上面的例子可以看出，在Asterisk与FreeSWITCH中的用户及路由的配置概念都是很类似的。如果用户熟悉Asterisk，则FreeSWITCH也应该很快能上手。Wiki页面http://wiki.freeswitch.org/wiki/Rosetta_Stone对两者相似的概念进行了对比，对于刚刚从Asterisk转到FreeSWITCH的读者来说，读一读或有帮助。</p>
+<p height="1em" width="2em">最后，关于Asterisk和FreeSWITCH的关系，我们来看一下Anthony Minessale在2009年接受媒体采访时的一段对话 <sup>
+<small>
+<a href="text00118.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ ：</p>
+<p height="1em" width="2em">
+<font color="#0468BB">媒体：</font>
+ 如果有人想把他或她的Asterisk系统换成FreeSWITCH，是否需要编写很多的代码以及学习完全不同的配置文件语法？</p>
+<p height="1em" width="2em">
+<font color="#0468BB">Anthony：</font>
+ 并不像你想象的那么难。理解FreeSWITCH最关键的地方有一个它与Asterisk之间的词形变化表。事实上，它们之间有很多相似的地方，如它们都使用可加载模块、都使用“application”执行相应的功能等。不同的，同时也是对学习FreeSWITCH、至关重要的一点是，其尝试最大程度地去除一切复杂性，我们可从一个简单的角度看待Free SWITCH。很多从Asterisk转移过来的FreeSWITCH新手往往由于想得太多而把问题搞得很复杂。实际上我们无比强大的社区成员已经写了一个名为“Asterisk罗塞塔石碑 <sup>
+<small>
+<a href="text00118.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ ”的Wiki页面 <sup>
+<small>
+<a href="text00118.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，该页面非常好地解释了从Asterisk转到FreeSWITCH的各种概念和要素。另外，我们也有一个模块 <sup>
+<small>
+<a href="text00118.html">
+<font size="2">
+<font color="#FF6600">[5]</font>
+</font>
+</a>
+</small>
+</sup>
+ 允许你使用你熟悉的Asterisk的语法写Dialplan进行电话路由。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00117.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 在此，笔者只是陈述一个事实，并无意将两者对立起来。其实，Asterisk的新版本在近几年性能也有了很大的提升。并且，在市场上有很多成熟的应用，很多用户也将会长期使用Asterisk，这也是笔者写这一节的原因之一。Anthony Minessale在2010年接受VOIPToday采访并被问及FreeSWITCH与其他“竞争者”的关系时也说过：这并不是一个FreeSWITCH必须“打败”Asterisk才能“胜利”的公认的所谓的“零和游戏”，在很多情况下人们都会把FreeSWITCH用作他们已有的Asterisk、CallWeaver、YATE安装部署的一部分……</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 来自http://www.888voip.com/interview-with-anthony-minessale-from-freeswitch/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[3]</font>
+</a>
+ Rosetta Stone，是一块刻有古埃及法老托勒密五世（Ptolemy V）诏书的石碑。由于这块石碑同时刻有同一段内容的三种不同语言版本，使得近代的考古学家得以有机会对照各语言版本的内容，解读出已经失传千余年的埃及象形文字的意义与结构。参见：http://zh.wikipedia.org/wiki/罗塞塔石碑。——笔者（译者）注</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 参见http://wiki.freeswitch.org/wiki/Rosetta_stone。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[5]</font>
+</a>
+ 指mod_dialplan_asterisk。——笔者（译者）注。</p>
+</body>
+</html>

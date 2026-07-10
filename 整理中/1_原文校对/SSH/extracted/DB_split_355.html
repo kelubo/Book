@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_464"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2356359" class="calibre7"></a>11.6.1 Metaconfiguration </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Tectia recognizes specially structured comments at the beginning of configuration files. These lines determine the syntax rules for the rest of the file, and are therefore called <span><em class="italic">metaconfiguration<a shape="rect" class="calibre15"></a><a id="filepos2356763" class="calibre15"></a> information</em></span>. </p>
+<p class="calibre4">Configuration files distributed with Tectia all start with lines of the form: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ## SSH CONFIGURATION FILE FORMAT VERSION 1.1<br class="calibre19"/>    ## REGEX-SYNTAX egrep<br class="calibre19"/>    ## end of metaconfig<br class="calibre19"/>    ## (leave above lines intact!)</tt></div></span><p class="calibre4">The first line specifies the syntax version number, and defines the start of the metaconfiguration information. Increasing syntax version numbers allow the syntax rules to be extended, possibly in incompatible ways. As long as older configuration files explicitly specify their syntax versions, they can still be correctly understood by newer versions of the Tectia server. </p>
+<p class="calibre4">The default syntax version (used if there is no metaconfiguration information) is 1.0. This refers to the "traditional" syntax rules understood by Tectia versions before Version 3.0.0 (when the metaconfiguration information syntax was introduced). The latest syntax version at press time is 1.1. </p>
+<p class="calibre4">Syntax rules are further refined by lines that immediately follow the syntax version. These lines contain pairs of metaconfiguration parameter names and values, and look similar to the keyword lines in the rest of the configuration file, with two important differences: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">The pairs occur within comment lines.</li>
+<li class="calibre18">The metaconfiguration parameter names must always be uppercase. </li>
+</ul></div>
+<p class="calibre4">Syntax Version 1.1 adds support for the <code class="calibre35">REGEX-SYNTAX</code> parameter, which determines how regular expressions are interpreted. The three standards are: </p>
+<p class="calibre4">These values are case-insensitive, unlike the parameter names. Full syntax rules are described in <a shape="rect" href="DB_split_498.html#filepos2938322" class="calibre6">Appendix B</a>. </p>
+<p class="calibre4">Metaconfiguration information ends when an unrecognized comment line (or a standard, uncommented keyword line) is encountered. It's a good idea to mark the end with an ordinary comment line (like "end of metaconfig" as shown earlier) that does not look like a metaconfiguration parameter, to prevent possible misinterpretation of adjacent comment lines and to enhance readability. Use of <code class="calibre35">##</code> instead of <code class="calibre35">#</code> is just a stylistic convention to allow the metaconfiguration information to be more easily distinguished from unrelated comments. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Pitfalls with Tectia Metaconfiguration</h3>
+<p class="calibre4">Since metaconfiguration information in Tectia is represented as structured comments, there is an unfortunate consequence: typos can cause the information to be ignored silently, because unrecognized lines are just ordinary comments. This can cause subtle (and dangerous) misinterpretation of the rest of the configuration file. </p>
+<p class="calibre4">We therefore recommend using the boilerplate metaconfiguration information in the sample configuration files from Tectia as a template. Edit carefully and sparingly, if you need to make changes (e.g., to use a different regex syntax). Resist the temptation to omit the metaconfiguration information, however, because explicitly specifying the syntax rules will protect you in the future if the default rules change. </p>
+<p class="calibre4">For troubleshooting, the <span><em class="italic">sshd -d</em></span> command-line option <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> with the <code class="calibre35">SshConfigParse</code> module and a relatively high debug level can be informative: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    sshd -d SshConfigParse=9</tt></div></span><p class="calibre4">More precise rules for recognizing metaconfiguration information are: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Metaconfiguration information must be at the beginning of the configuration file. It can only be preceded by empty lines or whitespace, but not by ordinary comments or uncommented keyword lines. </li>
+<li class="calibre18">Metaconfiguration information lines can only be separated by empty lines or whitespace. Don't try to add ordinary comments (or standard keywords) within the metaconfiguration information. </li>
+<li class="calibre18">The syntax version line must match the (<span><em class="italic">egrep</em></span>) regular expression:<a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    #.*VERSION[[:space:]]+[[:digit:]]+\.[[:digit:]]+.*</tt></div></span><br class="calibre19"/>Note that <code class="calibre35">VERSION</code> must be uppercase, but can be preceded by any other characters, which are ignored. At least one space must separate <code class="calibre35">VERSION</code> from the version number, which must have two numeric components, separated by a period. Any trailing characters are ignored. Here's a valid example:<a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    #VERSION 1.1 -- Tectia Configuration File for server.example.com</tt></div></span></li>
+<li class="calibre18">Metaconfiguration parameter lines must match the (<span><em class="italic">egrep</em></span>) regular expression:<a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    #[#[:space:]]+[[:upper:][:digit:]-]+\s+.*</tt></div></span><br class="calibre19"/>Note that at least one space or extra <code class="calibre35">#</code> character must appear between the first <code class="calibre35">#</code> comment character and the parameter name (in contrast to the <code class="calibre35">VERSION</code> line), so a line like <code class="calibre35">#REGEX egrep</code> does not work.<br class="calibre19"/>Parameter names can contain only uppercase letters, digits, or hyphens. At least one space must separate the parameter name from the value. Values can contain whitespace. </li>
+<li class="calibre18">Unrecognized parameter names are ignored, but metaconfiguration information continues as long as the parameter line is well formed. </li>
+</ul></div>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+</body>
+</html>

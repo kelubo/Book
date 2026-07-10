@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2140512" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_437"><span class="calibre2"><a shape="rect" class="calibre7"></a>FTP and SSH </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2140856" class="calibre15"></a>One of the most frequently asked questions about SSH is, "How can I use port forwarding to secure FTP?" If the forwarding in question is the traditional sort of static port forwarding provided by SSH clients such as OpenSSH, then the short answer is that you usually can't, at least not completely, as we will explain in detail in this section. Such port forwarding can protect your account password, but usually not the files being transferred. Still, protecting your password is a big win, since the most egregious problem with FTP is that it usually reveals your password to network snoopers. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">It's worth noting that FTP can in fact be used securely on its own. Both FTP and Telnet are famously considered "insecure," but it's more accurate to say that they are simply <span><em class="italic">used</em></span> insecurely most of the time. Both protocols allow the use of strong authentication and encryption methods, such as SSL or Kerberos. However, the vast majority of FTP and Telnet servers in the world do not provide these features, and so we are left trying to secure them as best we can with other tools, such as SSH. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Before trying to figure out how to forward FTP over SSH, you should first ask yourself whether you really need to use FTP at all. If possible, it's far less trouble to simply use a file-transfer method that works easily over SSH, such as <span><em class="italic">scp</em></span>, <span><em class="italic">sftp</em></span>, <span><em class="italic">rsync</em></span>, etc. (and remember that SFTP and FTP have <span><em class="italic">nothing</em></span> to do with one another, save the acronym). If you're going to secure FTP end-to-end with SSH, then the FTP server must already be running an SSH server—which means it shouldn't be hard to make the requisite files available via SSH as well. But the real world is messy, and you might be stuck with FTP. </p>
+</div>  </body>
+</html>

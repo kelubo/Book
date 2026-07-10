@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos194741" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_68"><span class="calibre2"><a shape="rect" class="calibre7"></a>Remote Terminal Sessions with ssh </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">Suppose your remote username on <span><em class="italic">shell.isp.com</em></span> is pat. To connect to your remote account from your friend's account on <span><em class="italic">local.university.edu</em></span>, you type: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -l pat shell.isp.com<br class="calibre19"/>    pat's password: ******<br class="calibre19"/>    Last login<a shape="rect" class="calibre15"></a><a id="filepos195611" class="calibre15"></a>: Mon Aug 16 19:32:51 2004 from quondam.nefertiti.org<br class="calibre19"/>    You have new mail.<br class="calibre19"/>    shell.isp.com&gt;</tt></div></span><p class="calibre4">This leads to the situation shown in <a shape="rect" href="#filepos196826" class="calibre6">Figure 2-1</a>. The <span><em class="italic">ssh</em></span> command runs a client that contacts the SSH server on <span><em class="italic">shell.isp.com</em></span> over the Internet, asking to be logged into the remote account with username pat.<sup class="calibre20">[<a id="filepos196284" shape="rect" href="DB_split_043.html#filepos204828" class="calibre6">5</a>]</sup> You can also provide <span><em class="italic">user@host</em></span> syntax instead of the <span><em class="italic">-l</em></span> option to accomplish the same thing: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh pat@shell.isp.com</tt></div></span><div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos196826" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Our example scenario" src="images/00005.jpg" class="calibre42"/></div>
+</div>
+</span><p class="calibre4">Figure 2-1. Our example scenario</p></div>
+<p class="calibre4">On first contact, SSH establishes a secure channel between the client and the server so that all transmissions between them are encrypted. The client then prompts for your password, which it supplies to the server over the secure channel. The server authenticates you by checking that the password is correct and permits the login. All subsequent client/server exchanges are protected by that secure channel, including everything you type into the SSH application and everything it displays to you from <span><em class="italic">shell.isp.com</em></span>. </p>
+<p class="calibre4">It's important to remember that the secure channel exists only between the SSH client and server machines. After logging into <span><em class="italic">shell.isp.com</em></span> via <span><em class="italic">ssh</em></span>, if you then <span><em class="italic">telnet</em></span> or <span><em class="italic">ftp</em></span> to a third machine, <span><em class="italic">insecure.isp.com</em></span>, the connection between <span><em class="italic">shell.isp.com</em></span> and <span><em class="italic">insecure.isp.com</em></span> is not secure. However, you can run another <span><em class="italic">ssh</em></span> client from <span><em class="italic">shell.isp.com</em></span> to <span><em class="italic">insecure.isp.com</em></span>, creating another secure channel, which keeps the chain of connections secure. </p>
+<p class="calibre4">We've covered only the simplest use of <span><em class="italic">ssh</em></span>. <a shape="rect" href="DB_split_214.html#filepos1423419" class="calibre6">Chapter 7</a> goes into far greater depth about its many features and options. </p>
+</div>  </body>
+</html>

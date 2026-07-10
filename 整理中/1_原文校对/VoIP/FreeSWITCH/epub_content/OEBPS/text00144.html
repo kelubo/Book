@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.3　在会议中呼出</font>
+</font>
+</p>
+<p height="1em" width="2em">很多网友都曾问过，如何在会议中通过DTMF去呼叫其他人加入会议？实现的方法有很多种，这里我们来看一下如何通过配合Lua脚本来实现。</p>
+<p height="1em" width="2em">首先，我们来看下面的Lua脚本：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 prompt="tone_stream://%(10000,0,350,440)"<br/>
+<br/>
+02 error="error.wav"<br/>
+<br/>
+03 result = ""<br/>
+<br/>
+04 extn = session:playAndGetDigits(1, 4, 3, 5000,<br/>
+<br/>
+    '#', prompt, error, "\\d+")<br/>
+<br/>
+05 arg = "3000 dial user/" .. extn<br/>
+<br/>
+06 session:execute("log", "INFO extn=" .. extn)<br/>
+<br/>
+07 session:execute("log", "INFO arg=" .. arg)<br/>
+<br/>
+08 if not (extn == "") then<br/>
+<br/>
+09     api = freeswitch.API()<br/>
+<br/>
+10     result = api:execute("conference", arg)<br/>
+<br/>
+11     session:execute("log", "INFO result=" .. result)<br/>
+<br/>
+12 else<br/>
+<br/>
+13     session:execute("log", "ERR Cannot result=" .. result)<br/>
+<br/>
+14 end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这个Lua脚本也很简单。首先，第1～3行初始化几个变量。然后在第4行执行playAndGetDigits，它的用法我们在第16章已经讲过了，它首先播放prompt指定的声音（是一个拨号音），然后等待用户输入，最大收号长度是4。如果用户输入错误，则播放error.wav，并提示用户重新输入，最多可重试3次。最后收到的DTMF将存入变量extn中。</p>
+<p height="1em" width="2em">第5行，我们构造一个字符串，作为conference命令的参数，备用。</p>
+<p height="1em" width="2em">第6～7行，打印日志（<font color="#0468BB">检查程序错误最好的方法就是多打印日志</font>
+ ）。</p>
+<p height="1em" width="2em">第8行，判断，如果输入的extn是一个有效的值，则在第9行初始化一个api变量，并在第10行执行一个API命令；如果用户输入的是1006，则实际执行的命令就是conference 3000 dial user/1006，它会主动外呼1006这个用户，被叫接听后便可进行会议。</p>
+<p height="1em" width="2em">不管呼叫成功还是失败，都会在第13行打印呼叫结果，如笔者在测试时，第一次拒绝了呼叫，日志如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] mod_dptools.c:1595 extn=1006<br/>
+<br/>
+[INFO] mod_dptools.c:1595 arg=3000 dial user/1006<br/>
+<br/>
+[INFO] mod_dptools.c:1595 result=Call Requested: result: [USER_BUSY]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第二次接听了呼叫，则日志结果如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] mod_dptools.c:1595 result=Call Requested: result: [SUCCESS]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，我们分析了上述脚本，还得研究一下怎么使用上述脚本。我们在12.5.1节曾讲过，在会议中，可以使用DTMF进行控制。我们先把会议控制中的call-controller部分的*和#号键对应的功能修改一下，让*号键对应执行我们刚写的Lua脚本（conference_dial.lua），并把#号键对应的功能注释掉，以防止产生冲突。autolocal_configs/conference.conf.xml中对应的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;caller-controls&gt;<br/>
+<br/>
+&lt;group name="default"&gt;<br/>
+<br/>
+    &lt;control action="execute_application" digits="*" data="lua conference_dial.lua"/&gt;<br/>
+<br/>
+    &lt;!-- &lt;control action="hangup" digits="#"/&gt; --&gt;<br/>
+<br/>
+&lt;/group&gt;<br/>
+<br/>
+&lt;/caller-controls&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，打个电话呼入名称为3000的会议，在会议中就可以通过按*号键在听到拨号音后输入一个号码进行外呼了。</p>
+<p height="1em" width="2em">如果只想会议管理员才能使用上述功能，也可以将上述功能键的映射关系放到单独的group中（如group name="modrator"）并通过会议Profile中的moderator-controls指定该组以确保只有管理员才可以使用这些按键来进行控制。</p>
+</body>
+</html>

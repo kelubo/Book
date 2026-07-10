@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_301"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1513526" class="calibre7"></a>7.4.3 Host Keys and Known-Hosts Databases </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Every SSH server has a host key <a shape="rect" href="DB_split_072.html#filepos313612" class="calibre6">[3.3]</a> that uniquely identifies the server to clients. This key helps prevent spoofing attacks. When an SSH client requests a connection and receives the server's host key, the client checks it against a local database of known host keys<a shape="rect" class="calibre15"></a><a id="filepos1514028" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1514067" class="calibre15"></a>. If the keys match, the connection proceeds. If they don't, the client behaves according to several options you can control. </p>
+<p class="calibre4">In OpenSSH, the host key database is maintained partly in a serverwide location (<em class="italic">/etc/ssh/ssh_known_hosts</em>) and partly in the user's SSH directory (<em class="italic">~/.ssh/known_hosts</em>). In Tectia, there are two databases of host keys for authenticating server hosts (the "hostkeys" map in <em class="italic">/etc/ssh2/hostkeys</em>) and client hosts (the "knownhosts" map); in this section we are concerned only with the former. Similar to its OpenSSH counterpart, the Tectia hostkeys map is maintained in a serverwide directory (<em class="italic">/etc/ssh2/hostkeys/</em> ) and a per-account directory (<em class="italic">~/.ssh2/hostkeys/</em>). In this section, we refer to the OpenSSH and Tectia map simply as the <span><em class="italic">host key database</em></span>. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1515347" class="calibre7"></a>7.4.3.1 Strict host-key checking </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1515444" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1515482" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1515579" class="calibre15"></a>Suppose you request an SSH connection with <span><em class="italic">server.example.com,</em></span> which sends its host key in response. Your client looks up <span><em class="italic">server.example.com</em></span> in its host key database. Ideally, a match is found and the connection proceeds. But what if this doesn't happen? Two scenarios may arise: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">SCENARIO 1: Mismatched key</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A host key is found for <span><em class="italic">server.example.com</em></span> in the database, but it doesn't match the incoming key. This can indicate a security hazard, or it can mean that <span><em class="italic">server.example.com</em></span> has changed its host key, which can happen legitimately. <a shape="rect" href="DB_split_098.html#filepos539371" class="calibre6">[3.9.4]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">SCENARIO 2: No key</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">No host key for <span><em class="italic">server.example.com</em></span> exists in the database. In this case, the SSH client is encountering <span><em class="italic">server.example.com</em></span> for the first time. </div>
+</blockquote>
+</div>
+<p class="calibre4">In each scenario, should the client proceed or fail? Should it store the new host key in the database, or not? These decisions are controlled by the keyword <code class="calibre35">StrictHostKeyChecking</code>, which may have three values: </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">yes</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Be strict. If a key is unknown or has changed, the connection fails. This is the most secure value, but it can be inconvenient or annoying if you connect to new hosts regularly or if your remote host keys change frequently. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">no</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Not strict. If a key is unknown, automatically add it to the user's database and proceed. If a key has changed, leave the known hosts entry intact, print a warning, and permit the connection to proceed. This is the least secure value. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">ask</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Prompt the user. If a key is unknown, ask whether it should be added to the user's database and whether to connect. If a key has changed, ask whether to connect. This is the default and a sensible value for knowledgeable users. (Less-experienced users might misunderstand what they're being asked and make the wrong decision.) </div>
+</blockquote>
+</div>
+<p class="calibre4">Here's an example:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    StrictHostKeyChecking yes</tt></div></span><p class="calibre4"><a shape="rect" href="#filepos1519405" class="calibre6">Table 7-1</a> summarizes SSH's <code class="calibre35">StrictHostKeyChecking</code>'s behavior. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1519405" class="calibre15"></a></span><p class="calibre4">Table 7-1. StrictHostKeyChecking behavior</p>
+<div class="calibre3">
+<table summary="StrictHostKeyChecking behavior" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Key found?</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Match?</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Strict?</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Action</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connect</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Warn and fail</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Warn and connect</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Ask</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Warn and ask whether to connect </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Warn and fail</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Add key and connect</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Ask</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Ask whether to add key and to connect </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<p class="calibre4">OpenSSH has an additional keyword, <code class="calibre35">CheckHostIP</code>, to make a client verify the IP address of an SSH server in the database. Its values may be <code class="calibre35">yes</code> (the default, to verify the address) or <code class="calibre35">no</code>. The value <code class="calibre35">yes</code> provides security against name service spoofing attacks: <a shape="rect" href="DB_split_096.html#filepos536704" class="calibre6">[3.9.2]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    CheckHostIP no</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1526639" class="calibre7"></a>7.4.3.2 Verifying host keys by DNS </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1526738" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1526835" class="calibre15"></a>The known-hosts mechanism for verifying hostkeys is fine when dealing with a handful of hosts, but quickly becomes unwieldy for larger numbers. Later we discuss overarching authentication systems such as PKI or Kerberos to address this problem. <a shape="rect" href="DB_split_351.html#filepos2287452" class="calibre6">[11.5]</a> Another method is to use the DNS: if we could attach hostkeys to domain names, then SSH could verify the server by looking up its keys in the DNS. The method is documented in draft-ietf-secsh-dns. It uses DNS resource records with the following format: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    IN SSHFP <em class="italic"><code class="calibre35">&lt;key type&gt; &lt;fingerprint type&gt; &lt;fingerprint&gt;</code></em></tt></div></span><p class="calibre4">where the key types can be 1 (for RSA) or 2 (DSS), and the fingerprint type can be 1 (for SHA-1). </p>
+<p class="calibre4"><span><em class="italic">ssh-keygen</em></span> can generate these DNS records in a form ready to be included in a zone file for the BIND nameserver: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh-keygen -r host.domain.net -f /etc/ssh/ssh_host_dsa_key.pub<br class="calibre19"/>    host.domain.net IN SSHFP 2 1 7ae79057cbff7de6d61b30fba02d936d6a0f5b5f<br class="calibre19"/><br class="calibre19"/>    $ ssh-keygen -r host.domain.net -f /etc/ssh/ssh_host_dsa_key.pub -g<br class="calibre19"/>    host.domain.net IN TYPE44 \# 22 02 01 7ae79057cbff7de6d61b30fba02d936d6a0f5b5f</tt></div></span><p class="calibre4">The <span><em class="italic">-g</em></span> form is for nameservers that don't understand the SSHFP RR type. </p>
+<p class="calibre4">To have OpenSSH use these DNS records, set the <code class="calibre35">VerifyHostDNS</code> keyword to <code class="calibre35">yes</code>, <code class="calibre35">no</code>, or <code class="calibre35">ask</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/ssh/config<br class="calibre19"/>    VerifyHostKeyDNS=yes</tt></div></span><p class="calibre4">It's vitally important to remember that the DNS itself is usually not secure! There is a standard for DNS security (DNSSEC, RFC-2535), but it is not much used yet. Without DNSSEC, DNS queries and replies can be easily intercepted and forged by attackers, so this level of hostkey verification may not be acceptable. </p>
+<p class="calibre4">If <code class="calibre35">VerifyHostKeyDNS</code> is <code class="calibre35">ask</code>, and <code class="calibre35">StrictHostKeyChecking</code> is <code class="calibre35">yes</code> or <code class="calibre35">ask</code>, OpenSSH will indicate whether it found a matching hostkey in the DNS, but still obey the usual semantics of <code class="calibre35">StrictHostKeyChecking</code> in deciding whether to approve the server. <code class="calibre35">VerifyHostKeyDNS yes</code> is the same, except that matching fingerprints obtained via secure DNS are considered just as trustworthy as those stored in the known-hosts list. If <code class="calibre35">StrictHostKeyChecking</code> is <code class="calibre35">no</code>, then <code class="calibre35">VerifyHostKeyDNS</code> makes no difference. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.3.3 Host key aliasing </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1530866" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1530904" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1531001" class="calibre15"></a>OpenSSH uses a simple method to find the host key for server authentication: it simply looks up in the known-hosts list exactly what you type on the command line for the remote server name. Sometimes, the situation is more complicated; you know which host you're actually contacting, but OpenSSH doesn't. For instance, you might be using SSH-over-SSH to contact a remote host through a second SSH port forwarding, like so: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -L 2001:david:22 goliath<br class="calibre19"/>    $ ssh -p 2001 localhost</tt></div></span><p class="calibre4">The second command will connect to the SSH server <span><em class="italic">David</em></span> through another one, <span><em class="italic">goliath</em></span>. However, the second <span><em class="italic">ssh</em></span> may complain about a host-key mismatch. It has no way of knowing about the port-forwarding indirection; it thinks you are connecting to an SSH server which is actually running on the local host, compares <span><em class="italic">goliath</em></span>'s hostkey to that of the local host, and finds they do not match. In this situation, you can tell OpenSSH which key to use with <code class="calibre35">HostKeyAlias</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -p 2001 -o HostKeyAlias=david localhost</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.3.4 Ignoring host keys for localhost </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">In many computing environments, users' home directories are shared across many machines. As a result, users' <em class="italic">~/.ssh</em> configuration files are shared in this manner. This is useful but has one little glitch: the idiom <span><em class="italic">ssh localhost</em></span>. </p>
+<p class="calibre4">The problem is that "localhost" means something different on every host! The first time you run this command, <span><em class="italic">ssh</em></span> will add a key for "localhost" to your known-hosts file—but the next time you do it on a different machine, SSH will complain about a host-key mismatch! You could get around this by adding multiple "localhost" lines to the known-hosts list, expanding the set of keys acceptable for that destination. However, since there's little security to be gained in verifying the identity of the host you're already logged into, OpenSSH has a special option, <code class="calibre35">NoHostAuthenticationForLocalhost</code>, to disable server authentication for the connections to the loopback address: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.ssh/config<br class="calibre19"/>    NoHostAuthenticationForLocalhost yes</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.3.5 Moving the known hosts files </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1534729" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1534767" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1534864" class="calibre15"></a>OpenSSH permits the locations of the host key database, both the serverwide and per-account parts, to be changed using configuration keywords. <code class="calibre35">GlobalKnownHostsFile</code> defines an alternative location for the serverwide file. It doesn't actually move the file—only the system administrator can do that—but it does force your clients to use another file in its place. This keyword is useful if the default file is outdated and you want your clients to ignore the serverwide file, particularly if you're tired of seeing warning messages from your clients about changed keys: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    GlobalKnownHostsFile /users/smith/.ssh/my_global_hosts_file</tt></div></span><p class="calibre4">Similarly, you can change the location of your per-user part of the database with the keyword <code class="calibre35">UserKnownHostsFile</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    UserKnownHostsFile /users/smith/.ssh/my_local_hosts_file</tt></div></span></div>
+</div>
+</body>
+</html>

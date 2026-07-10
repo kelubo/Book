@@ -1,0 +1,17 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">18.5　小结</font>
+</font>
+</p>
+<p height="1em" width="2em">本章详细介绍了Event Socket协议、ESL库及库函数的使用方法等，并通过一些简单的例子讲了它们在编程开发中的使用方法和注意事项。</p>
+<p height="1em" width="2em">初学者往往比较容易理解Event Socket的Inbound模式和Outbound模式，但对于何时该使用哪种模式不是很清楚。一般来说，Outbound模式与上一章讲的嵌入式语言相比更强大，它比较适合控制单腿的呼叫，实现复杂的IVR应用；而Inbound更适合接收所有的事件，与多条腿进行交互，进行更复杂的呼叫控制。其中，在Outbound模式中，又分为同步模式和异步模式，同步模式控制比较简单，但自由度较小；异步模式需要更多的编程技巧，但会更强大。</p>
+<p height="1em" width="2em">当然，上述说法不是绝对的，Inbound和Outbound两种模式都能完成所有的控制功能，只是，Outbound模式的Socket是由FreeSWITCH建立的，它是建立在Channel的基础上的，每一个Channel均会为外部的TCP Server建立一个连接，在Channel挂机时释放。因此，Outbound的连接要考虑Channel的生命周期（即Socket的生命周期）。而Inbound的连接由客户端主动向FreeSWITCH发起连接，极需要考虑断线重连等问题。</p>
+<p height="1em" width="2em">在实际开发应用中，具体使用哪种模式需要具体问题具体分析，解决问题需要自己动手进行实验，而不能盲目迷信别人说的。</p>
+<p height="1em" width="2em">如果你使用C语言进行ESL开发，可以参考一下源代码目录中的fs_cli.c（在libs/esl目录中），里面有各种函数的真实使用方法。我们也将在下一节再讲解一些实际的例子。</p>
+<p height="1em" width="2em">在本章的最后，我们也讲了FreeSWITCH的事件并重点讲了学习方法。后面讲了一些常用的事件主要是给想“偷懒”的读者一个捷径，以快速理解和使用这些事件，但更深入的学习还需要读者自己实际练习。</p>
+</body>
+</html>

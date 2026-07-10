@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.1　创建独立的ESL应用</font>
+</font>
+</p>
+<p height="1em" width="2em">在上一章，我们也讲了一些ESL的例子，但为了简单起见都是直接在FreeSWITCH源代码提供的例子上改的，也没有写自己的Makefile，这样有的读者在自己做项目的时候可能会觉得无从下手。下面我们就把ESL这一块从FreeSWITCH中独立出来。</p>
+<p height="1em" width="2em">当然，为了跟给读者讲清楚其中的原理，我们独立还是一步一步地进行。在进行下一步之前，我们先要为我们的新的项目起个名字，就叫myesl吧，虽然这个名字没有什么创造性。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.1.1　创建目录和源文件</font>
+</font>
+</p>
+<p height="1em" width="2em">下面我们先尝试把实现我们自己业务逻辑的源文件分离出来。首先，创建一个叫myesl的目录，把我们相关的源代码都放到该目录里面。</p>
+<p height="1em" width="2em">然后，创建myesl.c文件，它的内容就直接把FreeSWITCH源码目录下的testclient.c中的内容原样复制过来即可，我们暂时不改源代码，主要是看一看怎么把它独立出来。既然我们原文件已经有了，下面就写一个Makefile，保存到相同的目录下，内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESLPATH = /usr/src/freeswitch/libs/esl<br/>
+<br/>
+CFLAGS  = -I$(ESLPATH)/src/include<br/>
+<br/>
+all: myesl.c $(ESLPATH)/libesl.a<br/>
+<br/>
+    gcc $(CFLAGS) -o myeslmyesl.c $(ESLPATH)/libesl.a<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，第1行在Makefile中定义一个变量，它即是ESL库所在的路径（笔者把FreeSWITCH的源代码放到/usr/src/freeswitch目录中）。第2行定义另一个变量，使用“-I”参数指定C语言头文件的位置，这一行还使用“$()”引用了第1行中定义的变量ESLPATH。</p>
+<p height="1em" width="2em">第3行中的all，是一个目标（Target）。在Makefile中，默认会编译第一个目标，该目录依赖于myesl.c以及ESL的静态库文件libesl.a（所以libesl.a是必须存在的，即FreeSWITCH必须事先被编译过）。这样写的好处是，如果myesl.c已经编译过，那么在下次编译的时候就会检查它有没有变化，如果没有变化，则不用重新编译。这样做在单独一个源文件的时候影响不是很大（重新编译一次也费不了多少时间），但在编译比较大型的项目时，可能会有很多源文件，那么节省的时间就很可观了。</p>
+<p height="1em" width="2em">真正的编译动作是在第4行执行的，它调用gcc进行编译。命令行参数中，使用了“$(CFLAGS)”指定了头文件的位置；“-o”后面指定编译完成后生成的可执行文件的名称；myesl.c即是源文件；最后一个参数指定了ESL静态库的位置（libesl.a，注意ESL默认只生成静态库）。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.1.2　编译和执行</font>
+</font>
+</p>
+<p height="1em" width="2em">一切准备好以后，接下来直接在控制台上输入make命令进行编译，编译完成后将产生myesl可执行程序，然后即可以直接执行看一下效果。下面是执行make以及我们新生成的myesl命令的输出结果：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ make<br/>
+<br/>
+gcc -I/usr/src/freeswitch/libs/esl/src/include -o myeslmyesl.c /usr/src/freeswitch/libs/esl/libesl.a<br/>
+<br/>
+$ ./myesl<br/>
+<br/>
+UP 0 years, 0 days, 4 hours, 26 minutes, 48 seconds, 650 milliseconds, 344 microseconds<br/>
+<br/>
+FreeSWITCH (Version 1.5.8b git e7fe9aa 2013-11-25 00:45:51Z 64bit) is ready<br/>
+<br/>
+0 session(s) since startup<br/>
+<br/>
+0 session(s) - peak 0, last 5min 0<br/>
+<br/>
+0 session(s) per Sec out of max 200, peak 0, last 5min 0<br/>
+<br/>
+3000 session(s) max<br/>
+<br/>
+min idle cpu 0.00/100.00<br/>
+<br/>
+Current Stack Size/Max 240K/8192K<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，便大功告成了。我们成功地把我们的ESL应用与FreeSWITCH源代码分隔开了，以后再也不用跟FreeSWITCH的源代码放到同一目录了。其实，编译ESL应用程序时，不需要依赖全部FreeSWITCH的源代码了，只需要依赖于ESL的头文件及静态库文件libesl.a。也就是说，ESL的源代码是可以单独存在的，可以将FreeSWITCH源代码目录中的libs/esl目录复制到别的地方，以后做ESL客户端应用时就不需要全部的FreeSWITCH的源代码了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.1.3　将源代码纳入版本控制</font>
+</font>
+</p>
+<p height="1em" width="2em">在开发过程中，我们经常会对源代码进行修改，因此需要有版本控制工具进行管理。FreeSWITCH是使用Git进行源代码管理的，大家在前面的学习中也熟悉了Git的复制操作，下面我们再带领大家熟悉一下其他的操作，到后面我们阅读FreeSWITCH源代码甚至进行FreeSWITCH开发的时候，将会用到更多的Git功能。</p>
+<p height="1em" width="2em">使用Git很简单，只需要在我们的myesl目录中执行如下三条命令：</p>
+<p height="1em" width="2em">第一条，初始化一个版本库，该版本库仅在当前目录中有效。</p>
+<p height="1em" width="2em">第二条，把我们新建的两个文件增加到版本库管理中来。</p>
+<p height="1em" width="2em">第三条，提交（commit）我们的修改，这两个文件便存入版本库，并产生一条提交历史。</p>
+<p height="1em" width="2em">具体的命令如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ git init<br/>
+<br/>
+$ git add Makefilemyesl.c<br/>
+<br/>
+$ git commit -m 'initial commit' .<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">与SVN等版集中式的代码管理工具不同，Git的管理是分布式的，因此上述的提交操作仅在本地执行，如果需要与其他人共享，便需要将本地的代码库“推”（push）到远端去。Github是一个很好的源代码管理平台，对于开源项目是免费的。为了更好地与各位读者分享，我们也将我们的代码“推”上去。</p>
+<p height="1em" width="2em">具体的Github操作在此就不多讲了，笔者在Github上创建了一个远程版本库，它的地址是https://github.com/seven1240/myesl.git，下面首先在我们本地的代码库中用如下命令增加远程版本库：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ git remote add origin https://github.com/seven1240/myesl.git<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，就可以“推”了，命令和显示结果如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ git push origin master<br/>
+<br/>
+Counting objects: 4, done.<br/>
+<br/>
+Delta compression using up to 8 threads.<br/>
+<br/>
+Compressing objects: 100% (4/4), done.<br/>
+<br/>
+Writing objects: 100% (4/4), 658 bytes, done.<br/>
+<br/>
+Total 4 (delta 0), reused 0 (delta 0)<br/>
+<br/>
+To https://github.com/seven1240/myesl.git<br/>
+<br/>
+ * [new branch]      master -&gt; master<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">推送成功后，就可以用浏览器访问https://github.com/seven1240/myesl来查看远程版本库的情况了 <sup>
+<small>
+<a href="text00161.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">读者感兴趣的话，也可以把该项目复制到本地计算机上，如下面是笔者测试的复制过程：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+dujinfang@seven:~$ cd /tmp<br/>
+<br/>
+dujinfang@seven:/tmp$ git clone https://github.com/seven1240/myesl.git<br/>
+<br/>
+Cloning into 'myesl'...<br/>
+<br/>
+remote: Counting objects: 7, done.<br/>
+<br/>
+remote: Compressing objects: 100% (6/6), done.<br/>
+<br/>
+remote: Total 7 (delta 0), reused 4 (delta 0)<br/>
+<br/>
+Unpacking objects: 100% (7/7), done.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="10pt" width="0pt" align="justify">
+<a href="text00161.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 在首次查看的时候，该页面建议增加一个README，以让读者知道该项目是干什么的，此时读者就可以单击“创建”按钮在上面的网页上自动创建了。</p>
+</body>
+</html>

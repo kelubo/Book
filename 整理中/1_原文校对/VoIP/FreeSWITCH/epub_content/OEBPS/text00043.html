@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.6　API与App</font>
+</font>
+</p>
+<p height="1em" width="2em">在4.5.2节的例子中，originate是FreeSWITCH内部的一个命令（Command），它用于控制FreeSWITCH发起一个呼叫。FreeSWITCH的命令不仅可以在控制台上使用，也可以在各种嵌入式脚本、Event Socket（fs_cli就是使用了ESL库）或HTTP RPC上使用，所有命令都遵循一个抽象的接口，因而这些命令又称API Commands <sup>
+<small>
+<a href="text00044.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">echo则是一个常用的应用程序（Application，App），它的作用是控制一个Channel的一端。我们知道，一个Channel有两端，在上面的例子中，alice是一端，另一端就是echo。电话接通后相当于alice在跟echo通话。后面我们会讲到，它们实际上组成了FreeSWITCH的一条腿（leg），这种通话称为“单腿通话（one-legged connection）”。</p>
+<p height="1em" width="2em">另一个常用的App是park，其使用格式如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/alice &amp;park<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当我们初始化了一个呼叫时，在alice接电话后对端必须有一个人在跟其讲话（否则，如果一个Channel只有一端，那是不可思议的事情），而如果这时FreeSWITCH找不到一个合适的人跟alice通话，那么它可以将该电话“挂起”，park便是实现这个功能，它相当于一个Channel特殊的一端 <sup>
+<small>
+<a href="text00044.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">park的用户体验并不好，因为alice不知道要等多长时间才有人接电话，由于它听不到任何声音，这时它就会奇怪电话到底有没有接通。相对而言，另一个程序hold则比较友好，它能在等待的同时播放保持音乐（Music on Hold，MOH）。hold的使用格式如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt;originate user/alice &amp;hold<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，你也可以直接播放一个特定的声音文件，如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/alice &amp;playback(/root/welcome.wav)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或者直接录音，如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/alice &amp;record(/tmp/voice_of_alice.wav)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上的例子实际上都只是建立一个Channel，相当于FreeSWITCH作为一个UA跟alice通话。它是个一条腿（只有a-leg）的通话。在大多数情况下，FreeSWITCH都是作为一个B2BUA来桥接两个UA进行通话的。在alice接听电话以后，bridge程序可以再启动一个UA呼叫bob，如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/alice &amp;bridge(user/bob)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，alice和bob终于可以通话了。我们也可以用另一种方式建立他们之间的通话，具体步骤如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/alice &amp;park<br/>
+<br/>
+originate user/bob &amp;park<br/>
+<br/>
+show channels<br/>
+<br/>
+uuid_bridge &lt;alice_uuid&gt; &lt;bob_uuid&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在这里，我们分别呼叫alice和bob，并把他们暂时park到一个地方。通过命令show channels我们可以知道每个Channel的UUID，然后使用uuid_bridge命令将两个Channel桥接起来，而上一种方式实际上是先桥接，再呼叫bob。</p>
+<p height="1em" width="2em">上面我们一共学习了两条命令（API）——originate和uuid_bridge，以及几个程序（App）——echo、park、bridge等。细心的读者可能会发现，uuid_bridge API和bridge App有些类似。我们知道它们一个是先呼叫后桥接，另一个是先桥接后呼叫，那么它们到底有什么本质的区别呢？</p>
+<p height="1em" width="2em">
+<font color="#0468BB">简单来说，一个App是一个程序（Application），它作为一个Channel一端与另一端的UA进行通信，相当于它工作在Channel内部；而一个API则是独立于一个Channel之外的，它只能通过找到Channel的UUID来控制一个Channel（如果需要的话），相当于一个第三者。</font>
+ 这就是API与App最本质的区别。 <sup>
+<small>
+<a href="text00044.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+</p>
+<p height="1em" width="2em">通常我们在控制台上输入的命令都是API；而在dialplan中执行的程序都是App（dialplan中也能执行一些特殊的API）。大部分公用的API都是在mod_commands模块中加载的；而App则在mod_dptools中，因而App又称为拨号计划工具（Dialplan Tools）。某些模块（如mod_sofia）有自己特有的API和App。</p>
+<p height="1em" width="2em">某些App有与其对应的API，如上述的bridge和uuid_bridge，还有transfer和uuid_transfer、playback和uuid_playback等。uuid一族的API都是在一个Channel之外对Channel进行控制的，它们应用于不能参与到通话中却又想对正在通话的Channel做点什么的场景中。例如alice和bob正在畅聊，有个“坏蛋”使用uuid_kill将电话切断，或使用uuid_broadcast对他们广播恶作剧音频，或者使用uuid_record对他们谈话的内容录音等。</p>
+<p height="1em" width="2em">关于API和App更详细的内容，可以参见：</p>
+<p height="1em" width="2em">·mod_dptools:http://wiki.freeswitch.org/wiki/Mod_dptools。</p>
+<p height="1em" width="2em">·mod_commands:http://wiki.freeswitch.org/wiki/Mod_commands。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00043.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 当API与App相对时，我们一般叫API，这个名字来源于它的具体实现，在FreeSWITCH内部的实现中，所有的API都来源于一个叫switch_api_interface_t的结构。在其他情况下，我们不是刻意比较它与App的区别时，更倾向于称之为“命令”，这样描述起来更自然一些。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00043.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 笔者常举的一个例子是：如果把一个Channel看作是一根绳子，那么该例中是alice相当于拉着绳子的一头，而对端则拴（park）在一枚钉子上。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00044.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 当然，除originate以及uuid一族的API（以uuid_开头的API）外，其他大部分API（如version,、status等）一般是没有相对应的App的，因而这里就没有讨论的必要了。</p>
+</body>
+</html>

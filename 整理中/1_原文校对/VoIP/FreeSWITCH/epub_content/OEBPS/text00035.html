@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.5　配置SIP网关拨打外部电话</font>
+</font>
+</p>
+<p height="1em" width="2em">如果你拥有某个运营商提供的SIP账号，那么你就可以通过配置SIP来拨打外部电话了。该SIP账号（或提供该账号的设备）在FreeSWITCH中称为SIP网关（Gateway）。添加一个网关只需要在conf/sip_profiles/external/中创建一个XML文件，名字可以随便起，如gw1.xml，然后在该文件中输入如下代码：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;gateway name="gw1"&gt;<br/>
+<br/>
+    &lt;param name="realm" value="SIP<br/>
+<br/>
+服务器地址，可以是IP<br/>
+<br/>
+或IP:<br/>
+<br/>
+端口号"/&gt;<br/>
+<br/>
+    &lt;param name="username" value="SIP<br/>
+<br/>
+用户名"/&gt;<br/>
+<br/>
+    &lt;param name="password" value="<br/>
+<br/>
+密码"/&gt;<br/>
+<br/>
+&lt;/gateway&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果你的SIP网关还需要其他参数，可以参阅同目录下的example.xml，但一般来说上述参数就够了 <sup>
+<small>
+<a href="text00036.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。你可以重启FreeSWITCH，或者执行以下命令使用之生效：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia profile external rescan<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">显示一下网关的注册状态：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia status<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果显示gateway gw1的状态是REGED，则表明已正确地注册到了网关上。你可以先用命令试一下网关是否工作正常：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate sofia/gateway/gw1/xxxxxx &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上命令会通过网关gw1呼叫号码xxxxxx（可能是你的手机号），被叫号码接听电话后，FreeSWITCH会执行echo程序，你应该就能听到自己的回音了。</p>
+<p height="1em" width="2em">当然，世界SIP网关五花八门，你实际操作起来可能不会这么顺利。如果真的在这里遇到问题，那么你大可继续往下阅读，相信你读完本书之后，跟任何网关对接的复杂问题都能迎刃而解了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.5.1　从某一分机上呼出</font>
+</font>
+</p>
+<p height="1em" width="2em">如果网关测试正常，你就可以配置从你的SIP软电话或portaudio呼出了。由于我们是把FreeSWITCH当作PBX用，所以需要选一个出局字冠。常见的PBX一般是内部拨小号，打外部电话就需要加拨0或先拨9。当然，这是你自己的交换机，你可以用任何你喜欢的数字（甚至是字母）。继续修改拨号计划，创建一个新的XML文件——conf/dialplan/default/call_out.xml，内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;include&gt;<br/>
+<br/>
+  &lt;extension name="call out"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^0(\d+)$"&gt;<br/>
+<br/>
+      &lt;action application="bridge" data="sofia/gateway/gw1/$1"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+  &lt;/extension&gt;<br/>
+<br/>
+&lt;/include&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“^0(\d+)$”为正则表达式，“(\d+)”匹配0后面的所有数字并存到变量$1中。然后通过bridge程序通过网关gw1打出该号码。当然，建立该XML后需要在控制台中执行reloadxml使之生效。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.5.2　呼入电话处理</font>
+</font>
+</p>
+<p height="1em" width="2em">如果你的SIP网关支持DID <sup>
+<small>
+<a href="text00036.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，那么你需要知道呼入的DID号码。一般来说，呼入的DID就是你的SIP号码，如果你不知道，也没关系，学习完第6章你就能学到如何取得这个值了。创建以下XML文件并放到conf/dialplan/public/my_did.xml中：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;include&gt;<br/>
+<br/>
+  &lt;extension name="public_did"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^(<br/>
+<br/>
+你的DID)$"&gt;<br/>
+<br/>
+      &lt;action application="transfer" data="1000 XML default"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+  &lt;/extension&gt;<br/>
+<br/>
+&lt;/include&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在FreeSWITCH中执行reloadxml使之生效。上述配置会将来话直接转接到分机1000上。在后面的章节中你会学到如何更灵活地处理呼入电话，如转接到语音菜单或语音信箱等。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00035.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 当添加网关对外注册时，FreeSWITCH就相当于一个SIP客户端，读者可以对比一下，看与配置X-Lite有何不同。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00036.html">
+<font color="#FF6600">[2]</font>
+</a>
+ Direct Inbound Dial，即对内直接呼入。</p>
+</body>
+</html>

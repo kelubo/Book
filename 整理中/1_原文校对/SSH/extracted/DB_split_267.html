@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_349"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1769738" class="calibre7"></a>8.1.1 Overriding Serverwide Settings </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH settings in a user's account may only <span><em class="italic">restrict</em></span> the authentication of incoming connections. They can't enable any SSH features that have been turned off more globally, and they can't permit a forbidden user or host to authenticate. For example, if your SSH server rejects all connections from the domain <span><em class="italic">evil.org</em></span>, you can't override this restriction within your account by per-account configuration.<sup class="calibre20">[<a id="filepos1770463" shape="rect" href="DB_split_268.html#filepos1773567" class="calibre6">118</a>]</sup></p>
+<p class="calibre4">This limitation makes sense. No end-user tool should be able to violate a server security policy. However, end users should be (and are) allowed to restrict incoming connections to their accounts. </p>
+<p class="calibre4">A few features of the server may be overridden by per-account configuration. The most notable one is the server's idle timeout, which may be extended beyond the serverwide setting. But such features can't coerce the server to accept a connection it has been globally configured to reject. </p>
+<p class="calibre4">If you are an end user, and per-account configuration doesn't provide enough flexibility, you can run your own instance of the SSH server, which you may configure to your heart's content. <a shape="rect" href="DB_split_138.html#filepos730910" class="calibre6">[5.1.2]</a> Be cautious, though, since this is seldom the right thing to do. The restrictions you're trying to circumvent are part of the security policy defined for the machine by its administrators, and you shouldn't run a program that flouts this policy just because you can. If the machine in question is under your administrative control, simply configure the main SSH server as you wish. If not, then installing and running your own <span><em class="italic">sshd</em></span> might violate your usage agreement and/or certainly annoy your sysadmin. And that's never a wise thing to do. </p>
+</div>
+</body>
+</html>

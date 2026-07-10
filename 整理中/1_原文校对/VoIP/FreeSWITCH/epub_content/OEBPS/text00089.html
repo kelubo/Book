@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.2　用FreeSWITCH实现IVR</font>
+</font>
+</p>
+<p height="1em" width="2em">IVR（Interactive Voice Response，交互式语音响应）实际上就是我们经常说的电话语音菜单。在练习IVR的配置之前，我们先来一个感性的认识：FreeSWITCH默认的配置已包含了一个功能齐全的例子。随便拿起一个分机，拨5000，就可以听到菜单提示了。当然，默认的提示是英文的，大意是说欢迎来到FreeSWITCH，按1进入FreeSWITCH会议；按2进入回音（echo）程序（这时候可以听到自己的回音）；按3会听到等待音乐（Music on Hold，MOH）；按4转到FreeSWITCH开发者Brian West的SIP电话上；按5会听到一只猴子的尖叫；按6进入下级菜单；拨9重听；拨1000～1019之间的号码则会转到对应分机。</p>
+<p height="1em" width="2em">有条件的读者可以自行测试一下。有了这些直观的感受之后，我们就可以接着进行下面的配置练习了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.2.1　最简单的菜单</font>
+</font>
+</p>
+<p height="1em" width="2em">我们先来配置一种最简单的情形。一些廉价的小企业交换机通常会提供这样的功能，当有电话呼入时，会播放：“您好，欢迎致电某某公司，请直拨分机号，查号请拨0”。然后，来话用户就可以输入1000～1019之间的分机号，也可以直接按0转到人工台（如分机1000）进行查号，或要求转接其他分机。</p>
+<p height="1em" width="2em">IVR系统默认的配置文件为conf/autoload_configs/ivr.conf.xml，它装入conf/ivr_menus/目录下所有的XML文件。系统有一个示例的IVR配置，叫demo_ivr，也就是我们刚才拨5000听到的那个。</p>
+<p height="1em" width="2em">真正的菜单配置信息放到一对“&lt;menus&gt;&lt;/menus&gt;”标签中，每一对“&lt;menu&gt;&lt;/menu&gt;”标签就描述一个菜单。每个菜单应该有一个唯一的名字（name），以便在拨号计划（Dialplan）中引用（作为ivr App的参数）。在前面的章节中已经讲过，被装入的XML文件最外层一般都有一对“&lt;include&gt;”标签，以保证XML文档的完整性。为了实现目标菜单，我们创建一个XML配置文件conf/ivr_menus/welcome.xml，内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;include&gt;<br/>
+<br/>
+    &lt;menus&gt;<br/>
+<br/>
+        &lt;menu name="welcome"<br/>
+<br/>
+            greet-long="welcome.wav"<br/>
+<br/>
+            greet-short="welcom_short.wav"<br/>
+<br/>
+            invalid-sound="ivr/ivr-that_was_an_invalid_entry.wav"<br/>
+<br/>
+            exit-sound="voicemail/vm-goodbye.wav"<br/>
+<br/>
+            timeout="15000"<br/>
+<br/>
+            max-failures="3"<br/>
+<br/>
+            max-timeouts="3"<br/>
+<br/>
+            inter-digit-timeout="2000"<br/>
+<br/>
+            digit-len="4"&gt;<br/>
+<br/>
+            &lt;entry action="menu-exec-app" digits="0" param="transfer 1000 XML default"/&gt;<br/>
+<br/>
+            &lt;entry action="menu-exec-app" digits="/^(10[01][0-9])$/"<br/>
+<br/>
+                   param="transfer $1 XML default"/&gt;<br/>
+<br/>
+        &lt;/menu&gt;<br/>
+<br/>
+    &lt;/menus&gt;<br/>
+<br/>
+&lt;/include&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上述配置中，首先，我们指定菜单的名字（name）是welcome，其他各项的含义如下：</p>
+<p height="1em" width="2em">·<font color="#0468BB">greet-long</font>
+ ：指定最开始的欢迎音，即最开始播放的“您好，欢迎致电某某公司，请直拨分机号，查号请拨0”的语音，该语音文件默认的位置应该是在/usr/local/freeswitch/sounds目录下。应该事先把声音文件录好（可以使用Windows系统自带的“录音机”或其他录音软件实现，后面我们还会讲到其他录音的方法），在本例子中，我们都使用相对路径，当然也可以使用绝对路径，如/root/ivr/welcome.wav）。另外，PSTN交换机都是使用PCM编码的，如果与PSTN对接的话，将声音文件存储为单声道、8000Hz的格式，能获得较好的音质并占用较少的系统资源。当然，对于其他采样率的声音文件，FreeSWITCH也能自动转换，只是在Log中会有相关的采样率不匹配的警告，初学者可以暂时不必理会。</p>
+<p height="1em" width="2em">·<font color="#0468BB">greet-short</font>
+ ：该项指定一个简短的提示音。如果用户长时间没有按键，则应重新提示拨号，但重新提示应该简短，比如直接说“请直拨分机号，查号请拨0”，而不用再把公司的欢迎广告再重复播放一遍。所以，可以把这么一个声音文件录制到welcome_short.wav中。</p>
+<p height="1em" width="2em">·<font color="#0468BB">invalid-sound</font>
+ ：如果用户按错了键，则会使用该提示。如果使用“make sounds-install”命令安装了声音文件，则该文件应该是默认存在的。只是它是英文的，如果需要中文的提示，可以自己录一个，并修改这里的路径使其指向自己录制的声音文件。</p>
+<p height="1em" width="2em">·<font color="#0468BB">exit-sound</font>
+ ：该项指定最后菜单退出时（一般是超时没有按键）的声音，默认会提示“Good Bye”。</p>
+<p height="1em" width="2em">·<font color="#0468BB">timeout</font>
+ ：指定超时时间（毫秒），即多长时间没有收到按键就超时，播放其他提示音。</p>
+<p height="1em" width="2em">·<font color="#0468BB">max-failures</font>
+ ：为容忍用户按键错误的次数。如果用户的按键与下面配置的正则表达式不匹配（即没有找到相关的菜单项），就认为是错误的。</p>
+<p height="1em" width="2em">·<font color="#0468BB">max-timeouts</font>
+ ：即最大超时次数。</p>
+<p height="1em" width="2em">·<font color="#0468BB">inter-digit-timeout</font>
+ ：为两次按键的最大间隔（毫秒）。如用户拨分机号1001时，假设拨了10，等3秒，然后再按01，这时系统实际收到的号码为10（后面的01超时后没有收到），则会播放invalid-sound指定的声音文件以提示错误。</p>
+<p height="1em" width="2em">·<font color="#0468BB">digit-len</font>
+ ：说明菜单项的长度，即最大收号位数。在本例中，用户分机号长度为4位，因此我们使用4。</p>
+<p height="1em" width="2em">该菜单中有两个菜单项（Entry），第一个是在用户按0（digits="0"）时，通过menu-exec-app执行一个App。在此处它执行transfer，将来话转到default Dialplan中进行路由，并会最终转到分机1000。</p>
+<p height="1em" width="2em">如果来电用户知道被叫的分机号，则可以直接拨分机号，而不用经过人工转接，以节约时间。在本例中，第二个菜单项中的digits正则表达式“/^(10[01][0-9])$/”会匹配用户输入的1000～1019之间的分机，也是转到default Dialplan中进行路由，并最终转到对应的分机上。</p>
+<p height="1em" width="2em">如果来电用户按其他按键，则由于找不到匹配的菜单项进而提示错误（invalid-sound指定的声音），并提示用户重新输入。</p>
+<p height="1em" width="2em">以上菜单设定好后，需要在控制台中执行reloadxml（或按F6键）使配置生效。</p>
+<p height="1em" width="2em">配置完成后就可以在控制台上进行如下测试（呼叫1001，接听后进入ivr菜单）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1001 &amp;ivr(welcome)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">测试成功后，就可以配置Dialplan把用户来话转接到菜单，在Dialplan中加入一个extension（注意，需要加到正确的Dialplan Context中，如果不确定，则应该加到哪个Context中，在default和public中都加上会比较保险。实际上，如果这里出了问题，应该回去看第6章）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="incoming_call"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^1234$"&gt;<br/>
+<br/>
+        &lt;action application="answer" data=""/&gt;<br/>
+<br/>
+        &lt;action application="sleep" data="1000"/&gt;<br/>
+<br/>
+        &lt;action application="ivr" data="welcome"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，正则表达式“^1234$”匹配1234，即如果用户拨打1234时，就会在Dialplan中路由到这里。其中有三个action，分别指定接下来要执行的动作。首先，执行answer对来话进行应答（必须先应答才能向对方播放声音）；然后使用sleep暂停一秒，以防止由于声音通路没建立好（有时候，特别是当主叫与被叫之间的链路比较复杂时，声音链路的建立需要一个过程）而丢失声音；最后，执行ivr，它的参数就是我们刚刚建立的菜单项的名字welcome。</p>
+<p height="1em" width="2em">接下来呼叫1234进行测试，就可以听到我们刚才配置的IVR菜单了。注意，在实际应用中，为了能接受外部来的呼叫，可能要把这里的1234改成实际的DID（Direct Inbound Dial）号码。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.2.2　默认IVR简介</font>
+</font>
+</p>
+<p height="1em" width="2em">明白了以上简单的IVR配置方法，就很容易理解更复杂一点的配置了。上面我们提到，系统默认提供了一个名叫demo_ivr的菜单。最初的语音提示（greet-long及greet-short）是用Phrase实现的。Phrase是用XML定义的一些短语，虽然最终也是播放相关的声音文件，但在多语言系统中会更灵活。在此我们先不讨论Phrase，可以简单地认为它就是一个声音文件。其他各属性的含义都很直观，我们也不多介绍了。这里我们重点来看一下各菜单项。这些菜单项的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;entry action="menu-exec-app" digits="1"param="bridge sofia/$${domain}/888@conference.freeswitch.org"/&gt;<br/>
+<br/>
+&lt;entry action="menu-exec-app" digits="2" param="transfer 9196 XML default"/&gt;<br/>
+<br/>
+&lt;entry action="menu-exec-app" digits="3" param="transfer 9664 XML default"/&gt;<br/>
+<br/>
+&lt;entry action="menu-exec-app" digits="4" param="transfer 9191 XML default"/&gt;<br/>
+<br/>
+&lt;entry action="menu-exec-app" digits="5" param="transfer 1234*256 enum"/&gt;<br/>
+<br/>
+&lt;entry action="menu-sub" digits="6" param="demo_ivr_submenu"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，菜单选项大多都是根据用户按键使用menu-exec-app执行相应的App。其中，如果按1，则会执行bridge，连接到FreeSWITCH官方的电话会议平台；如果按2，则执行transfer，转移到XML Dialplan的default Context中的9196这个extension进行处理（对于9196我们已经很熟悉了，它最终会执行echo）；如果按3，则会转到9664（保持音乐）；按4转到9191（ClueCon）；按5转到enum Dialplan进行处理；按6则会使用menu-sub进入一个下级菜单。</p>
+<p height="1em" width="2em">menu-sub表示会执行一个下级菜单。其实下级菜单所有的配置项目与主菜单基本上都是一样的，不同的是，在下级菜单中（此处是demo_ivr_submenu），可以使用menu-top来返回上级菜单。默认的例子中下级菜单只包含一个到上级菜单的菜单项，它表示按“*”号键就可以返回主菜单。该菜单项的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;entry action="menu-top" digits="*"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">使用XML方式配置IVR菜单的知识基本上只有上面介绍的这么多了。不过，通过设置多级菜单，以及与Dialplan相配合，根据不同的情况进行跳转，可以实现一些相对复杂的功能。当然，如果这些还不够灵活和强大，我们后面也会讲到使用嵌入式脚本或Event Socket实现更灵活的菜单。</p>
+<p height="1em" width="2em">如果在试验过程中遇到非预期的情况，可以打开FreeSWITCH控制台，按F8键或使用“console loglevel debug”命令将日志调到DEBUG级别，在打电话时便能看到详细的执行过程。根据日志中的信息结合自己的使用经验就应该能比较容易定位到问题了。</p>
+</body>
+</html>

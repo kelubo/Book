@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_173"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos630223" class="calibre7"></a>4.3.3 Verifying with md5sum </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Binary and source distribution files are protected from tampering by MD5 message digests. Each file is accompanied by a separate file with an extra <em class="italic">.md5</em> suffix containing the digest. </p>
+<p class="calibre4">To verify the integrity of the files, use the <span><em class="italic">md5sum</em></span> command to compute the digest, and compare the result to the contents of the corresponding <em class="italic">.md5</em> file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ md5sum ssh-4.1.0.34-commercial.tar.gz<br class="calibre19"/>    0c7be85eb79e80e893d4c258df8443f0  ssh-4.1.0.34-commercial.tar.gz<br class="calibre19"/>    $ cat ssh-4.1.0.34-commercial.tar.gz.md5<br class="calibre19"/>    0c7be85eb79e80e893d4c258df8443f0</tt></div></span><p class="calibre4">Here's a brash one-liner for verification in a single step: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ md5sum ssh-4.1.0.34-1.i386.rpm | cut -c 1-32 | cmp - ssh-4.1.0.34-1.i386.rpm.md5</tt></div></span><p class="calibre4">If the command succeeds silently, the message digests are equal. </p>
+<p class="calibre4">Unfortunately, Tectia doesn't sign installers for binary package formats (like RPM) that support embedded signatures. MD5 message digests are provided for these installers, however. </p>
+</div>
+</body>
+</html>

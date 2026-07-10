@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_434"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2132421" class="calibre7"></a>11.1.5 General Precautions for Batch Jobs </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2132594" class="calibre15"></a>Regardless of the method you choose, some extra precautions will help secure your environment. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.1.5.1 Least-privilege accounts </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The account under which the automated job runs should have only those privileges needed to run the job, and no more. Don't run every batch job as root just because it's convenient. Arrange your filesystem and other protections so that the job can run as a less-privileged user. Remember that unattended remote jobs increase the risk of account compromise, so take the extra trouble to avoid the root account whenever possible. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.1.5.2 Separate, locked-down automation accounts </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2133814" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2133852" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2133890" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2133928" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2133966" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2134004" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2134042" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2134139" class="calibre15"></a>Create accounts that are used solely for automation. Try not to run system batch jobs in a user account, since you might not be able to reduce its privileges to the small set necessary to support the job. In many cases, an automation account doesn't even need to admit interactive logins. If jobs running under its uid are created directly by the batch job manager (e.g., <span><em class="italic">cron</em></span>), the account doesn't need a password and should be locked. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.1.5.3 Restricted-use keys </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">As much as possible, restrict the target account to perform only the work needed for the job. With public-key authentication, automated jobs should use keys that aren't shared by interactive logins. Imagine that someday you might need to eliminate the key for security reasons, and you don't want to affect other users or jobs by this change. For maximum control, use a separate key for each automated task. Additionally, place all possible restrictions on the key by setting options in the authorization file. <a shape="rect" href="DB_split_269.html#filepos1774010" class="calibre6">[8.2]</a> The <code class="calibre35">command</code> option restricts the key to running only the needed remote command, and the <code class="calibre35">from</code> option restricts usage to appropriate client hosts. Consider always adding the following options as well, if they don't interfere with the job: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty</tt></div></span><p class="calibre4">These make it harder to misuse the key should it be stolen. </p>
+<p class="calibre4">If you're using hostbased authentication, these restrictions aren't available. In this case, it's best to use a special shell for the account, which limits the commands that may be executed. Since <span><em class="italic">sshd</em></span> uses the target account's shell to run any commands on the user's behalf, this is an effective restriction. One standard tool is the Unix "restricted shell<a shape="rect" class="calibre15"></a><a id="filepos2136716" class="calibre15"></a>." Confusingly, the restricted shell is usually named "rsh," but has nothing to do with the Berkeley r-command for opening a remote shell, <span><em class="italic">rsh</em></span>. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.1.5.4 Useful ssh options </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2137311" class="calibre15"></a>When running SSH commands in a batch job, it's a good idea to use these options: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh -q -o 'BatchMode yes'</tt></div></span><p class="calibre4">The <span><em class="italic">-q</em></span> option is for quiet mode, preventing SSH from printing a variety of warnings. This is sometimes necessary if you're using SSH as a pipe from one program to another. Otherwise, the SSH warnings may be interpreted as remote program output and confuse the local program. <a shape="rect" href="DB_split_238.html#filepos1661152" class="calibre6">[7.4.17]</a></p>
+<p class="calibre4">The <code class="calibre35">BatchMode</code> keyword tells SSH not to prompt the user, who in this case doesn't exist. This makes error reporting more straightforward, eliminating some confusing SSH messages about failing to access a tty. <a shape="rect" href="DB_split_227.html#filepos1571356" class="calibre6">[7.4.6.4]</a></p>
+</div>
+</div>
+</body>
+</html>

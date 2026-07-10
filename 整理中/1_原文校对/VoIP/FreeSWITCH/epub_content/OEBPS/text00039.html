@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.2　系统启动脚本</font>
+</font>
+</p>
+<p height="1em" width="2em">在学习调试阶段，你可以将FreeSWITCH启动到前台，而系统真正运行时，你可以使用“-nc”参数启动到后台，然后通过查看log/freeswitch.log跟踪系统运行情况 <sup>
+<small>
+<a href="text00040.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">一般情况下，将FreeSWITCH启动到前台更容易调试，但如果你又不想在每次关闭Terminal时停止FreeSWITCH，可以考虑借助screen <sup>
+<small>
+<a href="text00040.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 或tmux来实现。</p>
+<p height="1em" width="2em">在真正的生产系统上，一般需要FreeSWITCH能跟系统一起启动。在UNIX类系统上，启动脚本一般放在/etc/init.d/下。你可以在系统源代码目录下找到不同系统启动脚本debian/freeswitch.init及build/freeswitch.init.*，大家可以根据自己的需求和实际情况参考使用。在Windows上，你也可以将FreeSWITCH注册为Windows服务（使用“FreeswitchConsole-install”命令）。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00039.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 你可以用“tail-f”命令实时跟踪，也可以使用“less+F”，或者在Windows平台上找一个叫wintail的软件。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00039.html">
+<font color="#FF6600">[2]</font>
+</a>
+ screen是一个终端模块器，它允许在一个终端连接上打开很多虚拟终端，并且能保持终端会话，使用起来非常方便。详情参见http://wiki.freeswitch.org/wiki/Freeswitch_In_Screen。</p>
+</body>
+</html>

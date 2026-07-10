@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_375"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1901560" class="calibre7"></a>9.2.3 Comparing Local and Remote Port Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1901740" class="calibre15"></a>The differences between local and remote forwarding can be subtle. It can get a bit confusing to know which kind of forwarding to use in a given situation. The quick rule is <span><em class="italic">look for the TCP client application</em></span>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">If the TCP client application (whose connections you want to forward) is running locally on the SSH client machine, use local forwarding. Otherwise, the client application is on the remote SSH server machine, and you use remote forwarding. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The rest of this section is devoted to dissecting the forwarding process in detail and understanding where this rule comes from. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.2.3.1 Common elements </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Local and remote forwarding can be confusing because of overloaded terminology. In a given port-forwarding situation, there are <span><em class="italic">two clients</em></span> and <span><em class="italic">two servers</em></span> lying around. We have the SSH client and server programs (e.g., <span><em class="italic">ssh</em></span> and <span><em class="italic">sshd</em></span>), plus the TCP application's client and server programs whose connection you want to protect by port forwarding. </p>
+<p class="calibre4">An SSH session has a direction of establishment. That is, you run an SSH client on one machine, and it initiates a session with an SSH server on another. Likewise, a forwarded connection has a direction of establishment: you run an application client on one machine, and it initiates a session with a service on another. These two directions <span><em class="italic">may or may not match</em></span>. This is the difference between local and remote forwarding. Let's introduce some terminology and provide some diagrams to make sense of this. </p>
+<p class="calibre4">To begin with, we have an application client and server running on two hosts, A and B (<a shape="rect" href="#filepos1905066" class="calibre6">Figure 9-2</a>). </p>
+<p class="calibre4">The application server is listening on a well-known port W for incoming client connections. Without SSH, you can tell the application client that its server is on host B, port W. The client makes a direct connection to the server, and all application protocol data goes in the clear over the network (<a shape="rect" href="#filepos1905510" class="calibre6">Figure 9-3</a>). </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1905066" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Application client and server" src="images/00033.jpg" class="calibre71"/></div>
+</div>
+</span><p class="calibre4">Figure 9-2. Application client and server</p></div>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1905510" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Direct client/server connection (no forwarding)" src="images/00034.jpg" class="calibre72"/></div>
+</div>
+</span><p class="calibre4">Figure 9-3. Direct client/server connection (no forwarding)</p></div>
+<p class="calibre4">To protect the application protocol data by forwarding, you establish an SSH session between these two hosts. When setting up the SSH session, you select an unused port number P on the application client side (host A), and request SSH port forwarding from the socket (A,P) to the socket (B,W). Once the session is established, the SSH process on A is listening for incoming TCP connection requests on port P. Tell the application client that its server is on (A,P) instead of (B,W), and the stage is now set for port forwarding (<a shape="rect" href="#filepos1907301" class="calibre6">Figure 9-4</a>). </p>
+<p class="calibre4">There are now two cooperating SSH processes with an established, encrypted SSH session between them; you don't distinguish between the SSH client and server. Inside that session, SSH creates multiple <span><em class="italic">channels</em></span>, or logical streams for carrying data. It uses channels to carry and distinguish the input, output, and error streams for an interactive login or remote command run via SSH, and similarly creates a new channel for each use of a port forwarding, to carry the forwarded data inside the protected SSH session. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1907301" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="A forwarded port" src="images/00035.jpg" class="calibre72"/></div>
+</div>
+</span><p class="calibre4">Figure 9-4. A forwarded port</p></div>
+<p class="calibre4"><a shape="rect" href="#filepos1908704" class="calibre6">Figure 9-5</a> shows that now, when the application client tries to connect to its server, it connects instead to the listening SSH process (1). The SSH listener notices this and accepts the connection. It then notifies its partner SSH process that a new instance of this port forwarding is starting up, and they cooperate to establish a new channel for carrying the data for this forwarding instance (2). Finally, the partner SSH process initiates a TCP connection to the target of the port forwarding: the application server listening on (B,W) (3). Once this connection succeeds, the port-forwarding instance is in place. The SSH processes cooperate to pass back and forth any data transmitted by the application client and server, over the channel inside the SSH session. This allows them to communicate and secures the application's activities on the network. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1908704" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="A forwarded connection" src="images/00036.jpg" class="calibre72"/></div>
+</div>
+</span><p class="calibre4">Figure 9-5. A forwarded connection</p></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.2.3.2 Local versus remote forwarding: the distinction </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">With this general framework in place, you can distinguish between local and remote forwarding. First we introduce some terms. In the generic port-forwarding description in the last section, you saw that one SSH process listens for connections, while the other is ready to initiate connections in response to connections accepted on the other side, to complete the forwarded path. We call the first side the <span><em class="italic">listening</em></span> side of the SSH session with respect to this forwarding, and the other, the <span><em class="italic">connecting</em></span> side. For example, in <a shape="rect" href="#filepos1907301" class="calibre6">Figure 9-4</a>, host A is the listening side, while host B is the connecting side. Note that these terms aren't mutually exclusive. Since a single SSH session may have multiple forwardings in place, the same side of a session may be the listening side for some forwardings, and simultaneously the connecting side for others. But with respect to any particular forwarding, it's one or the other. </p>
+<p class="calibre4">Now, recall that in the last section we didn't label the SSH processes according to which was the SSH client and which was the SSH server, but simply referred to two cooperating SSH processes. We do so now and can state succinctly the local versus remote distinction: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">In a <span><em class="italic">local</em></span> forwarding (<a shape="rect" href="#filepos1911758" class="calibre6">Figure 9-6</a>), the application client and hence the listening side are located with the SSH client. The application server and connecting side are located with the SSH server. </li>
+<li class="calibre18">In a <span><em class="italic">remote</em></span> forwarding (<a shape="rect" href="DB_split_287.html#filepos1913276" class="calibre6">Figure 9-7</a>), the situation is reversed: the application client and listening side are located with the SSH server, while the application server and connecting side are located with the SSH client. </li>
+</ul></div>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1911758" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Local forwarding" src="images/00037.jpg" class="calibre71"/></div>
+</div>
+</span><p class="calibre4">Figure 9-6. Local forwarding</p></div>
+<p class="calibre4">So, as we said at the beginning of this section: use a local forwarding when the application client is on the local side of the SSH connection, and a remote forwarding when it's on the remote side. </p>
+</div>
+</div>
+</body>
+</html>

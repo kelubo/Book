@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_412"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2078936" class="calibre7"></a>10.3.3 sshd2_config for Tectia </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2079098" class="calibre15"></a>We now move to our recommended <em class="italic">sshd2_config</em> settings for Tectia. Again, we've omitted some keywords that are not security-related. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.1 Choice of protocol </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We recommend disabling the SSH-1 protocol altogether:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Ssh1Compatibility no<br class="calibre19"/>    Sshd1Path /dev/null      <em class="italic"><span>Not strictly necessary, just our paranoia</span></em></tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.2 Important files </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">As we have mentioned for OpenSSH <a shape="rect" href="DB_split_314.html#filepos2067823" class="calibre6">[10.3.2.2]</a>, make sure all SSH-related files are on local disks, not remotely mounted partitions: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    HostKeyFile /etc/ssh2/hostkey<br class="calibre19"/>    PublicHostKeyFile /etc/ssh2/hostkey.pub<br class="calibre19"/>    RandomSeedFile /etc/ssh2/random_seed</tt></div></span><p class="calibre4">For the following settings, consider the pros and cons of storing user files on NFS-mounted filesystems: <a shape="rect" href="DB_split_319.html#filepos2096627" class="calibre6">[10.7]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    UserConfigDirectory <em class="italic"><code class="calibre35">directory</code></em><br class="calibre19"/>    IdentityFile <em class="italic"><code class="calibre35">filename</code></em><br class="calibre19"/>    AuthorizationFile <em class="italic"><code class="calibre35">filename</code></em></tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.3 File and directory permissions </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The <code class="calibre35">StrictModes</code> value requires users to protect their SSH-related files and directories, or else they can't authenticate: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    StrictModes yes</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.4 TCP/IP settings </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We recommend the same configuration as for OpenSSH, for the same reasons: <a shape="rect" href="DB_split_314.html#filepos2069412" class="calibre6">[10.3.2.4]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Port 22<br class="calibre19"/><br class="calibre19"/>    ListenAddress 0.0.0.0<br class="calibre19"/>    KeepAlive yes<br class="calibre19"/>    RequireReverseMapping no</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.5 Login time </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2083393" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2083431" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2083469" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2083566" class="calibre15"></a>For logins we allow 30 seconds for a successful authentication, which should be long enough for users and automated processes: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    LoginGraceTime 30</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.6 Authentication </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">These settings mirror those for OpenSSH:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications publickey<br class="calibre19"/>    RequiredAuthentications publickey          <em class="italic"><span>Overrides AllowedAuthentications; we're being paranoid</span></em><br class="calibre19"/>    PermitEmptyPasswords no                    <em class="italic"><span>Already disabled, but we're being paranoid</span></em></tt></div></span><p class="calibre4">Although we've disabled hostbased authentication already, we still forbid <span><em class="italic">sshd</em></span> to use <em class="italic">.rhosts</em> files at all (just in case you reenable hostbased authentication). We also disable <code class="calibre35">UserKnownHosts</code> to prevent users from extending trust to unknown hosts for the purpose of hostbased authentication. The superuser can still specify trusted hosts in <em class="italic">/etc/ssh2/knownhosts.</em></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    IgnoreRhosts yes<br class="calibre19"/>    IgnoreRootRhosts yes<br class="calibre19"/>    UserKnownHosts no</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.7 Access control </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We permit SSH connections only from within the local domain<sup class="calibre20">[<a id="filepos2086209" shape="rect" href="#filepos2090322" class="calibre6">140</a>]</sup>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowHosts fred@* *.your.domain.com        <em class="italic"><span>Just an example</span></em></tt></div></span><p class="calibre4">except for the account fred in this example, which may receive connections from anywhere. </p>
+<p class="calibre4">If you want to restrict access to particular local accounts or Unix groups, add <code class="calibre35">AllowUsers</code> and <code class="calibre35">AllowGroups</code> lines (or <code class="calibre35">DenyUsers</code> and <code class="calibre35">DenyGroups</code>
+<a shape="rect" class="calibre15"></a><a id="filepos2087113" class="calibre15"></a>). Also create an "ssh" group as we described earlier. <a shape="rect" href="DB_split_314.html#filepos2075104" class="calibre6">[10.3.2.7]</a></p>
+<p class="calibre4">We permit the superuser to connect via SSH but not by password authentication. This is redundant but consistent with turning off <code class="calibre35">PasswordAuthentication</code>. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PermitRootLogin nopwd</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.8 Forwarding </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We permit TCP port forwarding and X forwarding so that users can secure their other TCP connections: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowTcpForwarding yes<br class="calibre19"/>    X11Forwarding yes</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.9 Encryption </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2088665" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2088703" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2088741" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2088779" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2088817" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2088855" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2088952" class="calibre15"></a>Use either of the following settings as fits your needs. The notable feature is that they both exclude the "none" cipher which may be a security risk. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Ciphers anycipher<br class="calibre19"/>    Ciphers anystdcipher</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.3.10 SFTP </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Confirm that the SFTP subsystem is defined so that incoming sftp connections will work. (It is enabled in the default <em class="italic">/etc/ssh2/sshd2_config</em> for Tectia.) </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    subsystem-sftp   sftp-server</tt></div></span></div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2090322" shape="rect" href="#filepos2086209" class="calibre6">140</a>] </sup>The reliability of this restriction depends on the integrity of DNS. Unfortunately, due to the implementation of <code class="calibre35">AllowHosts</code>, restriction by IP address is no more secure. <a shape="rect" href="DB_split_166.html#filepos1010709" class="calibre6">[5.5.1]</a></p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_413"></div></body>
+</html>

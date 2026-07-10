@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.5　调试跟踪</font>
+</font>
+</p>
+<p height="1em" width="2em">在编写程序时，很少会一次写对，笔者也不例外。在笔者写myrtp.c的例子时，就遇到一个Bug，导致在程序运行时出现“Segmentation fault”，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ ./myrtp /wav/test.wav<br/>
+<br/>
+Opening file /wav/vacation.wav<br/>
+<br/>
+Frame size is 160<br/>
+<br/>
+Segmentation fault: 11 (core dumped)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">为了查找失败原因，笔者使用GDB进行调试。注意，在调试之前，需要先在编译过程中使用“-ggdb”选项，以让GCC在产生的可执行程序中写入相关的符号表。另外还要注意，设置ulimit环境，以允许系统产生内核转储文件（core dump）。比如，笔者使用如下命令设置允许内核转储文件的大小限制（unlimited即无限制，默认是0）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ulimit -c unlimited<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">设置完成后，可以使用“ulimit-a”命令验证。然后，重新运行程序，产生core dump文件。在Linux系统上，core dump文件一般是在当前目录中产生，在笔者使用的Mac每上，它固定产生在/cores目录中，并以当前的进程号作为扩展名。</p>
+<p height="1em" width="2em">在找到的core dump文件中，笔者使用以下命令开启了gdb，装入core dump文件用于调试：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ gdb -core /cores/core.75886<br/>
+<br/>
+GNU gdb 6.3.50-20050815 (Apple version gdb-1824)...<br/>
+<br/>
+Reading symbols for shared libraries . done<br/>
+<br/>
+#0  apr_palloc (pool=0x0, size=72) at apr_pools.c:603<br/>
+<br/>
+603     if (pool-&gt;user_mutex) apr_thread_mutex_lock(pool-&gt;user_mutex);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，我们可以看到调用堆栈中的第“#0”层有一个pool变量是空指针（0x0即NULL），这可能是我们遇到问题的原因。但上述的命令并没有列出详细的调用栈，apr_pools.c是APR底层的库，因而我们还是需要从更上层查找问题。接着输入“bt”命令（Back Trace），我们看到了详细的调用栈，原来在调堆栈的第“#2”层调用switch_rtp_init时pool指针就是空指针。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+(gdb) bt<br/>
+<br/>
+#0  apr_palloc (pool=0x0, size=72) at apr_pools.c:603<br/>
+<br/>
+#1  0x0000000108db8b55 in apr_thread_mutex_create (mutex=0x108f146d0, flags=1, pool=0x0) at thread_mutex.c:50<br/>
+<br/>
+#2  0x0000000108d53373 in switch_rtp_init (pool=0x0) at switch_rtp.c:1328<br/>
+<br/>
+#3  0x0000000108cce7e0 in main (argc=2, argv=0x7fff56f32760) at myrtp.c:74<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们查找源文件，发现该pool在任何地方都没有初始化，因而它是一个空指针。所以，增加了第53行的对内存池初始化的函数后，一切就都正常了。</p>
+<p height="1em" width="2em">在本例子中，错误比较明显，因而很容易发现。而在实际编程开发时，可能遇到一些更隐秘的错误，不容易直接从Back Trace中看到结果。那就要配合在代码中添加日志打印语句，或临时注释掉一些语句等手段来调试了。有时候，直接使GDB连接（attach）到正在运行的进程上，再进行调试、添加断点等，也是比较有效的调试方法。调试程序是一门细活，也需要有一定的耐心和经验。在此我们仅通过此简单的例子，给大家讲解一下调试程序的基本原理和方法，剩下的就需要读者自己多加研究和练习了。</p>
+</body>
+</html>

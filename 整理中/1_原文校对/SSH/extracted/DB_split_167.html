@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_225"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1034726" class="calibre7"></a>5.5.2 Group Access Control </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1034884" class="calibre15"></a>
+<span><em class="italic">sshd</em></span> may permit or deny SSH access to all accounts in a Unix group on the server machine. The keywords <code class="calibre35">AllowGroups</code> and <code class="calibre35">DenyGroups</code> serve this purpose: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    AllowGroups faculty<br class="calibre19"/>    DenyGroups students</tt></div></span><p class="calibre4">These keywords operate much like <code class="calibre35">AllowUsers</code> and <code class="calibre35">DenyUsers</code>. OpenSSH accepts the wildcards <code class="calibre35">*</code> and <code class="calibre35">?</code> within group names, and separates multiple groups with whitespace. Tectia accepts patterns according to the regular-expression syntax determined by the metaconfiguration information <a shape="rect" href="DB_split_355.html#filepos2356359" class="calibre6">[11.6.1]</a>, and separates groups with commas: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    AllowGroups good* better<br class="calibre19"/>    DenyGroups bad* worse<br class="calibre19"/><br class="calibre19"/>    # Tectia with zsh_fileglob or traditional regex syntax<br class="calibre19"/>    AllowGroups good*,better<br class="calibre19"/>    DenyGroups bad*, worse<br class="calibre19"/><br class="calibre19"/>    # Tectia with egrep regex syntax<br class="calibre19"/>    AllowGroups good.*,better<br class="calibre19"/>    DenyGroups bad.*, worse</tt></div></span><p class="calibre4">Tectia recognizes numerical group IDs as well (but OpenSSH does not): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowGroups 513<br class="calibre19"/>    DenyGroups 781</tt></div></span><p class="calibre4">By default, access is allowed to all groups. If any <code class="calibre35">AllowGroups</code> keyword appears, access is permitted only to the groups specified (and may be further restricted with <code class="calibre35">DenyGroups</code>). </p>
+<p class="calibre4">These directives apply to both the primary group (typically listed in <em class="italic">/etc/passwd</em> or the corresponding NIS map) and all supplementary groups (in <em class="italic">/etc/group</em> or an NIS map). If a user is a member of any group that matches a pattern listed by <code class="calibre35">AllowGroups</code> or <code class="calibre35">DenyGroups</code>, then access is restricted accordingly. </p>
+<p class="calibre4">Group access control is often more convenient than restricting specific users, since group memberships can be changed without updating the configuration of the SSH server. </p>
+<p class="calibre4"><code class="calibre35">AllowGroups</code> and <code class="calibre35">DenyGroups</code> do not accept hostname qualifiers, however, in contrast to <code class="calibre35">AllowUsers</code> and <code class="calibre35">DenyUsers</code>. This is a surprising and unfortunate inconsistency: if hostname (or IP address) restrictions are useful for controlling access by specific users, then those same restrictions could be even more useful for controling access for entire groups. </p>
+<p class="calibre4">As was the case for <code class="calibre35">AllowUsers</code> and <code class="calibre35">DenyUsers</code>, conflicts are resolved in the most restrictive way. If any <code class="calibre35">AllowGroups</code> or <code class="calibre35">DenyGroups</code> line prevents access to a given group, access is denied to that group even if another line appears to permit it. </p>
+</div>
+</body>
+</html>

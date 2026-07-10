@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.13　生产环境下的稳定性和安全性</font>
+</font>
+</p>
+<p height="1em" width="2em">如果将FreeSWITCH用于生产环境，或者用于公网上，那么稳定性和安全性是必须考虑的。一般来说，FreeSWITCH是比较稳定的，其默认的配置也是比较安全的。但真正的应用中肯定需要考虑稳定性的问题，而且仅使用其默认的配置也肯定不能满足应用要求。在此我们来简单介绍一下这两个问题。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.13.1　稳定性</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH本身是比较稳定的。它是很优秀的开源软件，全世界有很多人将它用于各种应用场景，因此，如果它有导致不稳定的地方，总会有人将问题反馈到社区，而且一般也会很快有人修复该问题。</p>
+<p height="1em" width="2em">另一方面来讲，FreeSWITCH又是比较激进的，它的开发分支里很快会有大量的新特性加入，因此在测试不全面的情况下出现不稳定的情况也是难免的。</p>
+<p height="1em" width="2em">所以，如果用于生产环境，使用一个稳定的分支是有必要的。在本书截稿时，最新的稳定版是1.2.22，最新的稳定分支是1.2.stable。最新的1.4版目前还处于Beta阶段，相信很快就见到正式版了。</p>
+<p height="1em" width="2em">另外，即使稳定版也可能会崩溃。一旦出现这种情况，最好的解决方案就是立即恢复系统运行。在UNIX类系统上，可以使用monit <sup>
+<small>
+<a href="text00134.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 等监控工具监控FreeSWITCH进程，并在崩溃后快速恢复FreeSWITCH运行。在对稳定性要求更高的场合，可以考虑使用我们前面讲过到双机HA方案或多机集群。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.13.2　安全性</font>
+</font>
+</p>
+<p height="1em" width="2em">对于安全性而言，我们来考虑以下几个方面：</p>
+<p height="1em" width="2em">·FreeSWITCH默认所有用户的密码都是1234，这个一定是需要改的。可以修改vars.xml中的default_password全局变量，也可以针对每个用户在conf/directory/default/*.xml中修改。</p>
+<p height="1em" width="2em">·Event Socket（就是使用fs_cli）默认监听在本地Loopback IP 127.0.0.1上，因此应该是安全的。但如果开了远程访问（如在其他主机上使用Event Socket与它连接）就记得修改一下这个密码。ESL连接的密码传输都是明文的，因此不建议在公网上使用，除非在专用的VPN或加密隧道中。</p>
+<p height="1em" width="2em">·默认情况下，mod_xml_rpc是不加载的。如果你需要加载它，也应记住修改该模块的密码。它使用HTTP Basic来认证，因为密码都是明文传输的，不建议在公网上使用。如果需要使用的话建议在前面加HTTPS代理服务器。</p>
+<p height="1em" width="2em">·默认的5080端口是允许任何人呼入的，因此需要确认它对应的public Dialplan里是否有最少的路由规则。</p>
+<p height="1em" width="2em">·如果有黑客攻击，一般会发送大量的注册或呼叫请求暴力尝试所有可能的密码，可以考虑使用Fail2ban <sup>
+<small>
+<a href="text00134.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 功能来抵御这种攻击。</p>
+<p height="1em" width="2em">·在操作系统层，可以使用考虑使用iptables来设置合适的防火墙。另外，配合使用Snort <sup>
+<small>
+<a href="text00134.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 或AIDE <sup>
+<small>
+<a href="text00134.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 等防止入侵检测系统 <sup>
+<small>
+<a href="text00134.html">
+<font size="2">
+<font color="#FF6600">[5]</font>
+</font>
+</a>
+</small>
+</sup>
+ 也非常有用。</p>
+<p height="1em" width="2em">·最后，最可怕的是DDOS <sup>
+<small>
+<a href="text00134.html">
+<font size="2">
+<font color="#FF6600">[6]</font>
+</font>
+</a>
+</small>
+</sup>
+ 攻击。这是一个世界性的难题，不过，如果你不幸遇到这种攻击了，那说明别人可能是找错了门，或者你的业务已经是世界级的大了。那时候你将可以有更多的资源来解决这一问题。不过为了防患于未然，一般来说选择一个好的数据中心能在一定程度上帮你解决这个问题。</p>
+<p height="1em" width="2em">总之，达到一定稳定性和安全性的同时肯定会带来一定的系统复杂性，另外也会增加一定的实施和维护成本，这是不可避免的。在本小节中，我们仅点出了一些应注意的问题，并提到了一些常用的软件和工具，希望对读者有所帮助。如果将FreeSWITCH真正应用于生产环境，肯定还有更多的问题需要考虑。更深入的讨论超出了本书的范围，在此我们就不再展开了。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00133.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 一个系系统监控工具，可以在检测到进程失败时迅速恢复运行，参见http://mmonit.com/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00134.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 失败即禁止，参见http://wiki.freeswitch.org/wiki/Fail2ban。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00134.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 一个开源的网络入侵防御和检测系统，参见http://www.snort.org/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00134.html">
+<font color="#FF6600">[4]</font>
+</a>
+ Advanced Intrusion Detection Environment，即高级入侵检测环境，参见http://en.wikipedia.org/wiki/Advanced_Intrusion_Detection_Environment。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00134.html">
+<font color="#FF6600">[5]</font>
+</a>
+ 简称IDS，即Intrusion Detection System，参见http://zh.wikipedia.org/wiki/入侵检测系统。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00134.html">
+<font color="#FF6600">[6]</font>
+</a>
+ Distributed Denial of Service，分布式阻断服务攻击，又称洪水攻击，参见http://zh.wikipedia.org/zh-cn/分布式阻断服务攻击。</p>
+</body>
+</html>

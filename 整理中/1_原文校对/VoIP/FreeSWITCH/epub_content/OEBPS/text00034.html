@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.4　FreeSWITCH用作软电话</font>
+</font>
+</p>
+<p height="1em" width="2em">也可以把FreeSWITCH简单地用作一个软电话（可以看作用FreeSWITCH做了一个X-Lite）。虽然相比而言，FreeSWITCH比配置X-Lite略微复杂一些，但你会从中得到更多好处：FreeSWITCH是开源的，更强大、灵活。关键是它是目前笔者所知道的唯一支持CELT高清通话的软电话。</p>
+<p height="1em" width="2em">FreeSWITCH使用mod_portaudio模块支持你本地的音频设备，该模块默认是不编译的。在你的源代码目录下执行如下命令，以安装该模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+make mod_portaudio<br/>
+<br/>
+make mod_portaudio-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其他的模块也可以依照上面的方式进行重新编译和安装。安装完成后到控制台中执行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_portaudio<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果得到“Cannot find an input device”之类的错误，则可能是你的声卡驱动有问题。如果是提示“+OK”就是成功了。接着执行pa devlist命令，可以看到如下输出：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; pa devlist<br/>
+<br/>
+API CALL [pa(devlist)] output:<br/>
+<br/>
+0;Built-in Microphone;2;0;<br/>
+<br/>
+1;Built-in Speaker;0;2;r<br/>
+<br/>
+2;Built-in Headphone;0;2;<br/>
+<br/>
+3;Logitech USB Headset;0;2;o<br/>
+<br/>
+4;Logitech USB Headset;1;0;i<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上是笔者的笔记本电脑上的输出，它列出了所有的声音设备。其中，3和4最后的“o”和“i”分别代表声音输出（out）和输入（in）设备。在你的电脑上可能不一样，如果你想选择其他设备，可以使用命令进行修改。例如下列命令可以选择使用笔者电脑上内置的麦克风和耳机：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; pa indev #0<br/>
+<br/>
+freeswitch&gt; pa outdev #2<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此你就有了一个可以用命令行控制的软电话了。尝试输入以下命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; pa looptest       <br/>
+<br/>
+（回路测试，echo<br/>
+<br/>
+）<br/>
+<br/>
+freeswitch&gt; pa call 9196      <br/>
+<br/>
+（呼叫9196<br/>
+<br/>
+）<br/>
+<br/>
+freeswitch&gt; pa call 1000      <br/>
+<br/>
+（呼叫1000<br/>
+<br/>
+）<br/>
+<br/>
+freeswitch&gt; pa hangup         <br/>
+<br/>
+（挂机）<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如上所示，你可以呼叫刚才试过的所有号码。现在假设想从SIP分机1000呼叫到你，那么需要修改拨号计划(Dialplan)。用你喜欢的编辑器编辑以下文件并放到conf/dialplan/default/portaudio.xml中：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;include&gt;<br/>
+<br/>
+  &lt;extension name="call me"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^(me|12345678)$"&gt;<br/>
+<br/>
+      &lt;action application="bridge" data="portaudio"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+  &lt;/extension&gt;<br/>
+<br/>
+&lt;/include&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，在控制台中按F6或输入以下命令使之生效：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; reloadxml<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在分机1000上呼叫me或12345678（你肯定想为自己选择一个更酷的号码），然后在控制台上应该能看到类似[DEBUG]mod_portaudio.c:268 BRRRRING!BRRRRING!call 1的输出（如果看不到，按F8能得到详细的log），这说明你的软电话在振铃。多按几个回车，然后输入pa answer就可以接听电话了。输入pa hangup可以挂断电话。</p>
+<p height="1em" width="2em">当然，你肯定希望在振铃时能听到真正的振铃音而不是看什么BRRRRRING。好办，选择一个好听的声音文件（WAV格式），编辑conf/autoload_configs/portaudio.conf.xml，将ring-file一行修改为下面的样子，其中，value指定你的声音文件的路径：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="ring-file" value="/home/your_name/your_ring_file.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后重新加载模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; reloadxml<br/>
+<br/>
+freeswitch&gt; reload mod_portaudio<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">再打打试试，看是否能听到振铃音了？</p>
+<p height="1em" width="2em">如果你用不习惯字符界面，可以看一下FreeSWITCH-Air（http://www.freeswitch.org.cn/download），它是使用Adobe Air开发的，为FreeSWITCH提供一个简洁的软电话的图形界面。另外，如果你需要高清通话，除需要设置相关的语音编解码器（codec）外，你还需要有一个好的耳机才能达到最好的效果。笔者使用的是一款Logitech的USB耳机。除此之外，还有两款基于FreeSWITCH的软电话，分别是FSComm <sup>
+<small>
+<a href="text00035.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ （QT实现）和FSClient <sup>
+<small>
+<a href="text00035.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ （C#实现）。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00035.html">
+<font color="#FF6600">[1]</font>
+</a>
+ http://wiki.freeswitch.org/wiki/FSComm</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00035.html">
+<font color="#FF6600">[2]</font>
+</a>
+ http://wiki.freeswitch.org/wiki/FSClient</p>
+</body>
+</html>

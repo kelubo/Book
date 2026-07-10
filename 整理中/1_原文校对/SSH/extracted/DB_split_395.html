@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2663058" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_517"><span class="calibre2"><a shape="rect" class="calibre7"></a>Setting Up the SSH Server </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">The SSH server, <span><em class="italic">sshd</em></span>, runs under Cygwin as a standard Windows service, called (not surprisingly) Cygwin SSH Service. Cygwin provides a script, called <span><em class="italic">ssh-host-config</em></span>, to set this up. Here's what to do: </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">The Cygwin SSH Service (a.k.a. <span><em class="italic">sshd</em></span>) runs only on flavors of Windows that support services: NT, 2000, XP, 2003, etc. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Make sure you've set up the path and environment variables for OpenSSH and Cygwin. <a shape="rect" href="DB_split_393.html#filepos2658374" class="calibre6">[14.1]</a></li>
+<li value="2" class="calibre18">From an account with administrative privileges, run:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; ssh-host-config</tt></div></span></li>
+<li value="3" class="calibre18">Answer yes to all questions.</li>
+<li value="4" class="calibre18">When <span><em class="italic">ssh-host-config</em></span> completes, your service should be ready to run. Open your Services control panel, look for Cygwin SSHD Service, and start the service. Alternatively, use the command line:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; net start sshd</tt></div></span><br class="calibre19"/>You might also want to set the service startup to Automatic, so it runs whenever you boot the computer. To stop the service, again use the Services control panel or type:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; net stop sshd</tt></div></span></li>
+</ol></div>
+<p class="calibre4">If the service refuses to run, here are some things to try:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Make sure the file <em class="italic">/var/log/sshd.log</em> is writable by the <code class="calibre35">SYSTEM</code> account. </li>
+<li class="calibre18">Read <em class="italic">/var/log/sshd.log</em> for error messages. </li>
+</ul></div>
+<p class="calibre4">To test the server, connect to yourself:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; ssh localhost</tt></div></span><p class="calibre4">You should be prompted for your password and be able to log in. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Serverwide configuration files are found in <em class="italic">/etc</em>, such as <em class="italic">/etc/sshd_config</em>. This is in contrast to Unix-like systems that usually keep these files in <em class="italic">/etc/ssh</em>. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>  </body>
+</html>

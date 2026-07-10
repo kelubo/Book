@@ -1,0 +1,463 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_304"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1565362" class="calibre7"></a>7.4.6 Making Connections </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1565518" class="calibre15"></a>Under the best conditions, an SSH client attempts a secure connection, succeeds, obtains your authentication credentials, and executes whatever command you've requested, be it a shell or otherwise. Various steps in this process are configurable, including: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> The number of times the client attempts the connection </li>
+<li class="calibre18"> The look and behavior of the password prompt (for password authentication only) </li>
+<li class="calibre18"> Suppressing all prompting </li>
+<li class="calibre18"> Running remote commands interactively with a tty </li>
+<li class="calibre18"> Running remote commands in the background </li>
+<li class="calibre18"> Whether or not to fall back to an insecure connection, if a secure one can't be established </li>
+<li class="calibre18"> The escape character for interrupting and resuming an SSH session </li>
+</ul></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.6.1 Number of connection attempts </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">If you run an OpenSSH client and it can't establish a secure connection, it will retry. By default, it tries once. You can change this behavior with the keyword <code class="calibre35">ConnectionAttempts</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    ConnectionAttempts 10</tt></div></span><p class="calibre4">In this example, <span><em class="italic">ssh</em></span> tries 10 times before admitting defeat. Most people don't have much use for this keyword, but it might be helpful if your network is unreliable. Just for fun, you can force <span><em class="italic">ssh</em></span> to give up immediately by setting <code class="calibre35">ConnectionAttempts</code> equal to zero: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -o ConnectionAttempts=0 server.example.com<br class="calibre19"/>    ssh: connect to host server.example.com port 22: Success<br class="calibre19"/>    $                                       <em class="italic"><span>ssh has exited: no connection was made</span></em></tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.6.2 Password prompting in OpenSSH </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">If you're using password authentication in OpenSSH, you may control the number of times you are prompted for your password if mistyped. By default, you're prompted three times, and if you mistype the password repeatedly, the client exits. You can change this number with the keyword <code class="calibre35">NumberOfPasswordPrompts</code>:<sup class="calibre20">[<a id="filepos1569054" shape="rect" href="DB_split_239.html#filepos1669257" class="calibre6">110</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #  OpenSSH<br class="calibre19"/>    NumberOfPasswordPrompts 2</tt></div></span><p class="calibre4">Now your SSH client provides only two chances to type your password correctly. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.6.3 Password prompting in Tectia </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1569790" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1569828" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1569925" class="calibre15"></a>Tectia adds flexibility to password prompting. Instead of preset prompt strings, you can design your own with the <code class="calibre35">PasswordPrompt</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PasswordPrompt Enter your password right now, infidel:</tt></div></span><p class="calibre4">You can insert the remote username or hostname with the symbols <code class="calibre35">%U</code> (remote username) or <code class="calibre35">%H</code> (remote hostname). For a typical username@hostname prompt you could use: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PasswordPrompt "%U@%H's password:"</tt></div></span><p class="calibre4">Or you can be fancier:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PasswordPrompt "Welcome %U! Please enter your %H password:"</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1571356" class="calibre7"></a>7.4.6.4 Batch mode: suppressing prompts </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">In some cases, you don't want to be prompted for your password or passphrase. If <span><em class="italic">ssh</em></span> is invoked by an unattended shell script, for example, nobody will be at the keyboard to type a password. This is why SSH <span><em class="italic">batch mode</em></span> exists. In batch mode, all prompting for authentication credentials is suppressed. The keyword <code class="calibre35">BatchMode</code> can have a value of <code class="calibre35">yes</code> (disable prompting) or <code class="calibre35">no</code> (the default, with prompting enabled): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    BatchMode yes</tt></div></span><p class="calibre4">Batch mode may be enabled for <span><em class="italic">scp</em></span> also with the <span><em class="italic">-B</em></span> option, for OpenSSH: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ scp -B myfile server.example.com:</tt></div></span><p class="calibre4">Batch mode doesn't replace authentication. If a password or passphrase is required, you can't magically log in without it by suppressing the prompt. If you try, your client exits with an error message such as "permission denied." In order for batch mode to work, you must arrange for authentication to work without a password/passphrase—say, with hostbased authentication or an SSH agent. <a shape="rect" href="DB_split_325.html#filepos2109314" class="calibre6">[11.1]</a></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1573490" class="calibre7"></a>7.4.6.5 Pseudo-terminal allocation (TTY/PTY/PTTY) </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1573604" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1573701" class="calibre15"></a>A Unix <span><em class="italic">tty</em></span> (pronounced as it's spelled, T-T-Y) is a software abstraction representing a computer terminal, originally an abbreviation for "teletype." As part of an interactive session with a Unix machine, a tty is allocated to process keyboard input, limit screen output to a given number of rows and columns, and handle other terminal-related activities. Since most terminal-like connections don't involve an actual hardware terminal, but rather a window, a software construct called a <span><em class="italic">pseudo-tty</em></span> (or <span><em class="italic">pty</em></span>, pronounced P-T-Y) handles this sort of connection. </p>
+<p class="calibre4">When a client requests an SSH connection, the server doesn't necessarily allocate a pty for the client. It does so, of course, if the client requests an interactive terminal session, e.g., just <span><em class="italic">ssh host</em></span>. But if you ask <span><em class="italic">ssh</em></span> to run a simple command on a remote server, such as <span><em class="italic">ls</em></span> : </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh remote.server.com /bin/ls</tt></div></span><p class="calibre4">no interactive terminal session is needed, just a quick dump of the output of <span><em class="italic">ls</em></span>. In fact, by default <span><em class="italic">sshd</em></span> doesn't allocate a pty for such a command. On the other hand, if you try running an interactive command like the text editor Emacs in this manner, you get an error message: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh remote.server.com emacs -nw<br class="calibre19"/>    emacs: standard input is not a tty</tt></div></span><p class="calibre4">because Emacs is a screen-based program intended for a terminal. In such cases, you can request that SSH allocate a pty using the <span><em class="italic">-t</em></span> option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -t server.example.com emacs</tt></div></span><p class="calibre4">Tectia also has the keyword <code class="calibre35">ForcePTTYAllocation</code>, which does the same thing as <span><em class="italic">-t</em></span> .<sup class="calibre20">[<a id="filepos1576591" shape="rect" href="DB_split_239.html#filepos1669612" class="calibre6">111</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    ForcePTTYAllocation yes</tt></div></span><p class="calibre4">Also, OpenSSH can request <span><em class="italic">not</em></span> to use a pty with the <span><em class="italic">-T</em></span> option, though most of the time this isn't needed: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -T server.example.com who<br class="calibre19"/>    barrett      :0           Aug 25 21:51  (console)<br class="calibre19"/>    byrnes       pts/1        Aug 25 15:19  (yoyodyne.org)<br class="calibre19"/>    silverman    pts/2        Aug 22 09:42  (client.example.com)</tt></div></span><p class="calibre4">If SSH allocates a pty, it also automatically defines an environment variable in the remote shell. The variable is <code class="calibre35">SSH_TTY</code> (for OpenSSH) or <code class="calibre35">SSH2_TTY</code> (for Tectia) and contains the name of the character device file connected to the "slave" side of the pty, the side that emulates a real tty. We can see this in action with a few simple commands. Try printing the value of <code class="calibre35">SSH_TTY</code> on a remote machine. If no tty is allocated, the result is blank: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com 'echo $SSH_TTY$SSH_TTY2'<br class="calibre19"/>    <em class="italic"><span>[no output]</span></em></tt></div></span><p class="calibre4">If you force allocation, the result is the name of the tty: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -t server.example.com 'echo $SSH_TTY$SSH_TTY2'<br class="calibre19"/>    /dev/pts/1</tt></div></span><p class="calibre4">Thanks to this variable, you can run shell scripts on the remote machine that use this information. For example, here's a script that runs your default editor only if a terminal is available: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/sh<br class="calibre19"/>    if [ -n $SSH_TTY -o -n $SSH2_TTY ]; then<br class="calibre19"/>       echo 'Success!'<br class="calibre19"/>       exec $EDITOR<br class="calibre19"/>    else<br class="calibre19"/>       echo "Sorry, interactive commands require a tty"<br class="calibre19"/>    fi</tt></div></span><p class="calibre4">Place this script in your remote account, calling it <span><em class="italic">myscript</em></span> (or whatever), and run: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com myscript<br class="calibre19"/>    Sorry, interactive commands require a tty<br class="calibre19"/>    $ ssh -t server.example.com myscript<br class="calibre19"/>    Success!<br class="calibre19"/>    <em class="italic"><span>...Emacs runs...</span></em></tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.6.6 Backgrounding a remote command </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1580650" class="calibre15"></a>If you try running an SSH remote command in the background, you might be surprised by the result. After the remote command runs to completion, the client automatically suspends before the output is printed: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com ls &amp;<br class="calibre19"/>    [1]  11910<br class="calibre19"/>    $<br class="calibre19"/>    <em class="italic"><span>... time passes ...</span></em><br class="calibre19"/>    [1] + Stopped (SIGTTIN)        ssh server.example.com ls &amp;</tt></div></span><p class="calibre4">This happens because <span><em class="italic">ssh</em></span> is attempting to read from standard input while in the background, which causes the shell to suspend <span><em class="italic">ssh</em></span>. To see the resulting output, you must bring <span><em class="italic">ssh</em></span> into the foreground: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ fg<br class="calibre19"/>    README<br class="calibre19"/>    myfile<br class="calibre19"/>    myfile2</tt></div></span><p class="calibre4"><span><em class="italic">ssh</em></span> provides the <span><em class="italic">-n</em></span> command-line option to get around this problem. It redirects standard input to come from <em class="italic">/dev/null</em>, which prevents <span><em class="italic">ssh</em></span> from blocking for input. Now when the remote command finishes, the output is printed immediately: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -n server.example.com ls &amp;<br class="calibre19"/>    [1]  11912<br class="calibre19"/>    $<br class="calibre19"/>    <em class="italic"><span>... time passes ...</span></em><br class="calibre19"/>    README<br class="calibre19"/>    myfile<br class="calibre19"/>    myfile2</tt></div></span><p class="calibre4">Tectia has a keyword, <code class="calibre35">DontReadStdin</code>, that does the same thing as <span><em class="italic">-n</em></span>, accepting the values <code class="calibre35">yes</code> or <code class="calibre35">no</code> (the default is <code class="calibre35">no</code>): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    DontReadStdin yes</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.6.7 Backgrounding a remote command, take two </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The preceding section assumed you didn't need to type a password or passphrase, e.g., that you're running an SSH agent. What happens if you use <span><em class="italic">-n</em></span> or Tectia's <code class="calibre35">DontReadStdin</code> but the SSH client needs to read a password or passphrase from you? </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -n server.example.com ls &amp;<br class="calibre19"/>    $<br class="calibre19"/>    Enter passphrase for RSA key 'smith@client':</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">STOP! Don't type your passphrase! Because the command is run in the background with <span><em class="italic">-n</em></span>, the prompt is also printed in the background. If you respond, your password will be visible! This is because you will be typing to the shell, not the <span><em class="italic">ssh</em></span> prompt. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">You need a solution that not only disables input and sends the process into the background, but also permits <span><em class="italic">ssh</em></span> to prompt you. This is the purpose of the <span><em class="italic">-f</em></span> command-line option, which instructs <span><em class="italic">ssh</em></span> to do the following, in order: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18"> Perform authentication, including any prompting </li>
+<li value="2" class="calibre18"> Cause the process to read from <em class="italic">/dev/null</em>, exactly like <span><em class="italic">-n</em></span>
+</li>
+<li value="3" class="calibre18"> Put the process into the background: no "&amp;" is needed </li>
+</ol></div>
+<p class="calibre4">Here's an example:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -f server.example.com ls<br class="calibre19"/>    Enter passphrase for RSA key 'smith@client': <strong class="calibre45"><code class="calibre35">********</code></strong><br class="calibre19"/>    $<br class="calibre19"/>    <em class="italic"><span>... time passes...</span></em><br class="calibre19"/>    README<br class="calibre19"/>    myfile<br class="calibre19"/>    myfile2</tt></div></span><p class="calibre4">Tectia has a keyword, <code class="calibre35">GoBackground</code>, that does the same thing, accepting the values <code class="calibre35">yes</code> or <code class="calibre35">no</code> (the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    GoBackground yes</tt></div></span><p class="calibre4"><code class="calibre35">GoBackground</code> and <span><em class="italic">-f</em></span> also set up any port forwardings you may have specified on the command line. <a shape="rect" href="DB_split_289.html#filepos1926475" class="calibre6">[9.2.6]</a> The setup occurs after authentication but before backgrounding. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1587776" class="calibre7"></a>7.4.6.8 Escaping </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1587917" class="calibre15"></a>Recall that the <span><em class="italic">ssh</em></span> client has an <span><em class="italic">escape sequence</em></span> feature. <a shape="rect" href="DB_split_046.html#filepos215743" class="calibre6">[2.3.2]</a> By typing a particular character, normally a tilde (~), immediately after a newline or carriage return, you can send special commands to <span><em class="italic">ssh</em></span>: terminate the connection, suspend the connection, and so forth. <a shape="rect" href="#filepos1589259" class="calibre6">Table 7-2</a> summarizes the supported escape sequences. It's followed by a list that describes each sequence's meaning. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">If the next character following the escape character isn't in <a shape="rect" href="#filepos1589259" class="calibre6">Table 7-2</a>, then OpenSSH sends the entire (unrecognized) escape sequence to the server verbatim, whereas Tectia discards the escape sequence and sends nothing. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1589259" class="calibre15"></a></span><p class="calibre4">Table 7-2. ssh escape sequences</p>
+<div class="calibre3">
+<table summary="ssh escape sequences" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Sequence</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Example with &lt;ESC&gt; = ~ </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Meaning</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; ^Z</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ ^Z</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Suspend the connection (<span>^Z</span> means <code class="calibre35">Control-Z</code>) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; .</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ .</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Terminate the connection </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; #</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ #</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">List all forwarded connections </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt;&lt;ESC&gt;</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ ~</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Send the escape character (by typing it twice) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; ?</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ ?</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Print a help message </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">OpenSSH only:</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; &amp;</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ &amp;</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Send <span><em class="italic">ssh</em></span> into the background when waiting for connections to terminate </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; B</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ B</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Send a break to the server ) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; C</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ C</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Open a command line to add or remove a port forwarding </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; R</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">~R</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Request rekeying immediately </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Tectia only:</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; -</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ -</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Disable the escape character </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; c</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ c</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Print statistics for individual channels </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; l</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ l</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Switch to line mode</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; r</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">~r</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Request rekeying immediately </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; s</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ s</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Print statistics about this session </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>&lt;ESC&gt; V</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span>~ V</span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Print version information </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> "Suspend the connection" puts <span><em class="italic">ssh</em></span> into the background, suspended, returning control of the terminal to the local shell. To return to <span><em class="italic">ssh</em></span>, use the appropriate job control command of your shell, typically <span><em class="italic">fg</em></span>. While suspended, <span><em class="italic">ssh</em></span> doesn't run, and if left suspended long enough, the connection may terminate since the client isn't responding to the server. Also, any forwarded connections are similarly blocked while <span><em class="italic">ssh</em></span> is suspended. <a shape="rect" href="DB_split_292.html#filepos1942071" class="calibre6">[9.2.9]</a>
+</li>
+<li class="calibre18"> "Terminate the connection" ends the SSH session immediately. This is most useful if you have lost control of the session: for instance, if a shell command on the remote host has hung and become unkillable, or if you tried exiting while a tunnel (forwarding) is still active. Any X or TCP port forwardings are terminated immediately as well. <a shape="rect" href="DB_split_292.html#filepos1942071" class="calibre6">[9.2.9]</a>
+</li>
+<li class="calibre18"> "List all forwarded connections" prints a list of each X forwarding or TCP port forwarding connection currently established. This lists only active instances of forwarding; if forwarding services are available but not currently in use, nothing is listed here. </li>
+<li class="calibre18"> "Send <span><em class="italic">ssh</em></span> into the background," like the "suspend connection" command, reconnects your terminal to the shell that started <span><em class="italic">ssh</em></span>, but it doesn't suspend the <span><em class="italic">ssh</em></span> process. Instead, <span><em class="italic">ssh</em></span> continues to run. This isn't ordinarily useful, since the backgrounded <span><em class="italic">ssh</em></span> process immediately encounters an error.<sup class="calibre20">[<a id="filepos1603494" shape="rect" href="DB_split_239.html#filepos1670037" class="calibre6">112</a>]</sup> This escape sequence becomes useful if your <span><em class="italic">ssh</em></span> session has active, forwarded connections when you log out. Normally in this situation, the client prints a message about waiting for forwarded connections to terminate. The client typically waits (silently) in the foreground for the forwarded connections to close before it exits: you can detect this by using the "list all forwarded connections" escape. While the client is in this state, the "send <span><em class="italic">ssh</em></span> into the background" escape sequence returns you to the local shell prompt. </li>
+<li class="calibre18"> "Request rekeying immediately" causes the SSH client and server to generate and use some new internal keys for encryption and integrity. Normally, the client and server agree to rekey automatically at regular intervals. <a shape="rect" href="DB_split_149.html#filepos880188" class="calibre6">[5.3.4]</a>
+</li>
+<li class="calibre18"> "Send the escape character" tells the client to send a real tilde (or whatever the escape character is) to the SSH server as plaintext, not to interpret it as an escape. </li>
+<li class="calibre18"> "Disable the escape character" prevents further escape sequences from having any effect, and is therefore irrevocable. </li>
+<li class="calibre18"> "Open a command line to add or remove a port forwarding" prompts for <span><em class="italic">-L</em></span> or <span><em class="italic">-R</em></span> options to create a new local or remote port forwarding, respectively. <a shape="rect" href="DB_split_283.html#filepos1873184" class="calibre6">[9.2]</a> An existing remote forwarding can be canceled using <span><em class="italic">-KR</em></span>, followed by the target port number.<sup class="calibre20">[<a id="filepos1605484" shape="rect" href="DB_split_239.html#filepos1670433" class="calibre6">113</a>]</sup> To obtain a help message, type <code class="calibre35">-h</code> or <code class="calibre35">?</code>. </li>
+<li class="calibre18"> "Switch to line mode" causes characters to be collected by the client and then sent together to the server after a newline has been entered. This allows line-editing features that are available on the client machine to be used, even in situations when similar features are not available on the server machine. Line mode is temporary: after a single line has been sent, the client resumes its normal operation of sending each character to the server as soon as it has been entered. </li>
+</ul></div>
+<p class="calibre4">The rest of the escape sequences are self-explanatory.</p>
+<p class="calibre4">Sometimes the default escape character can cause a problem. Suppose you connect by <span><em class="italic">ssh</em></span> from host A to host B, then from host B to host C, and finally from host C to host D, making a chain of <em class="italic">ssh</em> connections (we represent the machines' shell prompts as <code class="calibre35">A$</code>, <code class="calibre35">B$</code>, <code class="calibre35">C$</code>, and <code class="calibre35">D$</code>): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    A$ ssh B<br class="calibre19"/>    ...<br class="calibre19"/>      B$ ssh C<br class="calibre19"/>      ...<br class="calibre19"/>        C$ ssh D<br class="calibre19"/>        ...<br class="calibre19"/>          D$</tt></div></span><p class="calibre4">While logged onto host D, you press the Return key, then <span>~</span>
+<span>^Z</span> (tilde followed by <code class="calibre35">Control-Z</code>) to suspend the connection temporarily. Well, you've got three <span><em class="italic">ssh</em></span> connections active, so which one gets suspended? The first one does, and this escape sequence brings you back to the host A prompt. Well, what if you want to escape back to host B or C? There are two methods, one with forethought and one on the spur of the moment. </p>
+<p class="calibre4">If you prepare in advance, you may change the escape character for each connection with the configuration keyword <code class="calibre35">EscapeChar</code>, followed by a character: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    EscapeChar %</tt></div></span><p class="calibre4">or the <span><em class="italic">-e</em></span> command-line option, followed again by the desired character (quoted if necessary to protect it from expansion by the shell): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -e '%' server.example.com</tt></div></span><p class="calibre4">OpenSSH supports the value <code class="calibre35">none</code> to mean no escape character: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    EscapeChar none</tt></div></span><p class="calibre4">So, going back to our example of hosts <em class="italic"><code class="calibre35">A</code></em> through <em class="italic"><code class="calibre35">D</code></em>, you want a different escape character for each segment of this chain of connections. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    A$ ssh B<br class="calibre19"/>    ...<br class="calibre19"/>      B$ ssh -e '$' C<br class="calibre19"/>      ...<br class="calibre19"/>        C$ ssh -e '%' D<br class="calibre19"/>        ...<br class="calibre19"/>          D$</tt></div></span><p class="calibre4">Now, while logged onto host <em class="italic"><code class="calibre35">D</code></em>, a tilde still brings you back to host A, but a dollar sign brings you back to host B and a percent sign back to host C. The same effect can be achieved with the <code class="calibre35">EscapeChar</code> keyword, but the following table shows that more forethought is required to set up configuration files on three hosts. </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"># Host A configuration file</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"># Host A configuration file</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host B</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">B:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> EscapeChar ~</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> EscapeChar ~</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"># Host B configuration file</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"># Host B configuration file</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host C</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">C:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> EscapeChar ^</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> EscapeChar ^</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"># Host C configuration file</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"># Host C configuration file</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host D</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">D:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> EscapeChar %</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> EscapeChar %</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">Even if you don't normally make chains of SSH connections, you might still want to change the escape character. For example, your work might require you to type a lot of tildes for other reasons, and you might accidentally type an escape sequence such as <code class="calibre35">~.</code> (tilde period) and disconnect your session. Oops! </p>
+<p class="calibre4">There's a second method that requires no forethought: type the escape character multiple times. Typing it twice sends the character literally across the SSH connection. <a shape="rect" href="#filepos1587776" class="calibre6">[7.4.6.8]</a> Therefore, you can suspend the second SSH connection by typing two escapes, the third by typing three escapes, and so on. Remember, you must precede your escape characters by pressing the Return key. While logged onto host D, you could escape back to host B, for example, by hitting the Return key, then typing two tildes, and <code class="calibre35">Control-Z</code>. </p>
+</div>
+</div>
+</body>
+</html>

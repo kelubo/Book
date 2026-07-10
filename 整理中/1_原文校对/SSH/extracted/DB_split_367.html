@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_480"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2511835" class="calibre7"></a>12.2.1 General Problems </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The commands ssh, scp, ssh-agent, ssh-keygen, etc., aren't doing what I expect. Even the help messages look weird. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Maybe they are Tectia programs when you are expecting OpenSSH, or vice versa. Try running these commands to find out: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh -V<br class="calibre19"/>    $ ssh --help</tt></div></span></span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">When I try to connect to an SSH server, I get the error "Connection refused." </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No SSH server is running where you tried to connect. Double-check the hostname and TCP port number: perhaps the server is running on a port different from the default? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">When I log in, the message of the day (<em class="italic">/etc/motd</em>) prints twice. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Both <span><em class="italic">sshd</em></span> and the <span><em class="italic">login</em></span> program are printing it. Disable <span><em class="italic">sshd</em></span>'s printing by setting the serverwide configuration keyword <code class="calibre35">PrintMotd</code> to <code class="calibre35">no</code>. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">When I log in, I see two messages about email, such as "No mail" or "You have mail." </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Both <span><em class="italic">sshd</em></span> and the <span><em class="italic">login</em></span> program are checking for mail. Prevent <span><em class="italic">sshd</em></span> from checking by setting the serverwide configuration keyword <code class="calibre35">CheckMail</code> to <code class="calibre35">no</code>. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</body>
+</html>

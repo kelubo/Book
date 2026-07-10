@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_460"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2293115" class="calibre7"></a>11.5.1 Tectia with X.509 Certificates </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.5.1.1 What's a PKI? </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2293497" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2293594" class="calibre15"></a>"X.509 PKI"—a forbidding term; it sounds like part of a warp engine that needs calibration, right after you reinitialize the field coils. Let's break it down: PKI stands for Public Key Infrastructure, and refers to a system for dealing in scalable fashion with the trust issues raised by deploying asymmetric (public-key) cryptography, including: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> Binding public keys to identities: users, hosts, routers, etc.--these are the <span><em class="italic">principals</em></span> in the system </li>
+<li class="calibre18"> Indicating or controlling the use of keys (encryption, signing, email, web/SSL, etc.) </li>
+<li class="calibre18"> Replacing keys </li>
+<li class="calibre18"> Renewing or revoking previously made bindings </li>
+<li class="calibre18"> Securely communicating all these properties </li>
+</ul></div>
+<p class="calibre4">Although the term sounds generic, in practice it has come to refer specifically to hierarchical systems in which so-called Certifying Authorities (CAs) vouch for the identity of principals and certify ownership of cryptographic keys. CAs can themselves be vouched for by higher CAs, arranged in a <span><em class="italic">tree of trust</em></span>. This reduces the trust problem to distributing the keys of a small number of well-known authorities, avoiding the combinatorial explosion of dealing individually with every pair of principals who might need to communicate securely. </p>
+<p class="calibre4">X.509 is the name of a standards document of the International Telecommunications Union (ITU, formerly the CCITT). Its original intent was to describe an authentication system for another ITU standard: X.500 directories (the title is "Recommendation X.509: The Directory Authentication Framework"). However, in the process it specified a format for <span><em class="italic">digital certificates</em></span>: data structures which embody the key/principal binding we mentioned, and that portion of X.509 has become widely used in PKI systems. </p>
+<p class="calibre4">X.509-style PKIs also use a great many other standards. To get an idea of the scope of the subject, just take a look at the home page of the IETF PKIX working group, at: </p>
+<div class="calibre3"><span class="calibre27">
+<blockquote class="calibre5"><span class="calibre33">
+<div class="calibre3"><a href="http://www.ietf.org/html.charters/pkix-charter.html" shape="rect" class="calibre6">http://www.ietf.org/html.charters/pkix-charter.html</a></div>
+</span></blockquote>
+</span></div>
+<p class="calibre4">It's a daunting list...but we'll just sum up the essentials here. The most important components of a certificate are: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> Issuer name </li>
+<li class="calibre18"> Subject name </li>
+<li class="calibre18"> Public key </li>
+<li class="calibre18"> Validity dates </li>
+<li class="calibre18"> Signature </li>
+</ul></div>
+<p class="calibre4">The <span><em class="italic">signature</em></span> is a cryptographic function of the entire certificate data structure, and is made by the issuer using <span><em class="italic">its</em></span> private key (which does not appear here). The meaning of the certificate is: "the issuer vouches that the subject owns the private counterpart to this public key (but this affidavit is only good between the given validity dates)." </p>
+<p class="calibre4">Now in reality, certificates can be much more complex, containing many more attributes. Also, the interpretation may be different: "owns" might mean "is authorized to use," or "has access to sign with but does not actually know," etc. And there are many unanswered questions here, such as how carefully did the issuer check the subject's identity? But we'll leave all that alone and concentrate on the basics. </p>
+<p class="calibre4">The <span><em class="italic">issuer</em></span> and <span><em class="italic">subject name</em></span> are expressed as <span><em class="italic">Distinguished Names</em></span> (DNs), as defined by X.509. These are attribute/value sets, represented in text like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    /C=US/ST=New York/O=Mad Writer Enterprises/CN=Richard E. Silverman <br class="calibre19"/>/emailAddress=res@oreilly.com</tt></div></span><p class="calibre4">The attribute abbreviations here are Country, STate, Organization, and Common Name (and there are more). </p>
+<p class="calibre4">Now, let's see how all this helps with SSH host key verification. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.5.1.2 Using certificates with Tectia host keys </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">When an SSH client connects to a server, it needs to verify that the server's host key actually belongs to the host it intended to contact. The usual way is to compare it to a local list of already known keys, but that has many drawbacks, as we pointed out earlier. Instead of managing an unwieldy, changing set of host keys, with PKI each client needs only one public key: that of a CA shared by all hosts in the system. Each time you deploy a new Tectia host, you generate a new hostkey as usual—but you also obtain a certificate, binding the host's name to its public key. That certificate is signed by the CA, and every client has the CA's public key. During the key-exchange phase of the SSH protocol, the client receives the certificate along with the server's hostkey; there are key types <span><em class="italic">x509v3-sign-rsa</em></span> and <span><em class="italic">x509v3-sign-dss</em></span> for this purpose instead of the usual <span><em class="italic">ssh-rsa</em></span> and <span><em class="italic">ssh-dss</em></span>. Instead of looking up the hostkey in a list, the Tectia client: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18"> Compares the subject name in the certificate to the server hostname and verifies that they match </li>
+<li value="2" class="calibre18"> Verifies the server's signature on the key-exchange transaction, proving it actually holds the corresponding private key </li>
+<li value="3" class="calibre18"> Verifies the issuer signature on the certificate using the CA's public key, to be sure it's genuine (i.e., that the certificate was actually issued by the trusted CA) </li>
+</ol></div>
+<p class="calibre4">If the key passes all these tests, then the client considers the key valid, and server authentication succeeds. You'll notice this doesn't completely remove the need for key distribution: the clients do still need to get the CA key in a trusted manner. But it's much easier to distribute or update a single key that changes very infrequently, than to manage a constantly changing known-hosts list! </p>
+<p class="calibre4">Now we'll get down to specifics with a simple example.</p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.5.1.3 A simple configuration </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">For our example, we'll start with a new instance of Tectia Server installed on a Linux host; first, we need to generate a hostkey with a certificate. This is not something we can describe very comprehensively, because it relies on outside factors: what actual PKI system is in use. You might be using anything from a home-brew CA using the free OpenSSL software that comes with most Unix variants these days, to a managed PKI service outsourced to a major security vendor, involving multiple layers of hierarchy, cross-certification among organizations, separate Registration Authorities, private-key escrow, etc. </p>
+<p class="calibre4">If the PKI in question uses the Certificate Management Protocols (CMP, RFC-2510), then you can use <span><em class="italic">ssh-cmpclient</em></span> to communicate with the PKI system: generate keys; request, receive, revoke, or update certificates; etc. You should consult your PKI vendor or managing staff as to how to proceed in this case. To keep our example simple, we'll follow an older but still widely used process: generating a keypair and certificate request using OpenSSL, which we then supply to the CA by some simple method (email and the Web are the usual ways). </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2303482" class="calibre7"></a>11.5.1.4 Getting a certificate </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Suppose our company is Vogon Construction, Inc., and the server hostname is jeltz.vcon.com. To generate a key pair and certificate request: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    % openssl req -nodes -config -new rsa:1024 -out request.pem \<br class="calibre19"/>      -outform pem -keyout private.pem -days 1095 \<br class="calibre19"/>      -subj '/C=US/ST=New York/L=Manhattan/O=Vogon Construction, Inc./CN=jeltz.vcon.com'</tt></div></span><p class="calibre4">This generates a new 1024-bit RSA key pair and produces two files: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">private.pem</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The unencrypted private key</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">request.pem</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">An X.509 certificate request</div>
+</blockquote>
+</div>
+<p class="calibre4">The <em class="italic">request.pem</em> file contains the public key and asks to bind the hostname <span><em class="italic">jeltz.vcon.com</em></span> to that key for a period of three years (1095 days). The DN contains other information besides the hostname, and typically the CA will require set values for some of that, e.g., that the Organization field match that of the CA. </p>
+<p class="calibre4">Next, send the request to the CA, and engage in whatever authentication procedures it requires: call Bob in IT, verify receipt of an email at your given address, swear an oath and sign in blood—whatever it takes. When the CA is satisfied, it will return to you a certificate, which you save in a file, <em class="italic">certificate.blob</em>. If it is an ASCII file looking like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    -----BEGIN CERTIFICATE-----<br class="calibre19"/>    MIIDbzCCAtigAwIBAgIDA9GvMA0GCSqGSIb3DQEBBQUAME4xCzAJBgNVBAYTAlVT<br class="calibre19"/>    MRAwDgYDVQQKEwdFcXVpZmF4MS0wKwYDVQQLEyRFcXVpZmF4IFNlY3VyZSBDZXJ0<br class="calibre19"/>    ...<br class="calibre19"/>    VdrJ1Z4HLT7PL+nEuvRJcpyw+A==<br class="calibre19"/>    -----END CERTIFICATE-----</tt></div></span><p class="calibre4">then it is in a format called PEM; if it's not, then it's in another format called DER. </p>
+<p class="calibre4">The two files, <em class="italic">private.pem</em> and <em class="italic">certificate.blob</em>, contain the host private key and our desired certificate; you can delete <em class="italic">request.pem</em>. Now, we need to convert these to Tectia's format for host keys, in a two-step process. First: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    % openssl pkcs12 -export -out jeltz.p12 -in certificate.blob -inform {pem|der}  <br class="calibre19"/>-inkey private.pem</tt></div></span><p class="calibre4">Choose "pem" or "der" depending on the format of the certificate. This stores the combined public key, private key, and certificate in a single file using yet another format, PKCS-12. You will be prompted for a passphrase to protect the file. This is a good format in which to store the keypair and certificate in case you need to rebuild the host and restore the key, so keep that file. Next: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -k jeltz.p12 -p ''</tt></div></span><p class="calibre4">This will, of course, prompt you for the passphrase (twice, in fact), and finally produce the two files we want: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">jeltz.p12-1_ssh2.crt</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Certificate in DER format</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">jeltz.p12_ssh2</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Unencrypted private key in SECSH format used by Tectia <a shape="rect" href="DB_split_193.html#filepos1232261" class="calibre6">[6.1.2]</a></div>
+</blockquote>
+</div>
+<p class="calibre4">Now, to get Tectia <span><em class="italic">sshd</em></span> to use them. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.5.1.5 Hostkey verification: configuring the server </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Install the new key and certificate in the Tectia configuration directory: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # install -o root -m 444 jeltz.p12-1_ssh2.crt /etc/ssh2/jeltz.crt<br class="calibre19"/>    # install -o root -m 444 jeltz.p12_ssh2 /etc/ssh2/jeltz</tt></div></span><p class="calibre4">and add this to <em class="italic">sshd2_config</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    HostCertificateFile jeltz.crt<br class="calibre19"/>    HostKeyFile jeltz</tt></div></span><p class="calibre4">If you want to continue offering the existing plain <code class="calibre35">ssh-dss</code> host key as well as the new certificate, you may need to add or uncomment the following: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    PublicHostKeyFile hostkey.pub<br class="calibre19"/>    HostKeyFile hostkey</tt></div></span><p class="calibre4">These are the defaults if no hostkey is specified, but once you add the <code class="calibre35">HostCertificateFile</code>, the defaults will not apply. For our example, though, we suggest you turn or leave off all other hostkeys so that successful server authentication by the client depends on this one key working. </p>
+<p class="calibre4">Lastly, restart Tectia Server:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # service sshd2 restart</tt></div></span><p class="calibre4">and try to connect with <span><em class="italic">ssh</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    % ssh jeltz.vcon.com<br class="calibre19"/>    warning: Received host certificate is not valid, error:<br class="calibre19"/>    search-state = { certificate-was-not-found database-method-search-failed } warning:<br class="calibre19"/>    Authentication failed.  Disconnected (local); key exchange or algorithm negotiation failed<br class="calibre19"/>    (Key exchange failed.).</tt></div></span><p class="calibre4">This error message shows that we succeeded: the client received a certificate along with the host key. A debug trace will show more specifically that the host-key type has changed: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    % ssh -d4 jeltz.vcon.com<br class="calibre19"/>    ...<br class="calibre19"/>    debug: Ssh2Client/sshclient.c:244/ssh_client_key_check: Got key of type x509v3-sign-rsa<br class="calibre19"/>    debug: Ssh2Client/sshclient.c:286/ssh_client_key_check: Checking certificate validity<br class="calibre19"/>    ...</tt></div></span><p class="calibre4">Now, we just need to arrange for the client to be able to verify the certificate. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.5.1.6 Hostkey verification: configuring the Client </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2312600" class="calibre15"></a>For this, we need the CA's public key, itself in the form of a certificate. This should be readily available from your CA; after all, the CA isn't much use unless everyone has it. Get it in DER format; if they provide it in PEM, convert it thus: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ openssl x509 -inform pem -outform der -in &lt;certificate file&gt; -out cacert.der</tt></div></span><p class="calibre4">Now install the CA certificate:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # install -o root -m 444 cacert.der /etc/ssh2</tt></div></span><p class="calibre4">configure <span><em class="italic">ssh</em></span> to use it: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # /etc/ssh2/ssh2_config<br class="calibre19"/>    # Note <br class="calibre19"/>that this <br class="calibre19"/>path must be absolute, unlike in the server config, since otherwise it is relative<br class="calibre19"/>    # to the user's ~/.ssh2 directory.<br class="calibre19"/>    HostCANoCRLs /etc/ssh2/cacert.der</tt></div></span><p class="calibre4">...and try!</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh -v jeltz.vcon.com<br class="calibre19"/>    ...<br class="calibre19"/>    debug: <br class="calibre19"/>Ssh2Client/sshclient.c:984/keycheck_cert_cb: <br class="calibre19"/>Host certificate valid and signed by a trusted CA, accepting<br class="calibre19"/>    ...</tt></div></span><p class="calibre4">If all has gone according to plan, this works, using whatever user authentication method you have available; the debug message shown indicates that the certificate validation succeeded. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.5.1.7 User authentication: configuring the client </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We have just set up server authentication using a server-supplied certificate. In fact, the converse is possible as well: Tectia Server can authenticate users by certificate as well. As before, we need a new keypair and certificate, this time for a DN matching a user. We follow the same procedure we used earlier <a shape="rect" href="#filepos2303482" class="calibre6">[11.5.1.4]</a>, but with the following subject name: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    /C=US/ST=New York/L=Manhattan/O=Vogon Construction, Inc./CN=Prostetnic V. Jeltz/ <br class="calibre19"/>subjectAltName=email:pvj@vcon.com</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">It is critical to include a <code class="calibre35">subjectAltName</code> of type <code class="calibre35">email</code> as shown—even if the user has no email address at all, in fact, and you have to make one up. It is a very confusing and thoroughly undocumented fact that Tectia Server requires the presence of this attribute for user certificates, even if it's not used. Otherwise, Tectia mysteriously rejects the certificate with no reason. It cost us several hours of bewilderment, culminating in an intense threesome with <span><em class="italic">gdb</em></span> and the Tectia source, to uncover this fact. </p>
+<p class="calibre4">In a related bit of confusion, there's a bug in OpenSSL whereby this attribute will <span><em class="italic">not</em></span> be automatically copied into the certificate request, like everything else next to it. You must edit the OpenSSL configuration file (often in <em class="italic">/usr/share/ssl/openssl.cnf</em>), and add or uncomment the following: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    [ usr_cert ]</tt></div></span></span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Once you have your private key and user certificate, place them in <em class="italic">~/.ssh2,</em> say: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">~/.ssh2/pvj.crt</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Certificate</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">~/.ssh2/pvj</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Private key</div>
+</blockquote>
+</div>
+<p class="calibre4">and configure <span><em class="italic">ssh</em></span> to use this key: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.ssh2/identification<br class="calibre19"/>    CertKey pvj</tt></div></span><p class="calibre4">We know it won't work, since we haven't configured the server yet—but as a test: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    % ssh -l pvj jeltz -o AllowedAuthentications=publickey<br class="calibre19"/>    warning: Authentication failed.<br class="calibre19"/>    Disconnected (local); no more authentication methods available (No <br class="calibre19"/>further authentication methods available.).</tt></div></span><p class="calibre4">We set <span><em class="italic">ssh</em></span> to try only public-key authentication since that's what we want to test; this way it doesn't end up asking for a password. The interesting message will be in the server log, typically <em class="italic">/var/log/secure</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    sshd2: Authorization check for user pvj's certificate rejected, reason: No <br class="calibre19"/>certificate authorization configured.</tt></div></span><p class="calibre4">And now finally, we tell the server how to authorize users based on their certificates. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.5.1.8 User authentication: configuring the server </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">With the old method, there was an implicit correspondence between an account and a public key authorized to log into it: the key sat in a special file in the account's home directory. With PKI, there is only the certificate, so we need a rule whereby Tectia can determine whether a particular certificate grants access to the requested account. In fact, Tectia allows great flexibility in expressing such rules. First, add this to the server configuration: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # /etc/ssh2/sshd2_config<br class="calibre19"/>    PKI cacert.der<br class="calibre19"/>    PKIDisableCrls yes<br class="calibre19"/>    MapFile cert.users</tt></div></span><p class="calibre4">This tells Tectia Server to trust user certificates signed by our CA, and to use the rules in <em class="italic">/etc/ssh2/cert.users</em> to authorize access to accounts. The rule language is described in the manpage for <em class="italic">ssh_certd_config</em>, section "MAPPING FILES." We'll give a few examples here: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # allow a certificate issued to Prostetnic V. Jeltz in our company, access to account pvj<br class="calibre19"/>    #<br class="calibre19"/>    pvj subject C=US,ST=New York,L=Manhattan,O=Vogon Construction, Inc.,CN=Prostetnic V. Jeltz<br class="calibre19"/><br class="calibre19"/>    # allow any certificate issued to Prostetnic V. Jeltz, whether by our organization or not<br class="calibre19"/>    #<br class="calibre19"/>    pvj subject CN=Prostetnic V. Jeltz<br class="calibre19"/><br class="calibre19"/>    # allow certificate serial number 17 issued by our CA<br class="calibre19"/>    #<br class="calibre19"/>    pvj SerialAndIssuer 17 C=US,ST=New York,L=Manhattan,O=Vogon Construction, Inc.<br class="calibre19"/><br class="calibre19"/>    # allow any certificate issued by us to access account "shared"<br class="calibre19"/>    #<br class="calibre19"/>    shared Issuer C=US,ST=New York,L=Manhattan,O=Vogon Construction, Inc.<br class="calibre19"/><br class="calibre19"/>    # allow certificate with email address pvj@vcon.com<br class="calibre19"/>    #<br class="calibre19"/>    pvj email pvj@vcon.com<br class="calibre19"/><br class="calibre19"/>    # pattern rule: allow certificate with email address &lt;foo&gt;@vcon.com to access account &lt;foo&gt;<br class="calibre19"/>    #<br class="calibre19"/>    %subst% EmailRegex ([a-z]+)@vcon\.com</tt></div></span><p class="calibre4">You would think we'd now restart <span><em class="italic">sshd</em></span> to have these changes take effect, but in fact Tectia has a separate daemon responsible for certificate validation: <span><em class="italic">ssh-certd</em></span>. So: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # service ssh-certd restart</tt></div></span><p class="calibre4">Now, try logging in again:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    % ssh -l pvj jeltz -o AllowedAuthentications=publickey</tt></div></span><p class="calibre4">If all has gone well, it will work, with the following telltale message in syslog: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    sshd2: Certificate authentication for user pvj accepted.</tt></div></span><p class="calibre4">You can have multiple PKI blocks in the server configuration, directing trust of various CAs and each with its own account mapping. </p>
+<p class="calibre4">We have presented the simplest possible view of PKI; it may be much more complicated. You might interact with something called a Registration Authority for obtaining your certificate, for example, rather than directly with the CA. Verifying a certificate might involve following a chain of certificates and signatures back to a trusted "root" certificate, rather than just one—or there might be multiple trust paths, if cross-certification is available, etc. </p>
+</div>
+</div>
+</body>
+</html>

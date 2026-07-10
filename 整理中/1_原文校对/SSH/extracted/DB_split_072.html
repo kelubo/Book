@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos313612" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_108"><span class="calibre2"><a shape="rect" class="calibre7"></a>The Architecture of an SSH System </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos313978" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos314017" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos314056" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos314095" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos314134" class="calibre15"></a>SSH has about a dozen distinct, interacting components that produce the features we've covered. <a shape="rect" href="DB_split_062.html#filepos283772" class="calibre6">[3.1]</a>
+<a shape="rect" href="#filepos314551" class="calibre6">Figure 3-1</a> illustrates the major components and their relationships to one another. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos314551" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SSH architecture" src="images/00010.jpg" class="calibre49"/></div>
+</div>
+</span><p class="calibre4">Figure 3-1. SSH architecture</p></div>
+<p class="calibre4">By "component" we don't necessarily mean "program": SSH also has keys, sessions, and other fun things. In this section we provide a brief overview of all the components, so you can begin to get the big picture of SSH: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Server</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A program that allows incoming SSH connections to a machine, handling authentication, authorization, and so forth. In most Unix SSH implementations, the server<a shape="rect" class="calibre15"></a><a id="filepos315572" class="calibre15"></a> is <span><em class="italic">sshd</em></span>. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Client</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A program that connects to SSH servers and makes requests, such as "log me in" or "copy this file." In OpenSSH and Tectia, the major clients<a shape="rect" class="calibre15"></a><a id="filepos316035" class="calibre15"></a> are <span><em class="italic">ssh</em></span>, <span><em class="italic">scp</em></span>, and <span><em class="italic">sftp</em></span>. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Session</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">An ongoing connection between a client and a server. It begins after the client successfully authenticates to a server and ends when the connection terminates. Sessions may be interactive or batch. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Key</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A relatively small amount of data, generally from tens of to 1,000 or 2,000 bits, used as a parameter to cryptographic algorithms such as encryption or message authentication. The key binds the algorithm operation in some way to the key holder: in encryption, it ensures that only someone else holding that key (or a related one) can decrypt the message; in authentication, it allows you to verify later that the key holder actually signed the message. There are two kinds of keys<a shape="rect" class="calibre15"></a><a id="filepos317388" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos317427" class="calibre15"></a>: symmetric or secret key, and asymmetric or public key. <a shape="rect" href="DB_split_070.html#filepos302323" class="calibre6">[3.2.2]</a> An asymmetric key has two parts: the public and private components. SSH has several types of keys, as summarized in <a shape="rect" href="#filepos317830" class="calibre6">Table 3-1</a>. </div>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos317830" class="calibre15"></a></span><p class="calibre4">Table 3-1. Keys, keys, keys</p>
+<div class="calibre3">
+<table summary="Keys, keys, keys" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Name</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Lifetime</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Created by</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Type</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Purpose</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Persistent</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">User</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Public</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Identify a user to the server </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Host key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Persistent</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Administrator</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Public</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Identify a server/machine </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Session key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">One session</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Client (and server) </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Secret</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Protect communications </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">User key</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A persistent, asymmetric key used by clients as proof of a user's identity. (A single user may have many keys/identities.) </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Host key</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A persistent, asymmetric key used by a server as proof of its identity, as well as by a client when proving its host's identity as part of hostbased authentication. <a shape="rect" href="DB_split_076.html#filepos393737" class="calibre6">[3.4.3.6]</a> If a machine runs a single SSH server, the host key also uniquely identifies the machine. (If a machine is running multiple SSH servers, each may have a different host key, or they may share.) </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Session key</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A randomly generated, symmetric key for encrypting the communication between an SSH client and server. It is shared by the two parties in a secure manner during the SSH connection setup so that an eavesdropper can't discover it. Both sides then have the session key, which they use to encrypt their communications. When the SSH session ends, the key is destroyed. </div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">An SSH connection has several session keys: each direction (server to client, and client to server) has keys for encryption and others for integrity checking. In our discussions we treat all the session keys as a unit and speak of "the session key" for convenience; they are all derived from a single master secret, anyway. If the context requires it, we identify the individual key we mean. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Key generator</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A program that creates persistent keys (user keys and host keys) for SSH. OpenSSH and Tectia have the program <span><em class="italic">ssh-keygen</em></span>. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Known-hosts database</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A collection of host keys. Clients and servers refer to this database to authenticate one another. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Agent</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A program that caches user keys in memory, so users needn't keep retyping their passphrases. The agent responds to requests for key-related operations, such as signing an authenticator, but it doesn't disclose the keys themselves. It is a convenience feature. OpenSSH and Tectia have the agent <span><em class="italic">ssh-agent</em></span>, and the program <span><em class="italic">ssh-add</em></span> loads and unloads the key cache. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Signer</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A program that signs hostbased authentication packets. We explain this in our discussion of hostbased authentication. <a shape="rect" href="DB_split_076.html#filepos393737" class="calibre6">[3.4.3.6]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Random seed</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A pool of random data used by SSH components to initialize software pseudo-random number generators. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Configuration file</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A collection of settings to tailor the behavior of an SSH client or server. </div>
+</blockquote>
+</div>
+<p class="calibre4">Not all these components are required in an implementation of SSH. Certainly servers, clients, and keys are mandatory, but many implementations don't have an agent, and some don't even include a key generator. </p>
+</div>  <div class="mbppagebreak" id="calibre_pb_109"></div></body>
+</html>

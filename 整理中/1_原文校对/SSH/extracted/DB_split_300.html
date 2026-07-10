@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_391"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1987616" class="calibre7"></a>9.4.2 How X Forwarding Works </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Although X clients can communicate with remote X servers, this communication isn't secure. All interactions between the X client and server, such as keystrokes and displayed text, can be easily monitored by network snooping because the connection isn't encrypted. In addition, most X environments use primitive authentication methods for connecting to a remote display. A knowledgeable attacker can get a connection to your display, monitor your keystrokes, and control other programs you're running. </p>
+<p class="calibre4">Once again, SSH comes to the rescue. An X protocol connection can be routed through an SSH connection to provide security and stronger authentication. This feature is called <span><em class="italic">X forwarding</em></span>. </p>
+<p class="calibre4">X forwarding works in the following way, as illustrated in <a shape="rect" href="#filepos1991026" class="calibre6">Figure 9-10</a>. An SSH client requests X forwarding when it connects to an SSH server (assuming X forwarding is enabled in the client). If the server allows X forwarding for this connection, your login proceeds normally, but the server takes some special steps behind the scenes. In addition to handling your terminal session, it sets itself up as a proxy X server running on the remote machine and sets the <code class="calibre35">DISPLAY</code> environment variable in your remote shell to point to the proxy X display: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    syrinx$ ssh sys1<br class="calibre19"/>    Last login: Sat Nov 13 01:10:37 1999 from blackberry<br class="calibre19"/>    Sun Microsystems Inc.   SunOS 5.6       Generic August 1997<br class="calibre19"/>    You have new mail.<br class="calibre19"/>    sys1$ echo $DISPLAY<br class="calibre19"/>    sys1:10.0<br class="calibre19"/>    sys1$ xeyes<br class="calibre19"/>    <em class="italic"><span>The "xeyes" X client appears on the screen</span></em></tt></div></span><p class="calibre4">The <code class="calibre35">DISPLAY</code> value appears to refer to X display #10 on <span><em class="italic">sys1</em></span>, but there's no such display. (In fact, there might be no true displays on <span><em class="italic">sys1</em></span> at all!) Instead, the <code class="calibre35">DISPLAY</code> value points to the X proxy established by the SSH server, i.e., the SSH server is masquerading as an X server. If you now run an X client program, it connects to the proxy. The proxy behaves just like a "real" X server, and in turn instructs the SSH client to behave as a proxy X client, connecting to the X server on your local machine. The SSH client and server then cooperate to pass X protocol information back and forth over the SSH pipe between the two X sessions, and the X client program appears on your screen just as if it had connected directly to your display. That's the general idea of X forwarding. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1991026" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="X forwarding" src="images/00041.jpg" class="calibre75"/></div>
+</div>
+</span><p class="calibre4">Figure 9-10. X forwarding</p></div>
+<p class="calibre4">X forwarding can even solve the firewall problem mentioned earlier, as long as the firewall permits SSH connections to pass through. If a firewall sits between your local and remote machines, and you run an X client on the remote machine, X forwarding tunnels the X connection through the firewall's SSH port to the local machine. Therefore, the X client's windows can open on your local display. If X forwarding were not present, the firewall would block the connection. </p>
+<p class="calibre4">Some aspects of X forwarding probably sound familiar from our earlier explanation of port forwarding. In fact, X forwarding is just a special case of port forwarding for which SSH has special support. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_258"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1228940" class="calibre7"></a>6.1.1 OpenSSH Identities </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1229096" class="calibre15"></a>An OpenSSH identity is stored in two files. By default, the private key is stored in the file <em class="italic">id_dsa</em>, and the public key in <em class="italic">id_dsa.pub</em>.<sup class="calibre20">[<a id="filepos1229356" shape="rect" href="DB_split_193.html#filepos1241900" class="calibre6">91</a>]</sup> This key pair, which is kept in your <em class="italic">~/.ssh</em> directory, is your default identity that clients use unless told otherwise. The private key looks something like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    -----BEGIN DSA PRIVATE KEY-----         <em class="italic"><span>Or "BEGIN RSA" for RSA keys</span></em><br class="calibre19"/>    Proc-Type: 4,ENCRYPTED<br class="calibre19"/>    DEK-Info: DES-EDE3-CBC,89C3AE51BC5876FD<br class="calibre19"/><br class="calibre19"/>    MXZJgnkYE+1+eff3yt9j/aCCABz75egbGJfAbWrseiu0k3Dim9Teu2Ob1Xjdv4U9<br class="calibre19"/>    II1hVYOkgQYuhdJbzrLMpJ0W1+N5ujI8akJ6j0ESeGTwJbhGyst71Y3A2+w4m1iv<br class="calibre19"/><em class="italic"><span>    ... lines omitted ...</span></em><br class="calibre19"/>    gMtQSdL26V1+EmGiPfio8Q==<br class="calibre19"/>    -----END DSA PRIVATE KEY-----</tt></div></span><div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SSH authorization files (public keys) and the programs that use them" src="images/00022.jpg" class="calibre62"/></div>
+</div>
+</span><p class="calibre4">Figure 6-3. SSH authorization files (public keys) and the programs that use them </p></div>
+<p class="calibre4">and the public key file contains a long, single line:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh-dss AAAAB3NzaC1kc3MAAACBAM4a2KKBE6zhPBgR <em class="italic"><span>...more...</span></em> smith@example.com</tt></div></span><p class="calibre4">The file format for these keys is known as "OpenSSH format." </p>
+<p class="calibre4">The <em class="italic">.pub</em> file containing your public key has no function by itself. Before it can be used for authentication, this public key must be copied into an authorization file on an SSH server machine, <em class="italic">~/.ssh/authorized_keys</em>. Thereafter, when an SSH client requests a connection to your server account using a private key as proof of identity, the OpenSSH server consults your <em class="italic">authorized_keys</em> file to find the matching public key. </p>
+</div>
+</body>
+</html>

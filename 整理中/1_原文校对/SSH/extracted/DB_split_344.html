@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_450"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2250239" class="calibre7"></a>11.3.3 Using a Connection Script </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2250403" class="calibre15"></a>The Pine configuration option <span><em class="italic">ssh-path</em></span> can point not only to <span><em class="italic">ssh</em></span>, but also to any other program: most usefully, a script you've written providing any needed customizations. If your needs are complex, you might have to do this. For example, the <code class="calibre35">ssh-path</code> setting is global to all mailboxes, but perhaps the <span><em class="italic">imapd</em></span> executable is in different locations on different servers you want to access. You can solve this problem with a script which takes the four <code class="calibre35">ssh-command</code> arguments from Pine, and does the right thing depending on which server is specified: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh-path=/home/smith/bin/my-pine-ssh-script<br class="calibre19"/>    ssh-command="%s %s %s %s"</tt></div></span><p class="calibre4">where the script <span><em class="italic">my-pine-ssh-script</em></span> is: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/sh<br class="calibre19"/><br class="calibre19"/>    ssh=$1<br class="calibre19"/>    server=$2<br class="calibre19"/>    user=$3<br class="calibre19"/>    method=$4<br class="calibre19"/><br class="calibre19"/>    prefix="exec $ssh -qax $user@$server exec"<br class="calibre19"/><br class="calibre19"/>    case $server in<br class="calibre19"/>        mail.work.com) $prefix /usr/sbin/imapd ;;<br class="calibre19"/>         imap.isp.net) $prefix /usr/local/sbin/imapd ;;<br class="calibre19"/>                    *) exit 0<br class="calibre19"/>    esac</tt></div></span><p class="calibre4">The default action of <code class="calibre35">exit</code> will cause Pine to skip SSH access quickly for servers other than the two mentioned. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2252753" shape="rect" href="DB_split_341.html#filepos2222194" class="calibre6">146</a>] </sup>Internet Message Access Protocol, RFC-2060. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2253039" shape="rect" href="DB_split_341.html#filepos2222360" class="calibre6">147</a>] </sup>Simple Mail Transfer Protocol, RFC-821. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2253321" shape="rect" href="DB_split_342.html#filepos2225025" class="calibre6">148</a>] </sup>IMAP does support more secure methods of authentication, but they aren't widely deployed. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_451"></div></body>
+</html>

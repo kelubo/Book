@@ -1,0 +1,821 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.3　mod_sofia</font>
+</font>
+</p>
+<p height="1em" width="2em">mod_sofia是FreeSWITCH中最大的一个模块，也是最重要的一个模块。所有的SIP通话都是从它开始和终止的，因而分析该模块的源代码是很有参考意义的。</p>
+<p height="1em" width="2em">mod_sofia模块非常庞大而且复杂，它实现了SIP注册、呼叫、Presence、SLA等一系列的SIP特性。在此我们抓住一条主线，仅研究SIP呼叫有关的代码，以避免又陷入庞大代码的海洋。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.3.1　模块加载</font>
+</font>
+</p>
+<p height="1em" width="2em">我们还是把mod_sofia模块的load函数作为入口，它是在mod_sofia.c:5420实现的。该函数最开始在第5423行定义了一个api_interface指针，用于往核心中添加API。在第5427行，它将一个全局变量mod_sofia_globals清零。该全局变量在整个模块内是有效的，它用于记录一些模块级的数据和变量。然后，在进行一定的初始化后，它在第5447行将全局变量的一个running成员变量设为1，标志该模块是在运行的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5420  SWITCH_MODULE_LOAD_FUNCTION(mod_sofia_load)<br/>
+<br/>
+5421  {<br/>
+<br/>
+5423      switch_api_interface_t *api_interface;<br/>
+<br/>
+...<br/>
+<br/>
+5428      memset(&amp;mod_sofia_globals, 0, sizeof(mod_sofia_globals));<br/>
+<br/>
+...<br/>
+<br/>
+5446      switch_mutex_lock(mod_sofia_globals.mutex);<br/>
+<br/>
+5447      mod_sofia_globals.running = 1;<br/>
+<br/>
+5448      switch_mutex_unlock(mod_sofia_globals.mutex);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在第5468行，将启动一个消息处理线程，用于SIP消息的处理。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5468      sofia_msg_thread_start(0);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第5475行调用config_sofia函数来从XML中读取该模块的配置并启动相关的Sofia Profile。第5549行，向核心注册本模块。第5550行，初始化一个新的Endpoint，接着指定该新的Endpoint的名字及绑定相关的回调函数（第5551行～第5554行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5475      if (config_sofia(SOFIA_CONFIG_LOAD, NULL) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+...<br/>
+<br/>
+5549      *module_interface =<br/>
+<br/>
+              switch_loadable_module_create_module_interface(pool, modname);<br/>
+<br/>
+5550      sofia_endpoint_interface =<br/>
+<br/>
+              switch_loadable_module_create_interface(*module_interface,<br/>
+<br/>
+                  SWITCH_ENDPOINT_INTERFACE);<br/>
+<br/>
+5551      sofia_endpoint_interface-&gt;interface_name = "sofia";<br/>
+<br/>
+5552      sofia_endpoint_interface-&gt;io_routines = &amp;sofia_io_routines;<br/>
+<br/>
+5553      sofia_endpoint_interface-&gt;state_handler = &amp;sofia_event_handlers;<br/>
+<br/>
+5554      sofia_endpoint_interface-&gt;recover_callback = sofia_recover_callback;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">后面的代码还有很多，我们就不继续往下看了。至此，我们还有两个细节没有研究明白：第一，就是上面刚刚讲到的这些回调函数都是怎么使用的；第二，就是底层的Sofia库是在哪里启动的，又是如何接收SIP消息并建立通话的。为了从根本上了解一路通话的建立过程，这次我们先从第二个问题开始看。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.3.2　Sofia的加载及通话建立</font>
+</font>
+</p>
+<p height="1em" width="2em">接下来，我们来看一下Sofia（即我们的SIP服务）到底是从哪里加载的，通话的建立是从哪里开始的，又是如何进行的。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.Sofia的加载</font>
+</font>
+</p>
+<p height="1em" width="2em">关于Sofia的加载，其实我们刚刚已经讲过了，它就隐藏在第5475行的config_sofia函数中。该函数是在sofia.c:3585行定义的。该函数非常长，它解析XML配置文件，初始化与Profile相关的变量的数据结构，并启动相关的Profile。我们熟知的默认的internal Profile就是在第4940行启动的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3585  switch_status_t config_sofia(sofia_config_t reload, char *profile_name)<br/>
+<br/>
+3586  {<br/>
+<br/>
+3587      char *cf = "sofia.conf";<br/>
+<br/>
+...<br/>
+<br/>
+4940                          launch_sofia_profile_thread(profile);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">launch_sofia_profile_thread在第2817行定义的，它将于第2826行启动一个新线程，并在新线程中执行sofia_profile_thread_run，同时将profile作为输入参数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+2817 void launch_sofia_profile_thread(sofia_profile_t *profile)<br/>
+<br/>
+2818 {<br/>
+<br/>
+...<br/>
+<br/>
+2826     switch_thread_create(&amp;profile-&gt;thread, thd_attr,<br/>
+<br/>
+             sofia_profile_thread_run, profile, profile-&gt;pool);<br/>
+<br/>
+2827 }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在新线程中（第2430行），将在第2432行得到profile指针的值。然后会在第2481行调用nua_create函数建立一个UA（User Agent）。nua_create是Sofia-SIP库提供的函数，它将启动一个UA，监听相关的端口（如大家熟知的5060），并等待SIP消息到来。一旦收到SIP请求，它便会回调sofia_event_callback回调函数（第2482行），该回调函数中将带着对应的profile作为回调参数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+2430 void *SWITCH_THREAD_FUNC sofia_profile_thread_run(<br/>
+<br/>
+                                    switch_thread_t *thread, void *obj)<br/>
+<br/>
+2431 {<br/>
+<br/>
+2432     sofia_profile_t *profile = (sofia_profile_t *) obj;<br/>
+<br/>
+...<br/>
+<br/>
+2481    profile-&gt;nua = nua_create(profile-&gt;s_root,  /* Event loop */<br/>
+<br/>
+2482        sofia_event_callback, /* Callback for processing events */<br/>
+<br/>
+2483        profile,  /* Additional data to pass to callback */<br/>
+<br/>
+2484        ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">关于Sofia-SIP底层的库我们就不深入研究了。到此为止，我们的SIP服务已经启动了，就等着接收SIP消息了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.SIP消息的接收</font>
+</font>
+</p>
+<p height="1em" width="2em">当我们的服务收到SIP消息后，便会调用sofia_event_callback回调函数。该函数在第1789行定义。在该行，如果得到回调，则收到一个nua_event_t结果的SIP事件event。即使不看Sofia-SIP库的文档，我们也能从第1800行的switch语句以及后面的case分支中看出——该事件到底是对应什么类型的SIP消息了。如果收到SIP INVITE消息，那么它一定会匹配到第1840行。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1789  void sofia_event_callback(nua_event_t event,<br/>
+<br/>
+1790      int status,<br/>
+<br/>
+1791      char const *phrase,<br/>
+<br/>
+1792      nua_t *nua, sofia_profile_t *profile,<br/>
+<br/>
+        nua_handle_t *nh, sofia_private_t *sofia_private,<br/>
+<br/>
+        sip_t const *sip,<br/>
+<br/>
+1793      tagi_t tags[])<br/>
+<br/>
+1794  {<br/>
+<br/>
+...<br/>
+<br/>
+1800      switch(event) {<br/>
+<br/>
+1801      case nua_i_terminated:<br/>
+<br/>
+...<br/>
+<br/>
+1840      case nua_i_invite:<br/>
+<br/>
+1841      case nua_i_register:<br/>
+<br/>
+1842      case nua_i_options:<br/>
+<br/>
+1843      case nua_i_notify:<br/>
+<br/>
+1844      case nua_i_info:<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">不同的消息将进行不同的处理，但大部分都会执行到第2018行，将消息通过一个核心的消息队列分发出去（其中，de是一个sofia_dispatch_event_t的结构体指针，它包含了本次收到的SIP消息）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+2018      sofia_queue_message(de);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Sofia-SIP库在底层是一个单线程的结构，因此在这里我们使用了消息队列以提高并发量。</p>
+<p height="1em" width="2em">接下来我们跟踪到第1749行，sofia_queue_message函数将保证我们的消息队列有足够的处理能力。然后，进行必要的检查。如果这是第一次INVITE请求（第1881行），则在第1943行（略）或第1945行调用switch_core_session_request生成一个新的Session，并赋值给session指针。到这里，INVITE请求在我们系统中起作用了——它导致我们的系统创建了一个Session，在以后所有与该INVITE消息相关的会话消息中，都会与该Session相关（当然，具体的关联代码还有很多，我们就不再深入了）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1749 void sofia_queue_message(sofia_dispatch_event_t *de)<br/>
+<br/>
+1750 {<br/>
+<br/>
+...<br/>
+<br/>
+1881      if (event == nua_i_invite &amp;&amp; !sofia_private) {<br/>
+<br/>
+...<br/>
+<br/>
+1945            session = switch_core_session_request(sofia_endpoint_interface, SWITCH_CALL_DIRECTION_INBOUND, SOF_NONE, NULL);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，在第1950行，初始化一个tech_pvt指针（该指针所指向的结构中将用于保存本Session的私有数据，我们后面还会讲到）。在第1962行，将这些私有数据与session绑定。然后，在第1981行，为该Session启动一个新的线程，以执行后续耗时的操作，避免阻塞当前的线程。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1950            tech_pvt = sofia_glue_new_pvt(session);<br/>
+<br/>
+...<br/>
+<br/>
+1962            sofia_glue_attach_private(session, profile, tech_pvt, channel_name);<br/>
+<br/>
+...<br/>
+<br/>
+1981          if (switch_core_session_thread_launch(session) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，启动了新线程后，对该SIP事件的处理还没有完，它还会后续设置de指针，并将收到的消息通过第1777行的switch_queue_push推到一个模块级的消息队列中去（即这里的msg_queue）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+2003          de-&gt;init_session = session;<br/>
+<br/>
+...<br/>
+<br/>
+1777     switch_queue_push(mod_sofia_globals.msg_queue, de);<br/>
+<br/>
+1778 }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，SIP事件的接收就完成了。如果后续收到其他SIP事件，将进行下次回调，并推到队列中等候处理。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.SIP消息的处理</font>
+</font>
+</p>
+<p height="1em" width="2em">对SIP事件的处理是在单独的线程（组）中执行的。进行事件处理的线程是在模块加载时从sofia_msg_thread_start函数开始的。该函数定义于sofia.c:1715，它首先会启动一个新线程，并在以后根据CPU的数量以及当前的需要决定启动多少个消息处理线程。从第1738行可以看出，新的事件处理线程中将执行sofia_msg_thread_run函数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1715  void sofia_msg_thread_start(int idx)<br/>
+<br/>
+1716  {<br/>
+<br/>
+...<br/>
+<br/>
+1736      switch_thread_create(&amp;mod_sofia_globals.msg_queue_thread[i],<br/>
+<br/>
+1737                               thd_attr,<br/>
+<br/>
+1738                               sofia_msg_thread_run,<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们继续跟踪，就发现sofia_msg_thread_run是在第1671行定义的。它在第1691行使用一个无限循环，不断地从消息队列中取出一条消息（事件），然后在第1700行使用sofia_process_dispatch_event函数发送出去。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1671  void *SWITCH_THREAD_FUNC sofia_msg_thread_run(<br/>
+<br/>
+                                   switch_thread_t *thread, void *obj)<br/>
+<br/>
+1672  {<br/>
+<br/>
+...<br/>
+<br/>
+1691      for(;;) {<br/>
+<br/>
+1692<br/>
+<br/>
+1693          if (switch_queue_pop(q, &amp;pop) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+...<br/>
+<br/>
+1699              sofia_dispatch_event_t *de = (sofia_dispatch_event_t *) pop;<br/>
+<br/>
+1700              sofia_process_dispatch_event(&amp;de);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">看来还得继续跟踪，sofia_process_dispatch_event被定义在第1643行，当看到第1652行时，我们总算看到了一点曙光，它终于像在调用一个回调函数了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1643  void sofia_process_dispatch_event(sofia_dispatch_event_t **dep)<br/>
+<br/>
+1644  {<br/>
+<br/>
+...<br/>
+<br/>
+1652      our_sofia_event_callback(de-&gt;data-&gt;e_event, de-&gt;data-&gt;e_status,<br/>
+<br/>
+              de-&gt;data-&gt;e_phrase, de-&gt;nua, de-&gt;profile,<br/>
+<br/>
+1653          de-&gt;nh, sofia_private, de-&gt;sip, de, (tagi_t *)de-&gt;data-&gt;e_tags);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">继续往下跟踪可以确定我们的猜测，在第1024行找到our_sofia_event_callback的定义后，可以看到它确实是在处理SIP消息了。在第1130行的switch语句的各个分支中，我们可以看到许多以nua_r_和nua_i_开头的SIP event，其中，前者表示收到一条响应（Response）消息，而后者表示收到一条请求消息。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1024  static void our_sofia_event_callback(nua_event_t event,<br/>
+<br/>
+1025      int status,<br/>
+<br/>
+1026      char const *phrase,<br/>
+<br/>
+1027      nua_t *nua, sofia_profile_t *profile, nua_handle_t *nh,<br/>
+<br/>
+        sofia_private_t *sofia_private, sip_t const *sip,<br/>
+<br/>
+1028      sofia_dispatch_event_t *de, tagi_t tags[])<br/>
+<br/>
+1029  {<br/>
+<br/>
+...<br/>
+<br/>
+1130      switch (event) {<br/>
+<br/>
+1131      case nua_r_get_params:<br/>
+<br/>
+1132      case nua_i_fork:<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们集中精力看INVITE消息，如果收到INVITE消息，则第1247行的case条件成立。继续判断如果第1249行的条件成立，则说明是一个re-INVITE消息，在第1250行进行处理。否则，则说明是一个新的INVITE消息，在第1253行调用sofia_handle_sip_i_invite处理。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1247      case nua_i_invite:<br/>
+<br/>
+1248          if (session &amp;&amp; sofia_private) {<br/>
+<br/>
+1249              if (sofia_private-&gt;is_call &gt; 1) {<br/>
+<br/>
+1250                  sofia_handle_sip_i_reinvite(...<br/>
+<br/>
+1251              } else {<br/>
+<br/>
+1252                  sofia_private-&gt;is_call++;<br/>
+<br/>
+1253                  sofia_handle_sip_i_invite(session, nua, profile, nh,<br/>
+<br/>
+                        sofia_private, sip, de, tags);<br/>
+<br/>
+1254              }<br/>
+<br/>
+1255          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在sofia_handle_sip_i_invite中，将更深入解析INVITE消息，对Session的相关内容进行更新，如果需要对来话进行认证，还需要给对方发送SIP 407消息进行挑战认证等。sofia_handle_sip_i_invite函数是在第7845行定义的，有兴趣的读者可以找到它来研究一下，在此我们就不再深入了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.SIP状态机</font>
+</font>
+</p>
+<p height="1em" width="2em">在Sofia-SIP底层，也实现了一个状态机，在SIP通话的不同阶段使用不同的状态进行表示和处理。因而在SIP状态发生改变时，它便向上层上报状态变化事件，这些状态变化事件也是在SIP事件的形式上报的，因而会经过跟上述的INVITE消息类似的回调过程一直到回调同一个回调函数our_sofia_event_callback。在该函数的第1265行，我们会看到在收到Sofia-SIP底层驱动的状态变化后，继续回调sofia_handle_sip_i_state函数来进行相关处理。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1265      case nua_i_state:<br/>
+<br/>
+1266          sofia_handle_sip_i_state(session, status, phrase, nua,<br/>
+<br/>
+                  profile, nh, sofia_private, sip, de, tags);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">由于sofia_handle_sip_i_state函数有太多的状态和情况需要处理，因此也非常长。我们很难通过直接阅读源码的方式找到正确的入口。看起来，虽然我们代码剖析到最后了，但是竟然可能要迷失了。</p>
+<p height="1em" width="2em">不过，办法总比困难多。在本章中，我们过多地关注了理论却少了实践。下面让我们拿起一个SIP电话，拨打9196，很快就可以在日志中看到如下的信息：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[DEBUG] sofia.c:5861 ... Channel entering state [received][100]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从上一条日志可以看出，在第5861行打印了一条日志，表示我们的状态机进入了收到INVITE消息后发送100 Trying消息的阶段（代码略）。而接着下一条日志则告诉我们Channel的状态从CS_NEW变成了CS_INIT。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[DEBUG] sofia.c:6116 ... State Change CS_NEW -&gt; CS_INIT<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有了上述信息，我们就可以在sofia.c的第6116行很快找到该日志对应的代码了。只要满足一定的条件，在该行就会把Channel的状态变为CS_INIT，然后Channel的核心状态机就会回调相关的状态回调函数了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5773  static void sofia_handle_sip_i_state(...<br/>
+<br/>
+5778  {<br/>
+<br/>
+...<br/>
+<br/>
+6115                      if (switch_channel_get_state(channel) == CS_NEW) {<br/>
+<br/>
+6116                          switch_channel_set_state(channel, CS_INIT);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">5.Channel状态机</font>
+</font>
+</p>
+<p height="1em" width="2em">只要Channel的状态一变成CS_INIT，FreeSWITCH核心的状态机代码就会负责处理各种状态变化了，因而各Endpoint模块就不需要再自己维护状态机了。也就是说，在一个Endpoint模块，首先要有一定的机制用于初始化一个Session（对应一个Channel，它的初始状态将为CS_NEW），然后在适当的时候把该Channel的状态变成CS_INIT，剩下的事就基本不用管了。</p>
+<p height="1em" width="2em">当然，这里说的是“基本”而不是“绝对”。一般来说，还是要在Endpoint模块中跟踪Channel状态机的变化，这就需要靠在核心状态机上注册相应的回调函数实现，如Sofia Channel的状态机的回调是在第4012行定义的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4012  switch_state_handler_table_t sofia_event_handlers = {<br/>
+<br/>
+4013      /*.on_init */ sofia_on_init,<br/>
+<br/>
+4014      /*.on_routing */ sofia_on_routing,<br/>
+<br/>
+4015      /*.on_execute */ sofia_on_execute,<br/>
+<br/>
+4016      /*.on_hangup */ sofia_on_hangup,<br/>
+<br/>
+4017      /*.on_exchange_media */ sofia_on_exchange_media,<br/>
+<br/>
+4018      /*.on_soft_execute */ sofia_on_soft_execute,<br/>
+<br/>
+4019      /*.on_consume_media */ NULL,<br/>
+<br/>
+4020      /*.on_hibernate */ sofia_on_hibernate,<br/>
+<br/>
+4021      /*.on_reset */ sofia_on_reset,<br/>
+<br/>
+4022      /*.on_park */ NULL,<br/>
+<br/>
+4023      /*.on_reporting */ NULL,<br/>
+<br/>
+4024      /*.on_destroy */ sofia_on_destroy<br/>
+<br/>
+4025  };<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这些回调函数是在21.3.1节讲过的代码的第5553行注册到核心中去的。回调函数本身都比较简单，感兴趣的读者可以自己看一下代码。为了节省篇幅，在此我们就不多列举了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">6.IO例程</font>
+</font>
+</p>
+<p height="1em" width="2em">与Channel状态机回调相比，Endpoint模块中更重要的是IO例程的回调。IO例程主要提供媒体数据的输入输出（IO）功能。与上一节讲的Channel的状态机类似，IO例程的回调函数是在21.3.1节讲到的代码的第5552行注册到核心中去的。其中，IO例程的回调函数是由一个switch_io_routines_t类型的结构体变量设置的，该变量的定义在第3997行。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3997  switch_io_routines_t sofia_io_routines = {<br/>
+<br/>
+3998      /*.outgoing_channel */ sofia_outgoing_channel,<br/>
+<br/>
+3999      /*.read_frame */ sofia_read_frame,<br/>
+<br/>
+4000      /*.write_frame */ sofia_write_frame,<br/>
+<br/>
+4001      /*.kill_channel */ sofia_kill_channel,<br/>
+<br/>
+4002      /*.send_dtmf */ sofia_send_dtmf,<br/>
+<br/>
+4003      /*.receive_message */ sofia_receive_message,<br/>
+<br/>
+4004      /*.receive_event */ sofia_receive_event,<br/>
+<br/>
+4005      /*.state_change */ NULL,<br/>
+<br/>
+4006      /*.read_video_frame */ sofia_read_video_frame,<br/>
+<br/>
+4007      /*.write_video_frame */ sofia_write_video_frame,<br/>
+<br/>
+4008      /*.state_run*/ NULL,<br/>
+<br/>
+4009      /*.get_jb*/ sofia_get_jb<br/>
+<br/>
+4010  };<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在21.1.5节，我们已经讲过了outgoing_channel的回调，该回调是在有外呼请求的时候（如，执行“originate sofia/gateway/...”时）被回调执行的。在此我们再来看一下mod_sofia中的outgoing_channel有何不同。</p>
+<p height="1em" width="2em">该模块的outgoing_channel回调是在第4032行定义的。在第4057～4058行，它也是初始化了一个新的Session（nsession），然后初始化了一个新的tech_pvt用于存放私有数据。第4065行还是从outbound_profile中复制被叫号码，第4071行得到对应的Channel（nchannel）。如果该外呼是由bridge发起的，则还会有a-leg存在，因而在第4074行将得到与a-leg对应的Channel，我们新生成的nchannel即是b-leg。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4032  static switch_call_cause_t sofia_outgoing_channel(...<br/>
+<br/>
+...<br/>
+<br/>
+4057      if (!(nsession = switch_core_session_request_uuid(<br/>
+<br/>
+                sofia_endpoint_interface, SWITCH_CALL_DIRECTION_OUTBOUND,<br/>
+<br/>
+4058            flags, pool, switch_event_get_header(var_event,<br/>
+<br/>
+                                 "origination_uuid")))) {<br/>
+<br/>
+4063      tech_pvt = sofia_glue_new_pvt(nsession);<br/>
+<br/>
+4064<br/>
+<br/>
+4065      data = switch_core_session_strdup(nsession,<br/>
+<br/>
+                     outbound_profile-&gt;destination_number);<br/>
+<br/>
+...<br/>
+<br/>
+4071      nchannel = switch_core_session_get_channel(nsession);<br/>
+<br/>
+4072<br/>
+<br/>
+4073      if (session) {<br/>
+<br/>
+4074          o_channel = switch_core_session_get_channel(session);<br/>
+<br/>
+4075      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">之后，在第4346行将tech_pvt与nsession关联进来。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4346      sofia_glue_attach_private(nsession, profile, tech_pvt, dest);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从第4428～4430行可以看出，新的Channel nchannel的状态变为了CS_INIT。然后，该Channel便进入正常的呼叫流程了。接下来，核心的状态机会接管后面的状态变化，如将状态机置为CS_ROUTING，然后进行路由查找（即查找Dialplan），最后进入CS_EXECUTE状态，执行在Dialplan中找到的各种App等。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4428      if (switch_channel_get_state(nchannel) == CS_NEW) {<br/>
+<br/>
+4429          switch_channel_set_state(nchannel, CS_INIT);<br/>
+<br/>
+4430      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当代码中某处调用switch_core_session_read_frame试图读取一帧音频数据时（如21.1.4节中的情况），就会执行read_frame回调函数，因而会回调第929行定义的函数。该回调函数由于将大部分功能都移动到核心的Core Media代码中去了，因而非常简单，它主要就是在第964行调用核心的switch_core_media_read_frame从底层的RTP中读取音频数据。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+929  static switch_status_t sofia_read_frame(switch_core_session_t *session,<br/>
+<br/>
+        switch_frame_t **frame, switch_io_flag_t flags, int stream_id)<br/>
+<br/>
+930  {<br/>
+<br/>
+...<br/>
+<br/>
+964      status = switch_core_media_read_frame(session, frame, flags,<br/>
+<br/>
+                      stream_id, SWITCH_MEDIA_TYPE_AUDIO);<br/>
+<br/>
+...<br/>
+<br/>
+968      return status;<br/>
+<br/>
+969  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，写数据的情况与此差不多，write_frame回调函数在第971行定义。它在第1008行也是调用了Core Media中的函数switch_core_media_write_frame通过RTP将音频数据发送出去。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+971  static switch_status_t sofia_write_frame(switch_core_session_t *session,<br/>
+<br/>
+        switch_frame_t *frame, switch_io_flag_t flags, int stream_id)<br/>
+<br/>
+972  {<br/>
+<br/>
+...<br/>
+<br/>
+1008      if (switch_core_media_write_frame(session, frame, flags,<br/>
+<br/>
+              stream_id, SWITCH_MEDIA_TYPE_AUDIO)) {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">视频的回调函数read_video_frame和write_video_frame与此差不多。我们就不多讲了。最后，还有一个比较有意思的receive_message回调，看第1096行定义的回调函数。其中，在第1123行和第1244行各一个switch语句用于判断收到的各种消息，并进行相应的处理。我们直接跳到第2031行，在收到SWITCH_MESSAGE_INDICATE_ANSWER消息时，它将在第2032行调用sofia_answer_channel对当前通话进行应答。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1096  static switch_status_t sofia_receive_message(switch_core_session_t *session,<br/>
+<br/>
+                                switch_core_session_message_t *msg)<br/>
+<br/>
+1097  {<br/>
+<br/>
+...<br/>
+<br/>
+1123      switch (msg-&gt;message_id) {<br/>
+<br/>
+...<br/>
+<br/>
+1244      switch (msg-&gt;message_id) {<br/>
+<br/>
+...<br/>
+<br/>
+2031      case SWITCH_MESSAGE_INDICATE_ANSWER:<br/>
+<br/>
+2032          status = sofia_answer_channel(session);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可很容易想象到，应答将会向对方发送SIP 200 OK消息。而它就是在第608行调用Sofia-SIP底层库实现的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+602 static switch_status_t sofia_answer_channel(switch_core_session_t *session)<br/>
+<br/>
+603 {<br/>
+<br/>
+...<br/>
+<br/>
+608                    nua_respond(tech_pvt-&gt;nh, SIP_200_OK, ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果我们再回到21.1.2节的answer App，就可以看到它调用了核心的switch_answer_channel函数，并在switch_channel.c:3716行发送了一个SWITCH_MESSAGE_INDICATE_ANSWER消息，因而sofia_receive_message函数被回调，代码执行到了第2032行，并最终在第608行向对方的SIP终端发送200 OK消息。</p>
+<p height="1em" width="2em">至此，我们所有的呼叫流程就全部都串起来了，我们对源代码的分析也到此结束了。</p>
+</body>
+</html>

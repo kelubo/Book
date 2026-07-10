@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_482"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2553396" class="calibre7"></a>12.2.3 Key and Agent Problems </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.3.1 ssh-keygen </h3>
+</div>
+</div>
+</div>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I generated an OpenSSH key and tried using it with Tectia, but it didn't work. (Or vice versa.) </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">This is normal. OpenSSH and Tectia (SECSH) keys aren't compatible. However, you can convert one to the other with <span><em class="italic">ssh-keygen</em></span>. <a shape="rect" href="DB_split_195.html#filepos1243547" class="calibre6">[6.2.1]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Each time I run ssh-keygen, it overwrites my default identity file. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Tell <span><em class="italic">ssh-keygen</em></span> to write its output to a different file. For <span><em class="italic">ssh-keygen</em></span> in OpenSSH, use the <span><em class="italic">-f</em></span> option. For Tectia, specify the filename as the last argument on the command line; no option is needed. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Can I change the passphrase for a key without regenerating the key? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes. For <span><em class="italic">ssh-keygen</em></span> in OpenSSH, use the <span><em class="italic">-N</em></span> option, and for Tectia use the <span><em class="italic">-p</em></span> option. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How do I generate a host key?</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Generate a key with an empty passphrase and install it in the correct location. The OpenSSH source distribution has a <span><em class="italic">Makefile</em></span> target to do this: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # cd <em class="italic"><code class="calibre35">directory_containing_source_code</code></em><br class="calibre19"/>    # make host-key            <em class="italic"><span>Will not overwrite existing keys</span></em><br class="calibre19"/>    # make host-key-force      <em class="italic"><span>Will overwrite existing keys</span></em></tt></div></span><p class="calibre4">or you can do it manually:</p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # ssh-keygen -t rsa1 -f /usr/local/etc/ssh_host_key -N ""<br class="calibre19"/>    # ssh-keygen -t dsa -f /usr/local/etc/ssh_host_dsa_key -N ""<br class="calibre19"/>    # ssh-keygen -t rsa -f /usr/local/etc/ssh_host_rsa_key -N ""</tt></div></span><p class="calibre4">Likewise, the Tectia source distribution has a <em class="italic">Makefile</em> target: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # cd <em class="italic"><code class="calibre35">directory_containing_source_code</code></em><br class="calibre19"/>    # make generate-host-key    <em class="italic"><span>Will not overwrite existing key</span></em></tt></div></span><p class="calibre4">or you can do it manually:</p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # ssh-keygen -P -t dsa -c "DSA hostkey" /etc/ssh2/hostkey</tt></div></span></span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Generating a key takes a long time.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes it may, depending on the speed of your CPU and the number of bits you have requested. DSA keys tend to take longer than RSA keys. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How many bits should I make my keys?</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">We recommend at least 1024 bits for strong security. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">What does oOo.oOo.oOo.oOo mean, as printed by Tectia's ssh-keygen? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The manpage calls it a "progress indicator." We think it's an ASCII representation of a sine wave. Or the sound of a chattering gorilla. You can hide it with the <span><em class="italic">-q</em></span> flag. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.3.2 ssh-agent and ssh-add </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2564225" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2564263" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">My ssh-agent isn't terminating after I log out.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">If you use the single-shell method to start an agent, this is normal. You must terminate the agent yourself, either manually (bleah) or by including appropriate lines in your shell configuration files. <a shape="rect" href="DB_split_201.html#filepos1318422" class="calibre6">[6.3.2.1]</a> If you use the subshell method, the agent automatically terminates when you log out (actually, when you exit the subshell). <a shape="rect" href="DB_split_201.html#filepos1328269" class="calibre6">[6.3.2.2]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">When I invoke ssh-add and type my passphrase, I get the error message "Could not open a connection to your authentication agent." </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Follow this debugging process:</p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Make sure you are running an <span><em class="italic">ssh-agent</em></span> process:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ /usr/bin/ps -ef | grep ssh-agent<br class="calibre19"/>    smith 22719     1  0 23:34:44 ?        0:00 ssh-agent</tt></div></span><br class="calibre19"/>If not, you need to run an agent before <span><em class="italic">ssh-add</em></span> will work. </li>
+<li value="2" class="calibre18">Check that the agent's environment variables are set:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ env | grep SSH<br class="calibre19"/>    SSH_AUTH_SOCK=/tmp/ssh-barrett/ssh-22719-agent<br class="calibre19"/>    SSH_AGENT_PID=22720</tt></div></span><br class="calibre19"/>If not, then you probably ran <span><em class="italic">ssh-agent</em></span> incorrectly, like this:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # Wrong!<br class="calibre19"/>    $ ssh-agent</tt></div></span><br class="calibre19"/>For the single-shell method, you must use <span><em class="italic">eval</em></span> with backquotes:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">      $ eval `ssh-agent`</tt></div></span><br class="calibre19"/>Or for the subshell method, you must instruct <span><em class="italic">ssh-agent</em></span> to invoke a shell:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh-agent $SHELL</tt></div></span></li>
+<li value="3" class="calibre18">Make sure the agent points to a valid socket:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ls -lF $SSH_AUTH_SOCK<br class="calibre19"/>    prwx------   1 smith   0 May 14 23:37 /tmp/ssh-smith/ssh-22719-agent|</tt></div></span><br class="calibre19"/>If not, your <code class="calibre35">SSH_AUTH_SOCK</code> variable might be pointing to an old socket from a previous invocation of <span><em class="italic">ssh-agent</em></span>, due to user error. Terminate and restart the agent properly. </li>
+</ol></div>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.3.3 Per-account authorization files </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2569837" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2569875" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2569913" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">My per-account server configuration isn't taking effect. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Check the following:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">You might be confused about which versions of SSH use which files: <div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">OpenSSH</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19"><em class="italic">~/.ssh/authorized_keys</em></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Tectia</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19"><em class="italic">~/.ssh2/authorization</em></div>
+</blockquote>
+</div>
+</li>
+<li class="calibre18">Remember that the <em class="italic">authorized_keys</em> file contains keys, whereas the Tectia <em class="italic">authorization</em> file contains directives referring to other key files. </li>
+<li class="calibre18">You might have a typographical error in one of these files. Check the spelling of options, and remember to separate OpenSSH <em class="italic">authorized_keys</em> options with commas, not whitespace. For example:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # correct<br class="calibre19"/>    no-x11-forwarding,no-pty 1024 35 8697511247987525784866526224505...<br class="calibre19"/><br class="calibre19"/>    # INCORRECT (will silently fail)<br class="calibre19"/>    no-x11-forwarding no-pty 1024 35 8697511247987525784866526224505...<br class="calibre19"/>    # ALSO INCORRECT (note the extra space after "no-x11-forwarding,")<br class="calibre19"/>    no-x11-forwarding, no-pty 1024 35 8697511247987525784866526224505...</tt></div></span></li>
+</ul></div>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+</body>
+</html>

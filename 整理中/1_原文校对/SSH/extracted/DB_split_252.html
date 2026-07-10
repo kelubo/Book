@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_330"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1709776" class="calibre7"></a>7.5.12 Controlling Bandwidth </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The <span><em class="italic">-l</em></span> (lowercase L) option of OpenSSH's <span><em class="italic">scp</em></span> command will limit the bandwidth of the connection, in case you want to avoid saturating a slower network. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ scp -l 1000 myfile server.example.com:      <em class="italic"><span>Limit bandwidth to 1000 kilobits per second</span></em></tt></div></span><p class="calibre4">Tectia's <span><em class="italic">scp</em></span> command can limit the maximum number of concurrent requests it will issue, with the <span><em class="italic">-N</em></span> option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp -r -N 5 mydirectory server.example.com:   <em class="italic"><span>Limit to five concurrent requests in this recursive directory transfer</span></em></tt></div></span><p class="calibre4">Finally, Tectia's <span><em class="italic">-b</em></span> option controls the buffer size for the file transfer; the default is 32K: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp -b 65536 myfile server.example.com: <em class="italic"><span>Set buffer size to 64K</span></em></tt></div></span></div>
+</body>
+</html>

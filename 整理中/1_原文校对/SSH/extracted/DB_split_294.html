@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_383"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1953099" class="calibre7"></a>9.2.11 Protocol-Specific Forwarding: FTP </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1953271" class="calibre15"></a>SSH port forwarding works best with protocols that make simple use of TCP: those which operate over a single TCP connection and are not sensitive to its network-related details such as IP addresses or ports—in other words, they could operate just as well over a serial line or other similar path. Many common protocols fall in this category, but not all. The exceptions tend to be older protocols designed before the rise of firewalls and NAT on the Internet, which degrade true peer-to-peer connectivity and make some techniques problematic. As we have already mentioned, a prime example is FTP, which exhibits several forwarding problems all at once: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">It uses multiple TCP connections.</li>
+<li class="calibre18">They may go in different directions.</li>
+<li class="calibre18">The destination ports may be dynamically determined.</li>
+<li class="calibre18">It carries TCP port numbers and IP addresses inside the protocol. </li>
+</ul></div>
+<p class="calibre4">This is all pretty disastrous from a forwarding perspective in the presence of NAT, and we'll share those gory details later. <a shape="rect" href="DB_split_338.html#filepos2179080" class="calibre6">[11.2.6]</a> Some SSH implementations, though, have an FTP-specific forwarding feature designed to work around these problems. This protocol-specific forwarding involves the SSH client watching the tunneled FTP protocol as it operates, creating dynamic forwardings to accommodate it, and possibly altering some FTP messages as they pass through in order to accommodate this hacking. Tectia has an FTP forwarding mode, while OpenSSH doesn't. The Tectia usage is: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh -L ftp/2001:localhost:21 <em class="italic"><code class="calibre35">S</code></em></tt></div></span><p class="calibre4">This logs into server S, forwarding local port 2001 with the FTP workaround magic, to the FTP server running on S (the normal FTP control port is 21). To use the forwarding, point your FTP client at <span><em class="italic">localhost:2001</em></span>. FTP programs vary in syntax for this; some examples are: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ftp localhost 2001<br class="calibre19"/>    $ ftp -P 2001 localhost</tt></div></span><p class="calibre4">As long as the FTP and SSH clients are together on one host, the servers are together on another, and "localhost" is used as shown in the commands, both active and passive FTP now work. This is normally the way you want it, since if the clients or servers are split up, then FTP data transfers (which include directory listings) pass in the clear over a portion of the path, unprotected by SSH. However, in some circumstances you might be forced to split one side up. As a result of the way Tectia FTP forwarding works, the rule is: </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">In active mode, the servers must be together; in passive mode, the clients must be together. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Observe that if you split up both sides so that four separate hosts (technically, addresses) are in the picture, then <span><em class="italic">neither</em></span> mode works, and FTP won't work at all beyond the initial connection and login. </p>
+<p class="calibre4">This rule applies because when Tectia forwards ports to accommodate FTP data connections, the ports listen on the loopback address only, forcing both participants on one side or the other to be on the same host. Which side depends on which mode: in active mode the FTP server makes the data connections, so the SSH forwardings are remote, forcing the servers to be together. In passive mode, the FTP client makes the connections, so the SSH forwardings are local, forcing the clients to be together. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1958010" shape="rect" href="DB_split_283.html#filepos1874982" class="calibre6">128</a>] </sup>Our port forwarding example protects your IMAP connection but doesn't truly protect your email messages. Before reaching your IMAP server, the messages pass through other mail servers and may be intercepted in transit. For end-to-end email security, you and your correspondent should use tools such as PGP or S/MIME to sign and/or encrypt the messages themselves. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1958615" shape="rect" href="DB_split_283.html#filepos1877232" class="calibre6">129</a>] </sup>We're being a little imprecise here. DHCP is entirely based on UDP, so SSH port forwarding can't do anything with it. The others, however, either use both TCP and UDP for different purposes or can sometimes be configured to run over TCP, though they generally use UDP. Nevertheless, in most common situations, SSH can't forward them. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1959190" shape="rect" href="DB_split_284.html#filepos1878470" class="calibre6">130</a>] </sup>You can also use <span><em class="italic">ssh -L2001:S:143 S</em></span>, substituting "S" for localhost, but we discuss later why localhost is the better alternative when possible. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1959640" shape="rect" href="DB_split_284.html#filepos1880874" class="calibre6">131</a>] </sup>The mechanisms used to implement these guarantees, though, are designed to counter transmission problems in the network, such as routing around failed links, or retransmitting data corrupted by noise or lost due to temporary network congestion. They are not very effective against deliberate attempts to steal a connection or alter data in transit part. SSH provides this protection that TCP alone lacks. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1960286" shape="rect" href="DB_split_284.html#filepos1883559" class="calibre6">132</a>] </sup>IANA's complete list of port numbers is found at <a href="http://www.isi.edu/in-notes/iana/assignments/port-numbers/." shape="rect" class="calibre6">http://www.isi.edu/in-notes/iana/assignments/port-numbers/.</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1960743" shape="rect" href="DB_split_284.html#filepos1885665" class="calibre6">133</a>] </sup>The Berkeley r-commands, however, do care about source ports. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1961046" shape="rect" href="DB_split_287.html#filepos1918189" class="calibre6">134</a>] </sup>Actually, the entire network 127.0.0.0/8—comprising 24 million addresses—is reserved for addresses that refer to the local host. Only the address 127.0.0.1 is commonly used, although we have seen devices use a handful of others for special purposes, such as "reject" interfaces on a terminal server or router. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1961597" shape="rect" href="DB_split_287.html#filepos1919899" class="calibre6">135</a>] </sup>Named after the Berkeley sockets library routine <span><em class="italic">bind</em></span>, commonly used to establish the association. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1962001" shape="rect" href="DB_split_290.html#filepos1936714" class="calibre6">136</a>] </sup>Microsoft Windows has no privileged port restriction, so any user can listen on any free port. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_384"></div></body>
+</html>

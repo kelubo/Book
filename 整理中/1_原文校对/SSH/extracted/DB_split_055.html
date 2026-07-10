@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_84"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos262622" class="calibre7"></a>2.5.3 Agent Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos262776" class="calibre15"></a>In the preceding example, the remote instance of <span><em class="italic">scp</em></span> has no direct access to your private key, since the agent is running on the local host, not the remote host. SSH provides <span><em class="italic">agent forwarding</em></span>
+<a shape="rect" href="DB_split_204.html#filepos1377375" class="calibre6">[6.3.5]</a> to address this problem. </p>
+<p class="calibre4">When agent forwarding is turned on,<sup class="calibre20">[<a id="filepos263354" shape="rect" href="#filepos268384" class="calibre6">9</a>]</sup> the remote SSH server masquerades as a second <span><em class="italic">ssh-agent</em></span>, as shown in <a shape="rect" href="#filepos264294" class="calibre6">Figure 2-4</a>. It takes authentication requests from your SSH client processes there, passes them back over the SSH connection to the local agent for handling, and relays the results back to the remote clients. In short, remote clients transparently get access to the local <span><em class="italic">ssh-agent</em></span>. Since any programs executed via <span><em class="italic">ssh</em></span> on the remote side are children of the server, they all have access to the local agent just as if they were running on the local host. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos264294" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="How agent forwarding works" src="images/00008.jpg" class="calibre48"/></div>
+</div>
+</span><p class="calibre4">Figure 2-4. How agent forwarding works</p></div>
+<p class="calibre4">In our double-remote <span><em class="italic">scp</em></span> example, here is what happens when agent forwarding comes into play (see <a shape="rect" href="#filepos267181" class="calibre6">Figure 2-5</a>): </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">You run the command on your local machine:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp pat@shell.isp.com:printme.pdf psmith@other.host.net:imprime-moi.pdf</tt></div></span></li>
+<li value="2" class="calibre18">This <span><em class="italic">scp</em></span> process contacts your local agent and authenticates you to <span><em class="italic">shell.isp.com</em></span>. </li>
+<li value="3" class="calibre18">A second <span><em class="italic">scp</em></span> command is automatically launched on <span><em class="italic">shell.isp.com</em></span> to carry out the copy to <span><em class="italic">other.host.net</em></span>. </li>
+<li value="4" class="calibre18">Since agent forwarding is turned on, the SSH server on <span><em class="italic">shell.isp.com</em></span> poses as an agent. </li>
+<li value="5" class="calibre18">The second <span><em class="italic">scp</em></span> process tries to authenticate you to <span><em class="italic">other.host.net</em></span> by contacting the "agent" that is really the SSH server on <span><em class="italic">shell.isp.com</em></span>. </li>
+<li value="6" class="calibre18">Behind the scenes, the SSH server on <span><em class="italic">shell.isp.com</em></span> communicates with your local agent, which constructs an authenticator proving your identity and passes it back to the server. </li>
+<li value="7" class="calibre18">The server verifies your identity to the second <span><em class="italic">scp</em></span> process, and authentication succeeds on <span><em class="italic">other.host.net</em></span>. </li>
+<li value="8" class="calibre18">The file copying occurs.</li>
+</ol></div>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos267181" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Third-party scp with agent forwarding" src="images/00009.jpg" class="calibre39"/></div>
+</div>
+</span><p class="calibre4">Figure 2-5. Third-party scp with agent forwarding</p></div>
+<p class="calibre4">Agent forwarding works over multiple connections in a series, allowing you to <span><em class="italic">ssh</em></span> from one machine to another, and then to another, with the agent connection following along the whole way. These machines may be progressively less secure, but agent forwarding doesn't send your private key to the remote host: it just relays authentication requests back to the first host for processing. Therefore, you don't have to copy your private key to other machines. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos268384" shape="rect" href="#filepos263354" class="calibre6">9</a>] </sup>It is on by default in Tectia, but off in OpenSSH. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_85"></div></body>
+</html>

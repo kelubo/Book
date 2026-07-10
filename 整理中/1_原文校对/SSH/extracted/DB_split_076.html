@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_113"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos376537" class="calibre7"></a>3.4.3 SSH Authentication Protocol (SSH-AUTH) </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos376713" class="calibre15"></a>Compared to SSH-TRANS, SSH-AUTH is a relatively simple affair, defined in a mere 12 pages as opposed to the 28 of the SSH-TRANS document (and that's not counting various extensions!). As with SSH-TRANS and key-exchange methods, the authentication protocol defines a framework within which arbitrary authentication exchanges may take place. It then defines a small number of actual authentication mechanisms, and allows for easy extension to define others. The three defined methods are password, public-key, and host-based authentication, of which only public-key is required. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.3.1 The authentication request </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos377677" class="calibre15"></a>The authentication process is driven by the client, framed by client requests and server responses. A request contains the following parts: </p>
+<div class="calibre3">
+<div class="calibre3"><span>Username <em class="italic"><code class="calibre35">U</code></em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The authorization identity the client is claiming. For most SSH systems, this means a user account in the usual sense: for instance, in Unix, granting the right to create processes with a particular uid. However, it might have some other meaning in other contexts; its interpretation is not defined by the protocol. </div>
+</blockquote>
+<div class="calibre3"><span>Service name <em class="italic"><code class="calibre35">S</code></em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The facility to which the client is requesting access, and hence implicitly the protocol to be started over the SSH-TRANS connection after authentication succeeds. There might be several authenticated services available, but typically there is only one: "ssh-connection," requesting access to the various services provided via the SSH-CONN protocol: interactive login, remote command execution, file transfer, port forwarding, and all the other things users actually want to do with SSH. </div>
+</blockquote>
+<div class="calibre3"><span>Method name <em class="italic"><code class="calibre35">M</code></em>, and method-specific data <em class="italic"><code class="calibre35">D</code></em></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The particular authentication method being used in this request—say, "password" or "publickey"--and the method-specific data convey whatever is needed to start this particular authentication exchange, e.g., an actual password to be verified by the server. As with key-exchange names in SSH-TRANS, names with "@domain" syntax may be used by anyone to implement local methods, while names without @-signs must be globally registered SSH authentication methods. </div>
+</blockquote>
+</div>
+<p class="calibre4">Once a particular authentication method starts, it may include any number of other message types specific to its needs. Or in the simplest case, the data carried by the initial request is enough, and the server can respond right away. In any case, after the request and some number of subsequent method-specific messages back and forth, the server issues an authentication response<a shape="rect" class="calibre15"></a><a id="filepos380354" class="calibre15"></a>. </p>
+<p class="calibre4">Note that, strictly speaking, calling this an "authentication request" is not quite accurate; this request actually mixes authentication and authorization. It requests verifying an authentication identity via some method, and simultaneously asks the server to check that identity's right to access a particular account: an authorization decision. If the attempt fails, the client doesn't know whether this was because authentication failed (e.g., it supplied the wrong password), or authentication succeeded but authorization failed (e.g., the password was right but the account was disabled). A human-readable error message might make that clear, but the situations are indistinguishable as far as the protocol is concerned (in general, but individual methods may provide more information, as we will see later with the public-key method). </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.3.2 The authentication response </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">An SSH-AUTH authentication response comes in two flavors: SUCCESS and FAILURE (an early version of the protocol had chocolate, too, which was unfortunately abandoned). A SUCCESS message carries no other data; it simply means that authentication was successful, and the requested service has been started; further SSH-TRANS messages sent by the client should be defined within that service's protocol, and the SSH-AUTH run is over. </p>
+<p class="calibre4">A FAILURE message has more structure:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">A list of authentication methods that can continue</li>
+<li class="calibre18">A "Partial success" flag</li>
+</ul></div>
+<p class="calibre4">The name "failure" is actually a bit misleading here. If the partial success flag is false, then this message does mean the preceding authentication method has failed for some reason (e.g., a supplied password was incorrect, a mismatched public key produced an incorrect signature, the requested account is locked out, etc.). If the flag is true, however, the message means that the method <span><em class="italic">succeeded</em></span>; however, the server requires that additional methods also succeed before granting access. Thus, the protocol allows an SSH server to require multiple authentication methods—although not all implementations provide the feature; Tectia does, for instance, while OpenSSH currently does not.<sup class="calibre20">[<a id="filepos383246" shape="rect" href="DB_split_077.html#filepos421514" class="calibre6">17</a>]</sup></p>
+<p class="calibre4">In either case, the message also supplies the list of authentication methods the server is willing to accept next. This allows for much flexibility; if it wants, the server can completely control the authentication process by only allowing one method at any time. But it can also specify multiple methods, allowing the client to choose them in an order which makes sense for the user. For instance, given a choice, a SSH client usually first tries methods that allow automatic authentication, such as Kerberos or public key with an agent, before those that require user intervention, such as entering a password or key passphrase. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.3.3 Getting started: the "none" request </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos384400" class="calibre15"></a>One thing is missing from all this: if the client drives the authentication process by making requests, but the list of available authentication methods is contained in server responses, then how does the client pick a first method to try? Of course, it could always just try any method and see what happens; the worst that could happen is that it fails or isn't available, and the client gets a correct list to pick from. But that's messy, and there's a standard way to do it: the "none" method. The protocol reserves the method name "none," and gives it a special meaning: if authentication is required at all, then this method must always fail. A client typically starts SSH-AUTH by sending a "none" request, expecting failure and getting back the list of available non-"none" methods to try. Of course, if the account in question does <span><em class="italic">not</em></span> require authentication, the server may respond with SUCCESS, immediately granting access. </p>
+<p class="calibre4">Here, the client, having already sent the "none" request to start with, now receives its initial list of methods to try: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: Authentications that can continue: publickey,password</tt></div></span><p class="calibre4">If you're debugging on the server side, you see something like this (with the OpenSSH server): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: userauth-request for user res service ssh-connection method none<br class="calibre19"/>    debug1: attempt 0 failures 0<br class="calibre19"/>    Failed none for res from 10.1.1.1 port 50459 ssh2</tt></div></span><p class="calibre4">This message is confusing if you're debugging some other problem, as it appears to show some mysterious failure. </p>
+<p class="calibre4">The client continues, choosing public-key authentication<a shape="rect" class="calibre15"></a><a id="filepos386600" class="calibre15"></a> to try first, with a DSS key stored in the SSH agent: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: Next authentication method: publickey<br class="calibre19"/>    debug1: Offering agent key: res-dsa<br class="calibre19"/>    debug2: we sent a publickey packet, wait for reply</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.3.4 Public-key authentication </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">A public-key authentication request carries the method name "publickey" and may have different forms depending on a flag setting. One form has this method-specific payload: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Flag = FALSE</li>
+<li class="calibre18">Algorithm name</li>
+<li class="calibre18">Key data</li>
+</ul></div>
+<p class="calibre4">The usable public-key algorithms are the same set defined in SSH-TRANS, and the format key data depends on the type; e.g., for "ssh-dss" it contains just the key, whereas for x509v3-sign-rsa it contains an X.509 public-key certificate. </p>
+<p class="calibre4">With the flag set to FALSE, this message is merely an authorization test: it asks the server to check whether this key is authorized to access the desired account, without actually performing authentication. If it is, a special response message comes back; this is an example of the possible method-specific SSH-AUTH messages we mentioned earlier. If the key is not authorized, the response is simply FAILURE. </p>
+<p class="calibre4">The second form is:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Flag = TRUE</li>
+<li class="calibre18">Algorithm name</li>
+<li class="calibre18">Key data - signature</li>
+</ul></div>
+<p class="calibre4">This actually requests authentication; the signature is computed over a set of request-specific data which includes the session ID, which binds the request to this SSH session and gives the public-key method its own measure of MITM resistance, similar to that described earlier for key exchange. </p>
+<p class="calibre4">The reason for providing both forms of request is that computing and verifying public-key signatures are compute-intensive tasks, which might also require interaction with the user (e.g., typing in a key passphrase). Hence, it makes sense to test a key first, to see whether it's worth going to the trouble of using it. </p>
+<p class="calibre4">The way a server actually authorizes a key for access to an account is outside the scope of the protocol, and can be anything at all. The usual way is to list or refer to the key in some file in the account, as with the OpenSSH <em class="italic">~/.ssh/authorized_keys</em> file. However, the server might access any type of service to do this; again, checking an entry in an LDAP directory comes to mind. Or again, certificates might be used: just as with host authentication, the key here might include a certificate, and any of the certificate's data might be used to make the authorization decision. </p>
+<p class="calibre4">Coming back to our debug trace, we see that the server accepts the offered key: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: Server accepts key: pkalg ssh-dss blen 435 lastkey 0x309a40 hint -1<br class="calibre19"/>    debug2: input_userauth_pk_ok: fp 63:24:90:03:cb:78:85:e6:59:71:49:26:55:81:f5:70<br class="calibre19"/>    debug1: Authentication succeeded (publickey).</tt></div></span><p class="calibre4">Then it logs the key's fingerprint and returns the final SUCCESS message, indicating that access is granted and the SSH-AUTH session is finished. </p>
+<p class="calibre4">Before moving on to the final protocol phase, let's examine two other methods defined in SSH-AUTH: password and hostbased authentication. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos391365" class="calibre7"></a>3.4.3.5 Password authentication </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The password method is very simple: its name is "password," and the data is, surprise, the password. The server simply returns success or failure messages as appropriate. The method it uses to verify the password is implementation-dependent, and varies a great deal: PAM, Unix password files, LDAP, Kerberos, NTLM; all these are available in various products. </p>
+<p class="calibre4">The password is passed in plaintext, at least as far as SSH-AUTH is concerned; hence, it is critical that this method be used over an encrypted connection (as is usually the case with SSH). Furthermore, since this method reveals the password to the server, it is crucial that the server not be an impostor. Even if an SSH product may warn of, but allow, a connection to an unauthenticated server in SSH-TRANS, it usually disallows password authentication<a shape="rect" class="calibre15"></a><a id="filepos392399" class="calibre15"></a> in SSH-AUTH for this reason. Compare this with the public-key method, which doesn't reveal the user's key in the authentication process. </p>
+<p class="calibre4">It should be mentioned that "password authentication" is a pretty broad term, and might be construed as encompassing other, better methods. If you think of it as describing any mechanisms that rely on secrets that can be easily memorized and typed by a human, then there are "password" methods with much better security properties than the trivial one described here; the Secure Remote Password protocol (SRP, <a href="http://srp.stanford.edu/" shape="rect" class="calibre6">http://srp.stanford.edu/</a>) is one. <a shape="rect" href="DB_split_034.html#filepos181754" class="calibre6">[1.6.5]</a> In this book, however, when we talk about "password" authentication, we mean as defined in SSH-AUTH. </p>
+<p class="calibre4">SSH-AUTH also has a set of messages for password changing—for example, allowing a user whose password has expired to set a new one before logging in. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos393737" class="calibre7"></a>3.4.3.6 Hostbased authentication </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos393894" class="calibre15"></a>Hostbased authentication is fundamentally different from its public-key and password cousins, in that the server actually delegates responsibility for user authentication to the client host. In short, hostbased authentication establishes trust relationships between machines. Rather than directly verifying the user's identity, the SSH server verifies the identity of the client <span><em class="italic">host</em></span>--and then believes the host when it says the user has already authenticated on the client side. Therefore, you needn't prove your identity to every host that you visit. If you are logged in as user andrew on machine A, and you connect by SSH to account bob on machine B using hostbased authentication, the SSH server on machine B doesn't check your identity directly. Instead, it checks the identity of host A, making sure that A is a trusted host. It further checks that the connection is coming from a trusted program on A, one installed by the system administrator that won't lie about andrew's identity. If the connection passes these two tests, the server takes A's word that you have been authenticated as andrew and proceeds to make an authorization check that <span><a href="mailto:andrew@A" shape="rect" class="calibre6">andrew@A</a></span> is allowed to access the account <span><a href="mailto:bob@B" shape="rect" class="calibre6">bob@B</a></span>. </p>
+<p class="calibre4">This sort of authentication makes sense only in a tightly administrated environment with less stringent security requirements, or when deployed for very specific and limited purposes, such as batch jobs. It demands that all participating hosts be centrally administered, making sure that usernames are globally selected and coordinated. If not, you could get access to someone else's account just by adding an account with the same name to your own machine! Also, there's the problem of transitive compromise: once one host is broken, the attacker automatically gets access to all accounts accessible via hostbased authentication from there, without any further work. </p>
+<p class="calibre4">Nevertheless, hostbased authentication has advantages. For one, it is simple: you don't have to type passwords or passphrases, or generate, distribute, and maintain keys. It also provides ease of automation. Unattended processes such as <span><em class="italic">cron</em></span> jobs may have difficulty using SSH if they need a key, passphrase, or password coded into a script, placed in a protected file, or stored in memory. This isn't only a potential security risk but also a maintenance nightmare. If the authenticator ever changes, you must hunt down and change these hardcoded copies, a situation just begging for things to break mysteriously later on. Hostbased authentication gets around this problem neatly. </p>
+<p class="calibre4">The "hostbased" request looks like:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Host key algorithm</li>
+<li class="calibre18">Client host key</li>
+<li class="calibre18">Client hostname</li>
+<li class="calibre18">Client-side username, <em class="italic"><code class="calibre35">C</code></em></li>
+<li class="calibre18">Signature</li>
+</ul></div>
+<p class="calibre4">Note that this request has two usernames: the requested server-side account name <em class="italic"><code class="calibre35">U</code></em> present in every SSH-AUTH request, and the client-side username <span><em class="italic">C</em></span> specific to the hostbased request. The interpretation is that user <span><em class="italic">C</em></span> on the client is requesting access to account <span><em class="italic">U</em></span> on the server, and the client's authentication as <span><em class="italic">C</em></span> is vouched for by the signature of the client host key. The mapping of which client usernames may access which accounts on the server is up to the implementation. Unix products tend to use semantics similar to the historical <span><em class="italic">rhosts</em></span> syntax, in the files <em class="italic">/etc/shosts.equiv</em> and <em class="italic">~/.shosts</em>. These can implement global identity mappings, allowing matching usernames automatic access, as well as more complicated or limited access patterns. </p>
+<p class="calibre4">In order to perform this authentication, the server must verify the client host identity—that is, it must check that the supplied key matches the claimed client hostname (e.g., with a known-hosts file). Having checked that and verified the signature, it then uses that same hostname in the authorization check (e.g., in <em class="italic">/etc/shosts.equiv</em>), to see if the requested client/server name pair is allowed access from this client host. Some implementations also check that the client's network address actually maps to the given hostname via the local naming service (DNS, NIS, etc.), but this is not really necessary; the meat of the authorization is in the association of the verified hostname supplied in the request, and the authorization rules. In fact, the address check may cause more trouble than it's worth, in the presence of poorly maintained DNS, network complications such as NAT, firewalls, proxying, etc. </p>
+<p class="calibre4">Of course, for this whole scenario to make any sense at all, there are yet more administrative burdens to be met. The signature, after all, is supplied by the client; and yet it is interpreted here as a trusted third party—the client <span><em class="italic">host</em></span> as a separate entity—vouching for the user's identity. But the user is behind the SSH client; how does this work? The answer is that the client host and SSH software must be arranged so that the user is <span><em class="italic">not</em></span> fully in control of what's going on. The private client host key must not be accessible to the user; rather, there must be a trusted service whereby the user can obtain the needed signature for the hostbased authentication request, and such signatures are only issued as appropriate. In a Unix context, usually the private host key file is readable only by the root account, and some part of SSH is installed with special privileges by the sysadmin ("setuid root"; typically this is a separate program called <span><em class="italic">ssh-signer</em></span>, which serves only this purpose). This trusted program checks the uid of the user running it, and issues signatures only for the corresponding username. This effectively translates the local authentication that allowed the person to log in to begin with, into an SSH certificate which can be transmitted and trusted as part of hostbased authentication. This description makes it even more clear how the whole arrangement is predicated on a very centrally controlled and consistently administrated system. One should evaluate very carefully whether hostbased authentication is the right choice. </p>
+</div>
+</div>
+</body>
+</html>

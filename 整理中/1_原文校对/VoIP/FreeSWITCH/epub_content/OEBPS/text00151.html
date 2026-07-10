@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.10　使用mod_xml_cdr模块处理话单</font>
+</font>
+</p>
+<p height="1em" width="2em">与mod_xml_curl模块类似，mod_xml_cdr会在每次生成话单后请求一个HTTP服务器，然后HTTP服务器就可以进行一些逻辑处理和写入数据库等操作。在HTTP服务器端，用户可以使用任何熟悉的语言（如Java、PHP、Ruby、Python、C#等）来开发。</p>
+<p height="1em" width="2em">在本例中，我们将使用Ruby给大家讲解。之所以使用Ruby，是因为Ruby的语法比较易懂，讲起来也比较容易。Ruby语言之所以能发扬光大倒不是因为它的语法比较好，而是因为有个叫DHH <sup>
+<small>
+<a href="text00152.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 的人写了一个叫Ruby on Rails的开发框架，利用这个框架能迅速开发Web应用，从而使Ruby一时风靡Web开发领域。不过，我们在这里不使用Ruby on Rails，而是使用另外一个比较轻量级的框架Sinatra <sup>
+<small>
+<a href="text00152.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">使用Sinatra创建Web应用时能更快捷。笔者在这里选用它的另一个原因是，其不像PHP那样像个黑洞，它直接有个调试的控制台，可以很容易在日志中打印收到的内容。</p>
+<p height="1em" width="2em">Sinatra的安装很简单，如果你机器上已经有了Ruby环境，可以直接通过gem来安装，方法如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# gem install sinatra<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">先来看下面的代码。它的功能很简单，当收到“/cdr”的POST请求后，便在控制台上把请求信息中的“cdr”参数打印出来（Sinatra中所有的请求数据都在request对象中），然后返回一个纯文本的回应“CDR Saved”。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+require 'sinatra'<br/>
+<br/>
+post '/cdr' do<br/>
+<br/>
+    puts "cdr: #{request["cdr"]}"<br/>
+<br/>
+    "CDR Saved\n"<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">把上面的代码保存到cdr.rb文件，然后便可以直接启动一个Web服务器了（下面我们称为CDR服务器）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ ruby cdr.rb<br/>
+<br/>
+INFO  WEBrick 1.3.1<br/>
+<br/>
+INFO  ruby 1.9.3 (2012-04-20) [x86_64-darwin11.4.2]<br/>
+<br/>
+== Sinatra/1.4.4 has taken the stage on 4567 for development<br/>
+<br/>
+INFO  WEBrick::HTTPServer#start: pid=98950 port=4567<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在日志中我们可以看到它监听了4567端口，然后，我们在另外的终端上使用curl工具给它发送一个HTTP POST请求（FreeSWITCH默认都是发送POST请求），我们就能收到“CDR Saved”回应了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ curl -XPOST -d cdr=test localhost:4567/cdr<br/>
+<br/>
+CDR saved<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">同时，在CDR服务器的日志中也能看到“cdr:test”输出。接下来，修改FreeSWITCH中mod_xml_cdr的配置文件，将其中的url参数设为指向我们的CDR服务器：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="url" value="http://localhost:4567/cdr"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后在FreeSWITCH中重新加载一个mod_xml_cdr模块，并打一个电话测试，就能在CDR服务器日志中看到一大堆的XML。前面的一部分如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+cdr: &lt;?xml version="1.0"?&gt;<br/>
+<br/>
+&lt;cdr core-uuid="bf7f346e-25c8-498b-9a2c-8d0e5f70a266"&gt;<br/>
+<br/>
+  &lt;channel_data&gt;<br/>
+<br/>
+    &lt;state&gt;CS_REPORTING&lt;/state&gt;<br/>
+<br/>
+    &lt;direction&gt;inbound&lt;/direction&gt;<br/>
+<br/>
+    &lt;state_number&gt;11&lt;/state_number&gt;<br/>
+<br/>
+    &lt;flags&gt;0=1;1=1;36=1;37=1;39=1;42=1;52=1;87=1;111=1;114=1&lt;/flags&gt;<br/>
+<br/>
+    &lt;caps&gt;1=1;2=1;3=1;4=1;5=1;6=1&lt;/caps&gt;<br/>
+<br/>
+  &lt;/channel_data&gt;<br/>
+<br/>
+  &lt;variables&gt;<br/>
+<br/>
+    &lt;direction&gt;inbound&lt;/direction&gt;<br/>
+<br/>
+    &lt;uuid&gt;6c54299f-ad3b-4d5a-bd32-becbfd290cd2&lt;/uuid&gt;<br/>
+<br/>
+    &lt;session_id&gt;132&lt;/session_id&gt;<br/>
+<br/>
+    &lt;sip_from_user&gt;1006&lt;/sip_from_user&gt;<br/>
+<br/>
+    &lt;sip_from_uri&gt;1006%40192.168.7.6&lt;/sip_from_uri&gt;<br/>
+<br/>
+    &lt;sip_from_host&gt;192.168.7.6&lt;/sip_from_host&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">知道了XML的结构，就很容易将其中有用的内容解析出来了，如主被叫号码、呼叫起止时间、通话时长等。</p>
+<p height="1em" width="2em">Ruby中有一个gem叫Nokogiri <sup>
+<small>
+<a href="text00152.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，可以用于解析XML，我们可以用如下命令来安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# gem install nokogiri<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接着，我们使用Nokigiri解析XML <sup>
+<small>
+<a href="text00152.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，并通过XPath（对应doc对象的xpath方法）取得相关的内容，并打印出来，代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+require 'sinatra'<br/>
+<br/>
+require 'nokogiri'<br/>
+<br/>
+post '/cdr' do<br/>
+<br/>
+    doc  = Nokogiri::XML(request["cdr"])<br/>
+<br/>
+    caller = doc.xpath("/cdr/variables/user_name//text()")<br/>
+<br/>
+    dest = doc.xpath("/cdr/callflow/caller_profile/destination_number//text()")<br/>
+<br/>
+    start_epoch = doc.xpath("/cdr/variables/start_epoch//text()")<br/>
+<br/>
+    answer_epoch = doc.xpath("/cdr/variables/answer_epoch//text()")<br/>
+<br/>
+    end_epoch = doc.xpath("/cdr/variables/end_epoch//text()")<br/>
+<br/>
+    puts "caller: #{caller}"<br/>
+<br/>
+    puts "dest: #{dest}"<br/>
+<br/>
+    puts "start_epoch: #{start_epoch}"<br/>
+<br/>
+    puts "answer_epoch: #{answer_epoch}"<br/>
+<br/>
+    puts "end_epoch: #{end_epoch}"<br/>
+<br/>
+    "CDR saved\n"<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述代码执行后，打一个电话，挂断后日志中的显示结果如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+caller: 1006<br/>
+<br/>
+dest: 9196<br/>
+<br/>
+start_epoch: 1385041256<br/>
+<br/>
+answer_epoch: 1385041256<br/>
+<br/>
+end_epoch: 1385041257<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，epoch为UNIX时间戳，即1970年1月1日0时0分0秒以来的秒数（不包括闰秒），这样插入数据库等操作就会比较容易实现，当然，为了方便阅读，可以取stamp相关的变量，如start_stamp。</p>
+<p height="1em" width="2em">当然，既然能打印出这些值，就很容易将其写入数据库了。在Sinatra中进行数据库操作也很简单，不过限于篇幅，我们在此就不多讲了。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00151.html">
+<font color="#FF6600">[1]</font>
+</a>
+ David Heinemeier Hansson，参见http://en.wikipedia.org/wiki/David_Heinemeier_Hansson。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00151.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 一个用Ruby写的轻量级的Web开发框架，参见http://www.sinatrarb.com/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00152.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 一个Ruby的XML解析器，参见http://nokogiri.org/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00152.html">
+<font color="#FF6600">[4]</font>
+</a>
+ XPath即为XML路径语言（XML Path Language），它是一种用来确定XML文档中某部分位置的语言，参考http://zh.wikipedia.org/wiki/XPath及http://www.w3school.com.cn/xpath/。</p>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.1　调试与排错</font>
+</font>
+</p>
+<p height="1em" width="2em">在实际的应用场景中，我们不可避免地会遇到各种各样的问题，而要解决这些问题一般需要根据问题的现象、系统提供的日志、线索等查找原因。因此，在进一步练习之前，我们先来学习一下解决问题的思路、方法和技巧。熟练掌握了这些方法和技艺，以后无论遇到什么样的问题就都会很容易解决了。</p>
+<p height="1em" width="2em">解决问题首先要找到相关的线索，并加以分析。在前面的章节中我们也穿插着介绍过一些调试的手段，在本节我们再系统讲解一下。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.1.1　解决问题的一般方法和流程</font>
+</font>
+</p>
+<p height="1em" width="2em">解决问题一般要经过以下几个步骤：发现问题、定位问题、分析问题、解决问题。下面我们在对这些步骤进行讲解时并不上纲上线，而是以一个例子来简单地进行说明，目的就是教会大家如何发现并准确地定位问题。当定位了问题故障点后，就比较容易分析和解决该问题了。</p>
+<p height="1em" width="2em">假设我们遇到这样一个问题：Alice向我们报告说，她通过FreeSWITCH呼叫Bob，能呼通，但没有声音。</p>
+<p height="1em" width="2em">这确实是一个问题，因为电话的基本功能就是为了双方能互相听到对方的声音。不过，在这里我们虽然收到了这个问题报告，但对该问题的实际情况还了解得不够清楚。比方说，首先，也是最基本的，是两端都听不到声音，还是只有一方没有声音？其次，是每次都听不到，还是偶尔听不到？如果是偶尔，在什么情况下听不到？再次，Alice和Bob使用的是什么UA，软电话还是硬件的SIP话机？都是什么型号的？还有，他们所在的网络情况是什么样的？他们是用ADSL、小区宽带，还是用手机上网？……</p>
+<p height="1em" width="2em">一般来说，Alice只是个普通的电话用户，她可能不知道这些技术细节。但在这种情况下，我们就需要多问一下Alice，以确认这些问题实际上否与Alice描述的一致，以及能否重现等。了解了这些信息，我们才能进行下一步的定位和分析。总之，在这里，有两个问题是很值得考虑的：</p>
+<p height="1em" width="2em">·核实问题的现象。即假定Alice是不可信的，就算她没说谎，但有时问题的实际现象Alice可能描述不清楚，或者可能跟她描述的完全不一样。如果有条件最好亲自试验一下。</p>
+<p height="1em" width="2em">·问题能否重现。大家解决问题多了就会知道，如果一个问题总是能重现，那么一般是比较容易解决的。最难解决的问题就是不能重现的问题，或者不知道什么时候能重现的问题。说白了，就是电话有时候好，有时候不好，但至于什么时候好，什么时候不好，说不上来，总之就是没有任何规律。</p>
+<p height="1em" width="2em">在发现问题之后，就要尝试定位问题，即找出该问题出在什么地方。要想定位问题，要先有一个思路。笔者一般建议使用“分段法”和“换位思考法”来定位问题。所谓分段法，就是说，一个问题可能涉及很多环节，我们首先要把这些环节从逻辑上和功能上分开，一段一段地检查。所谓换位思考法，结合我们本节的例子可以理解为，如果Alice打给Bob没有声音，那么，Bob打给Alice有没有声音？能不能把Alice和Bob的话机对调一下再试一次？或者，有条件的话，给Alice或Bob换其他的话机试试。</p>
+<p height="1em" width="2em">这种定位问题的方法在对整个系统不了解的情况下，可以首先确定是不是话机终端的问题。使用这种方法不需要很高级的技术，但它却很有效，因为话机终端出现问题的情况会比较常见。比如，如果一方用的是软电话，还可以考虑是否是声卡有问题。好多人也会将喇叭静音，甚至出现音箱没开电源或耳机没插到正确的插孔里的情况。</p>
+<p height="1em" width="2em">当上面这些方法找不到具体原因时，就考虑分段法。如，首先让Alice拨打默认的9196，看能否听到自己的声音。到现在我们都很熟悉了，9196是默认的回音测试（echo）功能，如果Alice打9196都听不到声音，就先不要管Bob了，因为呼叫还没到达Bob，到目前为止还跟他一点关系都没有呢，所以要先集中精力解决Alice打9196的问题再说。</p>
+<p height="1em" width="2em">当然Alice打9196听不到声音的原因可能有很多，我们还需要一步一步地查。在这里首先建议关掉防火墙——Linux上的iptables、Windows防火墙等。对新手而言，这些太容易导致问题了。因此，简单地关掉，会省掉很多麻烦 <sup>
+<small>
+<a href="text00081.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">确认防火墙没有问题后，可以通过抓包看有没有RTP流到达或从服务器发出。我们将在下一节讲解使用Wireshark抓包的知识。在本节，我们来学习一个uuid_debug_media API命令。这是一个很有用但常常被忽略的命令。首先，在FreeSWITCH控制台上可以使用show channels命令来找到当前通话的Channel的UUID，然后使用uuid_debug_media调试媒体相关的信息。下面是笔者调试echo的情况（排版需要，截断了一些无关紧要的过长的行）。</p>
+<p height="1em" width="2em">首先找到当前通话的UUID，下列命令的结果中显示的第一个字段就是UUID：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; show channels<br/>
+<br/>
+uuid,direction,created,created_epoch,name,state,cid_name,cid_num,ip_addr,......<br/>
+<br/>
+b4fae306-3f78-4d91-bcde-a2e95b0f9c1d,inbound,2013-07-23 12:04:38,1374552278,......<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，使用uuid_debug_media命令查看调试输出。其中，该命令的第一个参数是Channel的UUID，接下来是欲调试的方向。方向有read和write两种（即读和写，也即收和发，都是相对于FreeSWITCH而言的，下同），也可以使用both参数表示双向都调试。最后一个参数是on或off，分别表示打开或关闭调试。命令的输出如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; uuid_debug_media b4fae306-3f78-4d91-bcde-a2e95b0f9c1d both on<br/>
+<br/>
++OK Success<br/>
+<br/>
+R sofia/internal/1002@192.168.7.5 b=172 192.168.7.5:17318 192.168.7.5:50050 pt=0 ts=3717002357 m=0<br/>
+<br/>
+W sofia/internal/1002@192.168.7.5 b=172 192.168.7.5:17318 192.168.7.5:50050 pt=0 ts=3717002357 m=0<br/>
+<br/>
+R sofia/internal/1002@192.168.7.5 b=172 192.168.7.5:17318 192.168.7.5:50050 pt=0 ts=3717002517 m=0<br/>
+<br/>
+W sofia/internal/1002@192.168.7.5 b=172 192.168.7.5:17318 192.168.7.5:50050 pt=0 ts=3717002517 m=0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">R与W分别表示Read和Write，即收和发。如果能看到R和W了，说明已正确收发媒体流。如果还是听不到声音，那可能需要更深入地检查了。更深入的检查在这里我们就不过多地展开了。我们在此再简单说一下上面调试输出的意义。b=172表示收、发172字节，它等于160字节的PCMU语音净荷（20ms）加上12个字节的RTP包头。17138和50050分别为本地和远端端口号。pt=0说明Payload Type（载荷类型）为0，即PCMU编码的语音数据。ts为时间戳，可以看出它在收和发方向上分别是以160递增的。最后m为RTP的Marker位，一般是0。</p>
+<p height="1em" width="2em">注意，上述我们使用了echo进行测试，它一般用于简单测试双向语音的情况，即FreeSWITCH作为一个“回音壁”，会等待客户端将RTP包发过来然后原样返回。如果由于防火墙或某种原因导致FreeSWITCH收不到RTP包，则它也就没有数据可发了。</p>
+<p height="1em" width="2em">在某些情况下，会只有单向的语音流，这种情况称为单通。测试单通的情况，可以用上面的uuid_debug_media对“收”和“发”分别测试。在没法执行上述命令的情况下，也可以使用更直观的方法进行测试。例如，出于简单起见，我们先测试“发”。拨打默认的9664，FreeSWITCH就会播放保持音乐，如果对方听不到的话，就需要在对方的电脑或话机上抓包看RTP包是否到达。如果没有到达，说明网络有问题，如果到达了还没有声音，那就可能是对方终端的问题，或扬声器或耳机的问题。</p>
+<p height="1em" width="2em">然后，倒过来测试是否能“收”到RTP流。先建一个Dialplan路由到record App进行录音，录音完成后听一下录音文件是否完整即可判断是否正确收到RTP流。录音的Dialplan设置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="record" data="/tmp/test.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或者直接使用如下回拨命令进行录音：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1002 &amp;record(/tmp/test.wav)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果一切正常，说明Alice端没有问题了。如果有问题我们也可以使用上面的步骤定位到问题并进行解决。总之，当我们解决完了Alice端的问题后，再用同样的方法解决Bob的问题。保证两端都没有问题后，再尝试直接从Alice呼叫Bob，看bridge后是否还有其他问题。一步一步，直到问题解决。</p>
+<p height="1em" width="2em">最后需要说明，没有媒体流或者媒体流不正常也可能是收到SIP消息错误引起的，我们后面还会讲到跟踪SIP消息的方法。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.1.2　查看日志</font>
+</font>
+</p>
+<p height="1em" width="2em">在有些情况下，呼叫可能直接不通，即无法正常建立呼叫。这时候我们就需要查看系统的日志。</p>
+<p height="1em" width="2em">在日志中，“警告”（WARNING）和“错误”（ERROR）是级别比较高的日志，“调试”（DEBUG）是级别比较低的日志，但其能显示更多的细节。在FreeSWITCH控制台上，可以通过console loglevel debug命令打开DEBUG级别的日志。</p>
+<p height="1em" width="2em">我们还是以Alice呼叫Bob为例，如果Alice发起呼叫后什么日志也不显示，那么肯定呼叫没有到达FreeSWITCH，此时应检查客户端是否配错了IP地址或防火墙是否有问题。如果呼叫到达了，还是出错，那么参照第6章中的介绍，查看是不是Dialplan设置的问题（还记得“从绿色的行开始看”吗？）。另外，日志中一般有挂机原因（Hangup Cause），比方说CALL_REJECTED一般代表呼叫被拒绝，可能是认证的用户名或密码不对。如果Alice方面没什么问题，错误也可能是Bob那端引起的，比如Hangup Casuse为USER_NOT_REGISTERED就说明Bob没有注册，因而呼叫无法继续进行。</p>
+<p height="1em" width="2em">有时候，呼叫Bob可能需要经过一个网关出去，这时候也可以采取“分段”的调试方法，如使用类似如下的命令看看呼叫的后半段有没有问题（即从FreeSWITCH中直接呼叫Bob有没有问题）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate sofia/gateway/gw1/Bob &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，gw1为呼叫Bob使用的网关的名字。上述命令是阻塞的，因而在Bob对应的网关没有任何反应的时候（不回任何SIP消息），可能会阻塞较长时间。当FreeSWITCH控制台被阻塞时，将不能输入任何命令。如果要解决这个问题，可以打开另一个终端，用fs_cli连接FreeSWITCH，然后使用show channels找到对应的Channel，并且用uuid_kill&lt;channel UUID&gt;将该Channel释放。当然，为了避免产生这种阻塞的情况，可以提前使用bgapi，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; bgapi originate sofia/gateway/gw1/Bob &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">bgapi可以使originate在后台（新的线程中）执行，因而不会阻塞控制台。</p>
+<p height="1em" width="2em">另外，在社区中（邮件列表或QQ群）中提问时，帮助你的人通常也会要求提供DEBUG级别的日志，以便于进行分析。</p>
+<p height="1em" width="2em">除了看日志以外，FreeSWITCH也支持现场抓包，使用下列命令可以在FreeSWITCH控制台上实时看到SIP消息，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia profile internal siptrace on<br/>
+<br/>
+freeswitch&gt; sofia profile external siptrace on<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面的命令可以开启不同Profile的SIP抓包。当a-leg和b-leg分别在不同的Profile上时可以分别来看，避免消息太多造成干扰。当然，初学者可能不知道实际的SIP消息应该走哪个Profile，这时可以使用以下命令打开所有Profile的抓包：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia global siptrace on<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，也可以随时关闭抓包：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia global siptrace off<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有时候，还能遇到更奇怪的情况，在试上了述各种办法后还是找不到原因。如果怀疑是SIP协议栈底层的问题（那么可能是SIP兼容性的问题或FreeSWITCH本身的BUG），就要打开底层协议栈的调试信息。开启Sofia协议栈底层的调试器的方法是使用以下命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia loglevel all 9<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以使用以下命令关闭所有底层的调试：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia loglevel all 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Sofia层的日志信息会有很多，如果你比较熟悉的话（一般是开发者），也可以仅打开某一类的日志，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia loglevel nua 9<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">具体可以参考sofia命令的帮助信息，如直接输入sofia命令不带任何参数会显示一个帮助，里面可以看到下面一行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+sofia loglevel &lt;all|default|tport|iptsec|nea|nta|nth_client|nth_server|nua|soa| sresolv|stun&gt; [0-9]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述帮助信息中可选的参数表示，可以选择调试Sofia协议栈的各个部分。协议栈底层的知识超出了本书的范围，我们在此就不多介绍了。</p>
+<p height="1em" width="2em"><img align="baseline" height="42" width="45" src="Image00087.jpg" />
+ <font color="#0468BB">小技巧</font>
+</p>
+<p height="1em" width="2em">有时候，尤其开启了测试以及SIP Trace后可能会收到大量的消息，不停滚动屏幕会令人很难定位到有问题的消息。笔者在调试时遇到这类问题时一般会使用fs_cli连接到FreeSWITCH，开启相应的DEBUG级别和跟踪，打个测试电话，然后使用Ctrl+D快捷键或/exit命令退出，这样就可以避免屏幕滚动了。</p>
+<p height="1em" width="2em">在实际应用中，遇到的问题可能还有很多。不要慌，冷静地思考和分析一下，一般很容易定位到问题。即使自己不能准确地定位问题，在寻找帮助时，把你通过上述步骤了解到的情况跟有经验的人说一下，一般他们就能很快帮你定位到问题。最忌讳的就是什么也不做，直接上QQ群里发问：“我装了FreeSWITCH，怎么打不通电话啊？”那样的话，问了等于白问，谁都帮不了你。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00080.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 注意，如果你在病毒很多或者很容易受坆击的电脑或服务器上学习FreeSWITCH而又不明白关掉防火墙的风险的话，建议不要这样做。如何部署防火墙已超出了本书的范围，故这里不过多介绍了。</p>
+</body>
+</html>

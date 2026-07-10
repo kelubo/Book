@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_183"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos717703" class="calibre7"></a>4.5.3 Pine </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The Pine mail reader uses <span><em class="italic">rsh</em></span> to invoke mail-server software on remote machines. For example, it might invoke the IMAP daemon, <span><em class="italic">imapd</em></span>, on a remote mail server. Another program can be substituted for <span><em class="italic">rsh</em></span> by changing the value of a Pine configuration variable, <code class="calibre35">rsh-path</code>. This variable holds the name of the program for opening remote shell connections, normally <em class="italic">/usr/bin/rsh</em>. A new value can be assigned in an individual user's Pine configuration file, <em class="italic">~/.pinerc</em>, or in the systemwide Pine configuration file, typically <em class="italic">/usr/local/lib/pine.conf</em>. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Set in a Pine configuration file<br class="calibre19"/>    rsh-path=/usr/local/bin/ssh</tt></div></span><p class="calibre4">A second variable, <code class="calibre35">rsh-command</code>, constructs the actual command string to be executed for the remote mail server. The value is a pattern in the style of the C function <code class="calibre35">printf()</code>. Most likely, you won't need to change the value because both <span><em class="italic">rsh</em></span> and <span><em class="italic">ssh</em></span> fit the default pattern, which is: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    "%s %s -l %s exec /etc/r%sd"</tt></div></span><p class="calibre4">The first three "%s" pattern substitutions refer to the <code class="calibre35">rsh-path</code> value, the remote hostname, and the remote username. (The fourth forms the remote mail daemon name, which doesn't concern us.) So, by default, if your username is <span><em class="italic">alice</em></span> and the remote mail server is <span><em class="italic">mail.example.com</em></span>, <code class="calibre35">rsh-command</code> evaluates to: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    /usr/bin/rsh mail.example.com -l alice ...</tt></div></span><p class="calibre4">By changing the <code class="calibre35">rsh-path</code>, it becomes instead: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    /usr/local/bin/ssh mail.example.com -l alice ...</tt></div></span><p class="calibre4">As we said, you probably don't need to do anything with <code class="calibre35">rsh-command</code>, but just in case, we've included it for reference. We present a detailed case study of integrating Pine and SSH later. <a shape="rect" href="DB_split_341.html#filepos2221456" class="calibre6">[11.3]</a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.4　使用libfreeswitch</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH不仅有完善的可加载模块支持，而且它的库libfreeswitch也可以被连接到其他系统中去，使得其他系统立即具有所有的FreeSWITCH中的功能。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.4.1　自己写一个软交换机</font>
+</font>
+</p>
+<p height="1em" width="2em">下面我们就尝试自己写一个软交换机。这里说的自己写，并不是一切都从头写，而是利用现有的libfreeswitch库，把它集成到我们的系统中来。</p>
+<p height="1em" width="2em">假设我们已有了一个系统，该系统的功能非常强大。不过，为了便于讲解，我们把系统精简到了最简单的程序，即精简到它在执行后仅仅打印一条信息就退出。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+int main(int argc, char **argv)<br/>
+<br/>
+{<br/>
+<br/>
+    printf("Hello, MySWITCH is running ...\n");<br/>
+<br/>
+    return 0;<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面我们要将libfreeswitch集成进我们的系统中，因此我们对main函数做了一些改变，具体实现代码如下。其中，我们在第3行装入了switch.h头文件，以便我们能引用里面的函数；第7行，我们设置一个flags标志，让它使用核心数据库；第8行，定义一个console变量并设为true；第13行，设置一些默认的全局参数；第14行，初始化并加载模块；第15行，进入控制台循环。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01  /* MySwitch using libfreeswitch */<br/>
+<br/>
+02<br/>
+<br/>
+03  #include &lt;switch.h&gt;<br/>
+<br/>
+04<br/>
+<br/>
+05  int main(int argc, char** argv)<br/>
+<br/>
+06  {<br/>
+<br/>
+07      switch_core_flag_t flags = SCF_USE_SQL;<br/>
+<br/>
+08      switch_bool_t console = SWITCH_TRUE;<br/>
+<br/>
+09      const char *err = NULL;<br/>
+<br/>
+10<br/>
+<br/>
+11      printf("Hello, MySWITCH is running ...\n");<br/>
+<br/>
+12<br/>
+<br/>
+13      switch_core_set_globals();<br/>
+<br/>
+14      switch_core_init_and_modload(flags, console, &amp;err);<br/>
+<br/>
+15      switch_core_runtime_loop(!console);<br/>
+<br/>
+16      return 0;<br/>
+<br/>
+17  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过这短短的几行，我们就写了一个功能强大的交换机，它具有FreeSWITCH全部的功能。我们通过如下的Makefile来编译它：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+FS  = /usr/local/freeswitch<br/>
+<br/>
+INC = -I$(FS)/include<br/>
+<br/>
+LIB = -L$(FS)/lib<br/>
+<br/>
+all: myswitch<br/>
+<br/>
+myswitch: myswitch.c<br/>
+<br/>
+    gcc -o myswitch -ggdb $(INC) $(LIB) -lfreeswitch myswitch.c<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上面的Makefile中，最开始的3行我们定义了3个变量。其中INC和LIB分别指定头文件和库文件的参数。最后一行使用gcc进行编译，输出可执行文件为myswitch；为了调试方便，我们在编译时使用-ggdb加入符号表；-lfreeswitch作用为连接libfreeswitch.so库文件（在Mac上为“freeswitch.dylib”），最后的myswitch.c为源文件名。</p>
+<p height="1em" width="2em">执行make即可进行编译，编译完成后运行结果如下。由结果可以看到其为与FreeSWITCH中类似的日志，由此证明，一个强大的软交换机诞生了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+./myswitch<br/>
+<br/>
+Hello, MySWITCH is running ...<br/>
+<br/>
+2013-12-10 20:50:52.349175 [INFO] switch_event.c:669 Activate Eventing Engine.<br/>
+<br/>
+...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.4.2　使用libfreeswitch提供的库函数</font>
+</font>
+</p>
+<p height="1em" width="2em">在大多数情况下，我们不会重新发明一个FreeSWITCH，而是想使用它提供的库文件中有用的部分。在下面这个例子中，我们就用到了它的文件接口、编码转换接口及RTP等功能。</p>
+<p height="1em" width="2em">我们程序的功能是从本地音频文件中读取数据，然后用PCMU进行编码，并通过RTP发送出去。将源文件命名为myrtp.c。在main函数的最开始，我们定义并初始化了很多变量。在此我们先不介绍这些变量，等后面用到的时候有必要的话再讲。该文件内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ 1  /* File/Codec/RTP Example Author: Seven Du */<br/>
+<br/>
+ 2<br/>
+<br/>
+ 3  #include &lt;switch.h&gt;<br/>
+<br/>
+ 4<br/>
+<br/>
+ 5  int main(int argc, char *argv[])<br/>
+<br/>
+ 6  {<br/>
+<br/>
+ 7      switch_bool_t verbose = SWITCH_TRUE;<br/>
+<br/>
+ 8      const char *err = NULL;<br/>
+<br/>
+ 9      const char *fmtp = "";<br/>
+<br/>
+10      int ptime = 20;<br/>
+<br/>
+11      const char *input = NULL;<br/>
+<br/>
+12      int channels = 1;<br/>
+<br/>
+13      int rate = 8000;<br/>
+<br/>
+14      switch_file_handle_t fh_input = { 0 };<br/>
+<br/>
+15      switch_codec_t codec = { 0 };<br/>
+<br/>
+16      char buf[2048];<br/>
+<br/>
+17      switch_size_t len = sizeof(buf)/2;<br/>
+<br/>
+18      switch_memory_pool_t *pool = NULL;<br/>
+<br/>
+19      int blocksize;<br/>
+<br/>
+20      switch_rtp_flag_t rtp_flags[SWITCH_RTP_FLAG_INVALID] = { 0 };<br/>
+<br/>
+21      switch_frame_t read_frame = { 0 };<br/>
+<br/>
+22      switch_frame_t write_frame = { 0 };<br/>
+<br/>
+23      switch_rtp_t *rtp_session = NULL;<br/>
+<br/>
+24      char *local_addr = "127.0.0.1";<br/>
+<br/>
+25      char *remote_addr = "127.0.0.1";<br/>
+<br/>
+26      switch_port_t local_port = 4444;<br/>
+<br/>
+27      switch_port_t remote_port = 6666;<br/>
+<br/>
+28      char *codec_string = "PCMU";<br/>
+<br/>
+29      int payload_type = 0;<br/>
+<br/>
+30      switch_status_t status;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从命令行参数获取音频文件名并将其放到input变量中（第34行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+32      if (argc &lt; 2) goto usage;<br/>
+<br/>
+33<br/>
+<br/>
+34      input = argv[1];<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第36行初始化libfreeswitch的内核，这里我们使用了SCF_MINIMAL选项，它将启动最小配置（因为这里不需要完整的FreeSWITCH）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+36      if (switch_core_init(SCF_MINIMAL, verbose, &amp;err) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+37          fprintf(stderr, "Cannot init core [%s]\n", err);<br/>
+<br/>
+38          goto end;<br/>
+<br/>
+39      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第41行，设置一些全局的参数。第42行初始化可加载模块的设置，我们使用了SWITCH_FALSE参数不让它自动加载模块，而是在后面手工加载。比如，第43～44行就加载了两个核心的模块，它们都是在核心中实现的，CORE_SOFTTIMER_MODULE是一个时钟模块，用于定时；CORE_PCM_MODULE即PCM编解码模块，用于PCMU/PCMA编解码。由于我们这里只用到PCMU，因此，其他编解码模块就不需要加载了，否则需要手工加载对应的编解码模块。由于我们要读取音频文件，因此我们在第47行加载了mod_sndfile模块，它使用libsndfile库支持很多类型的声音文件，如.au、.aiff等。当然，读者通过前面的学习也可能会想到，如果这里我们需要支持MP3的话就需要加载mod_shout了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+41      switch_core_set_globals();<br/>
+<br/>
+42      switch_loadable_module_init(SWITCH_FALSE);<br/>
+<br/>
+43      switch_loadable_module_load_module("", "CORE_SOFTTIMER_MODULE", <br/>
+<br/>
+            SWITCH_TRUE, &amp;err);<br/>
+<br/>
+44      switch_loadable_module_load_module("", "CORE_PCM_MODULE", SWITCH_TRUE, &amp;err);<br/>
+<br/>
+45<br/>
+<br/>
+46      if (switch_loadable_module_load_module((char *) SWITCH_GLOBAL_dirs.mod_dir,<br/>
+<br/>
+47          (char *) "mod_sndfile", SWITCH_TRUE, &amp;err) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+48          fprintf(stderr, "Cannot init mod_sndfile [%s]\n", err);<br/>
+<br/>
+49          goto end;<br/>
+<br/>
+50      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第53行初始化一个内存池。第57行调用switch_core_file_open打开输入的音频文件。其参数的值我们都在main函数的开始部分定义了。其中，channels为声道的数量，rate为采样率，读者可以倒回去查看一下。如果音频文件中的参数与这里的不匹配，它将按我们这里指定的自动进行转换。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+53      switch_core_new_memory_pool(&amp;pool);<br/>
+<br/>
+54<br/>
+<br/>
+55      fprintf(stderr, "Opening file %s\n", input);<br/>
+<br/>
+56<br/>
+<br/>
+57      if (switch_core_file_open(&amp;fh_input, input, channels, rate,<br/>
+<br/>
+58          SWITCH_FILE_FLAG_READ | SWITCH_FILE_DATA_SHORT, NULL) != SWITCH_<br/>
+<br/>
+                STATUS_SUCCESS) {<br/>
+<br/>
+59          fprintf(stderr, "Couldn't open %s\n", input);<br/>
+<br/>
+60          goto end;<br/>
+<br/>
+61      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第63行初始化PCMU编解码codec。音频数据从文件中读出来后，都是以L16编码实现的线性编码，后面我们需要把它们转成PCMU。其中，rate为采样率、ptime为打包时间、channels为声道数。SWITCH_CODEC_FLAG_ENCODE标志说明我们只需要用到该编码器的编码器，即不需要用它解码。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+63      if (switch_core_codec_init(&amp;codec,<br/>
+<br/>
+64          codec_string, fmtp, rate, ptime, channels,<br/>
+<br/>
+65          SWITCH_CODEC_FLAG_ENCODE, NULL, pool) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+66          fprintf(stderr, "Couldn't initialize codec for %s@%dh@%di\n", <br/>
+<br/>
+               codec_string, rate, ptime);<br/>
+<br/>
+67          goto end;<br/>
+<br/>
+68      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们可以根据采样率和打包时间算出一个数据包的长度len和需要的内存空间blocksize（第78行），在此我们使用的PCMU编码的数据长度就是8000×20/1000=160，即每个RTP包有160个字节的数据，而原始读取来的数据由于是使用16位的存储，因此每个数据有2字节，所以实际原始数据的长度是160×2字节=320字节。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+78      blocksize = len = (rate * ptime) / 1000;<br/>
+<br/>
+79      switch_assert(sizeof(buf) &gt;= len * 2);<br/>
+<br/>
+80      fprintf(stderr, "Frame size is %d\n", blocksize);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，在第74行初始化系统RTP环境，然后初始化一个RTP的标志参数；第76行表示它支持输入输出；第77行表示采取非阻塞的方式发送；第78行表示允许调试，它将在日志中打印调试信息；第79行指定使用时钟，以更好地定时。然后，在第81～84行初始化一个rtp_session，它的参数包含了RTP中必要的参数：本地IP地址和端口、远程IP地址和端口、负载类型（Payload Type）、采样率以及打包间隔等。另外，soft是一个定时器的名字，它是核心提供的定时器。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+74      switch_rtp_init(pool);<br/>
+<br/>
+75<br/>
+<br/>
+76      rtp_flags[SWITCH_RTP_FLAG_IO] = 1;<br/>
+<br/>
+77      rtp_flags[SWITCH_RTP_FLAG_NOBLOCK] = 1;<br/>
+<br/>
+78      rtp_flags[SWITCH_RTP_FLAG_DEBUG_RTP_WRITE] = 1;<br/>
+<br/>
+79      rtp_flags[SWITCH_RTP_FLAG_USE_TIMER] = 1;<br/>
+<br/>
+80<br/>
+<br/>
+81      rtp_session = switch_rtp_new(local_addr, local_port,<br/>
+<br/>
+82          remote_addr, remote_port,<br/>
+<br/>
+83          payload_type, rate / (1000 / ptime), ptime * 1000,<br/>
+<br/>
+84          rtp_flags, "soft", &amp;err, pool);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">libfreeswitch默认会捕获各种信号，因此，我们在第99行将信号捕获回调设为空值，以后我们在调试的时候随时可以按“Ctrl+C”终止程序。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+91      signal(SIGINT, NULL); /* allow break with Ctrl+C */<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来就是无限循环一直从文件中读取数据。我们每次只读取一帧（len）大小的数据，数据将读到buf缓冲区中（第93行）。然后，在第100～101行，将读到的数据进行编码，编码后的数据将存储到encode_buf中，数据长度可以在encodec_len中得到。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+93      while (switch_core_file_read(&amp;fh_input, buf, &amp;len) ==<br/>
+<br/>
+94          SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+95          char encode_buf[2048];<br/>
+<br/>
+96          uint32_t encoded_len = sizeof(buf);<br/>
+<br/>
+97          uint32_t encoded_rate = rate;<br/>
+<br/>
+98          unsigned int flags = 0;<br/>
+<br/>
+99<br/>
+<br/>
+100         if (switch_core_codec_encode(&amp;codec, NULL, buf, len*2, rate,<br/>
+<br/>
+101             encode_buf, &amp;encoded_len, &amp;encoded_rate, &amp;flags) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+102             fprintf(stderr, "Codec encoder error\n");<br/>
+<br/>
+103             goto end;<br/>
+<br/>
+104         }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将数据编码成PCMU以后，我们就可以把它打包成一个数据帧（frame）。下面就是设置该数据帧的各种参数：第107行，设置帧数据的地址指向我们新编码的数据；第108行设置数据的长度；第109行设置缓冲区的长度；第110行设置采样率；第111行设置该数据帧的编解码；然后在第112行将该数据帧发送出去。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+106          len = encoded_len;<br/>
+<br/>
+107          write_frame.data = encode_buf;<br/>
+<br/>
+108          write_frame.datalen = len;<br/>
+<br/>
+109          write_frame.buflen = len;<br/>
+<br/>
+110          write_frame.rate= 8000;<br/>
+<br/>
+111          write_frame.codec = &amp;codec;<br/>
+<br/>
+112          switch_rtp_write_frame(rtp_session, &amp;write_frame);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第114行，我们尝试从该rtp_session中读取一帧数据。其实，由于没人给我们发送数据，它将于20毫秒后超时，进入下一次循环。当然，在进入下一次循环前我们要重置len的值（第121行），以避免len的值可能在某些场合下更改为其他的值从而引起的错误。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+114          status = switch_rtp_zerocopy_read_frame(rtp_session,<br/>
+<br/>
+                         &amp;read_frame, 0);<br/>
+<br/>
+115<br/>
+<br/>
+116          if (status != SWITCH_STATUS_SUCCESS &amp;&amp;<br/>
+<br/>
+117              status != SWITCH_STATUS_BREAK) {<br/>
+<br/>
+118              goto end;<br/>
+<br/>
+119          }<br/>
+<br/>
+120<br/>
+<br/>
+121          len = blocksize;<br/>
+<br/>
+122      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果在前面遇到错误，或前面读文件的循环退出（如，读到文件尾），则代码会执行到第124行。后面第125行会释放编解码器；第126行关掉文件接口；第127行释放内存池；并于第128行释放整个libfreeswitch的核心资源，程序结束。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+124  end:<br/>
+<br/>
+125      switch_core_codec_destroy(&amp;codec);<br/>
+<br/>
+126      if (fh_input.file_interface) switch_core_file_close(&amp;fh_input);<br/>
+<br/>
+127      if (pool) switch_core_destroy_memory_pool(&amp;pool);<br/>
+<br/>
+128      switch_core_destroy();<br/>
+<br/>
+129      return 0;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，如果用户在命令行上输入错误的参数，程序将跳到usage标签，打印帮助信息。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+131  usage:<br/>
+<br/>
+132      printf("Usage: %s input_file\n\n", argv[0]);<br/>
+<br/>
+133      return 1;<br/>
+<br/>
+134  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将上述程序编译运行后，便可以看到它从本地的4444端口向外（6666端口）发送RTP数据了。由于数据长度为160字节，加上12字节的RTP包头，因而日志中显示的一共是172字节。部分日志如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ ./myrtp /wav/test.wav<br/>
+<br/>
+Opening file /wav/test.wav<br/>
+<br/>
+Frame size is 160<br/>
+<br/>
+[DEBUG] switch_rtp.c:3047 Starting timer [soft] 160 bytes per 20ms<br/>
+<br/>
+W NoName b= 172 127.0.0.1:4444 127.0.0.1:6666 127.0.0.1:4444 pt=0 ts=160 m=1<br/>
+<br/>
+W NoName b= 172 127.0.0.1:4444 127.0.0.1:6666 127.0.0.1:4444 pt=0 ts=320 m=0<br/>
+<br/>
+W NoName b= 172 127.0.0.1:4444 127.0.0.1:6666 127.0.0.1:4444 pt=0 ts=480 m=0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果在运行时，不想要FreeSWITCH打印日志，可以在第7行将verbose调为SWITCH_FALSE。读者也可以尝试修改其他参数。</p>
+<p height="1em" width="2em">读到这里，也许有的读者会问：数据是否真的发送出去了？怎么验证呢？最简单的答案是，如果你需要这个程序，也许你已经有方法接收了。当然，如果没有的话，也可以把上述程序稍加改造——我们在第114行已经有接收RTP的代码，只需照着再写一个程序，将收到的数据保存到声音文件中，或者从声卡中放出来。这些就留给读者自行练习了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.4.3　其他</font>
+</font>
+</p>
+<p height="1em" width="2em">其实，FreeSWITCH的源代码中，也自带一些例子，其中就包括使用libfreeswitch的例子。经常有朋友问到——FreeSWITCH安装目录下的bin目录中，除了freeswitch和fs_cli外，其他的几个程序是干什么用的？其实，要回答这个问题很简单，只需不带参数运行一下那个程序，或者加上“-h”参数，就很容易得到一个帮助信息。如，从fsxs程序的帮助信息看，是帮助编译一个模块的。笔者试了一下用它编译22.3节的mod_book，不用Makefile也能编译（意味着不用源代码环境也可以编写模块）。比如，下面的命令将生成mod_book.so</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ /usr/local/freeswitch/bin/fsxs build mod_book.so mod_book.c<br/>
+<br/>
+CC  mod_book.c<br/>
+<br/>
+LD  mod_book.so [mod_book.o]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">使用下列命令就可以安装模块了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+/usr/local/freeswitch/bin/fsxs install mod_book.so<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，fs_encode程序可以将一个语音文件从一种编码转到另一种编码，tone2wav则帮助你从一个TGML标记语言描述的铃声转换成一个声音文件。如果要使用这两个程序，读者可以自行参考相关的帮助信息。另外，既然我们已经学会了查看源代码，自然可以在源代码中发现更多的秘密。这两个程序对应的源代码都在FreeSWITCH的源代码目录中（fs_encode.c和tone2wav.c），跟我们22.4.2节的实现方式差不多，也都用到了libfreeswitch。读者可以找到这几个程序的源代码自己研究一下，并对比一下与我们在本节的实现有何异同。</p>
+</body>
+</html>

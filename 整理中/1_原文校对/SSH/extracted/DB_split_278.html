@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1850637" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_362"><span class="calibre2"><a shape="rect" class="calibre7"></a>Hostbased Access Control </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1850994" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1851033" class="calibre15"></a>A limited type of per-account configuration is possible in OpenSSH if you use hostbased authentication rather than public-key authentication. Specifically, you can permit SSH access to your account based on the client's remote username and hostname via the system files <em class="italic">/etc/shosts.equiv</em> and <em class="italic">/etc/hosts.equiv</em>, and personal files <em class="italic">~/.rhosts</em> and <em class="italic">~/.shosts</em>. A line like: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    +client.example.com jones</tt></div></span><p class="calibre4">permits hostbased SSH access by the user <span><a href="mailto:jones@client.example.com" shape="rect" class="calibre6">jones@client.example.com</a></span>. Since we've already covered the details of these four files, we won't repeat the information in this chapter. <a shape="rect" href="DB_split_081.html#filepos439637" class="calibre6">[3.6.2]</a></p>
+<p class="calibre4">Per-account configuration with hostbased authentication is similar to using host access control in your OpenSSH <em class="italic">authorized_keys</em>
+<a shape="rect" class="calibre15"></a><a id="filepos1852361" class="calibre15"></a> or Tectia <em class="italic">authorization</em> file. <a shape="rect" href="DB_split_273.html#filepos1814003" class="calibre6">[8.2.4]</a> Both methods may restrict SSH connections from particular hosts. The differences are shown in this table: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Feature</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Hostbased access</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Public-key host access</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Authenticate by hostname</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Authenticate by IP address</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Authenticate by remote username</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Wildcards in hostnames and IP</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Passphrase required for logins</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Use other public-key features</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Security</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Less</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">More</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">To use hostbased authentication for access control, all of the following conditions must be true: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Hostbased authentication is enabled in the server, both at compile time and in the serverwide configuration file. </li>
+<li class="calibre18">Your desired client hosts aren't specifically excluded by serverwide configuration, e.g., by <code class="calibre35">AllowHosts</code> and <code class="calibre35">DenyHosts</code>. </li>
+<li class="calibre18">For OpenSSH, the server configuration keyword <code class="calibre35">EnableSSHKeysign</code> must be set to <code class="calibre35">yes</code>.<sup class="calibre20">[<a id="filepos1858784" shape="rect" href="#filepos1861097" class="calibre6">127</a>]</sup></li>
+</ul></div>
+<p class="calibre4">Despite its capabilities, hostbased authentication is more complex than one might expect. For example, if your carefully crafted <em class="italic">.shosts</em> file denies access to <span><em class="italic">sandy@trusted.example.com</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.shosts<br class="calibre19"/>    -trusted.example.com sandy</tt></div></span><p class="calibre4">but your <em class="italic">.rhosts</em> file inadvertently permits access: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.rhosts<br class="calibre19"/>    +trusted.example.com</tt></div></span><p class="calibre4">then sandy will have SSH access to your account. Worse, even if you don't have a <em class="italic">~/.rhosts</em> file, the system files <em class="italic">/etc/hosts.equiv</em> and <em class="italic">/etc/shosts.equiv</em> can still punch a hostbased security hole into your account against your wishes. Unfortunately, using per-account configuration, there's no way to prevent this problem. Only compile-time or serverwide configuration can disable hostbased authentication. </p>
+<p class="calibre4">Because of these issues and other serious, inherent weaknesses, we recommend against using the weak form of hostbased authentication, Rhosts authentication, as a form of per-account configuration. (By default it is disabled, and we approve.) If you require the features of hostbased authentication, we recommend the stronger form, called <code class="calibre35">RhostsRSAAuthentication</code> (OpenSSH) or hostbased (Tectia), which adds cryptographic verification of host keys. </p>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1861097" shape="rect" href="#filepos1858784" class="calibre6">127</a>] </sup>In olden days, the <span><em class="italic">ssh</em></span> executable needed to be setuid root. </p>
+</div>
+</div>
+</div>  <div class="mbppagebreak" id="calibre_pb_363"></div></body>
+</html>

@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_228"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1046158" class="calibre7"></a>5.5.5 Root Access Control </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><span><em class="italic">sshd</em></span> has a separate access-control mechanism for the superuser. The keyword <code class="calibre35">PermitRootLogin</code> allows or denies access to the root account by SSH: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    PermitRootLogin no</tt></div></span><p class="calibre4">Permissible values for this keyword are <code class="calibre35">yes</code> (the default) to allow access to the root account by SSH; <code class="calibre35">no</code> to deny all such access; and <code class="calibre35">without-password</code> (OpenSSH) or <code class="calibre35">nopwd</code> (Tectia) to allow access except by password authentication. </p>
+<p class="calibre4">In addition, OpenSSH recognizes the value <code class="calibre35">forced-commands-only</code> to allow access only for forced commands specified in <em class="italic">authorized_keys</em>
+<a shape="rect" href="DB_split_272.html#filepos1787193" class="calibre6">[8.2.3]</a>; Tectia always allows such access for all values of <code class="calibre35">PermitRootLogin</code>. OpenSSH's level of control is useful, for example, if root's <em class="italic">authorized_keys</em> file contains a line beginning with: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    command="/bin/dump" ....</tt></div></span><p class="calibre4">Then the root account may be accessed by SSH to run the <span><em class="italic">dump</em></span> command. This capability lets remote clients run superuser processes, such as backups or filesystem checks, but not unrestricted login sessions. </p>
+<p class="calibre4">The server checks <code class="calibre35">PermitRootLogin</code> after authentication is complete. In other words, if <code class="calibre35">PermitRootLogin</code> is <code class="calibre35">no</code>, a client is offered the opportunity to authenticate (e.g., is prompted for a password or passphrase) but is shut down afterward regardless. </p>
+<p class="calibre4">We've previously seen a similar keyword, <code class="calibre35">IgnoreRootRhosts</code>, that controls access to the root account by hostbased authentication. <a shape="rect" href="DB_split_158.html#filepos959704" class="calibre6">[5.4.4]</a> It prevents entries in <em class="italic">~root/.rhosts</em> and <em class="italic">~root/.shosts</em> from being used to authenticate root. Because <span><em class="italic">sshd</em></span> checks <code class="calibre35">PermitRootLogin</code> after authentication is complete, it overrides any value of <code class="calibre35">IgnoreRootRhosts</code>. <a shape="rect" href="#filepos1049486" class="calibre6">Table 5-4</a> illustrates the interaction of these two keywords. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1049486" class="calibre15"></a></span><p class="calibre4">Table 5-4. Can root log in?</p>
+<div class="calibre3">
+<table summary="Can root log in?" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+ </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+IgnoreRootRhosts yes</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+IgnoreRootRhosts no</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PermitRootLogin yes</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes, except by hostbased </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PermitRootLogin no</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">No</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PermitRootLogin without-password (OpenSSH);</code>
+</p>
+<p class="calibre4">
+<code class="calibre35">PermitRootLogin nopwd (Tectia)</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes, except by hostbased or password </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Yes, except by password </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+</body>
+</html>

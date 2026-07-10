@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_121"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos469675" class="calibre7"></a>3.6.3 SSH-1 Backward Compatibility </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos469841" class="calibre15"></a>The Tectia server can provide backward compatibility<a shape="rect" class="calibre15"></a><a id="filepos469931" class="calibre15"></a> for the SSH-1 protocol, as long as another package supporting SSH-1 (such as OpenSSH) is also installed on the same machine. When the Tectia server encounters a client requesting an SSH-1 connection, it simply runs the SSH-1 server.<sup class="calibre20">[<a id="filepos470229" shape="rect" href="DB_split_084.html#filepos486390" class="calibre6">25</a>]</sup> This is rather cumbersome. It's also wasteful and slow, since each new <span><em class="italic">sshd1</em></span> needs to generate its own server key, which otherwise the single master server regenerates only once an hour. This wastes random bits, sometimes a precious commodity, and can cause noticeable delays in the startup of SSH-1 connections to a Tectia server. Further, it is an administrative headache and a security problem, since one must maintain two separate SSH server configurations and try to make sure all desired restrictions are adequately covered in both. </p>
+<p class="calibre4">OpenSSH, on the other hand, supports both SSH-1 and SSH-2 in a single set of programs, an approach we prefer. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_314"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1657763" class="calibre7"></a>7.4.16 Subsystems </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Subsystems are predefined commands supported by an SSH server. <a shape="rect" href="DB_split_182.html#filepos1123002" class="calibre6">[5.8]</a> Each installed server can implement different subsystems<a shape="rect" class="calibre15"></a><a id="filepos1658098" class="calibre15"></a>, so check with the system administrator of the server machine for a list.<sup class="calibre20">[<a id="filepos1658237" shape="rect" href="DB_split_239.html#filepos1670713" class="calibre6">114</a>]</sup></p>
+<p class="calibre4">The <span><em class="italic">-s</em></span> option of <span><em class="italic">ssh</em></span> invokes a subsystem on a remote machine. For example, if the SSH server running on <em class="italic">server.example.com</em> has a "backups" subsystem defined, you run it as: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com -s backups</tt></div></span><p class="calibre4">OpenSSH uses the remote command as the subsystem name: this must be specified last on the <span><em class="italic">ssh</em></span> command line. In contrast, Tectia obtains the subsystem name from the command-line argument that immediately follows the <span><em class="italic">-s</em></span> option. Therefore, our previous example works in both cases, so we highly recommend this syntax. Other orderings of the command line are possible for specific implementations: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -s server.example.com backups<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ ssh -s backups server.example.com</tt></div></span><p class="calibre4">Command-line arguments cannot be used with subsystems: neither OpenSSH nor Tectia provides any mechanism for passing them from client to server. If any extra arguments are given on the <span><em class="italic">ssh</em></span> command line, OpenSSH (mis)interprets them as part of the subsystem name: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh server.example.com -s backups /home<br class="calibre19"/>    Request for subsystem 'backups /home' failed on channel 0</tt></div></span><p class="calibre4">whereas Tectia simply forbids extra command-line arguments if <span><em class="italic">-s</em></span> is used: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh server.example.com -s backups /home<br class="calibre19"/>    ssh: FATAL: No command allowed with subsystem.</tt></div></span></div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_471"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2480034" class="calibre7"></a>11.7.3 A Plugin for External Authorization </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2480208" class="calibre15"></a>Next we'll write a plugin, once again using our <code class="calibre35">Net::SSH::Tectia::Plugin</code> package, to perform external access control. Our plugin will allow guest accounts to log in from untrusted systems, but only at certain times.<sup class="calibre20">[<a id="filepos2480522" shape="rect" href="#filepos2490536" class="calibre6">165</a>]</sup> We covered external access control in <a shape="rect" href="DB_split_135.html#filepos724225" class="calibre6">Chapter 5</a>. <a shape="rect" href="DB_split_171.html#filepos1052751" class="calibre6">[5.5.6]</a></p>
+<p class="calibre4">The plugin starts by reading parameters from the server:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/usr/bin/perl -w<br class="calibre19"/>    use strict;<br class="calibre19"/>    use Net::SSH::Tectia::Plugin;<br class="calibre19"/><br class="calibre19"/>    my ($end, %params) = &amp;ssh_plugin_params();<br class="calibre19"/><br class="calibre19"/>    unless (defined($end)) {<br class="calibre19"/>        &amp;ssh_plugin_failure();<br class="calibre19"/>        exit(2);<br class="calibre19"/>    }</tt></div></span><p class="calibre4">The plugin checks for protocol violations, such as a missing end marker for the parameters, and indicates failure (causing access to be denied) if any are detected. </p>
+<p class="calibre4">The parameters are stored in the <code class="calibre35">%params</code> hash for easy retrieval. The server supplies the same keys as for keyboard-interactive plugins. <a shape="rect" href="DB_split_360.html#filepos2463466" class="calibre6">[11.7.2]</a></p>
+<p class="calibre4">The program then uses any of the parameters and other information at its disposal to determine if access should be allowed or denied: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    my $restrict =<br class="calibre19"/>        &amp;account_type($params{"user_name"}) eq "guest" &amp;&amp;<br class="calibre19"/>        &amp;host_trust_level($params{"remote_host_ip"},<br class="calibre19"/>                          $params{"remote_host_name"}) eq "outside" &amp;&amp;<br class="calibre19"/>        &amp;schedule(time) eq "prime";</tt></div></span><p class="calibre4">Our example uses an <code class="calibre35">&amp;account_type</code> function to categorize usernames, perhaps based on the username itself (like <code class="calibre35">AllowUsers</code> or <code class="calibre35">DenyUsers</code>
+<a shape="rect" href="DB_split_166.html#filepos1010709" class="calibre6">[5.5.1]</a>) or by looking up group memberships (like <code class="calibre35">AllowGroups</code> or <code class="calibre35">DenyGroups</code>
+<a shape="rect" href="DB_split_167.html#filepos1034726" class="calibre6">[5.5.2]</a>). Similarly, an <code class="calibre35">&amp;host_trust_level</code> function classifies remote hosts, based on the address or hostname (like <code class="calibre35">AllowHosts</code> or <code class="calibre35">DenyHosts</code>
+<a shape="rect" href="DB_split_168.html#filepos1039161" class="calibre6">[5.5.3]</a>). </p>
+<p class="calibre4">External authorization programs are especially useful when access control decisions must be based on complicated logic or information that is not understood directly by the Tectia server. For example, netgroups or other databases could be used by the <code class="calibre35">&amp;account_type</code> or <code class="calibre35">&amp;host_trust_level</code> functions to evaluate users or hosts, respectively, and other factors such as the time can be incorporated, in our example by a <code class="calibre35">&amp;schedule</code> function. </p>
+<p class="calibre4">Finally, the program indicates success or failure to the server to allow or deny access: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    if (! $restrict) {<br class="calibre19"/>        &amp;ssh_plugin_success();<br class="calibre19"/>        exit(0);<br class="calibre19"/>    } else {<br class="calibre19"/><br class="calibre19"/>        &amp;ssh_plugin_failure();<br class="calibre19"/>        &amp;ssh_plugin_send("error_code", "generic_error");<br class="calibre19"/>        &amp;ssh_plugin_send("error_msg",  "Remote guest logins are not allowed during prime time.");<br class="calibre19"/>        exit(1);<br class="calibre19"/>    }</tt></div></span><p class="calibre4">The program can send an error code and message to the server to describe failures. The protocol defines only two error codes: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">password_too_old</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The user's password has expired.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">generic_error</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Some other error occurred.</div>
+</blockquote>
+</div>
+<p class="calibre4">If the program informs the server about password expiration, then the server runs the system password-change program (either the default, or the value for the <code class="calibre35">PasswdPath</code> keyword) as a forced command. <a shape="rect" href="DB_split_272.html#filepos1787193" class="calibre6">[8.2.3]</a> It does not, however, run a password-change plugin, because the plugin applies only to the authentication phase, which has already been completed when the external authorization program runs. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">In practice, password expiration isn't very useful for external authorization programs, since the programs don't interact (even indirectly) with clients, and passwords are really associated with separate authentication techniques that are performed earlier. Instead of using the <code class="calibre35">password_too_old</code> error code with an external authorization program, use a keyboard-interactive plugin <a shape="rect" href="DB_split_360.html#filepos2463466" class="calibre6">[11.7.2]</a> to flexibly handle password expiration. </p>
+<p class="calibre4">Because that leaves only the <code class="calibre35">generic_error</code> code, the <code class="calibre35">error_code</code> message is itself not very useful. Perhaps someday the protocol will be extended to define other, more meaningful error codes, if they are needed to modify server operation. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The error message is an arbitrary string that explains why access has been denied. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Unfortunately, the server doesn't currently (as of Tectia V476 Version 4.1) use the error message string for any purpose whatsoever. It isn't forwarded to the client, so it can be displayed by the user, and it isn't even recorded in the system log or mentioned in debug output. <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a></p>
+<p class="calibre4">It's still a good idea for external authorization programs to send an error message back to the server, however, so that future versions of the server might be able to use it. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The external authorization program should be written carefully, since it runs with all of the privileges of the SSH server (typically root). Perl's "taint mode" is useful for detecting possible security problems. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2488995" shape="rect" href="DB_split_359.html#filepos2432824" class="calibre6">161</a>] </sup>Alternatively, the <span><em class="italic">ssh-passwd-plugin</em></span> program can be built from the source distribution. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2489390" shape="rect" href="DB_split_359.html#filepos2434082" class="calibre6">162</a>] </sup>Including metaconfiguration information. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2489674" shape="rect" href="DB_split_359.html#filepos2437197" class="calibre6">163</a>] </sup>Newlines are not supplied automatically, so most response strings will need at least one explicit <code class="calibre35">\n</code>, usually at the end. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2490073" shape="rect" href="DB_split_360.html#filepos2464269" class="calibre6">164</a>] </sup>See the file <em class="italic">RFC.kbdint_plugin_protocol</em> in the Tectia distribution for details, and <em class="italic">kbdint_plugin_example.sh</em> for another example implemented as a shell script. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2490536" shape="rect" href="#filepos2480522" class="calibre6">165</a>] </sup>See the file <em class="italic">RFC.authorization_program_protocol</em>. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_472"></div></body>
+</html>

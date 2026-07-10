@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_410"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2064302" class="calibre7"></a>10.3.1 Disable Other Means of Access </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH can provide a secure front door into your system, but don't forget to close the back doors. If your system allows access via the infamous r-commands, disable them. This means: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Remove the file <em class="italic">/etc/hosts.equiv</em>, or make it a read-only empty file. </li>
+<li class="calibre18">Disable <span><em class="italic">rshd</em></span>, <span><em class="italic">rlogind</em></span>, and <span><em class="italic">rexecd</em></span> by removing or commenting out their lines in the <span><em class="italic">inetd</em></span> or <span><em class="italic">xinetd</em></span> configuration file. For example, in <em class="italic">/etc/inetd.conf</em> you might do:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # turned off -- don't use!<br class="calibre19"/>    #shell   stream  tcp   nowait  root  /usr/sbin/in.rshd     in.rshd</tt></div></span><br class="calibre19"/>Make sure you restart <span><em class="italic">inetd</em></span> or <span><em class="italic">xinetd</em></span> after doing this so that the change takes effect. </li>
+<li class="calibre18">Educate users not to create <em class="italic">.rhosts</em> files. </li>
+</ul></div>
+<p class="calibre4">You might also consider disabling<a shape="rect" class="calibre15"></a><a id="filepos2066111" class="calibre15"></a>
+<span><em class="italic">telnetd</em></span> and other insecure avenues for logging in, permitting logins only via SSH. </p>
+</div>
+</body>
+</html>

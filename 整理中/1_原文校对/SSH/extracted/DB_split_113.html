@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_160"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos576108" class="calibre7"></a>4.1.5 Perform Compile-Time Configuration </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos576280" class="calibre15"></a>Most SSH implementations have dozens of configuration<a shape="rect" class="calibre15"></a><a id="filepos576371" class="calibre15"></a> options you can set at compile time. It's a good idea to carefully consider each one, instead of blindly accepting the defaults. In fact, the flexibility provided by this compile-time configuration<a shape="rect" class="calibre15"></a><a id="filepos576607" class="calibre15"></a> process is a primary motivation for installing from source distributions. </p>
+<p class="calibre4">Compile-time configuration is performed by running a script named <em class="italic">configure</em> that is usually found in the top-level source directory.<sup class="calibre20">[<a id="filepos576973" shape="rect" href="DB_split_115.html#filepos595555" class="calibre6">38</a>]</sup> Roughly speaking, the <em class="italic">configure</em> script accomplishes two tasks: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">It examines the local system, setting various platform-specific and operating-system-specific options. For example, <code class="calibre35">configure</code> notices which header files and libraries are available and whether your C compiler is ANSI or not. It does this by compiling and running a series of carefully constructed, small test programs, examining system files, etc. This happens automatically in most cases, so you can just sit back and watch the script announce what it discovers as it runs. </li>
+<li class="calibre18">It includes or excludes certain features found in the SSH source code. For example, <code class="calibre35">configure</code> can keep or remove support for Kerberos authentication. </li>
+</ul></div>
+<p class="calibre4">We'll discuss only the second task, since it's SSH-specific, and cover only the configuration options that are directly related to SSH or security. For example, we won't cover options that relate to the compiler (e.g., whether warnings should be printed or suppressed) or operating system (e.g., whether particular Unix library functions should be used). To see the full set of configure options, use the command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ configure --help</tt></div></span><p class="calibre4">Also, read the installation documentation, which is often found in files named <em class="italic">README</em> and <em class="italic">INSTALL</em> in the source directory. </p>
+<p class="calibre4">The behavior of SSH servers can be controlled at three levels. The first is compile-time configuration as discussed in this chapter. In addition, <span><em class="italic">serverwide configuration</em></span> (<a shape="rect" href="DB_split_135.html#filepos724225" class="calibre6">Chapter 5</a>) controls global settings for a running SSH server, and <span><em class="italic">per-account configuration</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos579388" class="calibre15"></a> (<a shape="rect" href="DB_split_265.html#filepos1765155" class="calibre6">Chapter 8</a>) controls settings for each user account accepting SSH connections. <a shape="rect" href="#filepos580633" class="calibre6">Figure 4-1</a> illustrates where compile-time configuration fits into the whole spectrum. We'll remind you of this picture each time we introduce a new type of configuration. </p>
+<p class="calibre4">Compile-time configuration affects both the SSH server and client programs. Changing the configuration requires recompiling and reinstalling, which is neither easy nor convenient, so for most aspects of server and client operation, it's more appropriate to edit configuration files after installation. Nevertheless, there are some good reasons to use compile-time configuration: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Some configuration options can only be set at compile time. </li>
+<li class="calibre18">Features that are disabled at compile time can't be accidentally enabled by erroneous configuration files. Inflexibility can be an asset. <div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos580633" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SSH compile-time configuration (highlighted parts)" src="images/00015.jpg" class="calibre56"/></div>
+</div>
+</span><p class="calibre4">Figure 4-1. SSH compile-time configuration (highlighted parts) </p></div>
+</li>
+<li class="calibre18">Removing code for unused features improves security—you can't be burned by security holes in code that you don't compile! </li>
+<li class="calibre18">Similarly, code removal sometimes yields a performance advantage, since less memory and disk space is used. </li>
+</ul></div>
+<p class="calibre4">The <em class="italic">configure</em> script accepts command-line flags<a shape="rect" class="calibre15"></a><a id="filepos581500" class="calibre15"></a>, each beginning with a double dash (--), to control its actions. Flags are of two types: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">With/without flags</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Include a package during compilation. These flags begin with <code class="calibre35">--with</code> or <code class="calibre35">--without</code>. For example, support for the X Window System can be included using the flag <code class="calibre35">--with-x</code> and omitted using <code class="calibre35">--without-x</code>. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Enable/disable flags</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Set the default behavior of SSH. These flags begin with <code class="calibre35">--enable</code> or <code class="calibre35">--disable</code>. For example, the X forwarding feature in Tectia is enabled by the flag <code class="calibre35">--enable-X11-for</code>
+<code class="calibre35">warding</code> or disabled with <code class="calibre35">--disable-X11-forwarding</code>. Some of these defaults can be overridden later by serverwide or per-account configuration. </div>
+</blockquote>
+</div>
+<p class="calibre4">Flags beginning with <code class="calibre35">--with</code> or <code class="calibre35">--enable</code> may optionally be followed by an equals sign and a string value, such as: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    --with-etcdir=/usr/local/etc<br class="calibre19"/>    --enable-X11-forwarding=no</tt></div></span><p class="calibre4">Various string values are used, but the most common are <code class="calibre35">yes</code> and <code class="calibre35">no</code>. For a given package <em class="italic"><code class="calibre35">P</code></em>, the flags <code class="calibre35">--with-</code>
+<em class="italic"><code class="calibre35">P</code></em> and <code class="calibre35">--with-</code>
+<em class="italic"><code class="calibre35">P</code></em>
+<code class="calibre35">= yes</code> are equivalent. The following table illustrates the relationship: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+If you write:</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+It's equivalent to:</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--with-</code>
+<em class="italic"><code class="calibre35">P</code></em>
+<code class="calibre35">=yes</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--with-</code>
+<em class="italic"><code class="calibre35">P</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--with-</code>
+<em class="italic"><code class="calibre35">P</code></em>
+<code class="calibre35">=no</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--without-</code>
+<em class="italic"><code class="calibre35">P</code></em>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">This next table shows the relationships for a given feature <em class="italic"><code class="calibre35">F</code></em> : </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+If you write:</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+It's equivalent to:</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--enable-</code>
+<em class="italic"><code class="calibre35">F</code></em>
+<code class="calibre35">=yes</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--enable-</code>
+<em class="italic"><code class="calibre35">F</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--enable-</code>
+<em class="italic"><code class="calibre35">F</code></em>
+<code class="calibre35">=no</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--disable-</code>
+<em class="italic"><code class="calibre35">F</code></em>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">In the sections that follow, we show many examples of <span><em class="italic">configure</em></span> with different command-line flags. Most examples demonstrate only one flag at a time, but keep in mind that other flags might be present on the command line. The proper way to run <span><em class="italic">configure</em></span> is just once, before compilation, with all desired flags on the same command line. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Specifying Options for the configure Script</h3>
+<p class="calibre4">Be careful when specifying <span><em class="italic">configure</em></span> options<a shape="rect" class="calibre15"></a><a id="filepos588961" class="calibre15"></a>, or you might waste a lot of time. The <span><em class="italic">configure</em></span> script is not very smart, performing little or no sanity checking on its input. For example, if you provide an invalid value, <span><em class="italic">configure</em></span> can naively run for several minutes, handling 100 other configuration options, before finally reaching the bad value and dying. Now you have to run the script all over again. </p>
+<p class="calibre4">Unrecognized command-line options are silently ignored, which makes typos especially dangerous. Be sure to check the messages produced by <span><em class="italic">configure</em></span> as it runs, and especially the configuration summary printed at the end to verify that your options were understood as you intended. </p>
+<p class="calibre4">Don't depend on default values, since they might differ among SSH implementations. For maximum security and control, explicitly specify all the options you care about when running <span><em class="italic">configure</em></span>. </p>
+<p class="calibre4">The <code class="calibre35">--no-create</code> option causes the <span><em class="italic">configure</em></span> script to perform all of its checks, but not to create any output files in the build directory. This can be useful if you need to debug an unexpected interpretation of the other options. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The <span><em class="italic">configure</em></span> script uses directory information from its own location to embed pathnames into the <em class="italic">Makefiles</em>, header files, etc., that it creates. Relying on the <code class="calibre35">PATH</code> environment variable to find the <span><em class="italic">configure</em></span> script is therefore a bad practice. If you choose to compile within the source directory, specify the current directory explicitly when you run <span><em class="italic">configure</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ./configure <em class="italic"><code class="calibre35">...options...</code></em></tt></div></span><p class="calibre4">Alternately, you can compile in a different directory, which is convenient if the source directory is used for multiple platforms. To do this, create a separate, empty build directory, and run <span><em class="italic">configure</em></span> there, specifying the source directory for the <span><em class="italic">configure</em></span> pathname: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ mkdir -p /elsewhere/build/ssh<br class="calibre19"/>    $ cd /elsewhere/build/ssh<br class="calibre19"/>    $ /somewhere/src/ssh/configure ...</tt></div></span><p class="calibre4">In our examples, we'll omit the directory components from the <span><em class="italic">configure</em></span> pathname, but remember that they should be included when you run the script. </p>
+</div>
+</body>
+</html>

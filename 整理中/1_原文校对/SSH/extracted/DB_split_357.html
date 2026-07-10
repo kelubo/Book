@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_466"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2415806" class="calibre7"></a>11.6.3 Quoted Values </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2415958" class="calibre15"></a>Tectia removes double quotes from values. The following lines are all valid:<sup class="calibre20">[<a id="filepos2416099" shape="rect" href="#filepos2422461" class="calibre6">158</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PermitEmptyPasswords "no"<br class="calibre19"/>    PermitEmptyPasswords "y"es</tt></div></span><p class="calibre4">In most cases, there is no reason to use quotes, but they are handy in a few, rare situations. If a value ends with a colon (<code class="calibre35">:</code>) character, it will be misinterpreted as a section pattern: <a shape="rect" href="DB_split_140.html#filepos748785" class="calibre6">[5.2.1]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: misinterpreted as a section pattern!<br class="calibre19"/>    AuthKbdInt.Plugin /usr/local/sbin/kiplugin --prompt color:</tt></div></span><p class="calibre4">This is a particularly insidious error if it occurs in a configuration file that supports sections (e.g., subconfiguration files), because the section pattern will probably never match, so the rest of the configuration file is silently ignored!<sup class="calibre20">[<a id="filepos2417388" shape="rect" href="#filepos2422748" class="calibre6">159</a>]</sup></p>
+<p class="calibre4">To prevent this, enclose the value in quotes:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthKbdInt.Plugin "/usr/local/sbin/kiplugin --prompt  color:"</tt></div></span><p class="calibre4">This works because the recognition of section pattern lines occurs before quotes are removed. Since the quoted line doesn't end in a colon, it isn't considered a section pattern line. Equivalently, you can also enclose only part of the value in quotes, as long as the quoted part includes the final colon: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthKbdInt.Plugin  /usr/local/sbin/kiplugin --prompt "color:"<br class="calibre19"/>    AuthKbdInt.Plugin  /usr/local/sbin/kiplugin --prompt  color":"</tt></div></span><p class="calibre4">To include a literal quote character in a value, precede it with a backslash. For example, to construct a shell command that uses (shell) quotes to protect a command-line argument with embedded whitespace from being split: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthKbdInt.Plugin /usr/local/sbin/kiplugin --prompt \"Enter your favorite color:\"</tt></div></span><p class="calibre4">When configuration files are read, the whitespace between the keyword and value is discarded, and any trailing whitespace at the end of each line is removed from the value.<sup class="calibre20">[<a id="filepos2419322" shape="rect" href="#filepos2423159" class="calibre6">160</a>]</sup> Quotes can be used to retain this whitespace as part of the value. As a devious example, you can hide user configurations in a temporary directory named as a single space character: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    UserConfigDirectory /tmp/" "</tt></div></span></div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2420028" shape="rect" href="DB_split_356.html#filepos2371464" class="calibre6">153</a>] </sup>If debugging options <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> prevent forking, then the single server process exits after handling a single session, so only a single copy of the configuration is needed. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2420500" shape="rect" href="DB_split_356.html#filepos2373903" class="calibre6">154</a>] </sup>We'll use <span><em class="italic">egrep</em></span> regex syntax exclusively in this running example for simplicity, but of course other regex syntaxes could be used as well. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2420946" shape="rect" href="DB_split_356.html#filepos2378201" class="calibre6">155</a>] </sup>We have removed the first <code class="calibre35">PasswordGuesses</code> keyword, since it is always overridden by the second occurrence anyway. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2421337" shape="rect" href="DB_split_356.html#filepos2379252" class="calibre6">156</a>] </sup>The order for reading files can also be viewed as a consistent progression from general settings in the main configuration file to increasingly specific settings for hosts and users in the subconfiguration files. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2421793" shape="rect" href="DB_split_356.html#filepos2379889" class="calibre6">157</a>] </sup>The Tectia documentation also refers to sections as <span><em class="italic">configuration blocks</em></span>, or <span><em class="italic">stanzas</em></span>. Subconfiguration sections have the same structure as those used in client configuration files <a shape="rect" href="DB_split_217.html#filepos1429166" class="calibre6">[7.1.2]</a>, except for the interpretation of the patterns. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2422461" shape="rect" href="#filepos2416099" class="calibre6">158</a>] </sup>Single quotes have no special significance. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2422748" shape="rect" href="#filepos2417388" class="calibre6">159</a>] </sup>The server does warn about section patterns in configuration files that should not have them, like the main configuration file, which makes the error easier to detect. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2423159" shape="rect" href="#filepos2419322" class="calibre6">160</a>] </sup>Keywords that use multiple values separated by whitespace also discard the whitespace between those values. Otherwise, whitespace that is embedded within a single value is left unchanged. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_467"></div></body>
+</html>

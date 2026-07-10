@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_227"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1042438" class="calibre7"></a>5.5.4 shosts Access Control </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1042597" class="calibre15"></a>
+<code class="calibre35">AllowHosts</code> and <code class="calibre35">DenyHosts</code> offer total hostname-based access control, regardless of the type of authentication requested. A similar but less restrictive access control is specific to hostbased authentication. The Tectia server can deny access to hosts that are named in <em class="italic">.rhosts</em>, <em class="italic">.shosts</em>, <em class="italic">/etc/hosts.equiv</em>, and <em class="italic">/etc/shosts.equiv</em> files. This is accomplished with the keywords <code class="calibre35">AllowSHosts</code> and <code class="calibre35">DenySHosts</code>:<sup class="calibre20">[<a id="filepos1043318" shape="rect" href="DB_split_173.html#filepos1079960" class="calibre6">72</a>]</sup></p>
+<p class="calibre4">For example, the line:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia with zsh_fileglob or traditional regex syntax<br class="calibre19"/>    DenySHosts *.badguy.com<br class="calibre19"/><br class="calibre19"/>    # Tectia with egrep regex syntax<br class="calibre19"/>    DenySHosts .*\.badguy\.com</tt></div></span><p class="calibre4">forbids access by connections from hosts in the <span><em class="italic">badguy.com</em></span> domain, but only when hostbased authentication is being attempted. Likewise, <code class="calibre35">AllowSHosts</code> permits access only to given hosts when hostbased authentication is used. Values follow the same syntax as for <code class="calibre35">AllowHosts</code> and <code class="calibre35">DenyHosts</code>. As a result, system administrators can override values in users' <em class="italic">.rhosts</em> and <em class="italic">.shosts</em> files (which is good, because this can't be done via the <em class="italic">/etc/hosts.equiv</em> or <em class="italic">/etc/shosts.equiv</em> files). </p>
+<p class="calibre4"><code class="calibre35">AllowSHosts</code> and <code class="calibre35">DenySHosts</code> have caveats similar to those of <code class="calibre35">AllowHosts</code> and <code class="calibre35">DenyHosts</code>: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Patterns are interpreted according to the regular-expression syntax determined by the metaconfiguration information (<a shape="rect" href="DB_split_498.html#filepos2938322" class="calibre6">Appendix B</a>). </li>
+<li class="calibre18">Values may contain multiple patterns separated by commas, plus optional whitespace. </li>
+<li class="calibre18">Keywords may appear multiple times in the configuration file, and the results are cumulative. </li>
+<li class="calibre18">Hostnames or IP addresses may be used, with optional <code class="calibre35">\i</code> or <code class="calibre35">\m</code> prefixes. </li>
+<li class="calibre18">By default, access is allowed to all hosts, and if any <code class="calibre35">AllowSHosts</code> keyword appears, access is permitted only to the hosts specified (and may be further restricted with <code class="calibre35">DenySHosts</code>). </li>
+</ul></div>
+</div>
+</body>
+</html>

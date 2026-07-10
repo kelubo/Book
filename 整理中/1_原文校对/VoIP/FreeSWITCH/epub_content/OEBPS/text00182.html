@@ -1,0 +1,540 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.3　从头开始写一个模块</font>
+</font>
+</p>
+<p height="1em" width="2em">在22.2节，我们给大家讲了编码、解码模块的实现方法。本节我们再来从头实现一个综合性模块，实现自己的Dialplan、自己的App以及自己的API。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.3.1　初始准备工作</font>
+</font>
+</p>
+<p height="1em" width="2em">在准备下一步之前，我们先要为我们的模块取一个名字。笔者写书写到这里，脑子几乎用尽了，实在想不出更有创意的名字了，不如就叫mod_book吧。</p>
+<p height="1em" width="2em">我们的mod_book也将脱离FreeSWITCH源代码的环境，单独存放。因此，你可以在任何喜欢的目录下创建目录mod_book，然后在里面创建mod_book.c。内容我们还是参照上面讲的mod_vp8.c（它已经足够简单了），将不需要的函数的功能删除后，并把所有的mod_vp8替换为mod_book，得到的新的模块文件如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01  /* Book Example: Dialplan/App/API  Author: Seven Du */<br/>
+<br/>
+02<br/>
+<br/>
+03  #include &lt;switch.h&gt;<br/>
+<br/>
+04<br/>
+<br/>
+05  SWITCH_MODULE_LOAD_FUNCTION(mod_book_load);<br/>
+<br/>
+06  SWITCH_MODULE_DEFINITION(mod_book, mod_book_load, NULL, NULL);<br/>
+<br/>
+07<br/>
+<br/>
+08  SWITCH_MODULE_LOAD_FUNCTION(mod_book_load)<br/>
+<br/>
+09  {<br/>
+<br/>
+10      *module_interface = switch_loadable_module_create_module_interface(pool, modname);<br/>
+<br/>
+11      return SWITCH_STATUS_SUCCESS;<br/>
+<br/>
+12  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，该模块应该是最简单了，它只有短短的12行（去掉注释只有10行）。我们迅速创建一个Makefile，内容如下（注意，我们这里的BASE变量引用的是一个绝对路径，它就是FreeSWITCH源代码的路径，如果你的源代码路径与笔者的不同，应该相应地修改它）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+BASE=/usr/src/freeswitch<br/>
+<br/>
+include $(BASE)/build/modmake.rules<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，直接在当前目录执行make install，该模块就安装好了。</p>
+<p height="1em" width="2em">接着，到FreeSWITCH控制台上加载该模块，从日志输出中可以看到我们的模块已经加载好了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_book<br/>
+<br/>
+[CONSOLE] switch_loadable_module.c:1464 Successfully Loaded [mod_book]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">虽然到此为止，我们的模块还什么都不能做，但至少它顺利加载了。我们要把这阶段性的成果记录下来。执行以下3条命令将这些成果记录到Git中。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ git init<br/>
+<br/>
+$ git add Makefile mod_book.c<br/>
+<br/>
+$ git ci -m 'initial commit'<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.3.2　写一个简单的Dialplan</font>
+</font>
+</p>
+<p height="1em" width="2em">为了使我们的模块更有用，我们需要增加一些功能。在此我们就实现一个自己的Dialplan Interface——我们仍然叫它book。下面我们修改load函数，首先增加一个变量声明：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+switch_dialplan_interface_t *dp_interface;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，在*module_interface一行后，向核心注册我们的Dialplan，并设置一个回调函数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+SWITCH_ADD_DIALPLAN(dp_interface, "book", book_dialplan_hunt);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后实现该回调函数。注意这里我们文件中的行号发生了变化。该回调函数是使用SWITCH_STANDARD_DIALPLAN声明的。在第10行，我们定义了一个switch_caller_extension_t类型的指针变量，用于定义相关的extension（与XML Dialplan中的&lt;extension&gt;标签相对应）。第11行将得到当前的Channel。第14行将得到一个caller_profile，它里面保存了主叫用户的相关信息。比如，在第20行我们就在日志中打印出了一些我们关心的信息。该信息跟我们最早在第6章讲到的“绿色的行”是一样的，<font color="#0468BB">在此我们自己编程，实现了“绿色的行”</font>
+ 。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+08  SWITCH_STANDARD_DIALPLAN(book_dialplan_hunt)<br/>
+<br/>
+09  {<br/>
+<br/>
+10      switch_caller_extension_t *extension = NULL;<br/>
+<br/>
+11      switch_channel_t *channel = switch_core_session_get_channel(session);<br/>
+<br/>
+12<br/>
+<br/>
+13      if (!caller_profile) {<br/>
+<br/>
+14          caller_profile = switch_channel_get_caller_profile(channel);<br/>
+<br/>
+15      }<br/>
+<br/>
+16<br/>
+<br/>
+17      switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session), SWITCH_LOG_INFO,<br/>
+<br/>
+18          "Processing %s &lt;%s&gt;-&gt;%s in context %s\n",<br/>
+<br/>
+19          caller_profile-&gt;caller_id_name, caller_profile-&gt;caller_id_number,<br/>
+<br/>
+20          caller_profile-&gt;destination_number, caller_profile-&gt;context);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当FreeSWITCH执行到该回调函数时，说明有一路电话进入了路由（ROUTING）阶段，我们要查找Dialplan，返回对应的Extension（或里面的Action），以后在后续Channel进入执行阶段时（EXECUTE），执行相关的App。在第22行，我们初始化了一个extension。第26行，往该extension上增加了一个App。在此我们并没有进行任何查找，而是直接硬编码了一个log的App。最后，返回我们生成的extension（第29行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+22      extension = switch_caller_extension_new(session, "book", "book");<br/>
+<br/>
+23<br/>
+<br/>
+24      if (!extension) abort();<br/>
+<br/>
+25<br/>
+<br/>
+26      switch_caller_extension_add_application(session, extension,<br/>
+<br/>
+27          "log", "INFO Hey, I'm in the book");<br/>
+<br/>
+28<br/>
+<br/>
+29      return extension;<br/>
+<br/>
+30  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">进行了这些改变后，我们再次执行make install，并在FreeSWITCH控制台上使用reload mod_book重新加载模块。然后可以快速使用如下命令实验一下该Dialplan的效果：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1006 9999 book<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">还记得我们在6.7节所说的Dialplan的三要素吧？其中，9999就是Extension，book就是Dialplan的名字；而Context由于省略了，默认就是default。因此，可以在日志中看到如下的“绿色的行”，并且也可以看到我们增加的App也如期执行了（输出了对应的日志）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] mod_book.c:17 Processing  &lt;0000000000&gt;-&gt;9999 in context default<br/>
+<br/>
+[INFO] mod_dptools.c:1595 Hey, I'm in the book<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，我们的Dialplan应该可以正常工作了。我们可以在XML Dialplan里转向它：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="trasfer" data="9999 book default" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以在Sofia Profile中（如internal）直接使用它，配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="dialplan" value="book"/&gt;<br/>
+<br/>
+&lt;param name="context" value="default"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，我们的Dialplan功能还不是很强大，有待于进一步加强。我们继续将它提交到Git中（在提交之前执行一下git diff是个好习惯）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ git status<br/>
+<br/>
+$ git diff<br/>
+<br/>
+$ git commit -m 'add Dialplan Interface' .<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">到这里我们应该更深入地理解Dialplan到底是干什么的——<font color="#0468BB">它就是负责找到一组App，保证以后FreeSWITCH后续能执行这些App。</font>
+</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.3.3　增加一个App</font>
+</font>
+</p>
+<p height="1em" width="2em">在上述的Dialplan的例子中，我们还是使用了现有的log App作为例子。下面我们该实现一个自己的App了。我们继续将该App取名为book。实现的步骤如下。</p>
+<p height="1em" width="2em">首先，声明一个app_interface：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+switch_application_interface_t *app_interface;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将该App向核心注册，并增加一个回调函数book_function：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+SWITCH_ADD_APP(app_interface, "book", "book example", "book example",<br/>
+<br/>
+                   book_function, "[name]", SAF_SUPPORT_NOMEDIA);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">实现该回调函数。该函数的参数将从data指针中传过来，如果为空（第39行），则我们给它指定一个默认的名字；否则，就把传入的参数作为书的名字（第42行）。第45行输出一条日志，打印自己的名字：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+35  SWITCH_STANDARD_APP(book_function)<br/>
+<br/>
+36  {<br/>
+<br/>
+37      const char *name;<br/>
+<br/>
+38<br/>
+<br/>
+39      if (zstr(data)) {<br/>
+<br/>
+40          name = "No Name";<br/>
+<br/>
+41      } else {<br/>
+<br/>
+42          name = data;<br/>
+<br/>
+43      }<br/>
+<br/>
+44<br/>
+<br/>
+45      switch_log_printf(SWITCH_CHANNEL_SESSION_LOG(session),<br/>
+<br/>
+46          SWITCH_LOG_INFO, "I'm a book, My name is: %s\n", name);<br/>
+<br/>
+47  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，我们也不忘了在我们刚才的Dialplan中的extension上加上我们自己实现的App：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+switch_caller_extension_add_application(session, extension,<br/>
+<br/>
+    "book", "FreeSWITCH - The Definitive Guide");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">重新编译加载后，再执行一次，日志如下（可以看出，我们的App已经执行了）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] mod_dptools.c:1595 Hey, I'm in the book<br/>
+<br/>
+[INFO] mod_book.c:45 I'm a book, My name is: FreeSWITCH - The Definitive Guide<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">最后，当然我们也不要忘了再把我们的改变提交到Git里：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ git commit -m 'add book App' .<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.3.4　写一个API</font>
+</font>
+</p>
+<p height="1em" width="2em">通过上面的例子，相信读者也能想到，自己写一个API也是很容易的。出于完整性考虑，我们就来再写一个。我们已经完全没有创意了，因此该API的名字还是叫book。</p>
+<p height="1em" width="2em">声明一个api_interface：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+switch_api_interface_t *api_interface;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将API注册到核心，并设置回调函数book_api_function：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+SWITCH_ADD_API(api_interface, "book", "book example", book_api_function, "[name]");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">实现回调函数。该回调函数与上面的book_function类似，不同的是，参数是从cmd（第53行）获取的，而且这里我们没有打印日志，而是直接将命令的返回结果写到输出流（stream）里去了（第59行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+49  SWITCH_STANDARD_API(book_api_function)<br/>
+<br/>
+50  {<br/>
+<br/>
+51      const char *name;<br/>
+<br/>
+52<br/>
+<br/>
+53      if (zstr(cmd)) {<br/>
+<br/>
+54          name = "No Name";<br/>
+<br/>
+55      } else {<br/>
+<br/>
+56          name = cmd;<br/>
+<br/>
+57      }<br/>
+<br/>
+58<br/>
+<br/>
+59      stream-&gt;write_function(stream, "I'm a book, My name is: %s\n", name);<br/>
+<br/>
+60<br/>
+<br/>
+61      return SWITCH_STATUS_SUCCESS;<br/>
+<br/>
+62  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">重新编译并加载该模块后，我们在日志中看到如下的输出，它分别增加了以book为名称的Dialplan、Application和API Function（我们在前面还没注意到呢）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[NOTICE] switch_loadable_module.c:227 Adding Dialplan 'book'<br/>
+<br/>
+[NOTICE] switch_loadable_module.c:269 Adding Application 'book'<br/>
+<br/>
+[NOTICE] switch_loadable_module.c:315 Adding API Function 'book'<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，我们在FreeSWITCH控制台上就可以执行book命令了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; book<br/>
+<br/>
+I'm a book, My name is: No Name<br/>
+<br/>
+freeswitch&gt; book FreeSWITCH - The Definitive Guide<br/>
+<br/>
+I'm a book, My name is: FreeSWITCH - The Definitive Guide<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">再一次，我们将里程碑成果提交到Git中：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ git commit -m 'add book API Interface' .<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">22.3.5　小结</font>
+</font>
+</p>
+<p height="1em" width="2em">在本节的例子中，我们从无到有一步一步实现了一个模块，添加了Dialplan、App以及API。在前面的例子中，虽然我们阅读了很多源代码，但是“纸上得来终觉浅”，唯有手工一步一步地做一次才知到每一步是怎么来的。</p>
+<p height="1em" width="2em">另外，我们也把每一步的结果都提交到Git版本管理系统中了，因而可以随时查阅历史，重温这段美好的回忆。各位读者可以自己试一下，也可以从本书的Github站点上翻阅在写作本书时的美好回忆。</p>
+</body>
+</html>

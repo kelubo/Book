@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1774010" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_352"><span class="calibre2"><a shape="rect" class="calibre7"></a>Public-Key-Based Configuration </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">To set up public-key authentication in your account on an SSH server machine, you create an authorization file, typically called <em class="italic">authorized_keys</em> (OpenSSH) or <em class="italic">authorization</em> (Tectia), and list the keys that provide access to your account. <a shape="rect" href="DB_split_047.html#filepos219814" class="calibre6">[2.4]</a> Well, we've been keeping a secret. Your authorization file can contain not only keys, but also other keywords or options to control the SSH server in powerful ways. We will discuss: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">The full format of an authorization file</li>
+<li class="calibre18">Forced commands for limiting the set of programs that the client may invoke on the server </li>
+<li class="calibre18">Restricting incoming connections from particular hosts</li>
+<li class="calibre18">Setting environment variables for remote programs</li>
+<li class="calibre18">Setting an idle timeout so that clients will be forcibly disconnected if they aren't sending data </li>
+<li class="calibre18">Disabling or placing limits on certain features of the incoming SSH connection, such as port forwarding and tty allocation </li>
+</ul></div>
+<p class="calibre4">As we demonstrate how to modify your authorization file, remember that the file is consulted by the SSH server only at authentication time. Therefore, if you change your authorization file, only new connections will use the new information. Any existing connections are already authenticated and won't be affected by the change. </p>
+<p class="calibre4">Also remember that an incoming connection request won't reach your authorization file if the SSH server rejects it for other reasons, namely, failing to satisfy the serverwide configuration. If a change to your authorization file doesn't seem to be having an effect, make sure it doesn't conflict with a (more powerful) serverwide configuration setting. </p>
+</div>  </body>
+</html>

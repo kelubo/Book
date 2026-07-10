@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2741317" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_552"><span class="calibre2"><a shape="rect" class="calibre7"></a>Connector </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2741659" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2741698" class="calibre15"></a>We have previously seen how static port forwarding can be extended for SOCKS-aware applications to provide dynamic port forwarding. <a shape="rect" href="DB_split_295.html#filepos1962242" class="calibre6">[9.3]</a> SOCKS is fully supported by the Tectia client, but you have to reconfigure each application to use the SOCKS proxy, which can be annoying. </p>
+<p class="calibre4">Tectia Connector extends this concept further to achieve complete transparency: applications can use dynamic port forwarding without any reconfiguration whatsoever, because the applications are entirely unaware that the forwarding is happening. </p>
+<p class="calibre4">To accomplish this feat, Connector worms its way into the Windows TCP/IP protocol stack (which includes hostname lookup functionality). This allows it to intercept networking operations by applications and reroute them to its own Connector engine, which then initiates SSH connections to servers on behalf of the applications. The capture and forward mechanism also allows the Connector engine to exercise precise control over network connections, and to enforce security policies that require certain kinds of connections to use secure protocols, like SSH. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">As of Version 4.2, Connector requires functionality provided only by "Tectia Server (T)." <a shape="rect" href="DB_split_424.html#filepos2779070" class="calibre6">[16.11]</a> "Tectia Server (A)" can't be used with Connector, and other non-Tectia servers are unsupported. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Connector only affects outgoing TCP connections. Applications can still accept incoming connections directly, and other protocols (like UDP, ICMP, etc.) are completely ignored by Connector. Note, however, that all applications can be affected by Connector's interception of hostname lookups. </p>
+<p class="calibre4">Connector uses only the SSH-2 protocol, never SSH-1. It is fully self-contained, and does not rely on the Tectia client. Instead, Connector implements the SSH-2 protocol and initiates its own connections. </p>
+<p class="calibre4">The Connector engine starts automatically when each user logs in. If it has been stopped for some reason, it can be restarted manually using the SSH Tectia Connector item from the Start/Programs/SSH Tectia Connector menu, or by running the <span><em class="italic">SSHConnector</em></span> program in the Connector installation folder. </p>
+<p class="calibre4">In normal operation, Connector is unobtrusive, presenting only a small icon in the tool tray on the taskbar to announce its presence. Right-click the icon to produce a menu that displays a list of applications currently using Connector, a checkbox that allows the Connector engine to be enabled or disabled, and an Exit item that shuts down the Connector engine. </p>
+<p class="calibre4">The Connector Status dialog can be displayed by double-clicking the tool tray icon or selecting the Status item from the tool tray icon menu. The Tunnels view shows each forwarded port, with the program using the connection, the destination server, and usage statistics (data sent and received). The Logs view displays messages (with timestamps) about authentication, creation of forwarded ports, connections by applications, etc. The Connector engine maintains its own log; it doesn't send messages to the Windows event log. </p>
+<p class="calibre4">Privileged users can use the Administration dialog or edit the configuration file directly to configure the Connector engine. The administrative GUI interface is accessed by selecting the SSH Tectia Connector Admin item from the Start/Programs/SSH Tectia Connector menu, or a similar item in the Connector tool tray icon menu, or by running the <span><em class="italic">SSHConnectorAdmin</em></span> program in the Connector installation folder. </p>
+</div>  </body>
+</html>

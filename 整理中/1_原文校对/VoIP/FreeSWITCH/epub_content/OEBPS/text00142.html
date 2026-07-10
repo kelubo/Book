@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.1　用Lua脚本写个小游戏</font>
+</font>
+</p>
+<p height="1em" width="2em">工作再忙也总有时间轻松一下。好玩的游戏总会令人心情愉快。不过，在这里讲的这个小游戏不是我自己玩的，而是另有故事。在写作本书时，笔者的儿子刚刚4岁，他总会不时地过来敲打一下键盘，使得笔者总不能静下心来工作。当写到本章时，需要一个例子，笔者忽然来了灵感，就迅速给他写了个小游戏，这样他就可以自己玩一阵子。</p>
+<p height="1em" width="2em">由于是“迅速”写的，因此很简单。笔者给儿子在iPad上装了个软电话，他拨“1”就会进入FreeSWITCH上的一个Lua程序，该程序会提示他输入一个数字，并使用TTS读出这个数字。当然，如果只读“0123456789”肯定是太无聊了，所以笔者还加了一点点逻辑：如果输入的是“*”，就将数字减一，如果按的是“#”，就将数字加一。这样通过按“#”，数字就能一直累加上去。他能玩好一阵子，并乐此不疲。</p>
+<p height="1em" width="2em">后来，为了证明笔者确实收到了他的按键，笔者在程序中使用system App调用了系统的banner <sup>
+<small>
+<a href="text00143.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 程序，把它输入的数字在控制台上打印出来。下面是数字“9”在笔者电脑上的输出（只是一直没意识到，在Mac平台上“banner”的输出是横着的）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] switch_cpp.cpp:1293 DTMF: 9 Duration: 800<br/>
+<br/>
+[NOTICE] mod_dptools.c:1973 Executing command: banner -w 40 9<br/>
+<br/>
+                          #####<br/>
+<br/>
+           #          ############<br/>
+<br/>
+          ##         ##############<br/>
+<br/>
+          #         ####         ###<br/>
+<br/>
+          #         ##             ##<br/>
+<br/>
+          #         #               #<br/>
+<br/>
+          #         #               #<br/>
+<br/>
+          ###        ##           ###<br/>
+<br/>
+           #########################<br/>
+<br/>
+             #####################<br/>
+<br/>
+                ###############<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，增加了banner以后又带来了一个副作用，那就是儿子隔一阵就跑过来看看笔者的FreeSWITCH控制台以验证他输入的是否正确，还是会影响工作。好了，闲话少叙，我们来看代码：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 local x = 1<br/>
+<br/>
+02 function onInput(s, type, obj, arg)<br/>
+<br/>
+03   if (type == "dtmf") then<br/>
+<br/>
+04       freeswitch.consoleLog("INFO",<br/>
+<br/>
+05         "DTMF: " .. obj.digit .. " Duration: " .. obj.duration .. "\n")<br/>
+<br/>
+06     if (obj.digit == "*") then<br/>
+<br/>
+07       x = x - 1<br/>
+<br/>
+08       if (x &lt; 0) then x = 0 end<br/>
+<br/>
+09       n = x<br/>
+<br/>
+10     elseif (obj.digit == "#") then<br/>
+<br/>
+11       x = x + 1<br/>
+<br/>
+12       n = x<br/>
+<br/>
+13     else<br/>
+<br/>
+14       n = obj.digit<br/>
+<br/>
+15     end<br/>
+<br/>
+16     s:execute("system", "banner -w 40 " .. n)<br/>
+<br/>
+17     s:speak(n)<br/>
+<br/>
+18   end<br/>
+<br/>
+19   return ''<br/>
+<br/>
+20 end<br/>
+<br/>
+21 session:set_tts_params("tts_commandline", "Ting-Ting")<br/>
+<br/>
+22 session:answer()<br/>
+<br/>
+23 session:speak("<br/>
+<br/>
+冰冰你好，请按一个数字")<br/>
+<br/>
+24 session:setInputCallback('onInput', '')<br/>
+<br/>
+25 session:streamFile("local_stream://moh")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">程序的代码很简单。在第2行我们定义了一个onInput函数，当有按键输入时，系统会调用该回调函数，它用一个简单的算法计算一个变量值n，然后在第16行调用banner在控制台上输出n（其中的s变量就是传入的当前的“session”），并在第17行使用TTS技术“说”出n的值。</p>
+<p height="1em" width="2em">真正脚本的执行是从第21行开始的。该脚本在执行时会自动获得一个session变量，它唯一标志了当前的通话。在第21行，首先设置了我们将要使用的TTS的参数；然后在第22行进行应答；第23行播放一个提示音；第24行安装一个回调函数，当该session上有输入时，它将回调该函数；第24行播放保持音乐。</p>
+<p height="1em" width="2em">为了能让他很简单地按“1”就呼叫到该脚本，笔者使用了下面的Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Number Game"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^1$"&gt;<br/>
+<br/>
+    &lt;action application="lua" data="numbers_game.lua"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，除此之外，笔者还实现了当他按“2”时可跟笔者来一阵视频通话：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Video Me"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^2$"&gt;<br/>
+<br/>
+    &lt;action application="bridge" data="user/1007"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">等把书写完了，笔者一定好好想想，在FreeSWITCH中给他写更多更好玩的游戏。现在，就讲到这里吧。其实这个例子不仅仅是个游戏，它包含了在Lua脚本中接收DTMF输入、放音等基本操作，再多加上些if...else之类的语句，肯定能写出很强大的IVR应用了。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00142.html">
+<font color="#FF6600">[1]</font>
+</a>
+ UNIX系统上自带的一个程序。它会使用“ASCII Art”形式输出字符。</p>
+</body>
+</html>

@@ -1,0 +1,1289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.6　使用Erlang控制呼叫流程</font>
+</font>
+</p>
+<p height="1em" width="2em">Erlang <sup>
+<small>
+<a href="text00166.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 是一门函数式编程语言。相比其他语言来说，它比较小众，但有着20多年历史的它一点也不年轻 <sup>
+<small>
+<a href="text00166.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。它具有轻量级多进程、高并发、热代码替换等电信级的特性，并非常易于和适合于创建集群应用（Cluster）。更重要的是，它就是为了编写电信应运而生的，在云计算这个词异常火热的今天，Erlang编程语言更被赋予了新的意义。</p>
+<p height="1em" width="2em">在FreeSWITCH中有一个原生的模块mod_erlang_event，它作为一个隐藏的Erlang节点 <sup>
+<small>
+<a href="text00166.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 可以与任何Erlang节点通信。并且，它也实现了类似ESL中的Inbound和Outbound的通信模式。非常方便与其他Erlang系统集成。多年来，笔者一直从事FreeSWITCH以及与Erlang相关的开发，因此，本节的内容是必不可少的了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.6.1　准备工作</font>
+</font>
+</p>
+<p height="1em" width="2em">首先，对于对Erlang不熟悉的读者来说，我们简单补一补课。</p>
+<p height="1em" width="2em">在Erlang中，进程间通信靠消息和邮箱机制，一个进程可以给另外一个进程发消息，如下面的代码给一个进程（Pid）发送message消息（感叹号代码发送消息）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+Pid ! message<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Erlang天生支持集群，每个Erlang实例就相当于集群中的一个节点，每个节点有一个名字，可以是短名字（如'name@localhost'），也可以是长名字（如'name@freeswitch.org'或'name@192.168.1.2'）。短名字的节点只能和短名字的节点进行通信，长名字的节点也只能与长名字的节点通信。在下面的例子中，FreeSWITCH节点的名字叫'freeswitch@loalhost'，而我们实现的Erlang节点的名字则叫'test@localhost'。</p>
+<p height="1em" width="2em">相互能通信的节点间可以互发消息，如使用如下代码可以给一个远程节点上的Pid进程发送消息：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+{Pid, 'freeswitch@localhost'} ! hello<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Erlang在变量全部以大写字母或下划线开头，以小写字母开头的则是常量，在Erlang中称为原子（atom）。原子可以作为进程的名字，也可以作为节点的名字。反过来讲进程的名字和节点的名字（如果有的话）必须是原子。所有以单引号括起来的字符串都是原子（而不管字每是大写还是小写）。</p>
+<p height="1em" width="2em">关于Erlang的基础知识我们就讲这些，有了这些知识，Erlang新手也能大体理解以下的内容了。当然如果读者有一定Erlang基础就更好了。</p>
+<p height="1em" width="2em">接下来，我们再准备一下Erlang的环境。</p>
+<p height="1em" width="2em">在FreeSWITCH中，与Erlang节点通信的模块是mod_erlang_event，该模块在FreeSWITCH安装时默认是不安装的，安装该模块要首先应确认你的机器上已经安装好Erlang的开发环境。笔者习惯通过源代码安装（从官方网站上下载源代码，解压后使用如下命令安装：./configure&amp;&amp;make&amp;&amp;make install），如果通过系统提供的管理工具安装的话请安装erlang-devel或erlang-dev包。</p>
+<p height="1em" width="2em">确认安装好Erlang环境以后，在FreeSWITCH源代码目录中重新执行./configure，以在产生的Makefile中能找到相关的Erlang环境。然后在FreeSWITCH源代码目录中执行下列命令安装mod_erlang_event：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make mod_erlang_event-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">安装完成后，我们要对该模块进行配置。先检查配置文件，确认conf/autoload_configs/erlang_event.conf.xml中有以下三行（其他的行不动）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="nodename" value="freeswitch@localhost"/&gt;<br/>
+<br/>
+&lt;param name="encoding" value="binary"/&gt;<br/>
+<br/>
+&lt;param name="cookie" value="ClueCon"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中第1行的nodename是为了强制限定FreeSWITCH节点的名字，如果不配置的话，FreeSWITCH会自己为节点起一个最适合的名字，但我们发现它自己起的名字并不总是正确的，因此在这里为了防止引起其他可能的错误，在此人工指定一个名字（注意这里我们使用了短名字，如果你的Erlang节点在另一台机器上，你应该使用长名字）。第2行，我们使用二进制编码。默认的节点间通信使用文本编码，文本编码比二进制编码效率要低一些。第3行，设置该节点的Cookie。注意要与Erlang节点的Cookie相同。</p>
+<p height="1em" width="2em">然后就可以在FreeSWITCH中加载该模块了，命令如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_erlang_event<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.6.2　将来话交给Erlang处理</font>
+</font>
+</p>
+<p height="1em" width="2em">在此我们先讨论Erlang的Outbound模式。当有电话到来时，FreeSWITCH（可以看作一个客户端）会连接到你的Erlang程序节点（可以看作一个服务器）上，并把进来的电话控制权交给它。</p>
+<p height="1em" width="2em">在Dialplan中有两种设置方法：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="test"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^7777$"&gt;<br/>
+<br/>
+        &lt;action application="erlang" data ="ivr:start test@localhost"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+&lt;extension name="test"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^7778$"&gt;<br/>
+<br/>
+        &lt;action application="erlang" data ="ivr:! test@localhost"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们把这两种方法分别称为“7777法”和“7778法”，下面对这两种方法进行介绍。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.7777法</font>
+</font>
+</p>
+<p height="1em" width="2em">在7777法里，如果你呼叫7777，FreeSWITCH会首先将当前的Channel置于挂起（park）状态，并给你的Erlang程序（test@localhost节点）发送一个RPC调用，调用的函数为ivr:start(Ref)。其中，ivr:start是在Dialplan中定义的，Ref则是由FreeSWITCH端生成的针对该请求的唯一引用。在Erlang端，start/1函数应该创建（spawn）一个新的进程，并且将新进程的PID返回给FreeSWITCH，FreeSWITCH收到该PID以后，便会将后续的所有与该Channel相关的事件都送给该进程。</p>
+<p height="1em" width="2em">Erlang端的代码如下所示。当收到FreeSWITCH的远程调用时，它将产生一个新进程，并在新的进程中运行loop()函数，同时原来的进程会将新进程的Pid（NewPid）返回给FreeSWITCH。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+start(Ref) -&gt;<br/>
+<br/>
+     NewPid = spawn(fun() -&gt; loop() end),<br/>
+<br/>
+     {Ref, NewPid}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这是用Erlang控制呼叫的最简单的方法。任何时候来了一个呼叫，FreeSWITCH就发起一个远端RPC调用给Erlang，然后Erlang端启动一个新进程来控制该呼叫。由于Erlang的进程都是非常轻量级的，因而这种方式非常优雅。</p>
+<p height="1em" width="2em">我们将在后面再讨论loop()函数。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.7778法</font>
+</font>
+</p>
+<p height="1em" width="2em">除了使用RPC生成新的进程外，还可以用另外一种方法产生新进程。如上面的7778法对应的Dialplan所示，与7777不同的是，其中的ivr:start中的start被换成了“!”。该方法需要你首先在Erlang端启动一个进程，该进程监听所有进来的请求。当FreeSWITCH把电话路由到Erlang节点时，根据“!”语法的规定，FreeSWITCH会向Erlang发送一个{getpid,...}消息，意思是说：我这里来了一路电话，告诉我哪个进程（对应一个Pid）可以处理，我好把相应的事件发送给它。这种方法比上一种方法稍微复杂一些，但程序控制更加灵活。</p>
+<p height="1em" width="2em">如下面的代码，第一行的start函数必须事先执行，它在第2行注册一个有名字的进程（名字为ivr），然后进入wait()无限循环。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 start() -&gt;<br/>
+<br/>
+02     register(ivr, self()),<br/>
+<br/>
+03     wait().<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在wait()循环中，当收到一个{get_pid,UUID,Ref,FSPid}消息时，表示FreeSWITCH中来了一路通话，它便在第7行启动一个新的进程（新的进程将调用loop()进行服务），并在第8行把该新进程的Pid（NewPid）发送给FreeSWITCH（FSPid）。然后在第10行重新进入wait()等待后续的请求。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+04 wait() -&gt;<br/>
+<br/>
+05     receive<br/>
+<br/>
+06         {get_pid, UUID, Ref, FSPid} -&gt;<br/>
+<br/>
+07               NewPid = spawn(fun() -&gt; loop() end),<br/>
+<br/>
+08               FSPid ! {Ref, NewPid},<br/>
+<br/>
+09               io:format("Main Pid: ~p Child Pid: ~p~n", [self(), NewPid]),<br/>
+<br/>
+10               wait();<br/>
+<br/>
+11          _Any -&gt;<br/>
+<br/>
+12               wait()<br/>
+<br/>
+13     end.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.6.3　用Erlang实现空中充值服务</font>
+</font>
+</p>
+<p height="1em" width="2em">下面我们看一下Erlang版的空中充值服务是什么样子的。在此我们将使用“7777法”将呼叫转给Erlang处理。当有新呼叫到来时，新启动的进程将执行loop，并会立即收到一个初始的接通事件，该事件类似我们在C语言的ESL中收到的handle.info_event中的事件，它在Erlang中的消息格式是{event,[UUID|Event]}}，其中，UUID为当前Channel的UUID，Event是一个proplist，我们可以从中获取各种参数。</p>
+<p height="1em" width="2em">将我们的Erlang版的空中充值服务命名为echarge，则在Dialplan中使用如下设置便可以将来话路由到我们的Erlang节点了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="test"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^7777$"&gt;<br/>
+<br/>
+    &lt;action application="erlang" data ="echarge:start test@localhost"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面我们来看代码。Erlang程序不像C语言那样需要前向声明，因而我们不必把被调用的函数放到最前面，故这一次我们终于可以从程序的第一行开始看了。</p>
+<p height="1em" width="2em">首先，第1行声明一个Erlang模块，它需要与文件名对应。第2行导出一个start函数，以便被FreeSWITCH远程调用。第3行定义了一个宏，表示FreeSWITCH所在的Erlang节点的名称。第4行的宏与C语言版本的类似。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01  -module(echarge).<br/>
+<br/>
+02  -export([start/1]).<br/>
+<br/>
+03  -define(FS_NODE, 'freeswitch@localhost').<br/>
+<br/>
+04  -define(ERROR_PROMPT, "say:<br/>
+<br/>
+输入错误，请重新输入").<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们的start函数很简单，它使用了标准的7777法启动一个新进程，并执行loop()函数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+05  start(Ref) -&gt;<br/>
+<br/>
+06      NewPid = spawn(fun() -&gt; loop() end),<br/>
+<br/>
+07      {Ref, NewPid}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是我们的loop()函数。在第9行使用receive语句等待接收消息。第10行是它收到的第一个消息。收到消息后，它将打印该Channel的UUID（第11行），然后调用send_msg函数执行应答（第12行），并设置TTS参数。这些步骤都完成后，再调用send_lock_msg函数播放欢迎词（第15行）。</p>
+<p height="1em" width="2em">在这里，send_msg负责给FreeSWITCH发送一条Erlang消息，FreeSWITCH收到消息后便会立即执行它指定的App。send_lock_msg与C语言版本的ESL中的handle.event_locck=1的情况相似，主要是为了能让App顺序阻塞地执行。接下来，在第16行将执行一个函数询问账号和密码，我们稍后再来看该函数，现在只需要知道它与C语言版本中的调用play_and_get_digits类似。</p>
+<p height="1em" width="2em">在Erlang中，所有的消息都是异步的，因而上面所描述的操作都很快执行完了。接下来，它在第17行再次执行递归地调用loop()函数，并使用receive再次接收消息。Erlang也支持尾递归，因而不用担心消耗栈空间等。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ 8  loop() -&gt;<br/>
+<br/>
+ 9       receive<br/>
+<br/>
+10            {call, {event, [UUID | _Event]} } -&gt;<br/>
+<br/>
+11                 io:format("New call ~s~n", [UUID]),<br/>
+<br/>
+12                 send_msg(UUID, answer, ""),<br/>
+<br/>
+13                 send_msg(UUID, set, "tts_engine=tts_commandline"),<br/>
+<br/>
+14                 send_msg(UUID, set, "tts_voice=Ting-Ting"),<br/>
+<br/>
+15                 send_lock_msg(UUID, speak, "<br/>
+<br/>
+您好，欢迎使用空中充值服务"),<br/>
+<br/>
+16                 ask_account_and_password(UUID),<br/>
+<br/>
+17                 loop();<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">后续的消息格式都是类似第18行的格式（以call_event开头），在收到消息后，执行process_event()函数来进行处理。如果收到call_hangup消息，则表示电话已挂机，打印一条日志然后就不再进行循环了（不再执行loop()，该进程将会终止），否则在收到其他消息时（如第21、第23行）继续循环。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+18            {call_event, {event, [UUID | Event]} } -&gt;<br/>
+<br/>
+19                 process_event(UUID, Event),<br/>
+<br/>
+20                 loop();<br/>
+<br/>
+21            call_hangup -&gt; io:format("Call hangup~n", []);<br/>
+<br/>
+22            ok -&gt; loop();<br/>
+<br/>
+23            _X -&gt;<br/>
+<br/>
+24                 io:format("Ignoring message ~p~n", [_X]),<br/>
+<br/>
+25                 loop()<br/>
+<br/>
+26       end.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是我们询问账号和密码的函数，它还是类似19.2节所讲中的样子，在通道变量中设置当前充值流程的状态（charge_state），然后调用play_and_get_digits App收集信息。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+27  ask_account_and_password(UUID) -&gt;<br/>
+<br/>
+28       send_lock_msg(UUID, set, "charge_state=WAIT_ACCOUNT"),<br/>
+<br/>
+29       send_lock_msg(UUID, play_and_get_digits,<br/>
+<br/>
+30            "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的账号，以井号结束' "<br/>
+<br/>
+31            ?ERROR_PROMPT " charge_account ^\\d{4}$"),<br/>
+<br/>
+32       send_lock_msg(UUID, set, "charge_state=WAIT_PASSWORD"),<br/>
+<br/>
+33       send_lock_msg(UUID, play_and_get_digits,<br/>
+<br/>
+34            "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的密码，以井号结束' "<br/>
+<br/>
+35            ?ERROR_PROMPT " charge_password ^\\d{4}$").<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">大部分业务逻辑都在process_event函数中实现的，当收到来自FreeSWITCH的消息时，便执行该函数。Erlang中的case语句类似C语言中的switch，因此在第41行使用case来判断收到的消息类型，我们比较关心CHANNEL_EXECUTE_COMPLETE（第42行），并且只有当满足第43行的条件时（当前状态为WAIT_PASSWORD并且当前的App为play_and_get_digits），我们才知道账号和密码已收集完毕。在第44和45行我们分别取到它们的值，然后在第46行调用check_account_password函数检查输入是否合法。如果输入无误（第47行），则向用户播放当前余额（第49行），并挂机（第51行）。否则，提示输入错误（第53行），然后在第54行重新调用ask_account_and_password询问用户名和密码（Erlang中没有goto语句，因而无法跳转，这也是我们把这一部分单独写成一个函数的原因）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+36  process_event(UUID, Event) -&gt;<br/>
+<br/>
+37       Name = proplists:get_value(&lt;&lt;"Event-Name"&gt;&gt;, Event),<br/>
+<br/>
+38       App = proplists:get_value(&lt;&lt;"Application"&gt;&gt;, Event),<br/>
+<br/>
+39       State = proplists:get_value(&lt;&lt;"variable_charge_state"&gt;&gt;, Event),<br/>
+<br/>
+40       io:format("Event: ~s, App: ~s State: ~s~n", [Name, App, State]),<br/>
+<br/>
+41       case Name of<br/>
+<br/>
+42            &lt;&lt;"CHANNEL_EXECUTE_COMPLETE"&gt;&gt; when<br/>
+<br/>
+43                 State =:= &lt;&lt;"WAIT_PASSWORD"&gt;&gt;, App =:= &lt;&lt;"play_and_get_digits"&gt;&gt; -&gt;<br/>
+<br/>
+44                 Account = proplists:get_value(&lt;&lt;"variable_charge_account"&gt;&gt;, Event),<br/>
+<br/>
+45                 Password = proplists:get_value(&lt;&lt;"variable_charge_password"&gt;&gt;, Event),<br/>
+<br/>
+46                 case check_account_password(Account, Password) of<br/>
+<br/>
+47                      true -&gt;<br/>
+<br/>
+48                           io:format("Account ~s Balance: 100~n", [Account]),<br/>
+<br/>
+49                           send_lock_msg(UUID, speak, "<br/>
+<br/>
+您的余额是100<br/>
+<br/>
+元"),<br/>
+<br/>
+50                           send_lock_msg(UUID, speak, "<br/>
+<br/>
+再见"),<br/>
+<br/>
+51                           send_lock_msg(UUID, hangup, "");<br/>
+<br/>
+52                      false -&gt;<br/>
+<br/>
+53                           send_lock_msg(UUID, speak, "<br/>
+<br/>
+账号密码错误"),<br/>
+<br/>
+54                           ask_account_and_password(UUID)<br/>
+<br/>
+55                 end,<br/>
+<br/>
+56                 loop();<br/>
+<br/>
+57            _ -&gt; ok<br/>
+<br/>
+58       end.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面的函数与C语言中的类似，只是语法不同而已，它会返回true或false。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+59  check_account_password(Account, Password) -&gt;<br/>
+<br/>
+60       Account =:= &lt;&lt;"1111"&gt;&gt; andalso Password =:= &lt;&lt;"1111"&gt;&gt;.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面几个函数都是与FreeSWITCH交互的消息，第62行为向FreeSWITCH节点发送一条消息，消息的内容主要在Headers参数中指定。读者可以在下面的代码中看到send_msg和send_lock_msg的不同。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+61  send_msg(UUID, Headers) -&gt;<br/>
+<br/>
+62       {sendmsg, ?FS_NODE} ! {sendmsg, binary_to_list(UUID), Headers}.<br/>
+<br/>
+63  send_msg(UUID, App, Arg) -&gt;<br/>
+<br/>
+64       send_msg(UUID, [<br/>
+<br/>
+65            {"call-command", "execute"},<br/>
+<br/>
+66            {"execute-app-name", atom_to_list(App)},<br/>
+<br/>
+67            {"execute-app-arg", Arg}<br/>
+<br/>
+68       ]).<br/>
+<br/>
+69  send_lock_msg(UUID, App, Arg) -&gt;<br/>
+<br/>
+70       send_msg(UUID, [<br/>
+<br/>
+71            {"call-command", "execute"},<br/>
+<br/>
+72            {"event-lock", "true"},<br/>
+<br/>
+73            {"execute-app-name", atom_to_list(App)},<br/>
+<br/>
+74            {"execute-app-arg", Arg}<br/>
+<br/>
+75       ]).<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在本例中，我们也是仅实现了空中充值服务中的查询部分。Erlang的代码看起来也很直观，而且我们没有依赖任何其他的库文件，完全是利用纯粹的Erlang消息与FreeSWITCH通信。将上述代码存为echarge.erl，然后在Makefile中加入如下配置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+echarge: echarge.erl<br/>
+<br/>
+    erlc echarge.erl<br/>
+<br/>
+echarge-run:<br/>
+<br/>
+    erl -PA . -setcookie ClueCon -sname test@localhost<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后执行make echarge就可以编译该文件了。编译完毕后，将产生echarge.beam文件。Erlang的概念跟Java相似，它也是在一个虚拟机上运行的，这里编译生成的.beam文件相当于Java的.class文件，也是跨平台的。</p>
+<p height="1em" width="2em">然后，使用make echarge-run启动一个Erlang节点，该节点的名字是test@localhost，以便FreeSWITCH能够在Dialplan中连接到它。用电话呼叫7777，部分日志如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ make echarge-run<br/>
+<br/>
+erl -PA . -setcookie ClueCon -sname test@localhost<br/>
+<br/>
+Erlang R15B01 (erts-5.9.1) [source] [64-bit] [smp:8:8]...<br/>
+<br/>
+Eshell V5.9.1  (abort with ^G)<br/>
+<br/>
+(test@localhost)1&gt; New call 4acb4e76-a7da-4b1b-bde0-0cc6921b4b77<br/>
+<br/>
+Event: CHANNEL_PARK, App: undefined State: undefined<br/>
+<br/>
+Event: CHANNEL_EXECUTE_COMPLETE, App: answer State: undefined<br/>
+<br/>
+Event: CHANNEL_EXECUTE_COMPLETE, App: set State: WAIT_ACCOUNT<br/>
+<br/>
+Event: CHANNEL_EXECUTE_COMPLETE, App: set State: WAIT_PASSWORD<br/>
+<br/>
+Event: CHANNEL_HANGUP_COMPLETE, App: undefined State: WAIT_PASSWORD<br/>
+<br/>
+Call hangup<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.6.4　用Erlang状态机实现空中充值服务</font>
+</font>
+</p>
+<p height="1em" width="2em">在上一节，我们使用了Erlang原始的消息收发机制控制FreeSWITCH。在实际的Erlang使用中，大部都是都使用OTP（Open Telecom Platform，开放电信平台）框架进行开发的。OTP框架定义了一些标准的通用开发框架，使得Erlang项目开发更标准，也更简单。gen_fsm就是其中的一个有限状态机（Finite State Machine）的实现。在本质上，IVR服务最适合使用状态机实现，因为业务流程本来就是在各种不同状态中迁移的。</p>
+<p height="1em" width="2em">下面我们就来看一看如何利用gen_fsm使我们的空中充值服务的代码看起来更优雅。由于使用了Erlang标准的状态机，因此我们不再依赖于在FreeSWITCH中绑定通道变量的状态机实现，而且我们也不再使用send_lock_msg之类的阻塞执行过程，而是让所有过程都是异步的。下面你会看到这一节在Erlang中实现起来是多么的简单和优雅。</p>
+<p height="1em" width="2em">首先，我们将服务命名为fsmcharge。代码第2行导出gen_fsm标准的函数。第3行导出所有的状态函数。我们还在第7行定义了一个LOG宏，用于输出带有行号的日志。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01   -module('fsmcharge').<br/>
+<br/>
+02  -export([start/1, init/1, handle_info/3, terminate/3]).<br/>
+<br/>
+03  -export([welcome/2, wait_account/2, wait_password/2,<br/>
+<br/>
+04      wait_play_balance/2, wait_play_goodbye/2, wait_hangup/2]).<br/>
+<br/>
+05  -define(FS_NODE, 'freeswitch@localhost').<br/>
+<br/>
+06  -define(ERROR_PROMPT, "say:<br/>
+<br/>
+输入错误，请重新输入").<br/>
+<br/>
+07  -define(LOG(Fmt, Args), io:format("~b: " ++ Fmt ++ "~n", [?LINE | Args])).<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面我们定义一条记录（Erlang中的Record），其中fsnode为FreeSWITCH的节点的名称，其他的字符也都很直观了，不多解释。这些字段本身没什么用，我们实现该框架是为了方便以后扩充。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+08  -record(state, {<br/>
+<br/>
+09      fsnode           :: atom(),                 % FreeSWITCH node name<br/>
+<br/>
+10      uuid             :: undefined | binary(),    % Channel uuid<br/>
+<br/>
+11      cid_name         :: undefined | binary(),    % Caller id name<br/>
+<br/>
+12      cid_number       :: undefined | binary()     % Caller id number<br/>
+<br/>
+13  }).<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第14行指出是在start函数中。在第15行调用了gen_fsm:start()产生了一个新进的gen_fsm进程，它将在新进程中回调第17行的init函数，可以在这里面进行一些初始化工作。init函数的返回值在第19行，其中第1个值ok表示初始化成功；第2个值welcome表示下一个状态，如果后续收到消息，则调用welcome函数；第3个值State是一个内部状态变量，用于记录一些东西，在此，我们只是记住了FreeSWITCH的节点名（第18行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+14  start(Ref) -&gt;<br/>
+<br/>
+15      {ok, NewPid} = gen_fsm:start(?MODULE, [], []),<br/>
+<br/>
+16      {Ref, NewPid}.<br/>
+<br/>
+17  init([]) -&gt;<br/>
+<br/>
+18      State = #state{fsnode = ?FS_NODE},<br/>
+<br/>
+19      {ok, welcome, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当第一个消息到来时，将回调welcome函数。第一个消息的格式如第21行粗体字部分所示。该在函数中，我们在第22～23行取出主叫的名称和号码，第24行写一条日志，然后应答，设置TTS参数等。在第28行发出播放欢迎词的消息后，即返回第29行的值。其中，第29行的第一个参数为next_state，它指定下一个状态；下一个状态的值在第2个参数中，还是welcome；第3个参数（在第30行）中的内部状态变量被更新了，填入了当前的主叫用户名称和号码。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+20  %% The state machine<br/>
+<br/>
+21  welcome({call, _Name, UUID, Event}, State) -&gt;<br/>
+<br/>
+22      CidName = proplists:get_value(&lt;&lt;"Caller-Caller-ID-Name"&gt;&gt;, Event),<br/>
+<br/>
+23      CidNumber = proplists:get_value(&lt;&lt;"Caller-Caller-ID-Number"&gt;&gt;, Event),<br/>
+<br/>
+24      ?LOG("New Call \"~s\" &lt;~s&gt;", [CidName, CidNumber]),<br/>
+<br/>
+25      send_msg(UUID, answer, ""),<br/>
+<br/>
+26      send_msg(UUID, set, "tts_engine=tts_commandline"),<br/>
+<br/>
+27      send_msg(UUID, set, "tts_voice=Ting-Ting"),<br/>
+<br/>
+28      send_msg(UUID, speak, "<br/>
+<br/>
+您好，欢迎使用空中充值服务"),<br/>
+<br/>
+29      {next_state, welcome,<br/>
+<br/>
+30          State#state{uuid=UUID, cid_name=CidName, cid_number=CidNumber}};<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当有后续的消息到来时，都将会继续回调welcome，但消息格式永远不会匹配到第21行。如果到来的消息匹配到第31行，那么说明有一个App执行完了。我们接着在第32行进行判断，如果完成的App是speak（第33行），则说明欢迎语已播放完毕，我们立即发送play_and_get_digits App以提示用户输入账号（第34行），这次我们的返回值在第37行，它的第2个参数变为wait_account，即以后不管收到什么消息都会回调wait_account函数（也就是说我们进入了下一个状态）。另外，第41行会匹配任何消息，它的意思是，如果在这过程中收到的消息与第21和第31行都不匹配，就执行该行，它什么也不做，返回的下一个状态与当前状态相同，即不发生任何状态转换。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+31  welcome({call_event, &lt;&lt;"CHANNEL_EXECUTE_COMPLETE"&gt;&gt;, UUID, Event}, State) -&gt;<br/>
+<br/>
+32      case proplists:get_value(&lt;&lt;"Application"&gt;&gt;, Event) of<br/>
+<br/>
+33          &lt;&lt;"speak"&gt;&gt; -&gt;<br/>
+<br/>
+34              send_msg(UUID, play_and_get_digits,<br/>
+<br/>
+35                  "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的账号，以井号结束' "<br/>
+<br/>
+36                  ?ERROR_PROMPT " charge_account ^\\d{4}$"),<br/>
+<br/>
+37              {next_state, wait_account, State};<br/>
+<br/>
+38          _ -&gt;<br/>
+<br/>
+39              {next_state, welcome, State}<br/>
+<br/>
+40      end;<br/>
+<br/>
+41  welcome(_Any, State) -&gt; {next_state, welcome, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在wait_account状态下，我们仅会收到一个CHANNEL_EXECUTE_COMPLETE消息(第42行），就是第34行的执行结果，说明第34行的App已执行完毕，因而不需要再深入地去判断事件中的Application的值了，只需要继续发送下一个命令询问密码（第43行），并将下一个状态设为wait_password（第46行）。第47行的意思是不管收到任何不期望的事件，都不会发生状态转换。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+42  wait_account({call_event, &lt;&lt;"CHANNEL_EXECUTE_COMPLETE"&gt;&gt;, UUID, _Event}, State) -&gt;<br/>
+<br/>
+43      send_msg(UUID, play_and_get_digits,<br/>
+<br/>
+44          "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的密码，以井号结束' "<br/>
+<br/>
+45          ?ERROR_PROMPT " charge_password ^\\d{4}$"),<br/>
+<br/>
+46      {next_state, wait_password, State};<br/>
+<br/>
+47  wait_account(_Any, State) -&gt; {next_state, wait_account, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当用户输入密码完毕后，我们又收到一个CHANNEL_EXECUTE_COMPLETE，程序执行到第48行。此时，我们便可以在第51行检查账号和密码的有效性了。如果用户输入错误（第56行，注意这里我们先说错误的情况），则播放错误提示（第57行），然后将下一个状态变为welcome，下一次收到事件时将回到我们最开始的welcome状态，并回调welcome函数。</p>
+<p height="1em" width="2em">如果用户输入正确，则在第54行播放余额，并进入下一个状态wait_play_balance（第55行）等待播放完成。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+48  wait_password({call_event, &lt;&lt;"CHANNEL_EXECUTE_COMPLETE"&gt;&gt;, UUID, Event}, State) -&gt;<br/>
+<br/>
+49      Account = proplists:get_value(&lt;&lt;"variable_charge_account"&gt;&gt;, Event),<br/>
+<br/>
+50      Password = proplists:get_value(&lt;&lt;"variable_charge_password"&gt;&gt;, Event),<br/>
+<br/>
+51      case check_account_password(Account, Password) of<br/>
+<br/>
+52          true -&gt;<br/>
+<br/>
+53              ?LOG("Account: ~s, Balance: 100", [Account]),<br/>
+<br/>
+54              send_msg(UUID, speak, "<br/>
+<br/>
+您的余额是100<br/>
+<br/>
+元"),<br/>
+<br/>
+55              {next_state, wait_play_balance, State};<br/>
+<br/>
+56          false -&gt;<br/>
+<br/>
+57              send_msg(UUID, speak, "<br/>
+<br/>
+账号密码错误"),<br/>
+<br/>
+58              {next_state, welcome, State}<br/>
+<br/>
+59      end;<br/>
+<br/>
+60  wait_password(_Any, State) -&gt; {next_state, wait_password, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">余额播放完毕后，回调第61行的函数，继续在第62行播放“再见”，并进入下一个状态wait_play_goodbye。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+61  wait_play_balance({call_event, &lt;&lt;"CHANNEL_EXECUTE_COMPLETE"&gt;&gt;, UUID, _Event}, State) -&gt;<br/>
+<br/>
+62      send_msg(UUID, speak, "<br/>
+<br/>
+再见"),<br/>
+<br/>
+63      {next_state, wait_play_goodbye, State};<br/>
+<br/>
+64  wait_play_balance(_Any, State) -&gt; {next_state, wait_play_balance, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当“再见”也播放完成后，我们的程序会执行到第65行，这时没有其他事情要做了，我们便于第66行发送hangup命令通知FreeSWITCH挂机。为了记录一些信息，我们并没有立即退出进程，而是继续将状态转移到下一个状态wait_hangup等待挂机消息（第67行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+65  wait_play_goodbye({call_event, &lt;&lt;"CHANNEL_EXECUTE_COMPLETE"&gt;&gt;, UUID, _Event}, State) -&gt;<br/>
+<br/>
+66      send_msg(UUID, hangup, ""),<br/>
+<br/>
+67      {next_state, wait_hangup, State};<br/>
+<br/>
+68  wait_play_goodbye(_Any, State) -&gt; {next_state, wait_play_goodbye, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当收到CHANNEL_HANGUP_COMPLETE，表示电话已经释放完成了。我们可以从该事件中取到呼叫时长（Duration）和计费时长（Billsec）等信息（第70～71行），打印出来（第72行）或（以后）写入数据库。当然，到此为止我们真的没有什么要留恋的了，因而这次的返回值中（第73行）第一个字段是stop，表示不再进行状态转移了，而是要结束本进程。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+69  wait_hangup({call_event, &lt;&lt;"CHANNEL_HANGUP_COMPLETE"&gt;&gt;, _UUID, Event}, <br/>
+<br/>
+      State) -&gt;<br/>
+<br/>
+70      Duration = proplists:get_value(&lt;&lt;"variable_duration"&gt;&gt;, Event),<br/>
+<br/>
+71      Billsec = proplists:get_value(&lt;&lt;"variable_billsec"&gt;&gt;, Event),<br/>
+<br/>
+72      ?LOG("Call Ended, Duration: ~s Billsec: ~s", [Duration, Billsec]),<br/>
+<br/>
+73      {stop, normal, State};<br/>
+<br/>
+74  wait_hangup(_Any, State) -&gt;<br/>
+<br/>
+75      {next_state, wait_hangup, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">理论上讲不会执行到第76行，因为call_hangup消息是在CHANNEL_HANGUP_COMPLETE事件之后才发出发出的，而我们的进程已经终止了。但是，万一出现事件丢失的情况，多了这一层保障也是好的，我们还是会返回stop（第77行）。</p>
+<p height="1em" width="2em">注意，这里的call_hangup消息是在handle_info函数中收到的。在OTP中，一般来说所有原始的Erlang消息都是在handle_info函数中处理的。我们与FreeSWITCH之间是节点互联的关系，FreeSWITCH并不知道我们使用的是OTP框架，仍然给我们发送原始的Erlang消息。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+76  handle_info(call_hangup, _StateName, State) -&gt;<br/>
+<br/>
+77      {stop, normal, State};<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">所以，第78行就是FreeSWITCH发过来的所有消息的入口（除call_hangup之外）。在这里，我们收到消息后，取出事件的名字EventName（第79行），并重新组合成一个新的消息（第81行，我们把EventName放到消息中有助于在函数级别进行匹配），作为参数回调当前的状态函数（StateName）。</p>
+<p height="1em" width="2em">当然，第81行的实现属于一种取巧的方法。实际上真正的gen_fsm习惯是不使用第81行（可以注释掉），而使用第82行的gen_fsm:send_event函数再向自己（self）发送一次消息，并于第83行返回下一个状态（即当前的状态不做任何变化），让gen_fsm机制去回调当前的状态函数。当然，那样的话会多一次消息收发的过程，不是很高效，因此我们把第82行和第83行注释掉了 <sup>
+<small>
+<a href="text00166.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+78  handle_info({EventType, {event, [UUID | Event]}}, StateName, State) -&gt;<br/>
+<br/>
+79      EventName = proplists:get_value(&lt;&lt;"Event-Name"&gt;&gt;, Event),<br/>
+<br/>
+80      ?LOG("State: ~s Event: ~s", [StateName, EventName]),<br/>
+<br/>
+81      StateName({EventType, EventName, UUID, Event}, State);<br/>
+<br/>
+82      % gen_fsm:send_event(self(), {EventType, EventName, UUID, Event}),<br/>
+<br/>
+83      % {next_state, StateName, State};<br/>
+<br/>
+84  handle_info(_Any, StateName, State) -&gt;<br/>
+<br/>
+85      {next_state, StateName, State}.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">最后，将进程终止时，还是有机会进行回调清理一个现场的。如果进程正确终止，则回调第86行的函数；否则将回调第87或第91行的函数。如果是回调第87行，则说明进程是异常终止的（可以从_Reason参数中取得异常原因），这时最好是通知FreeSWITCH端挂机（第89行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+86  terminate(normal, _StateName, _State) -&gt; ok;<br/>
+<br/>
+87  terminate(_Reason, _StateName, #state{uuid = UUID}) when UUID =/= undefined -&gt;<br/>
+<br/>
+88      % do some clean up here<br/>
+<br/>
+89      send_msg(UUID, hangup, ""),<br/>
+<br/>
+90      ok<br/>
+<br/>
+；<br/>
+<br/>
+91  terminate(_Reason, _StateName, #state{uuid = UUID}) -&gt; ok;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其他的函数跟上一节讲过的一样，为了完整起见我们也列在这里。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+92  check_account_password(Account, Password) -&gt;<br/>
+<br/>
+93       Account =:= &lt;&lt;"1111"&gt;&gt; andalso Password =:= &lt;&lt;"1111"&gt;&gt;.<br/>
+<br/>
+94  send_msg(UUID, Headers) when is_list(Headers) -&gt;<br/>
+<br/>
+95       {sendmsg, ?FS_NODE} ! {sendmsg, binary_to_list(UUID), Headers}.<br/>
+<br/>
+96  send_msg(UUID, App, Arg) -&gt;<br/>
+<br/>
+97       send_msg(UUID, [<br/>
+<br/>
+98            {"call-command", "execute"},<br/>
+<br/>
+99            {"execute-app-name", atom_to_list(App)},<br/>
+<br/>
+100           {"execute-app-arg", Arg}<br/>
+<br/>
+101      ]).<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是该程序的执行日志（有删节，并手工调整了行号）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ make fsmcharge-run<br/>
+<br/>
+erl -PA . -setcookie ClueCon -sname test@localhost<br/>
+<br/>
+Erlang R15B01 (erts-5.9.1) [source] [64-bit] [smp:8:8] ...<br/>
+<br/>
+Eshell V5.9.1  (abort with ^G)<br/>
+<br/>
+(test@localhost)1&gt;<br/>
+<br/>
+80: State: welcome Event: CHANNEL_DATA<br/>
+<br/>
+24: New Call "1006" &lt;1006&gt;<br/>
+<br/>
+80: State: welcome Event: CHANNEL_PARK<br/>
+<br/>
+80: State: welcome Event: CHANNEL_EXECUTE_COMPLETE<br/>
+<br/>
+80: State: wait_account Event: CHANNEL_EXECUTE<br/>
+<br/>
+80: State: wait_account Event: CHANNEL_EXECUTE_COMPLETE<br/>
+<br/>
+80: State: wait_password Event: CHANNEL_EXECUTE<br/>
+<br/>
+80: State: wait_password Event: DTMF<br/>
+<br/>
+80: State: wait_password Event: CHANNEL_EXECUTE_COMPLETE<br/>
+<br/>
+66: Account: 1111, Balance: 100<br/>
+<br/>
+80: State: wait_hangup Event: CHANNEL_HANGUP_COMPLETE<br/>
+<br/>
+72: Call Ended, Duration: 17 Billsec: 17<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在本节的例子中，我们采用了完全的状态机实现了IVR应用。虽然代码有点长，但Erlang的状态机实现得很优雅，代码看起来很清晰，而在前面的例子中，如果if…else之类的判断多了，就会感觉很乱。这种状态机在其他语言中应该也不难实现。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.6.5　其他</font>
+</font>
+</p>
+<p height="1em" width="2em">在上面的例子中，我们都使用了Outbound模式的Erlang连接。其实，该模块也支持Inbound模式。</p>
+<p height="1em" width="2em">使用Inbound模式连接FreeSWITCH很简单，首先我们启动一个Erlang节点。下列命令实现的就是启动一个Erlang节点并进入一个Erlang Shell等待我们输入命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ erl -setcookie ClueCon -sname test@localhost<br/>
+<br/>
+Erlang R15B01 (erts-5.9.1) [source] [64-bit] [smp:8:8] ...<br/>
+<br/>
+Eshell V5.9.1  (abort with ^G)<br/>
+<br/>
+(test@localhost)1&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接着输入给FreeSWITCH节点发送一个register_event_handler消息通知FreeSWITCH我们想在当前进程（Erlang Shell进程）中收取事件：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+(test@localhost)2&gt; {event, 'freeswitch@localhost'} ! register_event_handler.<br/>
+<br/>
+register_event_handler<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这时在FreeSWITCH控制台上便能看到类似如下的Debug日志，提示有一个客户端节点test@localhost连接上来了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[DEBUG] mod_erlang_event.c:2022 Launching listener, connection from node test@localhost, ip 127.0.0.1<br/>
+<br/>
+[DEBUG] mod_erlang_event.c:1031 Connection Open from 127.0.0.1<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，我们再向其发送{event,all}消息订阅全部的事件：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+(test@localhost)3&gt; {event, 'freeswitch@localhost'} ! {event, all}.<br/>
+<br/>
+{event, all}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">FreeSWITCH端的日志如下（这说明日志订阅成功了）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[DEBUG] handle_msg.c:301 ALL events enabled<br/>
+<br/>
+[DEBUG] handle_msg.c:314 enable event all<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，在我们的Erlang节点上的Shell中输入“flush().”并按回车，就可以看到当前Shell收到的所有事件了，具体代码如下。其中，最初的两个“ok”消息是对我们上面发的两条消息的回复，如果这时候FreeSWITCH中产生了事件，我们也会一起看到。FreeSWITCH每20秒产生一次Heartbeat事件，因此笔者恰好收到了一次（下面只显示了一部分）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+(test@localhost)7&gt; flush().<br/>
+<br/>
+Shell got ok<br/>
+<br/>
+Shell got ok<br/>
+<br/>
+Shell got {event,[undefined,<br/>
+<br/>
+          {&lt;&lt;"Event-Name"&gt;&gt;,&lt;&lt;"HEARTBEAT"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"Core-UUID"&gt;&gt;,&lt;&lt;"238c20ac-54fb-4312-a6b4-8819fb8a10ac"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"FreeSWITCH-Hostname"&gt;&gt;,&lt;&lt;"seven.local"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"FreeSWITCH-Switchname"&gt;&gt;,&lt;&lt;"seven.local"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"FreeSWITCH-IPv4"&gt;&gt;,&lt;&lt;"192.168.7.6"&gt;&gt;},<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果有时间，可以多打几次“flush().”试试，应该能一直不停地收到新的事件。</p>
+<p height="1em" width="2em">当然，我们也可以直接向FreeSWITCH发送一个API命令，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+(test@localhost)3&gt; {api, 'freeswitch@localhost'} ! {api, version, ""}.<br/>
+<br/>
+{api,version,[]}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">再次输入“flush().”将会看到以下结果。可以看出，FreeSWITCH除了返回version命令的结果外，还产生了一个API事件。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+(test@localhost)4&gt; flush().<br/>
+<br/>
+Shell got {ok,&lt;&lt;"FreeSWITCH Version 1.5.8b+git~20131201T102929Z~558e484f05~64bit<br/>
+<br/>
+(git 558e484 2013-12-01 10:29:29Z 64bit)\n"&gt;&gt;}<br/>
+<br/>
+Shell got {event,[undefined,<br/>
+<br/>
+          {&lt;&lt;"Event-Name"&gt;&gt;,&lt;&lt;"API"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"Core-UUID"&gt;&gt;,&lt;&lt;"238c20ac-54fb-4312-a6b4-8819fb8a10ac"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"FreeSWITCH-Hostname"&gt;&gt;,&lt;&lt;"seven.local"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"FreeSWITCH-Switchname"&gt;&gt;,&lt;&lt;"seven.local"&gt;&gt;},<br/>
+<br/>
+          {&lt;&lt;"FreeSWITCH-IPv4"&gt;&gt;,&lt;&lt;"192.168.7.6"&gt;&gt;},<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，上面是mod_erlang_event模块使用的原始消息格式。在该模块的源代码中，附带了一个freeswitch.erl文件，它包装了一些有用的函数，使用起来就方便多了。作为练习，我们可以将它复制到当前的目录，用以下命令编译它：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ erlc freeswitch.erl<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">编译完成后将在当前目录下生成freeswitch.beam，使用如下命令可以启动一个新的Erlang节点，并加载当前目录（由参数“-pa.”指定）下所有的beam文件：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ erl -pa . -setcookie ClueCon -sname test@localhost<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，就可以直接使用freeswitch:api()进行API命令调用了，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+(test@localhost)1&gt; freeswitch:api('freeswitch@localhost', version, "").<br/>
+<br/>
+{ok,&lt;&lt;"FreeSWITCH Version 1.5.8b+git~20131201T102929Z~558e484f05~64bit<br/>
+<br/>
+(git 558e484 2013-12-01 10:29:29Z 64bit)\n"&gt;&gt;}<br/>
+<br/>
+(test@localhost)2&gt; freeswitch:api('freeswitch@localhost', show, "channels").<br/>
+<br/>
+{ok,&lt;&lt;"\n0 total.\n"&gt;&gt;}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">更多的使用方法我们就不多解释了，读者可以自行参考一下freeswitch.erl文件中的注释以及该模块的Wiki页面：http://wiki.freeswitch.org/wiki/Mod_erlang_event。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00165.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 参见http://www.erlang.org。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00165.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://www.erlang.org/course/history.html。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00165.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 即Hidden Node，它是一个标准的节点，但别的节点看不见它（形象一点的比喻，严格来说如果使劲看也能看得见），如果别的节点知道它的名字，则可以跟它通信。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00166.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 这一点初学者不需要过多深入研究，知道这一点以后就应该对OTP完全了解了。而且，笔者在生产环境中使用的是自己修改过的gen_fsfsm，这从根本上避免了多一次的消息发送，同时又符合OTP的使用习惯。</p>
+</body>
+</html>

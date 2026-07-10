@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_422"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2102347" class="calibre7"></a>10.7.2 NFS Access Problems </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2102505" class="calibre15"></a>Another problem that can arise with SSH and NFS is one of access rights. With the public-key or hostbased methods, if the per-user control files are in the usual place, <span><em class="italic">sshd</em></span> must read the target account's home directory in order to perform authentication. When that directory is on the same machine as <span><em class="italic">sshd</em></span>, this isn't a problem. <span><em class="italic">sshd</em></span> runs as root, and therefore has access to all files. However, if the directory is mounted from elsewhere via NFS, <span><em class="italic">sshd</em></span> might not have access to the directory. NFS is commonly configured so that the special access privileges accorded the root account don't extend to remote filesystems. </p>
+<p class="calibre4">Now, this isn't a truly serious restriction. Since one of the root privileges is the ability to create a process with any uid, root can simply "become" the right user, and access the remote directory. Current versions of Tectia and OpenSSH handle this correctly, but you might run into older versions that do not. You can work around the problem, but to do so you must make your <em class="italic">authorized_keys</em> file world-readable; the only way to let root read it remotely is to let everyone read it. This isn't too objectionable. The <em class="italic">authorized_keys</em> file contains no secrets; though you might prefer not to reveal which keys allow access to your account, thus advertising which keys to steal. However, to grant this access, you must make your home directory and <em class="italic">~/.ssh</em> world-searchable (that is, permissions at least 711). This doesn't allow other users to steal the contents, but it does allow them to guess at filenames and have those guesses verified. It also means that you must be careful about permissions on your files, since the top-level permissions on your directory don't prevent access by others. </p>
+<p class="calibre4">All this may be entirely unacceptable or no problem at all; it depends on your attitude toward your files and the other users on the machines where your home directory is accessible. </p>
+</div>
+</body>
+</html>

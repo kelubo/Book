@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos327020" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_110"><span class="calibre2"><a shape="rect" class="calibre7"></a>Inside SSH-2 </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos327365" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos327404" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos327443" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos327482" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos327521" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos327560" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos327599" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos327638" class="calibre15"></a>The SSH protocol has two major, incompatible versions, called Version 1<sup class="calibre20">[<a id="filepos327774" shape="rect" href="DB_split_077.html#filepos420138" class="calibre6">14</a>]</sup> and Version 2. <a shape="rect" href="DB_split_028.html#filepos164645" class="calibre6">[1.5]</a> We refer to these as SSH-1 and SSH-2. The SSH-1 protocol is now a relic; it is less flexible than SSH-2, has unfixable security weaknesses, and has been deprecated for years. Its implementations see no real development aside from bug fixes, and the default protocol for most SSH software has been SSH-2 for some time now. In this chapter, as we describe "the SSH protocol," we are talking about SSH-2. We limit our treatment of SSH-1 to a summary of its design, its differences with SSH-2, and its weaknesses. </p>
+<p class="calibre4">The SSH protocol is actually divided into four major pieces, formally described as four separate protocols in different IETF documents, and in principle independent of one another. In practice, they are layered together to provide the set of services most users associate with SSH as a whole. These are: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">SSH Transport Layer Protocol (SSH-TRANS)</li>
+<li class="calibre18">SSH Authentication Protocol (SSH-AUTH)</li>
+<li class="calibre18">SSH Connection Protocol (SSH-CONN)</li>
+<li class="calibre18">SSH File Transfer Protocol (SSH-SFTP)</li>
+</ul></div>
+<p class="calibre4">There are other documents that describe other aspects of, or extensions to, the protocols, but the preceding ones represent the core of SSH. As of this writing, these documents are still "Internet-Drafts," but after much effort by the IETF SECSH working group, they have been submitted to the IESG for consideration as proposed standards and may soon be published as Internet RFCs. </p>
+<p class="calibre4"><a shape="rect" href="#filepos330097" class="calibre6">Figure 3-2</a> outlines the division of labor between these protocols, and how they relate to each other, application programs, and the network. Elements in italics are protocol extensions defined in separate Internet-Draft documents, which have attained fairly widespread use. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos330097" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SSH-2 protocol family" src="images/00011.jpg" class="calibre53"/></div>
+</div>
+</span><p class="calibre4">Figure 3-2. SSH-2 protocol family</p></div>
+<p class="calibre4">SSH is designed to be modular and extensible. All of the core protocols define abstract services they provide and requirements they must meet, but allow multiple mechanisms for doing so, as well as a way of easily adding new mechanisms. All the critical parameters of an SSH connection are negotiable, including the methods and algorithms used in: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Session key exchange</li>
+<li class="calibre18">Server authentication</li>
+<li class="calibre18">Data privacy and integrity</li>
+<li class="calibre18">User authentication</li>
+<li class="calibre18">Data compression</li>
+</ul></div>
+<p class="calibre4">Client and server negotiate the use of a common set of methods, allowing broad interoperability among different implementations. In most categories, the protocol defines at least one <span><em class="italic">required</em></span> method, to further promote interoperability. Note that this only means a conforming implementation is required to support the method in its code; any particular method may in fact be turned off by the administrator in a particular environment. So, the fact that public-key authentication is required by SSH-AUTH<a shape="rect" class="calibre15"></a><a id="filepos331833" class="calibre15"></a> doesn't mean it's always available to clients from any particular running SSH server; it merely means it must be available and <span><em class="italic">could</em></span> be turned on, if need be. </p>
+</div>  </body>
+</html>

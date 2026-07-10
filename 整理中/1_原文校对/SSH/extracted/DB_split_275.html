@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_358"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1832510" class="calibre7"></a>8.2.6 Setting Idle Timeout </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1832668" class="calibre15"></a>Tectia's <code class="calibre35">idle-timeout</code> option tells the SSH server to disconnect a session that has been idle for a certain time limit. This is just like Tectia's <code class="calibre35">IdleTimeout</code> keyword for serverwide configuration but is set by you within your account, instead of by the system administrator. <a shape="rect" href="DB_split_148.html#filepos851609" class="calibre6">[5.3.3.5]</a></p>
+<p class="calibre4">Suppose you let your friend Jamie access your account by SSH. Jamie works in an untrusted environment, however, and you are worried that he might walk away from his computer while connected to your account, and someone else might come by and use his session. One way to reduce the risk is to set an <span><em class="italic">idle timeout</em></span> on Jamie's key, automatically disconnecting the SSH session after a given period of idle time. If the client stops sending output for a while, Jamie has probably walked away, and the session is terminated. </p>
+<p class="calibre4">Timeouts are set with the <code class="calibre35">idle-timeout</code> option. For example, to set the idle timeout to 60 seconds: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Key mykey.pub<br class="calibre19"/>    Options idle-timeout=60s</tt></div></span><p class="calibre4"><code class="calibre35">idle-timeout</code> uses the same notation for time as the <code class="calibre35">IdleTimeout</code> server keyword. <a shape="rect" href="DB_split_148.html#filepos851609" class="calibre6">[5.3.3.5]</a> It also <span><em class="italic">overrides</em></span> any serverwide value set with the <code class="calibre35">IdleTimeout</code> keyword. For example, if the serverwide idle timeout is five minutes: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    IdleTimeout 5m</tt></div></span><p class="calibre4">but your <em class="italic">authorization</em> file sets it to 10 minutes for your account: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Key mykey.pub<br class="calibre19"/>    Options idle-timeout=10m</tt></div></span><p class="calibre4">then any connection using this key has an idle timeout of 10 minutes, regardless of the serverwide setting. </p>
+<p class="calibre4">This feature has more uses than disconnecting absent typists. Suppose you're using an SSH key for an automated process, such as backups. An idle timeout value kills the process automatically if it hangs due to an error. </p>
+</div>
+</body>
+</html>

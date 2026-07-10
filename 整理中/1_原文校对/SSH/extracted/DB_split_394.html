@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2660012" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_515"><span class="calibre2"><a shape="rect" class="calibre7"></a>Using the SSH Clients </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2660366" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2660405" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2660444" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2660483" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2660522" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2660561" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2660600" class="calibre15"></a>The client programs <span><em class="italic">ssh</em></span>, <span><em class="italic">scp</em></span>, and <span><em class="italic">sftp</em></span> work just as they do on Unix: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Log into server.example.com as user smith<br class="calibre19"/>    $ ssh -l smith server.example.com<br class="calibre19"/><br class="calibre19"/>    # Copy myfile from your local machine to server.example.com<br class="calibre19"/>    $ scp myfile server.example.com:<br class="calibre19"/><br class="calibre19"/>    # Run an interactive file-copy session with sftp<br class="calibre19"/>    $ sftp server.example.com</tt></div></span><p class="calibre4">The only bit of trickiness is locating your <em class="italic">~/.ssh</em> directory via Windows. On Unix platforms, your home directory is located in an obvious place, usually <em class="italic">/home/</em>
+<em class="italic"><code class="calibre35">yourname</code></em>. And in fact, if you run a Cygwin shell, you can literally refer to <em class="italic">/home/</em>
+<em class="italic"><code class="calibre35">yourname</code></em> as well. But what if you're using a standard Windows command shell (e.g., <span><em class="italic">cmd</em></span>) or browsing files with Windows Explorer: how can you find your <em class="italic">~/.ssh</em> directory? Simply type this command from a Windows command shell: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; cygpath -w ~<br class="calibre19"/>    C:\cygwin\home\smith</tt></div></span><p class="calibre4">The <span><em class="italic">cygpath</em></span> command converts Cygwin paths into Windows paths, and the lone tilde (<span>~</span>) represents your Cygwin home directory. In this example, <span><em class="italic">cygpath</em></span> reveals your home directory to be <em class="italic">C:\cygwin\home\smith</em>. Thus, your SSH-related client files will be stored in the directory <em class="italic">C:\cygwin\home\smith\.ssh</em>. </p>
+</div>  <div class="mbppagebreak" id="calibre_pb_516"></div></body>
+</html>
