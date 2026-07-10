@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">第18章　Event Socket</font>
+</font>
+</p>
+<p height="1em" width="2em">与Lua之类的嵌入式语言不同，通过Event Socket方式，可以使用运行在FreeSWITCH外部的程序控制FreeSWITCH。Event Socket是操控FreeSWITCH的“瑞士军刀”。它可以通过Socket方式使用FreeSWITCH提供的所有的App程序和API命令。由于绝大多数程序语言都支持Socket，因而它几乎可以跟任何语言开发的程序通信，也就是说，它几乎可以跟任何系统进行集成。</p>
+<p height="1em" width="2em">另外，使用Event Socket的一点好处是，它避免了开源许可证的兼容性问题。开源许可证种类繁多，各有特点，如有的对开放源代码要求高些，有的对商业应用限制少些。FreeSWITCH使用MPL 1.1许可证发布，而有些开源许可证（典型的如GPL）与它是不兼容的，因而，如果FreeSWITCH与其他软件或库混合编译就可能遇到许可证兼容方面的问题。通过使用Event Socket与其他系统对接，其他任何许可证的软件或系统都是以独立的程序存在的，这样就避免了潜在的许可证兼容问题。</p>
+<p height="1em" width="2em">FreeSWITCH使用SWIG <sup>
+<small>
+<a href="text00154.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 来支持多语言。简单来讲，FreeSWITCH用C语言写了一些库函数，通过SWIG包封装成其他语言接口。现在已知FreeSWITCH支持的语言有C、Perl、PHP、Python、Ruby、Lua、Java、Tcl，以及由Managed支持的.Net平台语言如C#、VB.NET等。</p>
+<p height="1em" width="2em">其实，Event Socket并没有提供什么新的功能，只是提供了一个开发接口，所有的通道处理及媒体控制都是由FreeSWITCH内部提供的App和API来完成的。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00154.html">
+<font color="#FF6600">[1]</font>
+</a>
+ Simplified Wrapper and Interface Generator，即简单包装及接口生成器，用于帮助使用C或C++语言写的程序生成其他高级语言的接口。参见：http://www.swig.org/。</p>
+</body>
+</html>

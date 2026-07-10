@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.4　用Inbound模式实现IVR</font>
+</font>
+</p>
+<p height="1em" width="2em">上面讲到的例子大都是基于Outbound模式的，实际上Inbound模式也能完成同样的事情。下面我们仍以空中充值服务为例，来讲一下如何使用Inbound模式。这一次，我们把程序命名为icharge。</p>
+<p height="1em" width="2em">与Outbound模式不同，Inbound模式只跟FreeSWITCH建立一个Socket连接，即使有多路电话进来，所有的事件和控制命令也共享同一个Socket连接。当我们的服务程序接收到事件后，可以启用单线程处理，也可以启用多线程处理，但无论如何，Socket连接只有一个。两者的另一个不同之处我们在上一章也讲过，那就是Outbound模式的ESL程序是一个服务器，在逻辑上作为通话的一方参与到通话中；而Inbound式的ESL程序相对于FreeSWITCH来讲相当于一个客户端，它主动连接到FreeSWITCH上收取事件并进行命令控制，相当于一个第三者控制通话。那么，为了让这个第三者能感知的来话信息，我们可以使用如下Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Charge"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^1234$"&gt;<br/>
+<br/>
+    &lt;action application="set" data="service=icharge"/&gt;<br/>
+<br/>
+    &lt;action application="park" data=""/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述Dialplan的设计思路是：当有人拨打1234使用我们的icharge空中充值服务时，我们事先用set App设置一个service通道变量，然后将电话置为park状态。这样我们的icharge程序就可以在有电话进来时收到CHANNEL_PARK事件，并检查这里的service类型进行相应的处理。</p>
+<p height="1em" width="2em">通过前面的介绍，笔者想大家应该已经见识过了，C语言的代码比较冗长，因此，在这里我们不再实现完整的查询和充值服务，而只实现一个相对简单的查询功能，以节省篇幅。剩下的部分感兴趣的读者可以自己练习一下。</p>
+<p height="1em" width="2em">好了，我们这次将源代码命名为icharge.c，还是从main函数开始看。其中，我们于第74行通过esl_connect函数主动连接到FreeSWITCH上，该连接以后就通过handle来标识；第80行，订阅我们需要的事件，这样FreeSWITCH就会将相关的事件发给我们。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+68  int main(void)<br/>
+<br/>
+69  {<br/>
+<br/>
+70      esl_handle_t handle = {{ 0 }};<br/>
+<br/>
+71      esl_status_t status;<br/>
+<br/>
+72      const char *uuid;<br/>
+<br/>
+73      esl_global_set_default_logger(ESL_LOG_LEVEL_INFO);<br/>
+<br/>
+74      status = esl_connect(&amp;handle, "127.0.0.1", 8021, NULL, "ClueCon");<br/>
+<br/>
+75      if (status != ESL_SUCCESS) {<br/>
+<br/>
+76          esl_log(ESL_LOG_INFO, "Connect Error: %d\n", status);<br/>
+<br/>
+77          exit(1);<br/>
+<br/>
+78      }<br/>
+<br/>
+79      esl_log(ESL_LOG_INFO, "Connected to FreeSWITCH\n");<br/>
+<br/>
+80      esl_events(&amp;handle, ESL_EVENT_TYPE_PLAIN,<br/>
+<br/>
+81          "CHANNEL_PARK CHANNEL_EXECUTE_COMPLETE CHANNEL_HANGUP_COMPLETE");<br/>
+<br/>
+82      esl_log(ESL_LOG_INFO, "%s\n", handle.last_sr_reply);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第83行，我们设置本次连接的handle的event_lock成员变量为“1”，表示我们希望所有的App和事件都以同步的方式执行（类似于上面讲到的Outbound模式中的同步模式），这样我们需要处理的状态机就比较简单了。注意，这里为了简单仅实现了一个单线程的处理机制，因此不能使用sleep等浪费时间的函数，否则就会影响到其他的通话（我们用一个线程也可以处理几千个并发的呼叫）。</p>
+<p height="1em" width="2em">接着是一个while循环（第84行），它阻塞地接收事件，当有事件到来时，便使用process_event对事件进行处理。注意，由于ESL是双向的，有可能当程序正在向FreeSWITCH发送命令并等待FreeSWITCH返回结果时，正好收到一个事件，这时FreeSWITCH便会将收到的事件缓存到一个内部链表中，这里esl_recv_event的第二个参数为“1”，表示优先检查内部缓存链表，以防止错过事件。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+83      handle.event_lock = 1;<br/>
+<br/>
+84      while((status = esl_recv_event(&amp;handle, 1, NULL)) == ESL_SUCCESS) {<br/>
+<br/>
+90          if (handle.last_ievent) {<br/>
+<br/>
+91              process_event(&amp;handle, handle.last_ievent);<br/>
+<br/>
+92          }<br/>
+<br/>
+93      }<br/>
+<br/>
+94      esl_disconnect(&amp;handle);<br/>
+<br/>
+95      return 0;<br/>
+<br/>
+96  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面我们可以倒回到文件开始处。最开始的部分跟19.1.3节讲到的类似，没什么特别需要注意的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01  #include &lt;stdio.h&gt;<br/>
+<br/>
+02  #include &lt;stdlib.h&gt;<br/>
+<br/>
+03  #include &lt;esl.h&gt;<br/>
+<br/>
+04  #define ERROR_PROMPT "say:<br/>
+<br/>
+输入错误，请重新输入"<br/>
+<br/>
+05  int check_account_password(const char *account, const char *password)<br/>
+<br/>
+06  {<br/>
+<br/>
+07      return (!strcmp(account, "1111")) &amp;&amp; (!strcmp(password, "1111"));<br/>
+<br/>
+08  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">主要的业务逻辑在process_event函数里。第12行，我们还是使用一个switch语句来判断收到的事件类型。如果收到CHANNEL_PARK事件（第13行），则我们首先检查service通道变量，如果它不存在或不等于icharge，说明它不是我们关心的业务类型，我们直接用break跳过后续的处理。否则，继续往下进行打印日志（第20行）、应答（第21行）、播放欢迎词（第24行）等。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+09  void process_event(esl_handle_t *handle, esl_event_t *event)<br/>
+<br/>
+10  {<br/>
+<br/>
+11      const char *uuid;<br/>
+<br/>
+12      switch (event-&gt;event_id) {<br/>
+<br/>
+13          case ESL_EVENT_CHANNEL_PARK:<br/>
+<br/>
+14          {<br/>
+<br/>
+15              const char *service;<br/>
+<br/>
+16              service = esl_event_get_header(event, "variable_service");<br/>
+<br/>
+17              esl_log(ESL_LOG_INFO, "Service: %s\n", service);<br/>
+<br/>
+18              if (!service || (service &amp;&amp; strcmp(service, "icharge"))) break;<br/>
+<br/>
+19              uuid = esl_event_get_header(event, "Caller-Unique-ID");<br/>
+<br/>
+20              esl_log(ESL_LOG_INFO, "New Call %s\n", uuid);<br/>
+<br/>
+21              esl_execute(handle, "answer", NULL, uuid);<br/>
+<br/>
+22              esl_execute(handle, "set", "tts_engine=tts_commandline", uuid);<br/>
+<br/>
+23              esl_execute(handle, "set", "tts_voice=Ting-Ting", uuid);<br/>
+<br/>
+24              esl_execute(handle, "speak", "<br/>
+<br/>
+您好", uuid);<br/>
+<br/>
+25              /* esl_execute(&amp;handle, "speak", "<br/>
+<br/>
+您好，欢迎使用空中充值服务", uuid); */<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">由于我们使用了handle-&gt;event_block，所以我们后面执行的App不会抢占前面的App，因而我们可以在这一步尽量多执行一些App（注意，App的执行在FreeSWITCH中是阻塞的，但在C语言这一端不是，所以不用担心这里会阻塞接收事件的线程）。</p>
+<p height="1em" width="2em">在此，我们没有在C语言中实现状态机，而是借用通道变量实现了一个简单的状态机。在第27行，我们设置通道变量charge_state的值为WAIT_ACCOUNT，即等待输入账号。当账号输入完毕后，再在第31行将该变量的值设为WAIT_PASSWORD，即等待输入密码。其中第28行和第32行分别实现询问账号和密码，这些语句在C语言这一端很快就执行完成了，但在FreeSWITCH中，会一个接一个地执行。在此过程中，我们将会收到一个又一个的CHANNEL_EXECUTE_COMPLETE事件。不过，并不是所有事件都进行处理，直到收到的事件中满足第44～45行的检查条件才处理。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+26  again:<br/>
+<br/>
+27              esl_execute(handle, "set", "charge_state=WAIT_ACCOUNT", uuid);<br/>
+<br/>
+28              esl_execute(handle, "play_and_get_digits",<br/>
+<br/>
+29                  "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的账号，以井号结束' "<br/>
+<br/>
+30                  ERROR_PROMPT " charge_account ^\\d{4}$", uuid);<br/>
+<br/>
+31              esl_execute(handle, "set", "charge_state=WAIT_PASSWORD", uuid);<br/>
+<br/>
+32              esl_execute(handle, "play_and_get_digits",<br/>
+<br/>
+33                  "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的密码，以井号结束' "<br/>
+<br/>
+34                  ERROR_PROMPT " charge_password ^\\d{4}$", uuid);<br/>
+<br/>
+35              break;<br/>
+<br/>
+36          }<br/>
+<br/>
+37          case ESL_EVENT_CHANNEL_EXECUTE_COMPLETE:<br/>
+<br/>
+38          {<br/>
+<br/>
+39              const char *application;<br/>
+<br/>
+40              const char *charge_state;<br/>
+<br/>
+41              uuid = esl_event_get_header(event, "Caller-Unique-ID");<br/>
+<br/>
+42              application = esl_event_get_header(event, "Application");<br/>
+<br/>
+43              charge_state = esl_event_get_header(event, "variable_charge_state");<br/>
+<br/>
+44              if (!strcmp(application, "play_and_get_digits") &amp;&amp;<br/>
+<br/>
+45                  !strcmp(charge_state, "WAIT_PASSWORD")) {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第44～45行的检查条件是：收到CHANNEL_EXECUTE_COMPLETE，最后执行的App是play_and_get_digits，当前的状态是WAIT_PASSWORD。只有满足了这三个条件，我们才知道用户输入密码完成了。然后，我们在第46行和第47行分别取出用户输入的用户名和密码。如果用户名和密码检查（第48行）通过，我们就向用户播放当前的余额，然后挂机（第50～52行）。当然如果用户输入有误，我们也友好地告诉他（第54行），并使用goto语句（第55行）跳到第26行的again标签，让用户重新输入。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+46                  const char *account =<br/>
+<br/>
+                        esl_event_get_header(event, "variable_charge_account");<br/>
+<br/>
+47                  const char *password =<br/>
+<br/>
+                        esl_event_get_header(event, "variable_charge_password");<br/>
+<br/>
+48                  if (account &amp;&amp; password &amp;&amp; check_account_password(account, password)) {<br/>
+<br/>
+49                      esl_log(ESL_LOG_INFO, "Account: %s Balance: 100\n", account);<br/>
+<br/>
+50                      esl_execute(handle, "speak", "<br/>
+<br/>
+您的余额是100<br/>
+<br/>
+元", uuid);<br/>
+<br/>
+51                      esl_execute(handle, "speak", "<br/>
+<br/>
+再见", uuid);<br/>
+<br/>
+52                      esl_execute(handle, "hangup", NULL, uuid);<br/>
+<br/>
+53                  } else {<br/>
+<br/>
+54                      esl_execute(handle, "speak", "<br/>
+<br/>
+账号密码错误", uuid);<br/>
+<br/>
+55                      goto again;<br/>
+<br/>
+56                  }<br/>
+<br/>
+57              }<br/>
+<br/>
+58              break;<br/>
+<br/>
+59          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当收到用户挂机事件时（第60行），我们除了打印一条日志外（第62行）没有什么要特别处理的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+60          case ESL_EVENT_CHANNEL_HANGUP_COMPLETE:<br/>
+<br/>
+61              uuid = esl_event_get_header(event, "Caller-Unique-ID");<br/>
+<br/>
+62              esl_log(ESL_LOG_INFO, "Hangup %s\n", uuid);<br/>
+<br/>
+63              break;<br/>
+<br/>
+64          default:<br/>
+<br/>
+65              break;<br/>
+<br/>
+66      }<br/>
+<br/>
+67  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，我们的icharge服务已准备完毕，编译运行后相关日志如下，读者可以对着源代码自行分析一下（当然，为了消除空行对行号的影响，日志中还是手工调整了行号）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ ./icharge<br/>
+<br/>
+[INFO] icharge.c:79 main() Connected to FreeSWITCH<br/>
+<br/>
+[INFO] icharge.c:80 main() +OK event listener enabled plain<br/>
+<br/>
+[INFO] icharge.c:17 process_event() Service: icharge<br/>
+<br/>
+[INFO] icharge.c:20 process_event() New Call 65aca71e-4ad0-42d9-a638-e25e7bd75890<br/>
+<br/>
+[INFO] icharge.c:49 process_event() Account: 1111 Balance: 100<br/>
+<br/>
+[INFO] icharge.c:62 process_event() Hangup 65aca71e-4ad0-42d9-a638-e25e7bd75890<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在本例中，我们使用Inbound模式的ESL程序实现了我们的空中充值服务，并使用单线程处理多路通话。由于每一个呼入的Channel都有唯一的UUID，因此，对各路Channel的控制也互不影响。读者可能已经注意到了，在Outbound模式中，我们使用的esl_execute函数的最后一个参数值是NULL，而在Inbound模式中，我们指定了本路通话的UUID。原因就是，在Outbound模式中，是多个Socket连接，每个Channel对应一个Socket连接，因而不需要明确指定UUID（当然如果指定了也没错）；而在Inbound模式中，对所有的Channel的控制都是在同一个Socket上进行的，因而需要明确指定Channel的UUID。在我们这个简单的应用中，UUID可以动态地从事件中获取，因而我们不需要复杂的数据结构来保存这些UUID。</p>
+<p height="1em" width="2em">另外，读者可能也注意到了，我们在使用play_and_get_digits取得用户输入的账户和密码时，分别指定了charge_account和charge_password变量，这样就可以在后面一起取出（如第46行和47行），即可以通过这种方法把变量的值都保存到通道变量中，而不需要再在C语言中建立相关的数据结构来存储中间结果。</p>
+</body>
+</html>

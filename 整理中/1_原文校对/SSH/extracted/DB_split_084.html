@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_123"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos479974" class="calibre7"></a>3.6.5 Privilege Separation in OpenSSH </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos480143" class="calibre15"></a>A persistent problem in the world of Unix security is the lack of fine-grained permissions when it comes to process capabilities. Basically, either you're God (that is, "root") or you're not. The "Church" of Unix is missing the hosts of angels, archangels, cherubim, etc., that fill other pantheons and smooth the relationship between mere mortals and the divine, embodied for us in the mystical uid 0. This means that in order to accomplish some common tasks, such as listening on port 22 or creating processes under other uid's, the SSH server must also take on all the other powers of the root account. This flies in the face of a basic rule of security engineering: the Principle of Least Privilege, which says that a process should have only the privileges it needs, only when it needs them, and no more. If a serious vulnerability is found in the code of a server running as root, you can kiss your system goodbye, because when an attacker gets in, he has complete control. </p>
+<p class="calibre4">In order to address this general problem, OpenSSH has a feature called <span><em class="italic">privilege separation</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos481381" class="calibre15"></a>. The developers have factored out those server functions which require root privilege, and placed them in a separate process. The main server does not run as root; it gives up that privilege as soon as possible after startup, leaving a separate privileged "monitor" process with which it can communicate. The monitor opens the server listening socket which the main server inherits, but then closes its copy so that it does not communicate directly with clients (i.e., potential attackers). It communicates only by a private pipe to the main server and obeys a strict protocol, performing only those privileged operations necessary from time to time for the operation of the main server, and nothing else. This design mitigates the problem by restoring the Principle of Least Privilege, at least as much as is possible given the limitations of Unix. </p>
+<p class="calibre4">Privilege separation is a complicated feature to implement, however, due to many small differences among Unix platforms with regard to the exact behavior of relevant system calls such as <code class="calibre35">setuid</code>, <code class="calibre35">seteuid</code>, <code class="calibre35">setgid</code>, etc., as well as difficulties with related software such as PAM. The early implementations of privilege separation in OpenSSH were notorious for causing mysterious errors in the operation of the server. Things have improved a great deal, but if you run into odd problems you can't explain—especially having to do with a privilege or access violation on the part of the server—you could do worse than to disable privilege separation and see what happens. </p>
+<p class="calibre4">For more information on privilege separation, see:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"><a href="http://www.citi.umich.edu/u/provos/ssh/privsep.html" shape="rect" class="calibre6">http://www.citi.umich.edu/u/provos/ssh/privsep.html</a></li>
+<li class="calibre18">"Preventing Privilege Escalation," Niels Provos, Markus Friedl, and Peter Honeyman, 12th USENIX Security Symposium, Washington, D.C., August 2003, <a href="http://www.citi.umich.edu/u/provos/papers/privsep.pdf." shape="rect" class="calibre6">http://www.citi.umich.edu/u/provos/papers/privsep.pdf.</a></li>
+</ul></div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos484042" shape="rect" href="DB_split_080.html#filepos429372" class="calibre6">20</a>] </sup>In SSH-1, the host key also encrypts the session key for transmission to the server. However, this use is actually for server authentication, rather than for data protection per se; the server later proves its identity by showing that it correctly decrypted the session key. Protection of the session key is obtained by encrypting it a second time with the ephemeral server key. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos484658" shape="rect" href="DB_split_080.html#filepos429991" class="calibre6">21</a>] </sup>Or sharing the same key, if you wish, assuming the servers are compatible with one another. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos484988" shape="rect" href="DB_split_081.html#filepos443394" class="calibre6">22</a>] </sup>Unfortunately, you can't configure the server to look at one set but not the other. If it looks at <em class="italic">~/.shosts</em>, then it also considers <em class="italic">~/.rhosts</em>, and both global files are always considered. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos485475" shape="rect" href="DB_split_081.html#filepos463401" class="calibre6">23</a>] </sup>By setting the server's <code class="calibre35">IgnoreRhosts</code> keyword to <code class="calibre35">yes</code>, you can cause the server to ignore the per-account files completely and consult the global files exclusively instead. <a shape="rect" href="DB_split_158.html#filepos959704" class="calibre6">[5.4.4]</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos486020" shape="rect" href="DB_split_081.html#filepos465833" class="calibre6">24</a>] </sup>If strong hostbased authentication is in use, this means any host verified by public key against the server's known hosts database. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos486390" shape="rect" href="DB_split_082.html#filepos470229" class="calibre6">25</a>] </sup>Or it can use an internal SSH-1 compatibility mode. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_124"></div></body>
+</html>

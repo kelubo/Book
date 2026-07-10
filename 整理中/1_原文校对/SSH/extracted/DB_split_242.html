@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_320"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1689365" class="calibre7"></a>7.5.2 Handling of Wildcards </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1689524" class="calibre15"></a>
+<span><em class="italic">scp</em></span> for OpenSSH has no special support for wildcards<a shape="rect" class="calibre15"></a><a id="filepos1689679" class="calibre15"></a> in filenames. It simply lets the shell expand them: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp *.txt server.example.com:</tt></div></span><p class="calibre4">Watch out for wildcards in remote file specifications, as they are evaluated on the local machine, not the remote. For example, this attempt is likely to fail: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp server.example.com:*.txt .         <em class="italic"><span>Bad idea!</span></em></tt></div></span><p class="calibre4">The Unix shell attempts to expand the wildcard before <span><em class="italic">scp</em></span> is invoked, but the current directory contains no filename matching "server.example.com:*.txt". The C shell and its derivatives will report "no match" and will not execute <span><em class="italic">scp</em></span>. Bourne-style shells, noticing no match in the current directory, will pass the unexpanded wildcard to <span><em class="italic">scp</em></span>, and the copy may succeed as planned, but this coincidental behavior shouldn't be relied on. Always escape your wildcards so that they are explicitly ignored by the shell and are passed to <span><em class="italic">scp</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp server.example.com:\*.txt .</tt></div></span><p class="calibre4">Tectia's <span><em class="italic">scp</em></span> does its own regular expression matching after shell-wildcard expansion is complete. The <span><em class="italic">sshregex</em></span> manpage for Tectia (see <a shape="rect" href="DB_split_498.html#filepos2938322" class="calibre6">Appendix B</a>) describes the supported operators. Even so, escape your wildcard characters if you want your local shell to leave them alone. </p>
+</div>
+</body>
+</html>

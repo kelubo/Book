@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_393"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1994176" class="calibre7"></a>9.4.4 Configuring X Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The behavior of X forwarding can be modified through compile-time configuration, serverwide configuration, and per-account configuration. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.4.1 Compile-time configuration </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1994765" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1994803" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1994841" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1994879" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1994976" class="calibre15"></a>Tectia can be compiled with or without X support. The compile-time flags <code class="calibre35">--with-x</code> and <code class="calibre35">--without-x</code> make this determination: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ configure ... --without-x ...</tt></div></span><p class="calibre4">You can also enable or disable all X forwarding by default with <code class="calibre35">--enable-X11-forwarding</code> or <code class="calibre35">--disable-X11-forwarding</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ configure ... --enable-X11-forwarding ...</tt></div></span><p class="calibre4">Remember, enable/disable flags simply set the default behavior. You can override these defaults with serverwide and per-account configuration. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.4.2 Serverwide configuration </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The serverwide configuration keyword <code class="calibre35">X11Forwarding</code>
+<sup class="calibre20">[<a id="filepos1996499" shape="rect" href="DB_split_304.html#filepos2033085" class="calibre6">137</a>]</sup> enables or disables X forwarding in the SSH server. By default, it is enabled. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    X11Forwarding no</tt></div></span><p class="calibre4">The <code class="calibre35">X11DisplayOffset</code> keyword lets you reserve some X11 display numbers so that <span><em class="italic">sshd</em></span> can't use them. This keyword specifies the lowest display number SSH may use, preventing <span><em class="italic">sshd</em></span> from clashing with real X servers on the lower-numbered displays. For example, if you normally run actual X servers on displays 0 and 1, set: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #  OpenSSH<br class="calibre19"/>    X11DisplayOffset 2</tt></div></span><p class="calibre4">The <code class="calibre35">XAuthLocation</code> keyword specifies the path to the <span><em class="italic">xauth</em></span> program, which manipulates authorization records for X. We describe this keyword later, after we discuss <span><em class="italic">xauth</em></span>. <a shape="rect" href="DB_split_304.html#filepos2030114" class="calibre6">[9.4.6.4]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    XAuthLocation /usr/local/bin/xauth</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.4.3 Per-account configuration </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">In your authorization file for public keys, you may disallow X forwarding for incoming SSH connections that use a particular key for authentication. <a shape="rect" href="DB_split_276.html#filepos1835938" class="calibre6">[8.2.7]</a> In OpenSSH and Tectia this is done with the option <code class="calibre35">no-X11-forwarding</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    no-x11-forwarding ...<em class="italic"><code class="calibre35">key</code></em>...<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    Key mykey.pub<br class="calibre19"/>    Options no-x11-forwarding</tt></div></span></div>
+</div>
+</body>
+</html>

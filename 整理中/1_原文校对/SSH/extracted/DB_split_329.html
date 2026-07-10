@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_433"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2128744" class="calibre7"></a>11.1.4 Kerberos </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">There's no reason to deploy Kerberos <a shape="rect" href="DB_split_345.html#filepos2253558" class="calibre6">[11.4]</a> solely in order to support batch jobs; it has no special overall advantage in this regard. However, if you're already using Kerberos, you might want to keep things simple by using it for batch as well as interactive jobs. Unattended Kerberos usage has similar security properties to using a plaintext SSH key as described earlier: the Kerberos principal's key is stored on disk, can be similarly strong since it does not have to be derived from a user-memorable passphrase, and is not revealed in the authentication process. </p>
+<p class="calibre4">To do this, use the <span><em class="italic">kadmin</em></span> command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ kadmin -q "ktadd -k keytab <em class="italic"><code class="calibre35">principal</code></em>"</tt></div></span><p class="calibre4">to store the principal's key in the file <em class="italic">keytab</em>, and protect that file appropriately (e.g., so that only the Unix batch account can read it). The batch job can then call <span><em class="italic">kinit</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ kinit -k -t keytab</tt></div></span><p class="calibre4">to obtain Kerberos credentials for that principal.</p>
+<p class="calibre4">We suggest the following arrangement:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Arrange that the <em class="italic">keytab</em> file does not travel insecurely over the network, e.g., on an unsecured NFS filesystem. Perhaps also arrange that it is not dumped to backup tapes. </li>
+<li class="calibre18">Create separate principals for batch jobs; do not use existing user principals. </li>
+<li class="calibre18">Create a random key for the batch principal using the <span><em class="italic">kadmin</em></span> option, <code class="calibre35">addprinc -randkey</code>. </li>
+<li class="calibre18">If feasible, periodically change these keys. An advantage of the Kerberos system is that this does not require changing corresponding authorization entries, as changing a simple SSH key would require updating the matching <em class="italic">authorized_keys</em> files. Any running jobs will have to be restarted, though, since their credentials will become invalid. </li>
+<li class="calibre18">As always, restrict what the batch principal can do on the server side, here using the Kerberos <em class="italic">~/.k5login</em> or <em class="italic">~/.k5users</em> files. </li>
+</ul></div>
+<p class="calibre4">Kerberos-5 contains support for long-running jobs with "renewable" tickets, but note that this is still intended for jobs started interactively; it just supports those that may run for a long time. It is not intended as a solution for truly unattended jobs. </p>
+</div>
+</body>
+</html>

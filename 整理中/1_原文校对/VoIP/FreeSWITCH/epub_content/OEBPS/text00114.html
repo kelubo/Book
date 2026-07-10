@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.2　对接IMS</font>
+</font>
+</p>
+<p height="1em" width="2em">IMS是新一代通信网络事实上的标准，它旨在在过渡阶段兼容原有的PSTN TDM网络（基于电路交换的网络，在IMS中称为CS域），并最终将所有的业务都转移到基于包交换的网络（PS域）中。</p>
+<p height="1em" width="2em">目前，国内的运营商都部署了IMS。IMS网元众多，系统各网元之间通过高速网络相连。就与交换最相关的核心功能来讲，在IMS内部，包含P-CSCF、I-CSCF、S-CSCF及AS等功能与实体。其中P-CSCF位于网络的边缘，接收SIP消息，并将SIP消息转发到内部的S-CSCF及AS上。</p>
+<p height="1em" width="2em">一般来说，IMS运行在运营商内部专门的网络上（称为承载网），而在外部是无法接触到运营商的内部网络的。如果要通过互联网与运营商的IMS对接，就需要通过SBC设备及层层防火墙。SBC设备横跨运营商的承载网及互联网。所以，一般来说，我们可以通过SBC连接到IMS，进而能够与PSTN网络上所有的电话进行通信。所以我们可以把SBC设备和IMS看成一个SIP转PSTN的“大”网关。实际上，在实际使用中，大家也不关心是否有SBC设备，而只认为运营商有一个“大大”的SIP服务器，它可以给我们开放账号。</p>
+<p height="1em" width="2em">目前，有些运营商也开始在IMS系统上针对一些话务批发商或企业应用放号，因此如何使用FreeSWITCH与其对接就是我们需要研究的了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.2.1　网关配置</font>
+</font>
+</p>
+<p height="1em" width="2em">当然，与IMS对接最好的方式是使用SIP中继方式对接，配置简单使用起来也灵活。但很少有运营商允许你这么做。比较典型的方式还是使用类似电话号码的方式，一个账号一个账号地对接。</p>
+<p height="1em" width="2em">下面是一个与云南移动的IMS使用账号对接的实例。笔者拿到的是一个试验号码，实际上，对我们来讲，它就是一个SIP服务器上的账号。为了与其对接，我们要将FreeSWITCH当作一个SIP客户端注册到IMS上去。在FreeSWITCH中，这可以通过添加一个网关实现。下面是一个网关的配置文件：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;gateway name="ims"&gt;<br/>
+<br/>
+    &lt;param name="realm" value="ims.yn.chinamobile.com"/&gt;<br/>
+<br/>
+    &lt;param name="register-proxy" value="211.139.x.x"/&gt;<br/>
+<br/>
+    &lt;param name="username" value="+86871xxxxxxxx@ims.yn.chinamobile.com"/&gt;<br/>
+<br/>
+    &lt;param name="password" value="1234"/&gt;<br/>
+<br/>
+    &lt;param name="from-user" value="+86871xxxxxxxx"/&gt;<br/>
+<br/>
+    &lt;param name="from-domain" value="ims.yn.chinamobile.com"/&gt;<br/>
+<br/>
+    &lt;param name="register" value="true"/&gt;<br/>
+<br/>
+    &lt;param name="outbound-proxy" value="211.139.x.x"/&gt;<br/>
+<br/>
+&lt;/gateway&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在网关的配置参数中：</p>
+<p height="1em" width="2em">·ims.yn.chinamobile.com为云南移动内部的域。在公网上，它并不是一个合法的域名。那么我们怎么能注册到该服务器上去呢？实际注册的服务器地址是用register-proxy定义的，这里211.139.x.x是一个SBC的地址。以前，我们在配置网关时都不写这个register-proxy参数，它默认就等于realm。</p>
+<p height="1em" width="2em">·username是IMS中的用户账号，它和password配合用于鉴权（前者将出现在SIP消息中的Authorization头域中）。该用户账号中包含了用户所属的域，其用户名部分是一个PSTN网络中的E164格式的电话号码，前面几位中的“+86”表示中国的国家代码，“871”是云南昆明的区号，后面的“xxxxxxxx”则是一个本地的电话号码。</p>
+<p height="1em" width="2em">·from-user指定在SIP消息中的源用户信息，from-domain则是指定域，它们会影响SIP中的From头域。</p>
+<p height="1em" width="2em">·register的值为true表示FreeSWITCH会向该网关发起注册。</p>
+<p height="1em" width="2em">·前面的信息都是与注册相关的，最后的outbound-proxy表示呼叫（即INVITE消息）应该发到什么地址，它可以是与注册服务器不同的地址，不过在本例中它与register-proxy是相同的。</p>
+<p height="1em" width="2em">当然，上述这些参数的值都是在IMS系统上配置的。从IMS上取得正确值并进行配置后，我们就完成了从FreeSWITCH注册到IMS，这时就可以对外打电话了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.2.2　通过IMS呼出</font>
+</font>
+</p>
+<p height="1em" width="2em">完成上一节的配置后，我们可以很快地在FreeSWITCH中输入以下命令试一试它是否真的能打到我们的手机上：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate sofia/gateway/ims/0186xxxxxxxx &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">电话接通后，应该能听到自己的声音（回音）。注意，上述账号就相当于一个云南昆明本地的电话号码，因而拨云南以外的手机号需要加“0”。</p>
+<p height="1em" width="2em">在Dialplan中，进行如下设置就可以通过上面的网关往外打电话了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="IMS gateway outbound"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^(0.*)$"&gt;<br/>
+<br/>
+        &lt;action application="bridge" data="sofia/gateway/ims/$1"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，如果运营商给我们开的账号支持号码透传的话，我们就可以透传任何号码了。比如下面的代码，透传了一个美国的911出去（注意，最好不要透传110）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="effective_caller_id_number=911"/&gt;<br/>
+<br/>
+&lt;action application="bridge" data="sofia/gateway/ims/$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其实，有意思的是，有的运营商开的账号默认就是支持透传的，这样就会将FreeSWITCH内部的分机号（如1000）透传出去。为了能对所有呼出的电话都显示运营商给我们分配的号码（这里的“xxxxxxxx”），我们可以使用如下Dialplan设置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="effective_caller_id_number=xxxxxxxx"/&gt;<br/>
+<br/>
+&lt;action application="bridge" data="sofia/gateway/ims/$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以使用如下设置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="{origination_caller_id_number=xxxxxxxx}sofia/gateway/ims/$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.2.3　通过IMS呼入</font>
+</font>
+</p>
+<p height="1em" width="2em">在我们正确向IMS注册后，这种号码也支持呼入。如果有人呼叫该号码（即这里的“xxxxxxxx”），IMS就会给我们的FreeSWITCH发SIP INVITE消息。我们的FreeSWITCH收到该消息后，就可以在FreeSWITCH中进行路由了。一般来说，呼入的DID是不带区号的本地号码，就是上面网关配置中的“xxxxxxxx”部分，然后，我们就可以设置如下Dialplan将来话路由到一个IVR：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="IMS gateway outbound"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^(xxxxxxxx)$"&gt;<br/>
+<br/>
+        &lt;action application="answer" data=""/&gt;<br/>
+<br/>
+        &lt;action application="ivr" data="demo_ivr"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，如果我们很神奇地从运营商那里获得了一个号段（如一个千群或一个万群），也可以把这个号码与我们内部的分机号做成一对一的关系。如，下面Dialplan设置可以将来话DID的后4位与我们内部的分机号一一对应：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="IMS gateway outbound"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^xxxx([0-9]{4})$"&gt;<br/>
+<br/>
+        &lt;action application="answer" data=""/&gt;<br/>
+<br/>
+        &lt;action application="bridge" data="user/$1"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.2.4　其他问题</font>
+</font>
+</p>
+<p height="1em" width="2em">与这种IMS对接的难点就是调试比较困难。一般来说，也很难找到对端真正懂技术的技术人员配合。所以，在对接遇到问题时，解决的方法基本上就是抓包，看SIP消息，然后瞎猜，把所有可能的参数都试一遍。</p>
+<p height="1em" width="2em">在一次与IMS的对接测试中，发现主叫听不到被叫方的回铃音。经过无数次的探索，终于发现，对方需要一个特殊的SIP消息头“P-Early-Media:supported”。该消息头是在RFC5009 <sup>
+<small>
+<a href="text00115.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 中定义的。在FreeSWITCH的Dialplan中，可以使用“sip_h_”开头的通道变量添加扩展的SIP消息头，实现添加上述SIP消息头的Dialplan设置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="{sip_h_P-Early-Media=supported}sofia/gateway/ims/$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">一般来讲，SIP中的“1xx”响应消息是不需要证实的，但在IMS系统中，大部分情况下183消息也是需要证实的，否则可能无法听到正常的回铃音甚至无法正常接续。与普通的证实消息ACK不同的是，对于“1xx”的消息需要使用PRACK <sup>
+<small>
+<a href="text00115.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ （即Pre-ACK）消息证实。通过在Profile中开启如下参数可以让FreeSWITCH在收到183时发送PRACK证实消息：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="enable-100rel" value="true"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过这些配置，FreeSWITCH就可以完美地与IMS系统对接并进行呼入呼出了。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00115.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 参见http://tools.ietf.org/html/rfc5009。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00115.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://tools.ietf.org/html/rfc3262。</p>
+</body>
+</html>

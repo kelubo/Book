@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_131"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos505118" class="calibre7"></a>3.8.1 Public-Key Algorithms </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos505403" class="calibre7"></a>3.8.1.1 Rivest-Shamir-Adleman (RSA) </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The Rivest-Shamir-Adleman (RSA) public-key algorithm is the most widely used asymmetric cipher. It derives its security from the difficulty of factoring large integers </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos505802" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="scp operation" src="images/00013.jpg" class="calibre54"/></div>
+</div>
+</span><p class="calibre4">Figure 3-4. scp operation</p></div>
+<p class="calibre4">that are the product of two large primes of roughly equal size. Factoring is widely believed to be intractable (i.e., infeasible, admitting no efficient, polynomial-time solution), although this isn't proven. RSA can be used for both encryption and signatures. </p>
+<p class="calibre4">Until September 2000, RSA was claimed to be patented in the U.S. states by Public Key Partners, Inc., a company in which RSA Security, Inc. is a partner. (The algorithm is now in the public domain.) While the patent was in force, PKP claimed that it controlled the use of the RSA algorithm in the U.S., and that the use of unauthorized implementations was illegal. Until the mid-1990s, RSA Security provided a freely available reference implementation, RSAref, with a license allowing educational and broad commercial use (as long as the software itself was not sold for profit). Since RSA is now in the public domain, RSAref has disappeared. </p>
+<p class="calibre4">The SSH-1 protocol specified use of RSA explicitly. SSH-2 can use multiple public-key algorithms, but originally defined only DSA. <a shape="rect" href="#filepos507729" class="calibre6">[3.8.1.2]</a> The SECSH working group added the RSA algorithm to SSH-2 shortly after the patent expired. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos507729" class="calibre7"></a>3.8.1.2 Digital Signature Algorithm (DSA) </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos507895" class="calibre15"></a>The Digital Signature Algorithm (DSA) was developed by the U.S. National Security Agency (NSA), and promulgated by the U.S. National Institute of Standards and Technology (NIST) as part of the Digital Signature Standard (DSS). The DSS was issued as a Federal Information Processing Standard, FIPS-186, in May 1994. It is a public-key algorithm, based on the Schnorr and ElGamal methods, and relies on the difficulty of computing discrete logarithms in a finite field. It is designed as a signature-only scheme that can't be used for encryption, although a fully general implementation may easily perform both RSA and ElGamal encryption. </p>
+<p class="calibre4">DSA has also been surrounded by a swirl of controversy since its inception. The NIST first claimed that it had designed DSA, then eventually revealed that the NSA had done so. Many question the motives and ethics of the NSA, with ample historical reason to do so.<sup class="calibre20">[<a id="filepos508924" shape="rect" href="DB_split_093.html#filepos530905" class="calibre6">27</a>]</sup> Researcher Gus Simmons discovered a subliminal channel in DSA that allows an implementor to leak information—for instance, secret key bits—with every signature.<sup class="calibre20">[<a id="filepos509207" shape="rect" href="DB_split_093.html#filepos531303" class="calibre6">28</a>]</sup> Since the algorithm was to be made available as a closed hardware implementation in smart cards as part of the government's Capstone program, many people considered this property highly suspicious. Finally, the NIST intended DSA to be available royalty-free to all users. To that end it was patented by David Kravitz (patent #5,231,668), then an employee of the NSA, who assigned the patent to the U.S. government. There have been claims, however, that DSA infringes existing cryptographic patents, including the Schnorr patent. To our knowledge, this issue has yet to be settled in court. </p>
+<p class="calibre4">The SSH-2 protocol uses DSA as its required (and currently, only defined) public-key algorithm for host identification. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos510274" class="calibre7"></a>3.8.1.3 Diffie-Hellman key agreement </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos510375" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos510413" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos510510" class="calibre15"></a>The Diffie-Hellman key agreement algorithm<a shape="rect" class="calibre15"></a><a id="filepos510590" class="calibre15"></a> was the first public-key system published in the open literature, invented by Whitfield Diffie, Martin Hellman, and Ralph Merkle in 1976. It was patented by them in 1977 (issued in 1980, patent #4,200,770); that patent has now expired, and the algorithm is in the public domain. Like DSA, it is based on the discrete logarithm problem, and it allows two parties to derive a shared secret key securely over an open channel. That is, the parties engage in an exchange of messages, at the end of which they share a secret key. It isn't feasible for an eavesdropper to determine the shared secret merely from observing the exchanged messages. </p>
+<p class="calibre4">SSH-2 uses the Diffie-Hellman algorithm as its required (and currently, its only defined) key-exchange method. </p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,153 @@
+% GB28181协议
+% GB28181.tex
+
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息。
+\input{../../../common/page}
+
+% 设置字体，并解决显示难检字问题。
+\xeCJKsetup{AutoFallBack=true}
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）。
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 设置 part 和 chapter 标题格式。
+\ctexset{
+chapter/name={第,章},
+chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
+
+\title{\heiti\zihao{0} GB28181协议详解}
+\author{佚名}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\frontmatter
+
+\mainmatter
+
+\chapter{GB28181协议概述}
+
+GB28181是中国国家标准《安全防范视频监控联网系统信息传输、交换、控制技术要求》，是由公安部科技信息化局提出，由全国安全防范报警系统标准化技术委员会(SAC/TC100)归口，公安部第一研究所等单位起草的国家标准。
+
+\section{基本概念}
+
+\begin{itemize}
+  \item \textbf{定义}：GB28181是中国公安部主导制定的视频监控联网系统国家标准，规定了城市监控报警联网系统中信息传输、交换、控制的技术要求
+  \item \textbf{发布时间}：2011年发布，2016年和2022年分别进行了修订
+  \item \textbf{适用范围}：适用于安全防范视频监控联网系统的设计、施工、检验和验收
+  \item \textbf{核心目标}：实现不同厂商视频监控设备的互联互通
+\end{itemize}
+
+\section{核心功能}
+
+\begin{enumerate}
+  \item \textbf{设备注册与管理}：设备的注册、注销、状态查询等
+  \item \textbf{实时视频点播}：远程调看监控视频
+  \item \textbf{设备控制}：PTZ控制、录像控制等
+  \item \textbf{报警事件处理}：报警的上报、分发和处理
+  \item \textbf{录像检索与回放}：历史录像的查询和回放
+  \item \textbf{设备信息查询}：查询设备的能力和状态
+\end{enumerate}
+
+\chapter{技术特点}
+
+\begin{itemize}
+  \item \textbf{协议基础}：基于SIP（Session Initiation Protocol）协议扩展
+  \item \textbf{传输层}：基于TCP/UDP协议
+  \item \textbf{媒体传输}：支持RTP/RTCP协议传输音视频
+  \item \textbf{编码支持}：支持H.264、H.265等编码格式
+  \item \textbf{安全性}：支持设备认证和媒体流加密
+\end{itemize}
+
+\chapter{工作原理}
+
+\begin{enumerate}
+  \item \textbf{设备注册}：监控设备向SIP服务器注册
+  \item \textbf{设备发现}：客户端通过SIP服务器发现网络中的设备
+  \item \textbf{会话建立}：建立视频流传输会话
+  \item \textbf{媒体传输}：通过RTP协议传输音视频数据
+  \item \textbf{会话控制}：控制视频流的开始、暂停、结束等
+  \item \textbf{设备管理}：对设备进行配置和管理
+\end{enumerate}
+
+\chapter{与其他标准的对比}
+
+\section{GB28181 vs ONVIF}
+
+\begin{itemize}
+  \item \textbf{适用范围}：GB28181主要在中国国内使用，ONVIF是国际标准
+  \item \textbf{协议基础}：GB28181基于SIP，ONVIF基于SOAP/HTTP
+  \item \textbf{功能特点}：GB28181更注重报警联动和平台级联，ONVIF更注重设备级互操作
+  \item \textbf{政府支持}：GB28181是中国国家标准，得到政府强制推行
+\end{itemize}
+
+\section{GB28181 vs RTSP}
+
+\begin{itemize}
+  \item \textbf{作用范围}：GB28181是完整的监控系统标准，RTSP只是媒体流控制协议
+  \item \textbf{协议层次}：GB28181包含设备管理、报警等多种功能，RTSP仅负责媒体流控制
+  \item \textbf{应用场景}：GB28181适用于大型监控联网系统，RTSP适用于点对点媒体流控制
+\end{itemize}
+
+\chapter{应用场景}
+
+\begin{itemize}
+  \item \textbf{平安城市}：城市级视频监控联网系统
+  \item \textbf{智能交通}：道路监控、交通管理系统
+  \item \textbf{安防监控}：企业、园区、小区的视频监控系统
+  \item \textbf{应急指挥}：突发事件的视频调度和指挥
+  \item \textbf{雪亮工程}：农村地区视频监控全覆盖工程
+\end{itemize}
+
+\chapter{优缺点}
+
+\section{优点}
+
+\begin{itemize}
+  \item 符合中国国情，适应国内安防系统需求
+  \item 支持大规模联网，适合城市级监控系统
+  \item 统一标准，减少系统集成成本
+  \item 政府支持，推广力度大
+  \item 功能完善，涵盖监控系统各方面需求
+\end{itemize}
+
+\section{缺点}
+
+\begin{itemize}
+  \item 国际化程度低，主要在中国国内使用
+  \item 协议相对复杂，实现难度较大
+  \item 与国际标准存在一定差异，需要额外适配
+  \item 版本更新较慢，可能跟不上技术发展
+\end{itemize}
+
+\chapter{实际应用}
+
+在国内安防项目中，GB28181已成为强制标准。例如，平安城市项目要求所有接入的监控设备必须支持GB28181协议，确保不同厂商的设备能够无缝集成到统一的监控平台中。公安部门通过GB28181协议实现对辖区内所有监控设备的统一管理和调看，提高了应急处置能力。
+
+随着技术的发展，GB28181标准也在不断更新，2022年发布的新版本增加了对AI分析、智能识别等新技术的支持，进一步提升了标准的适用性和先进性。
+
+\backmatter
+
+\end{document}

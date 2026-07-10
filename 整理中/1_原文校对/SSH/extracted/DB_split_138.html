@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_192"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos730910" class="calibre7"></a>5.1.2 Running sshd as an Ordinary User </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos731080" class="calibre15"></a>Any user can run <span><em class="italic">sshd</em></span> if several steps are completed beforehand: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Get permission from your system administrator.</li>
+<li value="2" class="calibre18">Generate a host key. <div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><a id="filepos731550" class="calibre15"></a><h3 class="calibre25">Tectia's File-Naming Conventions</h3>
+<p class="calibre4">At first glance, Tectia's filenames might seem rather inconsistent, but actually they follow conventions designed for flexibility and ease of use: </p>
+<div class="calibre3">
+<ul class="calibre44"><li class="calibre18">Most filenames contain a "2" suffix, e.g., <em class="italic">sshd2</em>. These filenames distinguish the SSH-2 protocol implementation provided by Tectia from other implementations (e.g., OpenSSH). As a result, you could install SSH-1 protocol programs (not provided by Tectia) with filenames containing a "1" suffix, even in the same directories used by Tectia, without conflicts. </li>
+<li class="calibre18">Tectia installs symbolic links so that you can omit the "2" suffix when referring to programs, manpages, etc. For example, there's a symbolic link <em class="italic">sshd</em> pointing to <em class="italic">sshd2</em>. You can set up search paths so that Tectia is the preferred implementation, hiding other implementations that might be installed in other directories. </li>
+<li class="calibre18">On platforms like Microsoft Windows that don't support symbolic links, the program names all have the "2" suffix. </li>
+</ul></div>
+<p class="calibre4">There are a few exceptions:</p>
+<div class="calibre3">
+<ul class="calibre44"><li class="calibre18">Configuration files that live (at least by default) in fixed locations use <span><em class="italic">only</em></span> filenames with the "2" suffix, e.g., <em class="italic">/etc/ssh2</em> or <em class="italic">~/.ssh2</em>, with no corresponding symbolic links. This avoids confusing other SSH implementations that refer to similar locations without the "2" suffix (e.g., <em class="italic">/etc/ssh</em> or <em class="italic">~/.ssh</em>). </li>
+<li class="calibre18">Files unique to Tectia have <span><em class="italic">only</em></span> filenames that omit the "2" suffix. Strictly speaking, the "2" suffix is unnecessary in this case, but the convention is unfortunate, because it sometimes leads to unexpected filename comparisons. For example, the Tectia program for verifying <span><em class="italic">sshd2</em></span> configuration files is called <em class="italic">sshd-check-conf</em>, even though the default files it checks are named <em class="italic">/etc/ssh2/sshd2_config</em> and <em class="italic">~/.ssh2/sshd2_config</em>. <a shape="rect" href="DB_split_141.html#filepos754737" class="calibre6">[5.2.2]</a></li>
+</ul></div>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</li>
+<li value="3" class="calibre18">Select a port number.</li>
+<li value="4" class="calibre18">Create a server configuration file (optional but strongly recommended). </li>
+</ol></div>
+<p class="calibre4">Before starting, ask your system administrator if you may run an SSH server. While this isn't necessary from a technical standpoint, it is a wise idea. An administrator might not appreciate your creating a new avenue for logins behind his back. Likewise, if the administrator has disabled SSH or certain SSH features, there's probably a good security reason and you shouldn't just work around it! </p>
+<p class="calibre4">Next, generate your own host key. Any other existing host key is probably readable only by the superuser. Host keys are generated with the program <span><em class="italic">ssh-keygen</em></span>. <a shape="rect" href="DB_split_194.html#filepos1242580" class="calibre6">[6.2]</a> For now, to create a 1024-bit DSA host key and store it in the file <em class="italic">~/myserver/hostkey</em>, type the following for OpenSSH: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH: Note the -N value is two single quotes, not a double-quote<br class="calibre19"/>    $ ssh-keygen -N '' -b 1024 -t dsa -f ~/myserver/hostkey</tt></div></span><p class="calibre4">This command generates the files <em class="italic">hostkey</em> and <em class="italic">hostkey.pub</em> in the directory <em class="italic">~/myserver</em> (so make sure the directory exists). Here's the analogous command for Tectia: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh-keygen -P -b 1024 -t dsa ~/myserver/hostkey</tt></div></span><p class="calibre4">The <span><em class="italic">-N</em></span> (OpenSSH) and <span><em class="italic">-P</em></span> (Tectia) options cause the generated key to be left unencrypted because <span><em class="italic">sshd</em></span> expects to read it without a passphrase. </p>
+<p class="calibre4">Third, select a port number on which the SSH server listens for connections. The port number is set with the <span><em class="italic">-p</em></span> command-line option of <span><em class="italic">sshd</em></span> or the <code class="calibre35">Port</code> keyword in the configuration file, as we discuss later. Your server can't listen on port 22, the default, because only the superuser may run processes to listen on that port. Your port number must be greater than or equal to 1024, as lower port numbers are reserved by the operating system for use by privileged programs. <a shape="rect" href="DB_split_076.html#filepos393737" class="calibre6">[3.4.3.6]</a> The port number also must not conflict with those in use by other programs on the server computer; if it does, you get an error message when you try to start the server: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    error: bind: Address already in use</tt></div></span><p class="calibre4">If you receive this error, try another integer in the free range (above 1024). Avoid numbers mentioned in the computer's services map (usually <em class="italic">/etc/services</em> or the Network Information Service [NIS] "services" map, which you can view with the Unix command <span><em class="italic">ypcat -k services</em></span>). These numbers have been designated by the system administrator for use with particular programs or protocols, so you might cause trouble if you steal one. The command <span><em class="italic">netstat -a</em></span> lists all ports in use; add the <span><em class="italic">-n</em></span> option to see numeric values for the ports instead of service names. </p>
+<p class="calibre4">Finally, create your own SSH server configuration file. Otherwise, your server will use built-in defaults or a systemwide configuration file (if one exists) and might not operate as you intend. </p>
+<p class="calibre4">Assuming you have generated a host key in <em class="italic">~/myserver/hostkey</em>, selected the port number 2345, and created a configuration file in <em class="italic">~/myserver/config</em>, the server is invoked with the command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ sshd -h ~/myserver/hostkey -p 2345 -f ~/myserver/config</tt></div></span><p class="calibre4">A server run by an ordinary user has some disadvantages<a shape="rect" class="calibre15"></a><a id="filepos739577" class="calibre15"></a>: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">It runs under the uid of the ordinary user, not root, so it can connect only to that user's account. </li>
+<li class="calibre18">It is invoked manually, rather than automatically when the computer boots. As a result, to run the server, you must connect once without SSH to the computer. And each time the computer is rebooted, the server dies, and you need to redo this step. Conceivably you can set up a <span><em class="italic">cron</em></span> job to keep it running automatically. </li>
+<li class="calibre18">While setting up a server, consider running it in debug mode and reading the diagnostic messages it prints, in case something isn't working right. By default, your server's log messages are written to the system log files, which you don't own and possibly can't access. This is because <span><em class="italic">sshd</em></span> does its logging via the syslog service; ordinary users can't control where the log messages are sent, usually <em class="italic">/var/adm/messages</em>, <em class="italic">/var/log/messages</em>, or someplace else depending on how <span><em class="italic">syslogd</em></span> is set up, and you need appropriate permissions to read these files. Running the server in debug mode gets around this annoyance. Messages will appear on your terminal (as well as in the system logs). <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> This way, you can more easily see error messages until you get the server working. </li>
+</ul></div>
+<p class="calibre4">Nevertheless, for many users, the advantages of SSH outweigh these inconveniences. Assuming your system administrator approves, you can secure your logins with <span><em class="italic">sshd</em></span> even if you aren't a superuser. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos741857" shape="rect" href="DB_split_135.html#filepos724722" class="calibre6">42</a>] </sup>Tectia's server might also be named <span><em class="italic">sshd2</em></span>, with <span><em class="italic">sshd</em></span> being a symbolic link to <span><em class="italic">sshd2</em></span>. See the upcoming sidebar "<a shape="rect" href="#filepos731550" class="calibre6">Tectia's File-Naming Conventions</a>." </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos742493" shape="rect" href="DB_split_136.html#filepos728246" class="calibre6">43</a>] </sup>Or <span><em class="italic">sshd</em></span> can be invoked by <span><em class="italic">inetd</em></span>, creating one <span><em class="italic">sshd</em></span> process per connection. <a shape="rect" href="DB_split_148.html#filepos826611" class="calibre6">[5.3.3.2]</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos743067" shape="rect" href="DB_split_137.html#filepos730603" class="calibre6">44</a>] </sup>OpenSSH also includes <em class="italic">/usr/sbin/rcsshd</em>, a symbolic link to the startup script in <em class="italic">/etc/init.d</em>. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_193"></div></body>
+</html>

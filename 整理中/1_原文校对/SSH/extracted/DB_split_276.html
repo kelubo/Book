@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_359"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1835938" class="calibre7"></a>8.2.7 Disabling or Limiting Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Although you're permitting SSH access to your account, you might not want your account to be used as a springboard to other machines by port forwarding. <a shape="rect" href="DB_split_283.html#filepos1873184" class="calibre6">[9.2]</a> To prevent this, use the <code class="calibre35">no-port-forwarding</code> option for that key: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    no-port-forwarding ...<em class="italic"><code class="calibre35">key</code></em>...<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    Key mykey.pub<br class="calibre19"/>    Options no-port-forwarding</tt></div></span><p class="calibre4">Rather than disable forwarding, OpenSSH can place limits on it with the <code class="calibre35">permitopen</code> option for a key. For example, to restrict port forwarding to local port 12345 connecting to remote host <span><em class="italic">server.example.com</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    permitopen="server.example.com:12345" ...<em class="italic"><code class="calibre35">key</code></em>...</tt></div></span><p class="calibre4"><code class="calibre35">permitopen</code> may have multiple values separated by commas. The syntax is <em class="italic"><code class="calibre35">hostname</code></em>:<em class="italic"><code class="calibre35">port</code></em> for IPv4 addresses and <em class="italic"><code class="calibre35">hostname</code></em>/<em class="italic"><code class="calibre35">port</code></em> for IPv6 addresses. </p>
+<p class="calibre4">X forwarding <a shape="rect" href="DB_split_298.html#filepos1979146" class="calibre6">[9.4]</a> can be prohibited per key with the <code class="calibre35">no-x11-forwarding</code> option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    no-x11-forwarding ...<em class="italic"><code class="calibre35">key</code></em>...<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    Key mykey.pub<br class="calibre19"/>    Options no-x11-forwarding</tt></div></span><p class="calibre4">Agent forwarding can also be disabled per key, if you don't want remote users to travel through your account and onto other computers using the given key. <a shape="rect" href="DB_split_204.html#filepos1377375" class="calibre6">[6.3.5]</a> This is done with the <code class="calibre35">no-agent-forwarding</code> option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    no-agent-forwarding ...<em class="italic"><code class="calibre35">key</code></em>...<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    Options no-agent-forwarding</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">These aren't strong restrictions. As long as you allow shell access, just about anything can be done over the connection. The user need employ only a pair of custom programs that talk to each other across the connection and directly implement port forwarding, agent forwarding, or anything else you thought you were preventing. To be more than just a reminder or mild deterrent, these options must be used together with carefully restricted access on the server side, such as forced commands or a restricted shell on the target account. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+</body>
+</html>

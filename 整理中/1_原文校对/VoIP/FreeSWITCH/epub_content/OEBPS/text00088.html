@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.1　批量创建用户</font>
+</font>
+</p>
+<p height="1em" width="2em">如何在FreeSWITCH中快速创建大量用户是在社区中经常遇到的一个问题。其实该问题解决起来并不难。我们已经了解现有的用户配置文件是存放在FreeSWITCH安装目录的conf/directory/default目录下，每个用户对应一个XML配置文件，如1000.xml包含了1000这个用户的配置文件。FreeSWITCH默认提供了1000～1019这20个用户，如果要手工创建另外一个用户，如1020，我们只需以1000.xml为模板，将该文件中的内容复制到1020.xml，然后把1020.xml文件中的所有出现1000的地方全部替换成1020即可（这也是我们在3.3节使用的方式）。</p>
+<p height="1em" width="2em">当然，除了手工的复制和替换外，上述步骤可以在UNIX系统上的Shell <sup>
+<small>
+<a href="text00089.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 中使用下列命令完成：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# sed -e "s/1000/1020/" 1000.xml &gt; 1020.xml<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中sed是UNIX系统上经典的流文件编辑器，上面我们使用sed的“s”命令将1000.xml文件中所有出现1000的地方都替换成1020，然后将命令的输出重定向（大于号是Shell中的重定向操作符）到1020.xml文件中。</p>
+<p height="1em" width="2em">上述命令用于创建一个用户的情况，如果要创建一批用户怎么办呢？其实也很简单，我们只需要用一下Shell中的for循环就可以了。比如我们要创建1020～1039这20个用户，具体的Shell命令如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# for i in `seq 1020 1039`; do sed -e "s/1000/$i/" 1000.xml &gt; $i.xml ; done<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上述命令中，首先，seq <sup>
+<small>
+<a href="text00089.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 命令会产生一个序列，两个参数分别是序列的起止点，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ seq 1 3<br/>
+<br/>
+1<br/>
+<br/>
+2<br/>
+<br/>
+3<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">有了这个序列以后，for循环就可以从该序列中依次取得每一个值，并将该值赋值给“i”这个变量。do和done之间是循环体，其中的内容就是我们前面的sed命令，只不过我们使用“$i”这个变量引用，它的值都是每次循环时从序列中取得的。注意其中的分号也是有用的，它用于在同一行上隔开多个命令。详细的Shell语法我们就不多讲了，总之用上述命令批量生成用户是很方便的。</p>
+<p height="1em" width="2em">另外，在Mac平台上，笔者发现竟然没有seq这个命令，只好自己用Ruby写了一个。下面的Ruby脚本与Linux上的seq功能相似，同样，详细原理我们就不多解释了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+#!/usr/bin/env ruby<br/>
+<br/>
+(ARGV[0].to_i .. ARGV[1].to_i).each { |x| puts x}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，好多读者也在使用Windows平台。但很遗憾的是，Windows上的Shell功能比较弱，也没有像sed之类的工具，因此做起来不如在UNIX上方便。不过，也有人把经典的UNIX工具软件都移植到了Windows上，称为UnxUtils <sup>
+<small>
+<a href="text00089.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。安装完UnxUtils后，就可以使用大部分的UNIX命令了。如我们可以使用如下“.bat”脚本完成同样的添加用户的功能（将下列内容存到与1000.xml相同的目录下的扩展名为“.bat”的文件中，用鼠标双击即可执行）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+for /L %%i in (1020, 1 1039) do sed -e "s/1000/%%i" 1000.xml &gt; %%i.xml<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">除此之外，在FreeSWITCH源代码目录中的scripts/perl目录下也有一个add_user脚本，该脚本是用Perl写的，也能完成类似的功能，具体命令如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ./add_user 1020<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述命令将会把用户配置文件安装在默认的安装路径下面（使用默认的Domain——default）。当然，也可以在命令行上改变Domain和安装路径，如下列命令可以将配置文件安装在/opt/freeswitch/conf目录中的directory/my_domain目录下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ./add_user 1020 --domain=my_domain --confpath=/opt/freeswitch/conf<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以使用“--users”参数指定批量创建的用户的范围，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ./add_user --users=1020-1039<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之，如果不确定上述脚本的使用方法，最好先试验一下。比如，我们先创建一个新的目录用于测试：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# mkdir -p /tmp/directory/my_domain<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后使用下列命令可以看出它确实能创建指定的配置文件：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ./add_user 1111 --users=1020-1039 --domain=my_domain --confpath=/tmp<br/>
+<br/>
+Added 1020 in file /tmp/directory/my_domain/1020.xml<br/>
+<br/>
+Added 1021 in file /tmp/directory/my_domain/1021.xml<br/>
+<br/>
+Added 1022 in file /tmp/directory/my_domain/1022.xml<br/>
+<br/>
+Added ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">需要注意的是，add_user脚本创建的用户配置文件不是以1000.xml为模板的，而是内置在脚本中，因此，如果需要创建的用户与add_user脚本中的模板内容不同，需要事先更改脚本中的内容。</p>
+<p height="1em" width="2em">总之，不管使用什么方法，创建完用户配置文件后就可以在FreeSWITCH中使用reloadxml命令使之生效了。在配置生效后，使用这些用户进行注册和呼出操作都没有问题，如果这些用户也需要被叫，那就需要修改Dialplan，增加到这部分用户的路由。比如，我们增加了1020～1039这20个用户后，可以简单地将默认的Dialplan中的正则表达式“^(10[01][0-9])$”改为“^(10[0-3][0-9])$”，这样就可以包含我们新创建的用户了。更改后的部分内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Local_Extension"&gt;<br/>
+<br/>
+&lt;condition field="destination_number" expression="^(10[0-3][0-9])$"&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之，讲起来可能比较啰嗦，但实际使用起来还是挺简单的，读者不妨自己练习一下。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00088.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 这里我们假定使用Bourne Shell系列的Shell。UNIX历史上有多种Shell，最典型的是Bourne Shell和C Shell两大类，它们的语法稍有不同。目前使用比较多的都是Bourne Shell的变种，如Burne-Again Shell（即bash）、zsh等。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00088.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 注意，括在seq外面的不是单引号，而是重音符（“`”），即键盘上数字“1”左边那个按键。参见：http://zh.wikipedia.org/wiki/重音符。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00088.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 安装方法可以参考http://www.dujinfang.com/2010/05/27/zai-windows-shang-an-zhuang-unixutils.html。</p>
+</body>
+</html>

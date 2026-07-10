@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_311"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1639141" class="calibre7"></a>7.4.13 Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">In a typical SSH setup, clients try to authenticate by the strongest methods first. If a particular method fails or isn't set up, the next one is tried, and so on. This default behavior should work fine for most needs. </p>
+<p class="calibre4">Nevertheless, your clients may request specific types of authentication<a shape="rect" class="calibre15"></a><a id="filepos1639648" class="calibre15"></a> if they need to do so. For example, you might want to use public-key authentication only, and if it fails, no other methods should be tried. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.13.1 Requesting an authentication technique </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">OpenSSH clients can request specific authentication methods by keyword. The syntax is the same as the server's in <em class="italic">/etc/ssh/sshd_config</em>, and you can specify all the same authentication methods. <a shape="rect" href="DB_split_155.html#filepos933838" class="calibre6">[5.4.1]</a> Examples are <code class="calibre35">PasswordAuthentication</code>, <code class="calibre35">PubKeyAuthentication</code>, <code class="calibre35">and KerberosAuthentication</code>, followed by <code class="calibre35">yes</code> or <code class="calibre35">no</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PasswordAuthentication no<br class="calibre19"/>    PubKeyAuthentication yes</tt></div></span><p class="calibre4">Additionally, you can specify the order in which the client should try these authentication methods, with the <code class="calibre35">PreferredAuthentications</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PreferredAuthentications publickey,hostbased,password</tt></div></span><p class="calibre4">The <span><em class="italic">ssh_config</em></span>(5) manpage lists the currently supported methods. </p>
+<p class="calibre4">For Tectia, the <code class="calibre35">AllowedAuthentications</code> keyword selects one or more authentication techniques. Again, the keyword has the same use here as for the Tectia server: <a shape="rect" href="DB_split_155.html#filepos933838" class="calibre6">[5.4.1]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications publickey, password</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.13.2 The server is the boss </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1642482" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1642520" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1642617" class="calibre15"></a>When a client specifies an authentication technique, this is just a request, not a requirement. For example, the configuration: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    PasswordAuthentication yes</tt></div></span><p class="calibre4">informs the SSH server that you, the client, agree to participate in password authentication. It doesn't guarantee that you will authenticate by password, just that you are willing to do it if the server agrees. The server makes the decision and might still authenticate you by another method. </p>
+<p class="calibre4">For a client to require an authentication technique, it must tell the server that one, and only one, technique is acceptable. To do this, the client must deselect every other authentication technique. For example, to try only password authentication with the server, use OpenSSH's <code class="calibre35">PreferredAuthentications</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PreferredAuthentications password</tt></div></span><p class="calibre4">or Tectia's <code class="calibre35">AllowedAuthentications</code> keyword, which has the same syntax as the server keyword of the same name: <a shape="rect" href="DB_split_155.html#filepos933838" class="calibre6">[5.4.1]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications password</tt></div></span><p class="calibre4">If the server doesn't support password authentication, however, this connection attempt will fail. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.13.3 Detecting successful authentication </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1644853" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1644950" class="calibre15"></a>Tectia provides two keywords for reporting whether authentication is successful: <code class="calibre35">AuthenticationSuccessMsg</code> and <code class="calibre35">AuthenticationNotify</code>. Each of these causes Tectia clients to print a message after attempting authentication. </p>
+<p class="calibre4"><code class="calibre35">AuthenticationSuccessMsg</code> controls the appearance of the message "Authentication successful" after authentication, which is printed on standard error. Values may be <code class="calibre35">yes</code> (the default, to display the message) or <code class="calibre35">no</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh server.example.com<br class="calibre19"/>    Authentication successful.<br class="calibre19"/>    Last login: Sat Jun 24 2000 14:53:28 -0400<br class="calibre19"/>    ...<br class="calibre19"/>    $ ssh -p221 -o 'AuthenticationSuccessMsg no' server.example.com<br class="calibre19"/>    Last login: Sat Jun 24 2000 14:53:28 -0400<br class="calibre19"/>    ...</tt></div></span><p class="calibre4"><code class="calibre35">AuthenticationNotify</code>, an undocumented keyword, causes Tectia's <span><em class="italic">ssh</em></span> to print a different message, this time on standard output. If the authentication is successful, the message is "AUTHENTICATED YES"; otherwise, it's "AUTHENTICATED NO". Values may be <code class="calibre35">yes</code> (print the message) or <code class="calibre35">no</code> (the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -q -o 'AuthenticationNotify yes' server.example.com<br class="calibre19"/>    AUTHENTICATED YES<br class="calibre19"/>    Last login: Thu Jun 24 2004 14:53:35 -0400<br class="calibre19"/>    ...</tt></div></span><p class="calibre4">The behavior of these two keywords differs in the following ways: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">
+<code class="calibre35">AuthenticationSuccessMsg</code> writes to stderr; <code class="calibre35">AuthenticationNotify</code> writes to stdout. </li>
+<li class="calibre18"> The <span><em class="italic">-q</em></span> command-line option <a shape="rect" href="DB_split_238.html#filepos1661152" class="calibre6">[7.4.17]</a> silences <code class="calibre35">AuthenticationSuccessMsg</code> but not <code class="calibre35">AuthenticationNotify</code>. This makes <code class="calibre35">AuthenticationNotify</code> better for scripting (for example, to find out if an authentication can succeed or not). Notice that <span><em class="italic">exit</em></span> is used as a remote command so that the shell terminates immediately: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/csh<br class="calibre19"/>    # Tectia<br class="calibre19"/>    # Get the AUTHENTICATION line<br class="calibre19"/>    set line = `ssh -q -o 'AuthenticationNotify yes' server.example.com exit`<br class="calibre19"/>    # Capture the second word<br class="calibre19"/>    set result = `echo $line | awk '{print $2}'`<br class="calibre19"/>    if ( $result == "YES" ) then<br class="calibre19"/>      ...</tt></div></span><br class="calibre19"/>In fact, <code class="calibre35">AuthenticationNotify</code> is used precisely in this manner by Tectia's <span><em class="italic">scp</em></span> and <span><em class="italic">sftp</em></span>, when these programs run <span><em class="italic">ssh</em></span> in the background to connect to the remote host for file transfers. They wait for the appearance of the "AUTHENTICATED YES" message to know that the connection was successful, and they can now start speaking to the <span><em class="italic">sftp-server</em></span>. </li>
+</ul></div>
+<p class="calibre4"><code class="calibre35">AuthenticationSuccessMsg</code> provides an additional safety feature: a guarantee that authentication has occurred. Suppose you invoke Tectia's <span><em class="italic">ssh</em></span> and are prompted for your passphrase: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh server.example.com<br class="calibre19"/>    Passphrase for key "mykey": ********</tt></div></span><p class="calibre4">You then see, to your surprise, a second passphrase prompt: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Passphrase for key "mykey":</tt></div></span><p class="calibre4">You might conclude that you mistyped your passphrase the first time, and so you type it again. But what if the second prompt came not from your <span><em class="italic">ssh</em></span> client, but from the server, which has been cracked by an evil intruder? Your passphrase has just been stolen! To counteract this potential threat, <span><em class="italic">ssh</em></span> prints "Authentication successful" after authentication, so the previous session actually looks like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh server.example.com<br class="calibre19"/>    Passphrase for key "mykey": ********<br class="calibre19"/>    Authentication successful.<br class="calibre19"/>    Passphrase for key "mykey":      <em class="italic"><span>Suspicious!</span></em></tt></div></span><p class="calibre4">The second passphrase prompt is now revealed as a fraud. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.13.4 Using ssh-keysign for hostbased authentication </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1651625" class="calibre15"></a>Earlier we described how hostbased authentication requires a privileged program that provides SSH credentials to user processes. <a shape="rect" href="DB_split_076.html#filepos393737" class="calibre6">[3.4.3.6]</a> In OpenSSH, this program is <span><em class="italic">ssh-keysign</em></span>. It must be installed setuid root (or any account that can read the client hostkey). </p>
+<p class="calibre4">To allow a client system to perform hostbased authentication, the system administrator must set the <code class="calibre35">EnableSSHKeysign</code> keyword in <em class="italic">/etc/ssh/ssh_config</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ssh_config<br class="calibre19"/>    EnableSSHKeysign yes</tt></div></span><p class="calibre4">Most options in <em class="italic">ssh_config</em> are for the <span><em class="italic">ssh</em></span> program itself, but this one option is read by <span><em class="italic">ssh-keysign</em></span>. Hostbased authentication relies critically on the integrity of the client host and on other administrative requirements, such as correspondence of account names across hosts. It is crucial that it not be used unless these requirements are met; this option is to make sure that it is not enabled unless the system administrator consciously chooses to do so. </p>
+</div>
+</div>
+</body>
+</html>

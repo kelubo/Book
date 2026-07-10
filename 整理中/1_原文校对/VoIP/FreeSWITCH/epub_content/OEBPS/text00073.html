@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">9.1　基本概念</font>
+</font>
+</p>
+<p height="1em" width="2em">本节我们介绍一些与SIP相关的基本概念。</p>
+<p height="1em" width="2em">·Sofia-SIP <sup>
+<small>
+<a href="text00074.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ ：FreeSWITCH的SIP功能是在mod_sofia模块中实现的。FreeSWITCH并没有自己开发新的SIP协议栈，而是使用了比较成熟的开源SIP协议栈Sofia-SIP，以避免“重复发明轮子” <sup>
+<small>
+<a href="text00074.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">·Endpoint：在FreeSWITCH中，实现一些互联协议接口的模块称为Endpoint。Free-SWITH支持很多类型的Endpoint，如SIP <sup>
+<small>
+<a href="text00074.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 、H232等。这些不同的Endpoint主要是使用不同的控制协议跟其他的Endpoint通话。所以说，Endpoint一般是跟通话相关的。</p>
+<p height="1em" width="2em">·mod_sofia：mod_sofia实现了SIP中的注册服务器、重定向服务器、媒体服务器、呈现服务器、SBC等各种功能。它的定位是一个B2BUA，它不能实现SIP代理服务器 <sup>
+<small>
+<a href="text00074.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 的功能。</p>
+<p height="1em" width="2em">·SIP Profile：在mod_sofia中，有一个概念是SIPProfile，它相当于一个SIPUA，通过各种不同的配置参数可以配置一个UA的行为。一个系统中可以有多个SIP Profile，每个SIP Profile都可以监听不同的IP地址和端口对。</p>
+<p height="1em" width="2em">·Gateway：一个SIP Profile中有多个Gateway，Gateway可以直译为网关，它主要用于定义一个远端的SIP服务器，使FreeSWITCH可以与其他服务器通信。FreeSWITCH可以作为一个SIP客户端（UAC）向远端的网关进行注册；当然也可以不注册，而是使用与远端服务器对等的方式（俗称SIPTrunk，即SIP中继）相互通信（我们将在第14章讲到FreeSWITCH与其他系统相连的各种拓扑结构）。</p>
+<p height="1em" width="2em">·本地SIP用户：FreeSWITCH可以作为注册服务器，这时候，其他的SIP客户端就可以向它注册。FreeSWITCH将通过用户目录（Directory）中的配置信息对注册用户进行鉴权。这些SIP客户端所代表的用户就称为本地SIP用户，简称本地用户。</p>
+<p height="1em" width="2em">·来话和去话：牢记FreeSWITCH是一个B2BUA。如果Alice通过FreeSWITCH给Bob打电话，Alice首先向FreeSWITCH发起呼叫，对FreeSWITCH而言，这路通话就称为来话（InboundCall）；然后FreeSWITCH再去呼叫B，这路通话称为去话（OubtoundCall）。如果来、去话都是本地的，又称为本地来话和本地去话。</p>
+<p height="1em" width="2em">·中继来话或中继去话：如果来、去话不是本地的，双方通话需要以中继方式进行，就称为中继来话或中继去话。但是，中继的叫法只是沿用传统的PSTN网络中的概念，在SIP术语中，本来是没有中继的概念的。</p>
+<p height="1em" width="2em">了解了这些基本概念，下面我们来看一下它们在mod_sofia的配置文件中是怎么实现的。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00073.html">
+<font color="#FF6600">[1]</font>
+</a>
+ Sofia-SIP是由诺基亚公司开发的SIP协议栈，它以开源的许可证LGPL发布。参见http://sofia-sip.sourceforge.net/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00073.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 来自英文Reinvent the Wheel，指重复别人已经建立甚至已经优化了的基本工作和方法，该术语常用于软件开发或其他工程科目中。详见：http://en.wikipedia.org/wiki/Reinventing_the_wheel。当然，选用Sofia-SIP的实际原因比这个要复杂。FreeSWITCH的团队在试验了不下5种开源的SIP协议栈实现后才最后选定Sofia-SIP。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00073.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 有的读者可能会问，那么实现SIP的模块为什么不支持mod_sip呢？这是由于FreeSWITCH的Endpoint是一个抽象的概念，你可以用任意技术来实现。实际上mod_sofia只是对Sofia-SIP库的一个黏合和封装。除Sofia-SIP外，还有很多开源的SIP协议栈，如pjsip、osip等。最初选型的时候，FreeSWITCH的开发团队也对比过许多不同的SIP协议栈，最终选用了Sofia-SIP。FreeSWITCH是一个高度模块化的结构，如果你喜欢其他协议栈，可以自己实现如mod_pjsip或mod_osip等，它们是互不影响的。这也正是FreeSWITCH架构设计的精巧之处。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00073.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 实现SIP代理服务器的开源软件有OpenSIPS、Kamailio等。它们可以很好的与FreeSWITCH配合工作。</p>
+</body>
+</html>

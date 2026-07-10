@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_411"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2066510" class="calibre7"></a>10.3.2 sshd_config for OpenSSH </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2066672" class="calibre15"></a>We'll now discuss our recommended <em class="italic">sshd_config</em> settings for OpenSSH. We have omitted some keywords that aren't particularly security-related, such as <code class="calibre35">PrintMotd</code>, which simply prints a message after login. For any remaining keywords, use your judgment based on your system and needs. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.2.1 Choice of protocol </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We recommend disabling the SSH-1 protocol altogether:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Protocol 2</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2067823" class="calibre7"></a>10.3.2.2 Important files </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Important files containing your host key, PID, and so on, may be located anywhere on the machine's local disk. For security's sake, don't put them on an NFS-mounted partition. If you do, each time the files are accessed by the SSH server, their contents are transmitted in the clear over the network. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    HostKey /etc/ssh/ssh_host_key<br class="calibre19"/>    PidFile /var/run/sshd.pid</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.2.3 File and directory permissions </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The <code class="calibre35">StrictModes</code> value requires users to protect their SSH-related files and directories, or else they can't authenticate. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    StrictModes yes</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2069412" class="calibre7"></a>10.3.2.4 TCP/IP settings </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The <code class="calibre35">Port</code> and <code class="calibre35">ListenAddress</code> values we recommend are standard. Also, we enable keepalive messages so that connections to clients that have crashed or otherwise become unreachable will terminate rather than hang around and require manual reaping by the sysadmin. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Port 22<br class="calibre19"/>    ListenAddress 0.0.0.0<br class="calibre19"/>    TcpKeepAlive yes</tt></div></span><p class="calibre4">We also disable reverse DNS lookups on incoming connections: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    UseDNS no</tt></div></span><p class="calibre4">You might think security is increased by reverse DNS lookups, but in fact, DNS isn't secure enough to guarantee accurate lookups. Also, due to other issues in your Unix and network environment, reverse DNS mappings might not even work properly. <a shape="rect" href="DB_split_148.html#filepos866011" class="calibre6">[5.3.3.8]</a> Finally, SSH connections can be tremendously slowed down or fail altogether if the client's DNS is hosed (e.g., lots of nameservers, all unresponsive, so <span><em class="italic">sshd</em></span> times out). The IP addresses of connecting hosts end up in your logs anyway, so you can look them up later. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.2.5 Login time </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">For logins we allow 30 seconds for a successful authentication, which should be long enough for users and automated processes: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    LoginGraceTime 30</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.2.6 Authentication </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We enable only public-key authentication. Password authentication is disabled because passwords can be stolen and used more easily than public keys. This is a fairly harsh restriction, so you might want to leave it enabled depending on your needs. Without password authentication, you have a "chicken and egg" problem: how do users upload their public keys securely the first time? As system administrator, you have to institute a process for this transfer: for example, users can generate keys on a client machine and then request that you install them on the server machine. Rhosts authentication is disabled because it can be spoofed. RhostsRSA authentication is disabled too, because overall it is a medium-security method and this configuration is on the side of higher security. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PubkeyAuthentication yes<br class="calibre19"/><br class="calibre19"/>    PasswordAuthentication no<br class="calibre19"/>    PermitEmptyPasswords no               <em class="italic"><span>Already disabled, but we're being paranoid</span></em><br class="calibre19"/>    RSAAuthentication no<br class="calibre19"/>    RhostsRSAAuthentication no<br class="calibre19"/>    HostbasedAuthentication no<br class="calibre19"/>    KerberosAuthentication no             <em class="italic"><span>Optional</span></em><br class="calibre19"/>    ChallengeResponseAuthentication no    <em class="italic"><span>Optional</span></em><br class="calibre19"/>    GSSAPIAuthentication no               <em class="italic"><span>Optional</span></em></tt></div></span><p class="calibre4">We optionally disable Kerberos, keyboard-interactive, and GSSAPI authentication, even though they are quite secure, under the "keep it simple" principle: disable what you aren't using. Most SSH users aren't set up to use these techniques. Reenable them if your server needs to support them. </p>
+<p class="calibre4">Although we've disabled hostbased authentication already, we still forbid <span><em class="italic">sshd</em></span> to use <em class="italic">.rhosts</em> files at all (just in case you reenable hostbased authentication): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    IgnoreRhosts yes<br class="calibre19"/>    IgnoreRootRhosts yes</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2075104" class="calibre7"></a>10.3.2.7 Access control </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2075192" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2075230" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2075268" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2075365" class="calibre15"></a>If you want to restrict access to particular local accounts or Unix groups, add <code class="calibre35">AllowUsers</code> and <code class="calibre35">AllowGroups</code> lines (or <code class="calibre35">DenyUsers</code> and <code class="calibre35">DenyGroups</code>). We recommend creating a group for all your system's SSH users, called "ssh", and configuring the server with: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    AllowGroups ssh</tt></div></span><p class="calibre4">Now you've made SSH access a specific privilege to be granted or revoked, and you can easily do it for a user without changing the <span><em class="italic">sshd</em></span> configuration: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # usermod -G ssh,... joe         <em class="italic"><span>Add user joe to the SSH group</span></em></tt></div></span><p class="calibre4">As a bonus, you've disallowed SSH access by system accounts like <em class="italic">bin</em>, <em class="italic">sys</em>, and <em class="italic">daemon</em> that should never use SSH anyway. </p>
+<p class="calibre4">We also permit the superuser to connect via SSH but not by password authentication. This is redundant but consistent with turning off <code class="calibre35">PasswordAuthentication</code>. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PermitRootLogin without-password</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.2.8 Forwarding </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">We permit TCP port forwarding and X forwarding so that users can secure their other TCP connections: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    AllowTcpForwarding yes<br class="calibre19"/>    X11Forwarding yes</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>10.3.2.9 SFTP </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Confirm that the SFTP subsystem is defined so that incoming <span><em class="italic">sftp</em></span> connections will work. (It is enabled in the default <em class="italic">/etc/ssh/sshd_config</em> file for OpenSSH.) </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Subsystem    sftp    /usr/lib/ssh/sftp-server</tt></div></span></div>
+</div>
+</body>
+</html>

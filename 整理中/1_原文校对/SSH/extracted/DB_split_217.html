@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_291"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1429166" class="calibre7"></a>7.1.2 Client Configuration Files </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">If you don't want to retype command-line options continually, configuration files<a shape="rect" class="calibre15"></a><a id="filepos1429411" class="calibre15"></a> let you change a client's behavior now and in the future, until you change the configuration file again. For example, you can enable compression for all clients you invoke by inserting this line into a client configuration file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Compression yes</tt></div></span><p class="calibre4">In a client configuration file, client settings are changed by specifying keywords and values. In the example, the keyword is <code class="calibre35">Compression</code> and the value is <code class="calibre35">yes</code>. You may also separate the keyword and value with an equals sign, with optional whitespace: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Compression = yes</tt></div></span><p class="calibre4">You may configure clients to behave differently for each remote host you visit. This can be done on the fly with command-line options, but for anything reasonably complex, you'll end up typing long, inconvenient command lines like: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -a -p 220 -c blowfish -l sally -i myself server.example.com</tt></div></span><p class="calibre4">Alternatively, you can set these options within a configuration file. The following entry duplicates the function of the preceding command-line options, collecting them under the name "myserver": </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH (Tectia's syntax differs slightly as we'll see later)<br class="calibre19"/>    Host myserver<br class="calibre19"/>     ForwardAgent no<br class="calibre19"/>     Port 220<br class="calibre19"/>     Cipher blowfish<br class="calibre19"/>     User sally<br class="calibre19"/>     IdentityFile myself<br class="calibre19"/>     HostName server.example.com</tt></div></span><p class="calibre4">Now, to run a client with these options enabled, simply type: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh myserver</tt></div></span><p class="calibre4">Configuration files take some time to set up, but in the long run they are significant timesavers. We now discuss the general structure of these files (host specifications followed by keyword/value pairs), then dive into specific keywords. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1432358" class="calibre7"></a>7.1.2.1 Keywords versus command-line options </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1432527" class="calibre15"></a>Configuration files and command-line options have two important relationships: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Every configuration keyword can appear on the command line with the <span><em class="italic">-o</em></span> option. </li>
+<li class="calibre18">Alternative configuration files are referenced with the <span><em class="italic">-F</em></span> option. </li>
+</ul></div>
+<p class="calibre4">For any configuration line of the form:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35"><em class="italic"><code class="calibre35">Keyword Value</code></em></tt></div></span><p class="calibre4">you may type:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -o "<em class="italic"><code class="calibre35">Keyword Value</code></em>" ...</tt></div></span><p class="calibre4">For example, the configuration file lines:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    User sally<br class="calibre19"/>    Port 220</tt></div></span><p class="calibre4">can be specified on the command line as:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -o "User sally" -o "Port 220" server.example.com</tt></div></span><p class="calibre4">As in the configuration file, an equals sign (with optional whitespace) is permitted between the keyword and the value: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -o User=sally -o Port=220 server.example.com</tt></div></span><p class="calibre4">If you use an equals sign, and the value for the keyword contains special characters that would be misinterpreted by the shell, surround the value with quotes. </p>
+<p class="calibre4">The <span><em class="italic">-o</em></span> option may appear multiple times on the same command line, for both <span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #  OpenSSH<br class="calibre19"/>    $ scp -o "User sally" -o "Port 220" myfile server.example.com:</tt></div></span><p class="calibre4">The other relationship between command-line options and configuration keywords is found in the <span><em class="italic">-F</em></span> option, which instructs a client to use a different configuration file instead of the default. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -F /usr/local/ssh/other_config</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">OpenSSH and Tectia treat the <span><em class="italic">-F</em></span> option differently. OpenSSH will ignore the default configuration file (<em class="italic">/etc/ssh/ssh_config</em>) and use only the one you provide. Tectia, on the other hand, will still process its default configuration file (<em class="italic">/etc/ssh2/ssh2_config</em>), and then your provided file can override those settings. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1436813" class="calibre7"></a>7.1.2.2 Global and local files </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1436968" class="calibre15"></a>Client configuration files come in two flavors. A single, <span><em class="italic">global</em></span> client configuration file, usually created by a system administrator, governs client behavior for an entire computer. The file is traditionally <em class="italic">/etc/ssh/ssh_config</em> (OpenSSH) or <em class="italic">/etc/ssh2/ssh2_config</em> (Tectia). (Don't confuse these with the <span><em class="italic">server</em></span> configuration files in the same directories.) Each user may also create a <span><em class="italic">local</em></span> client configuration file within his or her account, usually <em class="italic">~/.ssh/config</em> (OpenSSH) or <em class="italic">~/.ssh2/ssh2_config</em> (Tectia). This file controls the behavior of clients run in the user's login session.<sup class="calibre20">[<a id="filepos1437929" shape="rect" href="DB_split_218.html#filepos1467578" class="calibre6">103</a>]</sup></p>
+<p class="calibre4">Values in a user's local file take precedence over those in the global file. For instance, if the global file turns on data compression, and your local file turns it off, the local file wins for clients run in your account. We cover precedence in more detail later. <a shape="rect" href="DB_split_219.html#filepos1468581" class="calibre6">[7.2]</a></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1438620" class="calibre7"></a>7.1.2.3 Configuration-file sections </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1438780" class="calibre15"></a>Client configuration files are divided into <span><em class="italic">sections</em></span>. Each section contains settings for one remote host or for a set of related remote hosts, such as all hosts in a given domain. </p>
+<p class="calibre4">The beginning of a section is marked differently in different SSH implementations. For OpenSSH, the keyword <code class="calibre35">Host</code> begins a new section, followed by a string called a <span><em class="italic">host specification</em></span>. The string may be a hostname: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host server.example.com</tt></div></span><p class="calibre4">an IP address:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host 123.61.4.10</tt></div></span><p class="calibre4">a nickname for a host: <a shape="rect" href="#filepos1455338" class="calibre6">[7.1.2.5]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host my-nickname</tt></div></span><p class="calibre4">or a wildcard pattern representing a set of hosts, where ? matches any single character and * any sequence of characters (just like filename wildcards in your favorite Unix shell): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host *.example.com<br class="calibre19"/>    Host 128.220.19.*</tt></div></span><p class="calibre4">Some further examples of wildcards:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host *.edu          <em class="italic"><span>Any hostname in the edu domain</span></em><br class="calibre19"/>    Host a*             <em class="italic"><span>Any hostname whose name begins with "a"</span></em><br class="calibre19"/>    Host *1*            <em class="italic"><span>Any hostname (or IP address!) with 1 in it</span></em><br class="calibre19"/>    Host *              <em class="italic"><span>Any hostname or IP address</span></em></tt></div></span><p class="calibre4">Tectia, in contrast, does not use a <code class="calibre35">Host</code> keyword. A new section is marked by a host specification string followed by a colon. This string may likewise be a computer name: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    server.example.com:</tt></div></span><p class="calibre4">an IP address:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    123.61.4.10:</tt></div></span><p class="calibre4">a nickname:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    my-nickname:</tt></div></span><p class="calibre4">or a wildcard pattern:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    *.example.com:<br class="calibre19"/>    128.220.19.*:</tt></div></span><p class="calibre4">You then follow the host-specification line with one or more settings, i.e., configuration keywords and values, as in the example we saw earlier. The following table contrasts OpenSSH and Tectia configuration files: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host myserver</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">myserver:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> IdentityFile myself</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> IdentityFile myself</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ForwardAgent no</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ForwardAgent no</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Port 220</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Port 220</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Cipher blowfish</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Ciphers blowfish</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">The settings apply only to the hosts named in the host specification. The section ends at the next host specification or the end of the file, whichever comes first. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1446763" class="calibre7"></a>7.1.2.4 Multiple matches </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1446852" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1446890" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1446928" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1446966" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1447063" class="calibre15"></a>Because wildcards are permitted in host specifications, a single hostname might match two or more sections in the configuration file. For example, if one section begins:<sup class="calibre20">[<a id="filepos1447297" shape="rect" href="DB_split_218.html#filepos1468326" class="calibre6">104</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host *.edu</tt></div></span><p class="calibre4">and another begins:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host *.harvard.edu</tt></div></span><p class="calibre4">and you connect to <span><em class="italic">server.harvard.edu</em></span>, which section applies? Believe it or not, they both do. Every matching section applies, and if a keyword is set more than once with different values, only one value applies. For OpenSSH, the earliest value takes precedence, whereas for Tectia the latest value wins. </p>
+<p class="calibre4">Suppose your client configuration file contains two sections to control data compression, password authentication, and the <span><em class="italic">ssh</em></span> escape character: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host *.edux<br class="calibre19"/>     Compression yes<br class="calibre19"/>     PasswordAuthentication yes<br class="calibre19"/><br class="calibre19"/>    Host *.harvard.edu<br class="calibre19"/>     Compression no<br class="calibre19"/>     EscapeChar %</tt></div></span><p class="calibre4">and you connect to <span><em class="italic">server.harvard.edu</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.harvard.edu</tt></div></span><p class="calibre4">Notice that the string <code class="calibre35">server.harvard.edu</code> matches both <code class="calibre35">Host</code> patterns, <code class="calibre35">*.edu</code> and <code class="calibre35">*.harvard.edu</code>. As we've said, the keywords in both sections apply to your connection. Therefore, the preceding <span><em class="italic">ssh</em></span> command sets values for the keywords <code class="calibre35">Compression</code>, <code class="calibre35">PasswordAuthentication</code>, and <code class="calibre35">EscapeChar</code>. </p>
+<p class="calibre4">But notice, in the example, that the two sections set different values for <code class="calibre35">Compression</code>. What happens? The rule is that the first value prevails -- in this case, <code class="calibre35">yes</code>. So, in the previous example, the values used for <em class="italic">server.harvard.edu</em> are: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Compression yes               <em class="italic"><span>The first of the Compression lines</span></em><br class="calibre19"/>    PasswordAuthentication yes    <em class="italic"><span>Unique to first section</span></em><br class="calibre19"/>    EscapeChar %                  <em class="italic"><span>Unique to second section</span></em></tt></div></span><p class="calibre4">and as shown in <a shape="rect" href="#filepos1451493" class="calibre6">Figure 7-2</a>. <code class="calibre35">Compression no</code> is ignored because it is the second <code class="calibre35">Compression</code> line encountered. Likewise, if 10 different <code class="calibre35">Host</code> lines match <span><em class="italic">server.harvard.edu</em></span>, all 10 of those sections apply, and if a particular keyword is set multiple times, only the first value is used. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1451493" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="OpenSSH client configuration file with multiple matches (Tectia not shown)" src="images/00028.jpg" class="calibre66"/></div>
+</div>
+</span><p class="calibre4">Figure 7-2. OpenSSH client configuration file with multiple matches (Tectia not shown) </p></div>
+<p class="calibre4">While this feature might seem confusing, it has useful properties. Suppose you want some settings applied to all remote hosts. Simply create a section beginning with: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host *</tt></div></span><p class="calibre4">and place the common settings within it. This section should be either the first or the last in the file. If first, its settings take precedence over any others. This can be used to guard against your own errors. For example, if you want to make sure you never, ever, accidentally use the old SSH-1 protocol, at the beginning of your configuration file put: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # First section of file<br class="calibre19"/>    Host *<br class="calibre19"/>     Protocol 2</tt></div></span><p class="calibre4">Alternatively, if you place <code class="calibre35">Host *</code> as the last section in the configuration file, its settings are used only if no other section overrides them. This is useful for changing SSH's default behavior, while still permitting overrides. For example, by default, data compression is disabled. You can make it enabled by default by ending your configuration file with: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Last section of file<br class="calibre19"/>    Host *<br class="calibre19"/>     Compression yes</tt></div></span><p class="calibre4">Voilá, you have changed the default behavior of <span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span> for your account! Any other section, earlier in the configuration file, can override this default simply by setting <code class="calibre35">Compression</code> to <code class="calibre35">no</code>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">The precedence rule is different for keywords that can apply multiple times in a section. For example, you can legitimately have more than one <code class="calibre35">IdentityFile</code> keyword in a section of <em class="italic">~/.ssh/config</em> (OpenSSH), meaning to try all the listed keys in turn. <a shape="rect" href="DB_split_223.html#filepos1501465" class="calibre6">[7.4.2]</a> Likewise, if more than one section applies to a host, and they each contain <code class="calibre35">IdentityFile</code> lines, then the union of all the named keys will be tried for authentication. In other words, <code class="calibre35">IdentityFile</code> values <span><em class="italic">accumulate</em></span> rather than override each other. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1455338" class="calibre7"></a>7.1.2.5 Making nicknames for hosts </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1455437" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1455475" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1455513" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1455551" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1455648" class="calibre15"></a>Suppose your client configuration file contains a section for the remote host <span><em class="italic">myserver.example.com</em></span> : </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host myserver.example.com<br class="calibre19"/>     ...</tt></div></span><p class="calibre4">One day, while logged onto <span><em class="italic">ourclient.example.com</em></span>, you decide to establish an SSH connection to <span><em class="italic">myserver.example.com</em></span>. Since both computers are in the same domain, <span><em class="italic">example.com</em></span>, you can omit the domain name on the command line and simply type: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh myserver</tt></div></span><p class="calibre4">This does establish the SSH connection, but you run into an unexpected nuance of configuration files. <span><em class="italic">ssh</em></span> compares the command-line string "myserver" to the Host string "myserver.example.com", determines that they don't match, and doesn't apply the section of the configuration file. Yes, the software requires an exact textual match between the hostnames on the command line and in the configuration file. </p>
+<p class="calibre4">You can get around this limitation by declaring <code class="calibre35">myserver</code> to be a nickname for <span><em class="italic">myserver.example.com</em></span>. In OpenSSH, this is done with the <code class="calibre35">Host</code> and <code class="calibre35">HostName</code> keywords. Simply use <code class="calibre35">Host</code> with the nickname and <code class="calibre35">HostName</code> with the fully qualified hostname: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host myserver<br class="calibre19"/>     HostName myserver.example.com<br class="calibre19"/>     ...</tt></div></span><p class="calibre4"><span><em class="italic">ssh</em></span> will now recognize that this section applies to your command <span><em class="italic">ssh myserver</em></span>. You may define any nickname you like for a given computer, even if it isn't related to the original hostname: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host simple<br class="calibre19"/>     HostName myserver.example.com<br class="calibre19"/>     ...</tt></div></span><p class="calibre4">Then you can use the nickname on the command line:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh simple</tt></div></span><p class="calibre4">For Tectia, the syntax is different but the effect is the same. Use the nickname in the host specification, and provide the full name to the <code class="calibre35">Host</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    simple:<br class="calibre19"/>     Host myserver.example.com<br class="calibre19"/>     ...</tt></div></span><p class="calibre4">Then type:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh simple</tt></div></span><p class="calibre4">Nicknames are convenient for testing new client settings. Suppose you have an OpenSSH configuration for <span><em class="italic">server.example.com</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Host server.example.com<br class="calibre19"/>     ...</tt></div></span><p class="calibre4">and you want to experiment with different settings. You could just modify the settings in place, but if they don't work, you'd have to waste time changing them back. The following steps demonstrate a more convenient way: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Within the configuration file, make a copy of the section you want to change:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Original<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     ...<br class="calibre19"/>    # Copy for testing<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     ...</tt></div></span></li>
+<li value="2" class="calibre18">In the copy, change "Host" to "HostName":<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Original<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     ...<br class="calibre19"/>    # Copy for testing<br class="calibre19"/>    HostName server.example.com<br class="calibre19"/>     ...</tt></div></span></li>
+<li value="3" class="calibre18">Add a new <code class="calibre35">Host</code> line at the beginning of the copy, using a phony name; for example, "Host my-test":<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Original<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>    ...<br class="calibre19"/>    # Copy for testing<br class="calibre19"/>    Host my-test<br class="calibre19"/>     HostName server.example.com<br class="calibre19"/>     ...</tt></div></span></li>
+<li value="4" class="calibre18">Setup is done. In the copy (<code class="calibre35">my-test</code>), make all the changes you want and connect using <span><em class="italic">ssh my-test</em></span>. You can conveniently compare the old and new behavior by running <span><em class="italic">ssh server.example.com</em></span> versus <span><em class="italic">ssh my-test</em></span>. If you decide against the changes, simply delete the <code class="calibre35">my-test</code> section. If you like the changes, copy them to the original section (or delete the original and keep the copy). </li>
+</ol></div>
+<p class="calibre4">You can do the same with Tectia:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Original<br class="calibre19"/>    server.example.com:<br class="calibre19"/>     ...<br class="calibre19"/>    # Copy for testing<br class="calibre19"/>    my-test:<br class="calibre19"/>     Host server.example.com<br class="calibre19"/>     ...</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.1.2.6 Comments, indenting, and style </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1463366" class="calibre15"></a>You probably noticed in the previous examples that we use the <code class="calibre35">#</code> symbol to represent comments: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # This is a comment</tt></div></span><p class="calibre4">In fact, any line beginning with # in the configuration file is treated as a comment and ignored. Likewise, blank lines (empty or containing only whitespace) are also ignored. </p>
+<p class="calibre4">You might also have noticed that the lines following a host specification are indented: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     Keyword1 value1<br class="calibre19"/>     Keyword2 value2<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    server.example.com:<br class="calibre19"/>     Keyword1 value1<br class="calibre19"/>     Keyword2 value2</tt></div></span><p class="calibre4">Indenting is considered good style because it visually indicates the beginning of a new section. It isn't required, but we recommend it. </p>
+</div>
+</div>
+</body>
+</html>

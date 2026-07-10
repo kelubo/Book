@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_176"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos680794" class="calibre7"></a>4.3.6 SSH-1 Compatibility Support for Tectia </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos680970" class="calibre15"></a>The Tectia server only supports the SSH-2 protocol, but it can be configured to run a separate SSH-1 server to support clients that are still using the older protocol. <a shape="rect" href="DB_split_187.html#filepos1202991" class="calibre6">[5.10]</a> The Tectia client can similarly run a separate SSH-1 client program, or it can use its own internal SSH-1 implementation. </p>
+<p class="calibre4">If separate SSH-1 programs are used, they must be obtained and installed. OpenSSH is a good choice for SSH-1 client support, but for SSH-1 server support, only versions earlier than 3.7 can be used. </p>
+<p class="calibre4">An alternative is the latest SSH1 implementation, which is quite old and (even worse) is no longer being actively maintained, but at least is designed to be integrated seamlessly with Tectia. </p>
+<p class="calibre4">To install SSH1, download the <code class="calibre35">tar</code> file and associated signature file from <a href="ftp://ftp.ssh.com/pub/ssh/" shape="rect" class="calibre6">ftp://ftp.ssh.com/pub/ssh/</a>. At press time, these were <em class="italic">ssh-1.2.33.tar.gz</em> and <em class="italic">ssh-1.2.33.tar.gz.sig</em>, respectively. </p>
+<p class="calibre4">To verify the signature, you also need to download the key, in the file <em class="italic">SSH1-DISTRIBUTION-KEY-RSA.asc</em>. Import the key into your key ring: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ gpg --import SSH1-DISTRIBUTION-KEY-RSA.asc</tt></div></span><p class="calibre4">Then check the integrity of the <code class="calibre35">tar</code> file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ gpg --verify ssh-1.2.33.tar.gz.sig</tt></div></span><p class="calibre4">Extract the files from the <code class="calibre35">tar</code> file in the usual way to create a source directory named <em class="italic">ssh-1.2.33</em>. <a shape="rect" href="DB_split_112.html#filepos572416" class="calibre6">[4.1.4]</a></p>
+<p class="calibre4">Run the <span><em class="italic">configure</em></span> script. We won't go over its options because they are obsolete for the most part, and because fancy features are presumably not needed (or even desirable) if SSH1 is only going to be employed as part of a transition strategy until older SSH-1 clients can be upgraded to use SSH-2. You can, however, remove unneeded features to prevent them from being exploited if any security holes are lurking in the code (which becomes increasingly likely as the software continues to age). As usual, see the output from <span><em class="italic">configure --help</em></span> for details. </p>
+<p class="calibre4">You can install SSH1 in the same directory as Tectia using the same <span><em class="italic">configure</em></span>
+<code class="calibre35">--prefix</code> option for each. <a shape="rect" href="DB_split_113.html#filepos576108" class="calibre6">[4.1.5]</a> Finally, compile everything with <span><em class="italic">make</em></span>, and install (typically as root) with <span><em class="italic">make install</em></span>. <a shape="rect" href="DB_split_114.html#filepos592786" class="calibre6">[4.1.6]</a> The following files are installed: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">The server program, <span><em class="italic">sshd1</em></span>, and a link to it called <span><em class="italic">sshd</em></span></li>
+<li class="calibre18">The clients <span><em class="italic">ssh1</em></span> and <span><em class="italic">scp1</em></span>, and respective links called <span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span></li>
+<li class="calibre18">The symbolic link <span><em class="italic">slogin1</em></span>, pointing to <span><em class="italic">ssh1</em></span>, and likewise a link called <span><em class="italic">slogin</em></span> pointing to <span><em class="italic">slogin1</em></span></li>
+<li class="calibre18">Support programs <span><em class="italic">ssh-add1</em></span>, <span><em class="italic">ssh-agent1</em></span>, <span><em class="italic">ssh-askpass1</em></span>, and <span><em class="italic">ssh-keygen1</em></span>, and links to them called <span><em class="italic">ssh-add</em></span>, <span><em class="italic">ssh-agent</em></span>, <span><em class="italic">ssh-askpass</em></span>, and <span><em class="italic">ssh-keygen</em></span>, respectively </li>
+<li class="calibre18">The support program <span><em class="italic">make-ssh-known-hosts</em></span></li>
+<li class="calibre18">A newly generated host key pair, created by <span><em class="italic">ssh-keygen1</em></span> and placed by default into <em class="italic">/etc/ssh/ssh_host_key</em> (private key) and <em class="italic">/etc/ssh/ssh_host_key.pub</em> (public key) </li>
+<li class="calibre18">The server configuration file, <em class="italic">/etc/ssh/sshd_config</em> by default <a shape="rect" href="DB_split_140.html#filepos748785" class="calibre6">[5.2.1]</a></li>
+<li class="calibre18">The client configuration file, <em class="italic">/etc/ssh/ssh_config</em> by default <a shape="rect" href="DB_split_217.html#filepos1429166" class="calibre6">[7.1.2]</a></li>
+<li class="calibre18">Manpages for the various programs</li>
+</ul></div>
+<p class="calibre4">Notice that SSH1 and Tectia create some files with the same names, such as the link <span><em class="italic">sshd</em></span>. What happens if you install both SSH1 and Tectia on the same machine? Happily, everything works out, even if you install the two products into the same <em class="italic">bin</em> and <em class="italic">etc</em> directories, provided you install the most recent versions. Each of their <em class="italic">Makefiles</em> is constructed to check for the existence of the other version and respond appropriately.<sup class="calibre20">[<a id="filepos688025" shape="rect" href="#filepos690915" class="calibre6">40</a>]</sup></p>
+<p class="calibre4">Specifically, both SSH1 and Tectia create symbolic links called <span><em class="italic">sshd</em></span>, <span><em class="italic">ssh</em></span>, <span><em class="italic">scp</em></span>, <span><em class="italic">ssh-add</em></span>, <span><em class="italic">ssh-agent</em></span>, <span><em class="italic">ssh-askpass</em></span>, and <span><em class="italic">ssh-keygen</em></span>. If you install SSH1 and then Tectia, the Tectia <em class="italic">Makefile</em> renames these files by appending the suffix <em class="italic">.old</em> and then creates new symbolic links pointing to its own Tectia programs. For instance, <span><em class="italic">ssh</em></span> originally points to <span><em class="italic">ssh1</em></span>; after installing Tectia, <span><em class="italic">ssh</em></span> points to <span><em class="italic">ssh2</em></span>, and <span><em class="italic">ssh.old</em></span> points to <span><em class="italic">ssh1</em></span>. This is appropriate since Tectia is considered a later version than SSH1. </p>
+<p class="calibre4">On the other hand, if you install Tectia and then SSH1, the SSH1 <em class="italic">Makefile</em> leaves Tectia's links untouched. As a result, <span><em class="italic">ssh</em></span> remains pointing to <span><em class="italic">ssh2</em></span>, and no link points to <span><em class="italic">ssh1</em></span>. This is consistent with the practice of installing SSH1 to allow Tectia to provide fallback SSH1 support. </p>
+<p class="calibre4">You need to set up the SSH1 configuration files in addition to the Tectia configuration files, and then keep them synchronized. <a shape="rect" href="DB_split_188.html#filepos1214412" class="calibre6">[5.10.1]</a></p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos690636" shape="rect" href="DB_split_126.html#filepos671175" class="calibre6">39</a>] </sup>Except for SOCKS5 authentication methods. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos690915" shape="rect" href="#filepos688025" class="calibre6">40</a>] </sup>Installers for Tectia binary distributions behave the same way when integrating with SSH1 installations. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_177"></div></body>
+</html>

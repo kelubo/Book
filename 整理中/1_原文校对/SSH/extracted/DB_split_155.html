@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_212"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos933838" class="calibre7"></a>5.4.1 Authentication Syntax </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos933997" class="calibre15"></a>
+<span><em class="italic">sshd</em></span> supports several different techniques for authentication that may be enabled or disabled. <a shape="rect" href="DB_split_065.html#filepos289467" class="calibre6">[3.1.3]</a>
+<a shape="rect" href="DB_split_076.html#filepos376537" class="calibre6">[3.4.3]</a> For example, if you don't trust password authentication, you can turn it off serverwide but still permit public-key authentication. </p>
+<p class="calibre4">As SSH has evolved, the syntax for configuring authentication has changed several times, and OpenSSH and Tectia use entirely different syntaxes. In OpenSSH, different authentication techniques are turned on and off with keywords of the form: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35"><em class="italic"><code class="calibre35">&lt;Name_Of_Technique&gt;</code></em>Authentication</tt></div></span><p class="calibre4">For example, password authentication is controlled by the keyword <code class="calibre35">PasswordAuthentication</code>, public-key authentication by <code class="calibre35">PubKeyAuthentication</code>, and so forth, one keyword per technique. Values may be <code class="calibre35">yes</code> or <code class="calibre35">no</code>, as in: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PubKeyAuthentication yes</tt></div></span><p class="calibre4"><a shape="rect" href="#filepos935875" class="calibre6">Table 5-1</a> lists all the authentication techniques supported by OpenSSH, and each is described in detail later. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos935875" class="calibre15"></a></span><p class="calibre4">Table 5-1. OpenSSH authentication keywords</p>
+<div class="calibre3">
+<table summary="OpenSSH authentication keywords" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Keyword</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Meaning</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ChallengeResponseAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">One-time passwords.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">GSSAPIAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Typically used for Kerberos. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostbasedAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Host-based authentication. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PasswordAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Password authentication. Exactly what this means is determined by the <code class="calibre35">UsePAM</code> and <code class="calibre35">KerberosAuthentication</code> keywords. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PubKeyAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Public-key authentication. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RhostsRSAAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SSH-1 protocol only: avoid. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RSAAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SSH-1 protocol only: avoid. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<p class="calibre4">Tectia has a more extensible syntax. Instead of creating a new keyword for each technique, you use only two keywords, <code class="calibre35">AllowedAuthentications</code> and <code class="calibre35">RequiredAuthentications</code>. Each is followed by the names of one or more authentication techniques<a shape="rect" class="calibre15"></a><a id="filepos940416" class="calibre15"></a>, separated by commas. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications password,hostbased,publickey</tt></div></span><p class="calibre4"><code class="calibre35">AllowedAuthentications</code> means that <span><em class="italic">any</em></span> of the given techniques <span><em class="italic">can</em></span> be used. In contrast, <code class="calibre35">RequiredAuthentications</code> means that <span><em class="italic">all</em></span> of the listed techniques <span><em class="italic">must</em></span> be used. If both keywords are present, then <code class="calibre35">RequiredAuthentications</code> is used, and <code class="calibre35">AllowedAuthentications</code> is ignored.<sup class="calibre20">[<a id="filepos941461" shape="rect" href="DB_split_164.html#filepos1005280" class="calibre6">62</a>]</sup><a shape="rect" href="#filepos942113" class="calibre6">Table 5-2</a> lists the supported values for these keywords. The first four techniques are specified by the IETF SECSH draft, while the ones with the @ssh.com suffix are nonstandard. It doesn't matter in what order you list the values because the SSH client, not the server, drives the authentication process. By default, Tectia's <span><em class="italic">sshd</em></span> allows only password and public-key authentication. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos942113" class="calibre15"></a></span><p class="calibre4">Table 5-2. Tectia authentication techniques for AllowedAuthentications and RequiredAuthentications </p>
+<div class="calibre3">
+<table summary="Tectia authentication techniques for AllowedAuthentications           and RequiredAuthentications" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Value</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Meaning</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">password</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Password authentication. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">publickey</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Public-key authentication. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">hostbased</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Host-based authentication. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">keyboard-interactive</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Extensible, general-purpose, interactive authentication. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">gssapi-with-mic</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">GSSAPI authentication with Message Integrity Code (MIC). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">gssapi</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">GSSAPI authentication (deprecated in favor of <code class="calibre35">gssapi-with-mic</code>). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">
+<span><a href="mailto:kerberos-2@ssh.com" shape="rect" class="calibre6">kerberos-2@ssh.com</a></span>
+</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Kerberos. Unsupported. Not available by default: requires recompilation. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">
+<span><a href="mailto:kerberos-tgt-2@ssh.com" shape="rect" class="calibre6">kerberos-tgt-2@ssh.com</a></span>
+</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Kerberos authentication with TGT (passed to server). Unsupported. </p>
+<p class="calibre4">Not available by default: requires recompilation. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">
+<span><a href="mailto:pam-1@ssh.com" shape="rect" class="calibre6">pam-1@ssh.com</a></span>
+</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Mostly obsolete: replaced by <code class="calibre35">keyboard-interactive</code>. Used only for old clients. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">
+<span><a href="mailto:securid-1@ssh.com" shape="rect" class="calibre6">securid-1@ssh.com</a></span>
+</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Mostly obsolete: replaced by <code class="calibre35">keyboard-interactive</code>. Used only for old clients. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<p class="calibre4">We now describe how to enable and disable each type of authentication except the deprecated SSH-1 keywords, which are in <a shape="rect" href="DB_split_511.html#filepos3030711" class="calibre6">Appendix D</a>. </p>
+</div>
+</body>
+</html>

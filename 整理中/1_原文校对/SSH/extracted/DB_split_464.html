@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_619"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2872900" class="calibre7"></a>18.3.2 File Transfer with PSFTP </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2873063" class="calibre15"></a>PSCP can copy files securely between computers, but the user interface is noninteractive. If you prefer a familiar FTP-like interface, try PSFTP, PuTTY's interactive file-transfer program. To start a file copying session with remote computer <span><em class="italic">server.example.com</em></span>, run: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; psftp server.example.com<br class="calibre19"/>    login as: smith<br class="calibre19"/>    Using username "smith".<br class="calibre19"/>    smith@server.example.com's password:<br class="calibre19"/>    Remote working directory is /home/smith<br class="calibre19"/>    psftp&gt;</tt></div></span><p class="calibre4">The prompt <code class="calibre35">psftp&gt;</code> indicates that PSFTP is ready to accept commands. If you're familiar with FTP, the PSFTP commands will make you feel right at home. To transfer a file from your local machine to the remote server, use: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    psftp&gt; put myfile</tt></div></span><p class="calibre4">or to copy a local file, <em class="italic">myfile</em>, as remote file <em class="italic">remotefile</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    psftp&gt; put myfile remotefile</tt></div></span><p class="calibre4">This is equivalent to the PSCP command:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; scp myfile server.example.com:remotefile</tt></div></span><p class="calibre4">In the other direction, to transfer files from the remote server to your local machine, use <span><em class="italic">get</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    psftp&gt; get remotefile<br class="calibre19"/>    psftp&gt; get remotefile myfile</tt></div></span><p class="calibre4">To traverse the directory (folder) hierarchy of the remote machine, use the <span><em class="italic">cd</em></span> command as in DOS or Unix: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    psftp&gt; cd my_remote_subfolder<br class="calibre19"/>    psftp&gt; cd ..</tt></div></span><p class="calibre4">To change your working directory on the local machine, use <span><em class="italic">lcd</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    psftp&gt; lcd my_local_subfolder<br class="calibre19"/>    psftp&gt; lcd ..</tt></div></span><p class="calibre4">For a full list of commands, type <span><em class="italic">help</em></span>, or for assistance with a particular command, specify the command name as well (e.g., <span><em class="italic">help put</em></span>). <a shape="rect" href="#filepos2876931" class="calibre6">Table 18-2</a> lists the available commands. Unfortunately, PSFTP does not include the useful <span><em class="italic">mput</em></span> and <span><em class="italic">mget</em></span> commands for transferring many files at once. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2876931" class="calibre15"></a></span><p class="calibre4">Table 18-2. PSFTP commands</p>
+<div class="calibre3">
+<table summary="PSFTP commands" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Basic commands:</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">open</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Open an SFTP connection to a remote server. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">bye, exit, quit</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Exit PSFTP.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">help</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Get a help message.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">!</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Shell escape: run a command-line program on your local computer. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Directory (folder) commands:</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">dir, ls</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">List a directory.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">cd</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Change directory (remote machine). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">lcd</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Change directory (local machine). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">pwd</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Print the name of the directory you're in (remote machine). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">lpwd</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Print the name of the directory you're in (local machine). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">mkdir</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Create a directory.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">rmdir</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Delete a directory.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">File commands:</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">get</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Download a file.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">put</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Upload a file.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">reget</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Restart a download that you tried previously, but failed; will pick up where the previous download left off. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">reput</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Restart an upload that you tried previously, but failed; will pick up where the previous upload left off. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">mv, ren</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Rename a file.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">rm, del</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Delete a file.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">chmod</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Change permissions of a file, like the Unix <span><em class="italic">chmod</em></span> command. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_620"></div></body>
+</html>

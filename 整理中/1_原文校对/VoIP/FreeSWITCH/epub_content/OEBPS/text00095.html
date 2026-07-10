@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.8　在呼叫失败的情况下向主叫用户播放语音提示</font>
+</font>
+</p>
+<p height="1em" width="2em">在传统的电话网络中，在呼叫失败的情况下交换机会给主叫用户一个有意义的语音提示，如“您拨打的电话正在通话中，请稍后再拨……”或“您拨打的电话暂时无法接通……”之类。在FreesSWITCH中也可以做到。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.8.1　实现方法</font>
+</font>
+</p>
+<p height="1em" width="2em">若已经熟练掌握了前面的知识，则再来看具体的实现就觉得很简单了。在此我们在默认的配置上修改，以实现具体的功能。</p>
+<p height="1em" width="2em">在默认的配置中，对本地用户的路由都是在conf/dialplan/default.xml中的Local_Extension部分配置的。在呼叫失败时，会将电话转到voicemail（语音信箱），提示用户可留言。为了能给主叫用户一个语音提示，我们可以在电话进入语音信箱之前做点文章，让它播放一个语音提示（当然播放完毕后也可以不进入语音信箱而直接挂机）。</p>
+<p height="1em" width="2em">找到&lt;extension name="Local_Extension"&gt;部分的最后几行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="user/${dialed_extension}@${domain_name}"/&gt;<br/>
+<br/>
+&lt;action application="answer"/&gt;<br/>
+<br/>
+&lt;action application="sleep" data="1000"/&gt;<br/>
+<br/>
+&lt;action application="bridge" data="loopback/app=voicemail:default ${domain_name} ${dialed_extension}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，第一个bridge用于呼叫被叫号码，如果呼叫失败，则Dialplan会继续往下执行，执行顺序是：</p>
+<p height="1em" width="2em">·应答（answer）；</p>
+<p height="1em" width="2em">·“睡”一会（sleep，即暂停1秒钟，其中1000的单位是毫秒）；</p>
+<p height="1em" width="2em">·进入语音信箱（voicemail）。</p>
+<p height="1em" width="2em">到这里，我们只需要在最后一个bridge之前加入下面一行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="playback" data="/tmp/${originate_disposition}.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">重新打电话试一下，如果被叫忙（或拒接），则originate_disposition变量的值就会是USER_BUSY（有的终端会返回CALL_REJECTED），而如果用户没注册就是USER_NOT_REGISTERED之类的。通过增加上面一行，笔者在拨打一个不存在的用户时，看到如下的日志：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+EXECUTE sofia/internal/1002@192.168.7.5 playback(USER_NOT_REGISTERED.wav)<br/>
+<br/>
+[ERR] mod_sndfile.c:202 Error Opening File [/tmp/USER_NOT_REGISTERED.wav][System error : No such file or directory.]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面的日志提示找不到指定的文件。当然这个问题很好解决，我们录一个放上去就可以了，内容可以是“您拨打的电话暂时无法接通……”。当然，对于其他情况，如用户忙，我们也可以录一段提示并放到/tmp/USER_BUSY.wav文件中。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.8.2　进阶</font>
+</font>
+</p>
+<p height="1em" width="2em">不过，呼叫失败的原因可能有很多，我们不可能录上所有的声音文件，此时有两种方法可以解决这个问题。</p>
+<p height="1em" width="2em">1）使用一个Lua（或其他语言）脚本。</p>
+<p height="1em" width="2em">我们可以不增加刚才playback一行的配置（即上一小节提到的在最后一个bridge之前加入的代码），而是增加如下的行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action appliction="lua" data="/tmp/xxx.lua"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在Lua脚本中可以取到originate_disposition变量，从而可以使用if...then...else之类的逻辑选择播放各种声音文件（即只针对有限几种常用的情况播放特定的声音，其他的一律播放同一个文件）。关于Lua开发的知识我们将在第16章讲到，在这里就不多讲了。</p>
+<p height="1em" width="2em">2）当然，如果不想使用Lua，也可以使用Dialplan配置做到。实际上，FreeSWITCH的Dialplan功能是非常强大的，你只需要使用如下配置将呼叫转到播放不同声音文件的Dialplan Extension：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="transfer" data="play-cause-${originate_disposition}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后创建如下Dialplan Extension，以匹配上面转移的目的地：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Local_Extension_play-cause"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^play-cause-USER_BUSY$"&gt;<br/>
+<br/>
+        &lt;action application="playback" data="/tmp/user-busy.wav"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+&lt;extension name="Local_Extension_play-cause"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^play-cause-USER_NOT_REGISTERED$"&gt;<br/>
+<br/>
+        &lt;action application="playback" data="/tmp/user-not-registered.wav"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+&lt;extension name="Local_Extension_play-cause"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^play-cause(.*)$"&gt;<br/>
+<br/>
+        &lt;action application="log" data="WARNING hangup cause: $1"/&gt;<br/>
+<br/>
+        &lt;!-- <br/>
+<br/>
+对于其他各种情况，播放该文件 --&gt;<br/>
+<br/>
+        &lt;action application="playback" data="/tmp/sounds/unknown-error.wav"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里的Dialplan配置即根据转移的目的地参数的不同播放不同的声音文件。读者可根据前面的知识自行分析。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.8.3　使用TTS</font>
+</font>
+</p>
+<p height="1em" width="2em">前面我们已经学会了强大的TTS功能，也讲到了TTS的各种好处，所以这里我们用TTS做语音提示。在此，我们使用前面讲过的Phrase Macro功能来实现各种提示音。</p>
+<p height="1em" width="2em">首先，我们在11.7.2节的基础上 <sup>
+<small>
+<a href="text00096.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，在conf/lang/zh/demo目录下创建以下脚本，可以将文件命名为book-demo.xml，内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;include&gt;<br/>
+<br/>
+  &lt;macro name="USER_BUSY"&gt;<br/>
+<br/>
+    &lt;input pattern="(.*)"&gt;<br/>
+<br/>
+      &lt;match&gt;<br/>
+<br/>
+        &lt;action function="speak-text" data="<br/>
+<br/>
+分机 $1 <br/>
+<br/>
+正在通话，请稍后再拨"/&gt;<br/>
+<br/>
+      &lt;/match&gt;<br/>
+<br/>
+    &lt;/input&gt;<br/>
+<br/>
+  &lt;/macro&gt;<br/>
+<br/>
+  &lt;macro name="USER_NOT_REGISTERED"&gt;<br/>
+<br/>
+    &lt;input pattern="(.*)"&gt;<br/>
+<br/>
+      &lt;match&gt;<br/>
+<br/>
+        &lt;action function="speak-text" data="<br/>
+<br/>
+分机"/&gt;<br/>
+<br/>
+        &lt;action function="say" data="$1" method="iterated" type="number"/&gt;<br/>
+<br/>
+        &lt;action function="speak-text" data="<br/>
+<br/>
+暂时无法接通，请稍后再拨"/&gt;<br/>
+<br/>
+      &lt;/match&gt;<br/>
+<br/>
+    &lt;/input&gt;<br/>
+<br/>
+  &lt;/macro&gt;<br/>
+<br/>
+&lt;/include&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，我们上面配置了两个宏（Macro），第一个用于在用户忙的时候播放；第二个在用户未注册的时候播放。其中，name为Macro的名字，pattern会使用正则表达式匹配输入的参数（类似于Dialplan中的正则表达式）。在这里，我们会将被叫号码作为输入参数。也就是说，如果呼叫分机1009失败，就会播放“分机1009正在通话，请稍后再拨”。当然，我们在第二个Macro中使用了Say来播放被叫号码，只是为了演示另外一种实现方式。</p>
+<p height="1em" width="2em">配置好上述文件后，在FreeSWITCH控制台上执行reloadxml使之生效。然后，在Dialplan中，就可以将11.8.1节的playback的参数换写成以下这样：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="playback" data="phrase:${originate_disposition}:$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，以“phrase:”开头的文件参数表示这里要播放一个Phrase Macro，冒号后面跟的是参数，即我们在Dialplan正则表达式匹配中获得的被叫号码。如果被叫是1009，并且在被叫忙的情况下，上述配置展开后最终的结果是这样的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="playback" data="phrase:USER_BUSY:1009"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，也可以在Dialplan中直接使用phrase App，下面的代码与上述配置是等价的（不同的是，这里参数的分隔符是逗号）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="phrase" data="${originate_disposition},$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">执行reloadxml后，再次拨打一个失败的电话试一下，就可以听到用TTS功能播放的提示音了。</p>
+<p height="1em" width="2em">当然，有了Phrase Macro，我们的配置方式就更灵活了，如我们可以只用一个Phrase Macro来搞定所有的情况。先配置如下Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="phrase" data="HangupCause,${originate_disposition}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">为了配合上述Dialplan，我们需要在Phrase Macro中配置一个名为HangupCause的Macro，并将originate_disposition作为参数传入。然后我们再来配置该Macro，同一个Macro中配置多个input可以针对不同的参数输入执行不同的动作（action），具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;macro name="HangupCause"&gt;<br/>
+<br/>
+    &lt;input pattern="USER_BUSY"&gt;<br/>
+<br/>
+        &lt;match&gt;<br/>
+<br/>
+            &lt;action function="speak-text" data="<br/>
+<br/>
+您拨的电话正在通话，请稍后再拨"/&gt;<br/>
+<br/>
+        &lt;/match&gt;<br/>
+<br/>
+    &lt;/input&gt;<br/>
+<br/>
+    &lt;input pattern="USER_NOT_REGISTERED"&gt;<br/>
+<br/>
+        &lt;match&gt;<br/>
+<br/>
+            &lt;action function="speak-text" data="<br/>
+<br/>
+您拨的电话不在线，请稍后再拨"/&gt;<br/>
+<br/>
+        &lt;/match&gt;<br/>
+<br/>
+    &lt;/input&gt;<br/>
+<br/>
+    &lt;input pattern="(.*)"&gt;<br/>
+<br/>
+        &lt;match&gt;<br/>
+<br/>
+            &lt;action function="speak-text" data="<br/>
+<br/>
+您拨的电话暂时无法接通，请稍后再拨"/&gt;<br/>
+<br/>
+        &lt;/match&gt;<br/>
+<br/>
+    &lt;/input&gt;<br/>
+<br/>
+&lt;/macro&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，该Phrase Macro对前两种情况播放不同的语音提示，对以后所有的情况都播放同一个语音提示，比在11.8.2节中用Dialplan方式实现显然更简洁，也更容易理解。</p>
+<p height="1em" width="2em">当然，最后这一个例子在播放提示时没有播放被叫号码。如果读者也想在提示音中包含被叫号码，可以与originate_disposition参数一起传到Phrase Macro中，使用一个分隔符隔开（如“!”），这样就可以再用类似“^(.*)!(.*)$”这样的正则表达式将两个参数取出来了。具体的实现留给读者练习，在此就不多讲了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.8.4　原理</font>
+</font>
+</p>
+<p height="1em" width="2em">当然，在被叫失败后播放我们上面指定的提示音或TTS是有一个前提的——在Dialplan的第一个bridge之前要有以下两行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="hangup_after_bridge=true"/&gt;<br/>
+<br/>
+&lt;action application="set" data="continue_on_fail=true"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，第一行的作用是：在一个成功的bridge之后，如果被叫用户挂断电话，我们也没有必要再向主叫用户播放提示音了，因此可以直接挂机（Hangup After Bridge的字面意思就是“在Bridge成功后挂断电话”）。当然，这一行也可以没有，这就需要在后面检查originate_disposition变量值的时候，发现如果是“NORMAL_CLEARING”（表示呼叫正常释放），再决定是否播放相关语音文件或挂机。</p>
+<p height="1em" width="2em">第二行的作用是：如果呼叫失败（fail，如空号，拒接等），让Dialplan继续往下执行；否则（值为false的情况）Channel在第一次呼叫（bridge）失败时就挂机了。该变量的值除了是笼统的“true”以外，还可是各种用逗号分隔开的挂断原因值。例如，下面的配置表示只有遇到用户忙或无应答这两种情况才播放语音，其他的就直接挂机。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="continue_on_fail=USER_BUSY,NO_ANSWER"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">常见的挂断原因取值除了上述代码中的外还有NORMAL_TEMPORARY_FAILURE（普通临时失败）、TIMEOUT（超时）、NO_ROUTE_DESTINATION（空号/无法路由）等几种。更详细的失败原因可以参见http://wiki.freeswitch.org/wiki/Hangup_causes。</p>
+<p height="1em" width="2em">总之，通过上述两个参数就可以在呼叫失败的时候让Dialplan正常往下进行，进而有机会检查上一次呼叫失败的原因，并播放相关的语音提示。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00095.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 注意在zh.xml中需要配置正确的TTS引擎，如笔者配置的是“tts-engine="tts_commandline"ttsvoice="Ting-Ting"”。</p>
+</body>
+</html>

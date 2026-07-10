@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_78"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos231928" class="calibre7"></a>2.4.3 Installing a Public Key on an SSH Server Machine </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos232114" class="calibre15"></a>When passwords are used for authentication, the host operating system maintains the association between the username and the password. For cryptographic keys, you must set up a similar association manually. After creating the key pair on the local host, you must install your public key in your account on the remote host. A remote account may have many public keys installed for accessing it in various ways. </p>
+<p class="calibre4">Returning to our running example, you must install a public key into the pat account on <span><em class="italic">shell.isp.com</em></span>. This is done by editing a file in the SSH configuration directory: <em class="italic">~/.ssh/authorized_keys</em>
+<a shape="rect" class="calibre15"></a><a id="filepos232913" class="calibre15"></a> for OpenSSH or <em class="italic">~/.ssh2/authorization</em> for Tectia. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>2.4.3.1 Instructions for OpenSSH </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Create or edit the remote file <em class="italic">~/.ssh/authorized_keys</em> and append your public key—i.e., the contents of the <em class="italic">id_dsa.pub</em> file you generated on the local machine. A typical <em class="italic">authorized_keys</em> file contains a list of public-key data, one key per line. The example contains only two public keys, each on its own line of the file, but they are too long to fit on this page. The line breaks inside the long numbers are printing artifacts; if they were actually in the file, it would be incorrectly formatted and wouldn't work: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh-dss<br class="calibre19"/>    AAAAB3NzaC1kc3MAAACBAMCiL15WEI+0dFJZ9InMSh4PAZ3eFO7YJBFZ6ybl7ld+807z/jnXGghYVuvKbHdNlR<br class="calibre19"/>YWidhdFWtDW3l5v8Ce7nyYhcQU7x+j4JeUf7qmLmQxlu0v+O5rlg7L5U2RuW94yt1BGj+xk7vzLwOhKHE/+YFVz52s<br class="calibre19"/>FNazoYXqPnm1pRPRAAAAFQDGjroMj+ML= jones@client2.com<br class="calibre19"/>    ssh-rsa<br class="calibre19"/>    AAAAB3NzaC1yc2EAAAABIwAAAIEAvpB4lUbAaEbh9u6HLig7amsfywD4fqSZq2ikACIUBn3GyRPfeF93l/<br class="calibre19"/>weQh702ofXbDydZAKMcDvBJqRhUotQUwqV6HJxqoqPDlPGUUyo8RDIkLUIPRyqypZxmK9aCXokFiHoGCXfQ9imUP/<br class="calibre19"/>w/jfqb9ByDtG97tUJF6nFMP5WzhM= smith@client.net</tt></div></span><p class="calibre4">The first entry is a DSA key and the second is RSA. <a shape="rect" href="DB_split_270.html#filepos1776655" class="calibre6">[8.2.1]</a></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>2.4.3.2 Instructions for Tectia </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos235144" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos235182" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos235220" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos235258" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos235296" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos235393" class="calibre15"></a>For Tectia you need to edit two files, one on the client machine and one on the server machine. On the client machine, create or edit the file <em class="italic">~/.ssh2/identification</em> and insert a line to identify your private-key file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    IdKey id_dsa_2048_a</tt></div></span><p class="calibre4">On the server machine, create or edit the file <em class="italic">~/.ssh2/authorization</em>, which contains information about public keys, one per line. But unlike OpenSSH's <em class="italic">authorized_keys</em> file, which contains copies of the public keys, the <em class="italic">authorization</em> file lists only the filename of the key: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Key id_dsa_2048_a.pub</tt></div></span><p class="calibre4">Finally, copy <em class="italic">id_dsa_2048_a.pub</em> from your local machine to the remote Tectia server machine, placing it in <em class="italic">~/.ssh2</em>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Installing OpenSSH Keys with ssh-copy-id</h3>
+<p class="calibre4">OpenSSH includes a program, <span><em class="italic">ssh-copy-id</em></span>, that installs a public key automatically on a remote server with a single command, placing it into <em class="italic">~/.ssh/authorized_keys</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    ssh-copy-id -i <em class="italic"><code class="calibre35">key_file</code></em> [<em class="italic"><code class="calibre35">user</code></em>@]<em class="italic"><code class="calibre35">server_name</code></em></tt></div></span><p class="calibre4">For example, to install the key <em class="italic">mykey</em> in the dulaney account on <span><em class="italic">server.example.com</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    $ ssh-copy-id -i mykey dulaney@server.example.com</tt></div></span><p class="calibre4">You don't need to list the <em class="italic">.pub</em> extension of the key file; or more specifically, you can provide either the private or public-key file, and the public key is copied to the remote server. </p>
+<p class="calibre4">In order for the copy to take place, you'll need an account on the remote machine, of course, and you'll need to authenticate somehow. If you've never set up public-key authentication on <span><em class="italic">server.example.com</em></span> before, you'll be prompted for your login password. </p>
+<p class="calibre4"><span><em class="italic">ssh-copy-id</em></span> is convenient, but it has some subtle issues: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">If you have no <em class="italic">authorized_keys</em> file on the remote machine, <span><em class="italic">ssh-copy-id</em></span> creates one containing your new key; otherwise, it appends the new key. </li>
+<li class="calibre18">If you do already have a remote <em class="italic">authorized_keys</em> file, and it does not end with a newline character, <span><em class="italic">ssh-copy-id</em></span> blindly appends your new key onto the last public key in the file, with no newline between them. This effectively corrupts the last two keys in <em class="italic">authorized_keys</em>. Moral: always make sure <em class="italic">authorized_keys</em> ends with a newline. (This is easy to overlook, especially when running OpenSSH on Windows. <a shape="rect" href="DB_split_397.html#filepos2669258" class="calibre6">[14.4]</a>) </li>
+<li class="calibre18">The syntax of <span><em class="italic">ssh-copy-id</em></span> is similar to that of <span><em class="italic">scp</em></span>, the secure copy program, but there's an important difference: <span><em class="italic">scp</em></span> follows the hostname of the remote machine with a colon. Don't use a colon with <span><em class="italic">ssh-copy-id</em></span> or you'll get an error message, "Name or service not known," as the hostname lookup fails. </li>
+</ul></div>
+<p class="calibre4">Before you use <span><em class="italic">ssh-copy-id</em></span> to simplify or hide the details of public-key authentication, we recommend that you understand how to set it up manually. This point is often true of security-related software: you should know how and why it works. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Regardless of which SSH implementation you use, make sure your remote SSH directory and associated files are writable only by your account:<sup class="calibre20">[<a id="filepos241043" shape="rect" href="DB_split_051.html#filepos247598" class="calibre6">8</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ chmod 755 ~/.ssh<br class="calibre19"/>    $ chmod 644 ~/.ssh/authorized_keys<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ chmod 755 ~/.ssh2<br class="calibre19"/>    $ chmod 644 ~/.ssh2/id_dsa_2048_a.pub<br class="calibre19"/>    $ chmod 644 ~/.ssh2/authorization</tt></div></span><p class="calibre4">The SSH server is picky about file and directory permissions and may refuse authentication if the remote account's SSH configuration files have insecure permissions. <a shape="rect" href="DB_split_147.html#filepos810666" class="calibre6">[5.3.2.1]</a></p>
+<p class="calibre4">You are now ready to use your new key to access the pat account: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -l pat shell.isp.com<br class="calibre19"/>    Enter passphrase for key '/home/you/.ssh/id_dsa': ************<br class="calibre19"/>    Last login: Mon Aug 16 19:44:21 2004 from quincunx.nefertiti.org<br class="calibre19"/>    You have new mail.<br class="calibre19"/>    shell.isp.com&gt;</tt></div></span><p class="calibre4">If all goes well, you are logged into the remote account. <a shape="rect" href="#filepos243515" class="calibre6">Figure 2-2</a> shows the entire process. </p>
+<p class="calibre4">Note the similarity to the earlier example with password authentication. <a shape="rect" href="DB_split_042.html#filepos194741" class="calibre6">[2.2]</a> On the surface, the only difference is that you provide the passphrase to your private key, instead of providing your login password. Underneath, however, something quite different is happening. In password authentication, the password is transmitted to the remote host. With cryptographic authentication, the passphrase serves only to decrypt the private key to create an authenticator. <a shape="rect" href="DB_split_048.html#filepos222084" class="calibre6">[2.4.1]</a></p>
+<p class="calibre4">Public-key authentication is more secure than password authentication because: </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos243515" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Public-key authentication" src="images/00006.jpg" class="calibre46"/></div>
+</div>
+</span><p class="calibre4">Figure 2-2. Public-key authentication</p></div>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">It requires two secret components—the identity file on disk, and the passphrase in your head—so both must be captured in order for an adversary to access your account. Password authentication requires only one component, the password, which might be easier to steal. </li>
+<li class="calibre18">Neither the passphrase nor the key is sent to the remote host, just the authenticator discussed earlier. Therefore, no secret information is transmitted off the client machine. </li>
+<li class="calibre18">Machine-generated cryptographic keys are infeasible to guess. Human-generated passwords are routinely cracked by a password-guessing technique called a <span><em class="italic">dictionary attack</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos244716" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos244755" class="calibre15"></a>. A dictionary attack may be mounted on the passphrase as well, but this requires stealing the private-key file first. </li>
+</ul></div>
+<p class="calibre4">A host's security can be greatly increased by disabling password authentication altogether and permitting only SSH connections by key. </p>
+</div>
+</div>
+</body>
+</html>

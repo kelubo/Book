@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_274"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1390800" class="calibre7"></a>6.3.7 Debugging the Agent </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">OpenSSH's <span><em class="italic">ssh-agent</em></span> has a primitive debugging mode that's enabled with the <span><em class="italic">-d</em></span> option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    ssh-agent -d<br class="calibre19"/>    SSH_AUTH_SOCK=/tmp/ssh-nQxHO27500/agent.27500; export SSH_AUTH_SOCK;<br class="calibre19"/>    echo Agent pid 27500;</tt></div></span><p class="calibre4">In debug mode, the agent runs in the foreground instead of putting itself into the background (forking). To communicate with the agent and watch it print debug messages, open a second shell (e.g., in a separate X terminal window) and run the variable-setting command that <span><em class="italic">ssh-agent</em></span> printed on invocation: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ SSH_AUTH_SOCK=/tmp/ssh-nQxHO27500/agent.27500; export SSH_AUTH_SOCK;</tt></div></span><p class="calibre4">Then try some <span><em class="italic">ssh-add</em></span> commands and see what the agent does. For example, if you run this in your second shell: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-add -l<br class="calibre19"/>    The agent has no identities.</tt></div></span><p class="calibre4">then the agent in the original shell prints:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: type 1<br class="calibre19"/>    debug1: type 11</tt></div></span><p class="calibre4">The <code class="calibre35">type</code> output indicates the type of message that <span><em class="italic">ssh-agent</em></span> has received. Types 1 and 11 are requests for identities (SSH-1 and SSH-2, respectively), which makes perfect sense because that's what <span><em class="italic">ssh-add -l</em></span> does. A few other message codes are 17 to load an identity, 18 to delete one, and 19 to delete all identities. You can learn more message types by reading the C header file <em class="italic">authfd.h</em> in the OpenSSH source code. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1393756" shape="rect" href="DB_split_200.html#filepos1316442" class="calibre6">93</a>] </sup>This design also fits well with <span><em class="italic">token-based key storage</em></span>, in which your keys are kept on a smart card carried with you. Like agents, smart cards respond to key-related requests but don't give out keys, so integration with SSH would be straightforward. Though adoption of tokens has been slow, we believe it will be commonplace in the future. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1394401" shape="rect" href="DB_split_201.html#filepos1321700" class="calibre6">94</a>] </sup>This is Bourne shell syntax. If your shell is <span><em class="italic">csh</em></span> or <span><em class="italic">tcsh</em></span>, use the appropriate syntax. <a shape="rect" href="DB_split_201.html#filepos1335344" class="calibre6">[6.3.2.3]</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1394926" shape="rect" href="DB_split_201.html#filepos1322529" class="calibre6">95</a>] </sup>Why can't <span><em class="italic">ssh-agent</em></span> set its environment variables without all this trickery? Because under Unix, a program can't set environment variables in its parent shell. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1395390" shape="rect" href="DB_split_201.html#filepos1325143" class="calibre6">96</a>] </sup>Actually, you can reconnect to an agent launched in a previous login, by modifying your <code class="calibre35">SSH_AUTH_SOCK</code> variable to point to the old socket. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1395803" shape="rect" href="DB_split_201.html#filepos1329881" class="calibre6">97</a>] </sup>In fact, many Linux distributions set this up for you, automatically launching <span><em class="italic">ssh-agent</em></span> when you log in via KDE or GNOME. Red Hat Linux and SUSE Linux are two examples. After logging in, run a <span><em class="italic">ps</em></span> command and grep for "agent" to see this in action. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1396420" shape="rect" href="DB_split_202.html#filepos1339735" class="calibre6">98</a>] </sup>OpenSSH's <span><em class="italic">ssh-add</em></span> tries to reuse a passphrase to load subsequent keys. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1396795" shape="rect" href="DB_split_202.html#filepos1341047" class="calibre6">99</a>] </sup>X has its own security problems, of course. If someone can connect to your X server, they can monitor all your keystrokes, including your passphrase. Whether this is an issue in using <span><em class="italic">ssh-askpass</em></span> depends on your system and security needs. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1397339" shape="rect" href="DB_split_204.html#filepos1388173" class="calibre6">100</a>] </sup>Tectia supports the keyword <code class="calibre35">AllowAgentForwarding</code> as a synonym for <code class="calibre35">ForwardAgent</code>. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_275"></div></body>
+</html>

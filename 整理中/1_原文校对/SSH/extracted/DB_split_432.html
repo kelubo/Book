@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_572"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2800450" class="calibre7"></a>16.11.8 Logging and Debugging </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2800611" class="calibre15"></a>The server records log messages in the Windows event log, instead of using the standards syslog service found on Unix systems. The event log can be viewed using the Tectia server administration program, or using the Control Panel, by selecting Administrative Tools/Event Viewer. </p>
+<p class="calibre4">The verbosity of the messages is controlled by the <code class="calibre35">EventLogFilter</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    EventLogFilter      error, warning</tt></div></span><p class="calibre4">Values are a comma-separated list (with optional whitespace) consisting of one or more of the following levels: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">error</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Serious problems that prevent operations from completing </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">warning</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Problems that allow operations to continue</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">information</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Normal, successful events</div>
+</blockquote>
+</div>
+<p class="calibre4">Note that the higher levels do not include the lower levels, as they do for syslog on Unix systems. Each Windows event log level must be specified explicitly. </p>
+<p class="calibre4">The SFTP server's log messages are controlled by a separate keyword, <code class="calibre35">SftpLogCategory</code>, that specifies the kinds of messages that are sent to the event log: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    SftpLogCategory     31</tt></div></span><p class="calibre4">The numeric value is the sum of any of the following:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">16 = user login/logout (the default)</li>
+<li class="calibre18">8 = folder listings</li>
+<li class="calibre18">4 = modifications</li>
+<li class="calibre18">2 = uploads</li>
+<li class="calibre18">1 = downloads</li>
+</ul></div>
+<p class="calibre4">The <span><em class="italic">ssh2admin</em></span> program provides more convenient checkboxes to specify the value for <code class="calibre35">SftpLogCategory</code>. </p>
+<p class="calibre4">The <span><em class="italic">ssh2master -d</em></span> option works the same way as it does for <span><em class="italic">sshd2</em></span> on Unix systems to enable debug mode and specify the debug log level: <a shape="rect" href="DB_split_185.html#filepos1164478" class="calibre6">[5.9.2]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    ssh2master -d4</tt></div></span><p class="calibre4">Debug output is written to the console window by default, but this can be redirected to a file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    ssh2master -d4 2&gt; debug.txt</tt></div></span><p class="calibre4">The scripts <span><em class="italic">debug-ssh.bat</em></span> and <span><em class="italic">debug-ssh-file.bat</em></span> run <span><em class="italic">ssh2master</em></span> with debug level 4, as shown earlier. In addition, the <span><em class="italic">debug-ssh-file.bat</em></span> script redirects output to the file <em class="italic">sshd2_debug_output.txt</em> in the installation folder, and then displays the file in the Notepad editor after the server exits. These scripts can also be run by selecting the items Troubleshoot Server or Troubleshoot Server and Save Debug Output from the menu Start/Programs/SSH Tectia Server/Tools. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2805661" shape="rect" href="DB_split_430.html#filepos2796225" class="calibre6">182</a>] </sup>Windows does not normally distinguish privileged ports from higher-numbered ports. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_573"></div></body>
+</html>

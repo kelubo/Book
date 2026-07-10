@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_386"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1972983" class="calibre7"></a>9.3.1. SOCKS v4, SOCKS v5, and Names </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">There are actually two commonly used versions of the SOCKS protocol: Version 4 and Version 5. Both OpenSSH and Tectia clients can do SOCKS proxying, and recent versions implement SOCKS5 as well as SOCKS4. SOCKS5 added many features over SOCKS4—authentication, UDP support, bidirect forwarding, and more—but the germane feature here is that SOCKS4 only understands IP addresses in destination sockets, whereas SOCKS5 accepts domain names as well. This is crucial for both practical and privacy reasons. Often, the naming context on either side of the SSH connection is different: in our current example, your company's network probably has a private namespace for hosts (e.g., an internal-only DNS which isn't available to the outside world). With SOCKS4, your browser must look up the name in the URL locally, then ask the SOCKS proxy to connect to the resulting address. That won't work for us; we want to give the proxy the (name,port) to reach, and have it resolve the name on the far side of the connection, in the correct context. </p>
+<p class="calibre4">The privacy aspect is, if you're proxying your browsing traffic to shield your local web traffic from prying eyes, you don't want to reveal the names of all the web servers you're hitting to anyone who can watch the DNS traffic from your browsing host. </p>
+<p class="calibre4">OK, so SOCKS4 is out; that's no problem, as many browsers support SOCKS5. But there's a further complication; the ugly face of reality nosing into our elegant solution. Disappointingly, most of the major browsers, even when they support SOCKS5, don't actually use it properly: they look up names locally, even though they could be passed through the proxy. We've tried dozens of OS/browser combinations, including Firefox, Safari, Netscape, Mozilla, Internet Explorer (IE), and Opera, and the <span><em class="italic">only</em></span> one we've found so far which does the right thing is...(drum roll please...) IE 5.2 on Macintosh OS X. We guess that the main motivation for adding SOCKS5 support was authentication, and so it was added without changing the address-lookup logic—but this is an oversight that makes any use of SOCKS5 proxying much less useful than it could be. So: write your browser developers and ask for better SOCKS5 support! A switch for choosing either local or remote name resolution would be ideal. </p>
+<p class="calibre4">Given the realities of browser SOCKS support, the best solution for now is usually using a static SSH port forwarding to a separate HTTP proxy server, such as Squid or Privoxy. These proxies can also provide lots of other useful features, such as pop-up blocking and cookie management—but one doesn't always have such a proxy available or the ability to set one up, so the SSH-only approach with dynamic forwarding is preferable if you can use it. </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_206"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos881924" class="calibre7"></a>5.3.5 Encryption Algorithms </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos882083" class="calibre15"></a>The SSH server can use a number of data-encryption algorithms<a shape="rect" class="calibre15"></a><a id="filepos882182" class="calibre15"></a> for its secure connection; the client chooses a cipher from the list the server allows. The <code class="calibre35">Ciphers</code> keyword describes the subset of allowable ciphers, selected from those the server software supports. Its value is a comma-separated list of algorithm names (strings), case-sensitive,<sup class="calibre20">[<a id="filepos882564" shape="rect" href="DB_split_153.html#filepos931300" class="calibre6">59</a>]</sup> indicating which algorithms are permissible. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Ciphers 3des-cbc<br class="calibre19"/>    Ciphers 3des-cbc,blowfish-cbc,arcfour</tt></div></span><p class="calibre4">The order of the values is not significant, since the client drives the choice of the cipher. </p>
+<p class="calibre4">If multiple <code class="calibre35">Ciphers</code> keywords are specified, the values are not accumulated into a single list. Instead, OpenSSH uses the list for the first <code class="calibre35">Ciphers</code> keyword, and Tectia uses the last. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">OpenSSH treats unrecognized cipher names as fatal errors, but Tectia silently ignores them, which makes typos hard to detect. For troubleshooting, use the <span><em class="italic">sshd -d</em></span> command-line option <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> with the <code class="calibre35">SshConfigParse</code> module and a high debug level: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    sshd -d SshConfigParse=9</tt></div></span><p class="calibre4">Look for "ssh_config_set_param_algs" in the output to see the actual list of cipher names that were used. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The <code class="calibre35">Ciphers</code> keyword is useful for quickly disabling individual encryption algorithms—say, if a security hole is discovered in one of them. Just omit that algorithm from the <code class="calibre35">Ciphers</code> list and restart the server. </p>
+<p class="calibre4">Both OpenSSH and Tectia support the following standard ciphers that are defined by the IETF SECSH draft: </p>
+<p class="calibre4">In addition, Tectia implements the following standard ciphers:<sup class="calibre20">[<a id="filepos885102" shape="rect" href="DB_split_153.html#filepos931611" class="calibre6">60</a>]</sup></p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">none</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">twofish-cbc</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">twofish128-cbc</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">twofish192-cbc</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">twofish256-cbc</span></td>
+</tr></span></table><p class="calibre4">The "none" cipher means that no encryption is used. This is unsuitable for production use, but it might occasionally be convenient for testing, e.g., if you are watching SSH traffic using a network sniffer for diagnostic purposes. Subconfiguration files can restrict insecure ciphers like "none" to specific hosts or users. <a shape="rect" href="DB_split_356.html#filepos2364262" class="calibre6">[11.6.2]</a></p>
+<p class="calibre4">OpenSSH also implements a number of nonstandard ciphers:</p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:acss@openssh.org" shape="rect" class="calibre6">acss@openssh.org</a></span>
+<sup class="calibre34">[<a id="filepos886863" shape="rect" href="DB_split_153.html#filepos932039" class="calibre6">61</a>]</sup></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">aes128-ctr</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">aes192-ctr</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">aes256-ctr</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rijndael-cbc@lysator.liu.se" shape="rect" class="calibre6">rijndael-cbc@lysator.liu.se</a></span></span></td>
+</tr></span></table><p class="calibre4">By default, all ciphers supported by the OpenSSH server (both standard and nonstandard) are allowed. </p>
+<p class="calibre4">Tectia supports a different set of recommended, nonstandard ciphers: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:cast128-12-cbc@ssh.com" shape="rect" class="calibre6">cast128-12-cbc@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:des-cbc@ssh.com" shape="rect" class="calibre6">des-cbc@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-cbc@ssh.com" shape="rect" class="calibre6">rc2-cbc@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-128-cbc@ssh.com" shape="rect" class="calibre6">rc2-128-cbc@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rijndael-cbc@ssh.com" shape="rect" class="calibre6">rijndael-cbc@ssh.com</a></span></span></td>
+</tr></span></table><p class="calibre4">Tectia also recognizes special values for the <code class="calibre35">Cipher</code> keyword indicating sets of algorithms: </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Tectia FIPS Mode</h3>
+<p class="calibre4">The FIPS 140-2 standard defines strict requirements for performing cryptographic operations, including allowable ciphers. Tectia servers can use a special cryptographic library that is certified to be FIPS 140-2 compliant. In FIPS mode, the server supports <span><em class="italic">only</em></span> the following ciphers: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre58">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">3des-cbc</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">aes128-cbc</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">aes192-cbc</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">aes256-cbc</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">des-cbc@ssh.com</span></td>
+</tr></span></table><p class="calibre4">To enable FIPS mode, run the <span><em class="italic">ssh-crypto-library-chooser</em></span> command: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh-crypto-library-chooser fips</tt></div></span><p class="calibre4">To use the standard cryptographic library that supports all of the ciphers: </p><a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh-crypto-library-chooser std</tt></div></span><p class="calibre4">With no command-line argument, the <span><em class="italic">ssh-crypto-library-chooser</em></span> command just prints the currently used library. </p>
+<p class="calibre4">The server must be restarted whenever the library is changed. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">AnyStd</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Any standard algorithm implemented by Tectia, including none </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">AnyStdCipher</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Same as <code class="calibre35">AnyStd</code>, but excluding none </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">Any</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Any standard or recommended, nonstandard algorithm implemented by Tectia, including none </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">AnyCipher</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Same as <code class="calibre35">Any</code>, but excluding none </div>
+</blockquote>
+</div>
+<p class="calibre4">These special values are case-insensitive, in contrast to the other values for cipher names. We recommend using the capitalization shown earlier, but you may see lowercase values in older Tectia configuration files or documentation. </p>
+<p class="calibre4">An important and unfortunate restriction is that the special values for cipher sets cannot be mixed with other cipher names: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: This is ILLEGAL<br class="calibre19"/>    Ciphers 3des-cbc,AnyStd</tt></div></span><p class="calibre4">The default for Tectia is <code class="calibre35">AnyStdCipher</code>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Cipher Naming Conventions</h3>
+<p class="calibre4">Ciphers use a conventional naming scheme that encodes the algorithm and any variable parameters. We illustrate the conventions by dissecting a sample cipher name: <span><em class="italic">cast128-12-cbc@ssh.com</em></span>. Here is the meaning of each part: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">cast</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The name of the algorithm in lowercase. <a shape="rect" href="DB_split_089.html#filepos504210" class="calibre6">[3.8]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">128</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Many algorithms can use different key lengths. For these, the number of bits in the key immediately follows the algorithm name. If the algorithm name ends in a digit, then a hyphen is added between the name and the key size (e.g., <span><em class="italic">rc2-128</em></span> for the RC2 algorithm using 128-bit keys). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-12</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A few algorithms are defined in terms of other parameters. If needed, these are specified next, each with a leading hyphen. For example, the CAST algorithm can use different numbers of rounds of encryption instead of the default 16. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-cbc</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Block cipher algorithms can be run in a variety of modes of operation: </div>
+<div class="calibre3">
+<blockquote class="calibre5">
+<div class="calibre3"><span><span><em class="italic">ECB</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Electronic code book</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">CBC</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Cipher block chaining</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">CFB</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Cipher feedback</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">OFB</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Output feedback</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">CTR</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Counter</div>
+</blockquote>
+</blockquote>
+</div>
+<div class="calibre19">The mode is appended to the cipher name, again translated to lowercase, with a hyphen. </div>
+</blockquote>
+<div class="calibre3"><span><span><a href="mailto:@ssh.com:" shape="rect" class="calibre6">@ssh.com:</a></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Finally, the IETF SECSH draft specifies that nonstandard ciphers must have a suffix with a leading <code class="calibre35">@</code> character indicating the domain that defined the cipher. </div>
+</blockquote>
+</div>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Tectia's extensive but poorly documented cryptographic library actually supports a much wider range of ciphers, including: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:3des-ecb@ssh.com" shape="rect" class="calibre6">3des-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:3des-cfb@ssh.com" shape="rect" class="calibre6">3des-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:3des-ofb@ssh.com" shape="rect" class="calibre6">3des-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:aes-ecb@ssh.com" shape="rect" class="calibre6">aes-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:aes-cbc@ssh.com" shape="rect" class="calibre6">aes-cbc@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:aes-cfb@ssh.com" shape="rect" class="calibre6">aes-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:aes-ofb@ssh.com" shape="rect" class="calibre6">aes-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:aes-ctr@ssh.com" shape="rect" class="calibre6">aes-ctr@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:blowfish-ecb@ssh.com" shape="rect" class="calibre6">blowfish-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:blowfish-cfb@ssh.com" shape="rect" class="calibre6">blowfish-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:blowfish-ofb@ssh.com" shape="rect" class="calibre6">blowfish-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:cast128-ecb@ssh.com" shape="rect" class="calibre6">cast128-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:cast128-cfb@ssh.com" shape="rect" class="calibre6">cast128-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:cast128-ofb@ssh.com" shape="rect" class="calibre6">cast128-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:cast128-12-ecb@ssh.com" shape="rect" class="calibre6">cast128-12-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:cast128-12-cfb@ssh.com" shape="rect" class="calibre6">cast128-12-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:cast128-12-ofb@ssh.com" shape="rect" class="calibre6">cast128-12-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:des-ecb@ssh.com" shape="rect" class="calibre6">des-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:des-cfb@ssh.com" shape="rect" class="calibre6">des-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:des-ofb@ssh.com" shape="rect" class="calibre6">des-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-ecb@ssh.com" shape="rect" class="calibre6">rc2-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-cfb@ssh.com" shape="rect" class="calibre6">rc2-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-ofb@ssh.com" shape="rect" class="calibre6">rc2-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-128-ecb@ssh.com" shape="rect" class="calibre6">rc2-128-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-128-cfb@ssh.com" shape="rect" class="calibre6">rc2-128-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rc2-128-ofb@ssh.com" shape="rect" class="calibre6">rc2-128-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rijndael-ecb@ssh.com" shape="rect" class="calibre6">rijndael-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rijndael-cfb@ssh.com" shape="rect" class="calibre6">rijndael-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rijndael-ofb@ssh.com" shape="rect" class="calibre6">rijndael-ofb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:rijndael-ctr@ssh.com" shape="rect" class="calibre6">rijndael-ctr@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:twofish-ecb@ssh.com" shape="rect" class="calibre6">twofish-ecb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:twofish-cfb@ssh.com" shape="rect" class="calibre6">twofish-cfb@ssh.com</a></span></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><a href="mailto:twofish-ofb@ssh.com" shape="rect" class="calibre6">twofish-ofb@ssh.com</a></span></span></td>
+</tr></span></table><p class="calibre4">These are not included in the sets for <code class="calibre35">Any</code> or <code class="calibre35">AnyCipher</code>. In some cases, this is because the ciphers are considered experimental or inferior. For example, DES is usually not recommended because of its short key length, and block ciphers in ECB mode are considered vulnerable to replay attacks. Other modes such as CFB, OFB, and CTR are plausible alternatives to the default CBC, however. </p>
+<p class="calibre4">Finally, Tectia recognizes a small number of convenient aliases for sets of ciphers: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Value</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Meaning</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">aes-cbc</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">aes128-cbc, aes192-cbc aes256-cbc</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">cast</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">cast128-cbc</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">twofish</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33">
+<p class="calibre4">twofish-cbc, twofish128-cbc, twofish192-cbc, twofish256-cbc </p>
+</span></td>
+</tr></tbody></span></table></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">In most cases, the names of block ciphers in CBC mode are also recognized by Tectia without "-cbc", since CBC is considered the default mode. There are exceptions, however, that don't follow any obvious pattern: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">aes-cbc@ssh.com</li>
+<li class="calibre18">cast128-cbc</li>
+<li class="calibre18">cast128-12-cbc@ssh.com</li>
+<li class="calibre18">rc2-cbc@ssh.com</li>
+<li class="calibre18">rc2-128-cbc@ssh.com</li>
+<li class="calibre18">twofish-cbc</li>
+</ul></div>
+<p class="calibre4">We therefore recommend explicitly specifying <code class="calibre35">-cbc</code> in cipher names. </p>
+<p class="calibre4">Tectia is rather forgiving (or sloppy, depending on your point of view) about the @ssh.com suffix for cipher names, which is supposed to be used consistently for nonstandard ciphers. </p>
+<p class="calibre4">Most standard cipher names are also recognized with this suffix. The exceptions are: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">aes128-cbc</li>
+<li class="calibre18">aes192-cbc</li>
+<li class="calibre18">aes256-cbc</li>
+<li class="calibre18">twofish128-cbc</li>
+<li class="calibre18">twofish192-cbc</li>
+<li class="calibre18">twofish256-cbc</li>
+</ul></div>
+<p class="calibre4">Similarly, the suffix can be omitted from most nonstandard cipher names. The lone exception is <span><em class="italic">aes-cbc@ssh.com</em></span>, because the name without the suffix is used as an alias for all AES ciphers in CBC mode with any key length, as described earlier. </p>
+<p class="calibre4">Misusing the @ssh.com suffix in this way is inadvisable, because it violates the IETF SECSH draft. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+</body>
+</html>

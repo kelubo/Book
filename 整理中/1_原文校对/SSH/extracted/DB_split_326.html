@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_430"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2111222" class="calibre7"></a>11.1.1 Password Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Rule number 1: forget password authentication<a shape="rect" class="calibre15"></a><a id="filepos2111429" class="calibre15"></a> if you care about the security of your batch jobs<a shape="rect" class="calibre15"></a><a id="filepos2111517" class="calibre15"></a>. As we mentioned, authentication for any unattended process will require some kind of persistent secret lying around, so it might seem that a password in a protected file will do as well as anything else, and password authentication is simple. In a strict sense that's correct, but it's a bad idea both practically and securitywise. Embedding a password in a command line is unwise: it may be exposed to other users by simple commands such as <span><em class="italic">ps</em></span>, end up in shell history files (e.g. <em class="italic">~/.bash_history</em>) or system logs, etc. In fact, most SSH clients deliberately require terminal input (a "tty") for a password, precisely to discourage this. You can use a tool like Expect to get around this limitation, but that will be awkward. Another practical limitation is that more methods tend to be available on the server side to restrict logins with public-key authentication<a shape="rect" class="calibre15"></a><a id="filepos2112516" class="calibre15"></a>, e.g., the "command" parameters in <em class="italic">~/.ssh/authorized_keys</em> (OpenSSH) and <em class="italic">~/.ssh2/authorization</em> (Tectia). This is just an implementation detail, but it's very relevant since you definitely want to restrict unattended logins to do just what they're intended to do. </p>
+<p class="calibre4">More generally, compared to other available methods, SSH password authentication is just inherently weak: passwords tend to be short and often guessable, and the client must reveal the password to the server as part of the authentication process; so if the server has been compromised, it will get your password. Public-key authentication, however, does not reveal the private key in the process. </p>
+<p class="calibre4">In the real world, though, you might be stuck using password authentication anyway. Perhaps you have to automate a transaction with a server not under your control; it only supports passwords, and you can't get that changed. If you must, we suggest co-opting the "askpass" facility if it's available. <a shape="rect" href="DB_split_202.html#filepos1338539" class="calibre6">[6.3.3]</a> The <span><em class="italic">ssh-askpass</em></span> program normally displays a window prompting for the password, but it can use instead a program that provides the password from wherever you're storing it. It does so via a pipe, which is much better than letting it appear on a command line. </p>
+</div>
+</body>
+</html>

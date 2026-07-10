@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.6　话单</font>
+</font>
+</p>
+<p height="1em" width="2em">作为一个运营平台，一定要有记录话单（Call Detail Record，CDR）的能力，以便为后续的计费提供数据支持。FreeSWITCH内部有几个可以记录话单的模块，我们来简单介绍一下。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.6.1　CSV格式的话单</font>
+</font>
+</p>
+<p height="1em" width="2em">mod_cdr_csv <sup>
+<small>
+<a href="text00105.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 模块可以记录CSV（Comma-Separated Values，即以逗号分隔的值）格式的话单，也可以在话单文件中嵌入SQL语句，方便后续直接导入到数据库中。该模块是默认加载的。</p>
+<p height="1em" width="2em">话单的格式是以模块定义的，默认的配置文件中定义了sql、example、snom、linksys、asterisk、opencdrrate等几个模板。默认使用的模板是example，它是一个CSV模板，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;template name="example"&gt;<br/>
+<br/>
+    "${caller_id_name}","${caller_id_number}",<br/>
+<br/>
+    "${destination_number}","${context}","${start_stamp}",<br/>
+<br/>
+    "${answer_stamp}","${end_stamp}","${duration}","${billsec}",<br/>
+<br/>
+    "${hangup_cause}","${uuid}","${bleg_uuid}","${accountcode}",<br/>
+<br/>
+    "${read_codec}","${write_codec}"<br/>
+<br/>
+&lt;/template&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，各字段都是通道变量的引用，在挂机的时候FreeSWITCH会将通道变量对应的值替换这里的变量。可以看到，里面包含主叫号码（caller_id_number）、被叫号码（destination_number）、起止时间（start_stamp、end_stamp）、呼叫时长（duration）、计费时长（billsec）等。其中呼叫时长是从呼叫开始到结束的总时间，而计费时长是从应答才开始计算的。</p>
+<p height="1em" width="2em">如果使用sql模板，就可以直接产生SQL语句，模板格式如下（省略部分字段）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;template name="sql"&gt;INSERT INTO cdr VALUES ("${caller_id_name}",...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，也可以参照这些模板写自己的模板。可以在配置文件中使用以下参数配置使用的模板：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="default-template" value="example"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">默认情况下，只记录a-leg的话单，如果连b-leg也记，可以修改如下参数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="legs" value="ab"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">话单文件默认存储在FreeSWITCH安装目录的log/cdr-csv目录中。其中有Master.csv记录了所有的话单，而每个独立的分机也有自己的话单文件。如果只需要记录总的话单，则可以在配置文件中配置如下参数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="master-file-only" value="true"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">话单文件是持续写入的。一般来说，当处理话单时（如将话单导入数据库），需要一个“冻结”版本的话单文件，以防止丢失或产生重复话单。为了达到该目的，可以在FreeSWITCH中使用cdr_csv rotate命令让话单文件产生轮转。该命令会将当前话单文件改名为包含有日期时间标志的文件名，如Master.csv.2013-07-29-09-29-41；并且重新打开一个新的话单文件继续写入。这时我们就可以用其他脚本或程序去处理旧的话单文件了。</p>
+<p height="1em" width="2em">也可以在Shell中按如下的方式执行该命令，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# fs_cli -x "cdr_csv rotate"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果配置文件中的rotate-on-hup参数值为true，也可以使用下列命令给FreeSWITCH进程发HUP信号触发日志轮转：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# kill -HUP &lt;FreeSWITCH<br/>
+<br/>
+进程ID&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在UNIX类系统中，还可以把日志轮转加到crontab定时任务中，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+0 * * * * fs_cli -x "cdr_csv rotate"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将上述配置加到crontab的配置中，可以每小时将话单轮转一次。当然，也可以在定时任务中直接配置一个处理话单的脚本，在脚本中调用话单轮转命令，并处理产生的话单文件。详细的处理过程我们就不多介绍了，请参考该模块相关的Wiki页面。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.6.2　直接将话单写入数据库</font>
+</font>
+</p>
+<p height="1em" width="2em">通过mod_cdr_pg_csv <sup>
+<small>
+<a href="text00105.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 模块可以直接在FreeSWITCH中将话单写入PostgreSQL数据库。默认该模块是不自动安装的，因此，在使用前，我们需要手工安装它。</p>
+<p height="1em" width="2em">首先，确保系统上安装了PostgreSQL的客户端库。如在Ubuntu Linux上，可以用如下命令安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# apt-get install libpq-dev libpq5<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后就可以按类似其他模块的安装方式来安装该模块了。到FreeSWITCH的源代码目录中，执行如下命令安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make mod_cdr_pg_csv-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该模块的配置文件是conf/autoload_configs/cdr_pg_csv.conf.xml，其中有一个参数是配置数据库的连接的，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="db-info" value="host=127.0.0.1 dbname=freeswitch user=password= connect_timeout=10" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，它并没有像其他模块那样使用核心数据库的“pgsql://”字符串方式，而是直接使用的PostgreSQL标准的连接字符串。因为该模块是在核心数据库中加入PostgreSQL之前写的，所以这里的配置格式并不统一。</p>
+<p height="1em" width="2em">默认写入的数据库表的名称是“cdr”，也可以使用如下参数修改，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="db-table" value="freeswitch_cdr"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">配置文件中的“schema”标签配置了通道变量与数据库中字段的对应关系，可以根据这里的配置建立数据库表结构。默认的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;schema&gt;<br/>
+<br/>
+    &lt;field var="local_ip_v4"/&gt;<br/>
+<br/>
+    &lt;field var="caller_id_name"/&gt;<br/>
+<br/>
+    &lt;field var="caller_id_number"/&gt;<br/>
+<br/>
+    &lt;field var="destination_number"/&gt;<br/>
+<br/>
+    &lt;field var="context"/&gt;<br/>
+<br/>
+    &lt;field var="start_stamp"/&gt;<br/>
+<br/>
+    &lt;field var="answer_stamp"/&gt;<br/>
+<br/>
+    &lt;field var="end_stamp"/&gt;<br/>
+<br/>
+    &lt;field var="duration" quote="false"/&gt;<br/>
+<br/>
+    &lt;field var="billsec" quote="false"/&gt;<br/>
+<br/>
+    &lt;field var="hangup_cause"/&gt;<br/>
+<br/>
+    &lt;field var="uuid"/&gt;<br/>
+<br/>
+    &lt;field var="bleg_uuid"/&gt;<br/>
+<br/>
+    &lt;field var="accountcode"/&gt;<br/>
+<br/>
+    &lt;field var="read_codec"/&gt;<br/>
+<br/>
+    &lt;field var="write_codec"/&gt;<br/>
+<br/>
+    &lt;!-- &lt;field var="sip_hangup_disposition"/&gt; --&gt;<br/>
+<br/>
+    &lt;!-- &lt;field var="ani"/&gt; --&gt;<br/>
+<br/>
+&lt;/schema&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，由于duration和billsec的值是整数值，因此对应的数据库中也应该使用整数（INTEGER）类型的字段，并且我们在SQL语句中不需要使用单引号，因此这里加了一个参数quote="false"。</p>
+<p height="1em" width="2em">默认数据库中话单的表结构中的字段名称与这里配置的名称是相同的，如果不相同，可以在&lt;field&gt;标签中增加column参数，以匹配在数据库中的字段名，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;field var="local_ip_v4" column="server_ip"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其他的配置参数与mod_cdr_csv中的类似，我们就不多讲了。配置完毕后就可以加载该模块将话单直接写入数据库了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_cdr_pg_csv<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果由于某种原因引起写入话单失败，则FreeSWITCH就会将这张话单存入一个本地的文件话单池中（默认位置在log/cdr-pg-csv目录中），以免丢失话单。在发生这种情况时，可以使用其他的工具将话单池中的话单取出，再导入数据库。</p>
+<p height="1em" width="2em">另外，如果你使用的是MySQL数据库，则目前FreeSWITCH中没有对应的模块，可以考虑使用我们下面介绍的方式实现。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.6.3　使用HTTP服务器接收话单</font>
+</font>
+</p>
+<p height="1em" width="2em">除了上面介绍的方式外，FreeSWITCH也支持将话单写入远程的HTTP服务器。在那里，你可以使用任何喜欢的编程语言处理话单以及写入任何可能的数据库。有三个模块可以实现该功能：mod_xml_cdr <sup>
+<small>
+<a href="text00105.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 、mod_json_cdr以及mod_format_cdr。前两者分别产生XML和JSON格式的话单，最后一个模块则可以配置产生XML或JSON格式的话单。</p>
+<p height="1em" width="2em">以mod_xml_cdr为例，在配置文件中配置如下url参数即可以将话单写入指定的Web服务器指定的地址上：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="url" value="http://localhost/cdr_curl/post.php"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果有话单写入，在Web服务器端就会收到一个HTTP Post请求，请求中带有一个xml参数，它的值是一个XML文档。然后，在Web服务器上就可以取出这个参数，并用XML解析器解析里面的内容了。XML格式的话单内容非常详细（包括电话转接历史等），因而可以很容易在其中获取各种信息。</p>
+<p height="1em" width="2em">服务器处理完毕后，应该返回HTTP“200 OK”消息，然后FreeSWITCH就会释放相关的Channel。如果服务器没有任何反应，FreeSWITCH就会一直等待，从而产生很多僵尸Channel，所以一定要保证Web服务器能正常响应。当然，Web技术都发展了几十年了，这种解决方案已经很成熟了。</p>
+<p height="1em" width="2em">如果由于某种原因引起写入话单失败，服务器返回非“200 OK”的消息，则FreeSWITCH就会将这张话单存入一个本地的XML文件中（默认位置在log/xml_cdr目录中），以免丢失话单。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00104.html">
+<font color="#FF6600">[1]</font>
+</a>
+ http://wiki.freeswitch.org/wiki/Mod_cdr_csv。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00104.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参考http://wiki.freeswitch.org/wiki/Mod_cdr_pg_csv。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00105.html">
+<font color="#FF6600">[3]</font>
+</a>
+ http://wiki.freeswitch.org/wiki/Mod_xml_cdr。</p>
+</body>
+</html>

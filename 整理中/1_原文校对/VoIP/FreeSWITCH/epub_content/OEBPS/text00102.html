@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.4　视频通话</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH也支持基于SIP的视频通话，下面我们来看一看基本的设置，以及视频转码与录像等高级话题。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.4.1　配置视频通话</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH默认的配置文件中并没有对视频编解码的相关项，因而默认不支持视频呼叫。如果需要支持视频呼叫，只需要在配置文件中增加相关的视频编解码就可以了。</p>
+<p height="1em" width="2em">目前FreeSWITCH支持的视频编解码有H261、H263、H263-1998（H263+）、H263-2000（H263++）、H264、VP8等。具体应该使用哪种或哪几种编解码需要看SIP终端的支持。需要注意的是，与音频编解码不同，FreeSWITCH中的视频编解码目前仅支持透传，即FreeSWITCH仅将通话中一方的视频原样送到另一方去，而不做任何编码转换。这就要求进行视频通信的双方使用一致的编解码 <sup>
+<small>
+<a href="text00103.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">FreeSWITCH支持的媒体编码默认是在conf/vars.xml中定义的，读者可以在该文件中找到类似下面的配置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="global_codec_prefs=G722,PCMU,PCMA,GSM"/&gt;<br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=PCMU,PCMA,GSM"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上两行分别定义了两个全局变量，它们的字面意思分别是全局的和出局的编解码首选项。假设我们要增加对H264和VP8编码的支持，则相应的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="global_codec_prefs=G722,PCMU,PCMA,GSM,GSM,H264,VP8"/&gt;<br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=PCMU,PCMA,GSM,GSM,H264,VP8"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">由于上述配置文件实际修改的是全局变量，一般来说需要重启FreeSWITCH才能使之生效。</p>
+<p height="1em" width="2em">另外，我们在8.1.3节也讲了不需要重启FreeSWITCH使之生效的一个技巧——如果是在UNIX类平台上，可以给FreeSWITCH进程发送一个SIGHUP信号，让它重新解析全局变量（当然，FreeSWITCH在收到该信号后还会做其他的事，如执行日志轮转等）。示例如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# kill -HUP &lt;FreeSWITCH<br/>
+<br/>
+的进程号&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">注意，上述Shell命令只是保证FreeSWITCH正确解析了这些变量。实际上，这些变量的值是在Sofia Profile中引用的，因而，还需要在FreeSWITCH中执行以下命令来重读Sofia的配置，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia profile internal rescan<br/>
+<br/>
+freeswitch&gt; sofia profile external rescan<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面我们重新加载了internal和external两个Profile的配置。当然，也可以用以下命令简单地重新加载Sofia模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; reload mod_sofia<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">实际上，我们也可以不修改全局变量，而直接修改Profile的配置。如internal.xml默认的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="inbound-codec-prefs" value="$${global_codec_prefs}"/&gt;<br/>
+<br/>
+&lt;param name="outbound-codec-prefs" value="$${global_codec_prefs}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们可以把视频编码附加到变量引用的后面，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="inbound-codec-prefs" value="$${global_codec_prefs},H264,VP8"/&gt;<br/>
+<br/>
+&lt;param name="outbound-codec-prefs" value="$${global_codec_prefs},H264,VP8"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或直接改成如下形式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="inbound-codec-prefs" value="PCMA,PCMU,H264,VP8"/&gt;<br/>
+<br/>
+&lt;param name="outbound-codec-prefs" value="PCMA,PCMU,H264,VP8"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果出局和入局编解码相同，也可以直接使用同一个参数设置，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="codec-prefs" value="$${global_codec_prefs}"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">配置完毕后记得通过rescan或reload mod_sofia命令使之生效。可以使用如下命令查看是否生效（其中CODECS IN和CODECS OUT分别代表入局和出局时使用的编解码）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; sofia status profile internal<br/>
+<br/>
+===========================================================================<br/>
+<br/>
+Name                internal<br/>
+<br/>
+CODECS IN           G722,PCMU,PCMA,GSM,G729,H264,VP8<br/>
+<br/>
+CODECS OUT          PCMU,PCMA,GSM,G729,H264,VP8<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">配置了正确的视频编解码后，就可以在视频话机之间进行视频通话了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.4.2　视频录像与回放</font>
+</font>
+</p>
+<p height="1em" width="2em">前面讲了，FreeSWITCH支持录音和视频通话，现在我们来讲讲录像。与录音相比，录像要复杂一些。录像数据要按一定的格式存储在文件中，而这些文件格式有好多种。不同的文件格式称为不同的容器（Container），在这些容器中，通常会包含多个音频轨道（Track）和视频轨道，有的还含有同步信息。</p>
+<p height="1em" width="2em">目前，处理视频格式最好的开源软件就是ffmpeg，但是暂时还没有人将它与FreeSWITCH集成（这样说也不全对，因为笔者已经在做了）。FreeSWITCH中实现了一个简单的mod_fsv <sup>
+<small>
+<a href="text00103.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 模块，提供FreeSWITCH中的录像及回放支持。它不依赖于任何其他的视频处理库，而是自己定义了一种私有的格式，将音频轨道用L16编码的数据保存，视频轨道则将整个RTP原始包都保存进去。</p>
+<p height="1em" width="2em">在默认的Dialplan中，也提供了录像与回放的例子。拨打9193可以通过record_fsv App进行录像，Dialplan的设置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="record_fsv" data="/tmp/testrecord.fsv"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">录像过程中，用户可以看到自己的视频也被原样echo了回来。</p>
+<p height="1em" width="2em">录制完成后，就可以拨打9194播放刚刚录制的录像了，它是使用play_fsv App实现的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="play_fsv" data="/tmp/testrecord.fsv"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面的录像只能针对单腿的呼叫进行。因为，对于桥接（bridge）的呼叫，需要类似音频的Media Bug方式支持录像。而标准的FreeSWITCH代码中并不包含视频的Media Bug支持。</p>
+<p height="1em" width="2em"><img align="baseline" height="42" width="45" src="Image00025.jpg" />
+ <font color="#0468BB">扩展</font>
+</p>
+<p height="1em" width="2em">笔者在做项目的过程中开发了视频的Media Bug支持，并实现了.fsv及.mp4文件接口，可以支持视频录像。通过使用文件接口，可以直接使用FreeSWITCH的record和playback App进行录像和回放，而不再需要针对每一种视频格式再单独写接口（虽然笔者也实现了record_mp4文件接口）。这些代码有望在不久的将来合并到标准的FreeSWITCH代码库中。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.4.3　视频转码</font>
+</font>
+</p>
+<p height="1em" width="2em">在FreeSWITCH支持WebRTC之后，人们对视频转码的需求就越来越迫切了。因为在此之前，视频设备一般都支持H263或H264转码，很容易统一。但有了WebRTC以后，由于Google Chrome浏览器实现的WebRTC仅支持VP8，与原来的H26x的设备进行视频通信就成了问题，而原来的视频设备也不能很快地支持VP8。当然，Firefox浏览器也开始支持WebRTC了，并支持H264格式的视频，但WebRTC毕竟是Google提出来的标准，因而还是有大量的用户会使用Chrome。</p>
+<p height="1em" width="2em">通过相应的视频库或硬件的DSP芯片，也可以在FreeSWITCH中提供视频的转码。在FreeSWITCH的作者Anthony Minessale的支持下，目前笔者已经开始了这方面的研究，希望在不远的将来会有所突破。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00102.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 目前，比较常用的编解码是H263、H264和VP8。这三种编码都是免费的，而且现在市场上大量的设备都支持H263和H264。但由于H264版税的不确定性（现在是免费的，但不知道何时不免费），因而Google又大力支持VP8，Google在这上面做了大量的工作，力求永远免费。这方面典型的代表就是Google Chrome浏览器中的WebRTC仅支持VP8。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00103.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://wiki.freeswitch.org/wiki/Mod_fsv。</p>
+</body>
+</html>

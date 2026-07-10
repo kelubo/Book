@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_521"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2673027" class="calibre7"></a>14.4.1 Running an Agent </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2673182" class="calibre15"></a>An agent is a program that keeps private keys in memory and provides authentication services to SSH clients. If you preload an agent with private keys at the beginning of a login session, your SSH clients won't prompt for passphrases. Instead, they communicate with the agent as needed. <a shape="rect" href="DB_split_052.html#filepos248100" class="calibre6">[2.5]</a> The OpenSSH agent program is <span><em class="italic">ssh-agent</em></span>. </p>
+<p class="calibre4">In order for <span><em class="italic">ssh-agent</em></span> to work, it communicates via environment variables. <a shape="rect" href="DB_split_201.html#filepos1316752" class="calibre6">[6.3.2]</a> If you're using the Cygwin shell (<span><em class="italic">bash</em></span>), you can start the agent via the same methods as on Unix. Unfortunately, these methods don't work immediately on Windows if you're using the command shell (<span><em class="italic">cmd.exe</em></span> or <span><em class="italic">command.exe</em></span>), so here is a quick recipe: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Run the agent:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; ssh-agent<br class="calibre19"/>    SSH_AUTH_SOCK=/tmp/ssh-agent.1468; export SSH_AUTH_SOCK;<br class="calibre19"/>    SSH_AGENT_PID=3212; export SSH_AGENT_PID;<br class="calibre19"/>    echo Agent pid 3212;</tt></div></span></li>
+<li value="2" class="calibre18">Notice the output includes some environment variables:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35"><span><strong class="calibre45">    SSH_AUTH_SOCK=/tmp/ssh-agent.1468</strong></span>; export SSH_AUTH_SOCK;<br class="calibre19"/>    <span><strong class="calibre45">SSH_AGENT_PID=3212</strong></span>; export SSH_AGENT_PID;</tt></div></span></li>
+<li value="3" class="calibre18">Set the environment variables by hand:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; set SSH_AUTH_SOCK=/tmp/ssh-agent.1468<br class="calibre19"/>    C:\&gt; set SSH_AGENT_PID=3212</tt></div></span></li>
+<li value="4" class="calibre18">Your agent is ready to load with keys: <a shape="rect" href="DB_split_052.html#filepos248100" class="calibre6">[2.5]</a><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; ssh-add<br class="calibre19"/>    Enter passphrase for /home/you/.ssh/id_dsa: <strong class="calibre45"><code class="calibre35">********</code></strong><br class="calibre19"/>    Identity added: /home/you/.ssh/id_dsa (/home/you/.ssh/id_dsa)</tt></div></span></li>
+</ol></div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2676428" shape="rect" href="DB_split_397.html#filepos2672065" class="calibre6">166</a>] </sup>For Kerberos or GSSAPI support., you might need to recompile OpenSSH. At press time, <code class="calibre35">KerberosAuthentication</code> and <code class="calibre35">GSSAPIAuthentication</code> are disabled in the Cygwin binaries for OpenSSH. You'll need to download the OpenSSH source code and recompile it with the GNU C compiler, <span><em class="italic">gcc</em></span>, also included with Cygwin. Once things are set up, they do work as in our case study. <a shape="rect" href="DB_split_353.html#filepos2324476" class="calibre6">[11.5.2]</a></p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_522"></div></body>
+</html>

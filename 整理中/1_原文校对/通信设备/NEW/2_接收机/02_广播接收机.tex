@@ -11,8 +11,40 @@
 % │   ├── \subsection{矿石收音机基础}
 % │   ├── \subsection{矿石检波器原理}
 % │   ├── \subsection{单回路矿石收音机}
-% │   ├── \subsection{多回路矿石收音机}
-% │   └── \subsection{矿石收音机制作实践}
+% │   ├── \subsection{双回路矿石收音机}
+% │   │   ├── \subsubsection{与单回路的区别}
+% │   │   ├── \subsubsection{工作原理}
+% │   │   ├── \subsubsection{电路结构}
+% │   │   ├── \subsubsection{元件选择}
+% │   │   ├── \subsubsection{调试方法}
+% │   │   ├── \subsubsection{特点与常见问题}
+% │   │   ├── \subsubsection{制作实例}
+% │   │   └── \subsubsection{历史意义与适合人群}
+% │   ├── \subsection{三回路矿石收音机}
+% │   │   ├── \subsubsection{与双回路的区别}
+% │   │   ├── \subsubsection{工作原理}
+% │   │   ├── \subsubsection{耦合方式}
+% │   │   ├── \subsubsection{电路结构}
+% │   │   ├── \subsubsection{元件选择}
+% │   │   ├── \subsubsection{调试方法}
+% │   │   ├── \subsubsection{特点与常见问题}
+% │   │   ├── \subsubsection{制作实例}
+% │   │   ├── \subsubsection{进阶实验}
+% │   │   ├── \subsubsection{技术极限与历史意义}
+% │   │   ├── \subsubsection{适合人群与实际应用}
+% │   │   └── \subsubsection{从三回路到有源}
+% │   ├── \subsection{矿石收音机制作实践}
+% │   └── \section{Lyonodyne-17 矿石收音机}
+% │       ├── \subsection{设计原理}
+% │       ├── \subsection{Tuggle 前端}
+% │       ├── \subsection{电路详情}
+% │       ├── \subsection{天线系统}
+% │       ├── \subsection{关键元件}
+% │       ├── \subsection{性能参数}
+% │       ├── \subsection{比赛成绩}
+% │       ├── \subsection{技术要点}
+% │       ├── \subsection{历史背景}
+% │       └── \subsection{参考资料}
 % ├── \section{电子管收音机}
 % │   ├── \subsection{电子管收音机概述}
 % │   ├── \subsection{电子管放大电路}
@@ -50,27 +82,495 @@
 \subsection{矿石收音机基础}
 \label{sec:crystal_radio_fundamentals}
 
-% 内容待补充
+矿石收音机是最早期的无线电接收装置，无需外接电源即可工作。其性能的优劣很大程度上取决于天线和接地装置的设计与安装，以及调谐电路的品质因数（Q值）等关键参数。
+
+\subsubsection*{关键概念}
+\label{subsubsec:crystal_radio_key_concepts}
+
+\begin{description}
+    \item[Q值] 品质因数，反映调谐电路的选择性和能量损耗特性。Q值越高，选择性越好，但带宽越窄。高Q值线圈是高性能矿石收音机的核心元件。
+    \item[L/C比] 电感与电容的比值，影响电路特性。Lyonodyne-17 等高级矿石收音机采用低 L/C 比设计，配合高Q值元件提高性能。
+    \item[利兹线] 多股绝缘线绞合而成，用于减少高频集肤效应损耗，提高线圈Q值。常见规格如 660/46（660股，每股直径0.046mm）。
+    \item[松耦合] 初级和次级线圈间的弱耦合方式，通过物理距离控制耦合程度，提高选择性并减少相互影响。
+\end{description}
+
+\subsubsection*{天线和接地的重要性}
+\label{subsubsec:antenna_ground_importance}
+
+矿石收音机靠天线接收空中的无线电波，因此天线和接地装置是其必备的组成部分。良好的天线和接地能够显著提高接收性能。
+
+\textbf{天线}：天线主要是由一根或一组张挂在空中的天线导线、和一根从天线导线引接而下、接到收音机上的引入线合并组成。天线是收音机的必要设备之一。收音机接有天线之后，可以很轻易地将广播电台发送出来的、传播在空中的无线电波接收进来，并把它转变成信号电流。
+
+\textbf{接地装置}：接地装置就是用一根地线（即接地线）将收音机的某一部分接到大地。这种装置主要是为了增进天线的接收性能。
+
+\begin{table}[htbp]
+    \centering
+    \caption{天线与接地记号对照}
+    \begin{tabular}{lll}
+        \hline
+        \textbf{项目} & \textbf{旧记号（刘同康，1958）} & \textbf{现代标准记号} \\
+        \hline
+        天线 & A & ANT（源自 Antenna，亦常写作 $\mathsf{Y}$） \\
+        接地 & C & GND 或 $\bot$（保护接地为 PE） \\
+        \hline
+    \end{tabular}
+    \label{tab:antenna_ground_symbols}
+\end{table}
+
+\noindent\textbf{记号沿革说明}：刘同康原著中以单个字母 \textbf{A} 表示天线、\textbf{C} 表示接地（取"地"字拼音首字母）。现行国家标准 GB/T 6988《电气技术用文件的编制》及 IEC 60617 电气简图用图形符号标准中：
+\begin{itemize}
+    \item 天线统一记号为 \textbf{ANT}，图形符号可表示为带箭头的辐射状图形或字母组合 $\mathsf{Y}$；
+    \item 接地统一记号为 \textbf{GND}（信号/工作接地），图形符号为经典的三横线渐短符号 $\bot$；安全保护接地则记为 \textbf{PE}（Protective Earthing）。
+\end{itemize}
+
+\noindent 阅读历史文献时需注意：A、C 这类单字母简写在 20 世纪中期国产收音机电路图中较常见，但与国际标准不接轨，在现代电路图和 PCB 设计文件中已不再使用。
+
+\subsubsection*{天线与接地的工作原理}
+
+天线利用电磁感应原理接收空间中的电磁波。当无线电波传播到天线时，会在天线导体中感应出高频电流，该电流经引入线馈送到接收机输入回路。
+
+接地装置则起到以下作用：
+\begin{itemize}
+    \item 作为接收机输入回路的参考点
+    \item 提供低损耗的回路通路
+    \item 减小外界电磁干扰的影响
+    \item 增强天线的有效高度
+\end{itemize}
+
+\subsubsection*{天线与接地对收音效果的影响}
+\label{subsubsec:antenna_ground_effect}
+
+天线与接地对收音机的收音效果影响极大。
+
+\begin{quote}
+\textit{一架构造比较简单的收音机，不论在收听本地的或是远地的电台时，都必需使用天线和接地，否则就无法收到播音。而一架构造繁复的收音机，处（在）某些场合之下，例如置放这架收音机的房间是钢筋混凝土的建筑物，或是用它来收听远地电台的播音等等，也都必需使用天线和接地；不然，收音效率一定会非常低劣。}
+\end{quote}
+
+\noindent\textbf{现代解读}：上述论断与现代无线电接收理论完全一致。即使是高灵敏度、多级放大的现代接收机，在以下场景中仍需良好的天线和接地：
+\begin{itemize}
+    \item \textbf{钢筋混凝土建筑内}：建筑钢筋网对电磁波产生强烈屏蔽与衰减，需要外置天线补偿；
+    \item \textbf{远距离弱信号接收}：信噪比成为限制因素，优良天线能显著提高接收信噪比；
+    \item \textbf{抗干扰需求}：良好的接地可抑制共模干扰和工频干扰。
+\end{itemize}
+
+\subsubsection*{信号电流与频率}
+\label{subsubsec:signal_current_frequency}
+
+由广播电台发送出来的无线电波具有一定的频率（常称周率）。频率的单位是赫兹（常称每秒周），不过普通我们都用赫兹的一千倍即千赫（常称每秒千周）做单位，这样可使计数上比较方便。一般由广播电台发送出来的无线电波，它的频率都在 550 千赫到 1600 千赫之间。在收听广播时，我们常常可以听到报告员说："$\cdots$ 周率 $\times\times$ 千周"，就是指这个，只是把"千周"前面的"每秒"两个字省去了。
+
+\noindent\textbf{术语沿革说明}：
+
+\begin{itemize}
+    \item \textbf{周率 / 周}：20 世纪中期对"频率（frequency）"和"周期数（cycle）"的口语化称呼。"千周"即"千赫兹（kHz）"，"每秒千周"即"千周/秒（kC/s 或 kc/s）"。该用法在 1960 年代前的中文技术文献中较常见，现已统一为"赫兹（Hz）"。
+    \item \textbf{中波广播频段}：刘同康所述 550–1600 kHz 即国际通行的中波广播（MW，Medium Wave）频段，与现今 AM 广播频段 540–1600 kHz（ITU 1 区）/ 540–1700 kHz（ITU 2 区）基本一致，仅低端略有差异。
+    \item \textbf{赫兹（Hz）}：频率的国际单位制（SI）单位，1 Hz = 1 周/秒，以德国物理学家海因里希·赫兹（Heinrich Hertz）命名。该单位在 1960 年第十一届国际计量大会（CGPM）上被正式采纳。
+\end{itemize}
+
+\noindent\textbf{中波广播频段参数（现代标准）}：
+
+\begin{table}[htbp]
+    \centering
+    \caption{中波 AM 广播频段参数}
+    \begin{tabular}{ll}
+        \hline
+        \textbf{参数} & \textbf{取值} \\
+        \hline
+        频率范围（ITU 1 区，含中国、欧洲） & 526.5 kHz – 1606.5 kHz \\
+        频率范围（ITU 2 区，美洲） & 540 kHz – 1700 kHz \\
+        频道间隔 & 9 kHz（1 区）/ 10 kHz（2 区） \\
+        调制方式 & 调幅（AM，双边带） \\
+        \hline
+    \end{tabular}
+    \label{tab:mw_broadcast_band}
+\end{table}
 
 \subsection{矿石检波器原理}
 \label{sec:crystal_detector_principle}
 
-% 内容待补充
+矿石检波器是矿石收音机的核心部件，利用某些矿物晶体（如方铅矿、黄铁矿）或半导体二极管的单向导电性进行检波，将高频调幅信号转换为音频信号。
+
+\subsubsection*{检波器类型}
+
+\begin{description}
+    \item[天然矿石检波器]：早期使用天然矿石，如方铅矿（Galena）、黄铁矿（Pyrite）等，需要触须接触点进行调节
+    \item[半导体二极管检波器]：现代常用锗二极管或肖特基二极管，性能稳定可靠
+\end{description}
+
+\subsubsection*{二极管选择}
+
+推荐使用锗二极管或肖特基二极管，其正向压降较低（约0.2V），对微弱信号灵敏度高：
+
+\begin{table}[htbp]
+    \centering
+    \caption{检波二极管推荐}
+    \begin{tabular}{lll}
+        \hline
+        \textbf{类型} & \textbf{推荐型号} & \textbf{特点} \\
+        \hline
+        锗二极管 & 1N34A、1N60 & 正向压降约0.2V，灵敏度高 \\
+        肖特基二极管 & 1SS86、1SS99 & 正向压降低，高频特性好 \\
+        \hline
+        \textbf{不推荐} & 1N4148（硅管） & 正向压降约0.6V，对微弱信号灵敏度低 \\
+        \hline
+    \end{tabular}
+    \label{tab:detector_diodes}
+\end{table}
+
+\subsubsection*{耳机选择}
+
+矿石收音机输出功率极低，需要高灵敏度的高阻耳机：
+
+\begin{table}[htbp]
+    \centering
+    \caption{耳机类型对比}
+    \begin{tabular}{lll}
+        \hline
+        \textbf{类型} & \textbf{标称阻抗} & \textbf{特点} \\
+        \hline
+        晶体耳机 & 20k-100kΩ & 灵敏度高，适合矿石收音机 \\
+        电磁式耳机 & 2000Ω & 灵敏度较低，需要更强的信号 \\
+        \hline
+    \end{tabular}
+    \label{tab:headphone_types}
+\end{table}
 
 \subsection{单回路矿石收音机}
 \label{sec:single_loop_crystal_radio}
 
 % 内容待补充
 
-\subsection{多回路矿石收音机}
-\label{sec:multi_loop_crystal_radio}
+\subsection{双回路矿石收音机}
+\label{sec:dual_loop_crystal_radio}
 
-% 内容待补充
+双回路矿石收音机是在单回路矿石收音机基础上的改进版本，通过增加一个独立的天线耦合回路，将天线与调谐回路分离，提高选择性和灵敏度。
+
+\noindent\textbf{概念区分}：
+\begin{itemize}
+    \item \textbf{双回路}：指"天线回路 + 谐振回路"（两个电流回路通过耦合线圈连接）
+    \item \textbf{双调谐}：指两个独立的LC调谐回路通过互感耦合（进阶设计，即三回路矿石收音机的两个谐振回路）
+\end{itemize}
+
+\subsubsection*{与单回路的区别}
+
+\begin{table}[htbp]
+    \centering
+    \caption{单回路与双回路矿石收音机对比}
+    \begin{tabular}{lll}
+        \hline
+        \textbf{特性} & \textbf{单回路矿石收音机} & \textbf{双回路矿石收音机} \\
+        \hline
+        回路结构 & 天线直接并联在调谐回路上 & 天线通过耦合线圈与调谐回路分离 \\
+        选择性 & 一般 & 较好 \\
+        串台抑制 & 较差 & 较好 \\
+        元件数量 & 6-8个 & 8-10个 \\
+        调试难度 & 简单 & 中等 \\
+        体积 & 小 & 较大 \\
+        \hline
+    \end{tabular}
+    \label{tab:single_vs_dual_loop}
+\end{table}
+
+\subsubsection*{工作原理}
+
+双回路矿石收音机包含两个电流回路：
+
+\begin{description}
+    \item[天线回路]：连接天线和地线，通过耦合线圈接收空中的无线电信号，提供能量耦合
+    \item[谐振回路]：由电感L和谐振电容C组成的并联谐振回路，通过耦合线圈与天线回路耦合，精确选择电台频率
+\end{description}
+
+两个回路之间通过互感耦合，耦合程度影响性能：
+\begin{itemize}
+    \item \textbf{松耦合}：选择性好，但灵敏度降低
+    \item \textbf{紧耦合}：灵敏度高，但选择性变差
+    \item \textbf{最佳耦合}：平衡灵敏度和选择性
+\end{itemize}
+
+\subsubsection*{电路结构}
+
+双回路矿石收音机的电路结构为：
+\begin{center}
+\begin{tabular}{c}
+天线 \verb+──+ Lc(耦合线圈) \verb+──+ 地线 \\
+\verb+         │+ \\
+\verb+         ├──+ L(谐振线圈) \verb+//+ C(可变电容) \verb+──+ 检波器 \verb+──+ 耳机 \verb+──+ 地线 \\
+\end{tabular}
+\end{center}
+
+其中 \verb+//+ 表示并联连接。天线回路通过耦合线圈Lc接收信号，信号通过互感耦合到谐振回路LC，经检波后驱动耳机。
+
+\subsubsection*{元件选择}
+
+\begin{description}
+    \item[耦合线圈Lc]：约10-30匝，直径3-5cm，漆包线0.2-0.3mm，作用是将天线信号耦合到谐振回路，隔离天线对谐振回路的影响
+    \item[谐振线圈L]：约200-300匝，直径3-5cm，漆包线0.1-0.2mm
+    \item[可变电容C]：365pF空气式可变电容
+\end{description}
+
+耦合要求：互感通过线圈间距调节，耦合系数0.1-0.3，线圈间距1-3cm。
+
+\subsubsection*{调试方法}
+
+调试步骤：
+\begin{enumerate}
+    \item 将可变电容调到中间位置
+    \item 调节耦合线圈与谐振线圈的间距到2cm左右
+    \item 接上天线和地线
+    \item 旋转可变电容寻找电台信号
+    \item 微调线圈间距：如声音太小，减小间距增强耦合；如串台严重，增大间距减弱耦合
+    \item 找到最佳耦合点：声音清晰且选择性好
+\end{enumerate}
+
+调试要点：
+\begin{itemize}
+    \item \textbf{耦合调节}：耦合越紧，灵敏度越高但选择性越差；耦合越松，选择性越好但灵敏度越低
+    \item \textbf{天线匹配}：天线长度影响信号强度，建议10-15米
+    \item \textbf{地线质量}：良好接地能显著提高接收效果
+\end{itemize}
+
+\subsubsection*{特点与常见问题}
+
+\begin{description}
+    \item[优点]：选择性好（邻道抑制比单回路高10-15dB）、串台少、音质清晰、灵活性高
+    \item[缺点]：调试复杂、灵敏度略降、体积增大
+\end{description}
+
+常见问题及解决：
+\begin{itemize}
+    \item \textbf{调谐困难}：调整线圈间距到1-3cm
+    \item \textbf{选择性不够}：增大线圈间距减弱耦合
+    \item \textbf{灵敏度太低}：减小线圈间距增强耦合，检查天线和地线质量
+\end{itemize}
+
+\subsubsection*{制作实例}
+
+所需材料：
+\begin{itemize}
+    \item 365pF可变电容 × 1
+    \item 漆包线（0.1-0.2mm）× 20米
+    \item 漆包线（0.2-0.3mm）× 5米
+    \item 塑料骨架（3-5cm直径）× 2个
+    \item 矿石检波器或1N34A/1N60二极管 × 1
+    \item 晶体耳机（20k-100kΩ）或电磁式耳机（2000Ω）× 1
+    \item 天线导线 × 15米
+    \item 地线导线 × 3米
+\end{itemize}
+
+制作要点：
+\begin{enumerate}
+    \item \textbf{绕制谐振线圈}：200-300匝，0.1-0.2mm漆包线，3-5cm直径
+    \item \textbf{绕制耦合线圈}：10-30匝，0.2-0.3mm漆包线，与谐振线圈同轴放置
+    \item \textbf{安装电容}：固定可变电容
+    \item \textbf{布置线圈}：耦合线圈与谐振线圈间距1-3cm，可调节
+    \item \textbf{连接检波器}：谐振回路输出到检波器，使用锗二极管
+    \item \textbf{连接耳机和地线}：完成电路
+\end{enumerate}
+
+\subsubsection*{历史意义与适合人群}
+
+双回路矿石收音机是无线电发展史上的重要里程碑，它证明了通过分离天线回路和谐振回路可以有效提高选择性，为后来更复杂的超外差收音机奠定了理论基础。
+
+适合人群：
+\begin{itemize}
+    \item 有单回路矿石收音机制作经验者
+    \item 追求更好接收效果的爱好者
+    \item 喜欢挑战的DIY玩家
+    \item 无线电原理深入学习者
+\end{itemize}
+
+\subsection{三回路矿石收音机}
+\label{sec:triple_loop_crystal_radio}
+
+三回路矿石收音机是矿石收音机技术的巅峰之作，在双回路基础上再增加一个谐振回路，达到了矿石收音机选择性的极限。三个回路协同工作，实现了极高的邻道选择性。
+
+\subsubsection*{与双回路的区别}
+
+\begin{table}[htbp]
+    \centering
+    \caption{双回路与三回路矿石收音机对比}
+    \begin{tabular}{lll}
+        \hline
+        \textbf{特性} & \textbf{双回路矿石收音机} & \textbf{三回路矿石收音机} \\
+        \hline
+        回路结构 & 天线回路 + 1个谐振回路 & 天线回路 + 2个谐振回路 \\
+        谐振回路数量 & 1个 & 2个（双调谐） \\
+        选择性 & 较好 & 极好 \\
+        串台抑制 & 较好 & 显著改善（邻道抑制提高15-25dB） \\
+        元件数量 & 8-10个 & 10-12个 \\
+        调试难度 & 中等 & 较高 \\
+        体积 & 较大 & 大 \\
+        \hline
+    \end{tabular}
+    \label{tab:dual_vs_triple_loop}
+\end{table}
+
+\noindent 注：三回路提高的是选择性而非频率稳定性，两者是不同概念。
+
+\subsubsection*{工作原理}
+
+三回路 = 天线回路 + 两个谐振回路，两个谐振回路之间通过互感耦合实现双调谐。
+
+\begin{description}
+    \item[天线回路]：连接天线和地线，通过耦合线圈接收信号，提供能量耦合
+    \item[第一谐振回路(L1C1)]：由电感L1和电容C1组成的并联谐振回路，通过耦合线圈与天线回路耦合，通过互感与第二回路耦合
+    \item[第二谐振回路(L2C2)]：由电感L2和电容C2组成的并联谐振回路，通过互感与第一回路耦合，决定最终选择性
+\end{description}
+
+\subsubsection*{耦合方式}
+
+\begin{description}
+    \item[天线-第一谐振耦合]：通过耦合线圈Lc实现，耦合系数0.1-0.3，通过线圈间距调节
+    \item[双谐振回路耦合]：两个谐振回路之间通过互感耦合，耦合程度由耦合系数 $k$ 描述
+\end{description}
+
+双谐振回路的耦合状态：
+\begin{itemize}
+    \item \textbf{松耦合（$k < k_c$）}：选择性优于临界耦合，但灵敏度显著降低
+    \item \textbf{临界耦合（$k = k_c$）}：最佳工作状态，选择性和灵敏度达到最佳平衡
+    \item \textbf{过耦合（$k > k_c$）}：灵敏度最高，但出现双峰响应，选择性严重恶化
+\end{itemize}
+
+临界耦合系数 $k_c = \frac{1}{\sqrt{Q_1 Q_2}}$，其中 $Q_1$ 和 $Q_2$ 分别为两个回路的品质因数。对于矿石收音机典型的 $Q$ 值（50-100），临界耦合系数约为0.01-0.02。超过此值会出现双峰现象，反而降低选择性。
+
+\noindent\textbf{双峰现象}：当耦合过强时，谐振曲线会出现两个峰值，中间形成凹陷。这会导致无法正确接收位于凹陷处的电台、邻道抑制能力下降、音质变差。因此，三回路矿石收音机的双谐振回路应工作在临界耦合或略松耦合状态。
+
+\subsubsection*{电路结构}
+
+三回路矿石收音机的电路结构为：
+\begin{center}
+\begin{tabular}{c}
+天线 \verb+──+ Lc(耦合线圈) \verb+──+ 地线 \\
+\verb+         │+ \\
+\verb+         ├──+ L1\verb+//+C1(第一谐振) \\
+\verb+         │+ \\
+\verb+         └──+[互感M]\verb+──+ L2\verb+//+C2(第二谐振) \verb+──+ 检波器 \verb+──+ 耳机 \verb+──+ 地线 \\
+\end{tabular}
+\end{center}
+
+\subsubsection*{元件选择}
+
+\begin{description}
+    \item[耦合线圈Lc]：约10-30匝，直径3-5cm，漆包线0.2-0.3mm
+    \item[谐振线圈L1/L2]：约250-300匝，直径3-4cm，漆包线0.15-0.2mm，两个线圈必须完全相同
+    \item[可变电容C1/C2]：365pF同轴双联空气式可变电容
+\end{description}
+
+耦合要求：
+\begin{itemize}
+    \item 天线-第一谐振耦合系数：0.1-0.3，线圈间距1-3cm
+    \item 双谐振回路耦合系数：0.01-0.02（临界耦合），线圈间距2-5cm
+\end{itemize}
+
+\subsubsection*{调试方法}
+
+三回路收音机的关键在于两个谐振回路的同步调谐。使用同轴双联电容时，两个谐振回路会自动同步调谐到同一频率。
+
+调试步骤：
+\begin{enumerate}
+    \item 将同轴电容调到中间位置
+    \item 调节Lc与L1的间距到2cm左右
+    \item 调节L1与L2的间距到3-4cm（中等耦合）
+    \item 接上天线和地线
+    \item \textbf{粗调}：旋转同轴电容，寻找电台信号
+    \item \textbf{天线耦合调节}：微调Lc与L1间距，找到最佳灵敏度（如声音太小，减小间距增强耦合）
+    \item \textbf{双谐振耦合调节}：微调L1与L2间距，找到最佳选择性（如串台严重，增大间距减弱耦合；如声音太小，减小间距增强耦合）
+    \item \textbf{细调}：如有独立调谐电容，交替微调C1和C2，找到声音最清晰的点
+    \item 找到临界耦合点：声音清晰且选择性好
+\end{enumerate}
+
+\subsubsection*{特点与常见问题}
+
+\begin{description}
+    \item[优点]：选择性极好（邻道抑制比双回路高15-25dB）、串台极少、音质纯净、灵活性高
+    \item[缺点]：调谐复杂、灵敏度略降、体积增大、调试困难
+\end{description}
+
+常见问题及解决：
+\begin{itemize}
+    \item \textbf{调谐困难}：使用同轴可变电容，确保两个线圈参数一致；调整线圈间距；检查天线质量
+    \item \textbf{选择性不够}：检查是否过耦合（如果出现双峰现象，增大L1和L2间距减弱耦合）；检查第二谐振回路工作状态
+    \item \textbf{灵敏度太低}：减小线圈间距增强耦合（注意不要过耦合）；确保天线长度足够（至少10-15米）；确保良好接地（3米以上接地棒）；使用锗二极管或肖特基二极管
+\end{itemize}
+
+\subsubsection*{制作实例}
+
+所需材料：
+\begin{itemize}
+    \item 365pF同轴双联可变电容 × 1
+    \item 漆包线（0.15-0.2mm）× 30米
+    \item 漆包线（0.2-0.3mm）× 5米
+    \item 塑料骨架（3-4cm直径）× 3个
+    \item 矿石检波器或1N34A/1N60二极管 × 1
+    \item 晶体耳机（20k-100kΩ）或电磁式耳机（2000Ω）× 1
+    \item 天线导线 × 15米
+    \item 地线导线 × 3米
+\end{itemize}
+
+制作要点：
+\begin{enumerate}
+    \item \textbf{绕制谐振线圈}：两个谐振线圈必须完全相同（250-300匝，0.15-0.2mm漆包线，3-4cm直径）
+    \item \textbf{绕制耦合线圈}：10-30匝，0.2-0.3mm漆包线，与谐振线圈同轴放置
+    \item \textbf{安装电容}：固定同轴双联电容，确保两个电容同步变化
+    \item \textbf{布置线圈}：耦合线圈与谐振线圈间距1-3cm，两个谐振线圈间距2-5cm，均可调节
+    \item \textbf{连接检波器}：第二谐振回路输出到检波器，使用锗二极管
+    \item \textbf{连接耳机和地线}：完成电路
+\end{enumerate}
+
+\subsubsection*{进阶实验}
+
+\begin{description}
+    \item[可变耦合]：使用滑动支架调节线圈间距实现可变耦合，在不同信号条件下选择最佳耦合程度，可增加耦合度指示提高使用便利性
+    \item[再生式三回路]：在第二谐振回路添加再生线圈，引入正反馈，利用正反馈提高灵敏度（可达20-30dB），需小心控制反馈量避免自激振荡
+\end{description}
+
+\subsubsection*{技术极限与历史意义}
+
+三回路矿石收音机已经接近矿石收音机的技术极限：
+\begin{itemize}
+    \item \textbf{选择性}：已达到矿石机的极限，受限于无源接收的物理限制
+    \item \textbf{灵敏度}：受限于无源接收的物理限制
+    \item \textbf{进一步改进}：需要引入有源器件（晶体管、电子管）
+\end{itemize}
+
+三回路矿石收音机代表了矿石收音机技术的最高水平，证明了通过增加谐振回路和互感耦合可以不断提高选择性，为后来有源收音机的发展提供了重要启示。
+
+\subsubsection*{适合人群与实际应用}
+
+适合人群：
+\begin{itemize}
+    \item 有丰富矿石收音机制作经验者
+    \item 追求极致选择性的发烧友
+    \item 喜欢挑战极限的DIY玩家
+    \item 无线电历史研究者
+    \item 技术极限探索者
+\end{itemize}
+
+实际应用：
+\begin{itemize}
+    \item \textbf{教育价值}：展示多级调谐和互感耦合的原理
+    \item \textbf{收藏价值}：矿石收音机技术的巅峰之作
+    \item \textbf{研究价值}：探索无源接收的技术极限
+    \item \textbf{展示价值}：无线电发展史的见证
+\end{itemize}
+
+\subsubsection*{从三回路到有源}
+
+三回路矿石收音机的局限性促使了有源收音机的发展：
+\begin{itemize}
+    \item \textbf{需要放大}：引入晶体管或电子管
+    \item \textbf{需要变频}：采用超外差架构
+    \item \textbf{需要稳定}：使用自动增益控制
+    \item \textbf{需要便利}：采用数字调谐
+\end{itemize}
+
+这些改进最终演变成了现代收音机的标准架构。
 
 \subsection{矿石收音机制作实践}
 \label{sec:crystal_radio_practice}
 
 % 内容待补充
+
+\input{2_接收机/02_广播接收机/Lyonodyne-17/Lyonodyne-17.tex}
 
 \section{电子管收音机}
 \label{sec:tube_radio}

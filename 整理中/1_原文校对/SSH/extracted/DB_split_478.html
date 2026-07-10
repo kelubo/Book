@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_635"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2909213" class="calibre7"></a>18.5.10 Logging and Debugging </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">If you're having a connection problem with PuTTY, you can capture the session data in a file. Open the PuTTY Configuration dialog and look under Session/Logging. Here you select the file to receive the data, and four different settings: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Logging completely turned off</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">As it says, do no logging.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Log printable output only</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">This simply captures the text of your terminal session, and is not very useful for debugging. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Log all session output</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">This captures not only the text of your session, but also any nonprinting control characters. This is useful for debugging terminal emulation problems, e.g., if your favorite text editor isn't behaving when viewed through PuTTY. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Log SSH packet data</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">This is the big one: the actual SSH data, unencrypted, that passes over the connection. It appears in hexadecimal and ASCII, annotated with high-level information such as "Doing Diffie-Hellman group exchange" and "Access denied." If you're debugging an SSH problem, this is the logging you need. However, it's not very user-friendly: you'll need substantial knowledge of the SSH protocol to figure out what's going on. </div>
+</blockquote>
+</div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">If you select "Log SSH packet data," <span><em class="italic">always</em></span> select "Omit known password fields" as well. Otherwise, sensitive data like passwords will be captured in the log file, which is a security risk if the log file is read or stolen by a hostile third party. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">If you're using Plink, you can display diagnostic information with the <span><em class="italic">-v</em></span> option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; plink -v smith@server.example.com<br class="calibre19"/>    Server version: SSH-1.99-OpenSSH_3.8.1p1<br class="calibre19"/>    We claim version: SSH-2.0-PuTTY-Release-0.56<br class="calibre19"/>    Using SSH protocol version 2<br class="calibre19"/>    Doing Diffie-Hellman group exchange<br class="calibre19"/>    Doing Diffie-Hellman key exchange<br class="calibre19"/>    Host key fingerprint is:<br class="calibre19"/>    ssh-dss 1024 80:de:c6:fa:f7:82:4f:c7:c4:8c:1f:6f:d4:40:4b:0e<br class="calibre19"/>    Initialised AES-256 client-&gt;server encryption<br class="calibre19"/>    Initialised AES-256 server-&gt;client encryption<br class="calibre19"/>    ...</tt></div></span></div>
+</body>
+</html>

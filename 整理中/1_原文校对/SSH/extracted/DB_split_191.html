@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_257"><span class="calibre2"><a shape="rect" class="calibre7"></a><a id="filepos1224036" class="calibre7"></a>What Is an Identity? </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1224188" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1224227" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1224266" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1224305" class="calibre15"></a>An SSH identity is a sequence of bits that says, "I am really me." It is a mathematical construct that permits an SSH client to prove itself to an SSH server, so the SSH server says, "Ah, I see, it's really you. You are hereby authenticated. Come in." </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1224666" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SSH user key and agent configuration (highlighted parts)" src="images/00020.jpg" class="calibre56"/></div>
+</div>
+</span><p class="calibre4">Figure 6-1. SSH user key and agent configuration (highlighted parts) </p></div>
+<p class="calibre4">An identity consists of two parts, called the private key and the public key. Together, they are known as a <span><em class="italic">key pair</em></span>. </p>
+<p class="calibre4">The private key represents your identity for <span><em class="italic">outgoing</em></span> SSH connections. When you run an SSH client in your account, such as <span><em class="italic">ssh</em></span> or <span><em class="italic">scp</em></span>, and it requests a connection with an SSH server, the client uses this private key to prove your identity to the server. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4"><span><em class="italic">Private keys must be kept secret.</em></span> An intruder with your private key can access your account as easily as you can. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The public key represents your identity for <span><em class="italic">incoming</em></span> connections to your account. When an SSH client requests access to your account, using a private key as proof of identity, the SSH server examines the corresponding public key. If the keys "match" (according to a cryptographic test), authentication succeeds and the connection proceeds. Public keys don't need to be secret; they can't be used to break into an account. </p>
+<p class="calibre4">A key pair is typically stored in a pair of files with related names. In SSH, the public-key filename is the same as the private one, but with the suffix <em class="italic">.pub</em> added. For example, if the file <em class="italic">mykey</em> holds a private key, its corresponding public key is found in <em class="italic">mykey.pub</em>. </p>
+<p class="calibre4">You may have as many SSH identities<a shape="rect" class="calibre15"></a><a id="filepos1227376" class="calibre15"></a> as you like. Most SSH implementations let you specify a <span><em class="italic">default identity</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos1227552" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1227591" class="calibre15"></a> clients use unless told otherwise. To use an alternative identity, you must change a setting by command-line argument, configuration file, or some other configuration tool. </p>
+<p class="calibre4">The structure of identity files differs for OpenSSH<a shape="rect" class="calibre15"></a><a id="filepos1227918" class="calibre15"></a> and Tectia, so we explain them separately. Their locations in the filesystem are shown in <a shape="rect" href="DB_split_217.html#filepos1451493" class="calibre6">Figures 6-2</a> (private keys) and <a shape="rect" href="DB_split_228.html#filepos1618102" class="calibre6">6-3</a> (public keys). </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SSH identity files (private keys) and the programs that use them" src="images/00021.jpg" class="calibre61"/></div>
+</div>
+</span><p class="calibre4">Figure 6-2. SSH identity files (private keys) and the programs that use them </p></div>
+</div>
+</body>
+</html>

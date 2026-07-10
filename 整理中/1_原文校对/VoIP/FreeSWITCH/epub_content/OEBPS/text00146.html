@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.5　使用Lua脚本通过多个网关循环外呼</font>
+</font>
+</p>
+<p height="1em" width="2em">有时候，我们外呼需要通过多个网关。在15.5.4节我们曾讲到使用mod_distributor将呼叫分配到多个网关的方法。现在我们就来看一下如何用Lua脚本来实现上述功能。</p>
+<p height="1em" width="2em">首先看脚本的内容。到这里大家应该已经对Lua比较熟悉了，因此我们就不逐行讲了，仅将关键的地方讲一下。</p>
+<p height="1em" width="2em">第3行，我们定义了4个网关的名称，电话将通过这4个网关呼出。第4行我们定义了被叫号码取第一个从该脚本输入的参数，我们后面将会看到如何将这个值从Dialplan里传过来。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 retries = 0<br/>
+<br/>
+02 bridge_hangup_cause = ""<br/>
+<br/>
+03 gateways = {"gw1", "gw2", "gw3", "gw4"}<br/>
+<br/>
+04 dest = argv[1]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面我们定义一个函数——call_retry，它将被递归调用。第7行中，每次递归我们都将retries参数加1，这是为了在第11行选择一下个网关；第8行很关键，它判断电话是否挂断，如果电话已挂断就立即退出，防止过多递归。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+05 function call_retry()<br/>
+<br/>
+06     freeswitch.consoleLog("notice", "Calling [" .. dest .. "] From Lua\n");<br/>
+<br/>
+07     retries = retries + 1<br/>
+<br/>
+08     if not session.ready() then<br/>
+<br/>
+09             return;<br/>
+<br/>
+10     end<br/>
+<br/>
+11     dial_string = "sofia/gateway/" .. gateways[retries] .. "/" .. dest;<br/>
+<br/>
+12     freeswitch.consoleLog("notice", "Dialing [" .. dial_string .. "]\n");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过上面的第11行中拼好了呼叫字符串后，下面第13行就调用bridge开始呼叫b-leg了，呼叫应该是阻塞的，直到呼叫失败或呼叫成功通话完毕后才会返回；然后在第14行我们能得到本次呼叫的结果，存放到变量brige_hangup_cause中；接下来判断呼叫结果，如果呼叫失败，而且失败原因是16～19行中的一种，并且重试次数小于4（第15行），则暂停1秒（第23行）并重新调用call_retry函数进行呼叫。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+13     session:execute("bridge", dial_string);<br/>
+<br/>
+14     bridge_hangup_cause = session:getVariable("bridge_hangup_cause") or session:getVariable("originate_disposition");<br/>
+<br/>
+15     if (retries &lt; 4 and<br/>
+<br/>
+16         (bridge_hangup_cause == "NORMAL_TEMPORARY_FAILURE" or<br/>
+<br/>
+17         bridge_hangup_cause == "NO_ROUTE_DESTINATION" or<br/>
+<br/>
+18         bridge_hangup_cause == "CALL_REJECTED" or<br/>
+<br/>
+19         bridge_hangup_cause == "INVALID_GATEWAY") ) then<br/>
+<br/>
+20         freeswitch.consoleLog("notice",<br/>
+<br/>
+21             "On calling [" .. dest .. "] hangup. Cause: [" ..<br/>
+<br/>
+22             bridge_hangup_cause .. "]. Retry: " .. retries .. " \n");<br/>
+<br/>
+23         session:sleep(1000);<br/>
+<br/>
+24         call_retry();<br/>
+<br/>
+25     else<br/>
+<br/>
+26         freeswitch.consoleLog("notice", "Retry Exceed, Now hangup!\n");<br/>
+<br/>
+27     end<br/>
+<br/>
+28 end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">值得注意的是，上面的call_retry函数是递归调用的。Lua支持尾递归，所以递归时不会消耗栈空间，因此递归深度再大也没关系。不过，这里我们只有4个网关，故递归深度再大也不会超过4。</p>
+<p height="1em" width="2em">上面只是定义了变量和函数，真正的函数是在下面开始执行的。第30行和第31行的两个变量设置也很重要，它保证在通过一个网关呼叫不通时电话不会挂断，以便继续尝试其他的网关；最后，第32行开始调用我们前面定义的call_retry函数进行外呼。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+29 session:preAnswer();<br/>
+<br/>
+30 session:setVariable("hangup_after_bridge", "true");<br/>
+<br/>
+31 session:setVariable("continue_on_fail", "true");<br/>
+<br/>
+32 call_retry();<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在本例中，我们的4个网关是硬编码的（Hard Coded），在真正使用时也可以从Dialplan或其他地方传进来，在此我们尽量保持简单。</p>
+<p height="1em" width="2em">另外，从脚本中也可以看出，与17.4节讲的外呼脚本不同，该脚本是在Dialplan中使用的。我们可以用如下的Dialplan调用该脚本：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Lua Multi-GW Example"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^0(.*)$"&gt;<br/>
+<br/>
+        &lt;action application="lua" data="call_gw.lua $1"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，如果匹配到以0开头的被叫号码，我们“吃掉”0，把剩余的部分作为参数传给Lua脚本，然后在Lua脚本中就可以从argv[1]中获得这些被叫号码的值了（参见代码中第4行）。</p>
+</body>
+</html>

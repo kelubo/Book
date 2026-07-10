@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1468581" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_294"><span class="calibre2"><a shape="rect" class="calibre7"></a>Precedence </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1468924" class="calibre15"></a>Perhaps you are wondering: what happens if some configuration settings conflict? For instance, if you use the <code class="calibre35">Compression</code> keyword to turn compression off, and also the <span><em class="italic">-C</em></span> command-line option to turn it on, who wins? In other words, who has <span><em class="italic">precedence</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos1469375" class="calibre15"></a> ? </p>
+<p class="calibre4">For OpenSSH and Tectia clients, the order of precedence is, from strongest to weakest: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Command-line options</li>
+<li value="2" class="calibre18">The user's local client configuration file</li>
+<li value="3" class="calibre18">The global client configuration file<sup class="calibre20">[<a id="filepos1469880" shape="rect" href="#filepos1471336" class="calibre6">105</a>]</sup></li>
+</ol></div>
+<p class="calibre4">Command-line options have the highest precedence, overriding any client configuration files. The user's local file has next highest precedence, and the global file has lowest precedence. So, in our compression example, <span><em class="italic">-C</em></span> takes precedence over the <code class="calibre35">Compression</code> keyword, and compression is enabled. If a setting isn't changed by any keyword or command-line option, the client's default setting is used. </p>
+<p class="calibre4">Remember that we're speaking only of outgoing connections initiated by clients. Incoming connections, controlled by the SSH server, have other precedence rules. For servers, the user's local configuration file definitely does <span><em class="italic">not</em></span> override the global file; otherwise, users could override global server settings, creating security holes and wreaking other havoc. <a shape="rect" href="DB_split_267.html#filepos1769738" class="calibre6">[8.1.1]</a></p>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1471336" shape="rect" href="#filepos1469880" class="calibre6">105</a>] </sup>We don't mention environment variables in this list because they don't compete for precedence. Environment variables control different features that don't overlap with command-line options and configuration files. </p>
+</div>
+</div>
+</div>  <div class="mbppagebreak" id="calibre_pb_295"></div></body>
+</html>

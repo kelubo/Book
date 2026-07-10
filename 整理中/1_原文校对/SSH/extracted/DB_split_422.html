@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2768944" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_560"><span class="calibre2"><a shape="rect" class="calibre7"></a>Command-Line Programs </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2769298" class="calibre15"></a>The GUI client can be launched from the command line. This is useful for creating customized shortcuts, or other wrapper scripts (e.g., <em class="italic">*.bat</em> files). </p>
+<p class="calibre4">The program is named <span><em class="italic">SSHClient</em></span>, and supports the following options:<sup class="calibre20">[<a id="filepos2769738" shape="rect" href="#filepos2774997" class="calibre6">179</a>]</sup></p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">-r</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Reset all customizations made to the user interface (toolbars and menus). The client asks for confirmation before doing this. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-u [username]</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Specify the remote username.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-h [hostname]</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Specify the remote hostname (where the SSH server runs). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-p [port]</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Specify the port number.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-f</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Start using the file-transfer window instead of the terminal window. </div>
+</blockquote>
+</div>
+<p class="calibre4">A profile settings file (<em class="italic">*.ssh2</em>) can also be specified as the last argument on the command line. </p>
+<p class="calibre4">The GUI client immediately initiates an outgoing connection if any of the <span><em class="italic">-u</em></span>, <span><em class="italic">-h</em></span>, or <span><em class="italic">-p</em></span> options, or a profile settings file, are specified. If no remote hostname is given (either by the <span><em class="italic">-h</em></span> option or a profile settings file), then the client prompts for connection parameters, with any other supplied values as defaults. Otherwise, the client starts in an unconnected state and waits for outgoing connections to be initiated manually. </p>
+<p class="calibre4">The precedence for settings is (from strongest to weakest):</p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Command-line options</li>
+<li value="2" class="calibre18">A profile settings file specified on the command line</li>
+<li value="3" class="calibre18">Default profile settings files: either <em class="italic">default.ssh2</em> or <em class="italic">defaultsftp.ssh2</em> (if the <span><em class="italic">-f</em></span> option is used) </li>
+<li value="4" class="calibre18">Hardwired default settings, if the default profile settings files do not exist </li>
+</ol></div>
+<p class="calibre4">The Tectia Client package also supplies a set of command-line programs, including <span><em class="italic">ssh2</em></span>, <span><em class="italic">scp2</em></span>, <span><em class="italic">sftp2</em></span>, and <span><em class="italic">ssh-keygen2</em></span>.<sup class="calibre20">[<a id="filepos2773400" shape="rect" href="#filepos2775453" class="calibre6">180</a>]</sup> These programs are intended for scripting, and function almost exactly as they do for Unix implementations, except that they are aware of the Windows conventions for configuration file locations. In fact, <span><em class="italic">ssh2 -h</em></span> is an easy way to list the location of the configuration files for the client (in the user profile folder). The programs understand both Windows and Unix filename conventions using backslashes and (forward) slashes, respectively. Wildcards are case-insensitive, in accordance with Windows filesystem conventions. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Command-line variants for <span><em class="italic">ssh-agent2</em></span> or <span><em class="italic">ssh-add2</em></span> are notably absent. This functionality is provided only by Accession Lite. The command-line client program (<span><em class="italic">ssh2</em></span>) uses Accession Lite to contact an agent for authentication. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2774997" shape="rect" href="#filepos2769738" class="calibre6">179</a>] </sup>Options can also be specified with a forward slash instead of a hyphen: e.g., <span><em class="italic">/f</em></span> or <span><em class="italic">-f</em></span>. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2775453" shape="rect" href="#filepos2773400" class="calibre6">180</a>] </sup>Note that all of the program names end with the "2" suffix. Corresponding program names without "2" are not provided, as they are (via symbolic links) on Unix systems. </p>
+</div>
+</div>
+</div>  <div class="mbppagebreak" id="calibre_pb_561"></div></body>
+</html>

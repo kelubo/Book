@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_465"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2364262" class="calibre7"></a>11.6.2 Subconfiguration Files </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2364423" class="calibre15"></a>It is sometimes useful to customize the SSH server configuration depending on the type of connection or session. For example, a system administrator might want to impose stronger authentication requirements if a connection originates from a client outside of a firewall, or to record more detailed logging information about the activities of special-purpose guest accounts. </p>
+<p class="calibre4">Tectia servers support these kinds of conditional configuration modifications with host-and user-specific configuration files, which are known collectively as <span><em class="italic">subconfiguration files</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos2365145" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2365184" class="calibre15"></a>. The subconfiguration files use the same syntax as the main configuration file, except as noted later. Each file starts with its own, independent metaconfiguration information. </p>
+<p class="calibre4">The <code class="calibre35">HostSpecificConfig</code> keyword is used to update the configuration based on the client host: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia with zsh_fileglob or traditional regex syntax<br class="calibre19"/>    HostSpecificConfig *.example.com    /etc/ssh2/subconfig/ourhosts<br class="calibre19"/><br class="calibre19"/>    # Tectia with egrep regex syntax<br class="calibre19"/>    HostSpecificConfig .*\.example\.com /etc/ssh2/subconfig/ourhosts</tt></div></span><p class="calibre4">The first value is a pattern that matches hostnames or addresses, as described for the <code class="calibre35">AllowHosts</code> keyword. <a shape="rect" href="DB_split_168.html#filepos1039161" class="calibre6">[5.5.3]</a> For example, if all of the machines inside a firewall are assigned to a range of addresses, it might be convenient to use a netmask for the pattern: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    HostSpecificConfig \m10.1.1.0/24 /etc/ssh2/subconfig/insiders</tt></div></span><p class="calibre4">The second value is the filename containing the host-specific configuration. </p>
+<p class="calibre4">Similarly, the <code class="calibre35">UserSpecificConfig</code> keyword specifies a pattern describing user accounts, and the filename with user-specific configuration settings that apply to those accounts. In the simplest case, the pattern matches usernames or numerical user IDs, as for the <code class="calibre35">AllowUsers</code> keyword: <a shape="rect" href="DB_split_166.html#filepos1010709" class="calibre6">[5.5.1]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia with zsh_fileglob or traditional regex syntax<br class="calibre19"/>    UserSpecificConfig guest[[:digit:]]## /etc/ssh2/subconfig/guests<br class="calibre19"/><br class="calibre19"/>    # Tectia with egrep regex syntax<br class="calibre19"/>    UserSpecificConfig guest[[:digit:]]+  /etc/ssh2/subconfig/guests<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    UserSpecificConfig 12[3-6][[:digit:]] /etc/ssh2/subconfig/guests</tt></div></span><p class="calibre4">More generally, patterns have the form <span><em class="italic">user</em></span>[%<span><em class="italic">group</em></span>][@<span><em class="italic">host</em></span>]. The optional <span><em class="italic">group</em></span> matches either group names or numerical group IDs, as for the <code class="calibre35">AllowGroup</code> keyword: <a shape="rect" href="DB_split_167.html#filepos1034726" class="calibre6">[5.5.2]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia with zsh_fileglob or traditional regex syntax<br class="calibre19"/>    UserSpecificConfig *%[x-z]guests /etc/ssh2/subconfig/xyz-guests<br class="calibre19"/><br class="calibre19"/>    UserSpecificConfig *%800[[:digit:]] /etc/ssh2/subconfig/guests-8k<br class="calibre19"/><br class="calibre19"/>    # Tectia with egrep regex syntax<br class="calibre19"/>    UserSpecificConfig .*%[x-z]guests /etc/ssh2/subconfig/xyz-guests<br class="calibre19"/>    UserSpecificConfig .*%800[[:digit:]] /etc/ssh2/subconfig/guests-8k</tt></div></span><p class="calibre4">Users can (and often do) belong to multiple groups: they are all checked. </p>
+<p class="calibre4">The optional <span><em class="italic">host</em></span> matches the client hostname or address, as for the <code class="calibre35">AllowHosts</code> keyword <a shape="rect" href="DB_split_168.html#filepos1039161" class="calibre6">[5.5.3]</a> or <code class="calibre35">HostSpecificConfig</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia with zsh_fileglob or traditional regex syntax<br class="calibre19"/>    UserSpecificConfig guest@*.friendly.org /etc/ssh2/subconfig/friends<br class="calibre19"/>    UserSpecificConfig *%trusted@\m10.1.1.0/24 /etc/ssh2/subconfig/trusted-insiders<br class="calibre19"/><br class="calibre19"/>    # Tectia with egrep regex syntax<br class="calibre19"/>    UserSpecificConfig guest@.*\.friendly\.org /etc/ssh2/subconfig/friends<br class="calibre19"/>    UserSpecificConfig .*%trusted@\m10.1.1.0/24 /etc/ssh2/subconfig/trusted-insiders</tt></div></span><p class="calibre4">The <span><em class="italic">user</em></span> cannot be omitted from the pattern. If the pattern has two or more components (<span><em class="italic">user</em></span>, <span><em class="italic">group</em></span>, or <span><em class="italic">host</em></span>), then <span><em class="italic">all</em></span> of them must match for the user-specific configuration to be read. </p>
+<p class="calibre4">The Tectia server starts by reading the main configuration file, and sets up the default configuration, which can include references to the subconfiguration files, and an associated pattern for each. When a connection is accepted from a client host, the server forks, and the child process that handles the session inherits its own private copy of the configuration. This private configuration is discarded when the child process exits at the end of the session, so the private configuration can be modified without affecting the default configuration that is used as the starting point for other sessions.<sup class="calibre20">[<a id="filepos2371464" shape="rect" href="DB_split_357.html#filepos2420028" class="calibre6">153</a>]</sup></p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">The metaconfiguration parameters are not considered part of the configuration and are not inherited by subconfiguration files. Metaconfiguration information is independently associated with each file, because it describes the syntax of that file's contents. Although it's possible to use different metaconfiguration parameters for subconfiguration files, this is confusing, and we strongly recommend starting each subconfiguration file with the same, explicit metaconfiguration information as the main configuration file. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Immediately after the server accepts a new connection, but before any conversation ensues with the client, the server uses the client hostname or address to check the patterns for all <code class="calibre35">HostSpecificConfig</code> keywords, in the order that they were specified in the main configuration file. The server reads each host-specific configuration file for patterns that match, and modifies its private configuration as it does so. </p>
+<p class="calibre4">Later, when the username has been specified by the client (and group memberships have been determined by the server for the user), the server checks the patterns for all <code class="calibre35">UserSpecificConfig</code> keywords, again in the order indicated by the main configuration file, and reads user-specific configuration files for matching patterns to further customize the configuration. </p>
+<p class="calibre4">The order for reading the configuration files is important because it determines how keywords apply to the final configuration that is used for each session. Keywords that are read later either override or append to the values for earlier keywords—this principle applies whether the keywords appear multiple times in a single file, or in separate files. </p>
+<p class="calibre4">For example, suppose our main configuration file contains:<sup class="calibre20">[<a id="filepos2373903" shape="rect" href="DB_split_357.html#filepos2420500" class="calibre6">154</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: /etc/ssh2/sshd2_config<br class="calibre19"/>    PasswordGuesses 1<br class="calibre19"/><br class="calibre19"/>    UserSpecificConfig guest[[:digit:]]+     /etc/ssh2/subconfig/guests<br class="calibre19"/>    UserSpecificConfig        .*%[x-z]guests /etc/ssh2/subconfig/xyz-guests<br class="calibre19"/><br class="calibre19"/>    HostSpecificConfig      .*\.example\.com /etc/ssh2/subconfig/ourhosts<br class="calibre19"/>    HostSpecificConfig .*\.foo\.example\.com /etc/ssh2/subconfig/foohosts<br class="calibre19"/><br class="calibre19"/>    PasswordGuesses 2</tt></div></span><p class="calibre4">When the server starts, it reads this main configuration file, and sets the value for the <code class="calibre35">PasswordGuesses</code> keyword first to <code class="calibre35">1</code>, and then to <code class="calibre35">2</code>. The server also records the filenames and patterns for the subconfiguration files. </p>
+<p class="calibre4">Later, the server checks the patterns for the host-specific configuration files, in order. If a connection is accepted from <span><em class="italic">laptop.foo.example.com</em></span>, then both host patterns match. So, if the files contain: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: /etc/ssh2/subconfig/ourhosts<br class="calibre19"/>    PasswordGuesses 3<br class="calibre19"/><br class="calibre19"/>    # Tectia: /etc/ssh2/subconfig/foohosts<br class="calibre19"/>    PasswordGuesses 4</tt></div></span><p class="calibre4">then the value for the <code class="calibre35">PasswordGuesses</code> keyword is overridden to <code class="calibre35">3</code>, and subsequently to <code class="calibre35">4</code>. </p>
+<p class="calibre4">Finally, the server checks the patterns for the user-specific configuration files, again in order. If the client specifies the username as guest33, and the server determines that this user belongs to the group yguests, then both user patterns match. So, if the files contain: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: /etc/ssh2/subconfig/guests<br class="calibre19"/><br class="calibre19"/>    PasswordGuesses 5<br class="calibre19"/><br class="calibre19"/>    # Tectia: /etc/ssh2/subconfig/xyz-guests<br class="calibre19"/>    PasswordGuesses 6</tt></div></span><p class="calibre4">then the value for the <code class="calibre35">PasswordGuesses</code> keyword is overridden to <code class="calibre35">5</code>, and eventually to <code class="calibre35">6</code>, which is the value that is actually used for authentication. </p>
+<p class="calibre4">The order for reading keywords is determined primarily by the order for reading files, and secondarily by the order of occurrence of the individual keywords within each file. In our example, even though the last <code class="calibre35">PasswordGuesses</code> keyword in the main configuration file appears after the subconfiguration keywords, the settings in the subconfiguration files still override the default configuration. Similarly, even though <code class="calibre35">UserSpecificConfig</code> keywords appear before <code class="calibre35">HostSpecificConfig</code> keywords in the main configuration file, the server always reads host-specific configuration files before user-specific configuration files. </p>
+<p class="calibre4">It's therefore a good idea to order the keywords in the main configuration file to reflect the order imposed by reading subconfiguration files, with default settings first, followed by <code class="calibre35">HostSpecificConfig</code> and <code class="calibre35">UserSpecificConfig</code> keywords at the end. Our example would be more clearly written as:<sup class="calibre20">[<a id="filepos2378201" shape="rect" href="DB_split_357.html#filepos2420946" class="calibre6">155</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: /etc/ssh2/sshd2_config<br class="calibre19"/>    PasswordGuesses 2<br class="calibre19"/><br class="calibre19"/>    HostSpecificConfig      .*\.example\.com /etc/ssh2/subconfig/ourhosts<br class="calibre19"/>    HostSpecificConfig .*\.foo\.example\.com /etc/ssh2/subconfig/foohosts<br class="calibre19"/><br class="calibre19"/>    UserSpecificConfig guest[[:digit:]]+     /etc/ssh2/subconfig/guests<br class="calibre19"/>    UserSpecificConfig        .*%[x-z]guests /etc/ssh2/subconfig/xyz-guests</tt></div></span><p class="calibre4">Because host- and user-specific configuration files are read in the order specified in the main configuration file, the patterns should be listed starting with general patterns first, followed by increasingly specific patterns.<sup class="calibre20">[<a id="filepos2379252" shape="rect" href="DB_split_357.html#filepos2421337" class="calibre6">156</a>]</sup> Patterns can be carefully constructed and ordered to encode arbitrarily complicated logic for customizing almost any aspect of the configuration based on the client host, users, or groups: a very powerful feature. </p>
+<p class="calibre4">Subconfiguration files can be further divided into sections<a shape="rect" class="calibre15"></a><a id="filepos2379690" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2379729" class="calibre15"></a>, which are marked by even more specific patterns, each followed by a colon, on separate lines.<sup class="calibre20">[<a id="filepos2379889" shape="rect" href="DB_split_357.html#filepos2421793" class="calibre6">157</a>]</sup> The keywords in each section are used only if the pattern for the section matches. Sections end when a new pattern line is encountered, or at the end of the subconfiguration file. The section patterns in host- and user-specific configuration files are interpreted in the same way as the patterns for the <code class="calibre35">HostSpecificConfig</code> and <code class="calibre35">UserSpecificConfig</code> keywords, in the main configuration file, respectively. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4"><span><em class="italic">Any</em></span> line that ends in a colon character (":") is considered to be a section pattern line. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Sections are a useful alternative to separate subconfiguration files. We might choose to combine the host-specific configuration files from our original example as: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: /etc/ssh2/subconfig/ourhosts<br class="calibre19"/>    PasswordGuesses 3<br class="calibre19"/>    # ... other general keywords for all hosts in example.com<br class="calibre19"/><br class="calibre19"/>    .*\.foo\.example\.com:<br class="calibre19"/>      PasswordGuesses 4<br class="calibre19"/>      # ... other more specific keywords for foo.example.com<br class="calibre19"/><br class="calibre19"/>    .*\.bar\.example\.com:<br class="calibre19"/>      PasswordGuesses 8<br class="calibre19"/>      # ... other more specific keywords for bar.example.com<br class="calibre19"/><br class="calibre19"/>    .*\.baz\.example\.com:<br class="calibre19"/>      PasswordGuesses 9<br class="calibre19"/>      # ... other more specific keywords for baz.example.com</tt></div></span><p class="calibre4">This is especially convenient if there are many general keywords for the primary domain, but only a few, more specific keywords for each subdomain. It's also handy if there are lots of subdomains, because we can add or remove subdomains without modifying the main configuration file. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Sections cannot be used in the main configuration file. This makes sense: it isn't at all clear what would be used to match such patterns. The server warns if any section pattern lines are detected in configuration files where sections are inappropriate, like the main configuration file. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Sections for user-specific configuration files work similarly. We can override settings for specific users: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: /etc/ssh2/subconfig/guests<br class="calibre19"/>    PasswordGuesses 5<br class="calibre19"/>    # ... other general keywords for all guest usernames<br class="calibre19"/><br class="calibre19"/>    guest[0-4][[:digit:]]*:<br class="calibre19"/>      PasswordGuesses 10<br class="calibre19"/>      # ... other more specific keywords for guest usernames with [0-4] digits<br class="calibre19"/><br class="calibre19"/>    guest[5-9][[:digit:]]*:<br class="calibre19"/><br class="calibre19"/>      PasswordGuesses 12<br class="calibre19"/>      # ... other more specific keywords for guest usernames with [5-9] digits</tt></div></span><p class="calibre4">or for specific groups:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: /etc/ssh2/subconfig/xyz-guests<br class="calibre19"/>    PasswordGuesses 6<br class="calibre19"/>    # ... other general keywords for all [x-z]guests groups<br class="calibre19"/><br class="calibre19"/>    .*%xguests:<br class="calibre19"/>      PasswordGuesses 15<br class="calibre19"/>      # ... other more specific keywords for the xguests group<br class="calibre19"/><br class="calibre19"/>    .*%yguests:<br class="calibre19"/>      PasswordGuesses 16<br class="calibre19"/>      # ... other more specific keywords for the yguests group<br class="calibre19"/><br class="calibre19"/>    .*%zguests:<br class="calibre19"/>      PasswordGuesses 17<br class="calibre19"/>      # ... other more specific keywords for the zguests group</tt></div></span><p class="calibre4">Several other important aspects of server behavior follow directly as consequences of the order and timing for reading the configuration files. The server normally reads its main configuration file only when it starts, and must be signaled to reread the configuration later, if changes are made. <a shape="rect" href="DB_split_143.html#filepos776646" class="calibre6">[5.2.4]</a> In contrast, subconfiguration files are reread for each connection, so no signaling is necessary if the files are modified. In fact, a "match anything" pattern can be used to store frequently changed keywords in a subconfiguration file, to avoid the need for frequent signaling: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia with zsh_fileglob or traditional regex syntax<br class="calibre19"/>    HostSpecificConfig  * /etc/ssh2/subconfig/volatile<br class="calibre19"/><br class="calibre19"/>    # Tectia with egrep regex syntax<br class="calibre19"/>    HostSpecificConfig .* /etc/ssh2/subconfig/volatile</tt></div></span><p class="calibre4">If an error is detected while reading the main configuration file, then the server exits. Errors within host-specific configuration files cause the connection to be terminated. For user-specific configuration files, errors result in denial of access. </p>
+<p class="calibre4">Some keywords cannot be specified in subconfiguration files. In some cases, the keywords control server behavior that happens before the subconfiguration files are read. For example, it doesn't make sense to specify the <code class="calibre35">Port</code> keyword <a shape="rect" href="DB_split_148.html#filepos816851" class="calibre6">[5.3.3.1]</a> in subconfiguration files, because the port (or ports) must be chosen to listen for incoming connections before any connections can be accepted. Certain other keywords are forbidden in subconfiguration files because they would be too confusing. For example, the <code class="calibre35">HostSpecificConfig</code> and <code class="calibre35">UserSpecificConfig</code> keywords are restricted to main configuration files: imagine trying to understand the pretzel logic resulting from nested subconfiguration files! <a shape="rect" href="#filepos2387320" class="calibre6">Tables 11-1</a>, <a shape="rect" href="#filepos2396745" class="calibre6">11-2</a>, and <a shape="rect" href="#filepos2402716" class="calibre6">11-3</a> list the keywords permitted in each kind of configuration file. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2387320" class="calibre15"></a></span><p class="calibre4">Table 11-1. Tectia keywords permitted only in the main configuration file </p>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><a id="filepos2387535" class="calibre15"></a><table summary="Tectia keywords permitted only in the main configuration           file" border="0" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowHosts</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">CertdListenerPath</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">DenyHosts</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ExternalMapper</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ExternalMapperTimeout</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">FIPSMode</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostCa</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostCAMoCRLs</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostCertificateFile</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostKeyFile</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostSpecificConfig</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostKeyEkInitString</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostKeyEkTimeOut</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostKeyEkProvider</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">KeepAlive</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">LDAPServers</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ListenAddress</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">MapFile</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">MaxBroadcastsPerSecond</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">MaxConnections</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">NoDelay</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">OCSPResponderURL</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PKI</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PKIDisableCrls</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PasswordAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Port</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ProtocolVersionString</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PubkeyAuthentication</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PublicHostKeyFile</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RSAAuthentication</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RandomSeedFile</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RequireReverseMapping</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ResolveClientHostName</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">SocksServer</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">SshPAMClientPath</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">UseSOCKS5</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">UserSpecificConfig</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">XauthPath</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2396745" class="calibre15"></a></span><p class="calibre4">Table 11-2. Tectia keywords permitted in the main and host-specific configuration files, but not user-specific ones </p>
+<div class="calibre3">
+<table summary="Tectia keywords permitted in the main and host-specific           configuration files, but not user-specific ones" border="0" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowGroups</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowTcpForwardingForGroups</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowTcpForwardingForUsers</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowUsers</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthPassword.ChangePlugin</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">BannerMessageFile</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ChRootGroups</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ChRootUsers</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Ciphers</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">DenyGroups</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">DenyTcpForwardingForGroups</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">DenyTcpForwardingForUsers</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">DenyUsers</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">DisableVersionFallback</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ExternalAuthorizationProgram</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ForwardACL</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">LoginGraceTime</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">MACs</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PermitRootLogin</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Ssh1Compatibility</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Sshd1ConfigFile</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Sshd1Path</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2402716" class="calibre15"></a></span><p class="calibre4">Table 11-3. Tectia keywords permitted in all configuration files</p>
+<div class="calibre3">
+<table summary="Tectia keywords permitted in all configuration files" border="0" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><tfoot class="calibre63"><tr class="calibre31"><th colspan="2" rowspan="1" class="calibre51"><span class="calibre33"><span class="bold"><a shape="rect" class="calibre15"></a><a id="filepos2403290" class="calibre15"></a></span><p class="calibre4">
+<sup class="calibre34">a</sup> The <code class="calibre35">VerboseMode</code> keyword (or the <code class="calibre35">Verbose</code> synonym) <a shape="rect" href="DB_split_182.html#filepos1123002" class="calibre6">[5.8]</a> prevents forking only if used in the main configuration file. In subconfiguration files, it merely enables debug output. </p></span></th>
+</tr></tfoot><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowAgentForwarding</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowSHosts</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowTcpForwarding</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowX11Forwarding</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AllowedAuthentications</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthInteractiveFailureTimeout</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthKbdInt.NumOptional</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthKbdInt.Optional</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthKbdInt.Plugin</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthKbdInt.Required</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthKbdInt.Retries</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthPublicKey.Cert.MaxSize</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthPublicKey.Cert.MinSize</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthPublicKey.MaxSize</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthPublicKey.MinSize</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">AuthorizationFile</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Cert.RSA.Compat.HashScheme</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">CheckMail</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">DenySHosts</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">FascistLogging</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ForwardAgent</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">ForwardX11</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">HostbasedAuthForceClientHostnameDNSMatch</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">IdleTimeout</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">IgnoreRhosts</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">IgnoreRootRhosts</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">NoOp</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PGPPublicKeyFile</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PGPSecretKeyFile</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PasswdPath</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PasswordGuesses</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PermitEmptyPasswords</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">PrintMOTD</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">QuietMode</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RekeyIntervalBytes</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RekeyIntervalSeconds</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">RequiredAuthentications</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">SecurIdGuesses</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">SettableEnvironmentVars</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">SftpSysLogFacility</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">StrictModes</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">StrictModes.UserDirMaskBits</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Subsystem-...</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">SysLogFacility</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">UserConfigDirectory</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">UserKnownHosts</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Verbose</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">VerboseMode<a shape="rect" href="#filepos2403290" class="calibre6">
+<sup class="calibre34">a</sup></a>
+</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">X11Forwarding</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+</body>
+</html>

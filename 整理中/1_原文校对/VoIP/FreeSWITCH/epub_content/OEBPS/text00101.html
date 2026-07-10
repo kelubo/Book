@@ -1,0 +1,647 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.3　数据库</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH内部使用关系型数据库记录一些实时的数据。这些数据有的是临时存储的，有的是持久存储的。关系型数据库很适合描述通信应用中的实体以及关系数据，而且它所支持的各种关系运算也极大简化了FreeSWITCH的代码量及开发难度。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.3.1　默认数据库中有什么？</font>
+</font>
+</p>
+<p height="1em" width="2em">数据库中到底有什么？很多网友会问这个问题。虽然，一般来讲，用户没有必要直接访问这里的数据库。但是在某些时候直接访问数据库比使用FreeSWITCH的命令访问速度更快一些，在合适的场合也不妨合理使用 <sup>
+<small>
+<a href="text00102.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.核心数据库</font>
+</font>
+</p>
+<p height="1em" width="2em">我们先从核心看起，看一看默认的数据库中都有什么。</p>
+<p height="1em" width="2em">FreeSWITCH默认使用SQLite嵌入式数据库，因而不需要任何配置就能工作。默认的数据库存储位置是FreeSWITCH安装目录下的db目录，默认的核心数据库名称是core.db。我们可以先打开该数据库，看看里面到底有什么。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+dujinfang@seven:/usr/local/freeswitch/db$ sqlite3 core.db<br/>
+<br/>
+sqlite&gt; .tables<br/>
+<br/>
+aliases         channels        interfaces      registrations<br/>
+<br/>
+basic_calls     complete        nat             tasks<br/>
+<br/>
+calls           detailed_calls  recovery<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，sqlite3命令用于打开SQLite数据库。.tables命令会显示数据库中所有的表，各表的作用如下：</p>
+<p height="1em" width="2em">·<font color="#0468BB">aliases</font>
+ ：别名表，用于存储命令行别名。</p>
+<p height="1em" width="2em">·<font color="#0468BB">basic_calls</font>
+ ：一个视图，基于channels和calls表，提供基本的呼叫信息。</p>
+<p height="1em" width="2em">·<font color="#0468BB">calls</font>
+ ：呼叫表，在bridge的呼叫中，用于关联Channel表中的两条腿。</p>
+<p height="1em" width="2em">·<font color="#0468BB">channels</font>
+ ：存储所有当前的Channel。</p>
+<p height="1em" width="2em">·<font color="#0468BB">complete</font>
+ ：存储所有Tab Complete数据。</p>
+<p height="1em" width="2em">·<font color="#0468BB">detailed_calls</font>
+ ：一个视图，基于Channels和Calls，提供详细的呼叫信息。</p>
+<p height="1em" width="2em">·<font color="#0468BB">interfaces</font>
+ ：存储所有的Interface。</p>
+<p height="1em" width="2em">·<font color="#0468BB">nat</font>
+ ：存储当前的NAT映射关系。</p>
+<p height="1em" width="2em">·<font color="#0468BB">recovery</font>
+ ：在使用系统恢复功能功能时，该表存储所有呼叫的详细信息。</p>
+<p height="1em" width="2em">·<font color="#0468BB">registrations</font>
+ ：存储注册用户的信息。</p>
+<p height="1em" width="2em">·<font color="#0468BB">tasks</font>
+ ：当前的任务表，如heartbeat（心跳）、检测IP地址变化等。</p>
+<p height="1em" width="2em">FreeSWITCH的show命令的大部分内容都是基于这些表的，如show channels即查询Channels表。当FreeSWITCH中有通话时，可以使用如下SQL语句进行查询：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+sqlite&gt; select * from channels;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以使用.schema命令看表的结构，如下列命令就显示了calls表的结构：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+sqlite&gt; .schema calls<br/>
+<br/>
+CREATE TABLE calls (<br/>
+<br/>
+   call_uuid  VARCHAR(255),<br/>
+<br/>
+   call_created  VARCHAR(128),<br/>
+<br/>
+   call_created_epoch  INTEGER,<br/>
+<br/>
+   caller_uuid      VARCHAR(256),<br/>
+<br/>
+   callee_uuid      VARCHAR(256),<br/>
+<br/>
+   hostname VARCHAR(256)<br/>
+<br/>
+);<br/>
+<br/>
+CREATE INDEX calls1 on calls(hostname);<br/>
+<br/>
+CREATE INDEX callsidx1 on calls (hostname);<br/>
+<br/>
+CREATE INDEX eeuuindex on calls (callee_uuid);<br/>
+<br/>
+CREATE INDEX eeuuindex2 on calls (call_uuid);<br/>
+<br/>
+CREATE INDEX eruuindex on calls (caller_uuid, hostname);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.Sofia数据库</font>
+</font>
+</p>
+<p height="1em" width="2em">除核心数据库外，很多外部模块也都使用数据库存储数据。最典型的就是mod_sofia模块。</p>
+<p height="1em" width="2em">mod_sofia模块中的每一个Profile都使用一个单独的数据库，如我们可以通过下面命令看到每个数据库：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+dujinfang@seven:/usr/local/freeswitch/db$ ls sofia*<br/>
+<br/>
+sofia_reg_external.db       sofia_reg_internal-ipv6.db  sofia_reg_internal.db<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们打开sofia_reg_internal.db（即internal Profile对应的数据库），看看里面有什么：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ sqlite3 sofia_reg_internal.db<br/>
+<br/>
+sqlite&gt; .tables<br/>
+<br/>
+sip_authentication   sip_shared_appearance_dialogs<br/>
+<br/>
+sip_dialogs          sip_shared_appearance_subscriptions<br/>
+<br/>
+sip_presence         sip_subscriptions<br/>
+<br/>
+sip_registrations<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，SIP用户的注册信息都存储在sip_registrations表中。当然，该表与core.db中的registrations表中的有些数据是重复的。由于不止SIP用户需要注册，其他模块的用户也可能需要注册，核心数据库中存储的是一种统一的注册信息。</p>
+<p height="1em" width="2em">其他各表的功能简介如下：</p>
+<p height="1em" width="2em">·sip_authentication：SIP认证相关。</p>
+<p height="1em" width="2em">·sip_dialogs：SIP对话相关。</p>
+<p height="1em" width="2em">·sip_presence：SIP呈现相关。</p>
+<p height="1em" width="2em">·sip_shared_appearance_dialogs：SIP SLA相关，记录当前的Dialog。</p>
+<p height="1em" width="2em">·sip_shared_appearance_subscriptions：SIP SLA相关，记录订阅信息。</p>
+<p height="1em" width="2em">·sip_subscriptions：SIP订阅相关。</p>
+<p height="1em" width="2em">感兴趣的读者可以自己打开看一下，这里就不多介绍了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.其他数据库</font>
+</font>
+</p>
+<p height="1em" width="2em">其他模块，如我们上面讲过的mod_fifo、mod_callcenter等也有自己的数据库。通过直接访问这些数据库，也可以从里面取出有趣的数据，甚至还可以改变模块的运行规则。当然，这类似黑客 <sup>
+<small>
+<a href="text00102.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 行为，跟前面讲的在数据库上安装触发器差不多，不推荐使用。</p>
+<p height="1em" width="2em">关于数据库，我们就不进行更深入的探索了，有兴趣的读者可以参照源代码自行学习。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.3.2　ODBC</font>
+</font>
+</p>
+<p height="1em" width="2em">SQLite在并发量特别大的情况下可能会是一个瓶颈，另外，在一些需要HA或负载均衡的场合，也需要一个外部的数据库。FreeSWITCH支持通过ODBC <sup>
+<small>
+<a href="text00102.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 接口连接外部的数据库。最典型的外部数据库是PostgreSQL和MySQL，也有人成功地连到Oracle或Microsoft SQL Server。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.增加ODBC数据库支持</font>
+</font>
+</p>
+<p height="1em" width="2em">为了让FreeSWITCH支持ODBC，在编译前需要安装unixODBC的开发包，并安装相应的数据库驱动。在CentOS、Ubuntu或Debian上的安装unixODBC的方式分别如下：</p>
+<p height="1em" width="2em">CentOS：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+yum install unixODBC unixODBC-devel<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Ubuntu/Debian：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+apt-get install unixODBC unixODBC-dev<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在系统中安装了上述软件包以后，再重新执行./configure&amp;&amp;make install的时候，FreeSWITCH就可以支持ODBC数据库了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.MySQL</font>
+</font>
+</p>
+<p height="1em" width="2em">如果使用MySQL，则需要安装MySQL数据库的ODBC驱动程序MyODBC。在不同的系统上可以使用以下命令安装：</p>
+<p height="1em" width="2em">Ubuntu：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# apt-get install libmyodbc<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">CentOS：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# yum install mysql-connector-odbc<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过/etc/odbcinst.ini可以配置数据库的驱动：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[MySQL]<br/>
+<br/>
+Description     = MySQL driver<br/>
+<br/>
+Driver          = /usr/lib64/odbc/libmyodbc.so<br/>
+<br/>
+Setup           = /usr/lib64/odbc/libodbcmyS.so<br/>
+<br/>
+UsageCount      = 1<br/>
+<br/>
+FileUsage       = 1<br/>
+<br/>
+Threading       = 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">MySQL的ODBC驱动有一个_r版本，如果在你使用的平台上存在这个版本，则必须使用该版本的，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+Driver = /usr/lib64/odbc/libmyodbc_r.so<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">MySQL的ODBC驱动以及客户端库在多线程环境中使用时可能会有问题（如内存泄露），而FreeSWITCH是一个典型的多线程系统，因而在生产环境中使用前，需要多做测试，并精心选择一个ODBC版本与MyODBC版本的有效组合。</p>
+<p height="1em" width="2em">接下来需要在/etc/odbc.ini中配置DSN。下面的配置中，DSN（即数据源的名称）为freeswitch，我们以后可以以这个名字引用它。注意该配置为64位平台上的例子，如果使用32位的系统，则可能需要将/usr/lib64替换为/usr/lib。另外，里面的OPTION=67108864一行非常重要——FreeSWITCH会将多条SQL语句放到一起执行，以提高效率，如果没有该选项则会出错（MyODBC 3.51.18及以后的版本才支持该选项）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[freeswitch]<br/>
+<br/>
+Driver      = /usr/lib64/odbc/libmyodbc.so<br/>
+<br/>
+SERVER      = localhost<br/>
+<br/>
+PORT        = 3306<br/>
+<br/>
+DATABASE    = freeswitch<br/>
+<br/>
+OPTION      = 67108864<br/>
+<br/>
+USER        = root<br/>
+<br/>
+PASSWORD    = password<br/>
+<br/>
+Threading   = 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.PostgreSQL</font>
+</font>
+</p>
+<p height="1em" width="2em">PostgreSQL的ODBC驱动在Ubuntu上的安装方法如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# apt-get install odbc-postgresql<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">/etc/odbcinst.ini配置如下。注意，下面有两个版本的PostgreSQL ODBC驱动。FreeSWITCH可以使用任意一个。如果你自己在数据库中存储Unicode数据的话（如中文），则最好选择Unicode版本的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[PostgreSQL ANSI]<br/>
+<br/>
+Description     = PostgreSQL ODBC driver (ANSI version)<br/>
+<br/>
+Driver          = /usr/lib/odbc/psqlodbca.so<br/>
+<br/>
+Setup           = /usr/lib/odbc/libodbcpsqlS.so<br/>
+<br/>
+Debug           = 0<br/>
+<br/>
+CommLog         = 0<br/>
+<br/>
+UsageCount      = 0<br/>
+<br/>
+Threading       = 0<br/>
+<br/>
+[PostgreSQL Unicode]<br/>
+<br/>
+Description     = PostgreSQL ODBC driver (Unicode version)<br/>
+<br/>
+Driver          = /usr/lib/odbc/psqlodbcw.so<br/>
+<br/>
+Setup           = /usr/lib/odbc/libodbcpsqlS.so<br/>
+<br/>
+Debug           = 0<br/>
+<br/>
+CommLog         = 0<br/>
+<br/>
+UsageCount      = 0<br/>
+<br/>
+Threading       = 0<br/>
+<br/>
+MaxLongVarcharSize=65536<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">/etc/odbc.ini的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[freeswitch]<br/>
+<br/>
+Driver      = /usr/lib64/odbc/psqlodbcw.so<br/>
+<br/>
+Description = POSTGRESQL<br/>
+<br/>
+Servername  = localhost<br/>
+<br/>
+Port        = 5432<br/>
+<br/>
+Protocol    = 6.4<br/>
+<br/>
+FetchBufferSize = 99<br/>
+<br/>
+Username        = postgres<br/>
+<br/>
+Password        = password<br/>
+<br/>
+Database        = freeswitch<br/>
+<br/>
+ReadOnly        = no<br/>
+<br/>
+Debug           = 1<br/>
+<br/>
+CommLog         = 1<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.测试ODBC连接</font>
+</font>
+</p>
+<p height="1em" width="2em">ODBC提供了一个用于连接测试的isql命令行工具。只要设置好ODBC驱动以及配置文件后，我们这里的测试就与具体数据库类型无关了。命令的使用格式是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+isql DSN [UID [PWD]] [options]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">比如，如果已经将密码写在odbc.ini中，我们可以用如下命令进行测试：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# isql -v freeswitch<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以明确地提供用户名和密码：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# isql -v freeswitch username password<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，-v选项是可选的，加上它以后可以输出更详细的调试信息。</p>
+<p height="1em" width="2em">如果连接成功，将会显示如下界面，然后就可以输入SQL语句进行查询了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
++---------------------------------------+<br/>
+<br/>
+| Connected!                            |<br/>
+<br/>
+|                                       |<br/>
+<br/>
+| sql-statement                         |<br/>
+<br/>
+| help [tablename]                      |<br/>
+<br/>
+| quit                                  |<br/>
+<br/>
+|                                       |<br/>
+<br/>
++---------------------------------------+<br/>
+<br/>
+SQL&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果连接失败，则需要查配置文件是否正确，对应的驱动程序是否存在。不同的系统及同一系统不同的版本，驱动程序的路径也不尽相同。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">5.使用ODBC</font>
+</font>
+</p>
+<p height="1em" width="2em">当然，也可以把核心数据库放到ODBC数据库中，这个可以通过配置switch.conf.xml中的如下选项实现：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="core-db-dsn" value="odbc://freeswitch:username:password" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，dsn为ODBC的Data Source Name，即数据源的名称，在这里，我们使用了上面配置的名称freeswitch；username和password分别为连接数据库的用户名和密码。</p>
+<p height="1em" width="2em">当然，如果把用户名和密码配置到odbc.ini中，则可以直接这样写：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="core-db-dsn" value="odbc://freeswitch::" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，我们也可以在mod_sofia的配置文件（如internal.xml）或mod_fifo的配置文件fifo.conf.xml中使用如下参数开启对ODBC的支持：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="odbc-dsn" value="odbc://freeswitch:username:password"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">配置完上述选择后，重启FreeSWITCH或相关模块，就可以使用上述数据库了。在第一次连接一个新的数据库时，FreeSWITCH会提示找到不相关的表，因而在日志中会出现很多错误。这些错误一般是无害的，FreeSWITCH会自动创建相关的表，下一次启动就不会报错了。如果不放心的话，可以再重启一次看这些错误是否仍然存在。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.3.3　使用数据库原生客户端库直接连接数据库</font>
+</font>
+</p>
+<p height="1em" width="2em">ODBC在客户端和数据库之间多加了一层中间环节，因而不如直接从客户端连接数据库来得有效。2012年有人贡献了一些代码，在FreeSWITCH内部增加了对PostgreSQL的原生支持。我们可以在编译的时候使用如下选项增加这一支持：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+./configure --enable-core-pgsql-support<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">重新编译安装后，如果一切正常，就可以使用以下方式直接使用原生的客户端库连接数据库了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="odbc-dsn"<br/>
+<br/>
+    value="pgsql://hostaddr=127.0.0.1<br/>
+<br/>
+    dbname=freeswitch user=freeswitch password=''<br/>
+<br/>
+    options='-c client_min_messages=NOTICE'<br/>
+<br/>
+    application_name='freeswitch'" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上述配置中，odbc-dsn参数的值，前面的“pgsql://”表示是使用PostgreSQL原生的客户端库外，后面的表示是一个标准的PostgreSQL数据库连接字符串。</p>
+<p height="1em" width="2em">现在在FreeSWITCH核心中还不能原生地支持MySQL。FreeSWITCH官方也不排斥提供对MySQL原生支持这个想法，但是到现在为止也没有人愿意贡献这部分代码，而且PostgreSQL本身工作得很好，因此在FreeSWITCH核心中对原生MySQL的支持至今没有进展。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00101.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 一般来说，进行简单的数据查询或少量的修改算是合理使用。除此之外，有的应用通过在某些数据库表（如用户注册表）上添加触发器，进而触发外部事件，这就显得有些不合适了。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00101.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 这里说的黑客并不含贬义，而是对某个程序或设备进行修改，使之完成原来不可用的功能的人，参见《黑客与画家》（硅谷创业之父Paul Graham文集，2011）。自由软件基金会创始人Richard Stallman说：“出于兴趣而解决某个问题，不管它有没有用，这就是黑客”。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00101.html">
+<font color="#FF6600">[3]</font>
+</a>
+ ODBC（Open DataBase Connectivity，开放数据库互连）是由Microsoft提出的数据库接口标准。旨在提供一种标准的API（应用程序编程接口）方法用于访问数据库管理系统（DBMS）。这些API利用SQL来完成其大部分任务。ODBC本身也提供了对SQL语言的支持，用户可以直接将SQL语句送给ODBC。ODBC的设计者们努力使它具有最大的独立性和开放性：与具体的编程语言无关，与具体的数据库系统无关，与具体的操作系统无关。参见http://zh.wikipedia.org/zh-cn/ODBC。</p>
+</body>
+</html>

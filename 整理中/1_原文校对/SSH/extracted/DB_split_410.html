@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_540"><span class="calibre2"><a shape="rect" class="calibre7"></a><a id="filepos2702264" class="calibre7"></a>Obtaining and Installing </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2702420" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2702459" class="calibre15"></a>Tectia products are shipped as Windows Installer Packages.<sup class="calibre20">[<a id="filepos2702582" shape="rect" href="#filepos2707950" class="calibre6">167</a>]</sup> The easiest way to install is to use Windows Explorer to double-click on the included <em class="italic">.msi</em> files: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">TectiaClient-<span><em class="italic">version</em></span>.<em class="italic">msi</em></li>
+<li class="calibre18">TectiaConnector-<span><em class="italic">version</em></span>.<em class="italic">msi</em></li>
+<li class="calibre18">TectiaServer-<span><em class="italic">version</em></span>.<em class="italic">msi</em></li>
+</ul></div>
+<p class="calibre4">These files can be found in the <em class="italic">install/windows</em> folder on your distribution media, or downloaded from the <span><em class="italic">ssh.com</em></span> web site, depending on how you purchased the products. The installers must be run by a user with administrative privileges. Installing the Connector package requires a reboot. </p>
+<p class="calibre4">During interactive installation<a shape="rect" class="calibre15"></a><a id="filepos2703879" class="calibre15"></a>, you'll see a series of dialogs; use these to specify the install directory if the default location is not appropriate. By default, Tectia products are installed within the Program Files folder in a Tectia subfolder named <em class="italic">SSH Communications Security</em>.<sup class="calibre20">[<a id="filepos2704225" shape="rect" href="#filepos2708299" class="calibre6">168</a>]</sup> Files for each product are collected in separate subfolders under the <em class="italic">Tectia</em> subfolder: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">SSH Secure Shell</li>
+<li class="calibre18">SSH Accession Lite</li>
+<li class="calibre18">SSH Tectia Connector</li>
+<li class="calibre18">SSH Secure Shell Server</li>
+</ul></div>
+<p class="calibre4">We'll refer to these as the "installation folders." The installers also create entries in the Start/Programs menu, under the program groups: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">SSH Tectia Client</li>
+<li class="calibre18">SSH Tectia Connector</li>
+<li class="calibre18">SSH Tectia Server</li>
+</ul></div>
+<p class="calibre4">The installer for the Client package optionally creates desktop icons for the GUI client application: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">SSH Tectia Client</li>
+<li class="calibre18">SSH Tectia Client - File Transfer</li>
+</ul></div>
+<p class="calibre4">The <code class="calibre35">PATH</code> environment variable is updated to include the installation folder for the Client package, so scripts can easily access command-line programs. </p>
+<p class="calibre4">The Server installer generates host key files by running <span><em class="italic">ssh-keygen2</em></span> in a command window: this can take several minutes to complete.<sup class="calibre20">[<a id="filepos2706045" shape="rect" href="#filepos2708744" class="calibre6">169</a>]</sup> The server is added as a service that starts automatically whenever the system boots. </p>
+<p class="calibre4">Tectia products can also be installed silently, using the <span><em class="italic">msiexec</em></span> command-line tool: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; msiexec /q /i Tectia<em class="italic"><code class="calibre35">&lt;Product&gt;</code></em>-<em class="italic"><code class="calibre35">&lt;version&gt;</code></em>.msi INSTALLDIR="<em class="italic"><code class="calibre35">&lt;path&gt;</code></em>"</tt></div></span><p class="calibre4">If the <code class="calibre35">INSTALLDIR</code> argument is omitted, the default locations are used. Silent installation is handy for rolling out products to a large number of systems. </p>
+<p class="calibre4">To remove Tectia products, use the Add/Remove Programs section of the Control Panel, or the command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; msiexec /q /x Tectia<em class="italic"><code class="calibre35">&lt;Product&gt;</code></em>-<em class="italic"><code class="calibre35">&lt;version&gt;</code></em>.msi</tt></div></span><p class="calibre4">The Tectia Server must be stopped before it is uninstalled.</p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2707950" shape="rect" href="#filepos2702582" class="calibre6">167</a>] </sup>Accession Lite is included with the Client and Connector packages and is not available as a separate package. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2708299" shape="rect" href="#filepos2704225" class="calibre6">168</a>] </sup>The Program Files folder can be determined by examining the value of the <code class="calibre35">PROGRAMFILES</code> environment variable. It is typically <em class="italic">C:\Program Files</em>. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2708744" shape="rect" href="#filepos2706045" class="calibre6">169</a>] </sup>If you run Server installer in silent mode, the host key is not generated automatically. Use <span><em class="italic">ssh-keygen2</em></span> to generate the host key manually. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_541"></div></body>
+</html>

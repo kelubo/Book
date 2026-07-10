@@ -1,0 +1,241 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_299"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1481514" class="calibre7"></a>7.4.1 Remote Account Name </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1481671" class="calibre15"></a>
+<span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span> assume that your local and remote usernames are the same. If your local username is henry and you run: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com</tt></div></span><p class="calibre4"><span><em class="italic">ssh</em></span> assumes your remote username is also henry and requests a connection to that account on <span><em class="italic">server.example.com</em></span>. If your remote account name<a shape="rect" class="calibre15"></a><a id="filepos1482441" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1482480" class="calibre15"></a> differs from the local one, you must tell the SSH client your remote account name. For henry to connect to a remote account called sally, he can use the <span><em class="italic">-l</em></span> command-line option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -l sally server.example.com</tt></div></span><p class="calibre4">If copying files with <span><em class="italic">scp</em></span>, the syntax is different for specifying the remote account name, looking more like an email address. <a shape="rect" href="DB_split_241.html#filepos1672209" class="calibre6">[7.5.1]</a> To copy the file <em class="italic">myfile</em> to the remote account sally on <span><em class="italic">server.example.com</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp myfile sally@server.example.com:</tt></div></span><p class="calibre4">If you frequently connect to a remote machine using a different username, instead of monkeying with command-line options specify the remote username in your client configuration file. The <code class="calibre35">User</code> keyword serves this purpose, and both <span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span> pay attention to it. Here's how to declare that your remote username is sally on a given remote host: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host server.example.com</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">server.example.com:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">Now, when connecting to <span><em class="italic">server.example.com</em></span>, you don't have to specify that your remote username is sally: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # The remote username sally will be used automatically<br class="calibre19"/>    $ ssh server.example.com</tt></div></span><div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.4.1.1 Tricks with remote account names </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1486531" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1486628" class="calibre15"></a>With <code class="calibre35">User</code> and nicknames, you can significantly shorten the command lines you type for <span><em class="italic">ssh</em></span> and <span><em class="italic">scp</em></span>. Continuing the preceding example with sally, if you have the configuration shown: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host simple</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">simple:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> HostName server.example.com</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Host server.example.com</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">then these long commands:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com -l sally<br class="calibre19"/>    $ scp myfile sally@server.example.com:</tt></div></span><p class="calibre4">may be reduced to:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh simple<br class="calibre19"/>    $ scp myfile simple:</tt></div></span><p class="calibre4">Here's how to specify separately several different account names on different hosts, each in its own section of the configuration file: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host server.example.com</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">server.example.com:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ...</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ...</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host another.example.com</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">another.example.com:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sharon</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sharon</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ...</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> ...</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">This technique is convenient if you have only one account on each remote machine. But suppose you have two accounts on <span><em class="italic">server.example.com</em></span>, called sally and sally2. Is there some way to specify both in the configuration file? The following attempt <span><em class="italic">doesn't</em></span> work (we show OpenSSH syntax only): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # THIS WILL NOT WORK PROPERLY!!!<br class="calibre19"/>    Host server.example.com<br class="calibre19"/>     User sally<br class="calibre19"/>     User sally2<br class="calibre19"/>     Compression yes</tt></div></span><p class="calibre4">because only the first value (<code class="calibre35">sally</code>) prevails. To get around this limitation, you can use nicknames to create two sections for the same machine in your configuration file, each with a different <code class="calibre35">User</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    # Section 1: Convenient access to the sally account<br class="calibre19"/>    Host sally-account<br class="calibre19"/>     HostName server.example.com<br class="calibre19"/>     User sally<br class="calibre19"/>     Compression yes<br class="calibre19"/><br class="calibre19"/>    # Section 2: Convenient access to the sally2 account<br class="calibre19"/>    Host sally2-account<br class="calibre19"/>     HostName server.example.com<br class="calibre19"/>     User sally2<br class="calibre19"/>     Compression yes</tt></div></span><p class="calibre4">Now you can access the two accounts easily by nickname:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh sally-account<br class="calibre19"/>    $ ssh sally2-account</tt></div></span><p class="calibre4">This works, but it isn't ideal. You've duplicated your settings (<code class="calibre35">HostName</code> and <code class="calibre35">Compression</code>) in each section. Duplication makes a configuration file harder to maintain, since any future changes need to be applied twice. (In general, duplication isn't good software engineering.) Are you doomed to duplicate? No, there's a better solution. Immediately after the two sections, create a third section with a <code class="calibre35">Host</code> wildcard that matches both <code class="calibre35">sally-account</code> and <code class="calibre35">sally2-account</code>. Suppose you use <code class="calibre35">sally*-account</code> and move all duplicated settings into this new section: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Host sally*-account<br class="calibre19"/>     HostName server.example.com<br class="calibre19"/>     Compression yes</tt></div></span><p class="calibre4">The end result is:</p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host sally-account</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">sally-account:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host sally2-account</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">sally2-account:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally2</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> User sally2</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">Host sally*-account</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">sally*-account:</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> HostName server.example.com</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Host server.example.com</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Compression yes</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35"> Compression yes</code>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">Since <code class="calibre35">sally*-account</code> matches both previous sections, its full name and compression settings apply to both <code class="calibre35">sally-account</code> and <code class="calibre35">sally2-account</code>. Any settings that differ between <code class="calibre35">sally-account</code> and <code class="calibre35">sally2-account</code> (in this case, <code class="calibre35">User</code>) are kept in their respective sections. You've now achieved the same effect as in the previous example—two accounts with different settings on the same remote machine—but with no duplication of settings. </p>
+</div>
+</div>
+</body>
+</html>

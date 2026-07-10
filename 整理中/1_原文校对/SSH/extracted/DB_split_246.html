@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_324"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1698459" class="calibre7"></a>7.5.6 Safety Features </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Tectia's <span><em class="italic">scp</em></span> has several features to protect you from running dangerous commands. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.5.6.1 Directory confirmation </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1699103" class="calibre15"></a>Suppose you want to copy a local file, <em class="italic">myfile</em>, to a remote directory. You type: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp myfile server.example.com:mydir<br class="calibre19"/>    $ rm myfile</tt></div></span><p class="calibre4">Then you connect to <span><em class="italic">server.example.com</em></span> and find, to your horror, that <em class="italic">mydir</em> was a file, not a directory, and you just overwrote it! Tectia's <span><em class="italic">-d</em></span> option prevents this tragedy. If the destination isn't a directory, <span><em class="italic">scp</em></span> complains and exits without copying the file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp -d myfile server.example.com:mydir<br class="calibre19"/>    scp: warning: Destination (example.com:mydir) is not a directory.</tt></div></span><p class="calibre4">This option is necessary only if you are copying a single file. If you are copying multiple files or a directory, all the <span><em class="italic">scp</em></span> implementations check by default that the remote destination is a directory.<sup class="calibre20">[<a id="filepos1700655" shape="rect" href="DB_split_260.html#filepos1729426" class="calibre6">117</a>]</sup></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.5.6.2 No-execute mode </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Another safety feature of Tectia's <span><em class="italic">scp</em></span> is the <span><em class="italic">-n</em></span> option, which instructs the program to describe its actions but not perform any copying. This is useful for verifying the behavior of <span><em class="italic">scp</em></span> before executing a potentially risky command. </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp -n myfile server.example.com:<br class="calibre19"/>    Not transferring myfile -&gt; server.example.com:./myfile  (1k)</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>7.5.6.3 Overwriting existing files </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Tectia's <span><em class="italic">scp</em></span> will refuse to overwrite existing files if you desire. The <span><em class="italic">-I</em></span> or <span><em class="italic">--interactive</em></span> option will prompt you before overwriting a destination file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp -I myfile server.example.com:<br class="calibre19"/>    Overwrite destination file './myfile' with '/home/smith/myfile' (yes/yes to all/no/no<br class="calibre19"/>    to all/abort) [y/Y/n/N/a]:<strong class="calibre45"><code class="calibre35">n</code></strong></tt></div></span><p class="calibre4">As an alternative, if you know in advance whether you'll want to overwrite existing files, use the <span><em class="italic">--overwrite</em></span> option (the default is <code class="calibre35">no</code>): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp --overwrite yes myfile server.example.com:   <em class="italic"><span>Always overwrite</span></em></tt></div></span></div>
+</div>
+</body>
+</html>

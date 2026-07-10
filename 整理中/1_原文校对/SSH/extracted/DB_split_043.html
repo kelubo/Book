@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_69"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos199489" class="calibre7"></a>2.2.1 File Transfer with scp </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos199649" class="calibre15"></a>Continuing the story, suppose that while browsing your files, you encounter a PDF file you'd like to print. In order to send the file to a local printer at the university, you must first transfer the file to <span><em class="italic">local.university.edu</em></span>. Once again, you reject as insecure the traditional file-transfer programs, such as <span><em class="italic">ftp</em></span>. Instead, you use another SSH client program, <span><em class="italic">scp</em></span>, to copy the file across the network via a secure channel. </p>
+<p class="calibre4">First, you write the attachment to a file in your home directory on <span><em class="italic">shell.isp.com</em></span> using your mail client, naming the file <em class="italic">printme.pdf</em>. When you've finished reading your other email messages, log out of <span><em class="italic">shell.isp.com</em></span>, ending the SSH session and returning to the shell prompt on <span><em class="italic">local.university.edu</em></span>. You're now ready to copy the file securely. </p>
+<p class="calibre4">The <span><em class="italic">scp</em></span> program has syntax<a shape="rect" class="calibre15"></a><a id="filepos201088" class="calibre15"></a> much like the traditional Unix <span><em class="italic">cp</em></span> program for copying files.<sup class="calibre20">[<a id="filepos201278" shape="rect" href="#filepos205344" class="calibre6">6</a>]</sup> It is roughly: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    scp<em class="italic"><code class="calibre35">name-of-source</code></em> <em class="italic"><code class="calibre35">name-of-destination</code></em></tt></div></span><p class="calibre4">In this example, <span><em class="italic">scp</em></span> copies the file <em class="italic">printme.pdf</em> on <span><em class="italic">shell.isp.com</em></span> over the network to a local file in your friend's account on <span><em class="italic">local.university.edu</em></span>, also called <em class="italic">printme.pdf</em> : </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp pat@shell.isp.com:printme.pdf printme.pdf</tt></div></span><p class="calibre4">The file is transferred over an SSH-secured connection. The source and destination files may be specified not only by filename, but also by username ("pat" in our example) and hostname (<span><em class="italic">shell.isp.com</em></span>), indicating the location of the file on the network. Depending on your needs, various parts of the source or destination name can be omitted, and default values used. For example, omitting the username and the at sign (pat@) makes <span><em class="italic">scp</em></span> assume that the remote username is the same as the local one. </p>
+<p class="calibre4">Like <span><em class="italic">ssh</em></span>, <span><em class="italic">scp</em></span> prompts for your remote password and passes it to the SSH server for verification. If successful, <span><em class="italic">scp</em></span> logs into the pat account on <span><em class="italic">shell.isp.com</em></span>, copies your remote file <em class="italic">printme.pdf</em> to the local file <em class="italic">printme.pdf</em>, and logs out of <span><em class="italic">shell.isp.com</em></span>. The local file <em class="italic">printme.pdf</em> may now be sent to a printer. </p>
+<p class="calibre4">The destination filename need not be the same as the remote one. For example, if you're feeling French, you could call the local file <em class="italic">imprime-moi.pdf</em> : </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp pat@shell.isp.com:printme.pdf imprime-moi.pdf</tt></div></span><p class="calibre4">The full syntax of <span><em class="italic">scp</em></span> can represent local and remote files in powerful ways, and the program also has numerous command-line options. <a shape="rect" href="DB_split_240.html#filepos1671027" class="calibre6">[7.5]</a></p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos204828" shape="rect" href="DB_split_042.html#filepos196284" class="calibre6">5</a>] </sup>If the local and remote usernames are identical, you can omit the -<span><em class="italic">l</em></span> option (<span><em class="italic">-l pat</em></span>) and just type <code class="calibre35">ssh shell.isp.com</code>. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos205344" shape="rect" href="#filepos201278" class="calibre6">6</a>] </sup>Actually it's modeled after the old <span><em class="italic">rcp</em></span> program for copying files insecurely between machines. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_70"></div></body>
+</html>

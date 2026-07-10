@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.3　用ESL写一个ACD</font>
+</font>
+</p>
+<p height="1em" width="2em">在第12章中，我们讲了使用mod_fifo和mod_callcenter做呼叫中心的例子，但在实际使用中，还是有大量的用户会自己写业务逻辑进行座席分配（ACD）。既然我们已经学会了ESL，也不妨试着自己写一个。</p>
+<p height="1em" width="2em">在此我们还是使用Outbound模式来实现ACD。实现思路是——以来话用户为驱动，当有用户呼入时，查找是否有空闲座席，如果有，则转接到相应的座席上；如果没有，则进行忙等待，不断重试，直到找到一个空闲的座席或者用户挂机。</p>
+<p height="1em" width="2em">我们还是先从main函数开始看。首先，在第131行，它初始化了一个MUTEX，该变量是一个全局变量，用于多线程间的互斥（在第17行定义，我们后面还会讲到）；第132行，初始化一些座席，我们也将在后面讲到；第135行，进入监听，有呼入请求即在新线程中执行acd_callback。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+129  int main(void)<br/>
+<br/>
+130  {<br/>
+<br/>
+131      esl_mutex_create(&amp;MUTEX);<br/>
+<br/>
+132      init_agents();<br/>
+<br/>
+133      esl_global_set_default_logger(ESL_LOG_LEVEL_INFO);<br/>
+<br/>
+134      esl_log(ESL_LOG_INFO, "ACD Server listening at localhost:8040 ...\n");<br/>
+<br/>
+135      esl_listen_threaded("localhost", 8040, acd_callback, NULL, 100000);<br/>
+<br/>
+136      esl_mutex_destroy(&amp;MUTEX);<br/>
+<br/>
+137      return 0;<br/>
+<br/>
+138  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是我们的acd_callback函数。当有用户呼入时，首先在第64行和65行取出主叫用户的名称和主叫号码，并于第66行打印一条日志。在第67行，我们使用myevents命令通知FreeSWITCH我们希望收到与本Channel相关的所有事件。第74行设置的这个变量比较重要，它用于保证在呼叫座席失败时不挂断电话，同时我们也需要第75行，它用于在成功bridge后（即成功接通座席后），如果座席首先挂机，则挂断来话。在播放完欢迎音（第76行）后，我们将持续播放音乐（第77行），直到转到座席上。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+57  static void acd_callback(esl_socket_t server_sock,<br/>
+<br/>
+            esl_socket_t client_sock, struct sockaddr_in *addr)<br/>
+<br/>
+58  {<br/>
+<br/>
+59      esl_handle_t handle = {{ 0 }};<br/>
+<br/>
+60      esl_status_t status = ESL_SUCCESS;<br/>
+<br/>
+61      agent_t *agent = NULL;<br/>
+<br/>
+62      const char *cid_name, *cid_number;<br/>
+<br/>
+63      esl_attach_handle(&amp;handle, client_sock, addr);<br/>
+<br/>
+64      cid_name = esl_event_get_header(handle.info_event, "Caller-Caller-ID-Name");<br/>
+<br/>
+65      cid_number = esl_event_get_header(handle.info_event, "Caller-Caller-ID-Number");<br/>
+<br/>
+66      esl_log(ESL_LOG_INFO, "New Call From \"%s\" &lt;%s&gt;\n", cid_name, cid_number);<br/>
+<br/>
+67      esl_send_recv(&amp;handle, "myevents");<br/>
+<br/>
+68      esl_log(ESL_LOG_INFO, "%s\n", handle.last_sr_reply);<br/>
+<br/>
+69      esl_send_recv(&amp;handle, "linger 5");<br/>
+<br/>
+70      esl_log(ESL_LOG_INFO, "%s\n", handle.last_sr_reply);<br/>
+<br/>
+71      esl_execute(&amp;handle, "answer", NULL, NULL);<br/>
+<br/>
+72      esl_execute(&amp;handle, "set", "tts_engine=tts_commandline", NULL);<br/>
+<br/>
+73      esl_execute(&amp;handle, "set", "tts_voice=Ting-Ting", NULL);<br/>
+<br/>
+74      esl_execute(&amp;handle, "set", "continue_on_fail=true", NULL);<br/>
+<br/>
+75      esl_execute(&amp;handle, "set", "hangup_after_bridge=true", NULL);<br/>
+<br/>
+76      esl_execute(&amp;handle, "speak", "<br/>
+<br/>
+您好，欢迎致电，电话接通中，请稍侯", NULL);<br/>
+<br/>
+77      sleep(5);<br/>
+<br/>
+78      esl_execute(&amp;handle, "playback", "local_stream://moh", NULL);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第79行是一个while循环。我们将于第82行使用esl_recv_timed接收事件，如果在1000毫秒（即1秒）内收不到事件，则该函数返回ESL_BREAK，这样就保证了我们的循环体不会因为收不到事件而阻塞。第83行判断如果在1秒内没有收到任何事件（如果收到事件我们则优先处理事件），并且没有找到对该呼入用户进行服务的座席，我们就在第85行查找空闲座席。第86行，如果找到了一个空闲坐席，则在第89行使用break App中断当前正在播放的音乐（这种方式只能在async模式下才有效），并于第90行使用bridge去桥接找到的座席。当然，如果本次没找到空闲的座席，则在下一秒时还有机会查找，因此只要呼入的用户不挂机，当有座席闲下来时，总能找到一个座席。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+79      while(status == ESL_SUCCESS || status == ESL_BREAK) {<br/>
+<br/>
+80          const char *type;<br/>
+<br/>
+81          const char *application;<br/>
+<br/>
+82          status = esl_recv_timed(&amp;handle, 1000);<br/>
+<br/>
+83          if (status == ESL_BREAK) {<br/>
+<br/>
+84              if (!agent) {<br/>
+<br/>
+85                  agent = find_available_agent();<br/>
+<br/>
+86                  if (agent) {<br/>
+<br/>
+87                      char dial_string[1024];<br/>
+<br/>
+88                      sprintf(dial_string, "user/%s", agent-&gt;exten);<br/>
+<br/>
+89                      esl_execute(&amp;handle, "break", NULL, NULL);<br/>
+<br/>
+90                      esl_execute(&amp;handle, "bridge", dial_string, NULL);<br/>
+<br/>
+91                      esl_log(ESL_LOG_INFO, "Calling: %s\n", dial_string);<br/>
+<br/>
+92                  }<br/>
+<br/>
+93              }<br/>
+<br/>
+94              continue;<br/>
+<br/>
+95          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是事件处理程序，如果收到CHANNEL_BRIDGE事件，则说明已将来话与座席接通，这时我们要记住座席的UUID（第101行），并打印一条日志。如果收到CHANNEL_HANGUP_COMPLETE，则将还原当前座席的状态（置闲，第106行），并于第107行直接使用goto语句跳转到第125行的end标签，结束本次循环和本服务线程。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+96          type = esl_event_get_header(handle.last_event, "content-type");<br/>
+<br/>
+97          if (type &amp;&amp; !strcasecmp(type, "text/event-plain")) {<br/>
+<br/>
+98              /* esl_log(ESL_LOG_INFO, "Event: %s\n",<br/>
+<br/>
+                esl_event_get_header(handle.last_ievent, "Event-Name")); */<br/>
+<br/>
+99              switch (handle.last_ievent-&gt;event_id) {<br/>
+<br/>
+100                  case ESL_EVENT_CHANNEL_BRIDGE:<br/>
+<br/>
+101                      set_string(agent-&gt;uuid, esl_event_get_header(handle.last_ievent, "Other-Leg-Unique-ID"));<br/>
+<br/>
+102                      esl_log(ESL_LOG_INFO, "bridged to %s\n", agent-&gt;exten);<br/>
+<br/>
+103                      break;<br/>
+<br/>
+104                  case ESL_EVENT_CHANNEL_HANGUP_COMPLETE:<br/>
+<br/>
+105                      esl_log(ESL_LOG_INFO, "Caller \"%s\" &lt;%s&gt; Hangup \n", <br/>
+<br/>
+                         cid_name, cid_number);<br/>
+<br/>
+106                      if (agent) reset_agent(agent);<br/>
+<br/>
+107                      goto end;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果收到CHANNEL_EXECUTE_COMPLETE事件，则说明有一个App执行完了，如果该App是bridge的话（第110行），则该事件中可以找到variable_originate_disposition包含了bridge的结果，我们先把它取出放到disposition变量中（第111行）。如果disposition为CALL_REJECTED（第113行，拒接）或USER_BUSY（第114行，被叫忙），则说明呼叫座席失败 <sup>
+<small>
+<a href="text00163.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，我们就于第115行重置该座席的状态，并于116行将当前座席设为NULL，以后在下次事件循环时可以有机会重新选择座席。</p>
+<p height="1em" width="2em">总之，到此为止，主要的业务逻辑都已经实现了。如果成功接通座席，则等待双方挂机后退出；如果未接通座席，则尝试重新查找座席。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+108                  case ESL_EVENT_CHANNEL_EXECUTE_COMPLETE:<br/>
+<br/>
+109                      application = esl_event_get_header(handle.last_<br/>
+<br/>
+                            ievent, "Application");<br/>
+<br/>
+110                      if (!strcmp(application, "bridge")) {<br/>
+<br/>
+111                          const char *disposition = esl_event_get_<br/>
+<br/>
+                             header(handle.last_ievent,<br/>
+<br/>
+                             "variable_originate_disposition");<br/>
+<br/>
+112                          esl_log(ESL_LOG_INFO, "Disposition: %s\n", disposition);<br/>
+<br/>
+113                          if (!strcmp(disposition, "CALL_REJECTED") ||<br/>
+<br/>
+114                              !strcmp(disposition, "USER_BUSY")) {<br/>
+<br/>
+115                              reset_agent(agent);<br/>
+<br/>
+116                              agent = NULL;<br/>
+<br/>
+117                          }<br/>
+<br/>
+118                      }<br/>
+<br/>
+119                      break;<br/>
+<br/>
+120                  default:<br/>
+<br/>
+121                      break;<br/>
+<br/>
+122              }<br/>
+<br/>
+123          }<br/>
+<br/>
+124      }<br/>
+<br/>
+125  end:<br/>
+<br/>
+126      esl_log(ESL_LOG_INFO, "Disconnected! status = %d\n", status);<br/>
+<br/>
+127      esl_disconnect(&amp;handle);<br/>
+<br/>
+128  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">到这里，让我们再回到程序的开始处。第6行定义了座席的状态，包括IDLE（空闲）和BUSY（忙），其他状态未用，只是作为一个例子，在实际的应用中座席会有更多的状态，如签入、签出、话后处理等。第11行定义了座席的结构体类型，它包括座席的分机号（exten）、通话中的UUID和座席当前的状态。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ 1  #include &lt;stdio.h&gt;<br/>
+<br/>
+ 2  #include &lt;stdlib.h&gt;<br/>
+<br/>
+ 3  #include &lt;esl.h&gt;<br/>
+<br/>
+ 4  #define MAX_AGENTS 3<br/>
+<br/>
+ 5  #define set_string(dest, str) strncpy(dest, str, sizeof(dest) - 1)<br/>
+<br/>
+ 6  typedef enum agent_state_s {<br/>
+<br/>
+ 7      AGENT_IDLE,<br/>
+<br/>
+ 8      AGENT_BUSY,<br/>
+<br/>
+ 9      AGENT_FAIL<br/>
+<br/>
+10  } agent_state_t;<br/>
+<br/>
+11  typedef struct agent_s {<br/>
+<br/>
+12      char exten[10];<br/>
+<br/>
+13      char uuid[37];<br/>
+<br/>
+14      agent_state_t state;<br/>
+<br/>
+15  } agent_t;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">出于简单起见，我们定义了几个全局变量。第16行的座席数组用于存放座席，目前我们最大可以有3个座席（由第4行的宏限制）。第17行定义了一个MUTEX（互斥） <sup>
+<small>
+<a href="text00163.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，由于我们是多线程的处理程序，当有多个电话同时呼入同时需要查找座席时，它用于保护临界区。第18行定义last_agent_index变量用于记录最后查询过的座席的位置，以支持轮循（Round Robin）的方式查找座席。在此，我们将它初始化为座席数组的最大值，以后它再启动会从第一个座席开始查。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+16  static agent_t AGENTS[MAX_AGENTS] = { { 0 } };<br/>
+<br/>
+17  static esl_mutex_t *MUTEX;<br/>
+<br/>
+18  static int last_agent_index = MAX_AGENTS - 1;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是初始化座席的函数，我们这里没有签入、签出等操作，因此所有的初始化操作都是硬编码的。在此我们初始化了三个座席：1000～1002。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+19  void init_agents()<br/>
+<br/>
+20  {<br/>
+<br/>
+21      set_string(AGENTS[0].exten, "1000");<br/>
+<br/>
+22      set_string(AGENTS[1].exten, "1001");<br/>
+<br/>
+23      set_string(AGENTS[2].exten, "1002");<br/>
+<br/>
+24  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面我们实现了一个简单的查找空闲坐席的算法。第29行首先锁定临界区，以防止其他线程同时查找（其他线程将在临界区外等待）。第31行我们使用一个无限循环，从上一次查找过的座席的下一个开始查起（第32～37行保证agent指针永远指向下一个座席），如果找到空闲座席的话（第40行），则将当前座席置忙（第41行），并将当前座席的指针返回给调用者（第43行）。注意，在这里第42行是非常关键的，它将执行解锁操作，如果在返回之前忘记对临界区解锁的话，将会造成死锁。该函数在找不到空闲座席的情况下将会返回NULL（第48行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+25  agent_t *find_available_agent()<br/>
+<br/>
+26  {<br/>
+<br/>
+27      int last;<br/>
+<br/>
+28      agent_t *agent;<br/>
+<br/>
+29      esl_mutex_lock(MUTEX);<br/>
+<br/>
+30      last = last_agent_index;<br/>
+<br/>
+31      while (1) {<br/>
+<br/>
+32          if (last_agent_index &gt;= MAX_AGENTS - 1) {<br/>
+<br/>
+33              last_agent_index = 0;<br/>
+<br/>
+34          } else {<br/>
+<br/>
+35              last_agent_index++;<br/>
+<br/>
+36          }<br/>
+<br/>
+37          agent = &amp;AGENTS[last_agent_index];<br/>
+<br/>
+38          esl_log(ESL_LOG_INFO, "Comparing agent [%d:%s:%s]\n",<br/>
+<br/>
+39              last_agent_index, agent-&gt;exten, agent-&gt;state == AGENT_IDLE ? <br/>
+<br/>
+                   "IDLE" : "BUSY");<br/>
+<br/>
+40          if (agent-&gt;state == AGENT_IDLE) {<br/>
+<br/>
+41              agent-&gt;state = AGENT_BUSY;<br/>
+<br/>
+42              esl_mutex_unlock(MUTEX);<br/>
+<br/>
+43              return agent;<br/>
+<br/>
+44          }<br/>
+<br/>
+45          if (last_agent_index == last) break;<br/>
+<br/>
+46      }<br/>
+<br/>
+47      esl_mutex_unlock(MUTEX);<br/>
+<br/>
+48      return NULL;<br/>
+<br/>
+49  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面函数用于把用完的座席还原，以便接听下一个电话（在下一次查找空闲座席时有机会找到它）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+50  reset_agent(agent_t *agent)<br/>
+<br/>
+51  {<br/>
+<br/>
+52      esl_mutex_lock(MUTEX);<br/>
+<br/>
+53      agent-&gt;state = AGENT_IDLE;<br/>
+<br/>
+54      *agent-&gt;uuid = '\0';<br/>
+<br/>
+55      esl_mutex_unlock(MUTEX);<br/>
+<br/>
+56  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，我们的ACD服务程序就写好了。编译后执行一下，日志输出如下。其中，第3行显示1006呼入。第6行找到空闲座席1000。第7行显示正在呼叫该座席。第8行显示被拒接，然后继续找到1001并呼叫（第9～10行），再次被拒接（第11行）后最终于在第14行呼通1002。座席挂机时第15行显示呼叫的结果为SUCCESS。第16行主叫挂机。第17行Socket中断线程并退出。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 $ ./acd<br/>
+<br/>
+02 [INFO] acd.c:165 main() ACD Server listening at localhost:8040 ...<br/>
+<br/>
+03 [INFO] acd.c:83 acd_callback() New Call From "1006" &lt;1006&gt;<br/>
+<br/>
+04 [INFO] acd.c:86 acd_callback() +OK Events Enabled<br/>
+<br/>
+05 [INFO] acd.c:88 acd_callback() +OK will linger 5 seconds<br/>
+<br/>
+06 [INFO] acd.c:48 find_available_agent() Comparing agent [0:1000:IDLE]<br/>
+<br/>
+07 [INFO] acd.c:114 acd_callback() Calling: user/1000<br/>
+<br/>
+08 [INFO] acd.c:138 acd_callback() Disposition: CALL_REJECTED<br/>
+<br/>
+09 [INFO] acd.c:48 find_available_agent() Comparing agent [1:1001:IDLE]<br/>
+<br/>
+10 [INFO] acd.c:114 acd_callback() Calling: user/1001<br/>
+<br/>
+11 [INFO] acd.c:138 acd_callback() Disposition: CALL_REJECTED<br/>
+<br/>
+12 [INFO] acd.c:48 find_available_agent() Comparing agent [2:1002:IDLE]<br/>
+<br/>
+13 [INFO] acd.c:114 acd_callback() Calling: user/1002<br/>
+<br/>
+14 [INFO] acd.c:128 acd_callback() bridged to 1002<br/>
+<br/>
+15 [INFO] acd.c:138 acd_callback() Disposition: SUCCESS<br/>
+<br/>
+16 [INFO] acd.c:131 acd_callback() Caller "1006" &lt;1006&gt; Hangup<br/>
+<br/>
+17 [INFO] acd.c:155 acd_callback() Disconnected! status = 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在本例中，我们使用ESL的Outbound方式实现了一个简单的ACD程序。该程序必须使用ESL的async模式才能工作，即在Dialplan中需要进行如下设置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="socket" data="127.0.0.1:8040 async full"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，该程序与上一节的程序有许多相似之处，在细节上又有诸多不同，读者可以自己对比体会一下。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00162.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 如果呼叫成功，disposition的值将是SUCCESS。当然你可以尝试修改第113～114行的判断条件，把所有非SUCCESS的值都认为是失败。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00163.html">
+<font color="#FF6600">[2]</font>
+</a>
+ esl_mutex_t是ESL库中的一个简单的多线程互斥的实现，它实际上是对操作系统底层的实现的一个跨平的的封装，如在有pthread库的平台上使用pthread_mutex_t实现，在Windows平台上则使用CRITICAL_SECTION实现。</p>
+</body>
+</html>

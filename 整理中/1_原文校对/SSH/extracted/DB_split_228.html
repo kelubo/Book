@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_305"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1616907" class="calibre7"></a>7.4.7 Proxies and SOCKS </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1617062" class="calibre15"></a>SOCKS is an application-layer network proxying system supported by various SSH implementations. Proxying in general provides a way to connect two networks at the application level, without allowing direct network-level connectivity between them. <a shape="rect" href="#filepos1618102" class="calibre6">Figure 7-3</a> shows a typical SOCKS installation. </p>
+<p class="calibre4">The figure shows a private network and the Internet. The gateway machine is connected to both, but doesn't function as a router; there's no direct IP connectivity between the two networks. If a program running on H wants to make a TCP connection to a server on S, it instead connects to the SOCKS server running on G. Using the SOCKS protocol, H requests a connection to S. The SOCKS server makes a connection from G to S on behalf of H and then steps out of the way, passing data back and forth between H and S. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1618102" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="A typical SOCKS installation" src="images/00029.jpg" class="calibre67"/></div>
+</div>
+</span><p class="calibre4">Figure 7-3. A typical SOCKS installation</p></div>
+<p class="calibre4">A general drawback of application-level proxying is lack of transparency: only those programs written with support for the particular proxying scheme have network access. SOCKS, however, isn't specific to any higher-level protocol such as HTTP or SMTP. It provides general services: makes a TCP connection, pings a host, performs a traceroute, etc. Many of its services match the existing programming boundary between applications and network-services libraries. As a result, on modern computer systems employing dynamically linked libraries, it is often possible to extend SOCKS to non-SOCKS-aware applications, such as SSH, by replacing the right libraries with SOCKS-aware ones. </p>
+<p class="calibre4">SOCKS comes in two versions, SOCKS4 and SOCKS5. There are two major added features in SOCKS5: authentication and naming support. SOCKS5 supports user authentication so that a proxy can apply access control and user logging to its service. "Naming support" refers to the fact that in SOCKS4, a proxy client expresses the socket it wants to reach as an <em class="italic"><code class="calibre35">(IP address, port)</code></em> pair. In real-world situations, however, the client will often know only the name, not the address, of the host it wants to reach. Furthermore, it may not be able to resolve that name directly, since being behind a proxy, it is likely to be in a different naming context than the server (e.g., a corporate network with split DNS). With SOCKS5, the client can instead pass a <em class="italic"><code class="calibre35">(name, port)</code></em> pair to the proxy server, leaving the proxy to perform the name lookup where it is mostly likely to succeed. </p>
+<p class="calibre4">There are two ways in which SSH clients use SOCKS:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> As a normal SOCKS client, as described earlier. </li>
+<li class="calibre18"> As a SOCKS <span><em class="italic">server</em></span>, in conjunction with port forwarding. This allows for <span><em class="italic">dynamic forwarding</em></span>, by which other SOCKS clients may reach any TCP socket on the other side of an SSH connection, through a single forwarded port. </li>
+</ul></div>
+<p class="calibre4">OpenSSH supports only the second method, while Tectia supports both. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1621252" class="calibre7"></a>7.4.7.1 SOCKS in OpenSSH: using DynamicForward </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Dynamic forwarding in OpenSSH is done using the <span><em class="italic">-D</em></span> switch or <code class="calibre35">DynamicForward</code> configuration statement: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -D1080 server</tt></div></span><p class="calibre4">or:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.ssh/config:<br class="calibre19"/>    host server<br class="calibre19"/>      DynamicForward 1080</tt></div></span><p class="calibre4">As with static (<span><em class="italic">-L</em></span>) port forwarding, this command causes the SSH client to listen for TCP connections on the given port (here 1080, the standard SOCKS port). Note, however, that there's no argument specifying a target socket for the forwarding! That's because this sort of forwarding is completely flexible: each connection to port 1080 can go to a different remote socket, given at connection time via the SOCKS protocol. Set any network client with SOCKS support to use this SSH-forwarded port as its "SOCKS server," and it will have complete TCP access to the network on the other side of the SSH connection. </p>
+<p class="calibre4">Just as with static forwarding, a dynamically forwarded port by default listens only on the loopback address. Use the <code class="calibre35">-g</code> switch to have it listen on all host addresses. This option affects <span><em class="italic">all</em></span> locally forwarded ports established with this instance of <span><em class="italic">ssh</em></span>. </p>
+<p class="calibre4">Unfortunately, OpenSSH does not have SOCKS <span><em class="italic">client</em></span> support built in. However, there are a number of packages around for conveniently "socksifying" existing programs on the fly; two such packages are <span><em class="italic">tsocks</em></span> and <span><em class="italic">runsocks</em></span>. They both play with the system dynamic linker to replace basic network library calls with SOCKS-aware wrappers, and they are both effective on OpenSSH. </p>
+<p class="calibre4">If this sort of linking trick doesn't work, then you can use a separate program instead. You'll need a simple utility which makes the connection through your SOCKS proxy, e.g., a socksified version of <span><em class="italic">netcat</em></span> (<span><em class="italic">nc</em></span>): </p>
+<div class="calibre3"><span class="calibre27">
+<blockquote class="calibre5"><span class="calibre33">
+<div class="calibre3"><a href="http://www.securityfocus.com/tools/137" shape="rect" class="calibre6">http://www.securityfocus.com/tools/137</a></div>
+<div class="calibre3"><a href="http://netcat.sourceforge.net/" shape="rect" class="calibre6">http://netcat.sourceforge.net/</a></div>
+</span></blockquote>
+</span></div>
+<p class="calibre4">Then simply:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    # ssh -o ProxyCommand="nc %h %p" ...</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1625272" class="calibre7"></a>7.4.7.2 SOCKS in Tectia </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1625360" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1625457" class="calibre15"></a>Tectia supports both SOCKS client and server (dynamic-forwarding) features, and both SOCKS4 and SOCKS5. However, it does not support user authentication in the SOCKS5 client. </p>
+<p class="calibre4"><span><strong class="calibre45">Tectia SOCKS client</strong></span> The Tectia SOCKS client feature is controlled with a single parameter, set with the <code class="calibre35">SocksServer</code> configuration keyword or the <code class="calibre35">SSH_SOCKS_SERVER</code> environment variable. The configuration option overrides the environment variable if both are present. </p>
+<p class="calibre4">The <code class="calibre35">SocksServer</code> keyword is a string with the following format: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35"><span><em class="italic">socks://[</em></span><em class="italic"><code class="calibre35">user</code></em><span><em class="italic">]@</em></span><em class="italic"><code class="calibre35">gateway</code></em><span><em class="italic">[:</em></span><em class="italic"><code class="calibre35">port</code></em><span><em class="italic">]/[</em></span><em class="italic"><code class="calibre35">net1</code></em><span><em class="italic">/</em></span><span><em class="italic">mask1</em></span><span><em class="italic">,</em></span><span><em class="italic">net2</em></span><span><em class="italic">/</em></span><span><em class="italic">mask2</em></span><span><em class="italic">,...]</em></span></tt></div></span><p class="calibre4">Here, <span><em class="italic">gateway</em></span> is the machine running the SOCKS server, <span><em class="italic">user</em></span> is the username you supply for identification to SOCKS, and <span><em class="italic">port</em></span> is the TCP port for the SOCKS server (by default, 1080). The <span><em class="italic">net</em></span>/<span><em class="italic">mask</em></span> entries indicate netblocks that are to be considered local; that is, <span><em class="italic">ssh</em></span> uses SOCKS only for connections lying outside the given network ranges. The mask is given as the length of the network prefix, not an explicit mask, e.g., 192.168.10.0/24 rather than 192.168.10.0/255.255.255.0. </p>
+<p class="calibre4">The parts of the string enclosed in square brackets are optional. So, an <code class="calibre35">SSH_SOCKS_SERVER</code> value can be as simple as this: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><em class="italic">socks://laces.shoes.net</em></span></span></td>
+</tr></span></table><p class="calibre4">With this value, <span><em class="italic">ssh</em></span> uses SOCKS for all connections. It connects to a SOCKS server running on <span><em class="italic">laces.shoes.net</em></span>, port 1080, and it doesn't supply a username. You'll probably never want to use an <code class="calibre35">SSH_SOCKS_SERVER</code> setting as simple as this one, which uses the SOCKS server for all <span><em class="italic">ssh</em></span> connections, even those connecting back to the same machine or to a machine on the same network. A better setup is to use SOCKS only for hosts on the other side of the gateway from you. Here's a more complete example: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><span><em class="italic">socks://dan@laces.shoes.net:4321/127.0.0.0/8,192.168.10.0/24</em></span></span></td>
+</tr></span></table><p class="calibre4">With this value, <span><em class="italic">ssh</em></span> connects directly to itself via its loopback address (127.0.0.1), or to hosts on the class C network, 192.168.10.0. It uses SOCKS for all other connections, supplying the username "dan" and looking for the SOCKS server on port 4321. </p>
+<p class="calibre4"><span><strong class="calibre45">Tectia SOCKS server (dynamic port forwarding<a shape="rect" class="calibre15"></a><a id="filepos1630552" class="calibre15"></a>)</strong></span> Tectia also has dynamic port forwarding via SOCKS, as described earlier for the OpenSSH <span><em class="italic">-D</em></span> option. <a shape="rect" href="#filepos1621252" class="calibre6">[7.4.7.1]</a> It works analogously, using this syntax: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh -L socks/1080 server</tt></div></span><p class="calibre4">You could then even use a separate <span><em class="italic">ssh</em></span> command as a SOCKS client of this one, to reach a second SSH server on the far side of the first one: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ssh -o 'SocksServer socks://localhost/' ...</tt></div></span></div>
+</div>
+</body>
+</html>

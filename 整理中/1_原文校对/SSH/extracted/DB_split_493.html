@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_654"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2930235" class="calibre7"></a>Port Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">When you construct a port forwarding, you can now specify a bind address: the address on which the accepting side of the forwarding will listen. This is useful either for controlling whether a forwarding is available off-host (not listening on only on the loopback), or distinguishing among multiple addresses if the listening host is multi-homed. You give the bind address on the command line, preceding the usual <span><em class="italic">-L</em></span> or <span><em class="italic">-R</em></span> value. For example, to set up a local forwarding from local port 2001 to remote server port 143 (IMAP), listening on 192.168.100.66: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -L 192.168.100.66:2001:localhost:143 server.example.com</tt></div></span><p class="calibre4">or for a remote forwarding:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -R 192.168.100.66:2001:localhost:143 server.example.com</tt></div></span><p class="calibre4">You can also do this with the <code class="calibre35">LocalForward</code> and <code class="calibre35">RemoteForward</code> configuration keywords, prepending the bind address to the second argument: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    LocalForward 2001 192.168.100.66:localhost:143<br class="calibre19"/>    RemoteForward 2001 192.168.100.66:localhost:143</tt></div></span><p class="calibre4">Note that this forwarding will <span><em class="italic">not</em></span> be listening on the loopback address. You need to connect to 192.168.100.66:2001, even on the server itself; trying to connect to localhost:2001 will result in "connection refused." Also note that the bind address refers to the client for local forwarding and to the server for remote forwarding. </p>
+<p class="calibre4">For local forwarding, the default binding is determined by the <code class="calibre35">GatewayPorts</code> keyword. For remote forwarding, the server may choose to honor or ignore a client's binding request using a new <code class="calibre35">GatewayPorts</code> value, <code class="calibre35">clientspecified</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    GatewayPorts clientspecified</tt></div></span><p class="calibre4">This means the SSH client can select the binding address for the forwarding. This permits clients to bind addresses for remote forwardings </p>
+<p class="calibre4">An empty binding address, or the special value <code class="calibre35">*</code>, indicates that the client or server should listen on all interfaces (including real ones and the loopback interface for localhost). </p>
+</div>
+</body>
+</html>

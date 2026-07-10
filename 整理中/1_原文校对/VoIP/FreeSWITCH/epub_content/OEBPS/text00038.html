@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.1　命令行参数</font>
+</font>
+</p>
+<p height="1em" width="2em">一般来说，FreeSWITCH不需要任何命令行参数就可以启动，但在某些情况下，你需要以一些特殊的参数启动。在此，仅作简单介绍。使用freeswitch-h或freeswitch-help或freeswitch--help会显示以下信息（其中中文部分是作者加的注释）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# freeswitch -help<br/>
+<br/>
+Usage: freeswitch [OPTIONS]<br/>
+<br/>
+These are the optional arguments you can pass to freeswitch:<br/>
+<br/>
+-nf                    -- <br/>
+<br/>
+不允许Fork<br/>
+<br/>
+新进程<br/>
+<br/>
+-u [user]              -- <br/>
+<br/>
+启动后以非 root <br/>
+<br/>
+用户 user <br/>
+<br/>
+身份运行<br/>
+<br/>
+-g [group]             -- <br/>
+<br/>
+启动后以非 root <br/>
+<br/>
+组 group <br/>
+<br/>
+身份运行<br/>
+<br/>
+-help                  -- <br/>
+<br/>
+显示本帮助信息<br/>
+<br/>
+-version               -- <br/>
+<br/>
+显示版本信息<br/>
+<br/>
+-waste                 --      <br/>
+<br/>
+允许浪费内存地址空间，FreeSWITCH<br/>
+<br/>
+仅需240KB <br/>
+<br/>
+的栈空间，你可以使用 ulimit -s 240 <br/>
+<br/>
+限制栈空间使用，或使用该选项忽略警告信息<br/>
+<br/>
+-core                  -- <br/>
+<br/>
+出错时进行内核转储<br/>
+<br/>
+-rp                    -- <br/>
+<br/>
+开启高优先级（实时）设置<br/>
+<br/>
+-lp                    -- <br/>
+<br/>
+开启低优先级设置<br/>
+<br/>
+-np                    -- <br/>
+<br/>
+普通优先级<br/>
+<br/>
+-vg                    -- <br/>
+<br/>
+在 valgrind <br/>
+<br/>
+下运行，调试内存泄露时使用<br/>
+<br/>
+-nosql                 -- <br/>
+<br/>
+不使用SQL<br/>
+<br/>
+，show channels <br/>
+<br/>
+类的命令将不能显示结果<br/>
+<br/>
+-heavy-timer           -- <br/>
+<br/>
+更精确的时钟。可能会更精确，但对系统要求更高<br/>
+<br/>
+-nonat                 -- <br/>
+<br/>
+如果路由器支持uPnP<br/>
+<br/>
+或NAT-PMP<br/>
+<br/>
+，则FreeSWITCH<br/>
+<br/>
+可以自动解决NAT<br/>
+<br/>
+穿越问题。如果路由器不支持，则该选项可以使启动更快<br/>
+<br/>
+-nocal                 -- <br/>
+<br/>
+关闭时钟核准。FreeSWITCH<br/>
+<br/>
+理想的运行环境是1000Hz <br/>
+<br/>
+的内核时钟。<br/>
+<br/>
+如果你的内核时钟小于1000Hz <br/>
+<br/>
+或在虚拟机上，可以尝试关闭该选项<br/>
+<br/>
+-nort                  -- <br/>
+<br/>
+关闭实时时钟<br/>
+<br/>
+-stop                  -- <br/>
+<br/>
+关闭 FreeSWITCH<br/>
+<br/>
+，它会在run<br/>
+<br/>
+目录中查找 PID<br/>
+<br/>
+文件<br/>
+<br/>
+-nc                    -- <br/>
+<br/>
+启动到后台模式，没有控制台<br/>
+<br/>
+-ncwait                --     <br/>
+<br/>
+后台模式，等待系统完全初始化完毕之后再退出父进程，隐含“-nc<br/>
+<br/>
+”选项<br/>
+<br/>
+-c                     -- <br/>
+<br/>
+启动到控制台，默认<br/>
+<br/>
+Options to  control location of files:<br/>
+<br/>
+-base [confdir]        -- <br/>
+<br/>
+指定其他的基准目录，在配置文件中使用$${base}<br/>
+<br/>
+-conf [confdir]        -- <br/>
+<br/>
+指定其他的配置文件所在目录，须与 -log<br/>
+<br/>
+、 -db <br/>
+<br/>
+合用<br/>
+<br/>
+-log [logdir]          -- <br/>
+<br/>
+指定其他的日志目录<br/>
+<br/>
+-run [rundir]          -- <br/>
+<br/>
+指定其他存放 PID <br/>
+<br/>
+文件的运行目录<br/>
+<br/>
+-db [dbdir]            -- <br/>
+<br/>
+指定其他数据库目录<br/>
+<br/>
+-mod [moddir]          -- <br/>
+<br/>
+指定其他模块目录<br/>
+<br/>
+-htdocs [htdocsdir]    -- <br/>
+<br/>
+指定其他 HTTP <br/>
+<br/>
+根目录<br/>
+<br/>
+-scripts [scriptsdir]  -- <br/>
+<br/>
+指定其他脚本目录<br/>
+<br/>
+-temp [directory]      -- <br/>
+<br/>
+指定其他临时文件目录<br/>
+<br/>
+-grammar [directory]   -- <br/>
+<br/>
+指定其他语法目录<br/>
+<br/>
+-certs [directory]     -- <br/>
+<br/>
+指定其他SSL<br/>
+<br/>
+证书路径<br/>
+<br/>
+-recordings [directory]-- <br/>
+<br/>
+指定其他录音目录<br/>
+<br/>
+-storage [directory]   -- <br/>
+<br/>
+指定其他存储目录（语音信箱等）<br/>
+<br/>
+-sounds [directory]    -- <br/>
+<br/>
+指定其他声音文件目录<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">虽然FreeSWITCH参数众多，但我们常用到的也没有几个。笔者经常用到两个参数，首先，就是将FreeSWITCH启动到后台的参数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# freeswitch -nc<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其次，FreeSWITCH在启动时默认会启用uPnP（或NAT-PMP）协议试图查找你的路由器是否支持并在你的路由器上“打洞”，如果你的路由器不支持该协议，这一步可能耗时较长，因而会影响启动速度。所以，如果你只是在内网测试并且像作者一样一天启动很多次的话，建议关掉这个选项。关于NAT的内容我们会在后面讲到。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# freeswitch <br/>
+<br/>
+–nonat<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面两个参数也可以组合来用：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# freeswitch <br/>
+<br/>
+–nc -nonat<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+</body>
+</html>

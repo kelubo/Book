@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_262"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1243547" class="calibre7"></a>6.2.1 Generating Keys for OpenSSH </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1243712" class="calibre15"></a>OpenSSH uses the program <span><em class="italic">ssh-keygen</em></span> to create key pairs. <a shape="rect" href="DB_split_049.html#filepos225725" class="calibre6">[2.4.2]</a> Let's go into more detail about this program for creating new keys or modifying existing keys. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>6.2.1.1 Creating OpenSSH keys </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">When creating a new key, you <span><em class="italic">must</em></span> indicate the key type (DSA or RSA) using the <span><em class="italic">-t</em></span> flag: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa</tt></div></span><p class="calibre4">You may also specify these options for creating keys:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> The number of bits in the key, using <span><em class="italic">-b</em></span>; the default is 1024 bits: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa -b 2048</tt></div></span></li>
+<li class="calibre18"> The name of the private-key file to be generated, using <span><em class="italic">-f</em></span>. The name is relative to your current directory. Recall that the public-key file is named after the private one with <em class="italic">.pub</em> appended. <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa -f mykey         <em class="italic"><span>Creates mykey and mykey.pub</span></em></tt></div></span><br class="calibre19"/>If you omit the <span><em class="italic">-f</em></span> option, you are prompted for the information: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa<br class="calibre19"/>    ...<br class="calibre19"/>    Enter file in which to save the key (/home/barrett/.ssh/id_dsa): <strong class="calibre45"><code class="calibre35">mykey</code></strong></tt></div></span><br class="calibre19"/>The default filename for DSA keys is <em class="italic">~/.ssh/id_dsa</em>, and for RSA keys it's <em class="italic">~/.ssh/id_rsa</em>. </li>
+<li class="calibre18"> The passphrase to decode the key, using <span><em class="italic">-N</em></span>: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa -N secretword</tt></div></span><br class="calibre19"/>If you omit this option, you'll be prompted for the information: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa<br class="calibre19"/>    ...<br class="calibre19"/>    Enter passphrase: <em class="italic"><span>[nothing is echoed]</span></em><br class="calibre19"/>    Enter the same passphrase again: <em class="italic"><span>[nothing is echoed]</span></em></tt></div></span></li>
+<li class="calibre18"> A textual comment associated with the key, using <span><em class="italic">-C</em></span>. If you omit this option, the comment is <em class="italic"><code class="calibre35">username</code></em>@<em class="italic"><code class="calibre35">host</code></em>, where <em class="italic"><code class="calibre35">username</code></em> is your username and <em class="italic"><code class="calibre35">host</code></em> is the local hostname: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen ... -C "my favorite key"</tt></div></span></li>
+</ul></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Before using any option that places your passphrase on the shell command line, such as the <span><em class="italic">-N</em></span> or <span><em class="italic">-P</em></span> options of <span><em class="italic">ssh-keygen</em></span>, carefully consider the security implications. Because the passphrase appears on your screen, it may be visible to onlookers, and while running, it may be visible to other users viewing the machine's process list via the <span><em class="italic">ps</em></span> command. In addition, if your shell creates history files of the commands you type, the passphrase is inserted into a history file where it can be read by a third party. </p>
+<p class="calibre4">Also, if you think you have a good reason just to type <span>Return</span> and give your key no passphrase, think again. That is essentially equivalent to putting your password in a file in your home directory named <em class="italic">MY-PASSWORD.PLEASE-STEAL-ME</em>. If you don't want to have to type a passphrase, the right thing to do is to use <span><em class="italic">ssh-agent</em></span>, hostbased authentication, or Kerberos. There are very limited circumstances having to do with unattended usage (e.g., <span><em class="italic">cron</em></span> jobs) where a plaintext, passphrase-less client key might be acceptable. <a shape="rect" href="DB_split_325.html#filepos2109314" class="calibre6">[11.1]</a></p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">If you use both <span><em class="italic">-f</em></span> (specify output file) and <span><em class="italic">-N</em></span> (specify passphrase), <span><em class="italic">ssh-keygen</em></span> issues no prompts. Therefore, you can automate key generation using these options (and perhaps redirecting output to <em class="italic">/dev/null</em>): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -f mykey -N secretword</tt></div></span><p class="calibre4">You might use this technique to automate generation of a large number of keys for some purpose. Use it carefully, though, and always on a secure machine. The password on the command line is probably visible to other users on the same machine via <span><em class="italic">ps</em></span> or similar programs; and if you're scripting with this technique, obviously the passphrases shouldn't be kept in files for long. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>6.2.1.2 Working with OpenSSH keys </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">In addition to creating keys, <span><em class="italic">ssh-keygen</em></span> can manipulate existing keys in the following ways: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> Changing the passphrase of an existing key, using <code class="calibre35">-</code>
+<span><em class="italic">p</em></span>. You can specify the filename with <span><em class="italic">-f</em></span> and the old and new passphrases with <span><em class="italic">-P</em></span> and <span><em class="italic">-N</em></span>, respectively: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa -p -f mykey -P secretword -N newword<br class="calibre19"/>    Your identification has been saved with the new passphrase.</tt></div></span><br class="calibre19"/>But if you omit them, you are prompted:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa -p<br class="calibre19"/>    Enter file in which the key is (/home/barrett/.ssh/id_rsa): <strong class="calibre45"><code class="calibre35">mykey</code></strong><br class="calibre19"/>    Enter old passphrase: <em class="italic"><span>[nothing is echoed]</span></em><br class="calibre19"/>    Key has comment 'my favorite key'<br class="calibre19"/>    Enter new passphrase (empty for no passphrase): <em class="italic"><span>[nothing is echoed]</span></em><br class="calibre19"/>    Enter the same passphrase again:<br class="calibre19"/>    Your identification has been saved with the new passphrase.</tt></div></span><br class="calibre19"/>Note that this changes the passphrase but <span><em class="italic">doesn't change the key</em></span>, it just re-encrypts the key with the new passphrase. So, the corresponding public-key file on remote machines doesn't change or need to be replaced. </li>
+<li class="calibre18"> Printing the <span><em class="italic">fingerprint</em></span> of a given key file, with <span><em class="italic">-l</em></span>. See the sidebar "<a shape="rect" href="DB_split_196.html#filepos1260366" class="calibre6">Key Fingerprints</a>" for more information. The fingerprint can be calculated from the public key: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -l -f stevekey.pub<br class="calibre19"/>    1024 5c:f6:e2:15:39:14:1a:8b:4c:93:44:57:6b:c6:f4:17 steve@snailbook.com<br class="calibre19"/>    $ ssh-keygen -B -f stevekey.pub<br class="calibre19"/>    1024 xitot-larit-gumet-fyfim-sozev-vyned-cigeb-sariv-tekuk-badus-bexax<br class="calibre19"/>    Steve@snailbook.com</tt></div></span></li>
+<li class="calibre18"> Printing a DNS resource record with <span><em class="italic">-r</em></span>, and using DNS resource record format with <span><em class="italic">-g</em></span>. These options produce key fingerprints in a format suitable for a BIND nameserver, for the purposes of verifying SSH host keys via the DNS. <a shape="rect" href="DB_split_224.html#filepos1526639" class="calibre6">[7.4.3.2]</a>
+</li>
+<li class="calibre18"> Converting between SECSH (Tectia) and OpenSSH key-storage formats, with <span><em class="italic">-e</em></span>, <span><em class="italic">-i</em></span>, and <span><em class="italic">-y</em></span>. <div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Option</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Extract/convert from... </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+To...</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-e</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenSSH private-key file ("export") </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH public key (Tectia format) </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-i</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH public-key file ("import") </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenSSH public key </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-y</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenSSH private-key file </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenSSH public key </p>
+</span></td>
+</tr></tbody></span></table></div>
+<br class="calibre19"/>An OpenSSH "private" key file actually contains both the public and private keys of a pair, so the <span><em class="italic">-e</em></span> and <span><em class="italic">-y</em></span> options simply extract the public key and print it out in the desired format. Use <span><em class="italic">-e</em></span> to convert an OpenSSH public key for your <em class="italic">~/.ssh2/authorization</em> file on a Tectia server host, and <code class="calibre35">-i</code> to do the opposite. The <span><em class="italic">-y</em></span> option is useful if you accidentally delete your OpenSSH public-key file and need to restore it. Tectia keys are in a format called SECSH Public Key File Format or SSH2 format, also used by other SSH implementations whose keys you may import and export. <br class="calibre19"/>A function that's missing is converting the <span><em class="italic">private</em></span> keys as well. This is useful if you have an OpenSSH server host on which you also want to run Tectia, and you want the two SSH servers to share a host key. </li>
+</ul></div>
+<p class="calibre4">When you make changes to a key, such as its passphrase or comment, the changes are applied to the key file only. If you have keys loaded in an SSH agent, the copies in the agent don't get changed. For instance, if you list the keys in the agent with <span><em class="italic">ssh-add -l</em></span> (lowercase L) after changing the comment, you still see the old comment in the agent. To make the changes take effect in the agent, unload and reload the affected keys. </p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos2961699" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_670"><span class="calibre2"><a shape="rect" class="calibre7"></a>Regex Syntax: SSH Patterns </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">The escape character is a tilde <code class="calibre35">~</code>. With this you can escape metacharacters to use them in their plain character form. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">In configuration the backslash (<code class="calibre35">\</code>) is used to escape the list separator <code class="calibre35">(',')</code>. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">In the following examples literal <code class="calibre35">E</code> and <code class="calibre35">F</code> denote any expression, whether a pattern or a character. </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">(</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Start a capturing subexpression.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">)</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">End a capturing subexpression.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">{</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Start an anonymous, noncapturing subexpression.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">}</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">End an anonymous, noncapturing subexpression.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E</code>|<code class="calibre35">F</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Disjunction, match either <code class="calibre35">E</code> or <code class="calibre35">F</code> (inclusive). <code class="calibre35">E</code> is preferred if both match. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E*</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Act as Kleene star, match <code class="calibre35">E</code> zero or more times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E*?</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Act as Kleene star, but match nongreedily (lazy match). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E+</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Closure, match E one or more times.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E+?</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Closure, but match non-greedily (lazy match).</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E?</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Option, match E optionally once.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E??</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Option, but match non-greedily (lazy match).</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">.</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match ANY character, including possibly the NULL byte and the newline characters. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E/</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">/</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code> exactly <em class="italic"><code class="calibre35">n</code></em> times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E/</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,/</code> or <code class="calibre35">E/</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,0/</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code>
+<em class="italic"><code class="calibre35">n</code></em> or more times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E/,</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">/</code> or <code class="calibre35">E/0,</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">/</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code> at most <em class="italic"><code class="calibre35">n</code></em> times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E/</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,</code>
+<em class="italic"><code class="calibre35">m</code></em>
+<code class="calibre35">/</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code> no less than <em class="italic"><code class="calibre35">n</code></em> times and no more than <em class="italic"><code class="calibre35">m</code></em> times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E/n,/?</code>, <code class="calibre35">E/</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,0/?</code>, <code class="calibre35">E/,</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">/?</code>, <code class="calibre35">E/0,</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">/?</code>, <code class="calibre35">E/</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,</code>
+<em class="italic"><code class="calibre35">m</code></em>
+<code class="calibre35">/?</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The lazy versions of above.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Start a character set. See the section "<a shape="rect" href="DB_split_505.html#filepos2970356" class="calibre6">Escaped Tokens for Regex Syntax SSH</a>." </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">&gt;C</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">One-character lookahead. 'C' must be either a literal character or parse as a character set. Match the empty string anywhere provided that the next character is 'C' or belongs to it. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">&lt;C</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">One-character lookback. As above, but examine the previous character instead of the next character. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">$</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match the empty string at the end of the input.</div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">^</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match the empty string at the start of the input.</div>
+</blockquote>
+</div>
+</div>  </body>
+</html>

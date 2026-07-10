@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1962242" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_385"><span class="calibre2"><a shape="rect" class="calibre7"></a>Dynamic Port Forwarding </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">We are often asked, "How can I tunnel my web browsing over SSH?" The usual reasons are for privacy or for browsing across a firewall. The SSH port forwarding we've described so far doesn't meet this need very well, but there is another flavor called <span><em class="italic">dynamic port forwarding</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos1962936" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1962975" class="calibre15"></a> which does. We'll call the previous technique "static forwarding" in contrast. </p>
+<p class="calibre4">Suppose you're at home, using your home machine H, and need to access a web server W1 at work, but your employer's internal network is behind a firewall. You might attempt to do this through a bastion server at work (say, B) which you can log into via SSH; and then from B, you can reach whatever internal web servers you want. So you create a tunnel using the following port-forwarding command on home machine H: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $  ssh -L 8080:W1:80 B         <em class="italic"><span>This runs into problems</span></em></tt></div></span><p class="calibre4">and point your web browser on H at <a href="http://localhost:8080/" shape="rect" class="calibre6">http://localhost:8080/</a>. This is a reasonable try, based on forwarding as we've seen it so far, but there are lots of problems: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Problem 1: virtual hosts</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Web servers can make decisions based on the hostname portion of the URL you request. For example, if the names <span><em class="italic">foo</em></span> and <span><em class="italic">bar</em></span> are aliases for the same host, then the URLs <a href="http://foo/" shape="rect" class="calibre6">http://foo/</a> and <a href="http://bar/" shape="rect" class="calibre6">http://bar/</a> may return different pages. A practical example is an ISP's web server, which could host content for dozens or hundreds of customers' web sites under different hostnames, all of which point to that same machine. This web server configuration is often called <span><em class="italic">virtual hosts</em></span>. </div>
+<div class="calibre19">In our home/work example, we're trying to access web server W1 as "localhost," but it might not be configured to serve any content under this name; and even if it does, it might not be the content you want. To address this problem, you'd have to get the browser to recognize other names as aliases for localhost, e.g., by hacking <em class="italic">/etc/hosts</em> on a Unix box—not exactly a smooth solution. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Problem 2: absolute links</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Suppose problem 1 is a non-issue, and you see the web page you want. However, if that web page has any absolute links that directly reference the hostname W1, they might not work. For example, the absolute URL <a href="http://W1/some_great_content.html" shape="rect" class="calibre6">http://W1/some_great_content.html</a> fails when your browser tries to follow it, because your browser knows the site only as localhost. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Problem 3: links to other secured servers</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Even if problems 1 and 2 don't bite you, your luck runs out when you hit a link to <span><em class="italic">another</em></span> internal web server, W2, or even a page on the same server but on a different port (e.g., <a href="http://W1:81/java-is-great.jsp" shape="rect" class="calibre6">http://W1:81/java-is-great.jsp</a>). </div>
+</blockquote>
+</div>
+<p class="calibre4">Clearly, static port forwarding is woefully inadequate for this scenario. You could get around individual problems by editing your host file or stopping now and then to forward another port, but who wants the annoyance? And such a burdensome solution isn't exactly convenient to explain to your Aunt Mae. Or your boss. </p>
+<p class="calibre4">We can address problems 1 and 2 by making a realization: that we want to redirect the web browser over SSH without fussing with the URL. Most browsers have just such a feature: a <span><em class="italic">proxy</em></span>. We can set the browser's HTTP proxy to our SSH-forwarded port <span><em class="italic">localhost:8080</em></span>; this means it <span><em class="italic">always</em></span> connects to our forwarded port in response to any HTTP URL we provide. The browser assumes this port leads to a proxy server that knows how to get the content for the various web servers we seek, so the browser doesn't have to contact those servers directly. </p>
+<p class="calibre4">Proxying gets us part of the way there, but doesn't solve problem 3: what happens if we hit a link to a hostname besides W1? The browser sends it to W1 anyway via its proxy setting, but W1 won't know how to handle it, so we'll get a web server error along the lines of "unrecognized URL." We can't feasibly deal with this manually; not only would we have to forward another port, but also we'd have to reset the browser to proxy through the new port, at which point it could reach the new URLs but not the old ones on W1! That's just a mess...what we really need is a way for the browser to communicate dynamically with SSH itself, telling it to forward to the correct web server for each URL the browser handles. And indeed, there is a feature to do exactly this, called <span><em class="italic">dynamic forwarding</em></span> or <span><em class="italic">SOCKS forwarding</em></span>. </p>
+<p class="calibre4">SOCKS is a small protocol, defined in RFC-1928. A SOCKS client connects via TCP, and indicates via the protocol the remote socket it wants to reach; the SOCKS server makes the connection, then gets out of the way, transparently passing data back and forth. Thereafter, it is just as if the client had connected directly to the remote socket. The OpenSSH and Tectia syntax for this kind of forwarding would be: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -D 1080 B<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ ssh -L socks/1080 B</tt></div></span><p class="calibre4">We've switched to port 1080 since that's the usual SOCKS port; 8080 or any other port would do, as usual. Note that there's no destination socket in either command, just the local port to be forwarded; that's because the destination is determined dynamically, and can be different for each connection. We can use this solution only if the browser has an option to use a SOCKS proxy (as most do). </p>
+<p class="calibre4">This solves the whole problem neatly! The process goes like so: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">The user types URL <span><em class="italic">scheme://foo:1234/</em></span> into the browser. The port 1234 might be implicit, as in 80 for HTTP or 443 for HTTPS. </li>
+<li value="2" class="calibre18">The browser connects to the SSH SOCKS proxy on <span><em class="italic">localhost:1080</em></span>, and asks for a connection to <span><em class="italic">foo:1234</em></span> using the SOCKS protocol. </li>
+<li value="3" class="calibre18">In response, the SSH client associates the browser's connection with a new <span><em class="italic">direct-tcpip</em></span> channel in the existing SSH session <a shape="rect" href="DB_split_077.html#filepos403401" class="calibre6">[3.4.4.1]</a>, connected to <span><em class="italic">foo:1234</em></span> via another TCP connection established by the SSH server. </li>
+<li value="4" class="calibre18">The SSH client and server "get out of the way," and the browser is connected to the desired web server. Note that there is nothing here specific to HTTP; the browser can next build an SSL session if the scheme is HTTPS, or use any protocol at all over the proxied connection. </li>
+</ol></div>
+<p class="calibre4">Each time a new connection arrives on port 1080, it can be forwarded to a different socket. This might seem odd if you have static forwarding firmly in mind, but it's just an extension of what you already know. With static forwarding, the SSH client still creates a new channel for each connection; it just sends them all to the same place. With dynamic forwarding, SOCKS allows each connection to indicate its own destination, and SSH obliges. </p>
+<p class="calibre4">No special support is required for dynamic forwarding on the SSH server, since it in fact uses the same mechanism as static forwarding. Only the client needs to support dynamic forwarding. </p>
+<p class="calibre4">So, this would be a perfect lightweight solution: complete remote web browsing with just SSH. Ah, if only we lived in such a simple world.... </p>
+</div>  </body>
+</html>

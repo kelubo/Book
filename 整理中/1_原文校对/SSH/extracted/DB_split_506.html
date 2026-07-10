@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_672"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2976466" class="calibre7"></a>Character Sets for Regex Syntax SSH </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2976633" class="calibre15"></a>A character set starts with <code class="calibre35">'['</code> and ends at non-escaped <code class="calibre35">]'</code> that is not part of a POSIX character set specifier and that does not follow immediately after <code class="calibre35">'['</code>. </p>
+<p class="calibre4">The following characters have a special meaning and need to be escaped if meant literally: </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">:</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A range operator, except immediately after <code class="calibre35">[</code>, where it loses its special meaning. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">-</code> (minus sign)</span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Until next +, the characters, ranges, and sets will be subtracted from the current set instead of being added. If appears as the first character after <code class="calibre35">[</code>, start subtracting from a set containing all characters instead of the empty set. </div>
+<div class="calibre19">Until next -, the characters, ranges, and sets will be added to the current set. This is the default. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:alnum:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isalnum</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:alpha:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isalpha</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:cntrl:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">iscntrl</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:digit:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isdigit</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:graph:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isgraph</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:lower:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">islower</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:print:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isprint</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:punct:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">ispunct</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:space:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isspace</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:upper:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isupper</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">[:xdigit:]</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Characters for which <code class="calibre35">isxdigit</code> returns <code class="calibre35">true</code> (see <em class="italic">ctype.h</em>). </div>
+</blockquote>
+</div>
+<p class="calibre4">It is also possible to include the predefined escaped character sets into a newly defined one, so: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    [~d~s]</tt></div></span><p class="calibre4">matches digits and whitespace characters.</p>
+<p class="calibre4">Also, escape sequences resulting in literals work inside character sets. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>Example </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    [[:xdigit:]-a:e]</tt></div></span><p class="calibre4">is typically equivalent to :</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    [0123456789ABCDEFf]</tt></div></span></div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_673"></div></body>
+</html>

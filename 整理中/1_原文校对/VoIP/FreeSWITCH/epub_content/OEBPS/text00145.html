@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.4　一个在FreeSWITCH中外呼的脚本</font>
+</font>
+</p>
+<p height="1em" width="2em">曾有一个朋友这样问笔者：能否实现在FreeSWITCH中外呼，然后放一段录音？笔者的回答是：当然能！写个简单的脚本就行。但后来他要求还要知道呼叫是否成功，那实现就要复杂一点了。</p>
+<p height="1em" width="2em">笔者针对上边的问题很快写了一个例子。这个例子的实现思路是：将待呼号码放到一个文件中，每个号码一行，然后用Lua依次读取每一行，并进行呼叫。呼通后播放一个声音文件，并将呼叫（通话）结果写到一个日志文件中。</p>
+<p height="1em" width="2em">该脚本比较长，我们一段一段地来看。</p>
+<p height="1em" width="2em">首先设置一些常量和变量。第1行，设置呼叫字符串的前面的参数，其中，ignore_early_media是为了保证对方应答后才开始播放（否则，在对方传回铃音或彩铃时播放就会开始，这不是我们想要的）；第2行指定我们呼叫的数据文件；第3行指定呼通后要播放的声音文件路径；第4行指定日志文件的路径。代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 prefix = "{ignore_early_media=true}sofia/gateway/gw1/"<br/>
+<br/>
+02 number_file_name = "/usr/local/freeswitch/scripts/number.txt"<br/>
+<br/>
+03 file_to_play = "/usr/local/freeswitch/sounds/ad.wav"<br/>
+<br/>
+04 log_file_name = "/usr/local/freeswitch/log/dialer_log.txt"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在脚本中，我们经常需要打印一些日志，简单起见，包装一个函数debug，它实际上就是调用了freeswitch.consoleLog来打印日志的。代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+05 function debug(s)<br/>
+<br/>
+06     freeswitch.consoleLog("notice", s .. "\n")<br/>
+<br/>
+07 end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，我们定义一个呼叫函数call_number，它接收一个号码（number）作为参数（第8行）。freeswitch.Session会呼叫一个号码（第11行），并一直等待对方应答，对方应答后，将得到一个session变量；如果该session是正常的（第12行），则在第13行先等待1秒（1000毫秒），以防止丢失最开始的声音。然后，在第14行使用streamFile播放一段声音，并在第15行挂机。第18行将进行忙等待；最后，第22行，函数返回挂机原因（hangup_cause）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+08 function call_number(number)<br/>
+<br/>
+09     dial_string = prefix .. tostring(number);<br/>
+<br/>
+10     debug("calling " .. dial_string);<br/>
+<br/>
+11     session = freeswitch.Session(dial_string);<br/>
+<br/>
+12     if session:ready() then<br/>
+<br/>
+13         session:sleep(1000)<br/>
+<br/>
+14         session:streamFile(file_to_play)<br/>
+<br/>
+15         session:hangup()<br/>
+<br/>
+16     end<br/>
+<br/>
+17     -- waiting for hangup<br/>
+<br/>
+18     while session:ready() do<br/>
+<br/>
+19         debug("waiting for hangup " .. number)<br/>
+<br/>
+20         session:sleep(1000)<br/>
+<br/>
+21     end<br/>
+<br/>
+22     return session:hangupCause()<br/>
+<br/>
+23 end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">实际的代码是从下面开始执行的。首先第24行打开存放电话号码的文件（准备读）和呼叫日志（第25行，准备写，追加）；然后进入一个死循环，第27行从数据文件中读出一个号码，放到line变量中；第28行测试，如果该行是空行或nil就说明文件读完了，跳出循环；第29行调用我们上面定义的call_number函数进行呼叫，并将结果存到hangup_cause变量中；最后，第30行将呼叫结果写到一个呼叫日志文件中。</p>
+<p height="1em" width="2em">然后是无限循环（while），每次读取一行，当读到空行或文件尾时，退出。</p>
+<p height="1em" width="2em">在while循环中，读到的每一行实际上是一个号码，调用上面定义的call_number()函数进行呼叫，并将呼叫结果写到log_file中。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+24 number_file = io.open(number_file_name, "r")<br/>
+<br/>
+25 log_file = io.open(log_file_name, "a+")<br/>
+<br/>
+26 while true do<br/>
+<br/>
+27     line = number_file:read("*line")<br/>
+<br/>
+28     if line == "" or line == nil then break end<br/>
+<br/>
+29     hangup_cause = call_number(line)<br/>
+<br/>
+30     log_file:write(os.date("%H:%M:%S ") .. line .. " " .. hangup_cause .. "\n")<br/>
+<br/>
+31 end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将上述脚本保存到FreeSWITCH的scripts目录中（通常是/usr/local/freeswitch/scripts/），命名为dialer.lua，然后在FreeSWITCH控制台上执行如下命令便可以开始呼叫了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; luarun dialer.lua<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">除此之外，还有一个batch_dialer，用于批量外呼，感兴趣的读者可以自行研究一下:http://fisheye.freeswitch.org/browse/freeswitch-contrib.git/seven/lua/batch_dialer.lua?hb=true。</p>
+</body>
+</html>

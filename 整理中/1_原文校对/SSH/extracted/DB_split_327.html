@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_431"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2114307" class="calibre7"></a>11.1.2 Public-Key Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2114471" class="calibre15"></a>In public-key authentication, a private key is the client's credentials. Therefore, the batch job needs access to the key, which must be stored where the job can access it. You have three choices of location for the key, which we discuss separately: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Store the encrypted key and its passphrase in the filesystem. </li>
+<li class="calibre18">Store a plaintext (unencrypted) private key in the filesystem, so it doesn't require a passphrase. </li>
+<li class="calibre18">Store the key in an agent, which keeps secrets out of the filesystem but requires a human to decrypt the key at system boot time. </li>
+</ul></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.1.2.1 Storing the passphrase in the filesystem </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">In this technique, you store an encrypted key and its passphrase in the filesystem so that a script can access them. We don't recommend this method, since you can store an unencrypted key in the filesystem with the same level of security (and considerably less complication). In either case, you rely solely on the filesystem's protections to keep the key secure. This observation is the rationale for the next technique. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2116205" class="calibre7"></a>11.1.2.2 Using a plaintext key </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">A plaintext or unencrypted key requires no passphrase. To create one, run <span><em class="italic">ssh-keygen</em></span> and simply press the Return key when prompted for a passphrase (or similarly, remove the passphrase from an existing key using <span><em class="italic">ssh-keygen -p</em></span>). You can then supply the key filename on the <span><em class="italic">ssh</em></span> command line using the <span><em class="italic">-i</em></span> option, or in the client configuration file with the <code class="calibre35">IdentityFile</code> keyword. <a shape="rect" href="DB_split_223.html#filepos1501465" class="calibre6">[7.4.2]</a></p>
+<p class="calibre4">Usually plaintext keys<a shape="rect" class="calibre15"></a><a id="filepos2117181" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2117220" class="calibre15"></a> are undesirable, equivalent to leaving your password in a file in your account. They are never a good idea for interactive logins, since the SSH agent provides the same benefits in a much more secure fashion. But a plaintext key is a viable option for automation, since the unattended aspect forces us to rely on some kind of persistent state in the machine. The filesystem is one possibility. </p>
+<p class="calibre4">Plaintext keys are frightening, though. To steal the key, an attacker needs to override filesystem protections only once, and this doesn't necessarily require any fancy hacking: stealing a single backup tape will do. You can arrange to keep them off backups, but that's an additional complication. If you need your batch jobs to continue working after an unattended system restart, plaintext keys are pretty much your best option. If the situation allows for some leeway in this regard, however, consider using <span><em class="italic">ssh-agent</em></span> instead. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>11.1.2.3 Using an agent </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2118596" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2118634" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2118731" class="calibre15"></a>
+<span><em class="italic">ssh-agent</em></span> provides another, somewhat less vulnerable method of key storage for batch jobs. A human invokes an agent and loads the needed keys from passphrase-protected key files, just once. Thereafter, unattended jobs use this long-running agent for authentication. </p>
+<p class="calibre4">In this case, the keys are still in plaintext but within the memory space of the running agent rather than in a file on disk. As a matter of practical cracking, it is more difficult to extract a data structure from the address space of a running process than to gain illicit access to a file. Also, this solution avoids the problem of an intruder walking off with a backup tape containing the plaintext key. </p>
+<p class="calibre4">Security can still be compromised by other methods, though. The agent provides access to its services via a Unix-domain socket, which appears as a node in the filesystem. Anyone who can read and write that socket might be able to instruct the agent to sign authentication requests and thus gain use of the keys. Some agent implementations attempt further checks, such as ensuring the communicating process runs under the same uid, but not all flavors of Unix support this. <a shape="rect" href="DB_split_203.html#filepos1367684" class="calibre6">[6.3.4.1]</a> In any event, this compromise isn't quite so devastating since the attacker can't obtain the actual keys through the agent socket. She merely gains use of the keys for as long as the agent is running and as long as she can maintain her compromise of the host. </p>
+<p class="calibre4">The agent method does have a down side: the system can't continue unattended after a reboot. When the host comes up again automatically, the batch jobs won't have their keys until someone shows up to restart the agent and provide the passphrases to load the keys. This is just a cost of the improved security, and you have a pager, right? </p>
+<p class="calibre4">Another bit of complication with the agent method is that you must arrange for the batch jobs to find the agent. SSH clients locate an agent via an environment variable pointing to the agent socket, such as SSH_AUTH_SOCK for the OpenSSH agent. <a shape="rect" href="DB_split_201.html#filepos1318422" class="calibre6">[6.3.2.1]</a> When you start the agent for batch jobs, you need to record its output where the jobs can find it. For instance, if the job is a shell script, you can store the environment values in a file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-agent | head -2 &gt; ~/agent-info<br class="calibre19"/>    $ cat ~/agent-info<br class="calibre19"/>    setenv SSH_AUTH_SOCK /tmp/ssh-res/ssh-12327-agent;<br class="calibre19"/>    setenv SSH_AGENT_PID 12328;</tt></div></span><p class="calibre4">You can add keys to the agent (assuming C-shell syntax here): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ source ~/agent-info<br class="calibre19"/>    $ ssh-add batch-key<br class="calibre19"/>    Need passphrase for batch-key (batch job SSH key).<br class="calibre19"/>    Enter passphrase: **************</tt></div></span><p class="calibre4">then instrument any scripts to set the same values for the environment variables: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/csh<br class="calibre19"/>    # Source the agent-info file to get access to our ssh-agent.<br class="calibre19"/>    set agent = ~/agent-info<br class="calibre19"/>    if (-r $agent) then<br class="calibre19"/>      source $agent<br class="calibre19"/>    else<br class="calibre19"/>      echo "Can't find or read agent file; exiting."<br class="calibre19"/>      exit 1<br class="calibre19"/>    endif<br class="calibre19"/>    # Now use SSH for something...<br class="calibre19"/>    ssh -q -o 'BatchMode yes' user@remote-server my-job-command</tt></div></span><p class="calibre4">You also need to ensure that the batch jobs (and nobody else!) can read and write the socket. If there's only one uid using the agent, the simplest thing to do is start the agent under that uid (e.g., as root, do <span><em class="italic">su &lt;batch_account&gt; ssh-agent ...</em></span>). If multiple uids are using the agent, you must adjust the permissions on the socket and its containing directory so that these uids can all access it, perhaps using group permissions. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Some operating systems behave oddly with respect to permissions on Unix-domain sockets. Some versions of Solaris, for example, completely ignore the modes on a socket, allowing any process at all full access to it. To protect a socket in such situations, set the containing directory to forbid access. For example, if the containing directory is mode 700, only the directory owner may access the socket. (This assumes there's no other shortcut to the socket located elsewhere, such as a hard link.) </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Using an agent for automation is more complicated and restrictive than using a plaintext key; however, it is more resistant to attack and doesn't leave the key on disk and tape where it can be stolen. Considering that the agent is still vulnerable to being misused via the filesystem, and that it is intended to run indefinitely, the advantages of this method are debatable. Still, we recommend the agent method as the most secure and flexible strategy for automated SSH usage in a security-conscious environment. </p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.9　使用mod_xml_curl提供动态用户管理</font>
+</font>
+</p>
+<p height="1em" width="2em">在本章前面我们讲了一个使用Lua来绑定一个回调为FreeSWITCH提供XML Dialplan的例子，但Lua脚本的灵活性还是稍微差一点。因此，这里我们再来看一个用外部的脚本来提供XML用户目录的例子。</p>
+<p height="1em" width="2em">FreeSWITCH默认使用静态的XML文件配置用户，但如果要动态认证，就需要跟数据库相关联。FreeSWITCH通过使用mod_xml_curl模块完美解决了这个问题。它的实现思路是你自己提供一个HTTP服务器，当有用户有注册请求时（或INVITE或其他，总之需要XML的请求时），FreeSWITCH向你的HTTP服务器发送请求，你查询数据库生成一个标准的XML文件，FreeSWITCH进而通过这一文件所描述的用户信息对用户进行认证。</p>
+<p height="1em" width="2em">下面我们先来看一下脚本。该脚本是用PHP实现的，PHP的语法与C/C++以及Java都很类似，因此对于不熟悉PHP的读者来说，也很容易理解。</p>
+<p height="1em" width="2em">首先，在脚本的头部，我们从$_POST数组中取得请求参数，如user（用户）以及domain等，然后设置一个$password变量，值为1234。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;?php<br/>
+<br/>
+  $user =  $_POST['user'];<br/>
+<br/>
+  $domain = $_POST['domain'];<br/>
+<br/>
+  $password = "1234";<br/>
+<br/>
+?&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">作为一个简单的例子，这里我们没有添加多少业务逻辑，下面的代码只是单纯返回了一个XML文件，在需要变量的地方便使用&lt;?php echo$var;?&gt;语法直接输出。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;document type="freeswitch/xml"&gt;<br/>
+<br/>
+&lt;section name="directory"&gt;<br/>
+<br/>
+  &lt;domain name="&lt;?php echo $domain;?&gt;"&gt;<br/>
+<br/>
+    &lt;params&gt;<br/>
+<br/>
+      &lt;param name="dial-string" value="{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"/&gt;<br/>
+<br/>
+    &lt;/params&gt;<br/>
+<br/>
+    &lt;groups&gt;<br/>
+<br/>
+    &lt;group name="default"&gt;<br/>
+<br/>
+      &lt;users&gt;<br/>
+<br/>
+        &lt;user id="&lt;?php echo $user; ?&gt;"&gt;<br/>
+<br/>
+          &lt;params&gt;<br/>
+<br/>
+            &lt;param name="password" value="&lt;?php echo $password; ?&gt;"/&gt;<br/>
+<br/>
+            &lt;param name="vm-password" value="&lt;?php echo $password; ?&gt;"/&gt;<br/>
+<br/>
+            &lt;/params&gt;<br/>
+<br/>
+          &lt;variables&gt;<br/>
+<br/>
+            &lt;variable name="toll_allow" value="domestic,international,local"/&gt;<br/>
+<br/>
+            &lt;variable name="accountcode" value="&lt;?php echo $user; ?&gt;"/&gt;<br/>
+<br/>
+            &lt;variable name="user_context" value="default"/&gt;<br/>
+<br/>
+            &lt;variable name="effective_caller_id_name" value="FreeSWITCH-CN"/&gt;<br/>
+<br/>
+            &lt;variable name="effective_caller_id_number" value="&lt;?php echo $user;?&gt;"/&gt;<br/>
+<br/>
+            &lt;variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/&gt;<br/>
+<br/>
+            &lt;variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/&gt;<br/>
+<br/>
+            &lt;variable name="callgroup" value="default"/&gt;<br/>
+<br/>
+            &lt;variable name="x-powered-by" value="http://www.freeswitch.org.cn"/&gt;<br/>
+<br/>
+          &lt;/variables&gt;<br/>
+<br/>
+        &lt;/user&gt;<br/>
+<br/>
+      &lt;/users&gt;<br/>
+<br/>
+    &lt;/group&gt;<br/>
+<br/>
+    &lt;/groups&gt;<br/>
+<br/>
+  &lt;/domain&gt;<br/>
+<br/>
+&lt;/section&gt;<br/>
+<br/>
+&lt;/document&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过上述脚本便可以生成XML并返回给FreeSWITCH，然后FreeSWITCH再解析该XML并进行下一步的认证等操作。因为该脚本根本不查询数据库，也没有任何业务逻辑，任何注册或呼叫请求只要密码是1234就都能通过验证，因此我们可以把它称为万能脚本。当然，熟悉PHP的读者可以自己尝试添加一些if…else类的条件判断以针对不同的用户返回不同的XML，或者通过查询数据库构造不同的XML。</p>
+<p height="1em" width="2em">接下来，把上述PHP文件放到你的HTTP服务器上，并确保它能正确执行，然后修改conf/autoload_configs/xml_curl.conf.xml配置文件，增加一个binding，并将gateway-url的value值设成与你Web服务器与PHP对应的访问地址，并将bindings属性设为directory。笔者的示例配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;configuration name="xml_curl.conf" description="cURL XML Gateway"&gt;<br/>
+<br/>
+  &lt;bindings&gt;<br/>
+<br/>
+    &lt;binding name="directory"&gt;<br/>
+<br/>
+      &lt;param name="gateway-url"<br/>
+<br/>
+             value="http://localhost/~seven/freeswitch/directory.php"bindings= "directory"/&gt;<br/>
+<br/>
+    &lt;/binding&gt;<br/>
+<br/>
+  &lt;/bindings&gt;<br/>
+<br/>
+&lt;/configuration&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以在源代码目录中使用如下命令编译安装该模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# mod mod_xml_curl-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后在FreeSWITCH控制台上加载该模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_xml_curl<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">拿起你的SIP电话注册试一下吧，别忘了万能密码是1234。</p>
+<p height="1em" width="2em">如果在测试过程中遇到错误，试着看一看出错的内容，一般是HTTP服务器无法正常访问造成的。如果没有直接看到错误，也可以在控制台上打开mod_xml_curl的调试选项，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; xml_curl debug_on<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，FreeSWITCH会将每次请求得到的XML文件存放到文件名类似/tmp/xxx.xml的文件中，检查一下里面的内容是否跟你HTTP服务预期的输出是一致的。</p>
+</body>
+</html>

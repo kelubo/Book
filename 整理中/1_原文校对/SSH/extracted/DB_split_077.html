@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_114"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos401712" class="calibre7"></a>3.4.4 SSH Connection Protocol (SSH-CONN) </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">In its final, successful authentication request, the client specified a service name of "ssh-connection"; this is not visible in the OpenSSH client debug trace but shows up on the server as: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: userauth-request for user res service ssh-connection method publickey</tt></div></span><p class="calibre4">Since it authenticated the client, the server now starts that service, and we move on to the SSH Connection Protocol. This layer actually provides the capabilities that users want to employ directly and that define SSH for most people: remote login and command execution, agent forwarding, file transfer, TCP port forwarding, X forwarding, etc. </p>
+<p class="calibre4">There is a lot of detail in the connection protocol, but much of it is too low-level for our present discussion; we give a fairly high-level description here, sufficient to interpret most debugging messages and to understand how an SSH product provides its services using SSH-CONN<a shape="rect" class="calibre15"></a><a id="filepos403038" class="calibre15"></a>. Unlike the earlier protocols, a really detailed understanding of SSH-CONN is not usually needed for debugging everyday SSH problems. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos403401" class="calibre7"></a>3.4.4.1 Channels </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos403482" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos403579" class="calibre15"></a>The basic service SSH-CONN provides is <span><em class="italic">multiplexing</em></span>. SSH-CONN takes the single, secure, duplex byte-stream provided by SSH-TRANS, and allows its clients to create dynamically any number of logical SSH-CONN <span><em class="italic">channels</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos403960" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos403999" class="calibre15"></a> over it. Channels are identified by <span><em class="italic">channel numbers</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos404154" class="calibre15"></a>, and may be created or destroyed by either side. Channels are individually flow-controlled, and each channel has a <span><em class="italic">channel type</em></span> which defines its use. Types and other items in SSH-CONN are named in the same extensible manner as other SSH namespaces (key exchanges, key algorithm and authenticated method names, etc.). The defined types are: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">session</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The remote execution of a program.</div>
+<div class="calibre19">Merely opening a session channel does not start a program; that is done using subsequent requests on the channel. An SSH-CONN session may have multiple session channels open at once, simultaneously supporting several terminal, file-transfer, or program executions at once. Various Windows-based SSH products have used this ability for some time now; it has only recently appeared in OpenSSH with the <code class="calibre35">ControlMaster</code>/<code class="calibre35">ControlPath</code> feature. <a shape="rect" href="DB_split_225.html#filepos1539841" class="calibre6">[7.4.4.2]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">x11</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">An X11 client connection.</div>
+<div class="calibre19">One of these is opened from server to client, for each X11 program using X forwarding as established by an <span><em class="italic">x11-req</em></span> on a session channel (discussed later). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">forwarded-tcpip</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">An inbound connection to a remotely forwarded port. </div>
+<div class="calibre19">When a connection arrives on a remotely forwarded TCP port, the server opens this channel back to the client to carry the connection. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">direct-tcpip</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">An outbound TCP connection.</div>
+<div class="calibre19">This directs the peer to open a TCP connection to a given socket, and attach the channel to that connection. The socket may be specified using a domain name or IP address, allowing a name to be resolved on the remote side in a possibly different namespace than the client. These channels are used to implement local TCP forwarding (<span><em class="italic">ssh -L</em></span>). Preparing for local forwarding is purely a client-side affair: the client simply starts listening on the requested port.<sup class="calibre20">[<a id="filepos407313" shape="rect" href="#filepos421815" class="calibre6">18</a>]</sup> The server first hears of it when a connection actually arrives on the port, whereupon the client opens a <span><em class="italic">direct-tcpip</em></span> channel with the appropriate target socket. This means that if certain local forwardings are disallowed by the server, this isn't noticed on connection setup, but only when a connection is actually attempted </div>
+</blockquote>
+</div>
+<p class="calibre4">Channel semantics are richer than a traditional Unix file handle; the data they carry can be typed, and this facility is used to distinguish between stdout and stderr output from a program on a single channel. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos408295" class="calibre7"></a>3.4.4.2 Requests </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos408376" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos408414" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos408452" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos408490" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos408528" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos408566" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos408604" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos408701" class="calibre15"></a>In addition to an array of channel operations—open, close, send data, send urgent data, etc.--SSH-CONN defines a set of <span><em class="italic">requests</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos408932" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos408971" class="calibre15"></a>, with global or channel scope. A global request affects the state of the connection as a whole, whereas a channel request is tied to a particular open channel. The global requests<a shape="rect" class="calibre15"></a><a id="filepos409189" class="calibre15"></a> are: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">tcpip-forward</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Request a remote TCP port forwarding.</div>
+<div class="calibre19">If the user requests a TCP port be forwarded on the remote side back to the local side (as with "ssh -R"), the SSH client issues this global request. In response, the server starts listening on the indicated port and starts a "forwarded-tcpip" channel back to the client for each connection. </div>
+<div class="calibre19">This request actually contains the full socket to be bound on the remote: an (<span><em class="italic">address</em></span>,<span><em class="italic">port</em></span>) pair and not just a port number. This allows the client to be selective in remote-forwarding remote ports on a multihomed server, or to implement local-only remote forwardings by binding only the loopback address (127.0.0.1), on a per-request basis. Not all implementations take advantage of this feature, however; Tectia does, but OpenSSH currently does not.<sup class="calibre20">[<a id="filepos410518" shape="rect" href="#filepos422127" class="calibre6">19</a>]</sup></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">cancel-tcpip-forward</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Cancel an existing remote forwarding.</div>
+</blockquote>
+</div>
+<p class="calibre4">Now let's summarize the channel requests<a shape="rect" class="calibre15"></a><a id="filepos411003" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos411042" class="calibre15"></a>; except as indicated, most operations refer to the remote side of a session channel: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">pty-req</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Allocate a <span><em class="italic">pty</em></span>, including window size and terminal modes. </div>
+<div class="calibre19">This creates a pseudo-terminal for the channel, generally required for interactive applications; the pseudo-terminal is a virtual device which makes it appear that the remote program is directly connected to a terminal. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">x11-req</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Set up X11 forwarding.</div>
+<div class="calibre19">Do the preparation necessary for X11 forwarding on the remote; usually involves listening on a socket (TCP or otherwise) for X11 connections, setting the DISPLAY variable to point to that socket, and setting up proxy X11 authentication. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">env</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Set an environment variable.</div>
+<div class="calibre19">Although useful, this feature is also a potential security problem. It has not been widely supported by SSH implementations until recently and is generally carefully controlled. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">shell, exec, subsystem</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Run the default account shell, an arbitrary program, or an abstract service, respectively. </div>
+<div class="calibre19">These requests start a program running on the remote side, and connect the channel to the program's standard input/output/error streams. The "subsystem" request allows a remote program to be named abstractly, rather than being depended on by a particular remote filename. For instance, an SFTP file transfer is usually started by sending a subsystem request with the name "sftp." The SSH server is configured to execute the correct server program in response to the request; this way, the location of the SFTP server program can change without affecting clients. Or indeed, SFTP could be implemented internal to the SSH server itself, rather than being a separate program, and this, too, would be transparent to clients; this is an option with Tectia. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">window-change</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Change terminal window size.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">xon-xoff</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Use client-side ^S/^Q flow control.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">signal</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Send a specified signal to a remote process (as in the Unix <span><em class="italic">kill</em></span> command). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">exit-status</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Return the program's exit status to the initiator. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">exit-signal</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Return the signal that terminated the program (e.g., if a remote program dies by signal, as from a segmentation fault or manual <span><em class="italic">kill -9</em></span> command). </div>
+</blockquote>
+</div>
+<p class="calibre4">Theoretically, all these requests are symmetric; that is, the protocol allows the server to open a session channel to the client and request a program to be started on it, for example. However, in most SSH implementations as a remote-login tool, this simply doesn't make sense, and is an obvious security risk to boot! So, such requests are usually not honored by clients (and the SSH-CONN draft recommends as much). </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.4.4.3 The finish line </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos416305" class="calibre15"></a>With all this behind us, we can easily make sense of the remainder of the connection setup. The client opens a session channel with id 0: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: channel 0: new [client-session]<br class="calibre19"/>    debug2: channel 0: send open<br class="calibre19"/>    debug1: Entering interactive session.</tt></div></span><p class="calibre4">This session is a terminal login, so next we request a pseudo-terminal on the session channel: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: channel 0: request pty-req</tt></div></span><p class="calibre4">X forwarding is turned on, so the client first gets the local X11 display key by running the <span><em class="italic">xauth</em></span> program on this side, then requests X forwarding on the remote by sending an <span><em class="italic">x11-req</em></span> global request: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug2: x11_get_proto: /usr/X11R6/bin/xauth list :0 2&gt;/dev/null<br class="calibre19"/>    debug1: Requesting X11 forwarding with authentication spoofing.<br class="calibre19"/>    debug1: channel 0: request x11-req</tt></div></span><p class="calibre4">Agent forwarding is also turned on, so we open a channel for that as well: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: Requesting authentication agent forwarding.<br class="calibre19"/>    debug1: channel 0: request auth-agent-req@openssh.com</tt></div></span><p class="calibre4">But wait... we didn't mention agent forwarding anywhere in SSH-CONN, nor the channel type that appears here, <code class="calibre35">
+<span><a href="mailto:auth-agent-req@openssh.com" shape="rect" class="calibre6">auth-agent-req@openssh.com</a></span>
+</code>. Indeed, that's because it's not there; key agents are an implementation detail outside the purview of the protocol. This channel type is an example of the naming extension syntax; it is particular to the OpenSSH implementation. An OpenSSH server accepts such a channel request and sets up an agent-forwarding socket on the remote end (whose details are specific to the OpenSSH program suite). A non-OpenSSH server would refuse the unrecognized request, and agent forwarding would not be available. </p>
+<p class="calibre4">Finally, the client issues a "shell" request on the session channel: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: channel 0: request shell</tt></div></span><p class="calibre4">directing the remote account's default command be started. And at long last... </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    debug1: channel 0: open confirm rwindow 100000 rmax 1638<br class="calibre19"/>    Last login: Mon Aug 30 2004 18:04:10 -0400 from foo.host.net<br class="calibre19"/>    $</tt></div></span><p class="calibre4">...we're logged in!</p>
+</div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos420138" shape="rect" href="DB_split_073.html#filepos327774" class="calibre6">14</a>] </sup>SSH Version 1 went through several revisions, the most popular known as Versions 1.3 and 1.5. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos420469" shape="rect" href="DB_split_075.html#filepos349606" class="calibre6">15</a>] </sup>A <span><em class="italic">group</em></span> is a mathematical abstraction relevant to the Diffie-Hellman procedure; see a reference on group theory, number theory, or abstract algebra if you're curious. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos420937" shape="rect" href="DB_split_075.html#filepos356894" class="calibre6">16</a>] </sup>OpenSSH has no support for the "none" cipher; it can't even be enabled at compile time. In contrast, Tectia fully supports the "none" cipher, but it is not enabled by default; it needs to be explicitly included using the <code class="calibre35">Ciphers</code> keyword. <a shape="rect" href="DB_split_150.html#filepos881924" class="calibre6">[5.3.5]</a></p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos421514" shape="rect" href="DB_split_076.html#filepos383246" class="calibre6">17</a>] </sup>The OpenSSH team is working on multiple authentication support. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos421815" shape="rect" href="#filepos407313" class="calibre6">18</a>] </sup>Unlike remote forwarding, no initial setup is required on the remote side. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos422127" shape="rect" href="#filepos410518" class="calibre6">19</a>] </sup>The OpenSSH team is working on adding this feature. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_115"></div></body>
+</html>

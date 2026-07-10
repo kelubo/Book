@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_195"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos748785" class="calibre7"></a>5.2.1 Server Configuration Files </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos748949" class="calibre15"></a>Serverwide configuration is accomplished in two ways: through a server configuration file, or through command-line options. In a <span><em class="italic">server configuration file</em></span>, numerous configuration variables, called <span><em class="italic">keywords</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos749321" class="calibre15"></a>, may have their values set. For example, to set the TCP port on which the server will listen, a configuration file can contain the line: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Port 1022</tt></div></span><p class="calibre4">You may also separate the keyword and value by an equals sign (with optional whitespace): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Port = 1022</tt></div></span><p class="calibre4">The configuration file is typically <em class="italic">/etc/ssh/sshd_config</em> for OpenSSH or <em class="italic">/etc/ssh2/sshd2_config</em> for Tectia.<sup class="calibre20">[<a id="filepos750194" shape="rect" href="DB_split_144.html#filepos784624" class="calibre6">45</a>]</sup> The file contains keywords and their values, as in the <code class="calibre35">Port</code> example, with one pair (keyword and value) per line. Keywords are case-insensitive: <code class="calibre35">Port</code>, <code class="calibre35">port</code>, and <code class="calibre35">PoRt</code> are all treated identically. Comments may appear in the file as well: any line beginning with a hash sign (#) is a comment: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # This is a comment</tt></div></span><p class="calibre4">Comments cannot be appended to keyword lines. For example, the following does not work: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Port 1022   #  This comment is not allowed here, so don't do this</tt></div></span><p class="calibre4">Empty lines (or lines containing only whitespace) are also ignored as comments. </p>
+<p class="calibre4">To use a configuration file other than the default, invoke <span><em class="italic">sshd</em></span> with the <span><em class="italic">-f</em></span> command-line option, providing the alternative filename as an argument: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ sshd -f /usr/local/ssh/my_config</tt></div></span><p class="calibre4">Tectia supports some extensions to configuration files that we cover in a detailed case study: <a shape="rect" href="DB_split_354.html#filepos2355087" class="calibre6">[11.6]</a></p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">Metaconfiguration information</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Structured comments at the top of the server configuration file that define syntax rules for the rest of the file. For example, the <code class="calibre35">REGEX-SYNTAX</code> metaconfiguration<a shape="rect" class="calibre15"></a><a id="filepos752555" class="calibre15"></a> statement selects one of several different regular expression standards: grep style (<code class="calibre35">egrep</code>), filename globbing (<code class="calibre35">zsh_fileglob</code>), and others. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Subconfiguration files</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Alternative configuration files specific to particular local accounts or remote hosts. The keywords <code class="calibre35">UserSpecificConfig</code> and <code class="calibre35">HostSpecificConfig</code> define the associations between subconfiguration files<a shape="rect" class="calibre15"></a><a id="filepos753292" class="calibre15"></a> and the affected accounts and hosts, respectively. For example, the line: </div><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    UserSpecificConfig smith /usr/local/ssh/smith.config</tt></div></span><div class="calibre19">states that all connection attempts to the smith account must adhere to the configuration in file <em class="italic">/usr/local/ssh/smith.config</em>. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">Quoted values</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Tectia has unusual rules for quoted strings<a shape="rect" class="calibre15"></a><a id="filepos754095" class="calibre15"></a>, namely, that quotes are largely ignored. The following <em class="italic">sshd2_config</em> lines are equivalent: </div><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Port 1022<br class="calibre19"/>    Port "1022"<br class="calibre19"/>    Port "10"22</tt></div></span></blockquote>
+</div>
+</div>
+</body>
+</html>

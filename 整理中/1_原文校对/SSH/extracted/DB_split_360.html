@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_470"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2463466" class="calibre7"></a>11.7.2 A Plugin for Keyboard-Interactive Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2463653" class="calibre15"></a>Keyboard-interactive authentication, including one-time passwords and challenge-response authentication, was covered in <a shape="rect" href="DB_split_135.html#filepos724225" class="calibre6">Chapter 5</a>. <a shape="rect" href="DB_split_159.html#filepos969704" class="calibre6">[5.4.5]</a> Here we'll show how to construct a plugin with our <code class="calibre35">Net::SSH::Tectia::Plugin</code> package to hook into keyboard-interactive authentication. It will prompt the user for some personal information, which is recorded (perhaps at account creation time) in a database.<sup class="calibre20">[<a id="filepos2464269" shape="rect" href="DB_split_361.html#filepos2490073" class="calibre6">164</a>]</sup></p>
+<p class="calibre4">The plugin starts by reading parameters from the server:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/usr/bin/perl -w<br class="calibre19"/>    use strict;<br class="calibre19"/>    use Net::SSH::Tectia::Plugin;<br class="calibre19"/><br class="calibre19"/>    sub ssh_plugin_die<br class="calibre19"/>    {<br class="calibre19"/>        &amp;ssh_plugin_failure();<br class="calibre19"/>        exit(2);<br class="calibre19"/>    }<br class="calibre19"/><br class="calibre19"/>    my ($end_params, %params) = &amp;ssh_plugin_params();<br class="calibre19"/>    &amp;ssh_plugin_die() unless defined($end_params);</tt></div></span><p class="calibre4">The plugin checks for protocol violations, such as a missing end marker for the parameters, and indicates failure using the <code class="calibre35">ssh_plugin_die</code> function. </p>
+<p class="calibre4">The parameters are stored in the <code class="calibre35">%params</code> hash for easy retrieval. Keys supplied by the server include: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">user_name</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The username requested by the client (to be used on the server). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">host_ip</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The local (server) host address.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">host_name</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The local (server) hostname.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">remote_user_name</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The remote (client) username. This is sent only if it is known by the server from an earlier hostbased authentication. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">remote_host_ip</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The remote (client) host address.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">remote_host_name</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The remote (client) hostname.</div>
+</blockquote>
+</div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">The <em class="italic">RFC.kbdint_plugin_protocol</em> file in the source distribution only defines the parameter's <code class="calibre35">user_name</code>, <code class="calibre35">remote_host_ip</code>, and <code class="calibre35">remote_host_name</code>. The Tectia plugin protocol requires plugins to ignore unrecognized parameters. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The keyboard-interactive plugin next sends a list of prompts to be displayed by the client: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    &amp;ssh_plugin_send("instruction", "Please provide some personal information.");<br class="calibre19"/>    &amp;ssh_plugin_send("req",         "Favorite color: ");<br class="calibre19"/>    &amp;ssh_plugin_send("req",         "Pet's name: ");<br class="calibre19"/>    &amp;ssh_plugin_send("req_echo",    "Do you like chocolate? ");<br class="calibre19"/>    &amp;ssh_plugin_send("end_of_requests");</tt></div></span><p class="calibre4">The optional "instruction" message is used to display introductory information. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Although the SSH-2 protocol (as described in the IETF SECSH draft) supports newlines in the instruction string, there is no way to send them using the Tectia plugin protocol, which uses newlines as delimiters. If multiple instruction strings are sent, only the last one is used by the server. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Responses collected by the client are not echoed for prompts specified by <code class="calibre35">req</code> messages. If the response should be echoed, then the <code class="calibre35">req_echo</code> message can be used instead. </p>
+<p class="calibre4">The list of prompts ends with the <code class="calibre35">end_of_requests</code> marker. When the server reads the marker, it sends the list of requests to the client. </p>
+<p class="calibre4">After the client collects the replies and sends them back to the server, the server forwards them to the plugin using the same kind of list: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    my ($end_replies, @replies) = &amp;ssh_plugin_recv("replies");<br class="calibre19"/>    &amp;ssh_plugin_die() unless defined($end_replies);</tt></div></span><p class="calibre4">The replies are stored in the <code class="calibre35">@replies</code> list as a series of (key,value) pairs; each reply pair corresponds to a request prompt. We use a list rather than a hash because the server uses a <code class="calibre35">reply</code> message for each response value, but the plugin can step through the list to set up a <code class="calibre35">%replies</code> hash for easy retrieval, checking for and rejecting protocol violations as it does so: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    my %replies;<br class="calibre19"/>    foreach my $reply qw(color petname chocolate) {<br class="calibre19"/>        my ($key, $value) = splice(@replies, 0, 2);<br class="calibre19"/>        &amp;ssh_plugin_die() unless defined($key) &amp;&amp; $key eq "reply" &amp;&amp;<br class="calibre19"/>                                 defined($value);<br class="calibre19"/>        $replies{$reply} = $value;<br class="calibre19"/>    }<br class="calibre19"/>    &amp;ssh_plugin_die() if @replies;  # too many replies</tt></div></span><p class="calibre4">Finally, the plugin uses any subset of the parameters and the replies collected from the user for authentication, in our example using a <code class="calibre35">verify_personal_info</code> function, and indicates the result of the operation to the server, which forwards it back to the client: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    my $result = &amp;verify_personal_info($params{"user_name"},<br class="calibre19"/>                                       # ... and other params, if relevant ...<br class="calibre19"/><br class="calibre19"/>                                       $replies{"color"},<br class="calibre19"/>                                       $replies{"petname"},<br class="calibre19"/>                                       $replies{"chocolate"});<br class="calibre19"/><br class="calibre19"/>    if ($result eq "success") {<br class="calibre19"/>        &amp;ssh_plugin_success();<br class="calibre19"/>        exit(0);<br class="calibre19"/>    } else {<br class="calibre19"/>        &amp;ssh_plugin_failure();<br class="calibre19"/>        exit(1);<br class="calibre19"/>    }</tt></div></span><p class="calibre4">Here's an example of keyboard-interactive authentication in action, shown from the client's perspective: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com<br class="calibre19"/>    Keyboard-interactive:<br class="calibre19"/>    Plugin authentication<br class="calibre19"/>    Please provide some personal information.<br class="calibre19"/>    Favorite color: green <em class="italic"><span>&lt; ... not echoed ... &gt;</span></em><br class="calibre19"/>    Pet's name: Elvis <em class="italic"><span>&lt; ... not echoed ... &gt;</span></em><br class="calibre19"/>    Do you like chocolate? yes <em class="italic"><span>&lt; ... echoed ... &gt;</span></em><br class="calibre19"/>    Authentication successful.<br class="calibre19"/>    <em class="italic"><span>&lt; ... login session begins ... &gt;</span></em></tt></div></span><p class="calibre4">Of course, a GUI-based SSH client could display the information in a different format. </p>
+<p class="calibre4">The plugin can perform additional rounds of request/reply interactions if needed. </p>
+<p class="calibre4">For example, if some of the responses were malformed, the plugin can ask again; in this case, an <code class="calibre35">instruction</code> message is often used to provide guidance about allowable values: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    unless ($replies{"chocolate"} eq "yes" ||<br class="calibre19"/>            $replies{"chocolate"} eq "no") {<br class="calibre19"/>        &amp;ssh_plugin_send("instruction", "Please answer \"yes\" or \"no\".");<br class="calibre19"/>        &amp;ssh_plugin_send("req_echo",    "Do you like chocolate? ");<br class="calibre19"/>        &amp;ssh_plugin_send("end_of_requests");<br class="calibre19"/>    }</tt></div></span><p class="calibre4">Subsequent interactions are sometimes needed to collect follow-up information whose relevance is based on previous responses: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    if ($replies{"chocolate"} eq "yes") {<br class="calibre19"/>        &amp;ssh_plugin_send("instruction", "Tell us more about how you like chocolate!");<br class="calibre19"/>        &amp;ssh_plugin_send("req",         "Light or dark? ");<br class="calibre19"/>        &amp;ssh_plugin_send("req",         "With nuts? ");<br class="calibre19"/>        &amp;ssh_plugin_send("end_of_requests");<br class="calibre19"/>    }</tt></div></span><p class="calibre4">More realistic examples of additional queries would be prompting to update expired passwords, multistage challenge-response protocols, etc. </p>
+<p class="calibre4">Only a single plugin can be specified by the <code class="calibre35">AuthKbdInt.Plugin</code> keyword. If multiple keyboard-interactive authentication techniques must be supported by the plugin, then it should ask the user to pick a technique during an initial round of interactions, and pose follow-up queries for specific techniques during subsequent rounds. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">To use Tectia's SecurID plugins along with other techniques that are supported by a custom plugin, the custom plugin can be written to forward information between the server and the SecurID plugins, according to the Tectia plugin protocol. An alternative is to recompile the server with built-in support for SecurID, eliminating the need for separate SecurID plugins. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The plugin should <span><em class="italic">not</em></span> implement its own retry logic for failed authentications. Instead, it should simply indicate failure and let the server manage retry attempts, according to the value for the <code class="calibre35">AuthKbdInt.Retries</code> keyword. </p>
+<p class="calibre4">The plugin program must be written carefully, since it runs with all of the privileges of the SSH server (typically root). For example, it's important to treat all data supplied by the user as potentially hostile: consider buffer overruns, special characters used to construct filenames, etc. Perl's "taint mode" is useful for detecting possible security problems. </p>
+<p class="calibre4">A more subtle danger is information leakage. For example, it might seem reasonable for a plugin to fail immediately after the initial parameters have been received from the server, if (say) the username is found to be invalid. After all, why ask for more information if the authentication will fail anyway? The problem with this approach is that it allows remote attackers to determine which usernames are valid, without authenticating. A system administrator might notice large numbers of failed authentications in the system logs <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a>, but by then, the damage has already been done. </p>
+<p class="calibre4">A better approach is to always collect <span><em class="italic">all</em></span> information from the user, and make authentication decisions only after this has been done. The design of the prompts can be tricky when later interactions depend on the validity of previous responses. In some cases, it's necessary to use "fake" information so that all of the interactions will seem plausible when early replies are incorrect. </p>
+<p class="calibre4">Even timing can be a concern. If authentication is computationally expensive, or requires a measurable amount of time to complete for other reasons, it may be necessary for the plugin to sleep for an equivalent interval when those costly authentication steps are skipped, so an attacker can't tell what's happening. </p>
+</div>
+</body>
+</html>

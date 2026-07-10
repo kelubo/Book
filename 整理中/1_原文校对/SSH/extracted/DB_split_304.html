@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_395"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2023133" class="calibre7"></a>9.4.6 Further Issues </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">As we've said, X forwarding usually works fine without any special effort on your part. In some special situations, however, you might need to take some extra steps. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.6.1 X server configuration </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">In order for X forwarding to work, your X server must accept the proxy X connections from your SSH client. This is sometimes not set up to begin with, because normal use doesn't require it. For example, if you're using an X server on a PC to access a remote Unix machine via XDM, you might never run local X clients at all, and they may not be allowed by default. You can use <span><em class="italic">xhost +localhost</em></span> to allow all connections from your PC, while still applying key-based authentication to connections from other sources. This allows SSH-forwarded (and authenticated) connections to be accepted. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.6.2 Setting your DISPLAY environment variable </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH sets the <code class="calibre35">DISPLAY</code> variable automatically only if X forwarding is in effect. If you don't use X forwarding but want to use X on a remote machine you logged into via SSH, remember that you have to set the <code class="calibre35">DISPLAY</code> variable yourself. You should really do this only when both machines are on the same, trusted network, as the X protocol by itself is quite insecure. </p>
+<p class="calibre4">Be <span><em class="italic">careful</em></span> not to set <code class="calibre35">DISPLAY</code> unintentionally! It is common for people to set the <code class="calibre35">DISPLAY</code> variable in a login command file or by other means. If you're not careful, this can make your X connections insecure without your noticing! If you use SSH to tunnel through a firewall that blocks normal X connections, then of course you'll notice because your X clients won't work. But if normal X connections are possible but undesirable, and X forwarding isn't in effect, your X programs will work but (silently) not be secured! This is a good reason to block X traffic at the firewall if it presents a security risk or to configure your X server to accept connections only from the local host (the source of the SSH-forwarded X connections). If that's not feasible, you may want to put something like this in your login script: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/csh<br class="calibre19"/>    if ($?DISPLAY) then<br class="calibre19"/>       set display_host   = `expr "$DISPLAY" : '\(.*\):'`<br class="calibre19"/>       set display_number = `expr "$DISPLAY" : '.*:\([^.]*\)'`<br class="calibre19"/>       set my_host = `hostname`<br class="calibre19"/>       set result  = `expr '(' "$display_host" = "$my_host" ')' '&amp;' '(' \<br class="calibre19"/>                     "$display_number" '&gt;' "0" ')'`<br class="calibre19"/>       if ($result == 0) then<br class="calibre19"/>          echo "WARNING: X display $DISPLAY does not appear to be protected by SSH!"<br class="calibre19"/>          echo "unsetting DISPLAY variable just to be safe"<br class="calibre19"/>          unsetenv DISPLAY<br class="calibre19"/>       endif<br class="calibre19"/>    endif</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.6.3 Shared accounts </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">If you share a single account among multiple people, you may have some trouble with X forwarding. For example, it is common for a group of sysadmins to share use of the root account. For each person to retain their own environment when using the root account, they may set their <code class="calibre35">USER</code>, <code class="calibre35">LOGNAME</code>, and <code class="calibre35">HOME</code> environment variables explicitly to reflect their personal accounts rather than the root account. If you use SSH to log into the root account with X forwarding turned on, though, it adds the proxy <span><em class="italic">xauth</em></span> key to root's <em class="italic">.Xauthority</em> file before the shell reads your login script and resets these environment variables. The result is that once you're logged in and try to use X, it fails: the X client looks in your <em class="italic">.Xauthority</em> file (because of the setting of your <code class="calibre35">HOME</code> variable), but the key isn't there. </p>
+<p class="calibre4">You can deal with this problem by setting the <code class="calibre35">XAUTHORITY</code> variable to point to root's <em class="italic">.Xauthority</em> file, or by using code like the following in your login script to copy the needed key into your personal one: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    if (($uid == 0) &amp;&amp; ($?SSH_CLIENT) &amp;&amp; ($?DISPLAY)) then<br class="calibre19"/>    # If I do ssh -l root with X forwarding, the X proxy server's xauth key<br class="calibre19"/>    # gets added to root's xauth db, not mine.  See if there's an entry for my<br class="calibre19"/>    # display in root's xauth db...<br class="calibre19"/>      set key = `bash -c "xauth -i -f /.Xauthority list $DISPLAY 2&gt; /dev/null"`<br class="calibre19"/>    # ... and if so, copy it into mine.<br class="calibre19"/>      if ($? == 0) then<br class="calibre19"/>        xauth -bi add $key<br class="calibre19"/>        chown res ~res/.Xauthority &gt;&amp; /dev/null<br class="calibre19"/>      endif<br class="calibre19"/>    endif</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2030114" class="calibre7"></a>9.4.6.4 Location of the xauth program </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2030216" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2030313" class="calibre15"></a>Remember that <span><em class="italic">sshd</em></span> runs the <span><em class="italic">xauth</em></span> program on your behalf, to add the proxy key to your <em class="italic">.Xauthority</em> file on the remote side. The location of the <span><em class="italic">xauth</em></span> program is discovered when you configure the SSH package and compile into the <span><em class="italic">sshd</em></span> executable. If <span><em class="italic">xauth</em></span> is subsequently moved, X forwarding won't work (<span><em class="italic">ssh -v</em></span> reveals this explicitly). For OpenSSH, the system administrator on the server side can use the serverwide configuration keyword <code class="calibre35">XAuthLocation</code> to set the path to the <span><em class="italic">xauth</em></span> program without having to recompile <span><em class="italic">sshd1</em></span>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    XAuthLocation /usr/local/bin/xauth</tt></div></span><p class="calibre4"><code class="calibre35">XAuthLocation</code> can also appear in the OpenSSH client configuration file; the client uses <span><em class="italic">xauth</em></span> to get the local X display key. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.4.6.5 X forwarding and the GatewayPorts feature </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The <code class="calibre35">GatewayPorts</code> (<span><em class="italic">-g</em></span>) feature discussed earlier applies only to general port forwarding, not to X forwarding. The X proxies in OpenSSH and Tectia always listen on all network interfaces and accept connections from anywhere, though those connections are then subject to X authentication as described earlier. To restrict X client source addresses, use TCP-wrappers<a shape="rect" class="calibre15"></a><a id="filepos2032770" class="calibre15"></a>, which we discuss in the next section. </p>
+</div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2033085" shape="rect" href="DB_split_302.html#filepos1996499" class="calibre6">137</a>] </sup>And its Tectia synonyms <code class="calibre35">ForwardX11</code> and <code class="calibre35">AllowX11Forwarding</code>. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos2033454" shape="rect" href="DB_split_303.html#filepos2011346" class="calibre6">138</a>] </sup>See the X11R6 <span><em class="italic">Xsecurity</em></span>(1) manpage for details on these methods. Also, remember that this is authentication only, not encryption. The contents of your X connection remain unencrypted and open to snooping or modification on the network. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_396"></div></body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_566"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2784951" class="calibre7"></a>16.11.2 Server Configuration </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2785111" class="calibre15"></a>The server's configuration<a shape="rect" class="calibre15"></a><a id="filepos2785175" class="calibre15"></a> files are stored in the installation folder (nothing is stored in the Windows registry): </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">hostkey</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Private host key (must be protected!)</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">hostkey.pub</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Public host key</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">server_random_seed</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Pool of random data</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">sshd2_config</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Server configuration</div>
+</blockquote>
+</div>
+<p class="calibre4"><em class="italic">sshd2_config</em> has the same format as for Unix systems, and almost all of the keywords have exactly the same meaning for Windows, so we'll just discuss the differences. </p>
+<p class="calibre4">The server administration program, <span><em class="italic">ssh2admin</em></span>, also known as the Server Configuration tool (<a shape="rect" href="DB_split_427.html#filepos2789634" class="calibre6">Figure 16-15</a>), can display and change some keywords, but many features can be customized only by editing the file. </p>
+<p class="calibre4"><span><em class="italic">ssh2admin</em></span> can be either run directly, or accessed by selecting the SSH Tectia Server Administration item within the menu Start/Programs/SSH Tectia Server. The Tools/View Configuration item displays the <em class="italic">sshd2_config</em> file in the Notepad editor. </p>
+<p class="calibre4">Configuration changes take effect for each new session, as they are read by <span><em class="italic">ssh2server</em></span>. Only a few configuration keywords are used by <span><em class="italic">ssh2master</em></span>. If any of these are changed, the service should be restarted: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"><code class="calibre35">Port</code></li>
+<li class="calibre18"><code class="calibre35">ListenAddress</code></li>
+<li class="calibre18"><code class="calibre35">MaxConnections</code></li>
+</ul></div>
+<p class="calibre4">FIPS mode is controlled by the <code class="calibre35">FIPSmode</code> keyword, with a value of <code class="calibre35">yes</code> or <code class="calibre35">no</code> (the default): <a shape="rect" href="DB_split_150.html#filepos881924" class="calibre6">[5.3.5]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    FIPSMode    yes</tt></div></span></div>
+</body>
+</html>

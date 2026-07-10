@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_377"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1922531" class="calibre7"></a>9.2.5 Bypassing a Firewall </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1922689" class="calibre15"></a>Let's tackle a more complicated example of port forwarding. <a shape="rect" href="#filepos1923771" class="calibre6">Figure 9-9</a> returns us to the same company situation as in <a shape="rect" href="DB_split_204.html#filepos1379965" class="calibre6">Figure 6-5</a>, when we discussed agent forwarding. <a shape="rect" href="DB_split_204.html#filepos1377375" class="calibre6">[6.3.5]</a> Your home machine H talks to work machine W via a bastion host, B, and you want to access your work email from home. Machine W runs an IMAP server, and your home machine H has an IMAP-capable email reader, but you can't hook them up. Your home IMAP client expects to make a TCP connection directly to the IMAP server on W, but unfortunately that connection is blocked by the firewall. Since host B is inside the firewall, and it's running an SSH server, there <span><em class="italic">should</em></span> be some way to put all the pieces together and make the IMAP connection from H to W. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1923771" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Port forwarding through a firewall" src="images/00040.jpg" class="calibre74"/></div>
+</div>
+</span><p class="calibre4">Figure 9-9. Port forwarding through a firewall</p></div>
+<p class="calibre4">Port forwarding can solve this problem. As before, the IMAP server is on port 143, and we select a random local port number, 2001. This time, however, we use a slightly different command to set up forwarding: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Executed on home machine H<br class="calibre19"/>    $ ssh -L2001:W:143 B</tt></div></span><p class="calibre4">This establishes an interactive SSH session from home machine H to bastion host B and also creates an SSH tunnel from local host H to the email server machine W. Specifically, in response to a connection on port 2001, the local SSH client directs the SSH server running on B to open a connection to port 143 on W, that is, socket W:143. The SSH server can do this because B is inside the firewall. If you configure your email reader to connect to local port 2001, as before, the communication path is now as follows: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">The email reader on home machine H sends data to local port 2001. </li>
+<li value="2" class="calibre18">The local SSH client reads port 2001, encrypts the data, and sends it into the tunnel. </li>
+<li value="3" class="calibre18">The tunnel passes through the firewall, because it is an SSH connection (port 22) that the firewall accepts. </li>
+<li value="4" class="calibre18">The SSH server on bastion host B decrypts the data and sends it to port 143 on work machine W. This transmission isn't encrypted, but it's protected behind the firewall, so encryption isn't necessary. (Assuming you're not worried about snooping on your internal network.) </li>
+<li value="5" class="calibre18">Data is sent back from the IMAP server to home machine H by the same process in reverse. </li>
+</ol></div>
+<p class="calibre4">You have now bypassed the firewall by tunneling the IMAP traffic through SSH. </p>
+</div>
+</body>
+</html>

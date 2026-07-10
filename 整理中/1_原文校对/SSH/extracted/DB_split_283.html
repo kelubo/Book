@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1873184" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_372"><span class="calibre2"><a shape="rect" class="calibre7"></a>Port Forwarding </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH uses TCP/IP as its transport mechanism, usually TCP port 22 on the server machine, as it encrypts and decrypts the traffic passing over the connection. We now discuss a cool feature that encrypts and decrypts TCP/IP traffic belonging to <span><em class="italic">other</em></span> applications, on other TCP ports, using SSH. This process, called <span><em class="italic">port forwarding</em></span>, is largely transparent and quite powerful. Telnet, SMTP, NNTP, IMAP, and other insecure protocols running over TCP can be made secure by forwarding the connections through SSH. Port forwarding is sometimes called <span><em class="italic">tunneling</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos1874277" class="calibre15"></a> because the SSH connection provides a secure "tunnel" through which another TCP/IP connection may pass. </p>
+<p class="calibre4">Suppose you have a home machine H that runs an IMAP-capable email reader, and you want to connect to an IMAP server on machine S to read and send mail. Normally, this connection is insecure, with your mail account password transmitted as plaintext between your mail program and the server. With SSH port forwarding, you can transparently reroute the IMAP connection (found on server S's TCP port 143) to pass through SSH, securely encrypting the data over the connection.<sup class="calibre20">[<a id="filepos1874982" shape="rect" href="DB_split_294.html#filepos1958010" class="calibre6">128</a>]</sup> The IMAP server machine must be running an SSH server for port forwarding to provide real protection. </p>
+<p class="calibre4">In short, with minimal configuration changes to your programs, SSH port forwarding protects arbitrary TCP/IP connections by redirecting them through an SSH session. Port forwarding can even pass a connection safely through a firewall if you configure things properly. Once you start securing your communications with port forwarding, you'll wonder how you ever got along without it. Here are examples of what you can do: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Access various kinds of TCP servers (e.g., SMTP, IMAP, POP, LDAP, etc.) across a firewall that prevents direct access. </li>
+<li class="calibre18">Provide protection for your sessions with these same TCP servers, preventing disclosure or alteration of passwords and other content that would otherwise be sent in the clear as part of the session. </li>
+<li class="calibre18">Tunnel the control connection of an FTP session, to encrypt your username, password, and commands. (It isn't usually possible to protect the data channels that carry the file contents, though. <a shape="rect" href="DB_split_332.html#filepos2140512" class="calibre6">[11.2]</a>) </li>
+<li class="calibre18">Use your ISP's SMTP servers for sending mail, even if you're connected outside the ISP's network and the ISP forbids mail relaying from your current location. <a shape="rect" href="DB_split_343.html#filepos2243354" class="calibre6">[11.3.2]</a></li>
+</ul></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">SSH port forwarding is a general proxying mechanism for TCP only. (See the sidebar "<a shape="rect" href="DB_split_284.html#filepos1879980" class="calibre6">TCP Connections</a>" for an overview of TCP concepts.) Forwarding can't work with protocols not built on TCP, such as the UDP-based DNS, DHCP, NFS, and NetBIOS,<sup class="calibre70">[<a id="filepos1877232" shape="rect" href="DB_split_294.html#filepos1958615" class="calibre6">129</a>]</sup> or with non-IP-based protocols, such as AppleTalk or Novell's SPX/IPX. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>  </body>
+</html>

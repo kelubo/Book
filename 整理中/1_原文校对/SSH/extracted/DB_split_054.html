@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_83"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos258445" class="calibre7"></a>2.5.2 A More Complex Passphrase Problem </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">In our running example, we copied a file from the remote to the local host: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp pat@shell.isp.com:printme.pdf imprime-moi.pdf</tt></div></span><p class="calibre4">In fact, <span><em class="italic">scp</em></span> can copy a file from the remote host <span><em class="italic">shell.isp.com</em></span> directly to a third host running SSH on which you have an account named, say, "psmith": </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp pat@shell.isp.com:printme.pdf psmith@other.host.net:imprime-moi.pdf</tt></div></span><p class="calibre4">Rather than copying the file first to the local host and then back out again to the final destination, this command has <span><em class="italic">shell.isp.com</em></span> send it directly to <span><em class="italic">other.host.net</em></span>. However, if you try this, you run into the following problem: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp pat@shell.isp.com:printme.pdf psmith@other.host.net:imprime-moi.pdf<br class="calibre19"/>    Enter passphrase for RSA key 'Your Name &lt;you@local.org&gt;': ************<br class="calibre19"/>    You have no controlling tty and no DISPLAY.  Cannot read passphrase.<br class="calibre19"/>    lost connection</tt></div></span><p class="calibre4">What happened? When you run <span><em class="italic">scp</em></span> on your local machine, it contacts <span><em class="italic">shell.isp.com</em></span> and internally invokes a second <span><em class="italic">scp</em></span> command to do the copy. Unfortunately, the second <span><em class="italic">scp</em></span> command also needs the passphrase for your private key. Since there is no terminal session to prompt for the passphrase, the second <span><em class="italic">scp</em></span> fails, causing the original <span><em class="italic">scp</em></span> to fail. The SSH agent solves this problem: the second <span><em class="italic">scp</em></span> command simply queries your local SSH agent, so no passphrase prompting is needed. </p>
+<p class="calibre4">The SSH agent also solves another, more subtle, problem in this example. Without the agent, the second <span><em class="italic">scp</em></span> (on <span><em class="italic">shell.isp.com</em></span>) needs access to your private-key file, but the file is on your local machine. So, you have to copy your private key file to <span><em class="italic">shell.isp.com</em></span>. This isn't ideal; what if <span><em class="italic">shell.isp.com</em></span> isn't a secure machine? Also, the solution doesn't scale: if you have a dozen different accounts, it is a maintenance headache to keep your private key file on all of them. Fortunately, the SSH agent comes to the rescue once again. The remote <span><em class="italic">scp</em></span> process simply contacts your local SSH agent and authenticates, and the secure copy proceeds successfully, through a process called agent forwarding<a shape="rect" class="calibre15"></a><a id="filepos262369" class="calibre15"></a>. </p>
+</div>
+</body>
+</html>

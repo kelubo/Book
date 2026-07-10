@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_128"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos500053" class="calibre7"></a>3.7.3 scp2/sftp Details </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos500208" class="calibre15"></a>When you run <span><em class="italic">scp2</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos500328" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos500367" class="calibre15"></a> or <span><em class="italic">sftp</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos500478" class="calibre15"></a> under Unix, it also runs an <span><em class="italic">ssh</em></span> program behind the scenes, as with <span><em class="italic">scp</em></span>.<sup class="calibre20">[<a id="filepos500743" shape="rect" href="#filepos504005" class="calibre6">26</a>]</sup> The exact details vary depend on which software is in use; remember that <span><em class="italic">sftp</em></span> comes with both OpenSSH and Tectia. However, they both look like: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ssh <em class="italic"><code class="calibre35">[options]</code></em> server-host -s sftp</tt></div></span><p class="calibre4">Instead of a remote command, this uses an SSH-2 subsystem request to start the <span><em class="italic">sftp</em></span> server on the remote host. This insulates the client from the details of how SFTP is implemented on the server, rather than embed the <span><em class="italic">sftp-server</em></span> pathname in the command (which might change), or relaying on the remote <code class="calibre35">PATH</code> setting to find it (which might not work). Unlike <span><em class="italic">scp</em></span>, here the command line doesn't specify the files to be transferred; that information is carried inside the SFTP protocol. </p>
+<p class="calibre4">Using a subsystem means that the SSH server must be specifically configured to handle SFTP. For OpenSSH: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # sshd_config<br class="calibre19"/>    subsystem sftp /usr/libexec/sftp-server</tt></div></span><p class="calibre4">Tectia can either execute an external SFTP server in the same way: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # sshd2_config<br class="calibre19"/>    subsystem-sftp /usr/libexec/sftp-server2</tt></div></span><p class="calibre4">or run the SFTP protocol within the SSH server process itself: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # sshd2_config<br class="calibre19"/>    subsystem-sftp internal://sftp-server</tt></div></span><p class="calibre4"><a shape="rect" href="#filepos503422" class="calibre6">Figure 3-4</a> shows more details of how <span><em class="italic">sftp</em></span> operates. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos503422" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="scp2/sftp operation" src="images/00012.jpg" class="calibre54"/></div>
+</div>
+</span><p class="calibre4">Figure 3-3. scp2/sftp operation</p></div>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos504005" shape="rect" href="#filepos500743" class="calibre6">26</a>] </sup>Tectia for Windows simply integrates SSH into these programs. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_129"></div></body>
+</html>

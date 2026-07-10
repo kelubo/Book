@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_382"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1947613" class="calibre7"></a>9.2.10 Configuring Port Forwarding in the Server </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">We've seen several keywords and command-line options for configuring SSH clients for port forwarding, such as <span><em class="italic">-L</em></span> and <span><em class="italic">-R</em></span>. In addition, the SSH <span><em class="italic">server</em></span> can be configured for port forwarding. We'll cover compile-time, serverwide, and per-account configuration. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.2.10.1 Compile-time configuration </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">You can enable or disable port forwarding at compile time in Tectia with <span><em class="italic">configure</em></span>. <a shape="rect" href="DB_split_126.html#filepos655245" class="calibre6">[4.3.5.5]</a> The Tectia flag <code class="calibre35">--disable-tcp-port-forwarding</code> disables port forwarding for both clients and servers. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.2.10.2 Serverwide configuration </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Port forwarding can be globally enabled or disabled in <span><em class="italic">sshd</em></span>. This is done with the serverwide configuration keyword <code class="calibre35">AllowTcpForwarding</code> in <em class="italic">/etc/sshd_config.</em> The keyword may have the value <code class="calibre35">yes</code> (the default, enabling forwarding) or <code class="calibre35">no</code> (disabling forwarding): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    AllowTcpForwarding no</tt></div></span><p class="calibre4">In addition, Tectia has the following options:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowTcpForwardingForUsers<br class="calibre19"/>    AllowTcpForwardingForGroups</tt></div></span><p class="calibre4">The syntax of these is the same as for the <code class="calibre35">AllowUsers</code> and <code class="calibre35">AllowGroups</code> options. <a shape="rect" href="DB_split_166.html#filepos1010709" class="calibre6">[5.5.1]</a> They specify a list of users or groups that are allowed to use port forwarding; the server refuses to honor port-forwarding requests for anyone else. Note that these refer to the <span><em class="italic">target</em></span> account of the SSH session, not the client username (which is often not known). </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>9.2.10.3 Per-account configuration </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1951165" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1951203" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1951241" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1951279" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1951317" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1951355" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1951452" class="calibre15"></a>In your account, you can disable port forwarding for any client that connects via a particular key. <a shape="rect" href="DB_split_276.html#filepos1835938" class="calibre6">[8.2.7]</a> For OpenSSH, locate the public key in your <em class="italic">authorized_keys</em> file and precede it with the option <code class="calibre35">no-port-forwarding</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    no-port-forwarding <em class="italic"><code class="calibre35">...key...</code></em></tt></div></span><p class="calibre4">or for Tectia, follow the <code class="calibre35">Key</code> line with an <code class="calibre35">Options</code> line: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Key mykey.pub<br class="calibre19"/>    Options no-port-forwarding</tt></div></span><p class="calibre4">Any SSH client that authenticates using this key can't perform port forwarding with your SSH server. Nevertheless, the earlier remarks we made about serverwide port-forwarding configuration apply here: the restriction isn't really meaningful unless you further restrict what this key is allowed to do. </p>
+</div>
+</div>
+</body>
+</html>

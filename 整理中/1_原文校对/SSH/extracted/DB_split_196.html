@@ -1,0 +1,526 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_263"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1259950" class="calibre7"></a>6.2.2 Generating Keys for Tectia </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Tectia also uses a program named <span><em class="italic">ssh-keygen</em></span> to create key pairs and manipulate existing keys. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><a id="filepos1260366" class="calibre15"></a><h3 class="calibre25">Key Fingerprints</h3>
+<p class="calibre4">Fingerprints are a common cryptographic feature for checking that two keys in different places are the same, when comparing them literally—bit by bit—is infeasible. OpenSSH and Tectia can compute fingerprints. </p>
+<p class="calibre4">Suppose Steve wants SSH access to Judy's account. He sends his public key to Judy by email, and she installs it in her SSH authorization file. While this key exchange seems straightforward, it is insecure: a hostile third party could intercept Steve's key and substitute his own, gaining access to Judy's account. </p>
+<p class="calibre4">To prevent this risk, Judy needs some way to verify that the key she receives is Steve's. She can call Steve on the telephone and check, but reading a 500-byte encrypted public key over the phone is annoying and error-prone. This is why fingerprints exist. </p>
+<p class="calibre4">A <span><em class="italic">fingerprint</em></span> is a short value computed from a key. It's analogous to a checksum, verifying that a string of data is unaltered—in our case, a key. To check the validity of a key using fingerprints, Steve and Judy could do the following: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18"> Judy receives a public key that is supposed to be Steve's, storing it in the file <em class="italic">stevekey.pub</em>. </li>
+<li value="2" class="calibre18"> Separately, Judy and Steve view the fingerprint of the key: <a shape="rect" class="calibre15"></a><span class="calibre43"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh-keygen -l -f stevekey.pub<br class="calibre19"/>    1024 5c:f6:e2:15:39:14:1a:8b:4c:93:44:57:6b:c6:f4:17 Steve@snailbook.com<br class="calibre19"/>    $ ssh-keygen -B -f stevekey.pub<br class="calibre19"/>    1024 xitot-larit-gumet-fyfim-sozev-vyned-cigeb-sariv-tekuk-badus-bexax<br class="calibre19"/>    Steve@snailbook.com<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ ssh-keygen -F stevekey.pub<br class="calibre19"/>    Fingerprint for key:<br class="calibre19"/>    xitot-larit-gumet-fyfim-sozev-vyned-cigeb-sariv-tekuk-badus-bexax</tt></div></span></li>
+<li value="3" class="calibre18"> Judy calls Steve on the telephone and asks him to read the fingerprint over the phone. Judy verifies that it matches the fingerprint of the key she received. Fingerprints are not unique, but for any two keys, the probability that their fingerprints are identical is extremely small. Therefore, fingerprints are a quick and convenient method for checking that a key is unaltered. </li>
+</ol></div>
+<p class="calibre4">As you can see, OpenSSH and Tectia use different output formats for fingerprints. OpenSSH supports both a numeric format which is more traditional and should be familiar to users of PGP, and a textual format called "Bubble Babble" which is claimed to be easier to read and remember. Tectia supports only Bubble Babble fingerprints. </p>
+<p class="calibre4">Fingerprints also surface when you connect to an SSH server whose host key has changed. In this case, OpenSSH prints a warning message and the fingerprint of the new key, which may be conveniently compared with the fingerprint of the real host key, should you have it. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>6.2.2.1 Creating Tectia keys </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">When creating a new key, you may choose the name of the private-key file to be generated, by specifying the name at the end of the command line: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen mykey         <em class="italic"><span>creates mykey and mykey.pub</span></em></tt></div></span><p class="calibre4">The name is relative to your current directory, and as usual, the public key file is named after the private one with <em class="italic">.pub</em> appended. The key is saved in the directory <em class="italic">~/.ssh2</em> in a file whose name indicates the key type and number of bits. An example is <em class="italic">id_dsa_2048_a</em>, which was generated by the DSA algorithm with 2048 bits. </p>
+<p class="calibre4">You also may indicate the following with command-line options: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> The number of bits in the key, using <span><em class="italic">-b</em></span>; the default is 2048 bits: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -b 4096</tt></div></span></li>
+<li class="calibre18"> The key type, such as DSA or RSA, using <span><em class="italic">-t</em></span>: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -t dsa</tt></div></span></li>
+<li class="calibre18"> A textual comment associated with the key, using <span><em class="italic">-c</em></span>: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -c "my favorite Tectia key"</tt></div></span><br class="calibre19"/>If you omit this option, the generated comment describes how and by whom the key was generated. For example: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    "2048-bit dsa, barrett@server.example.com, Tue Feb 22 2000 02:03:36"</tt></div></span></li>
+<li class="calibre18"> The passphrase to decode the key, using <span><em class="italic">-p</em></span>. If you omit this option, you are prompted after generation. <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -p secretword</tt></div></span><br class="calibre19"/>You can also designate an empty password using <span><em class="italic">-P</em></span>. This shouldn't be done in general but is appropriate in some special cases: <a shape="rect" href="DB_split_327.html#filepos2116205" class="calibre6">[11.1.2.2]</a><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -P</tt></div></span></li>
+<li class="calibre18"> Whether or not to overwrite the key file, if it already exists, with <code class="calibre35">--overwrite</code> and the value <code class="calibre35">yes</code> (the default) or <code class="calibre35">no</code>: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen --overwrite no mykeyfile</tt></div></span></li>
+</ul></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>6.2.2.2 Working with Tectia keys </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">In addition to creating keys, <span><em class="italic">ssh-keygen</em></span> can operate on keys in the following ways: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> By changing the passphrase and comment of an existing key, using <span><em class="italic">-e</em></span>. This option causes <span><em class="italic">ssh-keygen</em></span> to become interactive, prompting for the new information. This interactive mode is primitive and annoying, requiring nearly 10 user responses to change the passphrase and comment, but it does the job: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -e mykey<br class="calibre19"/>    Passphrase needed for key "my favorite Tectia key"<br class="calibre19"/>    Passphrase : <em class="italic"><span>[nothing is echoed]</span></em><br class="calibre19"/>    Do you want to edit key "my favorite Tectia key" (yes or no)? <strong class="calibre45"><code class="calibre35">yes</code></strong><br class="calibre19"/>    Your key comment is "my favorite Tectia key".<br class="calibre19"/>     Do you want to edit it (yes or no)? <strong class="calibre45"><code class="calibre35">yes</code></strong><br class="calibre19"/>    New key comment: <strong class="calibre45"><code class="calibre35">this is tedious</code></strong><br class="calibre19"/>    Do you want to edit passphrase (yes or no)? <strong class="calibre45"><code class="calibre35">yes</code></strong><br class="calibre19"/>    New passphrase : <em class="italic"><span>[nothing is echoed]</span></em><br class="calibre19"/>    Again          : <em class="italic"><span>[nothing is echoed]</span></em><br class="calibre19"/>    Do you want to continue editing key "this is tedious" (yes or no)? <strong class="calibre45"><code class="calibre35">god no</code></strong><br class="calibre19"/>    (yes or no)? <strong class="calibre45"><code class="calibre35">no</code></strong><br class="calibre19"/>    Do you want to save key "this is tedious" to file mykey (yes or no)? <strong class="calibre45"><code class="calibre35">yes</code></strong></tt></div></span><br class="calibre19"/>Changes are applied to the key files but not propagated to any copies currently loaded in an agent. (So, if you run <span><em class="italic">ssh-add -l</em></span> to list the keys in your agent, for example, you still see the old comment.) </li>
+<li class="calibre18"> By converting between various key-storage formats, with the following options: </li>
+</ul></div>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Option</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Extract/convert from... </span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+To...</span></p></span></th>
+</tr></thead><tfoot class="calibre63"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><span class="bold"><a shape="rect" class="calibre15"></a><a id="filepos1271984" class="calibre15"></a></span><p class="calibre4">
+<sup class="calibre34">a</sup> Handy if you ever lose your public-key file. </p></span></th>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr></tfoot><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-1</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SSH1 key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH key</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--import-public-key</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenSSH public key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH public key</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--import-private-key</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">OpenSSH private key, unencrypted only </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH private key</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--import-ssh1-authorized-keys</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">An OpenSSH or SSH1 <em class="italic">authorized_keys</em> file </p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Tectia <em class="italic">authorization</em> file, plus an individual file for each referenced public key </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-D</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH private key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH public key<a shape="rect" href="#filepos1271984" class="calibre6">
+<sup class="calibre34">a</sup></a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-x</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">X.509 private key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH private key</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-k</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">PKCS 12 file</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">SECSH certificate and private key </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">-7</em></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">PKCS 7 file</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Certificates from that file </p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4"><span><em class="italic">ssh-keygen</em></span> also gives you some control over input, output, and diagnostics: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> By printing the <span><em class="italic">fingerprint</em></span> of a given key file, with <span><em class="italic">-F</em></span>. See the sidebar "<a shape="rect" href="#filepos1260366" class="calibre6">Key Fingerprints</a>" for more information. <a shape="rect" href="DB_split_194.html#filepos1242580" class="calibre6">[6.2]</a> The fingerprint is calculated from the public key: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -F stevekey.pub<br class="calibre19"/>    Fingerprint for key:<br class="calibre19"/>    xitot-larit-gumet-fyfim-sozev-vyned-cigeb-sariv-tekuk-badus-bexax</tt></div></span></li>
+<li class="calibre18"> By printing cryptographic information about a key, with <span><em class="italic">-i</em></span>: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -i stevekey.pub<br class="calibre19"/>    DSA Public Key<br class="calibre19"/>    [Strength estimation as of July, 2000 considering NFS and Pollard rho: Attack<br class="calibre19"/>    requires O(2^80) steps, which is roughly equivalent to 6.7 * 10^7 years of effort<br class="calibre19"/>    with 1GHz machine.]<br class="calibre19"/>      p = [Large prime, characteristic of the finite field]<br class="calibre19"/>    18257155510680634708091813901445079313554557329637337413272033369505053693222548<br class="calibre19"/>    32994959179095338002184212706407725165597654255005411958024968996544803955496850.<br class="calibre19"/>    ...</tt></div></span><br class="calibre19"/>You can display this information in different bases with <span><em class="italic">-B</em></span>; the default is base 10: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -i -B 16 stevekey.pub      <em class="italic"><span>Base 16, hexadecimal</span></em><br class="calibre19"/>    ...<br class="calibre19"/>    0x909fe130f9fa7192dc2a28591a53c0687...</tt></div></span></li>
+<li class="calibre18"> By printing the program version number, with <span><em class="italic">-V</em></span>: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -V<br class="calibre19"/>    ssh-keygen: SSH Tectia Server 4.2.1 on i686-pc-linux-gnu<br class="calibre19"/>    Build: 1<br class="calibre19"/>    Crypto library version: SSH Cryptographic Library, version 1.2.4</tt></div></span></li>
+<li class="calibre18"> By printing a help message, with <span><em class="italic">-h</em></span> or <span><em class="italic">-?</em></span>; most Unix shells require you to escape the question mark to prevent the shell from interpreting it as a wildcard: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -h<br class="calibre19"/>    $ ssh-keygen -\?      <em class="italic"><span>escaping the question mark</span></em></tt></div></span></li>
+<li class="calibre18"> By printing debug information, with <span><em class="italic">-d</em></span>, as for Tectia's <span><em class="italic">sshd</em></span>. <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a>
+</li>
+<li class="calibre18"> By suppressing the progress indicator, using <span><em class="italic">-q</em></span>. The progress indicator is a sequence of O's and periods that displays while <span><em class="italic">ssh-keygen</em></span> runs, like this: <code class="calibre35">.oOo.oOo.oOo.oOo</code>: <a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen<br class="calibre19"/>    Generating 2048-bit dsa key pair<br class="calibre19"/>    .oOo.oOo.oOo.oOo<br class="calibre19"/>    Key generated.<br class="calibre19"/><br class="calibre19"/>    $ ssh-keygen -q<br class="calibre19"/>    Generating 2048-bit dsa key pair<br class="calibre19"/>    Key generated.</tt></div></span></li>
+</ul></div>
+<p class="calibre4">Finally, <span><em class="italic">ssh-keygen</em></span> has one guru-level advanced option, <span><em class="italic">-r</em></span>, for affecting the random numbers used for key generation. It causes <span><em class="italic">ssh-keygen</em></span> to modify <em class="italic">~/.ssh2/random_seed</em> using data you enter on standard input. <a shape="rect" href="DB_split_083.html#filepos471315" class="calibre6">[3.6.4]</a> The Tectia manpages call this "stirring data into the random pool." Note that the program doesn't prompt you to enter data, it just sits there looking like it's hung. When this occurs, type as much data as you like and press the EOF character (<code class="calibre35">Control-D</code> in most shells): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh-keygen -r<br class="calibre19"/>    <strong class="calibre45"><code class="calibre35">I am stirring the random pool.</code></strong><br class="calibre19"/>    <strong class="calibre45"><code class="calibre35">blah blah blah</code></strong><br class="calibre19"/>    ^D<br class="calibre19"/>    Stirred in 46 bytes.</tt></div></span><p class="calibre4">See <a shape="rect" href="#filepos1284021" class="calibre6">Table 6-1</a> for a description of <span><em class="italic">ssh-keygen</em></span> options. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1284021" class="calibre15"></a></span><p class="calibre4">Table 6-1. ssh-keygen options</p>
+<div class="calibre3">
+<table summary="ssh-keygen options" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+ssh-keygen feature</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tfoot class="calibre63"><tr class="calibre31"><th colspan="3" rowspan="1" class="calibre51"><span class="calibre33"><span class="bold"><a shape="rect" class="calibre15"></a><a id="filepos1285114" class="calibre15"></a></span><p class="calibre4">
+<sup class="calibre34">a</sup> Any illegal argument, such as <span><em class="italic">-h</em></span>, causes a help message to print. </p></span></th>
+</tr><tr class="calibre31"><th colspan="3" rowspan="1" class="calibre51"><span class="calibre33"><span class="bold"><a shape="rect" class="calibre15"></a><a id="filepos1285498" class="calibre15"></a></span><p class="calibre4">
+<sup class="calibre34">b</sup> You might need to escape the question mark in your shell, e.g., -\?. </p></span></th>
+</tr><tr class="calibre31"><th colspan="3" rowspan="1" class="calibre51"><span class="calibre33"><span class="bold"><a shape="rect" class="calibre15"></a><a id="filepos1285821" class="calibre15"></a></span><p class="calibre4">
+<sup class="calibre34">c</sup> The key file format used by SSH Tectia and several other implementations, but not OpenSSH. </p></span></th>
+</tr></tfoot><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Set number of bits</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-b <em class="italic"><code class="calibre35">bits</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-b <em class="italic"><code class="calibre35">bits</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Set output file</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-f <em class="italic"><code class="calibre35">file</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">final argument of the command </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Overwrite output file if present</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><em class="italic">--overwrite</em></span>
+<code class="calibre35">[</code>
+<em class="italic"><code class="calibre35">yes</code></em>|<em class="italic"><code class="calibre35">no</code></em>
+<code class="calibre35">]</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Set comment string</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-C <em class="italic"><code class="calibre35">comment</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-c <em class="italic"><code class="calibre35">comment</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Change comment string</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-c</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-e <em class="italic"><code class="calibre35">file</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Set (new) passphrase</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-N <em class="italic"><code class="calibre35">phrase</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-p <em class="italic"><code class="calibre35">phrase</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Set empty passphrase</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-N `'</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-P</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Specify current passphrase</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-P</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Change passphrase</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-p</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-e <em class="italic"><code class="calibre35">file</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Set encryption algorithm</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-t <em class="italic"><code class="calibre35">algorithm</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-t <em class="italic"><code class="calibre35">algorithm</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Change encryption algorithm</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-u</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Derive public key from private</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-D <em class="italic"><code class="calibre35">file</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Quieter output</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-q</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-q</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Describe key</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-i <em class="italic"><code class="calibre35">file</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Set numeric base for printing key information</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-B <em class="italic"><code class="calibre35">base</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Print version number</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-V</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-V</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Print help message</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-h <a shape="rect" href="#filepos1285114" class="calibre6">
+<sup class="calibre34">a</sup></a>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-h, -? <a shape="rect" href="#filepos1285498" class="calibre6">
+<sup class="calibre34">b</sup></a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Print debugging information</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-d <em class="italic"><code class="calibre35">debug_spec</code></em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Use data from stdin for randomness</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-r</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Print a key's fingerprint</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">- l or -B</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-F <span><em class="italic">file</em></span>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert from SSH-1 to SSH-2 format</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-1 <span><em class="italic">file</em></span>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert OpenSSH private to Tectia public</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-e</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert OpenSSH private to Tectia private</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--import-private-key</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert Tectia public to OpenSSH public</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-i</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--import-public-key</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Extract OpenSSH private to public</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-y</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert <em class="italic">authorized_keys</em> to <em class="italic">authorization</em> file</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">--import-ssh1-authorized-keys</code>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert X.509 key to SECSH format<a shape="rect" href="#filepos1285821" class="calibre6">
+<sup class="calibre34">c</sup></a>
+</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-x <span><em class="italic">file</em></span>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert PKCS 12 file to SECSH format</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-k <span><em class="italic">file</em></span>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<span><strong class="calibre45">Convert PKCS 7 file to SECSH format</strong></span>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre33"> </span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-7 <span><em class="italic">file</em></span>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+</div>
+</body>
+</html>

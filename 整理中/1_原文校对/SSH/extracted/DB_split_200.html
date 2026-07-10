@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_268"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1314409" class="calibre7"></a>6.3.1 Agents Do Not Expose Keys </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Agents perform two tasks:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Store your private keys in memory</li>
+<li class="calibre18">Answer questions (from SSH clients) about those keys</li>
+</ul></div>
+<p class="calibre4">Agents don't, however, send your private keys anywhere. This is important to understand. Once loaded, private keys remain within an agent, unseen by SSH clients. To access a key, a client says, "Hey agent! I need your help. Please perform a key-related operation for me." The agent obeys and sends the results to the client, as in <a shape="rect" href="#filepos1315362" class="calibre6">Figure 6-4</a>. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1315362" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="How an SSH agent works with its clients" src="images/00023.jpg" class="calibre64"/></div>
+</div>
+</span><p class="calibre4">Figure 6-4. How an SSH agent works with its clients</p></div>
+<p class="calibre4">For example, if <span><em class="italic">ssh</em></span> needs to sign an authenticator, it sends the agent a signing request containing the authenticator data and an indication of which key to use. The agent performs the cryptographic operation itself and returns the signature. </p>
+<p class="calibre4">In this manner, SSH clients use the agent without seeing its private keys. This technique is more secure than handing out keys to clients. The fewer places that private keys get stored or sent, the harder it is to steal them.<sup class="calibre20">[<a id="filepos1316442" shape="rect" href="DB_split_206.html#filepos1393756" class="calibre6">93</a>]</sup></p>
+</div>
+</body>
+</html>

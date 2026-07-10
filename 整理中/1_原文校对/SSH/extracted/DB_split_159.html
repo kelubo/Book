@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_216"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos969704" class="calibre7"></a>5.4.5 Keyboard-Interactive Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos969877" class="calibre15"></a>
+<span><em class="italic">Keyboard-interactive authentication</em></span> is an extensible, general-purpose mechanism for implementing a variety of authentication techniques that require interaction with the remote user, such as one-time passwords<a shape="rect" class="calibre15"></a><a id="filepos970189" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos970228" class="calibre15"></a> and challenge-response schemes. Clients must implement the keyboard-interactive protocol (described in an IETF SECSH draft, and tunneled securely over the SSH transport layer) but need no other modifications as new authentication techniques are added. </p>
+<p class="calibre4">An example of a keyboard-interactive authentication<a shape="rect" class="calibre15"></a><a id="filepos970634" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos970673" class="calibre15"></a> technique is <span><em class="italic">one-time passwords</em></span>, found in systems like Bellcore's S/Key. "One-time" means that each time you authenticate, you provide a different password, helping to guard against attacks, since a captured password will likely be useless. Here's how it works: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">When you connect to a remote service, it provides you with an integer and a string, called the <span><em class="italic">sequence number</em></span> and the <span><em class="italic">key</em></span>, respectively. </li>
+<li value="2" class="calibre18">You enter the sequence number and key into an <span><em class="italic">S/Key calculator</em></span> program on your local machine. </li>
+<li value="3" class="calibre18">You also enter a secret passphrase into the calculator, known only to yourself. This passphrase isn't transmitted over the network, only into the calculator on your local machine, so security is maintained. </li>
+<li value="4" class="calibre18">Based on the three inputs you provided, the calculator produces your one-time password. </li>
+<li value="5" class="calibre18">You enter the password to authenticate to the remote service. </li>
+</ol></div>
+<p class="calibre4">More information on one-time passwords is available at:</p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><a href="http://www.ietf.org/html.charters/otp-charter.html" shape="rect" class="calibre6">http://www.ietf.org/html.charters/otp-charter.html</a></span></td>
+</tr></span></table><div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.4.5.1 OpenSSH keyboard-interactive authentication </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos972891" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos972929" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos972967" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos973005" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos973102" class="calibre15"></a>In OpenSSH, you enable keyboard-interactive authentication with the keyword <code class="calibre35">ChallengeResponseAuthentication</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # sshd_config<br class="calibre19"/>    ChallengeResponseAuthentication yes</tt></div></span><p class="calibre4">OpenSSH supports three challenge/response methods, called "devices," listed in <a shape="rect" href="#filepos973869" class="calibre6">Table 5-3</a>. Since these methods are dependent on external software, you have to configure OpenSSH at compile time to support them. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos973869" class="calibre15"></a></span><p class="calibre4">Table 5-3. OpenSSH keyboard-interactive (challenge/response) authentication methods </p>
+<div class="calibre3">
+<table summary="OpenSSH keyboard-interactive (challenge/response)             authentication methods" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Method</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Device name</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Compilation option</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">BSD authentication</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">bsdauth</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">--with-bsd-auth</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">PAM</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">pam</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">--with-pam</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">S/Key</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<code class="calibre35">skey</code>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">--with-skey</p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<p class="calibre4">PAM is widely available and hence often included in compiled OpenSSH packages. Just make sure the server configuration keyword <code class="calibre35">UsePAM</code> is set: <a shape="rect" href="DB_split_162.html#filepos999943" class="calibre6">[5.4.8]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    UsePAM yes</tt></div></span><p class="calibre4">BSD authentication will likely be available only if running on a BSD platform (e.g., OpenBSD); see the manpage for <em class="italic">login.conf</em> for details on its operation. If you want S/Key support, you have two options: obtain a PAM library that supports it, such as <em class="italic">libpam_opie</em> or <em class="italic">libpam_skey</em>, or build OpenSSH yourself to get direct S/Key support. We recommend the PAM library approach. </p>
+<p class="calibre4">In conducting keyboard-interactive authentication, the client by default specifies no device, which means the server will try all. There's an undocumented client-side option, <code class="calibre35">KbdInteractiveDevices</code>, however, whose value is the list of devices to try: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    KbdInteractiveDevices pam,skey,bsdauth</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos978579" class="calibre7"></a>5.4.5.2 Tectia's keyboard-interactive authentication </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos978696" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos978734" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos978772" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos978810" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos978907" class="calibre15"></a>For Tectia, you can allow or require keyboard-interactive authentication by adding the value <code class="calibre35">keyboard-interactive</code> to the lists for <code class="calibre35">AllowedAuthentications</code> or <code class="calibre35">RequiredAuthentications</code>, respectively: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications keyboard-interactive</tt></div></span><p class="calibre4">Tectia servers support the following keyboard-interactive authentication techniques: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">password</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Standard password authentication <a shape="rect" href="DB_split_156.html#filepos948931" class="calibre6">[5.4.2]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">pam</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Pluggable Authentication Modules <a shape="rect" href="DB_split_162.html#filepos999943" class="calibre6">[5.4.8]</a></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">securid</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">SecurID hardware-based authentication</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">plugin</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Programmatic authentication <a shape="rect" href="DB_split_360.html#filepos2463466" class="calibre6">[11.7.2]</a></div>
+</blockquote>
+</div>
+<p class="calibre4">Keyboard-interactive authentication techniques can be either optional or required (or both), and are specified using the keywords <code class="calibre35">AuthKbdInt.Optional</code> or <code class="calibre35">AuthKbdInt.Required</code>. Multiple authentication techniques are separated by commas: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthKbdInt.Optional pam,securid,password<br class="calibre19"/>    AuthKbdInt.Required plugin,password</tt></div></span><p class="calibre4">The order of the authentication techniques is not significant for either keyword, since the client drives the authentication process. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Beware of typographic errors in the values of <code class="calibre35">AuthKbdInt.Optional</code> and <code class="calibre35">AuthKbdInt.Required</code>: they are not checked when the server reads them from configuration files. Invalid or unrecognized techniques are detected only when keyboard-interactive authentication is attempted, which can be long after the server starts. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Authentication succeeds if <span><em class="italic">all</em></span> of the required authentication techniques succeed, as well as a number of optional authentication techniques specified by the <code class="calibre35">AuthKbdInt.NumOptional</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthKbdInt.NumOptional 2</tt></div></span><p class="calibre4">The default for <code class="calibre35">AuthKbdInt.NumOptional</code> is zero if there are any required authentication techniques, or one otherwise. </p>
+<p class="calibre4">The <code class="calibre35">AuthKbdInt.Retries</code> keyword determines how many attempts are allowed for keyboard-interactive authentication: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthKbdInt.Retries 5</tt></div></span><p class="calibre4">By default, three retries are allowed.</p>
+<p class="calibre4">The Tectia server waits after each failed keyword-interactive authentication attempt, as for password authentication; the <code class="calibre35">AuthInteractiveFailureTimeout</code> keyword applies to this delay. <a shape="rect" href="DB_split_156.html#filepos950932" class="calibre6">[5.4.2.1]</a></p>
+<p class="calibre4">The keyboard-interactive password authentication technique is functionally identical to standard password authentication. <a shape="rect" href="DB_split_156.html#filepos948931" class="calibre6">[5.4.2]</a></p>
+<p class="calibre4">PAM authentication is supported by binary distributions of Tectia on systems that provide PAM (e.g., Linux, Solaris). On other systems, support for PAM requires recompiling the SSH server with the appropriate PAM headers and libraries. <a shape="rect" href="DB_split_162.html#filepos999943" class="calibre6">[5.4.8]</a></p>
+<p class="calibre4">SecurID<a shape="rect" class="calibre15"></a><a id="filepos984612" class="calibre15"></a> from Security Dynamics is a hardware-based authentication technique. Users need a physical card, called a SecurID card, in order to authenticate. The card contains a microchip that displays (on a little LCD) an integer that changes at regular intervals. To authenticate, provide this integer along with your password. Some versions of the SecurID card also have a keypad that supports entering a password, for two-factor authentication. Users must provide the current integer from their card in order to authenticate. </p>
+<p class="calibre4">By default, Tectia allows three attempts to enter the SecurID password. This can be changed with the <code class="calibre35">SecurIdGuesses</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    SecurIdGuesses 5</tt></div></span><p class="calibre4">SecurID support is included in binary distributions of Tectia. The <code class="calibre35">securid</code> keyboard-interactive authentication technique mentioned previously refers to code incorporated into the server. Alternately, separate plugins called <span><em class="italic">ssh-securidv5-plugin</em></span> and <span><em class="italic">ssh-securidv4-plugin</em></span> are provided for different RSA ACE versions on some platforms.<sup class="calibre20">[<a id="filepos986158" shape="rect" href="DB_split_164.html#filepos1006789" class="calibre6">65</a>]</sup> In either case, recompiling the server or plugins requires special SecurID headers and libraries. SecurID must also be configured by setting the environment variable <code class="calibre35">VAR_ACE</code> to the pathname of the ACE data directory before the server is started: consult the SecurID documentation for details. </p>
+<p class="calibre4">New authentication techniques can be added using keyboard-interactive plugins. If <code class="calibre35">plugin</code> is specified as either an optional or required keyboard-interactive authentication technique, then the <code class="calibre35">AuthKbdInt.Plugin</code> keyword must be used to identify a program that controls the interactive authentication steps:<sup class="calibre20">[<a id="filepos987044" shape="rect" href="DB_split_164.html#filepos1007390" class="calibre6">66</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthKbdInt.Plugin /usr/local/sbin/ssh-keyboard-interactive-plugin</tt></div></span><p class="calibre4">The server communicates with the plugin program using the Tectia plugin protocol, which we'll describe in a later case study. <a shape="rect" href="DB_split_360.html#filepos2463466" class="calibre6">[11.7.2]</a></p>
+</div>
+</div>
+</body>
+</html>

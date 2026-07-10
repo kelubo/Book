@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_536"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2689219" class="calibre7"></a>15.2.5 Kerberos Support </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The OS X OpenSSH build has protocol 2 Kerberos support for both user and server authentication, following the major Internet-Drafts on these (<em class="italic">draft-ietf-secsh-gsskex</em> and draft-<em class="italic">ietf-galb-secsh-gssapi</em>). It implements user authentication via the <code class="calibre35">gssapi</code> and <code class="calibre35">external-keyx</code> methods; it does not yet have the improved <code class="calibre35">gssapi-with-mic</code> method. In case a Kerberos-secured key exchange has been used for server authentication, the <code class="calibre35">external-keyx</code> method allows the <code class="calibre35">userauth</code> protocol to refer back to the previous Kerberos exchange for user authentication, skipping an unnecessary extra authentication phase. </p>
+<p class="calibre4">This Kerberos support is also fully DNS-enabled, meaning it will find Kerberos authentication servers from information in the DNS if it is available. In a network of compatible and correctly configured Kerberos and OpenSSH servers, <span><em class="italic">no</em></span> extra configuration is needed for a plain OS X host newly attached to the network to use Kerberos for secure, single-signon client SSH connections. All that is required is to run: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ kinit user@<em class="italic"><code class="calibre35">REALM</code></em><br class="calibre19"/>    Please enter the password for user@REALM: <strong class="calibre45"><code class="calibre35">********</code></strong><br class="calibre19"/>    $ ssh <em class="italic"><code class="calibre35">user</code></em>@<em class="italic"><code class="calibre35">host</code></em></tt></div></span><p class="calibre4">Place the following lines into <em class="italic">/etc/krb5.conf</em> to relieve the user from having to specify the realm—and if the Kerberos principal and OS X account usernames are the same, then a simple <span><em class="italic">kinit</em></span> will suffice: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    [libdefaults]<br class="calibre19"/>    default_realm        =<em class="italic"><code class="calibre35">REALM</code></em></tt></div></span><p class="calibre4">Instead of the command-line utility <span><em class="italic">kinit</em></span>, you can use the OS X GUI Kerberos utility: <em class="italic">/System/Library/CoreServices/Kerberos.app</em>. </p>
+</div>
+<div class="mbppagebreak" id="calibre_pb_537"></div></body>
+</html>

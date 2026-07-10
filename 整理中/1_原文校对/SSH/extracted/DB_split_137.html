@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_191"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos728825" class="calibre7"></a>5.1.1 Running sshd as the Superuser </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos728992" class="calibre15"></a>The SSH server is invoked by simply typing its name: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ sshd</tt></div></span><p class="calibre4">The server automatically runs in the background, so no ampersand is required at the end of the line. </p>
+<p class="calibre4">To invoke the server when the host computer boots, add appropriate lines to an appropriate startup file on your system, such as <em class="italic">/etc/rc.local</em> on Linux. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Specify the path to sshd.<br class="calibre19"/>    SSHD=/usr/local/sbin/sshd<br class="calibre19"/>    # If sshd exists and is executable, run it and echo success to the system console.<br class="calibre19"/>    if [ -x "$SSHD" ]<br class="calibre19"/>    then<br class="calibre19"/>      $SSHD &amp;&amp; echo 'Starting sshd'<br class="calibre19"/>    fi</tt></div></span><p class="calibre4">Both OpenSSH and Tectia come with a startup or boot script (i.e., a System-V-style <span><em class="italic">init</em></span> control script) found in the appropriate directory for each Unix variant. For Linux, for example, the scripts are <em class="italic">/etc/init.d/sshd</em> for OpenSSH and <em class="italic">/etc/init.d/sshd2</em> for Tectia.<sup class="calibre20">[<a id="filepos730603" shape="rect" href="DB_split_138.html#filepos743067" class="calibre6">44</a>]</sup></p>
+</div>
+</body>
+</html>

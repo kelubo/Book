@@ -1,0 +1,467 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.6　使用H.323协议对接</font>
+</font>
+</p>
+<p height="1em" width="2em">H.323是比较古老的VoIP协议，然而现在还是有很多设备支持该协议。作为一款多协议的VoIP系统，FreeSWITCH也支持H.323。下面我们就来简单讨论一下如何在FreeSWITCH中使用H.323。</p>
+<p height="1em" width="2em">FreeSWITCH中有两个H.323的实现——mod_opal <sup>
+<small>
+<a href="text00119.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 和mod_h323 <sup>
+<small>
+<a href="text00119.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。前者基于H323plus库 <sup>
+<small>
+<a href="text00119.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，后者基于Opal <sup>
+<small>
+<a href="text00119.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 库，两个库又都依赖于ptlib <sup>
+<small>
+<a href="text00119.html">
+<font size="2">
+<font color="#FF6600">[5]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.6.1　mod_h323</font>
+</font>
+</p>
+<p height="1em" width="2em">我们先来看mod_h323。下面我们将讨论如何对mod_h323进行安装、配置和拨打测试。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.安装</font>
+</font>
+</p>
+<p height="1em" width="2em">在安装mod_h323之前，首先要安装它依赖的库。这里需要注意的问题是，mod_h323依赖的两个库ptlib和h323plus需要特定的版本配合在一起才能正常工作。该模块对应的Wiki页面上有几个特定的组合列表。这里笔者使用的是h323plus官方网站上最新的组合。</p>
+<p height="1em" width="2em">笔者是在Ubuntu Linux 12.04上进行测试的，在编译上述两个库之前，要确保系统上有flex和bison两个软件。可以用如下命令安装它们：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# apt-get install flex bison<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，使用如下命令下载ptlib和h323plus：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+wget http://www.h323plus.org/source/download/ptlib-2.10.9.tar.bz2<br/>
+<br/>
+wget http://www.h323plus.org/source/download/h323plus-v1_25_0.tar.gz<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">解压并配置安装ptlib：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tar xvjf ptlib-2.10.9.tar.bz2<br/>
+<br/>
+# cd ptlib-2.10.9<br/>
+<br/>
+# ./configure &amp;&amp; make &amp;&amp; make install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">解压并配置安装h323plus：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tar xvzf h323plus-v1_25_0.tar.gz<br/>
+<br/>
+# cd h323plus<br/>
+<br/>
+# ./configure &amp;&amp; make<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在make过程中，笔者遇到以下错误：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+/home/app/book/h323/h323plus/include/openh323buildopts.h:37:34:<br/>
+<br/>
+fatal error: ptlib/../../revision.h: No such file or directory<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">为了解决该问题，笔者修改了对应的文件（h323plus/include/openh323buildopts.h”），将第37行的“#include&lt;ptlib/../../revision.h&gt;”一行注释掉（或删除）。然后，继续配置安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make &amp;&amp; make install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述两个库安装完毕后，到FreeSWITCH的源代码目录下安装mod_h323。由于我们上面的步骤中两个库的安装位置都在/usr/local目录下，因此我们需要改变mod_h323的Makefile（src/mod/endpoint/mod_h323/Makefile），将里面所在的“/usr”路径都替换为“/usr/local”。修改完毕后，就可以在FreeSWITCH源代码目录中使用如下命令安装了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make mod_h323-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或者，进入mod_h323源代码目录上，使用如下命令安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# cd src/mod/endpoint/mod_h323<br/>
+<br/>
+# make install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.配置和加载模块</font>
+</font>
+</p>
+<p height="1em" width="2em">安装完毕后，如果一切正常，就可以在FreeSWITCH中加载该模块了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_h323<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果在加载时遇到类似下面这样的错误，可以在Linux命令行上执行“ldconfig”，然后重启FreeSWITCH。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+**libh323_linux_x86_64_.so.1.25.0: cannot open shared object file:<br/>
+<br/>
+No such file or directory**<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果在加载模块时看到如下的错误，则说明FreeSWITCH默认没有安装相关的配置文件。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[ERR] mod_h323.cpp:483 open of h323.conf failed<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以在mod_h323源代码目录中找到h323.conf.xml，然后复制到conf/autoload_configs/目录中，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# cd src/mod/endpoint/mod_h323<br/>
+<br/>
+# cp h323.conf.xml /usr/local/freeswitch/conf/autoload_configs/<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后再重新加载该模块就可以了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_h323<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.呼叫测试</font>
+</font>
+</p>
+<p height="1em" width="2em">在正确加载完mod_h323以后，就可以进行拨打测试了。目前，该模块仅支持点对点的模式互通，并不支持Gatekeeper。因此，可以在大部分的H.323客户端上直接呼叫FreeSWITCH的IP地址。呼叫到达FreeSWITCH后，将按照h323.conf.xml中的配置进行路由。当然，有些客户端允许在呼叫的IP地址前面加一个被叫号码，如可以尝试呼叫“1000@192.168.7.5”或“1000@192.168.7.5:1720”等。</p>
+<p height="1em" width="2em">如果在FreeSWITCH中使用mod_h323呼出，可以使用如下Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="h323/6000@192.168.7.9"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“h323”是该模块实现的一个呼叫字符串，后面的地址是欲呼叫的对端的IP地址。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.6.2　mod_opal</font>
+</font>
+</p>
+<p height="1em" width="2em">mod_opal的安装步骤与mod_h323类似，它也是需要一对相互匹配的opal库与ptlib库。在测试时，笔者是如下地址http://sourceforge.net/projects/opalvoip/files/v3.12%20Eridani/Stable%206/下载的ptlib-2.12.6.tar.bz2以及opal-3.12.6.tar.bz2。</p>
+<p height="1em" width="2em">ptlib的安装方法与在mod_h323中的类似，在此就不多说了。只是注意，如果同时在一台主机上安装两个版本的ptlib可能会有冲突，如何在同一台主机上安装并运行不同版本的库文件超出了本书的范围，如果你对这些不熟悉的话，请分别在两台“干净”的机器上分别测试mod_h323与mod_opal。</p>
+<p height="1em" width="2em">接下来，使用以下命令安装Opal：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# tar xvjf opal-3.12.6.tar.bz2<br/>
+<br/>
+# cd opal-3.12.6<br/>
+<br/>
+# ./configure &amp;&amp; make &amp;&amp; make install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在FreeSWITCH源代码目录下使用如下命令安装mod_opal：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# cd src/mod/endpoint/mod_opal<br/>
+<br/>
+# make install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">笔者在编译时遇到如下错误：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+/home/app/work/freeswitch/src/mod/endpoints/mod_opal/mod_opal.cpp:1034:37:<br/>
+<br/>
+error: <br/>
+<br/>
+‘class OpalConnection<br/>
+<br/>
+’ has no member named <br/>
+<br/>
+‘SwitchT38<br/>
+<br/>
+’<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">错误的原因是mod_opal跟这里Opal的版本不兼容。不过，T38是与传真相关的，这里，我们不测试传真，所以，可以在mod_opal.h文件中找到如下的行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+#define HAVE_T38 (OPAL_CHECK_VERSION(3,11,2) &amp;&amp; OPAL_T38_CAPABILITY)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">并将其修改为：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+#define HAVE_T38 0<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">即暂时取消与T38相关的宏定义。然后就可以继续编译安装了。</p>
+<p height="1em" width="2em">安装完成后，在FreeSWITCH中加载：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_opal<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，如果有电话呼入，则可以在FreeSWITCH中看到日志。一旦呼叫到达了Dialplan，就是我们的天下了。通过前面学过的知识，如何配置Dialplan对来话进行路由对我们来说已是小菜一碟了。因此，在此就不多介绍了。</p>
+<p height="1em" width="2em">另外，如果使用mod_opal呼出的话，它提供了Opal呼叫字符串，因而可以使用如下Dialplan进行呼出：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="opal/h323:1000@192.168.7.9"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“192.168.7.9”是指对端的IP地址。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">14.6.3　其他</font>
+</font>
+</p>
+<p height="1em" width="2em">上面我们重点讲了H.323中两个模块的安装，因为该过程的复杂性往往是读者学习和实验这两个模块的门槛。这里笔者是仅仅做了几个实验。如果读者想将这两个模块用于生产环境的话，还需要多测试一下，找一找这几个依赖库的最佳组合。</p>
+<p height="1em" width="2em">由于使用H.323的人比较少，因而大家对这两个模块开发的积极性也不高，因而它们的功能也不是很完善。如它们并不支持视频呼叫，也不支持使用Gatekeeper方式注册。不过，如果需要Gatekeeper的环境，也可以考虑与GnuGK <sup>
+<small>
+<a href="text00119.html">
+<font size="2">
+<font color="#FF6600">[6]</font>
+</font>
+</a>
+</small>
+</sup>
+ 等专门的H.323 Gatekeeper配合部署，在此我们就不多讲了。</p>
+<p height="1em" width="2em">另外，笔者正在尝试重新写一个H.323模块——mod_ooh323，以支持视频通话。不过，该模块还没写好，暂时就不能写到书里了（等你看到本书时或许已经有了）。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 参考http://wiki.freeswitch.org/wiki/Mod_opal。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参考http://wiki.freeswitch.org/wiki/Mod_h323。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 参考http://www.h323plus.org/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 参考http://www.opalvoip.org/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00118.html">
+<font color="#FF6600">[5]</font>
+</a>
+ ptlib是一个底层的支持库，提供一些抽象和跨平台的支持。真正的历史是这样的：所有这些都起源于一个开源的项目OpenH323，后来，分离成了两个项目Opal和H323plus，底层的一些抽象及跨平台支持也几乎在同时成了独立的库，叫PWlib，后改名为ptlib。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00119.html">
+<font color="#FF6600">[6]</font>
+</a>
+ GnuGK是一款开源的H.323 Gatekeeper，请参考http://www.gnugk.org/。</p>
+</body>
+</html>

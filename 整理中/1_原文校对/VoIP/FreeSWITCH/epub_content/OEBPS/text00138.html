@@ -1,0 +1,1993 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2　Lua</font>
+</font>
+</p>
+<p height="1em" width="2em">Lua是一门小众语言，它可能不像其他语言（如Java）那样“如雷贯耳”，但由于其优雅的语法及小巧的身段受到很多开发者的青睐，尤其是游戏开发人员 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">在FreeSWITCH中，Lua模块是默认加载的。在所有嵌入式脚本语言中，它是最值得推荐的语言。首先它非常轻量级，mod_lua.so经过减肥（Strip）后只有272KB；另外，它的语法相对的简单。有人做过对比，在嵌入式的脚本语言里，如果Python得2分，Perl得4分，JavaScript得5，则Lua语言可得10分 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，由此可见一斑。</p>
+<p height="1em" width="2em">另外，Lua模块的文档也是最全的。笔者在使用其他语言（如JavaScript）甚至写Event Socket程序时也经常参考Lua模块的文档。</p>
+<p height="1em" width="0pt" align="left">
+<font color="#0468BB">注意</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH完全内置了Lua解释器，因此与操作系统上的Lua版本以及各种第三方库一点关系都没有，详细的配置信息可以参考conf/autoload_configs/lua.conf.xml。</p>
+<p height="1em" width="2em">另外，自2013年11月中旬起，FreeSWITCH中的Lua解释器升级到了Lua 5.2版本，因此，读者在写Lua脚本时要注意使用与Lua 5.2兼容的语法。而原来的Lua模块（基于Lua 5.1）则被移动到了源代码目录下的src/mod/legacy目录中，如果需要Lua 5.1的用户可以自行编译该版本。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.1　Lua语法简介</font>
+</font>
+</p>
+<p height="1em" width="2em">Lua的语法非常简洁易懂，有人说：如果你会其他编程语言，则在30分钟内就能学会它 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">大家都知道，如果有某种语言的编程经验，则学一种新的语言时可以对比着学。在这里，我们对比大家比较熟悉的JavaScript语言 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 来学习Lua。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.相似性</font>
+</font>
+</p>
+<p height="1em" width="2em">Lua与JS（JavaScript的缩写，下同）有很多相似的地方，简述如下。</p>
+<p height="1em" width="2em">·<font color="#0468BB">变量无需声明。</font>
+ Lua与JS都是“弱”类型的语言（不像C），所以它们不需要事先声明变量的类型。</p>
+<p height="1em" width="2em">·<font color="#0468BB">区分大小写。</font>
+ Lua和JS都是区分大小写的。true和false分别代表布尔类型的真和假，true与True或TRUE是完全不同的。</p>
+<p height="1em" width="2em">·<font color="#0468BB">函数可以接受个数不定的参数。</font>
+ 与JS类似，在Lua中，与已经声明的函数参数个数相比，实际传递的参数个数可多可少，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function showem( a, b, c )<br/>
+<br/>
+print( a, b, c )<br/>
+<br/>
+end<br/>
+<br/>
+showem( 'first'  )                             --&gt; first   nil      nil<br/>
+<br/>
+showem( 'first', 'second' )                    --&gt; first   second   nil<br/>
+<br/>
+showem( 'first', 'second', 'third' )           --&gt; first   second   third<br/>
+<br/>
+showem( 'first', 'second', 'third', 'fourth' ) --&gt; first   second   third<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在Lua中，个数不定的参数列表使用“...”（称为vararg expressions）来表示，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function showem(a, b, ...)<br/>
+<br/>
+    local output = tostring(a) .. "\t" .. tostring(b)<br/>
+<br/>
+    local theArgs = { ... }<br/>
+<br/>
+    for i,v in ipairs(theArgs) do<br/>
+<br/>
+        output = output .. "\t#" .. i .. ":" .. v<br/>
+<br/>
+    end<br/>
+<br/>
+    print(output)<br/>
+<br/>
+end<br/>
+<br/>
+showem('first' )                             --&gt; first  nil<br/>
+<br/>
+showem('first', 'second')                    --&gt; first  second<br/>
+<br/>
+showem('first', 'second', 'third')           --&gt; first  second  #1:third<br/>
+<br/>
+showem('first', 'second', 'third', 'fourth') --&gt; first  second  #1:third  #2:fourth<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">哈希可以用方括号或点方式引用。</font>
+ 哈希表是编程语言中一种重要的数据结构。在Lua中，哈希表用Table来实现，在JS中，用稀疏在数组实现。无论如何，在两者中都可以使用如下的语法引用，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+theage = gavin['age']<br/>
+<br/>
+theage = gavin.age<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">数字区别不大。</font>
+ 在JS和Lua中，整数和浮点数是没有区别是的。它们在内部都是以浮点数表示。在Lua中，所有的数字类型都是number类型。</p>
+<p height="1em" width="2em">·<font color="#0468BB">分号是可选的。</font>
+ 两者类似，在不产生歧义的情况下，行尾的分号可以有，也可以没有。不同的是对待分号的方式，在JS中，按惯例是包含分号的，而在Lua中，惯例是不包含分号的。</p>
+<p height="1em" width="2em">·<font color="#0468BB">默认全局变量。</font>
+ 在JS中，如果用var声明一个变量并赋值，则它是本地变量；如果不用var声明，默认就是全局的，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function foo( )<br/>
+<br/>
+{<br/>
+<br/>
+    var jim = "This variable is local to the foo function";<br/>
+<br/>
+    jam = "This variable is in global scope";<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">而在Lua中也类似，用local声明一个本地变量，省略local时则默认为全局变量：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function foo( )<br/>
+<br/>
+    local jim = "This variable is local to the foo function";<br/>
+<br/>
+    jam = "This variable is in global scope";<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">使用双引号和单引号表示字符串。</font>
+ 在JS和Lua中，字符串是用引号引起来的，并且单引号和双引号的作用没有任何不同 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[5]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。引号要配对使用，但这两种引号可以混合以避免使用转义符，必要时可以使用“\”来转义，如（其中，箭头后面为实际变量的值）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+local book = "Seven's Book";             --&gt; Seven's Book<br/>
+<br/>
+local book = 'Seven\'s Book';            --&gt; Seven's Book<br/>
+<br/>
+local book = '"Awsome" book of Seven';   --&gt; "Awsome" book of Seven<br/>
+<br/>
+local book = "\"Awsome\" book of Seven"; --&gt; "Awsome" book of Seven<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">函数是一等公民。</font>
+ 在JS和Lua中，函数是一等公民，这意味着，你可以将它赋值给一个变量，将它作为参数传递，或者直接加上括号进行调用，如在Lua中：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1    mytable = { }<br/>
+<br/>
+2    mytable.squareit = function( x )<br/>
+<br/>
+3        return x * x<br/>
+<br/>
+4    end<br/>
+<br/>
+5    thefunc = mytable.squareit<br/>
+<br/>
+6    print( thefunc( 7 ) ) --&gt; 49<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，第1行声明一个Table类型的变量mytable；第2～4行定义一个匿名函数，并将它赋值给mytable的squareit成员变量；第5行将上述成员变量的值又赋值给了一个变量thefunc。至此，thefunc实际上就代表第2行至第4行定义的匿名函数。最后，在第6行就可以通过thefunc引用该函数，该函数对输入的参数7进行平方计算（x*x），最后得到结果49。</p>
+<p height="1em" width="2em">·<font color="#0468BB">函数都是闭包。</font>
+ 在JS和Lua中，函数都是闭包。简单来说，这意味着函数可以随时访问该函数在定义时可以访问的本地变量，尽管在以后调用时这些本地变量逻辑上已经“失效”了。比如下面的Lua例子中，inBaseValue中在定义时有效，却能在调用时照样使用它。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function MakeAdder( inBaseValue )<br/>
+<br/>
+    return function( inValueToAdd )<br/>
+<br/>
+        return inBaseValue + inValueToAdd<br/>
+<br/>
+    end<br/>
+<br/>
+end<br/>
+<br/>
+add10 = MakeAdder( 10 )<br/>
+<br/>
+add30 = MakeAdder( 30 )<br/>
+<br/>
+print( add10( 1 ) )       --&gt; 11<br/>
+<br/>
+print( add10( 6 ) )       --&gt; 16<br/>
+<br/>
+print( add30( 3 ) )       --&gt; 33<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.区别</font>
+</font>
+</p>
+<p height="1em" width="2em">Lua与JS又有很多区别，简述如下：</p>
+<p height="1em" width="2em">·<font color="#0468BB">单行和多行注释不同。</font>
+ JS使用“//”做单行注释，而Lua使用“--”。JS使用“/*...*/”来做多行注释，而Lua中使用“--[[...]]”（注意，这里的“...”表示实际被注释的内容）。</p>
+<p height="1em" width="2em">JS中多行注释不能嵌套，解析器将在遇到第一个“*/”时终止该注释，而在Lua中，则可以使用类似“--[===[...]===]”的方式，通过在方括号中多加几个等号（前后等号的数量要匹配）来改变最外层的注释。参考以下Lua注释：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+-- <br/>
+<br/>
+本行是单行注释<br/>
+<br/>
+local jim = "This is not commented"<br/>
+<br/>
+--[[<br/>
+<br/>
+local foo = "<br/>
+<br/>
+本行代码被注释掉了"<br/>
+<br/>
+local bar = "<br/>
+<br/>
+本行代码也被注释掉了"<br/>
+<br/>
+--]]<br/>
+<br/>
+local jam = "<br/>
+<br/>
+本行是有效的"<br/>
+<br/>
+---[[ <br/>
+<br/>
+本行相关于一个单行注释<br/>
+<br/>
+local foo = "<br/>
+<br/>
+本行也是有效的，为什么？"<br/>
+<br/>
+local bar = "<br/>
+<br/>
+本行也是有效的，因为前面的注释中多了一个“-<br/>
+<br/>
+”<br/>
+<br/>
+--]] <br/>
+<br/>
+本行也相当于一个单行注释了<br/>
+<br/>
+--[==[ <br/>
+<br/>
+把下面这些全都注释掉<br/>
+<br/>
+--[[<br/>
+<br/>
+local foo = "foo"<br/>
+<br/>
+local bar = "bar"<br/>
+<br/>
+--]]<br/>
+<br/>
+--]==]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">用end终止程序块。</font>
+ Lua与Ruby类似，使用end来代替JS中的大括号来终止程序块，如下面是Lua中终止程序块的语法：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function foo( )<br/>
+<br/>
+    --my code here<br/>
+<br/>
+end<br/>
+<br/>
+if foo( ) then<br/>
+<br/>
+    --my code here<br/>
+<br/>
+end<br/>
+<br/>
+for i=0,1000 do<br/>
+<br/>
+    --my code here<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">使用nil代表空值。</font>
+ 类似Ruby，在Lua中，使用nil代表空值，在JS及C语言中则使用null或NULL。</p>
+<p height="1em" width="2em">在JS中，空字符串（""）和0在条件测试中都为假（false）。而在Lua中，nil和false是仅有的非“真”（True）值，其他所有的都表示测试结果为真。</p>
+<p height="1em" width="2em">·<font color="#0468BB">Lua中任何值都可以作为Table的键（Key）。</font>
+ 在JS中，对象（Object）的所有键都是字符串（如myObj[11]与myObj["11"]是相同的），而在Lua中，字符串、数字、甚至另一个Table都可以是键。参见如下Lua代码：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+a = {}<br/>
+<br/>
+b = {}<br/>
+<br/>
+mytable = {}<br/>
+<br/>
+mytable[1] = "The number one"<br/>
+<br/>
+mytable["1"] = "The string one"<br/>
+<br/>
+mytable[a] = "The empty table 'a'"<br/>
+<br/>
+mytable[b] = "The empty table 'b'"<br/>
+<br/>
+print( mytable["1"] ) --&gt; The string one<br/>
+<br/>
+print( mytable[1] )   --&gt; The number one<br/>
+<br/>
+print( mytable[b] )   --&gt; The empty table 'b'<br/>
+<br/>
+print( mytable[a] )   --&gt; The empty table 'a'<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">Lua中没有数组，任何复杂的数据类型都是Table。</font>
+ 在JS里有明确的数组对象，并且有对应的操作数组的方法，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+var myArray = new Array( 10 );  // <br/>
+<br/>
+声明一个新数组，有10<br/>
+<br/>
+个空元素<br/>
+<br/>
+var myArray1 = [ 1, 2, 3 ];     // <br/>
+<br/>
+声明一个新数组，有3<br/>
+<br/>
+个元素<br/>
+<br/>
+myArray1.pop();                 // <br/>
+<br/>
+从数组中弹出最后一个元素<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">而在Lua中，对象是Table、prototype是Table、哈希是Table、数组是Table、Table是Table、什么都是Table。</p>
+<p height="1em" width="2em">Lua中的所谓数组本身是一个Table，它相当于JS里的稀疏数组，只是它的第一个元素的下标是从1开始的，而不是0。可以使用Table的语法来创建数组。如下面Lua代码中的两种方法是等价的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+people = { "Alice", "Bob", "Carl" }<br/>
+<br/>
+people = { [1]="Alice", [2]="Bob", [3]="Carl" }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果拿Table当数组来用，可以使用两种方法来获取和设置数组的大小，并允许数组中有空值存在，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+people = { "Alice", "Bob", "Carl" }<br/>
+<br/>
+print( table.getn( people ) )              --&gt; 3<br/>
+<br/>
+people[ 7 ] = "Someone Else "<br/>
+<br/>
+print( table.getn( people ) )              --&gt; 3<br/>
+<br/>
+print( people[ 10 ] )                      --&gt; "Some Dude"<br/>
+<br/>
+for i=1,table.getn( people ) do<br/>
+<br/>
+    print( people[ i ] )<br/>
+<br/>
+end<br/>
+<br/>
+--&gt; Alice<br/>
+<br/>
+--&gt; Bob<br/>
+<br/>
+--&gt; Carl<br/>
+<br/>
+table.setn( people, 7 )<br/>
+<br/>
+print( table.getn( people ) )              --&gt; 7<br/>
+<br/>
+for i=1,table.getn( people ) do<br/>
+<br/>
+    print( people[ i ] )<br/>
+<br/>
+end<br/>
+<br/>
+--&gt; Gavin<br/>
+<br/>
+--&gt; Stephen<br/>
+<br/>
+--&gt; Harold<br/>
+<br/>
+--&gt; nil<br/>
+<br/>
+--&gt; nil<br/>
+<br/>
+--&gt; nil<br/>
+<br/>
+--&gt; Someone Else<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">数字、字符串以及Table都不是对象。</font>
+ 与面向对象概念里面的对象不同，数字、字符串以及Table本质上都不是对象。</p>
+<p height="1em" width="2em">Lua仍然是面向过程的编程，大多数操作可以通过库函数实现，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+print(string.len(mystring)  )  --&gt; 11<br/>
+<br/>
+print(string.lower(mystring))  --&gt; hello world<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，string.len是一个函数，实际上string本身是一个Table。从Lua5.1起，也支持一些类似面向对象的语法，如上面的例子等价于：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+mystring = "Hello World"<br/>
+<br/>
+print(mystring:len())  --&gt; 11<br/>
+<br/>
+print(mystring:lower())  --&gt; hello world<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上面的例子中，通过使用“:”，把mystring看成一个对象，然后len和lower就类似于这个对象的方法。便实际上，Lua是在内部把mystring这个假的“对象”特殊处理了，找到它所对应的数据类型（string）后，调用实际的string.len()，并把mystring作为该函数的第一个参数，所以mystring:len()与string.len(mystring)是等价的。</p>
+<p height="1em" width="2em">·<font color="#0468BB">没有++和+=。</font>
+ 在Lua中没有++和+=这样的缩写形式，所以变量自加必须用以下方式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+local i = 0;<br/>
+<br/>
+i = i + 1;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">字符串的拼接是使用“..”操作符实现的，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+local themessage = "Hello"<br/>
+<br/>
+themessage = themessage .. " World"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果把一个字符串和一个数字相加，Lua会试图将字符串转换成数字，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+print(10 + "2")    --&gt; 12<br/>
+<br/>
+print(10 + "a")    --&gt;<br/>
+<br/>
+出错：attempt to perform arithmetic on a string value<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">没有三目运算符。</font>
+ JS或C中的“a?b:c”语法是很贴心的，但在Lua中没有。不过，Lua中有个“短路”语法，与该功能类似，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+local foo = (math.random( ) &gt; 0.5) and "It's big!" or "It's small!"<br/>
+<br/>
+local numusers = 1<br/>
+<br/>
+print( numusers .. " user" ..<br/>
+<br/>
+(numusers == 1 and " is" or "s are") .. " online.")<br/>
+<br/>
+--&gt; 1 user is online.<br/>
+<br/>
+numusers = 2<br/>
+<br/>
+print( numusers .. " user" ..<br/>
+<br/>
+(numusers == 1 and " is" or "s are") .. " online.")<br/>
+<br/>
+--&gt; 2 users are online.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">模式匹配。</font>
+ 正则表达式是很方便的字符串匹配工具。与JS以及其他语言不同，为了保持Lua的小巧且减少对其他库的依赖，Lua没有使用常用的POSIX(regexp)，也没有使用PCRE（Perl兼容的正则表达式），而是自己实现了模式匹配算法，其语法也有很大不同。</p>
+<p height="1em" width="2em">模式（Pattern）实际上就是Lua中的正则表达式。它与普通正则表达式最大的不同就是使用“%”而不是使用“\”来转义。Lua模式中的字符分类如表16-1所示。</p>
+<p height="1em" width="0pt" align="center">表16-1　Lua中的模式</p>
+<p height="4pt" width="0pt" align="center"><img align="baseline" height="514" width="530" src="Image00072.jpg" />
+</p>
+<p height="1em" width="2em">除此之外，它还有一些具有魔法含义的特殊字符，这些字符有：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+( ) . % + - * ? [ ] ^ $<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它们的含义都与PCRE里的差不多的，其中“-”的含义与“*”类似，都是重复前一个字符0次或多次，不同的是，“*”为最大匹配，它会尽量匹配更长的字符串，而“-”为最小匹配，它会尽量匹配更短的字符串。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.其他</font>
+</font>
+</p>
+<p height="1em" width="2em">Lua的介绍已经占了本章很大的篇幅了。相信这些内容对于编辑简单的脚本也够用了。最后推荐一本学习Lua的书——《Lua程序设计（第二版）》（原名Programming Lua）。另外，英文好的读者可以参考另一本书Programming in Lua，该书第一版是免费的，见http://www.lua.org/pil/。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.2　将电话路由到Lua脚本</font>
+</font>
+</p>
+<p height="1em" width="2em">在快速测试的情况下，可以直接使用如下的originate命令在FreeSWITCH中外呼一路通话，并在电话的本端执行Lua脚本：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 &amp;lua(test.lua)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，lua是一个App，它的参数就是脚本的名字，脚本的默认路径在安装路径的scripts目录下，当然你也可以指定一个绝对路径，如/tmp/test.lua。</p>
+<p height="1em" width="2em">在Dialplan XML中，使用下列配置便可将进入Dialplan的电话（Channel）交给Lua脚本接管。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="lua" data="test.lua"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，除此之外，也可以直接使用uuid_transfer命令直接配合inline Dialplan将一个Channel路由到Lua脚本，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+uuid_transfer &lt;uuid&gt; lua:/tmp/test.lua inline<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之，这里的Lua是一个标准的App，在任何可以使用App的地方都可以使用它（如上面介绍的各种场景，以及后面要介绍的Event Socket等。甚至在Lua脚本中也可以再次使用lua App来调用下一个Lua脚本）。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.3　Session相关函数</font>
+</font>
+</p>
+<p height="1em" width="2em">在Lua环境中，FreeSWITCH会自动生成一个session对象（实际上是一个Table），因而可以在Lua脚本中使用Lua类似面向对象的语法特性编程，如以下脚本放播放欢迎声音 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[6]</font>
+</font>
+</a>
+</small>
+</sup>
+ ：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+-- <br/>
+<br/>
+应答<br/>
+<br/>
+session:answer()<br/>
+<br/>
+-- <br/>
+<br/>
+睡一小会（毫秒）<br/>
+<br/>
+session:sleep(1000)<br/>
+<br/>
+-- <br/>
+<br/>
+播放声音文件<br/>
+<br/>
+session:streamFile("/tmp/hello-lua.wav")<br/>
+<br/>
+-- <br/>
+<br/>
+挂机<br/>
+<br/>
+session:hangup()<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">大部分与Session有关的函数都是跟FreeSWITCH中的App是一一对应的，如上面的answer、hangup等。有一点要特别说明：streamFile对应playback这个App。如果在Lua中没有对应的函数，也可以通过session:execute()函数来执行相关的App，如session:execute("playback","/tmp/sound.wav")与session:streamFile("/tmp/sound.wav")是等价的 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[7]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">需要注意，Lua脚本执行完毕后默认会挂断电话，所以上面的Hello Lua例子中不需要明确的session:hangup()。如果想在Lua脚本执行完毕后继续执行Dialplan中的后续流程，则需要在脚本开始处先设置不要自动挂机，语法如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:setAutoHangup(false)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">例如下列场景，test.lua执行完毕后（假设没有session:hangup()，主叫也没有挂机），如果没有setAutoHangup(false)，则后续的playback动作得不到执行。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="test-lua"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^1234$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="lua" data="test.lua"/&gt;<br/>
+<br/>
+        &lt;action application="playback" data="lua-script-complete.wav"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面，我们来讲与Ssession相关的几个常用的函数：</p>
+<p height="1em" width="2em">·<font color="#0468BB">getVariable。</font>
+ 取得变量的值，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+local moh = session:getVariable("hold_music")<br/>
+<br/>
+local dest_number = session:getVariable("context")<br/>
+<br/>
+local dest_number = session:getVariable("destination_number")<br/>
+<br/>
+local cid_name = session:getVariable("caller_id_name")<br/>
+<br/>
+local cid_number = session:getVariable("caller_id_number")<br/>
+<br/>
+local ani = session:getVariable("ani")<br/>
+<br/>
+local uuid = session:getVariable("uuid")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">getUUID。</font>
+ 取得当前Session的UUID，下列两行是等价的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+local uuid = session:get_uuid(]);<br/>
+<br/>
+local uuid = session:getVariable("uuid")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">setVariable。</font>
+ 设置通道变量，等价于Dialplan App里的set：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:setVariable("varname", "varval")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">hangup。</font>
+ 挂断当前通话：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:hangup();<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以同时指定挂断原因，如以下函数将在挂断时向对方返回用户忙：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:hangup("USER_BUSY")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">ready。</font>
+ 检查Session是否可正常使用，如果已经挂机就会返回false。</p>
+<p height="1em" width="2em">在写脚本时，如果有循环，一定需要经常检测session:ready()是否为true，否则Session挂机后Lua脚本可能仍然在死循环地运行。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+while (session:ready() == true) do<br/>
+<br/>
+    -- do something here<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">streamFile：</font>
+ 放音，相当于Dialplan App里的playback。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:streamFile("/tmp/test.wav")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">recordFile：</font>
+ 录音，相当于Dialplan App里的record，参数是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+file_name [,max_len_secs] [,silence_threshold] [,silence_secs]<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，各参数含义如下：</p>
+<p height="1em" width="2em">·<font color="#0468BB">file_name：</font>
+ 录音文件名。</p>
+<p height="1em" width="2em">·<font color="#0468BB">max_len_secs：</font>
+ 录音最长的秒数。</p>
+<p height="1em" width="2em">·<font color="#0468BB">silence_threashold：</font>
+ 一个声音阈值，如果声音小于该值，就认为是静音。</p>
+<p height="1em" width="2em">·<font color="#0468BB">silence_secs：</font>
+ 如果静音时长大于一定秒数，则停止录音。</p>
+<p height="1em" width="2em">例如，以下函数将对当前的Channel录音，并存放到/tmp/test_record.wav中：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:recordFile("/tmp/test_record.wav")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">read。</font>
+ 类似于Dialplan App中的read，用于播放一个声音并获取DTMF。它的5个参数与read含义相同：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;min digits&gt;&lt;max digits&gt;&lt;file to play&gt;&lt;inter-digit timeout&gt;&lt;terminators&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">6.4节介绍的身份证号的例子用Lua改写如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+digits = session:read(15, 18, "/tmp/input-id-card.wav", "5000", "#");<br/>
+<br/>
+session:("log", "INFO ID Card Number: ".. digits .."\n");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">读者可以发现Lua中的read比Dialplan App中的read少了一个参数。由于session:read()能返回值，因此那个参数就不需要了，实际收到的DTMF会返回到本例的digits变量中。</p>
+<p height="1em" width="2em">·<font color="#0468BB">playAndGetDigits。</font>
+ 与Dialplan App中的play_and_get_digits类似，它的参数格式是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;min_digits&gt;, &lt;max_digits&gt;, &lt;max_attempts&gt;, &lt;timeout&gt;, &lt;terminators&gt;,&lt;prompt_audio_files&gt;, &lt;input_error_audio_files&gt;,&lt;digit_regex&gt;, [variable_name], [digit_timeout],[transfer_on_failure])<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，大部分参数都很直观，也跟play_and_get_digits中类似。其中timeout是收齐所有号的超时值，而digit_timeout是允许的两次按键之音的时间间隔最大值，最后transfer_on_failure指明如果失败后是否转到Dialplan中的一个Extension上去，它的格式应该是一个Dialplan三要素的格式串，如“failed XML dialplan”。</p>
+<p height="1em" width="2em">我们把6.4节中的身份证号的例子重写如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+digits = session:playAndGetDigits(15, 18, 3, 10000, "#",<br/>
+<br/>
+    "/tmp/input-id-card.wav", "/tmp/invalid_num.wav",<br/>
+<br/>
+    "^\\d{15}|\\d{17}[0-9\\*]$")<br/>
+<br/>
+session:execute("log", "INFO ID Card Number: ".. digits .."\n");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">setInputCallback。</font>
+ 在放音或录音时，用户按下的DTMF可以用于触发一些功能。所以在这些状态下，Lua支持如果收到DTMF等外部输入时，则调用相关的回调函数。setInputCallback的作用就是设置（安装）一个回调函数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 function onInputCBF(s, type, obj, arg)<br/>
+<br/>
+02     if (type == "dtmf") then<br/>
+<br/>
+03         freeswitch.consoleLog("INFO",<br/>
+<br/>
+04           "Got DTMF: " .. obj.digit .. " Duration: " .. obj.duration .. "\\n")<br/>
+<br/>
+05           if (obj.digit == "3") then<br/>
+<br/>
+06               return 'break'<br/>
+<br/>
+07           end<br/>
+<br/>
+08       end<br/>
+<br/>
+09       return ''<br/>
+<br/>
+10   end<br/>
+<br/>
+11 session:setInputCallback('onInputCBF', '');<br/>
+<br/>
+12 session:streamFile("local_stream://moh");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，第1行，我们定义了一个回调函数onInputCBF，并在第11行使用setInput-Callback将该函数绑定到该Session上。第12行执行streamFile实现一直不停地播放等待音乐。当用户按下话机上的键时，FreeSWITCH就会回调上面指定的回调函数。下面我们来看一下该函数的内容。</p>
+<p height="1em" width="2em">回调函数一共有4个参数，在这里我们只关注type和obj两个参数。在此，由于我们的回调函数是由DTMF触发的，因此这里的type值为“dtmf”。obj是一个Table，它的两个Key分别是digit和duration，分别表示DTMF的链值和时长。</p>
+<p height="1em" width="2em">上面的例子中第2行测试该回调是否是由DTMF引起，如果是，就打印相关DTMF信息。在第5行测试如果用户按了3的话，就返回break。返回break会停止当前正在执行的App（在这里我们正在播放保持音乐），如果后面没有其他脚本语句的话，Lua App就会退出。如果返回空值（空字符串，如第9行），则它什么也不做。</p>
+<p height="1em" width="2em">如果我们顺序按1、2、3，则上面例子在控制台上的输出结果如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 Got DTMF: 1<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 Got DTMF: 2<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 Got DTMF: 3<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">除DTMF外，回调还可能由其他的输入引起，如在进行语音识别的时候识别到相关关键词，这里我们就不多介绍了。</p>
+<p height="1em" width="2em">另外，使用unsetInputCallback函数也可以取消刚才设置的回调函数，在此我们就不多讲了。更多与Session相关的函数可以参考相关的wiki文档：http://wiki.freeswitch.org/wiki/Mod_lua。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.4　非Session函数和独立的Lua脚本</font>
+</font>
+</p>
+<p height="1em" width="2em">Lua脚本中也可以使用跟Session不相关的函数，最典型的是freeswitch.consoleLog()，其用于输出日志，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch.consoleLog("NOTICE", "Hello lua log!\n")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外一个是freeswitch.API()，允许你在Lua中执行任意API，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+api = freeswitch.API()<br/>
+<br/>
+reply = api:execute("version", "")<br/>
+<br/>
+freeswitch.consoleLog("INFO", "Got reply:\n\n" .. reply .. "\n")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面Lua脚本可以直接在FreeSWITCH控制台上执行，如果将上述脚本保存到/tmp/a.lua中，则输出结果为：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; lua /tmp/a.lua<br/>
+<br/>
+2013-09-16 16:20:31.363305 [INFO] switch_cpp.cpp:1288 Got reply:<br/>
+<br/>
+FreeSWITCH Version 1.5.6b+git~20130914T180606Z~60f5dec57e (git 60f5dec 2013-09-14 18:06:06Z)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">除此之外，其他的非Session函数还有freeswitch.bridge()、freeswitch.email()等，在此就不多介绍了。</p>
+<p height="1em" width="2em">非Session函数一般运行在独立的Lua脚本中。独立的Lua脚本可以直接在控制台终端上执行（使用luarun），这种脚本大部分可用于执行一些非Session相关的功能（因为这里面没有Session）。读到这里读者已经了解到了，Lua是一个App <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[8]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，而luarun是一个API。</p>
+<p height="1em" width="2em">我们刚刚讲到的a.lua就是一个典型的可独立运行的Lua脚本。独立运行的Lua脚本跟在Dialplan中用Lua App运行的不同，前者不会自动获得一个session对象（Table）。当然，独立运行的脚本也可以自行创建session对象。在17.4节可以看到相关的实例。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.5　Event相关函数</font>
+</font>
+</p>
+<p height="1em" width="2em">在第5章我们曾提到，FreeSWITCH使用事件机制进行异步通信。在Lua脚本中，可以“生产”事件，也可以“消费”事件，下面我们来看一下与事件相关的函数。</p>
+<p height="1em" width="2em">FreeSWITCH的事件也跟一个SIP消息类似，它包含一些事件头（Header）和可选的事件正文（Body）。在FreeSWITCH内部使用C语言结构体表示，可以序列化成类似SIP消息的简单文本格式（Plain）、JSON或XML。</p>
+<p height="1em" width="2em">·<font color="#0468BB">freeswitch.Event。</font>
+ 初始化一个事件，该事件类型需要在switch_event_types_t枚举类型中有定义，它是在switch_types.h中定义的。如果使用了未定义过的名字，则统一为MESSAGE。下面的例子初始化一个主事件：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event = freeswitch.Event("MESSAGE_WAITING")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以初始化一个CUSTOM事件，其中第二个参数可以是任意字符串 <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[9]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，它将作为事件中的Event-Subclass，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event = freeswitch.Event("CUSTOM", "freeswitch:book")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:addHeader。</font>
+ 给事件增加一个事件头，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:addHeader("MWI-Messages-Waiting", "no")<br/>
+<br/>
+event:addHeader("MWI-Message-Account", "sip:1000@192.168.0.2")<br/>
+<br/>
+event:addHeader("Sofia-Profile", "internal")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:fire。</font>
+ 产生（生产）事件，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:fire()<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:addBody。</font>
+ 给事件增加一个可选的正文，并使用Content-Type头标志正文的类型，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:addHeader("Content-Type", "text/plain")<br/>
+<br/>
+event:addBody("Hello FreeSWITCH")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:delHeader。</font>
+ 从事件中删除一个头域，下面的例子可以替换from头：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:delHeader("from")<br/>
+<br/>
+event:addHeader("from", "1000@192.168.0.2")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:getHeader。</font>
+ 在收到一个事件后，可以取得其头域的值，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:getHeader("from")<br/>
+<br/>
+event:getHeader("Caller-Caller-ID-Name")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:getBody。</font>
+ 取得Body的值（如果有的话），如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:getBody()<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:getType。</font>
+ 取得事件的类型（名字），以下两种方法是等价的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:getType()<br/>
+<br/>
+event:getHeader("Event-Name")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">event:serialize。</font>
+ 将事件序列化成可读的形式（字符串），支持plain text、JSON、XML三种类型，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+event:serialize()<br/>
+<br/>
+event:serialize("json")<br/>
+<br/>
+event:serialize("xml")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">最后，我们来看一个完整的例子。该例子综合使用了上面介绍的各种函数，读者可以对照下面的代码和输出结果自行分析一下。代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function log(k, v)<br/>
+<br/>
+    if not v then v = "[NIL]" end<br/>
+<br/>
+    freeswitch.consoleLog("INFO", k .. ": " .. v .. "\n")<br/>
+<br/>
+end<br/>
+<br/>
+event = freeswitch.Event("CUSTOM", "freeswitch:book")<br/>
+<br/>
+event:addHeader("Author", "Seven Du")<br/>
+<br/>
+event:addHeader("Content-Type", "text/plain")<br/>
+<br/>
+event:addBody("FreeSWITCH: The Definitive Guide")<br/>
+<br/>
+type = event:getType()<br/>
+<br/>
+author = event:getHeader("Author")<br/>
+<br/>
+text=event:serialize()<br/>
+<br/>
+json=event:serialize("json")<br/>
+<br/>
+xml=event:serialize("XML")<br/>
+<br/>
+log("type", type)<br/>
+<br/>
+log("author", author)<br/>
+<br/>
+log("text", text)<br/>
+<br/>
+log("json", json)<br/>
+<br/>
+log("xml", xml)<br/>
+<br/>
+event:fire()<br/>
+<br/>
+log("MSG", "Event Fired")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">将上述内容保存到/tmp/event.lua中，执行结果如下（为了节省篇幅这里省略了某些事件头域及JSON和XML中的一些字段）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; lua /tmp/event.lua<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 type: CUSTOM<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 author: Seven Du<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 text: 'Event-Name: CUSTOM<br/>
+<br/>
+...<br/>
+<br/>
+Event-Subclass: freeswitch%3Abook<br/>
+<br/>
+Author: Seven%20Du<br/>
+<br/>
+Content-Type: text/plain<br/>
+<br/>
+Content-Length: 32<br/>
+<br/>
+FreeSWITCH: The Definitive Guide'<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 json: {<br/>
+<br/>
+    "Event-Name":   "CUSTOM",<br/>
+<br/>
+    "Core-UUID":    "bc647e68-47de-407f-b32a-d9bdf5c25786",<br/>
+<br/>
+    "Event-Sequence":   "5000",<br/>
+<br/>
+    "Event-Subclass":   "freeswitch:book",<br/>
+<br/>
+    "Author":   "Seven Du",<br/>
+<br/>
+    "Content-Type": "text/plain",<br/>
+<br/>
+    "Content-Length":   "32",<br/>
+<br/>
+    "_body":    "FreeSWITCH: The Definitive Guide"<br/>
+<br/>
+}<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 xml: &lt;event&gt;<br/>
+<br/>
+&lt;headers&gt;<br/>
+<br/>
+&lt;Event-Name&gt;CUSTOM&lt;/Event-Name&gt;<br/>
+<br/>
+&lt;Core-UUID&gt;bc647e68-47de-407f-b32a-d9bdf5c25786&lt;/Core-UUID&gt;<br/>
+<br/>
+&lt;Event-Sequence&gt;5000&lt;/Event-Sequence&gt;<br/>
+<br/>
+&lt;Event-Subclass&gt;freeswitch%3Abook&lt;/Event-Subclass&gt;<br/>
+<br/>
+&lt;Author&gt;Seven%20Du&lt;/Author&gt;<br/>
+<br/>
+&lt;Content-Type&gt;text/plain&lt;/Content-Type&gt;<br/>
+<br/>
+&lt;/headers&gt;<br/>
+<br/>
+&lt;Content-Length&gt;32&lt;/Content-Length&gt;<br/>
+<br/>
+&lt;body&gt;FreeSWITCH: The Definitive Guide&lt;/body&gt;<br/>
+<br/>
+&lt;/event&gt;<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 MSG: Event Fired<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.6　Chat相关函数</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH通过mod_sms支持文本消息。一个文本消息与一个Session类似，FreeSWITCH收到文本消息后将执行Chatplan，然后在Chatplan中可以执行Lua脚本。在Chatplan中的Lua脚本会自动获得一个message对象，该对象的内部表示跟event是一样的。因而与Event相关的函数，如addHeader、delHeader、addBody、serialize等，都是可以用的。除此之外，还有一个chat_execute函数，它可以执行mod_sms中支持的以下动作。</p>
+<p height="1em" width="2em">·<font color="#0468BB">fire：</font>
+ 产生一个MESSAGE事件。</p>
+<p height="1em" width="2em">·<font color="#0468BB">send：</font>
+ 发送消息。</p>
+<p height="1em" width="2em">·<font color="#0468BB">reply：</font>
+ 回复消息。</p>
+<p height="1em" width="2em">·<font color="#0468BB">set：</font>
+ 设置变量。</p>
+<p height="1em" width="2em">·<font color="#0468BB">info：</font>
+ 显示信息。</p>
+<p height="1em" width="2em">·<font color="#0468BB">stop：</font>
+ 停止消息路由。</p>
+<p height="1em" width="2em">·<font color="#0468BB">system：</font>
+ 调用system函数执行系统调用。</p>
+<p height="1em" width="2em">下面的Lua脚本可以在Chatplan中执行，收到消息后先打印出来，然后修改目的号码和主机，并发送出去。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+area_code = "010"<br/>
+<br/>
+to_host = "192.168.0.2"<br/>
+<br/>
+function log(k, v)<br/>
+<br/>
+    if not v then v = "[NIL]" end<br/>
+<br/>
+    freeswitch.consoleLog("INFO", k .. ": " .. v .. "\n")<br/>
+<br/>
+end<br/>
+<br/>
+log("Message", message:serialize())<br/>
+<br/>
+to_user = message:getHeader("to")<br/>
+<br/>
+message:delHeader("to")<br/>
+<br/>
+message:addHeader("to", "internal/sip:" .. area_code .. to_user .. "@" .. to_host)<br/>
+<br/>
+message:delHeader("to_host")<br/>
+<br/>
+message:addHeader("to_host", to_host)<br/>
+<br/>
+log("New Message", message:serialize())<br/>
+<br/>
+message:chat_execute("send")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">与在Dialplan中类似，在Chatplan中可以用以下方法调用Lua脚本，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="lua" data="test.lua"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.7　LUA拨号计划</font>
+</font>
+</p>
+<p height="1em" width="2em">在第6章我们提到，拨号计划除XML外还有很多种，其中一种就是LUA拨号计划，即可以通过Lua脚本提供Lua风格的Dialplan。</p>
+<p height="1em" width="2em">我们在这里讨论LUA Dialplan，不仅可以增进对Lua脚本的理解，也可以增加对Dialplan的理解，即使读者永远不会用到LUA提供的Dialplan，了解这些知识也是很有意义的。</p>
+<p height="1em" width="2em">下面的脚本入进路由阶段时将查询并生成一个Dialplan，FreeSWITCH接下来执行该Dialplan，打印一些Log，并执行answer和playback。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function log(k, v)<br/>
+<br/>
+    if not v then v = "[NIL]" end<br/>
+<br/>
+    freeswitch.consoleLog("INFO", k .. ": " .. v .. "\n")<br/>
+<br/>
+end<br/>
+<br/>
+cid = session:getVariable("caller_id_number")<br/>
+<br/>
+dest = session:getVariable("destination_number")<br/>
+<br/>
+log("From Lua DP: cid:  ", cid)<br/>
+<br/>
+log("From Lua DP: dest: ", dest)<br/>
+<br/>
+-- Some Bussinuss logic here<br/>
+<br/>
+ACTIONS =  {<br/>
+<br/>
+    {"log", "INFO I'm From Lua Dialplan"},<br/>
+<br/>
+    {"log", "INFO Hello FreeSWITCH, Playing MOH ..."},<br/>
+<br/>
+    "answer",<br/>
+<br/>
+    {"playback", "local_stream://moh"}<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">首先，跟在Dialplan中执行Lua脚本类似，这里也有一个session对象，可以执行所有与Session相关的函数，如获取主被叫号码（cid、dest）等。获取到相关信息后可以通过Lua相关的函数，如判断日期时间、连接数据库检查主被叫号码合法性及黑白名单等（这里我们省略了跟逻辑相关的操作）。最后，生成一个Lua Table。该Table的名字必须是ACTIONS。其成员可以是一个字符串或一个子Table。FreeSWITCH在ROUTING阶段获得该Table后，便可以进入EXECUTING阶段执行ACTIONS中定义的一系列动作（Action）。</p>
+<p height="1em" width="2em">Dialplan有三个要素——Extension、Context和Dialplan的名字，在Lua Dialplan中，Dialplan的名字当然是LUA，其Context就是Lua脚本的路径。把上面的脚本存为/tmp/db.lua，我们可以立即使用originate测试。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1000 test LUA /tmp/dp.lua<br/>
+<br/>
+[NOTICE] switch_channel.c:1030 New Channel sofia/internal/sip:1000@192.168.1.124: 34574 ...<br/>
+<br/>
+[NOTICE] sofia.c:5898 Ring-Ready sofia/internal/sip:1000@192.168.1.124:34574!<br/>
+<br/>
+[NOTICE] sofia.c:6561 Channel [sofia/internal/sip:1000@192.168.1.124:34574] has been answered<br/>
+<br/>
+[NOTICE] switch_ivr.c:1831 Transfer sofia/internal/sip:1000@192.168.1.124:34574 to LUA[test@/tmp/dp.lua]<br/>
+<br/>
++OK bbe75fce-2e94-4730-94e0-060f1bc81026<br/>
+<br/>
+[INFO] mod_lua.cpp:566 Processing -&gt;test in context/script /tmp/dp.lua<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 From Lua DP: cid:  : 0000000000<br/>
+<br/>
+[INFO] switch_cpp.cpp:1288 From Lua DP: dest: : test<br/>
+<br/>
+[INFO] mod_dptools.c:1588 I'm From Lua Dialplan<br/>
+<br/>
+[INFO] mod_dptools.c:1588 Hello FreeSWITCH, Playing MOH ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，originate命令首先呼叫user/1000，当它接听后，即转入LUA Dialplan中的/tmp/dp.lua这一Context进行路由，其对应的extension是test。其执行结果也很直观。</p>
+<p height="1em" width="2em">用originate回呼是一种快速的测试方法，除此之外，读者也可以尝试在XML Dialplan中转入LUA Dialplan，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="transfer" data="$1 LUA /tmp/dp.lua"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或直接修改Profile，让电话在呼入时直接进入LUA Dialplan。如将internal.xml中的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="dialplan" value="XML"/&gt;<br/>
+<br/>
+&lt;param name="context" value="public"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">修改为：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="dialplan" value="LUA"/&gt;<br/>
+<br/>
+&lt;param name="context" value="/tmp/dp.lua"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">执行sofia profile internal rescan可以使之生效。别忘了如果是注册用户拨打的话，还需要修改User Directory中的user_context（因为它的优先级比Profile中的context要高），如在1000.xml中：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;variable name="user_context" value="/tmp/dp.lua"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之，读者可以自己尝试一下，尽量完全掌握对这些不同的参数。如果遇到错误也不要紧，仔细看一下日志，应该很容易找到解决的办法。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.2.8　连接数据库</font>
+</font>
+</p>
+<p height="1em" width="2em">在Lua中，可以使用LuaSQL <sup>
+<small>
+<a href="text00139.html">
+<font size="2">
+<font color="#FF6600">[10]</font>
+</font>
+</a>
+</small>
+</sup>
+ 连接各种关系型数据库，但LuaSQL与某些版本的数据库驱动结合有内存泄漏问题，配置起来也相对复杂一些。</p>
+<p height="1em" width="2em">另一种连接数据库的方式是直接使用freeswitch.Dbh。它可以直接通过FreeSWITCH内部的数据库连接句柄来连接SQLite数据库或任何支持ODBC的数据库。下面是一个来自FreeSWITCH Wiki的例子，这里稍微做了一些改动：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+-- <br/>
+<br/>
+这里我们使用SQLite<br/>
+<br/>
+数据库，先初始化一个DB Handle<br/>
+<br/>
+local dbh = freeswitch.Dbh("/tmp/test.db")<br/>
+<br/>
+-- <br/>
+<br/>
+如果使用ODBC<br/>
+<br/>
+数据库，可以使用以下格式<br/>
+<br/>
+-- local dbh = freeswitch.Dbh("odbc://dsn username password")<br/>
+<br/>
+assert(dbh:connected()) -- <br/>
+<br/>
+断言，测试数据库是否成功连接，如果连接不成功则退出<br/>
+<br/>
+-- test_reactive<br/>
+<br/>
+测试数据库表是否存在，它有三个参数：<br/>
+<br/>
+-- <br/>
+<br/>
+测试语句（查询，SELECT<br/>
+<br/>
+），删除语句（DROP<br/>
+<br/>
+）及创建语句（CREATE<br/>
+<br/>
+）<br/>
+<br/>
+-- <br/>
+<br/>
+意思是说，如果SELECT<br/>
+<br/>
+不成功，则先试图运行一个DROP<br/>
+<br/>
+操作，再用CREATE<br/>
+<br/>
+重新创建<br/>
+<br/>
+dbh:test_reactive("SELECT * FROM test_table",<br/>
+<br/>
+                  "DROP TABLE test_table",<br/>
+<br/>
+                  "CREATE TABLE test_table (id INTEGER, name VARCHAR(255))")<br/>
+<br/>
+-- <br/>
+<br/>
+往我们新建的表中插入两条数据<br/>
+<br/>
+dbh:query("INSERT INTO test_table VALUES(1, 'foo')")<br/>
+<br/>
+dbh:query("INSERT INTO test_table VALUES(2, 'bar')")<br/>
+<br/>
+-- <br/>
+<br/>
+查询数据，并对查询结果集的每一行回调一个匿名函数（function<br/>
+<br/>
+），<br/>
+<br/>
+-- <br/>
+<br/>
+查询结果集将作为一个Table<br/>
+<br/>
+传入row<br/>
+<br/>
+参数，则实际列的值可以用row.id<br/>
+<br/>
+、row.name<br/>
+<br/>
+引用<br/>
+<br/>
+dbh:query("SELECT id, name FROM test_table", function(row)<br/>
+<br/>
+    freeswitch.consoleLog("INFO", string.format("Row #%s: %s\n", row.id, row.name))<br/>
+<br/>
+end)<br/>
+<br/>
+-- <br/>
+<br/>
+更新表<br/>
+<br/>
+dbh:query("UPDATE test_table SET name = 'changed'")<br/>
+<br/>
+-- <br/>
+<br/>
+打印更新行数（Affected Rows<br/>
+<br/>
+）<br/>
+<br/>
+freeswitch.consoleLog("INFO", "Affected rows: " .. dbh:affected_rows() .. "\n")<br/>
+<br/>
+-- <br/>
+<br/>
+查看更新后的结果<br/>
+<br/>
+dbh:query("SELECT id, name FROM test_table", function(row)<br/>
+<br/>
+    freeswitch.consoleLog("INFO", string.format("Row #%s: %s\n", row.id, row.name))<br/>
+<br/>
+end)<br/>
+<br/>
+-- <br/>
+<br/>
+释放Handle<br/>
+<br/>
+，可选，默认用完后会自动释放<br/>
+<br/>
+dbh:release()<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">执行结果如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[DEBUG] freeswitch_lua.cpp:352 DBH handle 0x7fa218a0fd28 Connected.<br/>
+<br/>
+[DEBUG] switch_core_sqldb.c:1187 SQL ERR [no such table: test_table]<br/>
+<br/>
+[SELECT * FROM test_table]<br/>
+<br/>
+Auto Generating Table!<br/>
+<br/>
+[DEBUG] switch_core_sqldb.c:1194 SQL ERR [no such table: test_table]<br/>
+<br/>
+[DROP TABLE test_table]<br/>
+<br/>
+[ERR] freeswitch_lua.cpp:391 DBH NOT Connected.<br/>
+<br/>
+[INFO] switch_cpp.cpp:1287 Row #1: foo<br/>
+<br/>
+[INFO] switch_cpp.cpp:1287 Row #2: bar<br/>
+<br/>
+[INFO] switch_cpp.cpp:1287 Affected rows: 2<br/>
+<br/>
+[INFO] switch_cpp.cpp:1287 Row #1: changed<br/>
+<br/>
+[INFO] switch_cpp.cpp:1287 Row #2: changed<br/>
+<br/>
+[DEBUG] freeswitch_lua.cpp:369 DBH handle 0x7fa218a0fd28 released.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们也可以直接查看数据库（如果没有这个命令，需要安装sqlite3软件包，以“--”开头的注释为笔者所加）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+dujinfang@seven:/tmp$ sqlite3 test_db<br/>
+<br/>
+SQLite version 3.7.12 2012-04-03 19:43:07<br/>
+<br/>
+Enter ".help" for instructions<br/>
+<br/>
+Enter SQL statements terminated with a ";"<br/>
+<br/>
+sqlite&gt; -- <br/>
+<br/>
+显示所有表<br/>
+<br/>
+sqlite&gt; .table<br/>
+<br/>
+test_table<br/>
+<br/>
+sqlite&gt; -- <br/>
+<br/>
+显示表结构<br/>
+<br/>
+sqlite&gt; .schema test_table<br/>
+<br/>
+CREATE TABLE test_table (id INTEGER, name VARCHAR(255));<br/>
+<br/>
+sqlite&gt; -- <br/>
+<br/>
+查询<br/>
+<br/>
+sqlite&gt; select * from test_table;<br/>
+<br/>
+1|changed<br/>
+<br/>
+2|changed<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="10pt" width="0pt" align="justify">
+<a href="text00138.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 我相信有很多人知道它是缘于2010年一则新闻，新闻中说：一个14岁的少年用Lua编出了iPhone上的名为Bubble Ball的游戏，该游戏下载量曾一度超过史上最流行的《愤怒的小鸟》。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00138.html">
+<font color="#FF6600">[2]</font>
+</a>
+ Highly Embeddable:As far as embeddability goes-Python ranks a 2,Perl ranks a 4,JavaScript is a 5,and Lua is a 10!参见：http://wiki.freeswitch.org/wiki/Mod_lua。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00138.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 找不到原始的出处了，好像是FreeSWITCH IRC上某个成员说的。不过，下面这篇博客倒是有点意思：http://ruoyusun.com/2013/03/23/pragmatic-lua-basics-in-30-mins.html。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00138.html">
+<font color="#FF6600">[4]</font>
+</a>
+ JavaScript是网页上浏览器端最流行的开发语言，而且随着node.js的流行，它在服务器端也迅速成长。当然，如果读者连JavaScript都不熟悉的话，也不要紧。JavaScript的语法与C或C++也比较类似。即使读者对所有这些语言都不熟悉，在这里两种语言对比着学习也没有什么坏处。本节大部分内容来自：http://phrogz.net/lua/LearningLua_FromJS.html。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00138.html">
+<font color="#FF6600">[5]</font>
+</a>
+ 这一点与PHP、Ruby以及Bash不同。在这三种语言中，双引号表示引用的内容中如果有变量的话，则要进行变量替换；而单引号表示引用的内容中的的字符串形式要保持原样，不管有没有变量。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00138.html">
+<font color="#FF6600">[6]</font>
+</a>
+ 来自Hello Lua:http://wiki.freeswitch.org/wiki/Mod_lua#Hello_Lua。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00138.html">
+<font color="#FF6600">[7]</font>
+</a>
+ 实际上还是有一点区别：当使用onInputCallback回调时，session:execute方式不会触发回调，而session:streamFile则可以。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00139.html">
+<font color="#FF6600">[8]</font>
+</a>
+ 实际上，也有一个叫Lua的API，它与luarun是等价的。不同的是，前者是在当前线程中执行的，而后者会新启动一个线程执行Lua脚本，并不阻塞当前线程的执行。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00139.html">
+<font color="#FF6600">[9]</font>
+</a>
+ FreeSWITCH内部也使用CUSTOM事件，如sofia::register等。使用时注意命名空间与内部不要发生冲突就行了，当然也可以选择跟内部一样的名字，用于伪造事件。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00139.html">
+<font color="#FF6600">[10]</font>
+</a>
+ 参见：http://www.keplerproject.org/luasql/。</p>
+</body>
+</html>

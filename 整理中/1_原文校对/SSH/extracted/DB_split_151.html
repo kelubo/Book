@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_207"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos911163" class="calibre7"></a>5.3.6 Integrity-Checking (MAC) Algorithms </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos911336" class="calibre15"></a>The <code class="calibre35">MACs</code> keyword selects the allowable integrity-checking algorithms, known as the message authentication code (MAC), used by <span><em class="italic">sshd</em></span>. <a shape="rect" href="DB_split_075.html#filepos346112" class="calibre6">[3.4.2.3]</a> Except as described below, the <code class="calibre35">MACs</code> keyword behaves exactly like the <code class="calibre35">Ciphers</code> keyword. <a shape="rect" href="DB_split_150.html#filepos881924" class="calibre6">[5.3.5]</a> Here are some examples: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    MACs hmac-sha1<br class="calibre19"/>    MACs hmac-sha1,hmac-md5</tt></div></span><p class="calibre4">Both OpenSSH and Tectia support the following standard MAC algorithms defined by the IETF SECSH draft: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-sha1</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-sha1-96</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-md5</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-md5-96</span></td>
+</tr></span></table><p class="calibre4">In addition, Tectia implements the standard "none" MAC, meaning that no integrity checking is performed. This is intended only for testing. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">In Tectia's FIPS mode, <span><em class="italic">only</em></span> the hmac-sha1 MAC is supported. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">OpenSSH also implements a nonstandard MAC algorithm, hmac-ripemd160@openssh.org. The name hmac-ripemd160 is also recognized without the @openssh.org suffix, but this is deprecated, since all nonstandard names are supposed to use a domain suffix. Tectia also supports some nonstandard MAC algorithms: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-ripemd160@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-ripemd160-96@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-sha256@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-sha256-96@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-tiger128@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-tiger128-96@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-tiger160@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-tiger160-96@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-tiger192@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">hmac-tiger192-96@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">ssl3-md5@ssh.com</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37">ssl3-sha1@ssh.com</span></td>
+</tr></span></table><p class="calibre4">Tectia recognizes special values for the <code class="calibre35">Macs</code> keyword to describe sets of algorithms: </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">AnyStd</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Any standard algorithm implemented by Tectia, including none </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">AnyStdMac</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Same as <code class="calibre35">AnyStd</code>, but excluding none </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">Any</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Any standard or nonstandard algorithm implemented by Tectia, including none </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">AnyMac</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Same as <code class="calibre35">Any</code>, but excluding none </div>
+</blockquote>
+</div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">Algorithm Naming Conventions</h3>
+<p class="calibre4">MAC names encode the algorithm and parameters, as for cipher names. To demonstrate, let's decode a sample name: hmac-ripemd160-96@ssh.com: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">hmac-</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Algorithms are prefixed by the name of the scheme that is used to combine a shared secret key with the contents of each packet. The most common is HMAC, the keyed hashing technique described by RFC-2104. Tectia also supports an early HMAC variant used by SSL Version 3, denoted by the prefix "ssl3-". </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">ripemd160</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The name of MAC hash algorithm is next, which often contains digits that indicate either a version (e.g., sha1 and md5) or the number of bits produced by the hash. <a shape="rect" href="DB_split_092.html#filepos524142" class="calibre6">[3.8.3]</a> The names are translated to lowercase, and any hyphens are removed. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-96</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Some MAC algorithms have variants that truncate a larger message digest to a smaller number of bits. These are appended to the name, preceded by a hyphen. </div>
+</blockquote>
+<div class="calibre3"><span><span><a href="mailto:@ssh.com" shape="rect" class="calibre6">@ssh.com</a></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">A suffix is required by the IETF SECSH draft for nonstandard ciphers, describing the domain that defined the MAC algorithm, preceded by an @ character. </div>
+</blockquote>
+</div>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">By default, Tectia allows algorithms in the <code class="calibre35">AnyStdMac</code> set. (The <code class="calibre35">Any</code> value includes <span><em class="italic">all</em></span> supported MAC algorithms, unlike the <code class="calibre35">Ciphers</code> keyword.) OpenSSH allows all its available MACs by default. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Tectia also recognizes standard MAC names with the @ssh.com suffix. The suffix cannot be omitted for nonstandard MAC names, however, in contrast to the <code class="calibre35">Ciphers</code> keyword. </p>
+<p class="calibre4">It's best to use the suffix consistently according to the IETF SECSH draft, only for nonstandard names. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+</body>
+</html>

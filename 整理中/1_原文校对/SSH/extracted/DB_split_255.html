@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_333"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1716801" class="calibre7"></a>7.5.15 Optimizations </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1716953" class="calibre15"></a>Tectia's <span><em class="italic">scp</em></span> does a few optimizations to avoid transferring unnecessary files and data. Before coping a file, <span><em class="italic">scp</em></span> compares the file sizes. If they are different, the copy commences, but if they are the same, <span><em class="italic">scp</em></span> computes an MD5 checksum of the source and destination file. If the checksums are equal, the files are assumed to be identical and no copy takes place, and you'll see a message like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    myfile: complete md5 match -&gt; transfer skipped</tt></div></span><p class="calibre4">If you always want your files copied, even if they are identical (i.e., have equal checksums), you can disable the MD5 test with the <span><em class="italic">--checksum</em></span> option, providing the value <code class="calibre35">no</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp --checksum no myfile server.example.com:   <em class="italic"><span>Don't compute checksums for files</span></em></tt></div></span><p class="calibre4">Tectia's <span><em class="italic">scp</em></span> performs similar checking on individual data blocks to determine whether to transfer them or not. You can control this with the <span><em class="italic">-W</em></span> or <span><em class="italic">--whole-file</em></span> options, providing the value <code class="calibre35">yes</code> or <code class="calibre35">no</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ scp --whole-file yes myfile server.example.com:   <em class="italic"><span>Always transfer whole files</span></em></tt></div></span></div>
+</body>
+</html>

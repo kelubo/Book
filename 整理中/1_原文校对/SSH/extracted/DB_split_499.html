@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_662"><span class="calibre2"><a shape="rect" class="calibre7"></a><a id="filepos2939590" class="calibre7"></a>Regex Syntax: Egrep Patterns </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2939750" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2939789" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2939828" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2939867" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2939906" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2939945" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos2939984" class="calibre15"></a>The escape character is a backslash (<code class="calibre35">\</code>). You can use it to escape metacharacters to use them in their plain character form. </p>
+<p class="calibre4">In the following examples, literal <code class="calibre35">E</code> and <code class="calibre35">F</code> denote any expression, whether a pattern or a character: </p>
+<p class="calibre4"><code class="calibre35">(</code> Start a capturing subexpression. </p>
+<p class="calibre4"><code class="calibre35">)</code> End a capturing subexpression. </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">E</code>|<code class="calibre35">F</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Disjunction, match either <code class="calibre35">E</code> or <code class="calibre35">F</code> (inclusive). <code class="calibre35">E</code> is preferred if both match. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E*</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Act as Kleene star, match <code class="calibre35">E</code> zero or more times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E+</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Closure, match <code class="calibre35">E</code> one or more times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E?</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Option, match <code class="calibre35">E</code> optionally once. </div>
+</blockquote>
+</div>
+<p class="calibre4"><code class="calibre35">.</code> Match any character except for newline characters (<code class="calibre35">\n</code>, <code class="calibre35">\f</code>, <code class="calibre35">\r</code>) and the NULL byte. </p>
+<div class="calibre3">
+<div class="calibre3"><span><code class="calibre35">E{</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">}</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code> exactly <em class="italic"><code class="calibre35">n</code></em> times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E{</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,}</code> or <code class="calibre35">E{</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,0}</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code>
+<em class="italic"><code class="calibre35">n</code></em> or more times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E{,</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">}</code> or <code class="calibre35">E{0,</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">}</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code> at most <em class="italic"><code class="calibre35">n</code></em> times. </div>
+</blockquote>
+<div class="calibre3"><span><code class="calibre35">E{</code>
+<em class="italic"><code class="calibre35">n</code></em>
+<code class="calibre35">,</code>
+<em class="italic"><code class="calibre35">m</code></em>
+<code class="calibre35">}</code></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Match <code class="calibre35">E</code> no less than <em class="italic"><code class="calibre35">n</code></em> times and no more than <em class="italic"><code class="calibre35">m</code></em> times. </div>
+</blockquote>
+</div>
+<p class="calibre4"><code class="calibre35">[</code> Start a character set. See "<a shape="rect" href="DB_split_502.html#filepos2954930" class="calibre6">Character Sets for Egrep and ZSH_FILEGLOB</a>." </p>
+<p class="calibre4"><code class="calibre35">$</code> Match the empty string at the end of the input or at the end of a line. </p>
+<p class="calibre4"><code class="calibre35">^</code> Match the empty string at the start of the input or at the beginning of a line. </p>
+</div>
+</body>
+</html>

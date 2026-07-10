@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_614"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2859689" class="calibre7"></a>18.2.1 Plink, a Console Client </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2859851" class="calibre15"></a>PuTTY comes with a second SSH terminal client, Plink, which is reminiscent of the <span><em class="italic">ssh</em></span> client of OpenSSH and Tectia. For a quick start, open a command window and type: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    C:\&gt; plink smith@server.example.com</tt></div></span><p class="calibre4">This command connects you via SSH to <span><em class="italic">server.example.com</em></span>, logging in as remote user smith. </p>
+<p class="calibre4">Plink is most appropriate for noninteractive use: for example, setting up tunnels for port forwarding, or running inside batch jobs. It can also handle interactive logins, but PuTTY is a better choice, particularly for screen-based programs like text editors. The Windows command line is not a particularly good terminal emulator. </p>
+<p class="calibre4">The <span><em class="italic">plink</em></span> client has many command-line options, similar to those of <span><em class="italic">ssh</em></span>. Run <span><em class="italic">plink</em></span> by itself to see a list of valid options, as shown in <a shape="rect" href="#filepos2861417" class="calibre6">Table 18-1</a>. </p>
+<div class="calibre3"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2861417" class="calibre15"></a></span><p class="calibre4">Table 18-1. plink command-line options</p>
+<div class="calibre3">
+<table summary="plink command-line options" border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Option</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Meaning</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">1</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use SSH-1 protocol.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">2</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use SSH-2 protocol.</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">C</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use compression for the SSH connection. <a shape="rect" href="DB_split_235.html#filepos1653420" class="calibre6">[7.4.14]</a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-i <em class="italic"><code class="calibre35">keyname</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use the private key <em class="italic"><code class="calibre35">keyname</code></em>. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-l <em class="italic"><code class="calibre35">username</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Specify the remote username (if omitted, it defaults to your local username). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-load <em class="italic"><code class="calibre35">session</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Load settings from a saved <em class="italic"><code class="calibre35">session</code></em>. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-m <em class="italic"><code class="calibre35">filename</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Read remote commands<a shape="rect" class="calibre15"></a><a id="filepos2865513" class="calibre15"></a> from the file <em class="italic"><code class="calibre35">filename</code></em>. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-pw <em class="italic"><code class="calibre35">P</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use password <em class="italic"><code class="calibre35">P</code></em>. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-P <em class="italic"><code class="calibre35">port</code></em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use TCP port <em class="italic"><code class="calibre35">port</code></em> to connect to the remote SSH server. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-s</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use an SSH subsystem. <a shape="rect" href="DB_split_182.html#filepos1123002" class="calibre6">[5.8]</a>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-t</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Allocate a pseudo-terminal (pty). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-T</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Do not allocate a pseudo-terminal. (pty). </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">-v</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Print verbose diagnostics. </p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">V</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Display the program version. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+</body>
+</html>

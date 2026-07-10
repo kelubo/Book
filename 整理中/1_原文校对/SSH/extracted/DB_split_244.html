@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_322"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1694884" class="calibre7"></a>7.5.4 Preserving Permissions </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1695044" class="calibre15"></a>When <span><em class="italic">scp</em></span> copies files, the destination files are created with certain file attributes. By default, the file permissions<a shape="rect" class="calibre15"></a><a id="filepos1695265" class="calibre15"></a> adhere to a umask on the destination host, and the modification and last access times will be the time of the copy. Alternatively, you can tell <span><em class="italic">scp</em></span> to duplicate the permissions and timestamps of the original files. The <span><em class="italic">-p</em></span> option accomplishes this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp -p myfile server.example.com:</tt></div></span><p class="calibre4">For example, if you transfer your entire home directory to a remote machine, you probably want to keep the file attributes the same as the original: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ scp -rp $HOME server.example.com:myhome/</tt></div></span><p class="calibre4">Again, <span><em class="italic">scp</em></span> does not duplicate special files and links, so consider <span><em class="italic">tar</em></span> or <span><em class="italic">rsync -a</em></span> instead: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ rsync -a -e ssh /usr/local/bin server.example.com:</tt></div></span></div>
+</body>
+</html>

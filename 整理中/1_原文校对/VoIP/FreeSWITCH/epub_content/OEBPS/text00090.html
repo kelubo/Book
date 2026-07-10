@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.3　按时间进行路由</font>
+</font>
+</p>
+<p height="1em" width="2em">有时候，在一些企业应用中，可能需要按时间段进行路由。例如，在上班时间路由到一个IVR，该IVR在报完欢迎语后，可以引导转到人工总机接电话；而在下班后，来电就转到另外一个IVR，工作全部由电脑自动处理。</p>
+<p height="1em" width="2em">我们可以构造如下Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="time_based_ivr"&gt;<br/>
+<br/>
+  &lt;condition wday="2-6" hour="8:30-17:30"&gt;<br/>
+<br/>
+    &lt;action application="ivr" data="ivr_day"/&gt;<br/>
+<br/>
+    &lt;anti-action application="ivr" data="ivr_night"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，我们可以看到，这里的测试条件（Condition）与以前的不同。以前我们大部分以destination_number为测试条件，而在这里，我们有两个测试条件，一个是wday，一个是hour，这两个测试条件是逻辑“与”的关系。其中，wday表示星期（星期日的值为“0”），一般上班的时间都是周一至周五，因而这里wday的值用“2～6”表示；同时，这里的hour表示小时，即工作日的8:30至17:30为上班时间。</p>
+<p height="1em" width="2em">在有呼叫到达后，如果系统时间在该条件定义的范围内，则执行在后续的action中定义的App。这里，我们只有一个action，它只是使用ivr App将呼叫转入白天应该播放的IVR（即ivr_day）。如果定义的条件不在这个范围内，FreeSWITCH就会执行anti-action指定的App，它也是执行ivr，不过这次它的参数是另一个IVR——ivr_night。</p>
+<p height="1em" width="2em">当然，读到这里读者可能会有疑问，上面的例子没有测试被叫号码，会不会有什么副作用？这种担心不是多余的。这里由于没有限制被叫号码，相当于任何被叫号码都会转到IVR，而实际上，我们只希望有人打我们的DID号码时才转入IVR，所以我们的配置一般会比上面的更复杂一些。</p>
+<p height="1em" width="2em">首先，写一个extension，它会根据不同的时间执行不同的动作，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="time_based_ivr" continue="true"&gt;<br/>
+<br/>
+  &lt;condition wday="2-6" hour="8:30-17:30"&gt;<br/>
+<br/>
+    &lt;action application="set" data="ivr=ivr_day" inline="true"/&gt;<br/>
+<br/>
+    &lt;anti-action application="set" data="ivr=ivr_night" inline="true/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">与前面的extension不同的是，此处的extension中使用了“continue=true”属性。保证在Dialplan解析的时候解析完此处会继续往下进行。如果当前的时间可以匹配这里的测试条件（工作日上班时间），便会执行set，设置ivr变量的值为ivr_day；否则，则将ivr变量的值设为ivr_night。</p>
+<p height="1em" width="2em"><img align="baseline" height="42" width="36" src="Image00120.jpg" />
+ <font color="#0468BB">注意</font>
+</p>
+<p height="1em" width="2em">上面的action和anti-action都设置了inline属性，它的值为true表示该动作会立即生效，以便后续的Dialplan使用此处设置的ivr变量来进行条件判断。虽然后续我们并没有使用它来进行条件判断，但这里使用该参数仍然是一个好习惯。</p>
+<p height="1em" width="2em">总之，在路由阶段检查过这一段Dialplan后，变量ivr的值不是等于ivr_day就是等于ivr_night，具体如何取决于来电的时间。另外，由于该extension的定义中还有“continue=true”参数，因而，Dialplan的解析过程会继续往下执行。如果我们在它后面建立如下的Dialplan，它将通过被叫号码匹配到来话的DID，然后，执行answer进行应答，并执行ivr转到刚才我们设置的ivr变量指定的IVR。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="ivr"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^DID$"&gt;<br/>
+<br/>
+    &lt;action application="answer" data=""/&gt;<br/>
+<br/>
+    &lt;action application="ivr" data="${ivr}"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这样，其他的被叫号码可以忽略这里的时间检查及ivr变量照常进行路由，不受这里的时间条件的影响。</p>
+<p height="1em" width="2em">当然，要完成完整的例子还需要配置实现ivr_day和ivr_night两个不同的IVR，这部分内容我们在上一节刚刚讲过，读者可以自行练习。</p>
+</body>
+</html>

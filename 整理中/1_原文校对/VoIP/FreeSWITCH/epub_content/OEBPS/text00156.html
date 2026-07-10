@@ -1,0 +1,1074 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">18.3　Event Socket库</font>
+</font>
+</p>
+<p height="1em" width="2em">事情永远都不像看起来那么简单。如果所有协议都需要手工敲的话，那电话一多你就忙不过来了。不过，这些早就有人帮你做好了，这就是我们下面要讲的ESL（Event Socket Library，Event Socket库）。ESL提供了一些库函数，通过这些库函数可以很方便地使用ESL协议与FreeSWITCH交互，进而控制FreeSWITCH的各种功能。</p>
+<p height="1em" width="2em">在上面的实验中，你应该已注意到原始的ESL协议中有很多类似下面的输出：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+Content-Type: command/reply<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这些是针对你输入命令的响应，如果同时你订阅了事件的话还能收到很多事件。再如果你有很多通话，而同时你又要不停地控制它们，这时会不会很凌乱？会不会产生竞争条件（Race Condition）？答案是不会，因为ESL都帮你做好了，它将相关的功能模块都封装成了函数，而且有各种语言的版本。当然，对于不支持的语言，就需要自己写了。比如，笔者在几年前学习Flex时就曾自己写了一个Flex版本的ESL库 <sup>
+<small>
+<a href="text00157.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">虽然是实际应用中一般不需要知道上面的ESL协议的具体细节，但笔者相信了解了这些协议的具体内容，有助于理解ESL。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">18.3.1　Event Socket示例</font>
+</font>
+</p>
+<p height="1em" width="2em">言归正传，其实学习编程序最好的办法就是看别人写的代码。因此，下面我们先来看几个使用ESL的例子，然后再对ESL中提供的函数进行说明。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.Ruby客户端</font>
+</font>
+</p>
+<p height="1em" width="2em">下面是一个使用Ruby语言通过ESL控制FreeSWITCH的例子。不管你是否熟悉Ruby，以下脚本都是很好懂的，脚本内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+require 'ESL'<br/>
+<br/>
+con = ESL::ESLconnection.new('127.0.0.1', '8021', 'ClueCon')<br/>
+<br/>
+esl = con.sendRecv('api sofia status')<br/>
+<br/>
+puts esl.getBody<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述脚本只有短短的4行代码，首先它加载了ESL库，然后连接到FreeSWITCH，接着执行sofia status命令，最后将结果输出到控制台。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.C语言客户端示例</font>
+</font>
+</p>
+<p height="1em" width="2em">在源代码目录的libs/esl/目录下有个testclient.c的ESL客户端例子，编译运行它后会使用Inbound模式连接到FreeSWITCH。对于下面的testclient.c的内容，为了讲解方便我们进行了简单的修改并增加了中文注释：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+int main(void)<br/>
+<br/>
+{<br/>
+<br/>
+    // <br/>
+<br/>
+初始化一个 handle<br/>
+<br/>
+，用于标志到FreeSWITCH<br/>
+<br/>
+的Socket<br/>
+<br/>
+连接<br/>
+<br/>
+    esl_handle_t handle = {{ 0 }};<br/>
+<br/>
+    // <br/>
+<br/>
+连接服务器，如果成功 handle <br/>
+<br/>
+就代表连接成功了<br/>
+<br/>
+    esl_connect(&amp;handle, "localhost", 8021, NULL, "ClueCon");<br/>
+<br/>
+    // <br/>
+<br/>
+发送一个命令，并接收返回值<br/>
+<br/>
+    esl_send_recv(&amp;handle, "api status\n\n");<br/>
+<br/>
+    // last_sr_event<br/>
+<br/>
+应该是 last server response event<br/>
+<br/>
+，即针对上面命令的响应<br/>
+<br/>
+    // <br/>
+<br/>
+如果在此之前收到事件（在本例中不会，因为没有订阅），事件会存到一个队列里，不会发生竞争条件<br/>
+<br/>
+    if (handle.last_sr_event&amp;&amp; handle.last_sr_event-&gt;body) {<br/>
+<br/>
+        // <br/>
+<br/>
+打印返回结果<br/>
+<br/>
+        printf("%s\n", handle.last_sr_event-&gt;body);<br/>
+<br/>
+    } else {<br/>
+<br/>
+        // <br/>
+<br/>
+对于api<br/>
+<br/>
+和bgapi<br/>
+<br/>
+来说（上面已经将命令写死了），应该不会运行到这里，但其他命令可能<br/>
+<br/>
+        // <br/>
+<br/>
+会到这里<br/>
+<br/>
+        printf("%s\n", handle.last_sr_reply);<br/>
+<br/>
+    }<br/>
+<br/>
+    // <br/>
+<br/>
+断开连接<br/>
+<br/>
+    esl_disconnect(&amp;handle);<br/>
+<br/>
+    return 0;<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，该程序很简单，它运行之后向FreeSWITCH建立一个连接，运行一个API命令，然后输出命令的执行结果。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.C语言服务器示例</font>
+</font>
+</p>
+<p height="1em" width="2em">在testclient.c所在目录中有一个testserver.c，其运行于Outbound模式，是多线程的，每次有电话进来时，通过Dialplan路由到socket App。该App便会从FreeSWITCH中向testserver发起一个TCP连接。</p>
+<p height="1em" width="2em">我们先从main函数开始看。首先它调用esl_global_set_default_logger函数设置日志级别（代表DEBUG级别，即最大级别，这样能看到详细的日志，包括所有协议的细节）。然后它通过esl_listen_threaded启动一个Socket监听本地回环地址（localhost）的8040端口。如果有连接（从FreeSWITCH）到来，它便回调mycallback函数为该连接服务。其中，NULL是一个空指针，该参数的位置是一个无类型（void*）的指针，即允许你传入任何类型的指针，该指针将作为mycallback函数的参数（user_data）在回调中携带 <sup>
+<small>
+<a href="text00157.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+int main(void)<br/>
+<br/>
+{<br/>
+<br/>
+    esl_global_set_default_logger(7);<br/>
+<br/>
+    esl_listen_threaded("localhost", 8040, mycallback, NULL, 100000);<br/>
+<br/>
+    return 0;<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面我们介绍回调函数，该函数比较长，因此为了描述方便我们加了行号。注意，这里的行号仅为描述方便，与原始文件中的行号不同。</p>
+<p height="1em" width="2em">首先，第1行为函数的定义，它有三个参数，分别是服务器端的Socket标志、客户端的Socket标志、一个连接地址，以及一个用户私有数据。第3行初始化了一个句柄，用于标志本次ESL连接，其他几个变量的意义我们后面再说。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 static void mycallback(esl_socket_t server_sock, esl_socket_t client_sock, struct sockaddr_in *addr, void *user_data)<br/>
+<br/>
+02 {<br/>
+<br/>
+03     esl_handle_t handle = {{ 0 }}; // <br/>
+<br/>
+初始化一个句柄，用于标志一个ESL<br/>
+<br/>
+连接<br/>
+<br/>
+04     int done = 0;<br/>
+<br/>
+05     esl_status_t status;<br/>
+<br/>
+06     time_t exp = 0;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第7行，将用于标志ESL连接的handle与传入的客户端的Socket绑定，这样就可以与客户端之间相互收发消息了；第8行，打印一条日志；第11行，添加一个过滤器（filter），只收取与本次连接的Channel相关的事件（与本次连接的Channel UUID相同的事件）；第12～15行，订阅各种类型的事件，至此我们应该能收到跟本Channel相关的事件了。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+07    esl_attach_handle(&amp;handle, client_sock, addr); // <br/>
+<br/>
+将handle<br/>
+<br/>
+与socket<br/>
+<br/>
+绑定<br/>
+<br/>
+08    esl_log(ESL_LOG_INFO, "Connected! %d\n", handle.sock);<br/>
+<br/>
+11    esl_filter(&amp;Handle, "unique-id", esl_event_get_header(handle.info_event, <br/>
+<br/>
+                 caller-unique-id"));<br/>
+<br/>
+12    esl_events(&amp;handle, ESL_EVENT_TYPE_PLAIN, "SESSION_HEARTBEAT CHANNEL_NSWER"<br/>
+<br/>
+13        " CHANNEL_ORIGINATE CHANNEL_PROGRESS CHANNEL_HANGUP "<br/>
+<br/>
+14        " CHANNEL_BRIDGE CHANNEL_UNBRIDGE CHANNEL_OUTGOING CHANNEL_EXECUTE"<br/>
+<br/>
+15        " CHANNEL_EXECUTE_COMPLETE DTMF CUSTOM conference::maintenance");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第19行，发送一个linger命令开启逗留模式。如果不开启该模式，则主叫挂机后，FreeSWITCH会立即断开它主动建立的Socket，这样会造成一些后续的事件收不到，如CHANNEL_HANGUP_COMPLETE、CHANNEL_DESTROY等。逗留模式的目的就是告诉FreeSWITCH晚一些断开这个Socket。后面我们还会讲到linger的用法。第20行，执行answer App对来话进行应答（跟在Dialplan中类似），然后，在第21行将来话送入一个会议。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+19    esl_send_recv(&amp;handle, "linger");<br/>
+<br/>
+20    esl_execute(&amp;handle, "answer", NULL, NULL);<br/>
+<br/>
+21    esl_execute(&amp;handle, "conference", "3000@default", NULL);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来是一个无限循环，用于不断地接收事件。在第22行，我们用的接收事件函数esl_recv_timd是非阻塞的，如果在1秒内没有收到任何事件，它就会返回，然后程序进入循环体。在第23行，检测done变量，它是个结束标志，用于结束循环，在满足一定的条件下，将在第32行对其进行赋值。在24行，判断，即如果当前的时间超过exp变量指定的值，则退出循环（关于退出条件我们后面再讲）。一般情况下，程序会执行到第25行，如果成功收到一条消息，则在第26行取出消息的类型。在此，它忽略所有的消息，直到在满足第27行的条件（挂机时将收到该消息）。如果收到挂机消息，则第28行将取出FreeSWITCH发过来的关于挂机的相关信息，并在第29行打印一条日志。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+22    while((status = esl_recv_timed(&amp;handle, 1000)) != ESL_FAIL) {<br/>
+<br/>
+23        if (done) {<br/>
+<br/>
+24            if (time(NULL) &gt;= exp) { break; }<br/>
+<br/>
+25        } else if (status == ESL_SUCCESS) {<br/>
+<br/>
+26            const char *type = esl_event_get_header(handle.last_event, content-type");<br/>
+<br/>
+27            if (type &amp;&amp; !strcasecmp(type, "text/disconnect-notice")) {<br/>
+<br/>
+28                const char *dispo = esl_event_get_header(handle.last_event, <br/>
+<br/>
+                  content-disposition");<br/>
+<br/>
+29                esl_log(ESL_LOG_INFO, "Got a disconnection notice <br/>
+<br/>
+                  dispostion: %s]\n", dispo ? dispo : "");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">由于我们使用了逗留模式，因此FreeSWITCH给我们返回的消息中将包含linger字符（或者从打印出的日志中看到），因此，我们设置done变量为1，并于第35行将exp变量的值设为5秒，也就是说，在5秒之后循环中将匹配第23～24行的条件。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+31                if (!strcmp(dispo, "linger")) {<br/>
+<br/>
+32                    done = 1;<br/>
+<br/>
+33                    // <br/>
+<br/>
+挂机后，可能还有后续的事件，我们多等几秒钟<br/>
+<br/>
+34                    esl_log(ESL_LOG_INFO, "Waiting 5 seconds for any remaining <br/>
+<br/>
+                               events.\n");<br/>
+<br/>
+35                    exp = time(NULL) + 5;<br/>
+<br/>
+36                }<br/>
+<br/>
+37            }<br/>
+<br/>
+38        }<br/>
+<br/>
+39    }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面的消息接收循环完毕后将打印一条日志（第40行），并断开连接（第41行，这时很可能连接已经断开了，这样做只是为了保险）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+40    esl_log(ESL_LOG_INFO, "Disconnected! %d\n", handle.sock);<br/>
+<br/>
+41    esl_disconnect(&amp;handle);<br/>
+<br/>
+42 }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之，该程序也很简单，它启动后监听一个端口，当FreeSWITCH中有来话路由到它时便启动一个新线程为新的Channel进行服务（具体的服务就是应答），并将来话送入一个会议。由于它是多线程的，因而可以同时为很多来话服务。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.使用ESL发送SIP MESSAGE消息</font>
+</font>
+</p>
+<p height="1em" width="2em">Wiki <sup>
+<small>
+<a href="text00157.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 上有一个使用Perl发送MESSAGE的应用，这里我们用C改写一下（在testclient基础上修改的）。</p>
+<p height="1em" width="2em">首先，前三行装入了必要的头文件。程序比较简单，只有一个main函数（第5行），并于第7～9行初始化了一些变量。程序内容如下。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 #include &lt;stdio.h&gt;<br/>
+<br/>
+02 #include &lt;stdlib.h&gt;<br/>
+<br/>
+03 #include &lt;esl.h&gt;<br/>
+<br/>
+04<br/>
+<br/>
+05 int main(void)<br/>
+<br/>
+06 {<br/>
+<br/>
+07     esl_handle_t handle = {{ 0 }};<br/>
+<br/>
+08     struct esl_event *event;<br/>
+<br/>
+09     struct esl_event_header header;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第10行初始化一个CUSTOM类型的事件，它的子类型（Subclass）是SMS::SEND_MESSAGE。第11～17行则给该事件增加各种必要的参数。关于这些参数的具体含义我们就不多讲了，只需要知道，FreeSWITCH收到包含这些参数的事件后，将会给1000@192.168.0.7用户发送一个文本消息，消息内容是在第17行定义的。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+10     esl_event_create_subclass(&amp;event,  ESL_EVENT_CUSTOM, "SMS::SEND_MESSAGE");<br/>
+<br/>
+11     esl_event_add_header_string(event, ESL_STACK_BOTTOM, "to", "1000@192.168.0.7");<br/>
+<br/>
+12     esl_event_add_header_string(event, ESL_STACK_BOTTOM, "from", "seven@192.168.0.7");<br/>
+<br/>
+14     esl_event_add_header_string(event, ESL_STACK_BOTTOM, "sip_profile", "internal");<br/>
+<br/>
+15     esl_event_add_header_string(event, ESL_STACK_BOTTOM, "dest_proto", "sip");<br/>
+<br/>
+16     esl_event_add_header_string(event, ESL_STACK_BOTTOM, "type", "text/plain");<br/>
+<br/>
+17     esl_event_add_body(event, "Hello");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第18行，建立到FreeSWITCH的连接。第19行，发一个命令试试连接是否正常。第20行，如果连接正常的话，打印一下上述命令的输出结果（第21行），并于第23行将刚才构造的事件发送出去。当然，要记得在第24行释放事件占用的内存。当然，如果第19行执行失败的话，程序会执行到第29行，打印相关信息。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+18    esl_connect(&amp;handle, "localhost", 8021, NULL, "ClueCon");<br/>
+<br/>
+19    esl_send_recv(&amp;handle, "api version\n\n");<br/>
+<br/>
+20    if (handle.last_sr_event&amp;&amp; handle.last_sr_event-&gt;body) {<br/>
+<br/>
+21        printf("%s\n", handle.last_sr_event-&gt;body);<br/>
+<br/>
+22        printf("sending event....\n");<br/>
+<br/>
+23        esl_sendevent(&amp;handle, event);<br/>
+<br/>
+24        esl_event_destroy(&amp;event);<br/>
+<br/>
+28    } else {<br/>
+<br/>
+29        printf("%s\n", handle.last_sr_reply);<br/>
+<br/>
+30    }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">最后，断开连接，程序正常返回（第31～32行）。具体代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+31    esl_disconnect(&amp;handle);<br/>
+<br/>
+32    return 0;<br/>
+<br/>
+33 }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">执行以上程序后，在1000这个SIP电话上将会收到一个Hello消息（如果该用户正常注册的话）。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">18.3.2　ESL函数说明</font>
+</font>
+</p>
+<p height="1em" width="2em">通过上面的几个简单的例子，相信读者已经对ESL有了一个基本的了解，下面我们就来详细看一下ESL里涉及的基本概念以及它提供的库函数。</p>
+<p height="1em" width="2em">18.2.3节中所讲的Event Socket命令对于我们理解各种基本概念是非常有用的。除此之外，FreeSWITCH也通过ESL库包装了大量的易于使用的函数，我们在18.3.1节也已经领略到一部分函数的风采了。</p>
+<p height="1em" width="2em">ESL本身与FreeSWITCH没有任何依赖关系，可以单独编译和使用。它在底层是使用C语言实现的，并通过swig包装成了其他程序语言惯用的格式。Wiki上的例子大部分都是以Perl和PHP语言编写的，为了方便读者比较，本节也给出了C语言对应的形式，以方便使用C语言开发的读者参考。即使不使用C语言而使用其他语言开发，对照原代码也便于发现在Wiki上找不到的函数原型及数据结构。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.ESL对象</font>
+</font>
+</p>
+<p height="1em" width="2em">ESL对象是一个核心ESL的对象，它用于一些全局的设置。你可以使用如下函数设置打印日志的级别：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+eslSetLogLevel($loglevel)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它的C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(void) esl_global_set_default_logger(int level);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里的level是整数值，对应关系如下：</p>
+<p height="1em" width="2em">·0为EMERG；</p>
+<p height="1em" width="2em">·1为ALERT；</p>
+<p height="1em" width="2em">·2为CRIT；</p>
+<p height="1em" width="2em">·3为ERROR；</p>
+<p height="1em" width="2em">·4为WARNING；</p>
+<p height="1em" width="2em">·5为NOTICE；</p>
+<p height="1em" width="2em">·6为INFO；</p>
+<p height="1em" width="2em">·7为DEBUG。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.ESL Event对象</font>
+</font>
+</p>
+<p height="1em" width="2em">ESL Event是一个事件对象，在C语言中的定义如下（在esl_event.h中定义）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+/*! \brief Representation of an event */<br/>
+<br/>
+struct esl_event {<br/>
+<br/>
+    esl_event_types_t event_id;        /*! <br/>
+<br/>
+事件ID (<br/>
+<br/>
+描述符) */<br/>
+<br/>
+    esl_priority_t priority;           /*! <br/>
+<br/>
+事件优先级 */<br/>
+<br/>
+    char *owner;                       /*! <br/>
+<br/>
+事件所有者 */<br/>
+<br/>
+    char *subclass_name;               /*! <br/>
+<br/>
+事件的子类型（Subclass<br/>
+<br/>
+） */<br/>
+<br/>
+    esl_event_header_t *headers;       /*! <br/>
+<br/>
+事件的头域，指向一个链表 */<br/>
+<br/>
+    esl_event_header_t *last_header;   /*! <br/>
+<br/>
+指向事件的最后一个头域 */<br/>
+<br/>
+    char *body;                        /*! <br/>
+<br/>
+事件的正文（内容） */<br/>
+<br/>
+    void *bind_user_data;              /*! <br/>
+<br/>
+事件绑定者提供的用户自定义数据 */<br/>
+<br/>
+    void *event_user_data;             /*! <br/>
+<br/>
+事件发送者绑定的用户自定义数据 */<br/>
+<br/>
+    unsigned long key;                 /*! <br/>
+<br/>
+唯一的键值*/<br/>
+<br/>
+ struct esl_event next;                /*! <br/>
+<br/>
+下一个事件的指针/<br/>
+<br/>
+int flags;                             /*! <br/>
+<br/>
+标志 */<br/>
+<br/>
+};<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当从FreeSWITCH中收到一个事件后，你就得到一个事件对象。ESL定义了一些函数用于从该对象中获取信息或构造新的对象。下面我们来简单介绍。</p>
+<p height="1em" width="2em">·<font color="#0468BB">serialize([$format])。</font>
+ 它可以将事件序列化成可读的形式，以冒号分隔的“名称:值”的形式给出。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_event_serialize(esl_event_t *event, char **str, esl_bool_t encode);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">setPriority([$number])。</font>
+ 设置事件的级别。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_event_set_priority(esl_event_t *event, esl_priority_t priority);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">getHeader($header_name)。</font>
+ 从事件中获取头域的值。其C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(char *) esl_event_get_header_idx(esl_event_t *event, const <br/>
+<br/>
+char *header_name, int idx);<br/>
+<br/>
+#define esl_event_get_header(_e, _h) esl_event_get_header_idx(_e, _h, -1)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">getBody()。</font>
+ 从事件中获取正文：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(char *) esl_event_get_body(esl_event_t *event);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">getType()。</font>
+ 取得事件的类型。在C语言中可以使用下列方式实现：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+esl_event_get_header(event, "content-type");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">addBody($value)。</font>
+ 向事件中增加正文，可以调用多次。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_event_add_body(esl_event_t *event, const char *fmt, ...);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">setBody($value)。</font>
+ 设置事件的正文，可以多次调用，但后者将覆盖前者。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_event_set_body(esl_event_t *event, const char *body);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">addHeader($header_name,$value)。</font>
+ 向事件中增加一个头域。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_event_add_header_string(esl_event_t *event, <br/>
+<br/>
+esl_stack_t stack,<br/>
+<br/>
+const char *header_name, const char *data);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">C语言中还有另一种形式，即使用类似printf的方式设置字符串的值：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_event_add_header(esl_event_t *event,<br/>
+<br/>
+    esl_stack_t stack, const char *header_name, const char *fmt, ...);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">delHeader($header_name)。</font>
+ 从Event中删除头域。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_event_del_header_val(esl_event_t *event,<br/>
+<br/>
+    const char *header_name, const char *var);<br/>
+<br/>
+#define esl_event_del_header(_e, _h) esl_event_del_header_val(_e, _h, NULL)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">firstHeader()。</font>
+ 将指针指向Event的第一个头域，并返回它的Key值。C语言中没有明确的定义，靠使用ESL Event的headers结构体成员实现。</p>
+<p height="1em" width="2em">·<font color="#0468BB">nextHeader()。</font>
+ 移动指针指向下一个header，在调用该函数前必须先调用firstHeader()，同样在C语言中没有明确定义，靠访问esl_event_header结构体的next成员实现。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.ESLconnection对象</font>
+</font>
+</p>
+<p height="1em" width="2em">ESLConnection对象维护与FreeSWITCH之间的连接，以发送命令并进行事件处理。在C语言中使用如下定义（在esl.h中）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+typedef struct {<br/>
+<br/>
+    struct sockaddr_storage sockaddr;<br/>
+<br/>
+    struct hostent hostent;<br/>
+<br/>
+    char hostbuf[256];<br/>
+<br/>
+    esl_socket_t sock;<br/>
+<br/>
+    /*! In case of socket error, this will hold the error description as reported <br/>
+<br/>
+    by the OS */<br/>
+<br/>
+    char err[256];<br/>
+<br/>
+    /*! The error number reported by the OS */<br/>
+<br/>
+    int errnum;<br/>
+<br/>
+    /*! The inner contents received by the socket. Used only internally. */<br/>
+<br/>
+    esl_buffer_t *packet_buf;<br/>
+<br/>
+    char socket_buf[65536];<br/>
+<br/>
+    /*! Last command reply */<br/>
+<br/>
+    char last_reply[1024];<br/>
+<br/>
+    /*! Las command reply when called with esl_send_recv */<br/>
+<br/>
+    char last_sr_reply[1024];<br/>
+<br/>
+    /*! Last event received. Only populated when **save_event is NULL */<br/>
+<br/>
+    esl_event_t *last_event;<br/>
+<br/>
+    /*! Last event received when called by esl_send_recv */<br/>
+<br/>
+    esl_event_t *last_sr_event;<br/>
+<br/>
+    /*! This will hold already processed events queued by esl_recv_event */<br/>
+<br/>
+    esl_event_t *race_event;<br/>
+<br/>
+    /*! Events that have content-type == text/plain and a body */<br/>
+<br/>
+    esl_event_t *last_ievent;<br/>
+<br/>
+    /*! For outbound socket. Will hold reply information when connect\n\n is sent */<br/>
+<br/>
+    esl_event_t *info_event;<br/>
+<br/>
+    /*! Socket is connected or not */<br/>
+<br/>
+    int connected;<br/>
+<br/>
+    struct sockaddr_in addr;<br/>
+<br/>
+    /*! Internal mutex */<br/>
+<br/>
+    esl_mutex_t *mutex;<br/>
+<br/>
+    int async_execute;<br/>
+<br/>
+    int event_lock;<br/>
+<br/>
+    int destroyed;<br/>
+<br/>
+} esl_handle_t;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它有如下函数：</p>
+<p height="1em" width="2em">·<font color="#0468BB">new($host,$port,$password)。</font>
+ 该函数初始化一个新的连接，仅用于inbound模式。在C语言中定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_connect_timeout(esl_handle_t *handle,<br/>
+<br/>
+    const char *host, esl_port_t port,<br/>
+<br/>
+    const char *user, const char *password, uint32_t timeout);<br/>
+<br/>
+#define esl_connect(_handle, _host, _port, _user, _password)<br/>
+<br/>
+    esl_connect_timeout(_handle, _host, _port, _user, _password, 0)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，esl_connect只是指向esl_connect_timeout的一个宏，默认超时时间0表示永不超时。</p>
+<p height="1em" width="2em">·<font color="#0468BB">new($fd)。</font>
+ 该命令用于根据一个已存在的Socket句柄建立一个ESLconnection对象。它仅用于outbound模式。</p>
+<p height="1em" width="2em">·<font color="#0468BB">socketDescriptor()。</font>
+ 该函数返回连接的UNIX文件句柄。</p>
+<p height="1em" width="2em">·<font color="#0468BB">connected()。</font>
+ 判断是否已连接，连接返回1，否则返回0。</p>
+<p height="1em" width="2em">·<font color="#0468BB">getInfo()。</font>
+ 当FreeSWITCH使用outbound模式连接时，它将首先发出一个CHANNEL_DATA事件，getInfo会返回该事件。在inbound模式中它返回NULL。</p>
+<p height="1em" width="2em">·<font color="#0468BB">send($command)。</font>
+ 向FreeSWITCH发送一个ESL命令，它不会等待接收事件，而需要明确地使用recvEvent或recvEventTimed以接收返回的事件。返回事件的类型为api/response或command/reply。使用sendRecv()可以自动获取返回结果。对应C语言的定义是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_send(esl_handle_t *handle, const char *cmd);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">sendRecv($command)。</font>
+ 在ESL内部，sendRecv(command)首先调用send(command)，然后调用recvEvent()并最终返回一个ESLevent对象。recvEvent()会在一个循环中调用并一直阻塞直到收到头域为api/response或command/reply的事件为止。在此期间所有收到的其他的将保存到一个内部队列中，这些队列中的事件会能在后续的recvEvent()中取到。C语言中的定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_send_recv_timed(esl_handle_t *handle, const char  <br/>
+<br/>
+            *cmd, uint32_t ms);<br/>
+<br/>
+#define esl_send_recv(_handle, _cmd) esl_send_recv_timed(_handle, _cmd, 0)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">api($command[,$arguments])。</font>
+ 向FreeSWITCH发API命令，它是阻塞执行的。它与sendRecv("api$command$args")是等价的。</p>
+<p height="1em" width="2em">·<font color="#0468BB">bgapi($command[,$arguments])。</font>
+ 后台执行API，要执行的API将在新的线程中执行，因而不会阻塞。该函数与sendRecv("bgapi$command$args")也是完全等价的。它执行后也返回一个Job-UUID，与我们上面讨论的bgapi使用场景类似。</p>
+<p height="1em" width="2em">·<font color="#0468BB">sendEvent($event)。</font>
+ 向FreeSWITCH发送一个事件。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_sendevent(esl_handle_t *handle, esl_event_t *event);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">recvEvent()。</font>
+ 从FreeSWITCH中接收事件，如果此时没有事件，它将一直阻塞直到有新事件到来。如果在调用它之前曾经调用了sendRecv()，并且sendRecv()曾经将收到的事件放到队列中，则该函数会返回队列中的第一个事件，否则，它会一直等待。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_recv_event(esl_handle_t *handle, int check_q, esl_event_t **save_event);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">recvEventTimed($milliseconds)。</font>
+ 该函数与recvEvent类似，不同的是它不会永远阻塞，而是将在参数指定的毫秒数会返回。recvEventTimed(0)可以立即返回，可以用于事件轮循。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_recv_event_timed(esl_handle_t *handle,<br/>
+<br/>
+    uint32_t ms, int check_q, esl_event_t **save_event);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">filter($header,$value)。</font>
+ 类似上面提到的filter命令，用于过滤事件。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_filter(esl_handle_t *handle, const char *header, const char *value);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">events($event_type,$value)。</font>
+ 订阅事件，类似上面的event命令。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_events(esl_handle_t *handle, esl_event_type_t etype, const char *value);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">execute($app[,$arg][,$uuid])。</font>
+ 执行DialplanApp，并阻塞等待返回。它将最终返回一个ESLevent对象，通过getHeader("Reply-Text")方法可以获取返回值，一般来说“+OK[成功的信息]”表示执行成功，“-ERR[错误信息]”表示执行失败。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_execute(esl_handle_t *handle,<br/>
+<br/>
+    const char *app, const char *arg, const char *uuid);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">executeAsync($app[,$arg][,$uuid])。</font>
+ 与execute()相同，但非阻塞。两者实际上都调用了上面的execute命令，只是executeAsync带了“async:true”头。</p>
+<p height="1em" width="2em">·<font color="#0468BB">setAsyncExecute($value)。</font>
+ 强制将Socket连接设为异步模式。value为1为异步，0为同步。调用该函数后，所有使用execute()执行的App都将带有“async:true”头域，因而执行是异步的。除此之外本函数对其他函数没有影响。在C语言中可以通过设置esl_handle结构体成员async_execute=1来实现。</p>
+<p height="1em" width="2em">·<font color="#0468BB">disconnect()。</font>
+ 主动中断与FreeSWITCH的Socket连接。C语言定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESL_DECLARE(esl_status_t) esl_disconnect(esl_handle_t *handle);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·<font color="#0468BB">setEventLock($value)。</font>
+ 使用该选项后，所有后续的execute()调用都将带有“event-lock:true”头域。</p>
+<p height="1em" width="2em">关于ESL我们就先讲到这里，更多的请参考：http://wiki.freeswitch.org/wiki/Event_Socket_Library。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00156.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 参见：http://wiki.freeswitch.org/wiki/FsAir。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00156.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 也就是它允许你从main函数向回调函数传递私有数据。注意，该参数直到1.4版（及Git master版）才有，在1.2版中无此参数。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00156.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 参见：http://wiki.freeswitch.org/wiki/Mod_sms#Sending_a_Message_via_ESL。</p>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_198"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos776646" class="calibre7"></a>5.2.4 Changing the Configuration </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos776810" class="calibre15"></a>
+<span><em class="italic">sshd</em></span> reads its configuration file at startup. Therefore, if you modify the file while the server is running, the changes don't affect the server. You must force the server to reread the file in order to accept the changes. This is done by sending a SIGHUP signal<a shape="rect" class="calibre15"></a><a id="filepos777175" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos777214" class="calibre15"></a> to the server process. The pid of the server is found in a file, usually <em class="italic">/var/run/sshd.pid</em> for OpenSSH or <em class="italic">/var/run/sshd2_22.pid</em> for Tectia. <a shape="rect" href="DB_split_146.html#filepos794893" class="calibre6">[5.3.1.3]</a></p>
+<p class="calibre4">Suppose the pid file is <em class="italic">/var/run/sshd.pid</em>, the default for OpenSSH. To send the SIGHUP signal, run the Unix <span><em class="italic">kill</em></span> command: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ cat /etc/sshd.pid<br class="calibre19"/>    19384<br class="calibre19"/>    $ kill -HUP 19384</tt></div></span><p class="calibre4">or more succinctly, with backquotes:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ kill -HUP `cat /etc/sshd.pid`</tt></div></span><p class="calibre4">or on systems with the <span><em class="italic">pidof</em></span> command, which prints pids of given, named processes: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ kill -HUP `pidof sshd`</tt></div></span><p class="calibre4">Linux systems (and others) have boot scripts that can signal the SSH server. For example, instead of explicitly sending SIGHUP to <span><em class="italic">sshd</em></span>, you can run: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ /etc/init.d/sshd reload</tt></div></span><p class="calibre4">Regardless of how it's sent, the SIGHUP signal restarts <span><em class="italic">sshd</em></span> (with a different pid) but doesn't terminate existing SSH connections, so you can send it safely while clients are connected. The new <span><em class="italic">sshd</em></span> process reads and conforms to the new configuration. </p>
+<p class="calibre4">The SIGHUP technique affects settings defined in the configuration file, not command-line options. To change those, you must kill and restart the server with the new options. For example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ kill 19384<br class="calibre19"/>    $ sshd <em class="italic"><code class="calibre35">new_options</code></em></tt></div></span><p class="calibre4">Command-line options are often specified in boot scripts that are used to start <span><em class="italic">sshd</em></span>. For example, some Linux systems read an <code class="calibre35">OPTIONS</code> variable assignment from the file <em class="italic">/etc/sysconfig/sshd</em> (if it exists). You may need to edit such options files if you want to permanently change the command-line options used to start the SSH server at boot time. After doing this, you can use the boot script to restart the server with the new command-line options: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ /etc/init.d/sshd restart</tt></div></span><p class="calibre4">Boot scripts can perform other useful functions. To determine whether the SSH server is running, use: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ /etc/init.d/sshd status</tt></div></span><p class="calibre4">To start or stop the server, use:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ /etc/init.d/sshd start<br class="calibre19"/>    $ /etc/init.d/sshd stop</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Some configuration keywords refer to external files. If the contents of those files change, you might wonder if it is necessary to signal the SSH server. In almost all cases, the answer is no: only the filenames are recorded when the configuration file is read, and the external file's contents are reread each time they are needed. The host key file is an important exception, because it is normally read only when the server starts. <a shape="rect" href="DB_split_146.html#filepos788375" class="calibre6">[5.3.1.1]</a></p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+</div>
+</body>
+</html>

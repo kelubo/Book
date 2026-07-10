@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.6　收发传真</font>
+</font>
+</p>
+<p height="1em" width="2em">无论社会如何发展，老技术永远有它特殊的生命力，生生不息。传真技术也是如此。在互联网技术飞速发展的今天，电子邮件、即时通信以及基于移动互联网的各种应用，如微博、微信等，铺天盖地地发展，但我们在企业应用中，还是离不开传真机。当然，现代的传真机大多数都集打印、扫描等功能于一体了，但还是使用TDM通信的方式收发传真。</p>
+<p height="1em" width="2em">为了将这些老旧的技术及设备融入SIP世界里，很多人也进行了各种努力，因而我们也可以非常方便地使用它。连接TDM传真机最简单的方式是使用一个模拟转SIP的网关，将它变成SIP后在FreeSWITCH中收发传真就变得容易了。如我们可以使用如下命令，呼叫一个号码，并开始收传真。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate sofia/gateway/gw1/xxxx &amp;rxfax(/tmp/test.tiff)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">传真功能是在mod_spandsp <sup>
+<small>
+<a href="text00127.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 中实现的。它实现了一个rxfax的App用于收传真。普通的传真机是这样工作的，A呼叫B，首先建立正常的通话，电话打通以后A告诉B它想发一个传真，因此B会按下一个按钮将传真机切换到传真模式，这时A这一端将听到“吱吱”的传真音，然后A端按下传真机上的“发送键”（或传真开始键）发送传真。</p>
+<p height="1em" width="2em">有SIP参与的传真过程也是类似的。它们首先先建立正常的SIP连接，然后如果一方想发传真或收传真，则它的终端就会给另一方发送SIP“re-INVITE”消息，与对方协商将RTP媒体流切换到T.38（或T.30）传真图像模式，协商完成后开始发送传真。</p>
+<p height="1em" width="2em">上面我们讲到的“rxfax”是收传真的App，它会将接收到的传真存到本地的一个TIFF <sup>
+<small>
+<a href="text00127.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 格式的文件中。</p>
+<p height="1em" width="2em">发送传真与与此类似，只是需要预先将欲发送的内容转成TIFF格式的文件。如下命令可以呼叫一个号码并发送传真：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate sofia/gateway/gw1/xxxx &amp;txfax(/tmp/test.tiff)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以使用Gostscript或Imagemagick图像处理工具将欲发送的传真内容从原来的格式（如PDF）转换成TIFF格式。如，下列gs（即Gostscript）命令可以将fax.pdf转换成fax.tiff：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+gs -q -r204x98 -g1728x1078 -dNOPAUSE -dBATCH -dSAFER -sDEVICE=tiffg3 -sOutputFile=fax.tiff -- fax.pdf<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">注意，其中“204x98”表示分辨率。传真文件的分辨率就是比较奇怪——横向和纵向的分辨率是不同的。另外，传真页面也需要有特定的大小，大部分传真机都能接收页面大小为“1728x1078”的传真，其他尺寸的因传真机而异。</p>
+<p height="1em" width="2em">上面我们只讨论了收发两端均是SIP的情况。如果在FreeSWITCH内部也使用如ftdm这样的Endpoint（配合模拟或数字板卡），那么FreeSWITCH也可以通过t38gateway这个App进行传真媒体的转换 <sup>
+<small>
+<a href="text00127.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">最后，我们再来看一下默认的Dialplan的配置。配置的Dialplan配置了两个Extension，“9178”用于收传真，“9179”用于发传真。具体内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="fax_receive"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^9178$"&gt;<br/>
+<br/>
+    &lt;action application="answer" /&gt;<br/>
+<br/>
+    &lt;action application="playback" data="silence_stream://2000"/&gt;<br/>
+<br/>
+    &lt;action application="rxfax" data="/tmp/rxfax.tif"/&gt;<br/>
+<br/>
+    &lt;action application="hangup"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+&lt;extension name="fax_transmit"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^9179$"&gt;<br/>
+<br/>
+    &lt;action application="txfax" data="/tmp/txfax.tif"/&gt;<br/>
+<br/>
+    &lt;action application="hangup"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">读者可以自行拨打测试一下。Dialplan的内容很简单，我们就不详细解释了。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00126.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 基于Spandsp库，当然除了传真之外它还实现了一些语音编解码。参考http://wiki.freeswitch.org/wiki/Mod_spandsp。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00126.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 传真常用的格式，与常见的JPEG或PNG格式不同，但类似于PDF，它主要的特点是支持多页，而这一点在传真文件中非常重要。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00127.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 详情参考http://wiki.freeswitch.org/wiki/Mod_spandsp。</p>
+</body>
+</html>

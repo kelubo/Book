@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_196"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos754737" class="calibre7"></a>5.2.2 Checking Configuration Files </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos754903" class="calibre15"></a>After you've changed a server configuration file (or constructed an initial version of the file), how do you know it's going to work and have the effects you intend? Later, when you upgrade the server to a more recent version, how can you detect incompatible changes in the meaning of keywords that you've been using? </p>
+<p class="calibre4">The most thorough way to verify the server configuration, of course, is to run the server exactly as you plan to deploy it, and test all of the functionality that you expect to use. This kind of testing can be time-consuming, however, and you might not be able to afford interrupting service on a busy production machine. </p>
+<p class="calibre4">Alternately, you could use some other test machine, or run the server on a different port <a shape="rect" href="DB_split_148.html#filepos816851" class="calibre6">[5.3.3.1]</a> while the old configuration is still being used on the original machine. These approaches are almost as good, but they can be complicated if the server configuration refers to network characteristics of the machine where it will be deployed, or by firewalls that block access to nonstandard ports. </p>
+<p class="calibre4">Both OpenSSH and Tectia have test features to help with these situations, or to just provide a quick check of the server configuration before more rigorous testing. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.2.2.1 Checking OpenSSH configuration files </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">If the OpenSSH server is started with the <span><em class="italic">-t</em></span> (test) option, it starts up, checks the validity of its host keys and the server configuration file, and then immediately exits without performing any other actions. When no problems are found, the server silently returns a zero exit status to indicate successful operation. Otherwise, error messages are printed to the standard error and the server exits with a nonzero status: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ sshd -t<br class="calibre19"/>    /etc/ssh/sshd_config: line 33: Bad configuration option: BlurflPox<br class="calibre19"/>    /etc/ssh/sshd_config: Bad yes/no argument: maybe</tt></div></span><p class="calibre4">The server must be run by a user (typically root) who has read access to the host key files and the server configuration file. Any other server options can be used in conjunction with <span><em class="italic">-t</em></span>, such as <span><em class="italic">-h</em></span> options <a shape="rect" href="DB_split_146.html#filepos788375" class="calibre6">[5.3.1.1]</a> to specify new host key files, the <span><em class="italic">-f</em></span> option <a shape="rect" href="DB_split_140.html#filepos748785" class="calibre6">[5.2.1]</a> to specify a new configuration file, or <span><em class="italic">-d</em></span> options <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> for more detailed debugging output (even if no errors are detected). </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.2.2.2 Checking Tectia configuration files </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos758785" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos758823" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos758920" class="calibre15"></a>Tectia provides a separate program, <span><em class="italic">sshd-check-conf</em></span>, to check server configuration files.<sup class="calibre20">[<a id="filepos759138" shape="rect" href="DB_split_144.html#filepos784960" class="calibre6">46</a>]</sup> Supply a hypothetical user and remote host, and <span><em class="italic">sshd-check-conf</em></span> will describe its access control decisions for them: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ sshd-check-conf rebecca@client.friendly.org<br class="calibre19"/>    Verifying rebecca@client.friendly.org[10.1.2.3]...<br class="calibre19"/>      Logins from client.friendly.org[10.1.2.3] allowed.<br class="calibre19"/>      Hostbased can be used from client.friendly.org[10.1.2.3].<br class="calibre19"/>      Login by user rebecca allowed.<br class="calibre19"/>      User rebecca will not be chrooted.<br class="calibre19"/>      TCP forwarding by user rebecca allowed.</tt></div></span><p class="calibre4"><span><em class="italic">sshd-check-conf</em></span> is especially helpful for verifying policies described by complicated patterns and subconfiguration files. <a shape="rect" href="DB_split_356.html#filepos2364262" class="calibre6">[11.6.2]</a> It uses the same code as <span><em class="italic">sshd</em></span> to parse the server configuration files and understands metaconfiguration information. <a shape="rect" href="DB_split_355.html#filepos2356359" class="calibre6">[11.6.1]</a></p>
+<p class="calibre4">If any errors are detected, <span><em class="italic">sshd-check-conf</em></span> prints messages to the standard error, as <span><em class="italic">sshd</em></span> would: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ sshd-check-conf rebecca@client.friendly.org<br class="calibre19"/>    Warning: Unrecognized configuration parameter 'BlurflPox'.<br class="calibre19"/>    Warning: Illegal IdleTimeout value 'never'.<br class="calibre19"/>    Warning: Failed to parse some variables from config file '/etc/ssh2/sshd2_config'.<br class="calibre19"/>    FATAL: Failed to read config file "/etc/ssh2/sshd2_config"</tt></div></span><p class="calibre4">It is not necessary to run <span><em class="italic">sshd-check-config</em></span> as root, as long as the server configuration files can be read. By default, <em class="italic">/etc/ssh2/sshd2_config</em> is used if the program is run by the superuser, or <em class="italic">$HOME/.ssh2/sshd2_config</em> otherwise. As for <span><em class="italic">sshd</em></span>, the <span><em class="italic">-f</em></span> option specifies a different configuration file: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ sshd-check-conf -f /tmp/sshd2_config_new rebecca@client.friendly.org</tt></div></span><p class="calibre4">The hypothetical SSH sessions are described by one or more [<em class="italic"><code class="calibre35">user</code></em>@]<em class="italic"><code class="calibre35">host</code></em> arguments on the command line. A numerical user ID can be used in place of a username, or the username can be omitted entirely to check only the remote host. In this case, <span><em class="italic">sshd-check-conf</em></span> substitutes <code class="calibre35">UNKNOWN</code> for the username when it analyzes the access controls: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ sshd-check-conf client.friendly.org<br class="calibre19"/>    Verifying UNKNOWN@client.friendly.org[10.1.2.3]...<br class="calibre19"/>      Logins from client.friendly.org[10.1.2.3] allowed.<br class="calibre19"/>      Hostbased can be used from client.friendly.org[10.1.2.3].<br class="calibre19"/>      Login by user UNKNOWN denied.</tt></div></span><p class="calibre4">An IP address can be used instead of a hostname: both the hostname and IP address are checked. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">If a hostname resolves to multiple IP addresses, then only the first IP address is used, and a warning is printed by <span><em class="italic">sshd-check-conf</em></span>. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Here's a brash one-liner to check the access controls for all local users: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ sed -e "s/:.*/@`hostname`/" /etc/passwd | xargs sshd-check-conf</tt></div></span><p class="calibre4">You can also run <span><em class="italic">sshd-check-conf</em></span> interactively: just don't supply any <em class="italic"><code class="calibre35">[user@]host</code></em> arguments on the command line. The program prompts for <em class="italic"><code class="calibre35">[user@]host</code></em> strings, permits Emacs-style editing of the strings as you enter them (using the GNU readline library), and maintains a history of previously entered values. </p>
+<p class="calibre4">In addition, <span><em class="italic">sshd-check-conf</em></span> recognizes a <span><em class="italic">dump</em></span> command to print keywords and values for the server configuration: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ sshd-check-conf<br class="calibre19"/>    ...<br class="calibre19"/>    ssh-check-conf&gt; <strong class="calibre45"><code class="calibre35">dump</code></strong><br class="calibre19"/>    # General<br class="calibre19"/>    Port = 22<br class="calibre19"/>    ProtocolVersionString = 4.1.3.2 SSH Secure Shell<br class="calibre19"/>    MaxConnections = 0<br class="calibre19"/>    ...<br class="calibre19"/>    # Authentication and authorization<br class="calibre19"/>    AllowedAuthentications = publickey,password<br class="calibre19"/>    IgnoreRhosts = no<br class="calibre19"/>    ...<br class="calibre19"/>    # Forwardings<br class="calibre19"/>    ForwardX11 = yes<br class="calibre19"/>    ForwardAgent = yes<br class="calibre19"/>    ...<br class="calibre19"/>    # Miscellaneous user setup<br class="calibre19"/>    UserConfigDirectory = %D/.ssh2<br class="calibre19"/>    PrintMOTD = yes<br class="calibre19"/>    ...<br class="calibre19"/>    sshd-check-conf&gt; <strong class="calibre45"><code class="calibre35">quit</code></strong><br class="calibre19"/>    $</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Tectia's <span><em class="italic">sshd-check-conf dump</em></span> command prints most configuration keywords and values, but not all of them. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">To exit from interactive mode, use the <code class="calibre35">quit</code> command, or type the end-of-file character (usually <span>^D</span>), or just kill the program (typically with <span>^C</span>). The <code class="calibre35">quit</code> and <code class="calibre35">dump</code> commands are case-insensitive. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Because <span><em class="italic">sshd-check-conf</em></span> matches patterns for subconfiguration files <a shape="rect" href="DB_split_356.html#filepos2364262" class="calibre6">[11.6.2]</a>, it reads the main configuration file only when a <em class="italic"><code class="calibre35">[user@]host</code></em> string has been given. Therefore, the <code class="calibre35">dump</code> command can't be used before then: </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ sshd-check-conf<br class="calibre19"/>    sshd-check-conf&gt; <strong class="calibre45"><code class="calibre35">dump</code></strong><br class="calibre19"/>    No config data to dump; input &lt;user@host&gt; first.</tt></div></span><p class="calibre4">The <span><em class="italic">sshd-check-conf</em></span> program accepts the debug options <span><em class="italic">-d</em></span> and <span><em class="italic">-v</em></span>
+<a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> to print more detailed debugging information as it reads the configuration files and analyzes access control decisions. </p>
+</div>
+</div>
+</body>
+</html>

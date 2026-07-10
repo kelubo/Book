@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.5　使用Java连接ESL</font>
+</font>
+</p>
+<p height="1em" width="2em">前面我们讲的都是C语言的例子，C语言是比较基础的语言，因而比较容易说明问题。然而，毕竟C语言比较底层，现在大多数的应用系统都是Java、Ruby、PHP、C#等高级语言开发的，因而更多的需要使用这些语言直接访问ESL。考虑到Java语言在企业应用开发中还是比较流行的语言，因此，本节我们一起来看一下它是如何跟FreeSWITCH交互的。</p>
+<p height="1em" width="2em">下面我们假定读者已经非常熟悉Java，并在主机上安装好了Java环境，对于不熟悉的读者，也可以通过该例子开拓一下视野，但对于基础的Java知识我们就不详细讲了。</p>
+<p height="1em" width="2em">FreeSWITCH的ESL通过Swig支持多语言，并使用JNI集成C与Java的接口。Java的ESL库是默认不编译的，如果要使用Java ESL，则需要手工进行编译。为了能让FreeSWITCH的编译脚本能找到你的Java安装路径，需要在configure阶段指定，如笔者主机上的Java路径是/opt/jdk1.7.0_45，则笔者在进行configure时按如下的方法指定Java路径：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+./configure --with-java=/opt/jdk1.7.0_45<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果FreeSWITCH以前已经编译过，也可以不用再次运行configure，而是直接修改libs/esl/java目录下的Makefile，将LOCAL_CFLAGS中相关的路径修改为Java的安装目录。比如，笔者修改后的Makefile中相应的行是这样的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+LOCAL_CFLAGS=-I../src/include -I/opt/jdk1.7.0_45/include -I/opt/jdk1.7.0_45/include/linux -fPIC<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">修改完成后直接在libs/esl/java目录下执行make或在libs/esl目录下执行make javamod命令完成编译。编译完成后，会在java目录下生成libesljni.so和esl.jar，我们马上就会用到它们。</p>
+<p height="1em" width="2em">下面我们就创建一个Java项目，写一个简单的测试的类MyESLTest，并保存到文件MyESLTest.java中。该类的代码很简单，首先第一行导入Java ESL库中一类和函数；第4行在main函数中初始化一个事件变量（event）；在第5行装入ESL的JNI接口库（在此我们使用了绝对路径，如果将该库文件放入Java的库文件目录中，也可以使用相对路径）；第6行初始化一个连接conn，通过Inbound模式连接到FreeSWITCH上；第8行订阅全部事件；第10行在while循环中接收一个事件；第11行打印出事件的名字；当然也可以把第12行的注释去掉，让第11行打印整个事件。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01  import org.freeswitch.esl.*;<br/>
+<br/>
+02  public class MyESLTest {<br/>
+<br/>
+03          public static void main(String [] args) {<br/>
+<br/>
+04                  ESLevent event;<br/>
+<br/>
+05                  System.load("/root/java/libesljni.so");<br/>
+<br/>
+06                  ESLconnection conn = new ESLconnection("127.0.0.1",8021,"ClueCon");<br/>
+<br/>
+07                  if (conn.connected() == 1) System.out.println("Connected");<br/>
+<br/>
+08                  conn.events("plain","ALL");<br/>
+<br/>
+09                  while (conn.connected() == 1) {<br/>
+<br/>
+10                          event = conn.recvEvent();<br/>
+<br/>
+11                          System.out.println(event.getHeader("Event-Name", -1));<br/>
+<br/>
+12                          //System.out.println(event.serialize("plain"));<br/>
+<br/>
+13                  }<br/>
+<br/>
+14<br/>
+<br/>
+15          }<br/>
+<br/>
+16  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在Java中使用的函数与C语言中都是类似的，只是命名和调用习惯不一样。在开发过程中可以参考libs/esl/java/org/freeswitch/esl/*.java文件中的接口定义。</p>
+<p height="1em" width="2em">Java源文件需要经过编译才能执行，如果你使用Java的集成开发环境，你需要引入esl.jar并进行编译，不过在此我们简单地写一个Makefile，然后使用make命令编译就可以了，Makefile内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+all:<br/>
+<br/>
+        javac -cp esl.jar MyESLTest.java<br/>
+<br/>
+clean:<br/>
+<br/>
+        rm MyESLTest.class<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">编译完成后，将得到MyESLTest.class文件，然后，就可以使用下面的命令执行它了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+java -cp .:esl.jar MyESLTest<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是该程序在笔者服务器上的输出结果：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+root@server:~/java# java -cp .:esl.jar MyESLTest<br/>
+<br/>
+Connected<br/>
+<br/>
+HEARTBEAT<br/>
+<br/>
+RE_SCHEDULE<br/>
+<br/>
+RE_SCHEDULE<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，该程序除了打印一些事件外什么也做不了，不过有了这个例子，相信很容易将FreeSWITCH集成到你现有的Java环境中了。更多的信息可以参考：http://wiki.freeswitch.org/wiki/Java_ESL。</p>
+<p height="1em" width="2em">除了标准的ESL库以外，还有一个基于异步IO的Netty框架的ESL库，有兴趣的读者，尤其是正在使用Netty框架进行开发的读者也可以研究一下：http://wiki.freeswitch.org/wiki/Java_ESL_Client。</p>
+</body>
+</html>

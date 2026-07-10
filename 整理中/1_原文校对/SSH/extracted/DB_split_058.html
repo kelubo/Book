@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_89"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos272635" class="calibre7"></a>2.7.1 sftp </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The <span><em class="italic">scp</em></span> command is convenient and useful, but many users are already familiar with FTP (File Transfer Protocol), a more widely used technique for transferring files on the Internet.<sup class="calibre20">[<a id="filepos273049" shape="rect" href="DB_split_059.html#filepos279714" class="calibre6">10</a>]</sup><span><em class="italic">sftp</em></span> is a separate file-transfer tool layered on top of SSH. The OpenSSH <span><em class="italic">sftp</em></span> can run over either SSH-1 or SSH-2, whereas the Tectia version runs over SSH-2 only due to implementation details. </p>
+<p class="calibre4"><span><em class="italic">sftp</em></span> has several advantages: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">It is secure, using an SSH-protected channel for data transfer. </li>
+<li class="calibre18">Multiple commands for file copying and manipulation can be invoked within a single <span><em class="italic">sftp</em></span> session, whereas <span><em class="italic">scp</em></span> opens a new session each time it is invoked. </li>
+<li class="calibre18">It can be scripted using the familiar <span><em class="italic">ftp</em></span> command language. </li>
+<li class="calibre18">In other software applications that run an FTP client in the background, you can try substituting <span><em class="italic">sftp</em></span>, thus securing the file transfers of that application. You might need to run an agent, however, since programs that normally invoke <span><em class="italic">ftp</em></span> might not recognize the <span><em class="italic">sftp</em></span> passphrase prompt, or they might expect you to have suppressed FTP's password prompt (using a <em class="italic">.netrc</em> file, for example). </li>
+</ul></div>
+<p class="calibre4">Anyone familiar with FTP will feel right at home with <span><em class="italic">sftp</em></span>, but <span><em class="italic">sftp</em></span> has some additional features of note: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Command-line editing using GNU Emacs-like keystrokes (<code class="calibre35">Control-B</code> for backward character, <code class="calibre35">Control-E</code> for end of line, and so forth).<sup class="calibre20">[<a id="filepos275525" shape="rect" href="DB_split_059.html#filepos280145" class="calibre6">11</a>]</sup></li>
+<li class="calibre18">Wildcards for matching filenames. OpenSSH uses the same "globbing" syntax that is supported by most common shells, while Tectia uses an extended regular expression syntax described in Appendix B. </li>
+<li class="calibre18">Several useful command-line options<a shape="rect" class="calibre15"></a><a id="filepos275912" class="calibre15"></a>: </li>
+</ul></div>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">-b filename (OpenSSH)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19"></div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">
+<span><em class="italic">-</em></span>B filename (Tectia)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Read commands from the given file instead of the terminal. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-S path</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Locate the <span><em class="italic">ssh</em></span> program using the given path. </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-v</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Print verbose messages as the program runs.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">-V <span><em class="italic">(OpenSS</em></span>H)</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Print the program version number and exit.</div>
+</blockquote>
+</div>
+<p class="calibre4">In addition, many of the command-line options for ssh can also be used for <span><em class="italic">sftp</em></span>. </p>
+<p class="calibre4">The OpenSSH version of <span><em class="italic">sftp</em></span> supports only the binary transfer mode of standard FTP, in which files are transferred without modification. Tectia's <span><em class="italic">sftp</em></span> also supports ASCII transfer mode, which translates end-of-line characters between systems that might use different conventions, e.g., carriage return plus newline for Windows, newline (only) for Unix, or carriage return (only) for Macintosh. </p>
+</div>
+</body>
+</html>

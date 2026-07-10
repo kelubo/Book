@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_581"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2812775" class="calibre7"></a>17.3.1 Key Generation Wizard </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2812942" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SecureCRT Quick Connect window" src="images/00076.jpg" class="calibre101"/></div>
+</div>
+</span><p class="calibre4">Figure 17-1. SecureCRT Quick Connect window</p></div>
+<p class="calibre4">SecureCRT's Key Generation Wizard creates key pairs for public-key authentication. The utility is run in the Tools menu by selecting Create Public Key. Equivalently, from the Global Options window, under SSH2 or SSH1,<sup class="calibre20">[<a id="filepos2813625" shape="rect" href="DB_split_439.html#filepos2822770" class="calibre6">183</a>]</sup> click Create Identity File. </p>
+<p class="calibre4">Operation is straightforward. All you need to supply are the passphrase, the number of bits in the key, and some random data by moving your mouse around the screen. The RSA Key Generation Wizard then creates a key pair and stores it in two files. As with the Unix SSH implementations, the private key filename is anything you choose (say, <em class="italic">mykey</em>), and its corresponding public-key filename is the same with <em class="italic">.pub</em> added (e.g., <em class="italic">mykey.pub</em>). </p>
+<p class="calibre4">Once your key pair is generated, you need to copy the public key to the SSH server machine, storing it in your account's authorization file. <a shape="rect" href="DB_split_191.html#filepos1224036" class="calibre6">[6.1]</a> SecureCRT can do this automatically, or you can do it manually. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>17.3.1.1 Automatic installation of keys </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2814970" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2815067" class="calibre15"></a>SecureCRT can upload your public keys to an SSH server with the click of a button, but there's a catch: your remote SSH server must support the publickey subsystem, described in technical detail at: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><a href="http://www.vandyke.com/technology/draft-ietf-secsh-publickey-subsystem.txt" shape="rect" class="calibre6">http://www.vandyke.com/technology/draft-ietf-secsh-publickey-subsystem.txt</a></span></td>
+</tr></span></table><p class="calibre4">VanDyke's own VShell server supports it, and VanDyke makes available a patched OpenSSH server with similar support at: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><a href="http://www.vandyke.com/download/os/pks_ossh.html" shape="rect" class="calibre6">http://www.vandyke.com/download/os/pks_ossh.html</a></span></td>
+</tr></span></table><p class="calibre4">Assuming you're running one of these servers:</p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Open the Session Options window, either for an existing session or to create a new session. </li>
+<li value="2" class="calibre18">Under Connection/SSH2, fill in your desired hostname and remote username. Then, for your primary authentication method, choose PublicKey. </li>
+<li value="3" class="calibre18">Click the Properties button to display the Public Key Properties dialog (see <a shape="rect" href="#filepos2817326" class="calibre6">Figure 17-2</a>). </li>
+<li value="4" class="calibre18">Select your desired public key, or generate a new one. </li>
+<li value="5" class="calibre18">Click the Upload button.</li>
+<li value="6" class="calibre18">SecureCRT will upload your public key to the remote SSH server machine. You will have to authenticate. </li>
+</ol></div>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2817326" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="SecureCRT Public Key Properties dialog" src="images/00077.jpg" class="calibre55"/></div>
+</div>
+</span><p class="calibre4">Figure 17-2. SecureCRT Public Key Properties dialog</p></div>
+<p class="calibre4">If the server does not support the publickey subsystem, you'll see an error message like "Unable to open the subsystem for publickey assistant." Try installing the key manually. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>17.3.1.2 Manual installation of keys </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2818318" class="calibre15"></a>To install your SecureCRT public key on a remote SSH server: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Log into the SSH server machine using SecureCRT and password authentication. </li>
+<li value="2" class="calibre18">View the public-key file and copy the full text of the key to the Windows clipboard. </li>
+<li value="3" class="calibre18">Install the public key (by pasting from the clipboard as necessary) on the SSH server machine in your remote account. <a shape="rect" href="DB_split_050.html#filepos231928" class="calibre6">[2.4.3]</a></li>
+<li value="4" class="calibre18">Log out.</li>
+<li value="5" class="calibre18">In the Session Options window, select Connection/SSH2, and change Authentication from Password to PublicKey. </li>
+<li value="6" class="calibre18">Log in again. SecureCRT prompts you for your private-key passphrase, and you'll be logged in. </li>
+</ol></div>
+</div>
+</div>
+</body>
+</html>

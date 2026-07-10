@@ -1,0 +1,837 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.2　用ESL重写空中充值服务</font>
+</font>
+</p>
+<p height="1em" width="2em">在17.3节我们讲过一个空中充值服务，当时是用Lua脚本实现的，下面我们来看一下在ESL中该怎么实现。</p>
+<p height="1em" width="2em">IVR类应用一般只涉及一个Channel，因此比较适合使用ESL的Outbound模式——即我们启动一个ESL服务器，当有新的呼叫到来时FreeSWITCH便会连接我们的ESL服务器。</p>
+<p height="1em" width="2em">在此，我们还是使用C语言作为例子。接着上一节的内容，在myesl目录中创建源文件charge.c。我们稍后再看如何改写Makefile，下面我们会先从代码看起。</p>
+<p height="1em" width="2em"><img align="baseline" height="42" width="36" src="Image00079.jpg" />
+ <font color="#0468BB">注意</font>
+</p>
+<p height="1em" width="2em">一般来说，在C语言程序中，被调用的函数写在前面，调用别的函数的函数则写在后面，这样就可以避免对所有的被调用的函数做前向声明。而在我们的程序中，main要调用前面的其他函数，所以我们把main函数写到最后。但从逻辑上看，程序是从main函数开始执行的，所以我们先从main函数开始看。</p>
+<p height="1em" width="2em">下面是我们的main函数入口，它比较简单。第188行定义main函数。第190行设置ESL日志级别，在此我们使用的是INFO级别，如果在调试的情况下，可以将日志级别改为ESL_LOG_LEVEL_DEBUG，这样便可以在控制台上看到大量日志输出。第191行使用esl_listen_threaded函数监听本地的一个8040端口，并阻塞等待连接到来。如果有新的连接到来，它就会启动一个新线程，并回调charge_callback函数 <sup>
+<small>
+<a href="text00162.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+188  int main(void)<br/>
+<br/>
+189  {<br/>
+<br/>
+190    esl_global_set_default_logger(ESL_LOG_LEVEL_INFO);<br/>
+<br/>
+191    esl_listen_threaded("localhost", 8040, charge_callback, NULL, 100000);<br/>
+<br/>
+192    return 0;<br/>
+<br/>
+193  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">charge_callback回调函数是在第161行定义的，当有新的连接到来时，它便在新的线程里执行。在函数的一开始，我们初始化了一个handle变量，用于标识一个ESL Socket连接，以及一个charge_helper结构体变量，用于记录充值过程中的一些数据。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+161  static void charge_callback(esl_socket_t server_sock, esl_socket_t client_sock, struct sockaddr_in *addr, void *user_data)<br/>
+<br/>
+162  {<br/>
+<br/>
+163    esl_handle_t handle = {{ 0 }};<br/>
+<br/>
+164    esl_status_t status;<br/>
+<br/>
+165    charge_helper_t charge_helper = { 0 };<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来初始化charge_helper的值。第166行设置handle。第167行初始化当前的余额。第168行将充值状态机的当前状态设为CHARGE_WELCOME，即欢迎主菜单。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+166    charge_helper.handle = &amp;handle;<br/>
+<br/>
+167    charge_helper.balance = BALANCE;<br/>
+<br/>
+168    charge_helper.state = CHARGE_WELCOME;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第169行将连接进来的Socket（client_sock）与我们这里的handle进行绑定，以后所有与FreeSWITCH的交互都通过该handle进行。第171行订阅我们需要的CHANNEL_EXECUTE_COMPLETE事件。第172行通过一个过滤器（filter）告诉FreeSWITCH，我们仅需要关注与本次通话（当前的Channel）相关的事件，而其他的事件一概不关心。注意该过滤器的作用不是过滤掉，而是“过滤进”，即过滤关键字（这里是Unique-ID）指定的是想要的内容，而不是不想要的内容。当然，为了取得当前通话的UUID，我们使用了esl_event_get_header函数从handle.info_event中取出。在有通话到来时，FreeSWITCH会首先发一个事件告诉我们的ESL程序该通话相关的信息，这些信息就存在handle.info_event变量中。另外，第173行我们还给FreeSWITCH发送linger API命令，通知FreeSWITCH如果电话挂机的话，“逗留”5秒后再将该Socket断开，以保证所有我们需要的事件都能收到。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+169    esl_attach_handle(&amp;handle, client_sock, addr);<br/>
+<br/>
+170    esl_log(ESL_LOG_INFO, "Connected! %d\n", handle.sock);<br/>
+<br/>
+171    esl_events(&amp;handle, ESL_EVENT_TYPE_PLAIN, "CHANNEL_EXECUTE_COMPLETE");<br/>
+<br/>
+172    esl_filter(&amp;handle, "Unique-ID",<br/>
+<br/>
+           esl_event_get_header(handle.info_event, "Caller-Unique-ID"));<br/>
+<br/>
+173    esl_send_recv(&amp;handle, "linger 5");<br/>
+<br/>
+174    esl_log(ESL_LOG_INFO, "%s\n", handle.last_sr_reply);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">本函数中上面的语句都是当有电话进来时进行的一些初始化和准备工作，从第175行开始，就通过esl_execute函数在FreeSWITCH中执行一些App了，这些App的执行跟在Dialplan中是类似的。如第175行的answer表示对来话进行应答（必须先应答再放音），然后设置中TTS引擎的参数（第176～177行），并播放欢迎音（第178行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+175    esl_execute(&amp;handle, "answer", NULL, NULL);<br/>
+<br/>
+176    esl_execute(&amp;handle, "set", "tts_engine=tts_commandline", NULL);<br/>
+<br/>
+177    esl_execute(&amp;handle, "set", "tts_voice=Ting-Ting", NULL);<br/>
+<br/>
+178    esl_execute(&amp;handle, "speak", "<br/>
+<br/>
+您好，欢迎使用空中充值服务", NULL);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面是一个while循环，不断地从FreeSWITCH接收（esl_recv）事件，收到的事件将存到变量handle.last_event中，如果我们判断事件的类型（type）是“text/event-plain”（第181行），说明是一个我们订阅的事件，然后就可调用回调函数event_callback（第182行）进行处理。注意，这里我们收到的事件last_event是ESL对FreeSWITCH中事件的一个包装，我们需要的真正的事件在last_ievent中，所以后面将看到在第56行我们将事件指针event指向handle-&gt;last_ievent。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+179    while((status = esl_recv(&amp;handle)) == ESL_SUCCESS) {<br/>
+<br/>
+180      const char *type = esl_event_get_header(handle.last_event, "content-type");<br/>
+<br/>
+181      if (type &amp;&amp; !strcasecmp(type, "text/event-plain")) {<br/>
+<br/>
+182        event_callback(&amp;charge_helper);<br/>
+<br/>
+183      }<br/>
+<br/>
+184    }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果上述while循环中接收失败（可能是Socket已断开），则循环结束，我们打印一行日志（第185行），并为了保险起见再调用一次esl_disconnect（第186行）断开Socket连接。该线程会退出。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+185    esl_log(ESL_LOG_INFO, "Disconnected! %d\n", handle.sock);<br/>
+<br/>
+186    esl_disconnect(&amp;handle);<br/>
+<br/>
+187  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，系统的关键部分在event_callback函数中。该函数我们稍后会讲到，现在为了理解该函数，我们从返回到文件开始处，从程序的第一行开始看。</p>
+<p height="1em" width="2em">在程序的一开始，先装入必要的头文件（第1～3行）以及定义几个宏（第4～13行）。其中，ENSURE_INPUT宏（第8～13行）比较长，它用于检查用户的输入是否为空，以避免遇到空指针引起崩溃。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01  #include &lt;stdio.h&gt;<br/>
+<br/>
+02  #include &lt;stdlib.h&gt;<br/>
+<br/>
+03  #include &lt;esl.h&gt;<br/>
+<br/>
+04  #define ERROR_PROMPT "say:<br/>
+<br/>
+输入错误，请重新输入"<br/>
+<br/>
+05  #define BALANCE 100<br/>
+<br/>
+06  #define CHARGE  100<br/>
+<br/>
+07  #define set_string(dest, str) strncpy(dest, str, sizeof(dest) - 1)<br/>
+<br/>
+08  #define ENSURE_INPUT(input) if (!input) { \<br/>
+<br/>
+09    esl_execute(ch-&gt;handle, "speak", "<br/>
+<br/>
+再见", NULL); \<br/>
+<br/>
+10    /* sleep(1); */ \<br/>
+<br/>
+11    esl_execute(ch-&gt;handle, "hangup", NULL, NULL); \<br/>
+<br/>
+12    return; \<br/>
+<br/>
+13  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，我们定义几个结构。charge_menu_t是一个enum的类型，用于定义菜单项。其中，为了与用户输入按键相匹配，我们定义了一个无效的菜单CHARGE_MENU_NONE，它的值为0，那么后面的CHARGE_MENU_QUERY和CHARGE_MENU_CHARGE的值就可以与菜单项相应的按键（1和2）对应起来。使用enum类型的常量在C语言编程中是一个好的习惯，这样代码就比较易读。后面接着我们定义了一个charge_state_t类型，作为菜单中的状态机使用（注意由于C语言的编程方法不太一样，这里跟Lua脚本中的状态并不是一一对应的），它也是对enum的重定义。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+14  typedef enum charge_menu_s {<br/>
+<br/>
+15    CHARGE_MENU_NONE,<br/>
+<br/>
+16    CHARGE_MENU_QUERY,<br/>
+<br/>
+17    CHARGE_MENU_CHARGE<br/>
+<br/>
+18  } charge_menu_t;<br/>
+<br/>
+19  typedef enum charge_state {<br/>
+<br/>
+20    CHARGE_WELCOME,<br/>
+<br/>
+21    CHARGE_MENU,<br/>
+<br/>
+22    CHARGE_WAIT_ACCOUNT,<br/>
+<br/>
+23    CHARGE_WAIT_ACCOUNT_PASSWORD,<br/>
+<br/>
+24    CHARGE_WAIT_CARD,<br/>
+<br/>
+25    CHARGE_WAIT_CONFIRM<br/>
+<br/>
+26  } charge_state_t;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面定义一个charge_helper_t类型，用于保存充值环节中数据。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+27  typedef struct charge_helper_s {<br/>
+<br/>
+28    esl_handle_t *handle;<br/>
+<br/>
+29    charge_state_t state;<br/>
+<br/>
+30    charge_menu_t menu;<br/>
+<br/>
+31    char account[20];<br/>
+<br/>
+32    char card[20];<br/>
+<br/>
+33    int balance;<br/>
+<br/>
+34  } charge_helper_t;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">get_digits函数用于从用户输入事件中获取输入的DTMF字符串。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+35  char * get_digits(esl_event_t *event)<br/>
+<br/>
+36  {<br/>
+<br/>
+37    char *digits = esl_event_get_header(event, "variable_digits");<br/>
+<br/>
+38    if (digits) esl_log(ESL_LOG_INFO, "digits: %s\n", digits);<br/>
+<br/>
+39    return digits;<br/>
+<br/>
+40  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面的check_account_password和check_account_card函数只是用于硬编码的检查用户的账号、卡号、密码等 <sup>
+<small>
+<a href="text00162.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。do_charge函数也只是简单地将余额与充值金额相加。这些函数在以后都可以扩充（如与数据库交互等）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+41  int check_account_password(char *account, char *password)<br/>
+<br/>
+42  {<br/>
+<br/>
+43    return (!strcmp(account, "1111")) &amp;&amp; (!strcmp(password, "1111"));<br/>
+<br/>
+44  }<br/>
+<br/>
+45  int check_account_card(char *account, char *card)<br/>
+<br/>
+46  {<br/>
+<br/>
+47    return (!strcmp(account, "1111")) &amp;&amp; (!strcmp(card, "2222"));<br/>
+<br/>
+48  }<br/>
+<br/>
+49  int do_charge(int balance, int charge)<br/>
+<br/>
+50  {<br/>
+<br/>
+51    return balance + charge;<br/>
+<br/>
+52  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">下面的event_callback函数（第53行）是一个回调函数，我们在每次收到相关的事件时，都会回调该函数。在该函数内，我们实现了一个简单的状态机，用于根据用户的输入进行各种判断，以决定执行哪个流程。</p>
+<p height="1em" width="2em">该函数的输入参数是一个charge_helper_t类型的指针ch，通过它可以取得相应的收到的事件，如第56行将event指针指向当前收到的事件。第57行是一行调试信息，我们暂时注释掉了，在用到的时候可以将注释去掉，以方便调试。第58行判断事件的类型，我们只接收CHANNEL_EXECUTE_COMPLETE类型的事件，其他事件一概不理。第59行我们将从当前事件中取得最后执行的App的名字，并赋值给application变量。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+53  static void event_callback(charge_helper_t *ch)<br/>
+<br/>
+54  {<br/>
+<br/>
+55    char *application = NULL;<br/>
+<br/>
+56    esl_event_t *event = ch-&gt;handle-&gt;last_ievent;<br/>
+<br/>
+57    /* esl_log(ESL_LOG_INFO, "event_id: %d\n", event-&gt;event_id); */<br/>
+<br/>
+58    if (event-&gt;event_id != ESL_EVENT_CHANNEL_EXECUTE_COMPLETE) return;<br/>
+<br/>
+59    application = esl_event_get_header(event, "Application");<br/>
+<br/>
+60    esl_log(ESL_LOG_INFO, "State: %d App: %s\n", ch-&gt;state, application);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第61行用一个switch语句判断当前的状态。电话刚刚接入时将进入CHARGE_WELCOME状态，然后我们判断上一次执行的App是不是speak（注意，这里我们只有一个speak，如果前面执行多个speak，则需要更多的条件进行判断，以找到最后一个speak），如果是，则说明前面的欢迎音（第180行，后面会讲到）播放完了，便接着使用play_and_get_digits提示用户选择是查询还是充值，以进入相应的菜单。注意这里的play_and_get_digits与Lua中的用法有点差别，前者将收到的输入结果存入digits变量中，我们后续收到CHANNEL_EXECUTE_COMPLETE时便可以从事件的variable_digits头域中取得结果（如第37行所示）。当然，在这里我们只需要使用esl_execute（第66行）通知FreeSWITCH执行就行了，执行完毕后我们将在下次收到事件时获得用户输入。当然，我们事先在第65行将下一次的状态设为CHARGE_MENU，这样在下次收到事件后，我们将跳到第71行开始判断。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+61    switch(ch-&gt;state) {<br/>
+<br/>
+62      case CHARGE_WELCOME:<br/>
+<br/>
+63        if (!strcmp(application, "speak")) {<br/>
+<br/>
+64  select_menu:<br/>
+<br/>
+65          ch-&gt;state = CHARGE_MENU;<br/>
+<br/>
+66          esl_execute(ch-&gt;handle, "play_and_get_digits",<br/>
+<br/>
+67            "1 1 3 5000 # 'say:<br/>
+<br/>
+查询请按1<br/>
+<br/>
+，充值请按2' "<br/>
+<br/>
+68            ERROR_PROMPT " digits ^\\d$", NULL);<br/>
+<br/>
+69        }<br/>
+<br/>
+70        break;<br/>
+<br/>
+71      case CHARGE_MENU:<br/>
+<br/>
+72        if (!strcmp(application, "play_and_get_digits")) {<br/>
+<br/>
+73          char *menu = get_digits(event);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在收到用户输入后，我们将使用ENSURE_INPUT宏判断用户输入是否合法，如果不合法则立即播放“再见”并挂机。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+74          ENSURE_INPUT(menu)<br/>
+<br/>
+75          if (!strcmp(menu, "1")) {<br/>
+<br/>
+76            ch-&gt;menu = CHARGE_MENU_QUERY;<br/>
+<br/>
+77          } else if (!strcmp(menu, "2")) {<br/>
+<br/>
+78            ch-&gt;menu = CHARGE_MENU_CHARGE;<br/>
+<br/>
+79          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在获取到用户输入的菜单后（1或2），我们接着询问用户的账号（第81行），并将状态设为CHARGE_WAIT_ACCOUNT（第80行）等待下一次事件到来。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+80          ch-&gt;state = CHARGE_WAIT_ACCOUNT;<br/>
+<br/>
+81          esl_execute(ch-&gt;handle, "play_and_get_digits",<br/>
+<br/>
+82            "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的账号，以井号结束' "<br/>
+<br/>
+83            ERROR_PROMPT " digits ^\\d{4}$", NULL);<br/>
+<br/>
+84        }<br/>
+<br/>
+85        break;<br/>
+<br/>
+86      case CHARGE_WAIT_ACCOUNT:<br/>
+<br/>
+87        if (!strcmp(application, "play_and_get_digits")) {<br/>
+<br/>
+88          char *account = get_digits(event);<br/>
+<br/>
+89          ENSURE_INPUT(account)<br/>
+<br/>
+90          set_string(ch-&gt;account, account);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当用户输入账号后，检查用户在上一步中选择的菜单项（已存到ch-&gt;menu变量中），并根据不同的菜单项决定下一步继续询问密码还是询问卡号。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+91          if (ch-&gt;menu == CHARGE_MENU_QUERY) {<br/>
+<br/>
+92            ch-&gt;state = CHARGE_WAIT_ACCOUNT_PASSWORD;<br/>
+<br/>
+93            esl_execute(ch-&gt;handle, "play_and_get_digits",<br/>
+<br/>
+94              "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的密码，以井号结束' "<br/>
+<br/>
+95              ERROR_PROMPT " digits ^\\d{4}$", NULL);<br/>
+<br/>
+96          } else if (ch-&gt;menu == CHARGE_MENU_CHARGE) {<br/>
+<br/>
+97            ch-&gt;state = CHARGE_WAIT_CARD;<br/>
+<br/>
+98            esl_execute(ch-&gt;handle, "play_and_get_digits",<br/>
+<br/>
+99              "4 5 3 5000 # 'say:<br/>
+<br/>
+请输入您的充值卡卡号，以井号结束' "<br/>
+<br/>
+100              ERROR_PROMPT " digits ^\\d{4}$", NULL);<br/>
+<br/>
+101          } else {<br/>
+<br/>
+102            ch-&gt;state = CHARGE_WELCOME;<br/>
+<br/>
+103            esl_execute(ch-&gt;handle, "speak", "<br/>
+<br/>
+输入有误，请重新输入", NULL);<br/>
+<br/>
+104          }<br/>
+<br/>
+105        }<br/>
+<br/>
+106        break;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在等待账户密码状态下，如果收到用户输入事件，则检查用户输入的账户、密码是否匹配（第111行）。如果匹配，则将下一步的状态设为CHARGE_WELCOME（第114行），以使播放完毕后重新进入主菜单，并播放当前余额（第115行）；如果用户输入错误（第116行），则播放错误提示，也转入主菜单。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+107      case CHARGE_WAIT_ACCOUNT_PASSWORD:<br/>
+<br/>
+108        if (!strcmp(application, "play_and_get_digits")) {<br/>
+<br/>
+109          char *password = get_digits(event);<br/>
+<br/>
+110          ENSURE_INPUT(password)<br/>
+<br/>
+111          if (check_account_password(ch-&gt;account, password)) {<br/>
+<br/>
+112            char buffer[1024];<br/>
+<br/>
+113            sprintf(buffer, "<br/>
+<br/>
+您的余额是%d<br/>
+<br/>
+元", ch-&gt;balance);<br/>
+<br/>
+114            ch-&gt;state = CHARGE_WELCOME;<br/>
+<br/>
+115            esl_execute(ch-&gt;handle, "speak", buffer, NULL);<br/>
+<br/>
+116          } else {<br/>
+<br/>
+117            ch-&gt;state = CHARGE_WELCOME;<br/>
+<br/>
+118            esl_execute(ch-&gt;handle, "speak", "<br/>
+<br/>
+输入有误，请重新输入", NULL);<br/>
+<br/>
+119          }<br/>
+<br/>
+120        }<br/>
+<br/>
+121        break;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果用户当初选择了充值，则下面这一步将得到卡号（第124行）。如果用户输入的卡号是正确的（第126行），则播放提示音提示充值卡上的金额（第129行）。注意其中我们在第127行初始化了一个缓冲区，并在第128行写入一个字符串，这是C语言中拼接字符串的一种方式，为了避免缓冲区溢出需要保证缓冲区足够大（这里我们使用了1024字节）。接下来让用户确认是否充值（第132行），并将下一步的状态设为CHARGE_WAIT_CONFIRM等待用户输入结果。如果用户输入的号码有误（第135行），则转入主菜单。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+122      case CHARGE_WAIT_CARD:<br/>
+<br/>
+123        if (!strcmp(application, "play_and_get_digits")) {<br/>
+<br/>
+124          char *card = get_digits(event);<br/>
+<br/>
+125          ENSURE_INPUT(card)<br/>
+<br/>
+126          if (check_account_card(ch-&gt;account, card)) {<br/>
+<br/>
+127            char buffer[1024];<br/>
+<br/>
+128            sprintf(buffer, "<br/>
+<br/>
+您要充值%d<br/>
+<br/>
+元", CHARGE);<br/>
+<br/>
+129            esl_execute(ch-&gt;handle, "speak", buffer, NULL);<br/>
+<br/>
+130            /* sleep(2); */<br/>
+<br/>
+131            ch-&gt;state = CHARGE_WAIT_CONFIRM;<br/>
+<br/>
+132            esl_execute(ch-&gt;handle, "play_and_get_digits",<br/>
+<br/>
+133              "1 1 3 5000 # 'say:<br/>
+<br/>
+确认请按1<br/>
+<br/>
+，返回请按2' "<br/>
+<br/>
+134              ERROR_PROMPT " digits ^\\d$", NULL);<br/>
+<br/>
+135          } else {<br/>
+<br/>
+136            ch-&gt;state = CHARGE_WELCOME;<br/>
+<br/>
+137            esl_execute(ch-&gt;handle, "speak", "<br/>
+<br/>
+输入有误，请重新输入", NULL);<br/>
+<br/>
+138          }<br/>
+<br/>
+139        }<br/>
+<br/>
+140        break;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在等待用户输入状态下，如果用户按“1”确认，则进行充值（第147）操作，并向用户播报充值结果（第150行），播报完毕后，就可以返回主菜单了（第149行）。如果用户按“2”则放弃充值并返回主菜单。这时我们就会遇到一个问题：首先看第63行有一个验证，即最后执行的App必须是一个speak才能顺利往下走，我们前面返回主菜单前都使用了speak（如第117～118行、第136～137行），而此处用户输入“1”以后，显然在此播放任何语音都是不合适的，因此这里我们使用了C语言中的一个技巧，第153行使用goto语句直接跳转到在第64行定义的select_menu标签，并直接播放主菜单，而不用等待下一次事件的到来。虽然goto语句在C语言中一般是不推荐使用的，但是我们这里编写的是“不一般”的程序，而且到后面我们看FreeSWITCH源代码的时候，也能看到大量的goto语句。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+141      case CHARGE_WAIT_CONFIRM:<br/>
+<br/>
+142        if (!strcmp(application, "play_and_get_digits")) {<br/>
+<br/>
+143          char *confirm = get_digits(event);<br/>
+<br/>
+144          ENSURE_INPUT(confirm)<br/>
+<br/>
+145          if (!strcmp(confirm, "1")) {<br/>
+<br/>
+146            char buffer[1024];<br/>
+<br/>
+147            ch-&gt;balance = do_charge(ch-&gt;balance, CHARGE);<br/>
+<br/>
+148            sprintf(buffer, "<br/>
+<br/>
+充值成功，充值金额%d<br/>
+<br/>
+元，余额为%d<br/>
+<br/>
+元", CHARGE, ch-&gt;balance);<br/>
+<br/>
+149            ch-&gt;state = CHARGE_WELCOME;<br/>
+<br/>
+150            esl_execute(ch-&gt;handle, "speak", buffer, NULL);<br/>
+<br/>
+151          } else if (!strcmp(confirm, "2")) {<br/>
+<br/>
+152            ch-&gt;state = CHARGE_WELCOME;<br/>
+<br/>
+153            goto select_menu;<br/>
+<br/>
+154          }<br/>
+<br/>
+155        }<br/>
+<br/>
+156        break;<br/>
+<br/>
+157      default:<br/>
+<br/>
+158        break;<br/>
+<br/>
+159    }<br/>
+<br/>
+160  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">到此为止，我们充值服务的所有代码都准备好了。接下来就需要编译运行了。为了编译运行新的充值服务程序，我们需要修改我们的Makefile，内容如下所示：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+ESLPATH = /usr/src/freeswitch/libs/esl<br/>
+<br/>
+CFLAGS  = -ggdb -I$(ESLPATH)/src/include<br/>
+<br/>
+all: myesl charge<br/>
+<br/>
+myesl: myesl.c<br/>
+<br/>
+    gcc $(CFLAGS) -o myeslmyesl.c $(ESLPATH)/libesl.a<br/>
+<br/>
+charge: charge.c<br/>
+<br/>
+    gcc $(CFLAGS) -o charge charge.c $(ESLPATH)/libesl.a<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">修改后的Makefile有3个Target——all、myesl和charge。其中all是默认的，但它又依赖于其他两个Target。如果在当前目录中执行Make，则它会先编译生成myesl，再编译charge。</p>
+<p height="1em" width="2em">编译完成后，将生成一个名为charge的可执行文件，它就是我们的“空中充值服务”程序。运行该程度后便监听8040端口，一旦有新的连接进来，便开启一个新线程为用户服务，用户挂机后线程退出。笔者拨打电话测试了查询菜单，日志输出如下（由于源文件中有空行，实际日志输出中的行号与代码中的行号不对应，为了读者参考方便对照源代码，笔者手动修改了日志中的行号）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] charge.c:170 charge_callback() Connected! 4<br/>
+<br/>
+[INFO] charge.c:174 charge_callback() +OK will linger 5 seconds<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 0 App: answer<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 0 App: set<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 0 App: set<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 0 App: speak<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 1 App: play_and_get_digits<br/>
+<br/>
+[INFO] charge.c:38 get_digits() digits: 1<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 2 App: play_and_get_digits<br/>
+<br/>
+[INFO] charge.c:38 get_digits() digits: 1111<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 3 App: play_and_get_digits<br/>
+<br/>
+[INFO] charge.c:38 get_digits() digits: 1111<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 0 App: speak<br/>
+<br/>
+[INFO] charge.c:60 event_callback() State: 1 App: play_and_get_digits<br/>
+<br/>
+[INFO] charge.c:185 charge_callback() Disconnected! 4<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在本例中，我们使用了ESL的Outbound模式，即我们的程序启动后便作为一个ESL服务器程序监听一个TCP端口，而FreeSWITCH中有电话到来时，便主动连接我们的服务器程序。我们的服务器程序是多线程的，因而可以同时为多个用户服务。我们使用如下的Dialplan配置将来话送到我们的充值服务器：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="IVR Charge"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^1234$"&gt;<br/>
+<br/>
+        &lt;action application="socket" data="127.0.0.1:8040 full"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">注意，在这里我们使用了ESL的“同步”模式。在同步模式中，使用esl_execute执行App时是顺序进行的，只有等待一个执行完了才会执行下一个，因而编程比较简单（缺点是不能打断正在执行的App，如想打断一个正在播放长语音文件 <sup>
+<small>
+<a href="text00162.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 的App是无法实现的）。当然，有时我们可能也希望使用“异步”模式的ESL连接，那么可以在Dialplan配置中加入async参数，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="socket" data="127.0.0.1:8040 async full"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，在使用了async参数的情况下，我们上述程序的第129行的执行就会出现问题，因为它会紧接着被132行的App抢占了。在出现这种问题时，需要等待第129行的App执行完毕后（收到CHANNEL_EXECUTE_COMPLETE事件）后再执行第131行的App。当然，那样就会在状态机中引入新的状态，代码就比较复杂了。因此，为了简单起见，我们在第130行使用了一个sleep函数暂停2秒。当然该行默认是注释掉的，仅在异步模式下才需要打开，同样的情况还有第10行。</p>
+<p height="1em" width="2em">至此我们的例子就结束了。从本例子中可以看出，使用C语言进行IVR编程也不是很复杂的，虽然代码行数与Lua相比大约增加了一倍。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00161.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 注意，这段代码是基于FreeSWITCH 1.4版（Git master）的例子。回调函数中多了一个私有用户数据（user_data）参数，允许在main函数和回调函数间传递私有数据，虽然本例中我们没有用到私有数据。参见18.3.1节中C语言的例子。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00161.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 注意，strcmp函数在匹配成功时返回0（在C语言逻辑判断中为“假”），因而习惯用法是在前面加上一个“!”对0取反使之为“真”。这是该函数容易造成困扰的地方，好多Bug也是因此产生的。但这是一个不可避免的事实。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00162.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 注意，这里说的打断是指在ESL程序中打断，我们使用play_and_get_digits在任何时候都是可以使用DTMF按键打断当前播放的提示音的。</p>
+</body>
+</html>

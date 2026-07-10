@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">5.2　目录结构</font>
+</font>
+</p>
+<p height="1em" width="2em">在UNIX类系统上，FreeSWITCH默认的安装位置是/usr/local/freeswitch，在Windows上可能是C:\Programming Files\FreeSWITCH。在这两种系统上，FreeSWITCH的目录结构大致相同，如表5-1所示。</p>
+<p height="1em" width="0pt" align="center">表5-1　FreesSWITCH目录结构</p>
+<p height="4pt" width="0pt" align="center"><img align="baseline" height="636" width="1208" src="Image00147.jpg" />
+</p>
+<p height="1em" width="2em">一般来说，大部分的目录结构都是扁平的，没有什么子目录。比较例外的有以下几个：</p>
+<p height="1em" width="2em">·sounds：sounds目录中存放了各种声音文件。FreeSWITCH支持多种频率的通话，因而也支持多种频率的声音文件。如下面的列表所示。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+├── en<br/>
+<br/>
+│   <br/>
+<br/>
+└── us<br/>
+<br/>
+│       <br/>
+<br/>
+└── callie<br/>
+<br/>
+│           <br/>
+<br/>
+├── ascii<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── base256<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── conference<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── currency<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── digits<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── directory<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── ivr<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── misc<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── phonetic-ascii<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── time<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+├── voicemail<br/>
+<br/>
+│           <br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│           <br/>
+<br/>
+└── zrtp<br/>
+<br/>
+│               <br/>
+<br/>
+└── 8000<br/>
+<br/>
+├── music<br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+└── zh<br/>
+<br/>
+└── cn<br/>
+<br/>
+└── link<br/>
+<br/>
+├── ascii<br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+├── conference<br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em"><img align="baseline" height="42" width="36" src="Image00165.jpg" />
+ <font color="#0468BB">注意</font>
+</p>
+<p height="1em" width="2em">中文目录与英文目录结构大致相同，以下略。</p>
+<p height="1em" width="2em">声音文件存放在多级目录中。其中，en表示英语、us表示美国英语、callie表示嗓音（即人的声音，不同的人，音调和音色不同），下面的ascii、conference表示声音文件的类别。在这里我们只有8000Hz的语音，因此里面只有8000这个子目录，具体的声音文件在8000目录下面。</p>
+<p height="1em" width="2em">music目录中存放的是MOH，即保持音乐。</p>
+<p height="1em" width="2em">·storage：storage目录中存放从其他HTTP服务器下载过来的语音文件缓存（http_file_cache）以及voicemail录音留言等。其中voicemail的声音文件也是以profile（如下面的default）和domain（如下面的192.168.1.123）分级存放的，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+├── http_file_cache<br/>
+<br/>
+└── voicemail<br/>
+<br/>
+└── default<br/>
+<br/>
+├── 192.168.1.123<br/>
+<br/>
+│   <br/>
+<br/>
+├── 1001<br/>
+<br/>
+│   <br/>
+<br/>
+└── 1007<br/>
+<br/>
+├── 192.168.1.124<br/>
+<br/>
+│   <br/>
+<br/>
+├── 1000<br/>
+<br/>
+│   <br/>
+<br/>
+├── 1001<br/>
+<br/>
+│   <br/>
+<br/>
+├── 1003<br/>
+<br/>
+│   <br/>
+<br/>
+└── 1004<br/>
+<br/>
+└── 192.168.127.103<br/>
+<br/>
+└── 1001<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·conf:conf目录中存放的是FreeSWITCH的配置文件，我们将在下一节单独说明。</p>
+</body>
+</html>

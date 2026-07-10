@@ -1,0 +1,273 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_481"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2517557" class="calibre7"></a>12.2.2 Authentication Problems </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.2.1 General authentication problems </h3>
+</div>
+</div>
+</div>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The SSH server says "Permission denied" and exits. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">This occurs if all authentication techniques have failed. Run your client in debug mode and read the diagnostic messages, looking for clues. Also read our solutions to specific authentication problems in the rest of this section. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How do I authenticate without typing a password or passphrase? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The four available authentication methods for this are: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Public-key with <span><em class="italic">ssh-agent</em></span></li>
+<li class="calibre18">Public-key with an unencrypted key on disk (empty passphrase) </li>
+<li class="calibre18">Trusted-host</li>
+<li class="calibre18">Kerberos</li>
+</ul></div>
+<p class="calibre4">Automatic authentication has a number of important issues you should carefully consider before selecting from the preceding list. Read our case study on this topic. <a shape="rect" href="DB_split_325.html#filepos2109314" class="calibre6">[11.1]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I get prompted for my password or passphrase, but before I have time to respond, the SSH server closes the connection. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Your server's idle timeout value may be too short. If you are a system administrator of a Tectia server machine, set <code class="calibre35">IdleTimeout</code> to a larger value in the serverwide configuration file. <a shape="rect" href="DB_split_148.html#filepos851609" class="calibre6">[5.3.3.5]</a> If you are an end user of OpenSSH, set an <code class="calibre35">idle-timeout</code> value in <em class="italic">authorized_keys</em>. <a shape="rect" href="DB_split_276.html#filepos1835938" class="calibre6">[8.2.7]</a></p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2522750" class="calibre7"></a>12.2.2.2 Password authentication </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2522847" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2522885" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2522923" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2522961" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2522999" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Password authentication isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use <span><em class="italic">ssh -v</em></span>. If the connection is being refused altogether, the SSH server is probably not running, or you are connecting to the wrong port. Port 22 is the default, but the remote system administrator might have changed it. If you see "permission denied," password authentication might be disabled in the server. </p>
+<p class="calibre4">Make sure the server permits password authentication in the serverwide configuration file (<code class="calibre35">PasswordAuthentication yes</code> for OpenSSH, <code class="calibre35">AllowedAuthentications password</code> for Tectia). Also check your client configuration file to make sure you don't have <code class="calibre35">PasswordAuthentication no</code>. </p>
+<p class="calibre4">If you are prompted for your password, but it is rejected, you might accidentally be connecting to the wrong account. Does your local username differ from the remote username? Then you must specify the remote username when connecting: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh -l my_remote_username server.example.com<br class="calibre19"/>    $ scp myfile my_remote_username@server.example.com:</tt></div></span><p class="calibre4">If this still doesn't work, check your local client configuration file (<em class="italic">~/.ssh/config</em> or <em class="italic">~/.ssh2/ssh2_config</em>) to make sure you haven't accidentally set the wrong value for the <code class="calibre35">User</code> keyword. In particular, if your configuration file contains <code class="calibre35">Host</code> values with wildcards, check that your current command line (the one that isn't working) isn't matching the wrong section in the file. <a shape="rect" href="DB_split_217.html#filepos1446763" class="calibre6">[7.1.2.4]</a></p>
+<p class="calibre4">One common problem on the server side involves OpenSSH and Pluggable Authentication Modules configuration. PAM is a general system for performing authentication, authorization, and accounting in an application-independent fashion. If your operating system supports PAM (as Linux and HPUX do, for example), OpenSSH will probably have been automatically compiled to use it. Unless you take the extra step of configuring PAM to support SSH, all password authentication will mysteriously fail. This is usually just a matter of copying the appropriate <em class="italic">sshd.pam</em> file from the <em class="italic">contrib</em> directory in the OpenSSH distribution, naming the copy "sshd," and placing it in the PAM configuration directory (usually <em class="italic">/etc/pam.d</em>). The <em class="italic">contrib</em> directory contains several example files for different flavors of Unix. For example, on a Red Hat Linux system: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # cp contrib/redhat/sshd.pam /etc/pam.d/sshd<br class="calibre19"/>    # chown root.root /etc/pam.d/sshd<br class="calibre19"/>    # chmod 644 /etc/pam.d/sshd</tt></div></span><p class="calibre4">If OpenSSH isn't using PAM, and password authentication still isn't working, the compilation options <code class="calibre35">--with-md5-passwords</code> or <code class="calibre35">--without-shadow</code> might be relevant. These make no difference if PAM support is enabled in OpenSSH, because they deal with how OpenSSH reads the Unix <span><em class="italic">passwd</em></span> map. When using PAM, the OpenSSH code doesn't read the <em class="italic">passwd</em> map directly; the PAM libraries do it instead. Without PAM, though, if your system is using MD5-hashed passwords instead of the more traditional <span><em class="italic">crypt</em></span> (DES) hash, you must use <code class="calibre35">--with-md5-passwords</code>. You can tell which hash your system is using by inspecting the <em class="italic">/etc/passwd</em> and <em class="italic">/etc/shadow</em> files. The hashed password is the second field in each entry; if the password field in <em class="italic">/etc/passwd</em> is just "x", then the real entry is in <em class="italic">/etc/shadow</em> instead. MD5 hashes are much longer and contain a wider range of characters: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    # /etc/shadow, MD5 hash<br class="calibre19"/>    test:$1$tEMXcnZB$rDEZbQXJzUz4g2J4qYkRh.:...<br class="calibre19"/><br class="calibre19"/>    # /etc/shadow, crypt hash<br class="calibre19"/>    test:JGQfZ8DeroV22:...</tt></div></span><p class="calibre4">Finally, you can try the compilation option <code class="calibre35">--without-shadow</code> if you suspect OpenSSH is trying to use the shadow password file, but your system doesn't use it. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The server won't let me use an empty password.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Empty passwords are insecure and should be avoided. Nevertheless, you can set <code class="calibre35">PermitEmptyPasswords yes</code> in the serverwide configuration file. <a shape="rect" href="DB_split_156.html#filepos951722" class="calibre6">[5.4.2.2]</a></p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2530810" class="calibre7"></a>12.2.2.3 Hostbased authentication </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2530908" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Hostbased authentication isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use <span><em class="italic">ssh -v</em></span>. If everything looks right, check the following. Suppose the client user is <span><a href="mailto:orpheus@earth" shape="rect" class="calibre6">orpheus@earth</a></span>, and the target account is <span><a href="mailto:orpheus@hades" shape="rect" class="calibre6">orpheus@hades</a></span>--that is, on host <span><em class="italic">earth</em></span>, user orpheus invokes <span><em class="italic">ssh hades</em></span>. </p>
+<p class="calibre4"><span><em class="italic">For OpenSSH:</em></span></p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"><code class="calibre35">PubkeyAuthentication yes</code> belongs in the server and client configurations. </li>
+<li class="calibre18"><code class="calibre35">EnableSSHKeysign yes</code> must be in the client configuration. </li>
+<li class="calibre18">A copy of earth's public host key must be in <em class="italic">hades:/etc/ssh/ssh_known_hosts</em> (or <em class="italic">hades:~orpheus:/.ssh/known_hosts2</em>). </li>
+<li class="calibre18">The entry may be in the target account's known hosts file instead, i.e., in <em class="italic">hades:~orpheus/.ssh/known_hosts</em>. Take care that "earth" is the canonical name of the client host from the server's point of view. That is, if the SSH connection is coming from the address 192.168.10.1, then <code class="calibre35">gethostbyname(192.168.10.1)</code> on hades must return "earth," and not a nickname or alias for the host (e.g., if the hostname is <span><em class="italic">river.earth.net</em></span>, the lookup must not return just "river"). Note that this can involve multiple naming services, since <code class="calibre35">gethostbyname</code> can be configured to consult multiple sources to determine a translation (e.g., DNS, NIS, <em class="italic">/etc/hosts</em>). See <em class="italic">/etc/nsswitch.conf.</em> If your systems don't agree on canonical hostnames, you'll have no end of trouble with hostbased authentication. You can work around such problems to an extent by manually adding extra host nicknames to the known hosts file, like this:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    earth,gaia,terra 1024 37 71641647885140363140390131934...</tt></div></span></li>
+</ul></div>
+<p class="calibre4">For Tectia:</p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"><code class="calibre35">AllowedAuthentications</code> must include the value <code class="calibre35">hostbased</code> in the server and client configurations. </li>
+<li class="calibre18"><span><em class="italic">ssh-signer</em></span> must be setuid root. More precisely, it needs to be able to read the private host key, which in the normal installation means it must be setuid root. </li>
+<li class="calibre18">A copy of earth's public host key in <em class="italic">hades:/etc/ssh2/knownhosts/earth.ssh-dss.pub</em> (or <em class="italic">hades:~orpheus:/.ssh2/knownhosts/earth.ssh-dss.pub</em>, if you specified <code class="calibre35">UserKnownHosts yes</code> on the server). </li>
+<li class="calibre18">Regarding canonical hostnames, the same comments as for OpenSSH apply. </li>
+</ul></div>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos2536020" class="calibre7"></a>12.2.2.4 Public-key authentication </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos2536119" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos2536157" class="calibre15"></a><div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How do I install my public key file on the remote host the first time? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Here's the general method:</p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Generate a key pair.</li>
+<li value="2" class="calibre18">Copy the text of the public key into your computer's clipboard or other cut/paste buffer. </li>
+<li value="3" class="calibre18">Log into the remote host via SSH with password authentication, which doesn't require any special files in your remote account. </li>
+<li value="4" class="calibre18">Edit the appropriate authorization and key files on the remote host: <div class="calibre3">
+<ul class="calibre44"><li class="calibre18">For OpenSSH, append the public key to <em class="italic">~/.ssh/authorized_keys.</em> Alternatively, run the program <span><em class="italic">ssh-copy-id</em></span>. <a shape="rect" href="DB_split_050.html#filepos231928" class="calibre6">[2.4.3]</a></li>
+<li class="calibre18">For Tectia, paste the public key into a new <em class="italic">.pub</em> file in <em class="italic">~/.ssh2</em> (say, <em class="italic">newkey.pub</em>), and append the line <code class="calibre35">Key newkey.pub</code> to <em class="italic">~/.ssh2/authorization.</em></li>
+</ul></div>
+</li>
+<li value="5" class="calibre18">Log out from the remote host.</li>
+<li value="6" class="calibre18">Log back into the remote host using public-key authentication. </li>
+</ol></div>
+<p class="calibre4">When editing the remote authorization file, make sure your text editor doesn't insert line breaks into the middle of a public key. OpenSSH public keys are very long and must be kept on a single line. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I put my SSH public-key file, mykey.pub, into my remote SSH directory, but public-key authentication doesn't work. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Placing a valid public-key file (e.g., <em class="italic">mykey.pub</em>) in your SSH directory isn't sufficient. For OpenSSH you must append the key (i.e., the contents of <em class="italic">mykey.pub</em>) to <em class="italic">~/.ssh/authorized_keys.</em> For Tectia, you must add a line of text to <em class="italic">~/.ssh2/authorization</em>, <code class="calibre35">Key mykey.pub</code>. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Public-key authentication isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Invoke the client in debug mode (<span><em class="italic">ssh -v</em></span>). Make sure: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Your local client is using the expected identity file </li>
+<li class="calibre18">The correct public key is on the remote host in the right location </li>
+<li class="calibre18">Your remote home directory, SSH directory, and other SSH-related files have the correct permissions <a shape="rect" href="DB_split_147.html#filepos810666" class="calibre6">[5.3.2.1]</a></li>
+</ul></div>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I'm being prompted for my login password instead of my public-key passphrase. Or, my connection is rejected with the error message "No further authentication methods available." (Tectia) </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">There are several possible causes for both of these problems: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Public-key authentication must be enabled in both the client and server (OpenSSH <code class="calibre35">PubkeyAuthentication yes</code>, Tectia <code class="calibre35">AllowedAuthentications publickey</code>). </li>
+<li class="calibre18">Specify your remote username with <span><em class="italic">-l</em></span> (lowercase L) if it differs from your local username, or else the SSH server will examine the wrong remote account:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh -l jones server.example.com</tt></div></span></li>
+<li class="calibre18">Check the file permissions in your server account. If certain files or directories have the wrong owner or careless access permissions, the SSH server refuses to perform public-key authentication. This is a security feature. Run <span><em class="italic">ssh</em></span> in verbose mode to reveal the problem:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh -v server.example.com<br class="calibre19"/>    ...<br class="calibre19"/>    server.example.com: Remote: Bad file modes for /u/smith/.ssh</tt></div></span><br class="calibre19"/>In your server account, make sure that the following files and directories are owned by you and are <span><em class="italic">not</em></span> world-writable: ~ (your home directory), <em class="italic">~/.ssh</em>, <em class="italic">~/.ssh/authorized_keys</em>, <em class="italic">~/.ssh2</em>, <em class="italic">~/.rhosts</em>, and <em class="italic">~/.shosts.</em></li>
+<li class="calibre18">For Tectia, if you use the <span><em class="italic">-i</em></span> option to specify an identification file:<a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ ssh -i my-identity server.example.com</tt></div></span><br class="calibre19"/>check that <em class="italic">my-identity</em> is an identification file, not a private-key file. (In contrast, <span><em class="italic">ssh -i</em></span> for OpenSSH expects a private-key file.) Remember that Tectia identification files are text files containing the names of private keys. </li>
+</ul></div>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I'm being prompted for the passphrase of the wrong key. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Make sure your desired public key is in your authorization file on the SSH server machine. Also check for typographical errors in any options specified for the key. <a shape="rect" href="DB_split_269.html#filepos1774010" class="calibre6">[8.2]</a> A mistyped option causes the associated key line to be skipped silently. Remember that options are separated by commas, not whitespace. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I ran ssh-agent, but when I run ssh-add to add keys, it cannot find the agent. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4"><span><em class="italic">ssh-add</em></span> can communicate with <span><em class="italic">ssh-agent</em></span> only if certain environment variables are set. These variables--<code class="calibre35">SSH_AUTH_SOCK</code> for OpenSSH and <code class="calibre35">SSH2_AUTH_SOCK</code> for Tectia—direct <span><em class="italic">ssh-add</em></span> to the socket used by <span><em class="italic">ssh-agent</em></span>. The environment variables are set automatically if you run the agent correctly. <a shape="rect" href="DB_split_201.html#filepos1316752" class="calibre6">[6.3.2]</a> This implies that any shells run before <span><em class="italic">ssh-agent</em></span> won't know how to contact it. </p>
+<p class="calibre4">In the shell where you're running the failed <span><em class="italic">ssh-add</em></span>, check for the presence of the appropriate environment variable: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">    $ env | grep SSH<br class="calibre19"/>    SSH_AGENT_PID=7206<br class="calibre19"/>    SSH_AUTH_SOCK=/tmp/ssh-gckksA7161/agent.7161</tt></div></span><p class="calibre4">If you don't see it, then either you didn't run the agent correctly, you ran this shell before you ran <span><em class="italic">ssh-agent</em></span>, or you're not properly exporting the <code class="calibre35">SSH_AUTH_SOCK</code> variable. If you do see the socket variable, then perhaps it has an old value (from a previously run and now-dead agent). Try opening a new shell and running <span><em class="italic">ssh-add</em></span>. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>12.2.2.5 PGP key authentication </h3>
+</div>
+</div>
+</div>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">After the PGP passphrase prompt, I am being prompted for my login password. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">If you get prompted for your PGP key, and then your password: </p><a shape="rect" class="calibre15"></a><span class="calibre33"><div class="calibre3"><tt class="calibre35">  Passphrase for pgp key "mykey": ********<br class="calibre19"/>  smith's password:</tt></div></span><p class="calibre4">first make sure you're typing your PGP passphrase correctly. (For instance, PGP-encrypt a file with that public key and decrypt it.) If so, then there might be an incompatibility between the PGP implementations on your client and server machines. We've seen this behavior when the PGP key (generated on the client machine) doesn't have sufficient bits for the PGP implementation on the server machine. Generate a new key on the server machine. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I get "Invalid pgp key id number '0276C297'".</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">You probably forgot the leading "0x" on the key ID, and SSH is trying to interpret a hexadecimal number as a decimal. Use <code class="calibre35">PgpKeyId 0x0276C297</code> instead. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_248"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1197674" class="calibre7"></a>5.9.3 Debugging Under inetd or xinetd </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1197843" class="calibre15"></a>If you run the SSH server from <span><em class="italic">inetd</em></span> or <span><em class="italic">xinetd</em></span> using the <span><em class="italic">-i</em></span> command-line option <a shape="rect" href="DB_split_148.html#filepos826611" class="calibre6">[5.3.3.2]</a>, debugging can be tricky. It is necessary for <span><em class="italic">sshd</em></span> to avoid sending any extra debugging output to the standard error, since it would be relayed by <span><em class="italic">inetd</em></span> or <span><em class="italic">xinetd</em></span> to the SSH client along with the normal SSH protocol conversation, messing it up and causing the connection to fail. </p>
+<p class="calibre4">OpenSSH forces all debug output to be sent to syslog if the <span><em class="italic">-i</em></span> option is used, which neatly solves the problem. For Tectia, however, the easiest approach is to redirect the debug output from the standard error to a file. Because many versions of <span><em class="italic">inetd</em></span> or <span><em class="italic">xinetd</em></span> do not support shell metacharacters in their configuration files, it's best to use a short shell script to invoke <span><em class="italic">sshd</em></span> with the redirected output: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/sh<br class="calibre19"/>    # redirect Tectia sshd standard error to a file<br class="calibre19"/>    exec /usr/local/sbin/sshd -d 2 -i 2&gt; /tmp/sshd2.debug</tt></div></span><p class="calibre4">Simply specify this shell script in place of <span><em class="italic">sshd</em></span> in the <span><em class="italic">inetd</em></span> or <span><em class="italic">xinetd</em></span> configuration files. </p>
+<p class="calibre4">Alternately, you can send debug output to syslog using the <span><em class="italic">logger</em></span> program: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #!/bin/sh<br class="calibre19"/>    # send Tectia sshd debug output to syslog<br class="calibre19"/>    exec /usr/local/sbin/sshd -d 2 -i 2&gt;&amp;1 | grep "^debug" | logger -p local3.debug</tt></div></span><p class="calibre4"><span><em class="italic">grep</em></span> selects only the debug output, discarding the duplicate syslog messages that are also sent to the standard error in debug mode. </p>
+</div>
+<div class="calibre3"><br class="calibre19"/><hr class="calibre16"/><div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1201079" shape="rect" href="DB_split_183.html#filepos1139105" class="calibre6">86</a>] </sup>The system logger adds other information to each log message, such as a timestamp, the name of the machine, and the process ID of the SSH server, so lines in the log files will actually look like: </p>
+<p class="calibre4">Aug 30 17:41:47 graceland sshd[731]: Illegal user elvis from 10.11.12.13 </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1201651" shape="rect" href="DB_split_183.html#filepos1146378" class="calibre6">87</a>] </sup>These names are <span><em class="italic">not</em></span> syslog priority levels, although some of the names are similar. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1202037" shape="rect" href="DB_split_184.html#filepos1148160" class="calibre6">88</a>] </sup><code class="calibre35">DEBUG</code> is a synonym for <code class="calibre35">DEBUG1</code>. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1202374" shape="rect" href="DB_split_185.html#filepos1164844" class="calibre6">89</a>] </sup>The <span><em class="italic">-d</em></span> option has no corresponding keyword. </p>
+</div>
+<div class="calibre3">
+<p class="calibre4"><sup class="calibre20">[<a id="filepos1202720" shape="rect" href="DB_split_185.html#filepos1191323" class="calibre6">90</a>] </sup>If <code class="calibre35">SIGUSR1</code> is sent to the parent, it will die, since it has not arranged to catch the signal. </p>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_249"></div></body>
+</html>

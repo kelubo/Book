@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_265"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1309319" class="calibre7"></a>6.2.4 Generating New Groups for Diffie-Hellman Key Exchange </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1309510" class="calibre15"></a>As we saw in <a shape="rect" href="DB_split_061.html#filepos281573" class="calibre6">Chapter 3</a>, the SSH Transport Protocol uses the Diffie-Hellman key-agreement algorithm to generate cryptographic session keys for the SSH connection. <a shape="rect" href="DB_split_090.html#filepos510274" class="calibre6">[3.8.1.3]</a> One parameter to this algorithm is a mathematical structure from algebra known as a "group"; specifically, a finite integer group with respect to multiplication modulo a prime. In the initial SSH protocol, a single fixed group was used for the key exchange. Due to concern over possible future attacks against this fixed parameter, an extension was created to allow the group to be negotiated, and this extension is now widely implemented. </p>
+<p class="calibre4">The OpenSSH server selects the groups to be offered the client from the file <em class="italic">/etc/moduli</em>. OpenSSH comes with a <em class="italic">moduli</em> file defining a set of suitable groups, and for most people this is sufficient; there is no pressing need to regenerate them. On particularly slow systems, you might edit this file to select groups with a smaller prime modulus, to speed up the key exchange. </p>
+<p class="calibre4">If you like, you can generate your own set of key-exchange groups using <span><em class="italic">ssh-keygen -G</em></span>. This usage is quite technical and infrequently used, so we won't delve further into it here; refer to the <span><em class="italic">ssh-keygen</em></span> manpage, in the section "MODULI GENERATION," for details. You can also see an example in OpenBSD's <em class="italic">usr/src/etc/Makefile</em> for OpenSSH, e.g.: </p>
+<div class="calibre3"><span class="calibre27">
+<blockquote class="calibre5"><span class="calibre33">
+<div class="calibre3"><a href="http://www.openbsd.org/cgi-bin/cvsweb/src/etc/Makefile?rev=1.215&amp;content-type=text/x-cvsweb-markup" shape="rect" class="calibre6">http://www.openbsd.org/cgi-bin/cvsweb/src/etc/Makefile?rev=1.215&amp;content-type=text/x-cvsweb-markup</a></div>
+</span></blockquote>
+</span></div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_266"></div></body>
+</html>

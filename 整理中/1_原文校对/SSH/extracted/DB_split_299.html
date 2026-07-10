@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_390"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1981439" class="calibre7"></a>9.4.1 The X Window System </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The X Window System, or X, is the most widely used graphical display system for Unix machines. Like SSH, X has clients and servers. X clients are windowing application programs, such as terminal emulators, paint programs, graphical clocks, and so forth. An X server is the underlying display engine that processes requests from X clients, communicating via a network protocol called the <span><em class="italic">X protocol</em></span>. A machine typically runs a single X server but possibly many X clients. </p>
+<p class="calibre4">Most important to our discussion, X supports sophisticated window management over a network. X clients can open windows not only on their local machine, but also on other computers on the network, whether they are down the hall or across the globe. To accomplish this, an X client makes a network connection to a remote X </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><h3 class="calibre25">VNC Forwarding: An Alternative to X Forwarding</h3>
+<p class="calibre4">X forwarding is problematic from a security point of view, for the same reason as X itself. As you will see, the design of X means that remote programs must make separate network connections back to the user; this requires yet another layer of authentication and authorization, complicating the situation and opening an avenue of attack. SSH X forwarding tries to secure this as much as possible, but it may still be unacceptable in some environments. </p>
+<p class="calibre4">An alternative technique is to use Virtual Network Computing (VNC) over SSH. VNC is free software developed by AT&amp;T Laboratories in the UK, which provides remote GUI access for Unix and Windows platforms. With VNC, you can open a window on your Unix machine running X, and have the desktop of a remote Windows machine appear there, so you can operate the Windows box remotely. Conversely, you can run the VNC client on a Windows machine and connect to a remote X display running on a Unix host. Since VNC involves only a single outbound connection, it is easy and safer to tunnel through SSH than X. You can find out more about VNC (and download the software) at <a href="http://www.realvnc.com/." shape="rect" class="calibre6">http://www.realvnc.com/.</a></p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">server and carries on a conversation, using the X protocol to draw on the remote screen, receive remote keyboard events, learn the remote mouse location, and so on. This obviously requires some type of security, which we discuss soon. </p>
+<p class="calibre4">A central concept of X is the <span><em class="italic">display</em></span>, an abstraction for the screen managed by an X server. When an X client is invoked, it needs to know which display to use. Displays are named by strings of the form <span><em class="italic">HOST:n.v</em></span>, where: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"><span><em class="italic">HOST</em></span> is the name of the machine running the X server controlling the display. </li>
+<li class="calibre18"><span><em class="italic">n</em></span> is the <span><em class="italic">display</em></span> number, an integer, usually 0. X allows for multiple displays controlled by a single server; additional displays are numbered 1, 2, and so on. </li>
+<li class="calibre18"><span><em class="italic">v</em></span> is the <span><em class="italic">visual</em></span> number, another integer. A visual is a virtual display. X supports multiple virtual displays on a single, physical display. If there's only one virtual display (which is the most common scenario), you omit the ".v", and the default is visual 0. </li>
+</ul></div>
+<p class="calibre4">For example, on the machine <span><em class="italic">server.example.com</em></span>, display 0, visual 1 is represented by the display string "server.example.com:0.1". </p>
+<p class="calibre4">Under Unix, most X client programs let you specify the display string in two ways: the <span><em class="italic">-d</em></span> or <span><em class="italic">-display</em></span> command-line option, or the environment variable <code class="calibre35">DISPLAY</code>. For example, to run the X client program <span><em class="italic">xterm</em></span> on the only X display of the workstation <span><em class="italic">anacreon</em></span>, use the command-line option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ xterm -d anacreon:0 &amp;</tt></div></span><p class="calibre4">or the environment variable:</p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ setenv DISPLAY anacreon:0<br class="calibre19"/>    $ xterm &amp;</tt></div></span><p class="calibre4">X is a large, deep software product whose documentation fills a dozen O'Reilly books. We've barely scratched the surface with our explanation, but you've now seen enough to understand X forwarding. </p>
+</div>
+</body>
+</html>

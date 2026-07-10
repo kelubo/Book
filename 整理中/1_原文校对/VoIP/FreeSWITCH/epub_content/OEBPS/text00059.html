@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">6.6　深入理解通道变量及相关操作</font>
+</font>
+</p>
+<p height="1em" width="2em">在Dialplan中，可以对通道变量（Channel Variable）进行各种操作。虽然有一些我们已经在前面的内容中提到过，但这里我们再来系统地学习一下。</p>
+<p height="1em" width="2em">比如，我们已经熟悉的set App可以给变量赋值：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="my_var=my_value"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，export可以对a-leg和b-leg同时赋值（即使此时b-leg还不存在）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="export" data="my_var=my_value"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上两条命令都可以将my_var变量的值设置为my_value。不同的是set程序仅会作用于当前的Channel（a-leg），而export程序则会将变量设置到两个Channel（a-leg和b-leg）上，如果当时b-leg还没有创建，则会在创建时设置。另外，export也可以通过nolocal参数将变量值限制仅设置到b-leg上：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action appliction="export" data="nolocal:my_var=my_value"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在实际应用中，如果a-leg上已经有一些变量的值（如var1、var2、var3），但想同时把这些变量都复制到b-leg上，可以使用以下几种办法：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="export" data="var1=$var1"/&gt;<br/>
+<br/>
+&lt;action application="export" data="var2=$var2"/&gt;<br/>
+<br/>
+&lt;action application="export" data="var3=$var3"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或者使用如下等价的方式：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="export_vars=var1,var2,var3"&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">所以，set也具有能往b-leg上赋值的能力。其实，它和export一样，都是操作export_vars这个特殊的变量。只不过export的语法更直观一些。</p>
+<p height="1em" width="2em">另外，我们也可以随时取消某些Variable的定义。取消Variable定义只需对它赋一个特殊的值——“_undef_”或使用unset App，如，下面两行代码是等价的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="var1=_undef_"/&gt;<br/>
+<br/>
+&lt;action application="unset" data="var1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在实际使用时，还常常会用到截取Variable值的部分操作。在FreeSWITCH中，可以使用特殊的语法取一个通道变量值的子字符串，使用格式是“${var:位置:长度}”。其中“位置”从0开始计数，若为负数则从字符串尾部开始计数；如果“长度”为0或小于0，则会从当前“位置”一直取到字符串结尾（或开头，若“位置”为负的话）。例如var的值为1234567890，那么各种取值方法见下面的例子：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+${var}      = 1234567890       # <br/>
+<br/>
+原始变量的值<br/>
+<br/>
+${var:0:1}  = 1                # <br/>
+<br/>
+从第0<br/>
+<br/>
+个位置起，取1<br/>
+<br/>
+个字符<br/>
+<br/>
+${var:1}    = 234567890        # <br/>
+<br/>
+从第1<br/>
+<br/>
+个位置起，一直取到字符串结束<br/>
+<br/>
+${var:-4}   = 7890             # <br/>
+<br/>
+从倒数第4<br/>
+<br/>
+个位置起，一直取到字符串结束<br/>
+<br/>
+${var:-4:2} = 78               # <br/>
+<br/>
+从倒数第4<br/>
+<br/>
+个位置起，取2<br/>
+<br/>
+个字符<br/>
+<br/>
+${var:4:2}  = 56               # <br/>
+<br/>
+从第4<br/>
+<br/>
+个位置起，取2<br/>
+<br/>
+个字符<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+</body>
+</html>

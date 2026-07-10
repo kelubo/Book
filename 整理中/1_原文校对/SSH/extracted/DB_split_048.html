@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_76"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos222084" class="calibre7"></a>2.4.1 A Brief Introduction to Keys </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos222250" class="calibre15"></a>A key is a digital identity. It's a unique string of binary data that means "This is me, honestly, I swear." And with a little cryptographic magic, your SSH client can prove to a server that its key is genuine, and you are really you. </p>
+<p class="calibre4">An SSH identity uses a pair of keys, one private and one public. The <span><em class="italic">private key</em></span> is a closely guarded secret only you have. Your SSH clients use it to prove your identity to servers. The <span><em class="italic">public key</em></span> is, like the name says, public. You place it freely into your accounts on SSH server machines. During authentication, the SSH client and server have a little conversation about your private and public key. If they match (according to a cryptographic test), your identity is proven, and authentication succeeds. </p>
+<p class="calibre4">The following sequence demonstrates the conversation between client and server. <a shape="rect" href="DB_split_075.html#filepos362549" class="calibre6">[3.4.2.4]</a> (It occurs behind the scenes, so you don't need to memorize it or anything; we just thought you might be interested.) </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Your client says, "Hey server, I'd like to connect by SSH to an account on your system, specifically, the account owned by user smith." </li>
+<li value="2" class="calibre18">The server says, "Well, maybe. First, I challenge you to prove your identity!" And the server sends some data, known as a <span><em class="italic">challenge</em></span>, to the client. </li>
+<li value="3" class="calibre18">Your client says, "I accept your challenge. Here is proof of my identity. I made it myself by mathematically using your challenge and my private key." This response to the server is called an <span><em class="italic">authenticator<a shape="rect" class="calibre15"></a><a id="filepos224350" class="calibre15"></a>.</em></span></li>
+<li value="4" class="calibre18">The server says, "Thanks for the authenticator. I will now examine the smith account to see if you may enter." Specifically, the server checks smith's public keys<a shape="rect" class="calibre15"></a><a id="filepos224604" class="calibre15"></a> to see if the authenticator "matches" any of them. (The "match" is another cryptographic operation.) If so, the server says, "OK, come on in!" Otherwise, the authentication fails. </li>
+</ol></div>
+<p class="calibre4">Before you can use public-key authentication, some setup is required: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">You need a private key and a public key, known collectively as a <span><em class="italic">key pair.</em></span> You also need a secret passphrase to protect your private key. <a shape="rect" href="DB_split_049.html#filepos225725" class="calibre6">[2.4.2]</a></li>
+<li class="calibre18">You need to install your public key on an SSH server machine. <a shape="rect" href="DB_split_050.html#filepos231928" class="calibre6">[2.4.3]</a></li>
+</ul></div>
+</div>
+</body>
+</html>

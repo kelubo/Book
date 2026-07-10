@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">19.7　定时呼叫</font>
+</font>
+</p>
+<p height="1em" width="2em">在本章的最后，我们再讲一个定时呼叫的例子。定时呼叫类似于现有PSTN网络中的叫醒服务，但在FreeSWITCH中我们肯定能玩出更多的花样。在此我们仅举一个最简单的例子。</p>
+<p height="1em" width="2em">在UNIX类的系统中，使用crontab作定时服务，我们可以用它定时执行一个脚本或程序。它的设置非常灵活，因此我们几乎可以用它作任何定时。</p>
+<p height="1em" width="2em">在Shell中使用crontab-e命令可以启动一个编辑器编辑当前用户的crontab文件，我们输入以下内容并存盘：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+0 6 * * * /usr/local/freeswitch/bin/fs_cli -x "originate user/1006 &amp;playback(/tmp/wakeup.wav)"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">以上内容中，以空格分隔的有多个域，前5个分别表示分钟、小时、月、日、星期，如果某个位置的值为“*”，则它可匹配任何值。如上述的定时就是每天早上的6点整执行后面的命令（如果是“0****”则表示每小时整点执行一次，“*****”表示每分钟执行一次，以此类推）。</p>
+<p height="1em" width="2em">后面的命令实际上是使用fs_cli的-x参数执行一个FreeSWITCH的API，它的操作很简单，即呼叫用户1006，接通后播放声音文件/tmp/wakeup.wav叫用户起床。</p>
+<p height="1em" width="2em">如果想要执行的业务逻辑比较复杂（如未接听的情况下重呼，或得接听了但不按“1”就重呼），可以将逻辑放到一个Lua脚本中，用以下命令调用：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+0 6 * * * /usr/local/freeswitch/bin/fs_cli -x "luarun /tmp/wakeup.lua"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">具体的Lua脚本内容我们就不举例了。当然，如果觉得Lua不过瘾，也可以使用我们本章讲的ESL知识写一个ESL应用，如/tmp/esl_wakeup，然后可以通过如下配置执行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+0 6 * * * /tmp/esl_wakeup<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之实现定时呼逻辑应该不是很复杂的事，如果有需要，读者可自行练习。Windows系统上的用户也可以通过系统的定时任务定时执行程序或脚本，因为我们的实现方案是跨平台的。</p>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.5　号码连选</font>
+</font>
+</p>
+<p height="1em" width="2em">虽然有些运营商也开始尝试开放SIP号码，但大部分还是谨慎的、试探性的。因此一般不提供SIP对开中继的方式，而是开放单个的接入号码。虽然这不是理想的方式，但有总比没有好。在此，假设我们从运营商那里获得10个SIP账号，号码范围是xxxxxx30～xxxxxx39。我们来看一下如何有效地使用这些号码。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.5.1　注册到运营商服务器</font>
+</font>
+</p>
+<p height="1em" width="2em">我们可以在FreeSWITCH中添加一些网关，以便注册到运营商的SIP服务器上去（应该是一个SBC）。</p>
+<p height="1em" width="2em">网关的配置文件如下，为了使用方便，我们让网关名称（name）的后两位与号码的最后两位相同：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;gateway name="gw30"&gt;<br/>
+<br/>
+    &lt;param name="realm" value="218.56.x.x"/&gt;<br/>
+<br/>
+    &lt;param name="username" value="xxxxxx30"/&gt;<br/>
+<br/>
+    &lt;param name="password" value="xxxx"/&gt;<br/>
+<br/>
+    &lt;param name="register" value="true"/&gt;<br/>
+<br/>
+&lt;/gateway&gt;<br/>
+<br/>
+&lt;gateway name="yt31"&gt;<br/>
+<br/>
+    &lt;param name="realm" value="218.56.x.x"/&gt;<br/>
+<br/>
+    &lt;param name="username" value="xxxxxx31"/&gt;<br/>
+<br/>
+    &lt;param name="password" value="xxxx"/&gt;<br/>
+<br/>
+    &lt;param name="register" value="true"/&gt;<br/>
+<br/>
+&lt;/gateway&gt;<br/>
+<br/>
+......<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面我们仅列出了两个网关账号的配置，其他账号依此类推。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.5.2　通过单个号码呼出</font>
+</font>
+</p>
+<p height="1em" width="2em">15.5.1节配置的网关注册成功后，我们就可以通过这个号码（又称为线路）打入打出电话了。我们可以使用如下命令快速试一下是否能通过某一条线路（如gw30）成功呼出：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate sofia/gateway/gw30/1860535xxxx &amp;echo<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">测试成功后，就可以设置如下的Dialplan让所有分机都可以通过该网关呼出了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+    &lt;extension name="Outbound Call"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^(1[358].*)$"&gt;<br/>
+<br/>
+    &lt;action application="bridge" data="sofia/gateway/gw30/$1"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em"><img align="baseline" height="42" width="36" src="Image00174.jpg" />
+ 注意</p>
+<p height="1em" width="2em">出于简单起见，本例中使用的正则表达式仅匹配手机号。上述配置将统一使用网关gw3 <img align="baseline" height="28" width="28" src="Image00056.jpg" />
+ （即通过号码xxxxxx3 <img align="baseline" height="28" width="28" src="Image00057.jpg" />
+ ）呼出。很容易想到，如果有第二个人同时进行呼叫时，由于该网关对应的号码占线，会导致呼叫失败。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.5.3　使用随机数做号码连选</font>
+</font>
+</p>
+<p height="1em" width="2em">为了能自动选择一个网关呼出，我们想办法从这10个网关中自动选择一个进行呼出。这种选择的过程就称为选线，也称为号码连选。当然，号码连选最简单的实现方法是使用一个随机数。见下面的Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="gw=gw${expr(randomize(&amp;x);ceil(random(30,39,&amp;x)))"/&gt;<br/>
+<br/>
+&lt;action application="bridge" data="sofia/gateway/${gw}/$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“expr”是一个API，我们用它的randomize方法产生一个从30到39之间的随机数（如33），在该随机数前面加上“gw”字符（变为gw33），并把它赋值给一个“gw”通道变量（使用“set”）实现。有了该通道变量后，在“bridge”的参数中就可以使用“${gw}”引用该变量（在本例中它的值就是gw33），实现动态选择一个随机的网关。</p>
+<p height="1em" width="2em">当然，这种选线算法有一个缺点，就是它不记录实际号码的忙闲状态，如果选到正在通话的号码时，通话还是会失败。通过下面的方式，我们可以做一个改进的算法：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set"<br/>
+<br/>
+    data="gw1=gw${expr(randomize(&amp;x);ceil(random(30,39,&amp;x)))"/&gt;<br/>
+<br/>
+&lt;action application="set"<br/>
+<br/>
+    data="gw2=gw${expr(randomize(&amp;x);ceil(random(30,39,&amp;x)))"/&gt;<br/>
+<br/>
+&lt;action application="bridge"<br/>
+<br/>
+    data="sofia/gateway/${gw1}/$1|sofia/gateway/${gw2}/$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该方法的思路是，同时选择两个网关（gw1和gw2），如果一个失败，则走另一个（该方法不能从根本上解决选到正在通话的线路问题，但可以大大减少失败的概率）。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.5.4　使用mod_distributor进行连选</font>
+</font>
+</p>
+<p height="1em" width="2em">除随机数外，FreeSWITCH也提供了一个mod_distributor模块模块，专门实现这种连选功能。首先，要安装该模块，进入FreeSWITCH的源代码目录，执行如下命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+make mod_distributor-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，在conf/autoload_configs/distributor.conf.xml中进行如下设置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;list name="dist1" total-weight="10"&gt;<br/>
+<br/>
+&lt;node name="30" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="31" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="32" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="33" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="34" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="35" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="36" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="37" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="38" weight="1"/&gt;<br/>
+<br/>
+&lt;node name="39" weight="1"/&gt;<br/>
+<br/>
+&lt;/list&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，我们配置了一个列表（list），它的名字是“dist1”，总体的权重（total-weight）是“10”。该列表有好多节点（node）组成，其中每个节点的权重（weight）为“1” <sup>
+<small>
+<a href="text00126.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。可以看出，这些节点的名字跟我们线路号码的最后两位相同。</p>
+<p height="1em" width="2em">FreeSWITCH加载该模块后，我们就可以先用如下的命令进行一下测试：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; distributor dist1<br/>
+<br/>
+32<br/>
+<br/>
+freeswitch&gt; distributor dist1<br/>
+<br/>
+35<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">distributor是该模块提供的一个API命令，它可以用于从预定义的列表中根据权重选择一个节点，并返回该节点的名称。然后，我们就可以在Dialplan中使用它来帮助我们选线了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="gw"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^(01[358].*)$"&gt;<br/>
+<br/>
+    &lt;action application="bridge"data="sofia/gateway/gw${distributor(dist1)}/$1" loop="2"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，我们使用${distributor(dist1)}让mod_distributor帮我们选择一个节点，并使用它作为网关的名字向外呼出。当然，与上一节使用的随机数的方案相比，它也聪明不了许多，因为，该模块也没有记录线路是空闲还是忙的。因此，我们使用了Dialplan Action中的loop属性，如果第一次呼叫失败，它将再试一次（重新执行该Action）。</p>
+<p height="1em" width="2em">当然，与上一节的随机数方案比起来，它还是聪明一点的。例如，虽然我们配置了10个网关，但并不一定所有时间所有的网关都能正常注册上。通过如下方法，就可以让distributor在生成选择节点时，排除掉处于down状态（即不可用状态）的网关：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge"<br/>
+<br/>
+data="sofia/gateway/gw${distributor(dist1 ${sofia(profile internal gwlist down)})}/$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">15.5.5　其他</font>
+</font>
+</p>
+<p height="1em" width="2em">上述的几种方案在一般话务量不是很高的情况下，问题应该不大。不过在很繁忙的场合（如线路占用率90%以上），可能就会出现较高的呼损（即呼叫失败，我们这里更多的是指在还有空闲线路的情况下的呼叫失败）。因此，为了提高线路的利用率，降低呼损，我们需要更好的算法。</p>
+<p height="1em" width="2em">当然，没有现成的方案来解决该问题，这里我们仅探讨一下实现的思路。首先，实现该算法的时候，应该能检测并记住线路的状态，避免选到坏线（如网关注册失败的线路）或忙线；其次，应该有冲突解决方案，即能够解决同抢的情况（如刚刚选择了一个空间闲的线路，但在呼出前的瞬间忽然来了一通呼入的电话）。</p>
+<p height="1em" width="2em">当然，实现这种算法比较复杂，而且如果实现不好，也不一定能减少呼损。所以有时候，多开一些网关线路，利用减少线路利用率来换取更低的呼损，选择一个折中的值还是可以接受的。</p>
+<p height="1em" width="2em">另外，在这些网关线路也会有大量呼入的情况下，呼损率肯定会更高。这时候，可以采取将呼入和呼出分开的方法，即一部分线路只允许呼入，另一部分仅用于呼出（最好能在运营商的交换机上做限制，让该号码永远呼叫不进来）。具体两部分的比例应该根据实际情况设置，当然使用这种办法也会更进一步降低线路利用率。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00126.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 如果某条线路支持多线呼出，我们也可以增加它的权重。</p>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1202991" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_250"><span class="calibre2"><a shape="rect" class="calibre7"></a>Compatibility Between SSH-1 and SSH-2 Servers </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1203369" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1203408" class="calibre15"></a>OpenSSH supports both the SSH-1 and SSH-2 protocols within a single daemon accepting both types of connections. The <code class="calibre35">Protocol</code> keyword can be used to limit the support to either protocol exclusively. <a shape="rect" href="DB_split_152.html#filepos920417" class="calibre6">[5.3.7]</a></p>
+<p class="calibre4">For Tectia, however, the story is more complicated. The Tectia server itself only supports the SSH-2 protocol, but it can accept connections from clients that request the older SSH-1 protocol. This backward compatibility is achieved by having the Tectia server run some other server program for the SSH-1 protocol instead, whenever an SSH-1 connection is requested. This feature is enabled and disabled with the Tectia <code class="calibre35">Ssh1Compatibility</code> keyword, given a value of <code class="calibre35">yes</code> or <code class="calibre35">no</code> (the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Ssh1Compatibility yes</tt></div></span><p class="calibre4">When <code class="calibre35">Ssh1Compatibility</code> is enabled, and an SSH-1 client connects to the Tectia server, the two programs exchange strings indicating their versions. <a shape="rect" href="DB_split_082.html#filepos469675" class="calibre6">[3.6.3]</a>
+<span><em class="italic">sshd</em></span> (also known as <span><em class="italic">sshd2</em></span>, see the sidebar "<a shape="rect" href="DB_split_138.html#filepos731550" class="calibre6">Tectia's File-Naming Conventions</a>" <a shape="rect" href="DB_split_136.html#filepos727393" class="calibre6">[5.1]</a>) then locates the <span><em class="italic">sshd1</em></span> executable by examining the value of the <code class="calibre35">Sshd1Path</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Sshd1Path /usr/local/sbin/sshd1</tt></div></span><p class="calibre4">and invokes <span><em class="italic">sshd1</em></span>. The Tectia server adds the <span><em class="italic">-i</em></span> option <a shape="rect" href="DB_split_148.html#filepos826611" class="calibre6">[5.3.3.2]</a> to the <span><em class="italic">sshd1</em></span> command line to indicate that the client connection has already been accepted by Tectia, and <span><em class="italic">sshd1</em></span> should expect the socket to be attached to its standard input, output, and error streams. In addition, the Tectia server passes the client's version string using the (mostly undocumented) <span><em class="italic">-V</em></span> command-line option: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia, invoked automatically by sshd<br class="calibre19"/>    /usr/local/sbin/sshd1 -i -V "<em class="italic"><code class="calibre35">client version string</code></em>" <em class="italic"><code class="calibre35">&lt;other arguments&gt;</code></em></tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">Although <span><em class="italic">sshd2</em></span> can accept and reroute SSH-1 client connections, the reverse isn't true: <span><em class="italic">sshd1</em></span> can't accept SSH-2 connections. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">The <span><em class="italic">-V</em></span> command-line option is supported by <span><em class="italic">sshd1</em></span> implementations for internal use only by <span><em class="italic">sshd2</em></span>. It is necessary because when <span><em class="italic">sshd1</em></span> starts this way, the client has already sent its initial version announcement, which <span><em class="italic">sshd1</em></span> needs to get somehow. We can't think of any practical reason to use this option manually, but we mention it here for completeness. </p>
+<p class="calibre4">The OpenSSH server also implements the <span><em class="italic">-V</em></span> option, so you could use OpenSSH to handle SSH-1 protocol connections that are delegated from Tectia in its backward-compatibility mode. Be sure to set OpenSSH's <code class="calibre35">Protocol</code> keyword value to <code class="calibre35">1</code> to force protocol SSH-1. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Unfortunately, Tectia's SSH-1 compatibility mode is scarcely supported by other SSH implementations. Only OpenSSH versions earlier than 3.7 understand the <span><em class="italic">-V</em></span> option. An alternative is to use the latest implementation of SSH1--the original SSH product—which is still available from <a href="ftp://ftp.ssh.com/pub/ssh/" shape="rect" class="calibre6">ftp://ftp.ssh.com/pub/ssh/</a>, but it is ancient and no longer actively maintained. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Most other command-line options are passed on from <span><em class="italic">sshd2</em></span> to <span><em class="italic">sshd1</em></span> without modification. Specifically, the Tectia server leaves the following options untouched: <span><em class="italic">-b</em></span>, <span><em class="italic">-g</em></span>, <span><em class="italic">-h</em></span>, <span><em class="italic">-k</em></span>, <span><em class="italic">-p</em></span>, <span><em class="italic">-q</em></span>, and <span><em class="italic">-i</em></span>. The <span><em class="italic">-d</em></span> option <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> is passed to <span><em class="italic">sshd1</em></span>, but the debug level argument is removed, since it is Tectia-specific. Similarly, the argument for the <span><em class="italic">-f</em></span> option is unsuitable for <span><em class="italic">sshd1</em></span>, since it specifies an alternate configuration file, and the syntax for <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> configuration files isn't compatible. Therefore, if an <span><em class="italic">sshd2 -f</em></span> option is specified, then Tectia uses the <code class="calibre35">Sshd1ConfigFile</code> keyword to modify the argument for the <span><em class="italic">-f</em></span> option that is used for the <span><em class="italic">sshd1</em></span> invocation: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    Sshd1ConfigFile /usr/local/etc/sshd1_config</tt></div></span><p class="calibre4">The <code class="calibre35">Sshd1ConfigFile</code> is only used if <span><em class="italic">sshd2</em></span> was invoked with an explicit <span><em class="italic">-f</em></span> command-line option. Otherwise, no <span><em class="italic">-f</em></span> option is passed on the <span><em class="italic">sshd1</em></span>, and <span><em class="italic">sshd1</em></span> uses its own default configuration file, just like <span><em class="italic">sshd2</em></span>. </p>
+<p class="calibre4">All other <span><em class="italic">sshd2</em></span> options are removed from the command line that is passed to <span><em class="italic">sshd1</em></span>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Other command-line options besides <span><em class="italic">-f</em></span> can cause compatibility problems when they are passed on from <span><em class="italic">sshd2</em></span> to <span><em class="italic">sshd1</em></span>. Some <span><em class="italic">sshd2</em></span> options are not supported by all <span><em class="italic">sshd1</em></span> implementations, and (even worse) some options with the same names have different interpretations. Be sure to carefully compare the <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> documentation for any options that are used. It is usually best to use keywords in different configuration files for <span><em class="italic">sshd2</em></span> and <span><em class="italic">sshd1</em></span> instead of command-line options in SSH-1 compatibility mode. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">If SSH-1 compatibility mode is used, only the Tectia server should be started at boot time. <span><em class="italic">sshd1</em></span> is then launched by <span><em class="italic">sshd2</em></span> only when needed for SSH-1 connections. </p>
+</div>  </body>
+</html>

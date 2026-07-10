@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_271"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1366708" class="calibre7"></a>6.3.4 Agents and Security </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">As we mentioned earlier, agents don't expose private keys to SSH clients. Instead, they answer requests from clients <span><em class="italic">using</em></span> the keys. This approach is more secure than passing keys around, but it still has security concerns. It is important to understand these concerns before completely trusting the agent model: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Agents rely on external access control<a shape="rect" class="calibre15"></a><a id="filepos1367376" class="calibre15"></a> mechanisms. </li>
+<li class="calibre18">Agents can be cracked.</li>
+</ul></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1367684" class="calibre7"></a>6.3.4.1 Access control </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">When your agent is loaded with private keys, a potential security issue arises. How does your agent distinguish between legitimate requests from your SSH clients and illegitimate requests from unauthorized sources? Since the agent speaks only to other processes on the same host, it uses the host's existing security mechanisms. These vary from one operating system to another, but the four main mechanisms are: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">File permissions</li>
+<li class="calibre18">Client identification</li>
+<li class="calibre18">Protected memory</li>
+<li class="calibre18">Prompt-on-use</li>
+</ul></div>
+<p class="calibre4"><span><strong class="calibre45">File permissions.</strong></span> Under Unix, the agent communicates with users via a named pipe (Unix-domain socket) in the filesystem, so the first line of defense is the file permissions on the socket. OpenSSH and Tectia keep agent sockets in a protected directory. OpenSSH's socket is named <em class="italic">/tmp/ssh-</em>
+<span><em class="italic">STRING</em></span>
+<em class="italic">/agent.</em>
+<span><em class="italic">n</em></span>, where <span><em class="italic">STRING</em></span> is random text based on the agent's process ID, and <span><em class="italic">n</em></span> is a number: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ls -la /tmp/ssh-alHMKX4537<br class="calibre19"/>    drwx------   2 smith    smith       4096 Feb  4 13:40 .<br class="calibre19"/>    drwxrwxrwt   7 root     root        4096 Feb  4 13:40 ..<br class="calibre19"/>    srwxr-xr-x   1 smith    smith       0 Feb  4 13:40 agent.4537</tt></div></span><p class="calibre4">while Tectia's is named <em class="italic">/tmp/ssh-</em>
+<span><em class="italic">USERNAME</em></span>
+<em class="italic">/</em>
+<span><em class="italic">ssh2</em></span>
+<em class="italic">-</em>
+<span><em class="italic">n</em></span>
+<em class="italic">-</em>
+<span><em class="italic">agent</em></span>, where <span><em class="italic">USERNAME</em></span> is your username and <span><em class="italic">n</em></span> is again a number: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    $ ls -la /tmp/ssh-smith/<br class="calibre19"/>    drwx------   2 smith   smith       4096 Feb  4 13:40 .<br class="calibre19"/>    drwxrwxrwt   7 root    root        4096 Feb  4 13:40 ..<br class="calibre19"/>    srw-------   1 smith   smith       0 Feb  4 13:40 ssh2-4537-agent</tt></div></span><p class="calibre4">The number <span><em class="italic">n</em></span> is usually one less than the process ID (pid) of the agent itself. This is because <span><em class="italic">ssh-agent</em></span> first creates the socket using its pid, then later starts another process that actually persists as the agent. In these examples, user smith has a socket for an agent which probably has PID 4536. The containing directory itself has mode 0700. </p>
+<p class="calibre4">This organization of a user's sockets into a single directory is not only for neatness but also for security and portability, because different operating systems treat socket permissions in different ways. For example, Solaris appears to ignore them completely; even a socket with permission 000 (no access for anyone) accepts all connections. Linux respects socket permissions, but a write-only socket permits both reading and writing. To deal with such diverse implementations, SSH keeps your sockets in a directory owned by you, with directory permissions that forbid anyone else to access the sockets inside. </p>
+<p class="calibre4">Using a subdirectory of <em class="italic">/tmp</em>, rather than <em class="italic">/tmp</em> itself, also prevents a class of attacks called <span><em class="italic">temp races</em></span>. A temp-race attack takes advantage of race conditions inherent in the common setting of the "sticky" mode bit on the Unix <em class="italic">/tmp</em> directory, allowing anyone to create a file there, but only allowing deletion of files owned by the same uid as the deleting process. </p>
+<p class="calibre4">If you want to move the socket out of the default <em class="italic">/tmp</em> directory, use the <span><em class="italic">-a</em></span> option: <a shape="rect" href="DB_split_202.html#filepos1356083" class="calibre6">[6.3.3.1]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    ssh-agent -a /private/ssh/mysocket<br class="calibre19"/>    SSH_AUTH_SOCK=/private/ssh/mysocket; export SSH_AUTH_SOCK;<br class="calibre19"/>    echo Agent pid 28320;</tt></div></span><p class="calibre4"><span><strong class="calibre45">Client identification</strong></span>. Some flavors of Unix allow one process to find out who's on the other end of a named pipe: the peer's process ID, user ID, etc. If this feature is available, an agent can verify that the client's user ID matches its own. </p>
+<p class="calibre4"><span><strong class="calibre45">Protected memory</strong></span>. The <span><em class="italic">ssh-agent</em></span> process won't reveal keys via the agent protocol, but those keys are in its memory. A privileged user might be able to attach to the agent process and read the keys from its memory space, bypassing the usual Unix process separation. Some Unixes allow a process to limit or prevent this kind of external interference, so some agents make use of this feature. </p>
+<p class="calibre4"><span><strong class="calibre45">Prompt-on-use</strong></span>. Some agents can query the user for permission each time a request comes in over the agent socket (e.g., OpenSSH <span><em class="italic">ssh-add -c</em></span>). If you use this feature and a window pops up unexpectedly asking about your agent, something's wrong! </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>6.3.4.2 Cracking an agent </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1375265" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1375303" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1375341" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1375438" class="calibre15"></a>If the machine running your agent is compromised, an attacker can easily gain access to the IPC channel and thus to your agent. This permits the interloper to make requests of the agent, at least for a time. Once you log out or unload your keys from the agent, the security hole is closed. Therefore, you should run agents only on trusted machines, perhaps unloading your keys (<span><em class="italic">ssh-agent -D</em></span>) if you're away from the computer for an extended time, such as overnight. </p>
+<p class="calibre4">Since agents don't give out keys, your keys seem safe from theft if the machine is compromised. Alas, that's not the case. An enterprising cracker, once logged into the machine, has other means for getting your keys, such as: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">Stealing your private-key file and attempting to guess your passphrase </li>
+<li class="calibre18">Tracing processes that you're running, and catching your passphrase while you type it </li>
+<li class="calibre18">Trojan horse attacks: installing modified versions of system programs, such as the login program, shells, or the SSH implementation itself, that steal your passphrase </li>
+<li class="calibre18">Obtaining a copy of the memory space of your running agent and picking the keys out of it directly (this is a bit harder than the others) </li>
+</ul></div>
+<p class="calibre4">The bottom line is this: run agents only on trusted machines. SSH does not excuse you from securing other aspects of your system. </p>
+</div>
+</div>
+</body>
+</html>

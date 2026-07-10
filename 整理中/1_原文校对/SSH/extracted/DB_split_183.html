@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1137830" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_245"><span class="calibre2"><a shape="rect" class="calibre7"></a>Logging and Debugging </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1138184" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1138223" class="calibre15"></a>As an SSH server runs, it optionally produces log messages to describe what it's doing. Log messages aid the system administrator in tracking the server's behavior and detecting and diagnosing problems. For example, if a server is mysteriously rejecting connections, one of the first places to look is the server's log output. </p>
+<p class="calibre4">By default, the SSH server writes log messages to <span><em class="italic">syslog</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos1138773" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos1138812" class="calibre15"></a>, the standard Unix logging service (see the sidebar, "<a shape="rect" href="#filepos1140529" class="calibre6">The Syslog Logging Service</a>"). For example, an SSH server typically announces its startup with log messages like:<sup class="calibre20">[<a id="filepos1139105" shape="rect" href="DB_split_186.html#filepos1201079" class="calibre6">86</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Server listening on 0.0.0.0 port 22.<br class="calibre19"/>    Generating 768 bit RSA key.<br class="calibre19"/>    RSA key generation complete.</tt></div></span><p class="calibre4">and a connection from a client is recorded with log messages like: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    session opened for user rebecca by (uid=9005)<br class="calibre19"/>    Accepted publickey for rebecca from 10.1.2.3 port 1265<br class="calibre19"/>    ssh2 session closed for user rebecca</tt></div></span><p class="calibre4">The <code class="calibre35">SyslogFacility</code> keyword specifies how the SSH server tags log messages: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    SyslogFacility LOCAL3</tt></div></span><p class="calibre4">The value is one of the (case-insensitive) syslog facility codes, and the default is <code class="calibre35">AUTH</code>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre8"><span class="calibre24"><a shape="rect" class="calibre15"></a><a id="filepos1140529" class="calibre15"></a><h3 class="calibre25">The Syslog Logging Service</h3>
+<p class="calibre4">Syslog is the standard Unix logging service. Programs send their log messages to the syslog daemon, <span><em class="italic">syslogd</em></span>, which forwards them to other destinations such as files, the system console, or even other machines. Destinations are specified in the syslog configuration file, <em class="italic">/etc/syslog.conf</em>. </p>
+<p class="calibre4">Messages received by <span><em class="italic">syslogd</em></span> are processed according to their <span><em class="italic">facility</em></span>, which indicates their origin. Standard syslog facilities include <code class="calibre35">AUTH</code> (security and authorization), <code class="calibre35">AUTHPRIV</code> (similar, but for sensitive information), <code class="calibre35">DAEMON</code> (system daemons), <code class="calibre35">LOCAL0</code> through <code class="calibre35">LOCAL7</code> (reserved for local use), and <code class="calibre35">USER</code> (user processes). </p>
+<p class="calibre4">Log messages are also assigned a <span><em class="italic">priority level</em></span>, which indicates their importance. The standard syslog priorities are, in order from most to least important, <code class="calibre35">EMERG</code>, <code class="calibre35">ALERT</code>, <code class="calibre35">CRIT</code>, <code class="calibre35">ERR</code>, <code class="calibre35">WARNING</code>, <code class="calibre35">NOTICE</code>, <code class="calibre35">INFO</code>, and <code class="calibre35">DEBUG</code>. </p>
+<p class="calibre4">See the manpages for <span><em class="italic">syslog</em></span>, <span><em class="italic">syslogd</em></span>, and <em class="italic">syslog.conf</em> for more information about this logging service. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Warning </h3>
+<p class="calibre4">Tectia confusingly interprets <code class="calibre35">AUTH</code> to actually mean <code class="calibre35">AUTHPRIV</code> (this also applies to the default behavior), and does not recognize <code class="calibre35">AUTHPRIV</code> as a syslog facility code. On systems that do not support a separate <code class="calibre35">AUTHPRIV</code> facility, Tectia resorts to <code class="calibre35">AUTH</code>. Otherwise, Tectia provides no way to specify the <code class="calibre35">AUTH</code> facility explicitly. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">For Tectia, a separate syslog facility code is used for the <span><em class="italic">sftp</em></span> subsystem. <a shape="rect" href="DB_split_182.html#filepos1123002" class="calibre6">[5.8]</a> This is specified by the <code class="calibre35">SftpSysLogFacility</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    SftpSysLogFacility LOCAL7</tt></div></span><p class="calibre4">By default, no logging is performed for <span><em class="italic">sftp</em></span>. </p>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">If the <span><em class="italic">sftp</em></span> subsystem is implemented by an external program, then the Tectia server passes the <span><em class="italic">sftp</em></span> syslog facility code via the environment variable <code class="calibre35">SSH2_SFTP_LOG_FACILITY</code>. Otherwise, if the internal <span><em class="italic">sftp</em></span> subsystem that is built into the server is used, then the value for the <code class="calibre35">SftpSysLogFacility</code> keyword is consulted directly. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">SSH servers use a range of syslog priority levels, depending on the types of log messages that are sent. These priority levels aren't directly controllable, but the syslog configuration determines where and how they are recorded (or discarded). </p>
+<p class="calibre4">The amount of detail provided by log messages can be specified in a variety of ways, however. OpenSSH uses the keyword <code class="calibre35">LogLevel</code> to control the verbosity level: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    LogLevel VERBOSE</tt></div></span><p class="calibre4">The permitted values (in order of increasing verbosity) are <code class="calibre35">QUIET</code>, <code class="calibre35">FATAL</code>, <code class="calibre35">ERROR</code>, <code class="calibre35">INFO</code>, <code class="calibre35">VERBOSE</code>, <code class="calibre35">DEBUG</code>, and <code class="calibre35">DEBUG1</code> through <code class="calibre35">DEBUG3</code>.<sup class="calibre20">[<a id="filepos1146378" shape="rect" href="DB_split_186.html#filepos1201651" class="calibre6">87</a>]</sup></p>
+<p class="calibre4">The <code class="calibre35">QUIET</code> level sends nothing whatsoever to the system log (although some messages resulting from OpenSSH activity may still be recorded by other programs and libraries, such as PAM). Tectia uses a separate keyword, <code class="calibre35">QuietMode</code>, to suppress all log messages (except fatal errors), with the values <code class="calibre35">yes</code> or <code class="calibre35">no</code> (the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    QuietMode yes</tt></div></span><p class="calibre4">The <span><em class="italic">-q</em></span> command-line option also selects quiet operation: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ sshd -q</tt></div></span></div>  </body>
+</html>

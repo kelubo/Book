@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.7　使用Lua提供XML Binding</font>
+</font>
+</p>
+<p height="1em" width="2em">在16.2.7节我们介绍了用Lua提供动态括号计划的例子，下面我们再看一下Lua能提供的另外一个功能——XML绑定（Binding）。</p>
+<p height="1em" width="2em">前面我们学习过的XML配置文件都是静态的，在很多时候编辑静态的XML很不方便。FreeSWITCH提供了一种机制可以在XML配置节点上绑定一些回调（函数或方法），然后当FreeSWITCH用到一段XML时，就可以调用该回调功能来取得XML。我们可以使用Lua绑定一个回调，并通过Lua脚本来产动态的XML内容。</p>
+<p height="1em" width="2em">我们仍以Dialplan为例，注意这里我们使用的是Lua绑定XML提供的Dialplan（提供的还是XML Dialplan），而不是LUA Dialplan。</p>
+<p height="1em" width="2em">首先，回想一下第5章，我们讲过FreeSWITCH配置文件conf/freeswitch.xml中有多个Section，如Configuraton、Directory、Dialplan、Chatplan、Languages等，这里我们只绑定到Dialplan。Lua代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch.consoleLog("NOTICE", "SECTION " .. XML_REQUEST["section"] .. "\n")<br/>
+<br/>
+xml = [[<br/>
+<br/>
+&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;<br/>
+<br/>
+&lt;document type="freeswitch/xml"&gt;<br/>
+<br/>
+&lt;section name="dialplan" description="RE Dial Plan For FreeSwitch"&gt;<br/>
+<br/>
+  &lt;context name="default"&gt;<br/>
+<br/>
+    &lt;extension name="9196"&gt;<br/>
+<br/>
+      &lt;condition field="destination_number" expression="^9196$"&gt;<br/>
+<br/>
+        &lt;action application="log" data="ERR I'm from Lua XML dialplan"/&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="echo"/&gt;<br/>
+<br/>
+      &lt;/condition&gt;<br/>
+<br/>
+    &lt;/extension&gt;<br/>
+<br/>
+  &lt;/context&gt;<br/>
+<br/>
+&lt;/section&gt;<br/>
+<br/>
+&lt;/document&gt;<br/>
+<br/>
+]]<br/>
+<br/>
+XML_STRING=xml<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这段代码没有什么特别的，只是第1行打印了一行日志，该日志的内容包含从XML_REQUEST中取出来的参数。跟前面基于Session的脚本类似，所有这种绑定的请求，都会自动有一个XML_REQUEST变量，然后在Lua脚本中通过这个变量的内容来进行各种if…else判断，进而动态产生XML。当然，本例子出于简单起见，在Lua脚本中还是写了一个静态的字符串。</p>
+<p height="1em" width="2em">脚本的最后一行，定义一个XML_STRING变量，当脚本执行完成后，FreeSWITCH会在该变量中找到相应的XML文本并进行解析，以执行下一步的动作。</p>
+<p height="1em" width="2em">上述脚本编辑完成后，可以在conf/lua.conf.xml中进行如下设置并重启FreeSWITCH使之生效：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="xml-handler-script" value="/tmp/dp_xml.lua"/&gt;<br/>
+<br/>
+&lt;param name="xml-handler-bindings" value="dialplan"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该配置将/tmp/dp_xml.lua脚本绑定到XML配置文件中的Dialplan这个Section，以后当FreeSWITCH需要查找XML Dialplan时，便会自动执行绑定的Lua脚本，生成动态的XML。</p>
+</body>
+</html>

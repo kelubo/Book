@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_423"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2105129" class="calibre7"></a>10.7.3 AFS Access Problems </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">The Andrew File System, or AFS, is a file-sharing protocol similar in purpose to NFS, but considerably more sophisticated. It uses Kerberos-4 for user authentication and is generally more secure than NFS. The access problem discussed previously comes up for AFS, but it's more work to solve, and this time, OpenSSH is the winner. </p>
+<p class="calibre4">AFS uses its own authentication system; access to remote files is controlled by possession of an appropriate AFS <span><em class="italic">token</em></span>. There are no uid-switching games root can play; <span><em class="italic">sshd</em></span> must have the right AFS token in order to access your home directory. If you were logged into that machine, of course, you could use the usual AFS <span><em class="italic">klog</em></span> command to authenticate to AFS. However, <span><em class="italic">sshd</em></span> needs it before you've logged in, so there's a bit of a quandary. </p>
+<p class="calibre4">There is one solution available, though, involving Kerberos. If Kerberos is available, AFS will usually be configured so that AFS tokens can be obtained via Kerberos, bringing AFS into the Kerberos single-signon universe. If you have protocol-2 Kerberos support enabled with ticket forwarding <a shape="rect" href="DB_split_353.html#filepos2333023" class="calibre6">[11.5.2.2]</a>, then OpenSSH can use your forwarded credentials to automatically obtain the needed AFS token: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.ssh/config<br class="calibre19"/>    GSSAPIAuthentication       yes<br class="calibre19"/>    GSSAPIDelegateCredentials  yes<br class="calibre19"/>    KerberosGetAFSToken        yes</tt></div></span><p class="calibre4">Note that the older OpenSSH Kerberos-4 mechanism for this, controlled by the keyword <code class="calibre35">AFSTokenPassing</code>, is no longer available. The current support is only for Kerberos-5 and GSSAPI. </p>
+</div>
+<div class="mbppagebreak" id="calibre_pb_424"></div></body>
+</html>

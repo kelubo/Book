@@ -1,0 +1,950 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.8　语音识别</font>
+</font>
+</p>
+<p height="1em" width="2em">语音识别（Automatic Speech Recognition，ASR）算是一个高级话题。不过，之所以直到现在我们才讲到语音识别，并不仅是因为它高级，还因为使用它不像其他模块那样配置一下就能用了，而是需要配合一些脚本才能实现。</p>
+<p height="1em" width="2em">语音识别与TTS技术可以说是一对孪生兄弟，但“长相”却迥然不同。TTS是把文字转成语音，而语音识别则是把声音转换成文字 <sup>
+<small>
+<a href="text00150.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。一般来说，TTS技术是比较容易实现的，最简单的实现仅需要用查表法将与文字对应的录音逐个查找到并读出，高级一些的借助一些语法和词法分析并借助语音合成技术能读出抑扬顿挫的声调；但语音识别就不同了，它不仅需要语法和词法分析，还需要“理解”声音的内容，以转换成合适的文字。</p>
+<p height="1em" width="2em">语音识别分为基于关键词的识别和自然语音识别。基于关键词的识别比较成熟，因为词汇数量有限，比较容易做到精确。这类应用一般用于声控场合，如发出打开、关闭（设备或程序）、呼叫（某人）等命令。基于自然语言的识别则比较难，多年来人们进行了大量的研究，但鲜有较好的应用。后来，随着iPhone上Siri的出现，语音识别好像一下子迎来了曙光，众多的语音识别产品也很快推出来了。</p>
+<p height="1em" width="2em">当然，在此我们无意关注这些产品，也不想深入探究这些底层的技术，而是想了解FreeSWITCH如何与语音识别搭上边——由于FreeSWITCH内部处理的媒体类型主要是声音，自然一切与声音有关的应用都能搭上边。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.8.1　使用Pocket Sphinx进行中文语音识别</font>
+</font>
+</p>
+<p height="1em" width="2em">Sphinx <sup>
+<small>
+<a href="text00150.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 是卡内基梅隆大学研究的开源语音识别软件，Pocket Sphinx <sup>
+<small>
+<a href="text00150.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ 则是一个轻量版，主要用于嵌入式及手持移动设备。FreeSWITCH中有一个mod_pocketsphinx <sup>
+<small>
+<a href="text00150.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 模块可以通过PocketSphinx进行语音识别。该模块不是默认安装的，但可以参照前面其他模块的安装方法，在源代码目录下使用“make mod_pocketshpinx-install”并在FreeSWITCH控制台上使用“load mod_pocketsphinx”命令加载。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.英文语音识别快速体验</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH自己带了一个Pizza的例子，大意是打电话到一个比萨店，店里的IVR会自动询问你欲订何种比萨，你的回答对方可以识别出来。读者可以参阅该模块的Wiki页面看一下如何测试该例子。不过，该例子讲起来比较复杂，下面我们看一个简单点的例子。</p>
+<p height="1em" width="2em">首先，语音识别需要一个语法文件。在FreeSWITCH源代码目录下的script目录下有一个yes_no.gram的语法文件的例子，我们先把它复制到FreeSWITCH安装目录的grammar目录下。该文件不长，全部内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+#JSGF V1.0;<br/>
+<br/>
+/** JSGF Grammar for example */<br/>
+<br/>
+grammar example;<br/>
+<br/>
+&lt;yes&gt; = [ yes ];<br/>
+<br/>
+&lt;no&gt; = [ no ];<br/>
+<br/>
+public &lt;results&gt; = [ &lt;yes&gt; | &lt;no&gt; ];<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该语法文件是根据JSGF <sup>
+<small>
+<a href="text00150.html">
+<font size="2">
+<font color="#FF6600">[5]</font>
+</font>
+</a>
+</small>
+</sup>
+ 语法写的，它的作用是对照字典组成相关的词语或句子。在此，该语法仅定义了“yes”和“no”，因此，它仅能识别英文单词“yes”或“no”。不过，对于我们演示语言识别的例子来说足够了。</p>
+<p height="1em" width="2em">接下来设置如下Dialplan。这一次我们使用了flite作为TTS，并使用kal嗓音。play_and_detect_speech是一个App，它的作用是播放一段声音（声音文件或TTS文本）并进行语音识别。它的第1个参数是say:please say yes or no，用于指定播放的TTS文本；第2个参数是detect:pocketsphinx，表示使用pocketsphinx进行语音识别；第3个参数yes_no，指定一个语法文件（就是我们刚刚准备的那个）。当语音识别完成后，识别的结果将存入detect_speech_result通道变量中，同时使用log App将它的内容打印到日志中以便观察识别结果。完整的Dialplan设置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="ASR"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^1234$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="set" data="tts_engine=flite"/&gt;<br/>
+<br/>
+        &lt;action application="set" data="tts_voice=kal"/&gt;<br/>
+<br/>
+        &lt;action application="play_and_detect_speech" data="say:please say yes or no detect:pocketsphinx yes_no"/&gt;<br/>
+<br/>
+        &lt;action application="log" data="INFO ${detect_speech_result}"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">设置好上述Dialplan后，拨打1234便进入了语音识别程序。它将首先播放“please say yes or no”，当说了“yes”后，控制台上打印出如下的日志：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+[INFO] switch_ivr_async.c:3718 (sofia/internal/1012@192.168.7.6) START OF SPEECH<br/>
+<br/>
+[INFO] switch_ivr_async.c:3708 (sofia/internal/1012@192.168.7.6) DETECTED SPEECH<br/>
+<br/>
+[INFO] mod_dptools.c:1602 &lt;?xml version="1.0"?&gt;<br/>
+<br/>
+&lt;result grammar="pizza_yesno"&gt;<br/>
+<br/>
+  &lt;interpretation grammar="pizza_yesno" confidence="100"&gt;<br/>
+<br/>
+    &lt;input mode="speech"&gt;yes&lt;/input&gt;<br/>
+<br/>
+  &lt;/interpretation&gt;<br/>
+<br/>
+&lt;/result&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，第1行START OF SPEECH表示PocketSphinx“听”到了有人说话；第2行DETECTED SPEECH表示识别出了说话的内容；从第3行可以看出，识别的结果是使用XML表示的，里面的yes（在第6行）即表示识别到的文本。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.中文语音识别</font>
+</font>
+</p>
+<p height="1em" width="2em">在中国，语音识别软件必须能识别出中文才有意义。接下来我们再看一看中文语音识别的例子。</p>
+<p height="1em" width="2em">（1）准备工作</p>
+<p height="1em" width="2em">我们需要先选择一个中文的声音模型，笔者选择了tdt_sc_8k，放到grammer/model目录下面；另外，还得有个字典文件，笔者选择了zh_broadcastnews_utf8.dic，放到grammar目录下面。在conf/autoload_configs/pocketsphinx.conf.xml中进行如下配置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;param name="narrowband-model" value="tdt_sc_8k"/&gt;<br/>
+<br/>
+&lt;param name="dictionary" value="zh_broadcastnews_utf8.dic"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">字典文件本身有点大，笔者精简了一下，内容大致如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+杜 d u<br/>
+<br/>
+金 j in<br/>
+<br/>
+房 f ang<br/>
+<br/>
+令 l ing<br/>
+<br/>
+狐 h u<br/>
+<br/>
+冲 ch ong<br/>
+<br/>
+乔 q iao<br/>
+<br/>
+布 b u<br/>
+<br/>
+斯 s if<br/>
+<br/>
+孙 s un<br/>
+<br/>
+悟 w u<br/>
+<br/>
+空 k ong<br/>
+<br/>
+中 zh ong<br/>
+<br/>
+山 sh an<br/>
+<br/>
+杜金房 d u j in f ang<br/>
+<br/>
+令狐冲 l ing h u ch ong<br/>
+<br/>
+乔布斯 q iao b u s if<br/>
+<br/>
+孙悟空 s un w u k ong<br/>
+<br/>
+孙中山 s un zh ong sh an<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在此我们就不深入研究字典文件的意义了，读者大致也能明白上面首先是中文的字词，后面是相关的语素就可以了。除了字典文件外，我们还需要有一个语法文件，存放在grammar目录下，不妨取名为zh.gram。内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+#JSGF V1.0;<br/>
+<br/>
+/**<br/>
+<br/>
+  * JSGF Grammar for pizza_size names<br/>
+<br/>
+  */<br/>
+<br/>
+grammar names;<br/>
+<br/>
+&lt;du&gt; = <br/>
+<br/>
+杜;<br/>
+<br/>
+&lt;jin&gt; = <br/>
+<br/>
+金;<br/>
+<br/>
+&lt;fang&gt; = <br/>
+<br/>
+房;<br/>
+<br/>
+&lt;<br/>
+<br/>
+孙&gt; = <br/>
+<br/>
+孙;<br/>
+<br/>
+&lt;<br/>
+<br/>
+中&gt; = <br/>
+<br/>
+中;<br/>
+<br/>
+&lt;<br/>
+<br/>
+山&gt; = <br/>
+<br/>
+山;<br/>
+<br/>
+public &lt;jf&gt; = &lt;jin&gt;&lt;fang&gt;;<br/>
+<br/>
+public &lt;djf&gt; = &lt;du&gt;&lt;jin&gt;&lt;fang&gt;;<br/>
+<br/>
+public &lt;szs&gt; = &lt;<br/>
+<br/>
+孙&gt;&lt;<br/>
+<br/>
+中&gt;&lt;<br/>
+<br/>
+山&gt;;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该语法文件也是根据JSGF语法写的。准备好这些内容后，我们就可以写我们的语音识别脚本了。</p>
+<p height="1em" width="2em"><img align="baseline" height="42" width="36" src="Image00074.jpg" />
+ 注意</p>
+<p height="1em" width="2em">需要指出，本例中用到的部分语言模型及数据字典不是默认安装的，语音识别是一个相对专业的技术，而使用Pocketsphinx进行中文语音识别也没有完整的文档，感兴趣的读者如果需要按这里的内容进行实践的话，可以根据这里提供的关键字自行到互联网上搜索相关资源。</p>
+<p height="1em" width="2em">（2）语音识别Lua脚本</p>
+<p height="1em" width="2em">我们还是以Lua为例来介绍语音识别的脚本。首先，我们当然要先写一个log函数，以便知道脚本在运行过程中都发生了什么。内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+function log(text)<br/>
+<br/>
+    freeswitch.consoleLog("INFO", text);<br/>
+<br/>
+end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，我们写一个onInput函数，实现在有输入的时候可以得到回调。在前面的例子中我们学过，当有用户DTMF输入时便可以调用回调函数。在语音识别中，当识别到用户的语音时，也可以回调相应的函数。如下面函数的前几行，当回调是由DTMF引起的时（第3行），便打印一条日志（第4行）并退出（第5行）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 function onInput(s, type, obj)<br/>
+<br/>
+02     log("Callback type:" .. type)<br/>
+<br/>
+03     if (type == "dtmf") then<br/>
+<br/>
+04         log("DTMF: " .. obj.digit .. "\n")<br/>
+<br/>
+05         return "break"<br/>
+<br/>
+06     end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当检测到语音识别的结果时，回调的类型（type）将是event（第7行），obj即是实际的事件，我们可以在事件中取出Speech-Type的值（第8行）。</p>
+<p height="1em" width="2em">当Speech-Type值为begin-speaking时，说明系统检测到你说话了，我们便打印出事件的内容（第10行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+07     if (type == "event") then<br/>
+<br/>
+08         local event = obj:getHeader("Speech-Type")<br/>
+<br/>
+09         if (event == "begin-speaking") then<br/>
+<br/>
+10             log("\n" .. obj:serialize())<br/>
+<br/>
+11             return ""<br/>
+<br/>
+12         end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在实际的运行中，输出结果如下，可以从中看出Speech-Type：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+Event-Name: DETECTED_SPEECH<br/>
+<br/>
+Core-UUID: bf7f346e-25c8-498b-9a2c-8d0e5f70a266<br/>
+<br/>
+FreeSWITCH-Hostname: seven.local<br/>
+<br/>
+FreeSWITCH-Switchname: seven.local<br/>
+<br/>
+FreeSWITCH-IPv4: 192.168.7.6<br/>
+<br/>
+FreeSWITCH-IPv6: %3A%3A1<br/>
+<br/>
+Event-Date-Local: 2013-11-21%2014%3A48%3A55<br/>
+<br/>
+Event-Date-GMT: Thu,%2021%20Nov%202013%2006%3A48%3A55%20GMT<br/>
+<br/>
+Event-Date-Timestamp: 1385016535584614<br/>
+<br/>
+Event-Calling-File: switch_ivr_async.c<br/>
+<br/>
+Event-Calling-Function: speech_thread<br/>
+<br/>
+Event-Calling-Line-Number: 3860<br/>
+<br/>
+Event-Sequence: 7705<br/>
+<br/>
+Speech-Type: begin-speaking<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当识别出语音时，Speech-Type的值就是detected-speech（第13行），然后我们在第14行将语音识别暂停（pause），代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+13         if (event == "detected-speech") then<br/>
+<br/>
+14             session:execute("detect_speech", "pause")<br/>
+<br/>
+15             log("\n" .. obj:serialize())<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">同时我们看到，第15行打印了收到的事件的内容，实际运行效果如下（为节省篇幅，我们省略了一部分事件头）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+Event-Name: DETECTED_SPEECH<br/>
+<br/>
+Speech-Type: detected-speech<br/>
+<br/>
+Content-Length: 168<br/>
+<br/>
+&lt;?xml version="1.0"?&gt;<br/>
+<br/>
+&lt;result grammar="zh"&gt;<br/>
+<br/>
+  &lt;interpretation grammar="zh" confidence="100"&gt;<br/>
+<br/>
+    &lt;input mode="speech"&gt;<br/>
+<br/>
+杜金房&lt;/input&gt;<br/>
+<br/>
+  &lt;/interpretation&gt;<br/>
+<br/>
+&lt;/result&gt;<br/>
+<br/>
+[INFO] switch_cpp.cpp:1293 Heard! CONFIDENCE = 100<br/>
+<br/>
+[INFO] switch_cpp.cpp:1293 Heard: <br/>
+<br/>
+杜金房<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">读者可以看到，实际识别到的内容是以XML描述的，其中confidence的值表示该语音识别程序有多大的把握保证它听到的是正确的，而真正的检测结果在input标签中（即这里的“杜金房”）。接下来，我们只需要用一个XML解析器解出相应的内容即可。下面的代码第16行将通过getBody函数取得XML，同样第17行将识别暂停，第19行使用XML解析函数getResults进而得出结果，并放入results变量中，然后打印日志，并在第23行用TTS进行回放。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+16             if (obj:getBody()) then<br/>
+<br/>
+17                 session:execute("detect_speech", "pause")<br/>
+<br/>
+18                 local speech_ouput = obj:getBody()<br/>
+<br/>
+19                 results = getResults(obj:getBody())<br/>
+<br/>
+20                 if(results.score ~= nil) then<br/>
+<br/>
+21                     log("Heard: CONFIDENCE = " .. results.score .. "\n")<br/>
+<br/>
+22                     log("Heard: " .. results.text)<br/>
+<br/>
+23                     s:speak("<br/>
+<br/>
+我听到您说的是" .. results.text .. "\n")<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里使用TTS把“听到”的内容再跟用户确认一遍，然后执行其他的动作，如根据姓名拨号，调用其他程序的接口控制其他设备等，具体的应用就看读者的想象力了。</p>
+<p height="1em" width="2em">本函数其他的代码不是很重要，但出于完整性起见，我们也把它们列在了下面（第24～37行）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+24                 else<br/>
+<br/>
+25                     session:speak("<br/>
+<br/>
+对不起，我听不见你说话")<br/>
+<br/>
+26                 end<br/>
+<br/>
+27                 session:sleep(100)<br/>
+<br/>
+28             end<br/>
+<br/>
+29             return "break"<br/>
+<br/>
+30         else<br/>
+<br/>
+31             session:speak("<br/>
+<br/>
+对不起，我听不见你说话")<br/>
+<br/>
+32             return "break"<br/>
+<br/>
+33         end<br/>
+<br/>
+34         return "break"<br/>
+<br/>
+35     end<br/>
+<br/>
+36     return "break"<br/>
+<br/>
+37 end<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在上面的代码中，我们没有考虑识别不成功的情况。在实际的应用中，如果在识别不成功时要重启识别，可以在代码中合适的地方使用session:execute("detect_speech","resume")实现。</p>
+<p height="1em" width="2em">当然，上面仅定义了回调函数，实际的动作是在下面执行的。其中，第43行安装了回调函数；第45行设置了TTS的参数；第46行开启语音识别，它有三个参数，分别表示使用pocketsphinx模块、使用中文（zh）语法文件，以及语法的路径（zh，在这里可以随便填，但不能为空）。第47行实际上是播放一个无限长的静音文件并等待你说话。代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+38 results = {};<br/>
+<br/>
+39 speech_detected = false;<br/>
+<br/>
+40 speech_detected_dest = false;<br/>
+<br/>
+41 session:sleep(1000);<br/>
+<br/>
+42 session:answer();<br/>
+<br/>
+43 session:setInputCallback("onInput");<br/>
+<br/>
+44 session:sleep(200);<br/>
+<br/>
+45 session:set_tts_params("tts_commandline", "Ting-Ting");<br/>
+<br/>
+45 session:speak("<br/>
+<br/>
+请说出一个名字");<br/>
+<br/>
+46 session:execute("detect_speech", "pocketsphinx zh zh");<br/>
+<br/>
+47 session:streamFile("silence_stream://0");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">前面我们讲过，有一些语音识别的参数是在mod_pocketsphinx的模块配置文件中配置的，如果需要动态配置，也可以直接使用detect_speech的params子命令实现。比如，下面代码就设置了另外一个声音识别模型：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:execute("detect_speech","param narrowband-model zh_broadcastnews_ptm256_8000");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，我们在此省略了代码中的XML解析函数，读者可以参考http://lua-users.org/wiki/LuaXml尝试着自己写一个。</p>
+<p height="1em" width="2em">（3）测试语音识别</p>
+<p height="1em" width="2em">将上面讲的脚本存为asr.lua后可以使用如下Dialplan测试语音识别：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="ASR demo"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^1234$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="lua" data="asr.lua"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当呼叫1234后，便听到语音提示你说出一个名字，此时你可以根据语法文件中的名字说几个来测试一下。测试的输出结果我们上面已经讲过了，在此就不赘述了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">17.8.2　通过商业语音识别软件进行识别</font>
+</font>
+</p>
+<p height="1em" width="2em">在上面的语音识别例子中，可能是由于笔者配置、调试得不够到位，识别率不是很高。为了给读者提供一个更生动的例子，笔者联系了Vestec <sup>
+<small>
+<a href="text00150.html">
+<font size="2">
+<font color="#FF6600">[6]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，他们同意提供一个试用的语音识别许可证。Vestec是加拿大的一家做语音技术的公司，他们的ASR产品支持很多种语言，其中一种就是汉语。</p>
+<p height="1em" width="2em">Vestec本身的安装和配置也不是太复杂，但需要花一些时间从各种文档里找到需要的信息，这不是一件轻松的事情。笔者在这里就不详细讲解各种细节了，仅将简单的安装过程罗列一下，以便读者参考。</p>
+<p height="1em" width="2em">Vestec支持多种Linux平台，笔者是在Ubuntu Linux 12.04上测试的，因此安装了如下的包：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# dpkg -i vasre-so_2.10.5.Ubuntu.1204-1_amd64.deb       # <br/>
+<br/>
+动态库<br/>
+<br/>
+# dpkg -i vasre-server_2.10.5.Ubuntu.1204-1_amd64.deb   # ASR<br/>
+<br/>
+服务器<br/>
+<br/>
+# dpkg -i vasre-rm_2.10.5.Ubuntu.1204-1_amd64.deb       # <br/>
+<br/>
+资源管理（许可证等）<br/>
+<br/>
+# dpkg -i vasre-mrcp_2.10.5.Ubuntu.1204-1_amd64.deb     # MRCP<br/>
+<br/>
+接口<br/>
+<br/>
+# dpkg -i vasre-lang-zh-CN_2.5.2-1_all.deb              # <br/>
+<br/>
+中文包<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，将申请到的许可证文件license.lic放到/opt/Vestec/license目录中。</p>
+<p height="1em" width="2em">我们将使用MRCP接口连接语音识别服务。在默认的配置中，MRCP服务是监听在本地回环接口（127.0.0.1）上，因此我们需要修改/opt/Vestec/mrcp/conf/mrcpserver.xml中的IP地址，将其中的auto修改为实际的IP地址。然后启动以下服务：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# /etc/init.d/vasre-server start<br/>
+<br/>
+# /etc/init.d/vasre-rm start<br/>
+<br/>
+# /etc/init.d/vasre-mrcp start<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此Vestec ASR服务程序应该就可以正常工作了。在/opt/Vestec/mrcp/sample-freeswitch目录中有一些与FreeSWITCH集成的示例文件，可以进行测试，不过那些例子都是英文的，我们这里还是讲中文的例子。</p>
+<p height="1em" width="2em">Vestec配置好以后，下面就是配置FreeSWITCH端了。首先，我们需要配置mod_unimrcp模块。该模块提供MRCP协议的支持。MRCP协议有两个版本，V1使用RTSP，V2使用SIP，Vestec和FreeSWITCH对两个版本都支持。在这里，我们仅介绍一个V1版本的例子。在FreeSWITCH安装目录的conf/mrcp_profiles中创建vestec.xml文件，内容如下（其中server-ip为Vestec ASR MRCP服务器的IP，而rtp-ip为FreeSWITCH的IP，其他都是默认值）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;include&gt;<br/>
+<br/>
+  &lt;!-- UniMRCP Server MRCPv1 --&gt;<br/>
+<br/>
+  &lt;profile name="vestec" version="1"&gt;<br/>
+<br/>
+    &lt;param name="server-ip" value="192.168.7.11"/&gt;<br/>
+<br/>
+    &lt;param name="server-port" value="1554"/&gt;<br/>
+<br/>
+    &lt;param name="resource-location" value=""/&gt;<br/>
+<br/>
+    &lt;param name="speechsynth" value="speechsynthesizer"/&gt;<br/>
+<br/>
+    &lt;param name="speechrecog" value="speechrecognizer"/&gt;<br/>
+<br/>
+    &lt;param name="rtp-ip" value="192.168.7.6"/&gt;<br/>
+<br/>
+    &lt;param name="rtp-port-min" value="4000"/&gt;<br/>
+<br/>
+    &lt;param name="rtp-port-max" value="5000"/&gt;<br/>
+<br/>
+    &lt;!--param name="ptime" value="20"/--&gt;<br/>
+<br/>
+    &lt;param name="codecs" value="PCMU PCMA L16/96/8000"/&gt;<br/>
+<br/>
+    &lt;!-- Add any default MRCP params for SPEAK requests here --&gt;<br/>
+<br/>
+    &lt;synthparams&gt;<br/>
+<br/>
+    &lt;/synthparams&gt;<br/>
+<br/>
+    &lt;!-- Add any default MRCP params for RECOGNIZE requests here --&gt;<br/>
+<br/>
+    &lt;recogparams&gt;<br/>
+<br/>
+      &lt;!--param name="start-input-timers" value="false"/--&gt;<br/>
+<br/>
+    &lt;/recogparams&gt;<br/>
+<br/>
+  &lt;/profile&gt;<br/>
+<br/>
+&lt;/include&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">mod_unimrcp模块默认是不编译的，可以到FreeSWITCH源代码目录下编译安装它：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make mod_unimrcp-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，在FreeSWITCH中加载该模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_unimrcp<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，还是使用我们在上一节讲的姓名识别的脚本，为了能让Vestec识别到我们的关键词，我们按它的语法规则（基于ABNF <sup>
+<small>
+<a href="text00150.html">
+<font size="2">
+<font color="#FF6600">[7]</font>
+</font>
+</a>
+</small>
+</sup>
+ ）来生成一个语法文件ves-zh.gram放到grammar目录下，内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+#ABNF 1.0;<br/>
+<br/>
+language zh-CN;<br/>
+<br/>
+tag-format &lt;semantics/1.0-literals&gt;;<br/>
+<br/>
+root $Name;<br/>
+<br/>
+$Name =<br/>
+<br/>
+杜金房     {Seven Du}<br/>
+<br/>
+    |   <br/>
+<br/>
+孙中山     {Sun Yat-sen}<br/>
+<br/>
+    |   <br/>
+<br/>
+乔布斯     {Steve Jobs}<br/>
+<br/>
+    |   <br/>
+<br/>
+令狐冲     {Linghu Chong}<br/>
+<br/>
+    |   <br/>
+<br/>
+孙悟空     {Sun Wukong};<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">准备好上面这些以后，我们便可以进行测试了。在这里，我们还是使用上一节的Lua脚本，只是把ASR的调用参数修改为下面一行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session:execute("detect_speech", "unimrcp:vestec ves-zh ves-zh");<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，unimrcp:vestec指定我们新的ASR引擎，ves-zh则指定我们新的语法文件。接下来，就可以用类似上一节的方法测试了。在笔者的测试过程中，识别效果还是相当不错的。下面是识别结果的XML文件，与上一节比起来有一点小小的差别：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br/>
+<br/>
+&lt;result&gt;<br/>
+<br/>
+    &lt;interpretation grammar="session:ves-zh" confidence="99"&gt;<br/>
+<br/>
+        &lt;input mode="speech" confidence="99"&gt;<br/>
+<br/>
+孙悟空&lt;/input&gt;<br/>
+<br/>
+        &lt;instance confidence="99"&gt;<br/>
+<br/>
+            &lt;Name&gt;Sun Wukong&lt;/Name&gt;<br/>
+<br/>
+        &lt;/instance&gt;<br/>
+<br/>
+    &lt;/interpretation&gt;<br/>
+<br/>
+&lt;/result&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，笔者也在Vestec的日志中发现，它对汉字发音的分析与我们上一节的语言模型有些差异，部分日志内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+WARN  Auto-pron generates the pronunciation of <br/>
+<br/>
+杜金房<br/>
+<br/>
+INFO  <br/>
+<br/>
+杜金房: "d uw j ih n f ah ng"<br/>
+<br/>
+WARN  Auto-pron generates the pronunciation of <br/>
+<br/>
+孙中山<br/>
+<br/>
+INFO  <br/>
+<br/>
+孙中山: "s uh n zh oh ng sh ah n"<br/>
+<br/>
+WARN  Auto-pron generates the pronunciation of <br/>
+<br/>
+乔布斯<br/>
+<br/>
+INFO  <br/>
+<br/>
+乔布斯: "q ih ao b uw s ir"<br/>
+<br/>
+WARN  Auto-pron generates the pronunciation of <br/>
+<br/>
+令狐冲<br/>
+<br/>
+INFO  <br/>
+<br/>
+令狐冲: "l ih ng hh uw ch oh ng"<br/>
+<br/>
+WARN  Auto-pron generates the pronunciation of <br/>
+<br/>
+孙悟空<br/>
+<br/>
+INFO  <br/>
+<br/>
+孙悟空: "s uh n w uw k oh ng"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之，测试结果还是令人满意的。而且，Vestec对FreeSWITCH开源社区也非常友好。如果读者对此有兴趣的话，也可以向他们申请测试的许可证。</p>
+<p height="1em" width="2em">除此之外，我们也在本节讲了mod_unimrcp的使用和配置，读者可以参照本节的内容配置与其他的TTS或ASR MRCP服务器对接。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00149.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 当然，它的定义本身不是这么狭隘，语音识别强调的是理解声音的内容，而不单是转换成文字。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00149.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://www.speech.cs.cmu.edu/sphinx/doc/Sphinx.html。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00149.html">
+<font color="#FF6600">[3]</font>
+</a>
+ 参见http://www.speech.cs.cmu.edu/pocketsphinx/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00149.html">
+<font color="#FF6600">[4]</font>
+</a>
+ http://wiki.freeswitch.org/wiki/Mod_pocketsphinx。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00149.html">
+<font color="#FF6600">[5]</font>
+</a>
+ JSpeech Grammar Format，即JSpeech语法格式。参见 &amp;lt;http://www.w3.org/TR/jsgf/&amp;gt;。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00150.html">
+<font color="#FF6600">[6]</font>
+</a>
+ 参见http://www.vestec.com。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00150.html">
+<font color="#FF6600">[7]</font>
+</a>
+ Augmented Backus–Naur Form，扩充巴科斯-瑙尔范式，一种基于BNF的元语言。参见http://zh.wikipedia.org/wiki/扩充式巴斯科范式。</p>
+</body>
+</html>

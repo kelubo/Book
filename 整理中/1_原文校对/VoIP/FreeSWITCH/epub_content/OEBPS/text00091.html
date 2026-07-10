@@ -1,0 +1,506 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.4　配置中文语音提示</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH中默认的提示音都是英文的，有不少中文读者都觉得不方便。几年前，在中文社区网友link的帮助下，笔者制作了中文的语音包，虽然现在看来有些过时，但有总比没有好。这些语音包可以在下面的地址找到：http://wiki.freeswitch.org/wiki/Language_Files#Chinese。</p>
+<p height="1em" width="2em">FreeSWITCH对多语言的支持非常强大、灵活，下面我们先从最简单的方法学起。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.4.1　最简单的实现方案</font>
+</font>
+</p>
+<p height="1em" width="2em">在FreeSWITCH中，默认的声音文件存放在FreeSWITCH安装目录的sounds目录下面，不同语种及嗓音的文件以不同的目录分类存放。在笔者的电脑上，用ls命令显示的目录结构如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+dujinfang@seven:/usr/local/freeswitch/sounds/en/us/callie$ ls<br/>
+<br/>
+ascii/      currency/   ivr/        time/<br/>
+<br/>
+base256/    digits/     misc/       voicemail/<br/>
+<br/>
+conference/ directory/  phonetic-ascii/ zrtp/<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">基中，en/us表示语种，即美国英语；callie是个人名，即这些录音是由callie录的。下面的子目录分别是声音文件的分类，如ascii代表ASCII字符、digits代表数字等。当然，使用tree命令可能看起来更直观一些（为了简单起见我们省略了大部分输出）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+dujinfang@seven:/usr/local/freeswitch/sounds/en/us/callie$ tree .<br/>
+<br/>
+.<br/>
+<br/>
+├── ascii<br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│       <br/>
+<br/>
+├── 100.wav<br/>
+<br/>
+│       <br/>
+<br/>
+├── 101.wav<br/>
+<br/>
+│       <br/>
+<br/>
+├── 102.wav<br/>
+<br/>
+.       .<br/>
+<br/>
+├── digits<br/>
+<br/>
+│   <br/>
+<br/>
+└── 8000<br/>
+<br/>
+│       <br/>
+<br/>
+├── 0.wav<br/>
+<br/>
+│       <br/>
+<br/>
+├── 1.wav<br/>
+<br/>
+│       <br/>
+<br/>
+├── 10.wav<br/>
+<br/>
+│       <br/>
+<br/>
+├── 2.wav<br/>
+<br/>
+│       <br/>
+<br/>
+├── 3.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，每个子目录中又都有8000这个子目录，它说明这些声音文件是以8000Hz的采样率存放的 <sup>
+<small>
+<a href="text00092.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。该目录中最后存放了实际的声音文件（读者可以自己播放来听一下）。</p>
+<p height="1em" width="2em">当然，这些文件中的语音都是英文的。我们这里所说的最简单的支持中文的方案就是将这些文件直接用中文语音包中对应的文件替换。这种方法看起来比较“土”，但很有效。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.4.2　使用sound_prefix</font>
+</font>
+</p>
+<p height="1em" width="2em">在FreeSWITCH的配置文件中，有一个sound_prefix变量用于定义声音文件的具体路径，它在vars.xml中是这样定义的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="sound_prefix=$${sounds_dir}/en/us/callie"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">所以，改变该变量的值也能改变大部分声音文件的参考位置。例如，可以将其指向我们中文的语音文件路径：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="set" data="sound_prefix=$${sounds_dir}/zh/cn/link"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，也可以在Dialplan中针对每一个Channel进行改变，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="sound_prefix=$${sounds_dir}/zh/cn/link"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，该变量也可以设置到用户目录中，当特定的用户拨打电话时就能使用该变量。如，我们在1002.xml中可以加入以下设置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;variable name="sound_prefix" value="$${sounds_dir}/zh/cn/link"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后我们设置如下测试Dialplan：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="lang"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^1234$"&gt;<br/>
+<br/>
+    &lt;action application="answer"/&gt;<br/>
+<br/>
+    &lt;action application="playback" data="digits/1.wav"/&gt;<br/>
+<br/>
+    &lt;action application="playback" data="digits/2.wav"/&gt;<br/>
+<br/>
+    &lt;action application="playback" data="digits/3.wav"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当1002拨打1234时，便能听到“一二三”，但其他用户拨打时，仍会听到英文的“one two three”。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.4.3　使用Phrase</font>
+</font>
+</p>
+<p height="1em" width="2em">当然，使用11.4.2节的方式更改的一般只是playback使用的声音文件的路径，而FreeSWITCH中大部分的语音提示，如IVR和Voicemail等，为了支持多语言，都是使用Phrase来实现的。接下来，我们就来看一下Phrase。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.认识Phrase</font>
+</font>
+</p>
+<p height="1em" width="2em">为了屏蔽各种不同语言提示的差异性，FreeSWITCH实现了Phrase（短语）框架。简单来说，通过使用它，可以将不同语言的日期、时间、货币及数字等以相同语法表示，并可以在必要时结合TTS实现更强大的语音提示。</p>
+<p height="1em" width="2em">在默认的IVR配置中，就使用了Phrase。如在ivr_menus/demo_ivr.xml中，greet-long的配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+greet-long="phrase:demo_ivr_main_menu"<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该Phrase是在conf/lang/en/demo/demo_ivr.xml中定义的一个宏，该宏定义的前几行代码如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;macro name="demo_ivr_main_menu" pause="100"&gt;<br/>
+<br/>
+    &lt;input pattern="(.*)"&gt;<br/>
+<br/>
+        &lt;match&gt;<br/>
+<br/>
+        &lt;action function="play-file" data="ivr/ivr-welcome_to_freeswitch.wav"/&gt;<br/>
+<br/>
+        &lt;action function="play-file" data="ivr/ivr-this_ivr_will_let_you_test_features.wav"/&gt;<br/>
+<br/>
+        &lt;action function="play-file" data="ivr/ivr-you_may_exit_by_hanging_up.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，name属性定义了该宏的名称，以便在其他地方引用；pause表示在每个action（下面讲到）之间暂停多长时间（毫秒），它匹配（match）指定的模式（pattern）后（我们这里不讨论match和pattern），便执行下面的动作（action）。本例中的动作都是一系列的play-file，即播放后面的data指定的声音文件。</p>
+<p height="1em" width="2em">这些声音文件的具体路径是在conf/lang/en/en.xml中定义的，实际上，demo_ivr.xml也是由该文件使用INCLUDE装入的。en.xml的部分内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;language name="en" say-module="en"<br/>
+<br/>
+    sound-prefix="$${sounds_dir}/en/us/callie"<br/>
+<br/>
+    tts-engine="cepstral" tts-voice="callie"&gt;<br/>
+<br/>
+    &lt;phrases&gt;<br/>
+<br/>
+        &lt;macros&gt;<br/>
+<br/>
+            &lt;X-PRE-PROCESS cmd="include" data="demo/*.xml"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，en.xml定义了一种语言（language），该语言的名字（name）为en；该语言是由say-module指定的en模块（在mod_say_en模块中实现）支持的；所有支持它的声音文件路径都由sound-prefix指定；如果用到TTS，后面还有tts-engine和tts-voice参数（我们将在11.7节研究TTS）。</p>
+<p height="1em" width="2em">然后，在该语言中，定义了一些phrase标签，在phrase中又定义了一些宏（macros），具体的宏都是由后续的XML配置文件定义的，如上面的IVR中使用的宏就是在demo_ivr.xml中定义的。</p>
+<p height="1em" width="2em">更多关于Phrase的知识我们就不多介绍了，有兴趣的读者不妨拨打9386试一下。在FreeSWITCH默认的配置中拨打9386将播放一些有趣的声音，这些声音的定义都是在funny_prompts这个Phrase中实现的，读者可以通过这里所学的知识及跟踪FreeSWITCH的日志看是否能找到它们。另外，我们将在11.8.3节再讲一个实际的Phrase Macro的例子。读者也可以参考http://wiki.freeswitch.org/wiki/Speech_Phrase_Management进行更深入的学习。</p>
+<p height="1em" width="2em">下面我们以增加中文支持为例来看一下如何修改这些配置文件。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.中文Phrase配置</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH默认没有中文的语音文件配置，因此我们需要自己添加。中文与英文的配置大同小异，在此我们将英文的复制一份，并在它的基础上进行修改。</p>
+<p height="1em" width="2em">使用如下命令复制整个目录到zh（其中每行的第一个#号为系统提示符，第二个#为笔者加的注释）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# cd conf/lang      # <br/>
+<br/>
+进入lang<br/>
+<br/>
+目录<br/>
+<br/>
+# cp -R en zh       # <br/>
+<br/>
+从en<br/>
+<br/>
+目录复制产生zh<br/>
+<br/>
+目录<br/>
+<br/>
+# cd zh             # <br/>
+<br/>
+进入zh<br/>
+<br/>
+目录<br/>
+<br/>
+# mv en.xml zh.xml  # <br/>
+<br/>
+将en.xml<br/>
+<br/>
+改为zh.xml<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，中文配置文件的基本框架已经完成了，下面修改zh.xml，将其中的name和say-module都修改为zh，并把sound-prefix修改为中文录音文件的路径，修改后的结果如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;language name="zh" say-module="zh"<br/>
+<br/>
+    sound-prefix="$${sounds_dir}/zh/cn/link"<br/>
+<br/>
+    tts-engine="mod_tts_commandline" tts-voice="Ting-Ting"&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">关于tts-engine和tts-voice两个参数我们先设置到这里，等后面讲到TTS的时候（见11.7节）再详细讲解。</p>
+<p height="1em" width="2em">改好这些配置框架以后，就可以告诉FreeSWITCH将我们新建的中文配置文件包括进来了。在conf/freeswitch.xml中，可以看到如下的行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="include" data="lang/en/*.xml"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上面是装入英文配置文件的配置，我们只需要在该行后面加入如下的行让它也装入中文的配置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;X-PRE-PROCESS cmd="include" data="lang/zh/*.xml"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">重启FreeSWITCH，中文语言的配置就基本准备好了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.“说”中文</font>
+</font>
+</p>
+<p height="1em" width="2em">另外，FreeSWITCH中的Say接口（Interface）可以通过一些预先录制的声音文件“说”出一些常用的词语组合，如日期、时间、货币、数字等。它相当于一种限制级的TTS实现（之所以说是限制级，就是因为它虽然非常灵活，但只能读特定范围内的词）。</p>
+<p height="1em" width="2em">Say接口支持各种语言，如果需要支持中文语言，就需要mod_say_zh模块。该模块默认是不被编译也不被加载的，因此我们需要先编译它。到FreeSWITCH的源代码目录中，执行如下命令即可编译安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+make mod_say_zh-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后在FreeSWITCH控制台上加载该模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_say_zh<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">为了让FreeSWITCH在启动时能自动加载该模块，需要在conf/autoload_configs/modules中将下列行的注释去掉，以让FreeSWITCH自动加载该模块。去掉注释后的结果为：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;load module="mod_say_zh"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">关于Say的例子我们将在后面讲到，暂时先把它准备好，后面的例子会用到。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.4.4　使用中文语音提示</font>
+</font>
+</p>
+<p height="1em" width="2em">中文支持准备就绪后，为了能播放中文提示，还需要在Dialplan中指定language或（和）default_language通道变量 <sup>
+<small>
+<a href="text00092.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。比如，我们修改默认的5000对应的Dialplan，加入以下配置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="language=zh"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">完整的Dialplan如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="ivr_demo"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^5000$"&gt;<br/>
+<br/>
+        &lt;action application="set" data="language=zh"/&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="sleep" data="2000"/&gt;<br/>
+<br/>
+        &lt;action application="ivr" data="demo_ivr"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，该变量也可以加到用户目录中。比如，我们可以在1002的用户配置文件1002.xml的variables标签中添加如下配置，让该语言仅对1002用户生效：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;variable name="language" value="zh"/&gt;<br/>
+<br/>
+&lt;variable name="default_language" value="zh"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以将上述配置添加到conf/directory/default.xml中（也就是添加到variables标签中），以使该配置对本域中的所有用户都生效。</p>
+<p height="1em" width="2em">总之，不管使用哪种配置，拿起对应的分机拨打5000，就应该能听到中文的语音提示了。</p>
+<p height="1em" width="2em">此话题我们就先讲到这里，有条件的读者不妨也试着同步配置一下。在本章后面的部分，我们将看到更多使用中文的语音提示的实例。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00091.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 回顾一下3.2.1节中的Linux部分，上面的声音文件是我们使用“make sounds-install”命令安装的。FreeSWITCH中支持多种频率的声音文件，如果在安装时选择了更高频率的声音文件（如使用了“make hd-sounds-install”等），则可能有16000、32000之类的目录。在使用时，FreeSWITCH可以根据当前Channel的语音编码的采样率自动选择适合的声音文件。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00092.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 关于language和default_language，有的情况需要前者，有的情况需要后者，所以，为了保险起见，我们最好两者都配置。</p>
+</body>
+</html>

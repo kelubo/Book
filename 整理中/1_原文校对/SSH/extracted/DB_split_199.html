@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div id="filepos1311823" class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h1 class="calibre1" id="calibre_pb_267"><span class="calibre2"><a shape="rect" class="calibre7"></a>SSH Agents </span></h1>
+</div>
+</div>
+</div>
+<p class="calibre4">An SSH agent is a program that caches private keys and responds to authentication-related queries from SSH clients. <a shape="rect" href="DB_split_052.html#filepos248100" class="calibre6">[2.5]</a> They are terrific labor-saving devices, handling all key-related operations and eliminating the need to retype your passphrase. </p>
+<p class="calibre4">The programs related to agents<a shape="rect" class="calibre15"></a><a id="filepos1312571" class="calibre15"></a> are <span><em class="italic">ssh-agent</em></span> and <span><em class="italic">ssh-add</em></span>. <span><em class="italic">ssh-agent</em></span> runs an agent, and <span><em class="italic">ssh-add</em></span> inserts and removes keys from the agent's key cache. A typical use might look like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Start the agent<br class="calibre19"/>    $ ssh-agent $SHELL<br class="calibre19"/>    # Load your default identity<br class="calibre19"/>    $ ssh-add<br class="calibre19"/>    Need passphrase for /home/barrett/.ssh/identity (barrett@example.com).<br class="calibre19"/>    Enter passphrase: <strong class="calibre45"><code class="calibre35">********</code></strong></tt></div></span><p class="calibre4">By typing your passphrase a single time, you decrypt the private key which is then stored in memory by the agent. From now on, until you terminate the agent or log out, SSH clients automatically contact the agent for all key-related operations. You needn't type your passphrase again. </p>
+<p class="calibre4">We now briefly discuss how agents work. After that we get practical and illustrate different ways to start an agent, various configuration options, and several techniques for automatically loading your keys into the agent. Finally, we cover agent security and agent forwarding. </p>
+</div>  </body>
+</html>

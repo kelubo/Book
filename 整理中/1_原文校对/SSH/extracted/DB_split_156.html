@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_213"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos948931" class="calibre7"></a>5.4.2 Password Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos949092" class="calibre15"></a>Password authentication accepts your login password as proof of identity. <a shape="rect" href="DB_split_076.html#filepos391365" class="calibre6">[3.4.3.5]</a> OpenSSH allows or disallows password authentication<a shape="rect" class="calibre15"></a><a id="filepos949326" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos949365" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos949404" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos949443" class="calibre15"></a> with the <code class="calibre35">PasswordAuthentication</code> keyword, given the value <code class="calibre35">yes</code> (the default) or <code class="calibre35">no</code>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    PasswordAuthentication yes</tt></div></span><p class="calibre4">Normally, OpenSSH password authentication requires your ordinary login password. However, this may be changed via PAM <a shape="rect" href="DB_split_162.html#filepos999943" class="calibre6">[5.4.8]</a>, Kerberos <a shape="rect" href="DB_split_161.html#filepos988501" class="calibre6">[5.4.7]</a>, or other features. </p>
+<p class="calibre4">For Tectia, you can allow or require password authentication by adding the value <code class="calibre35">password</code> to the lists for <code class="calibre35">AllowedAuthentications</code> or <code class="calibre35">RequiredAuthentications</code>, respectively: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications password</tt></div></span><div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos950932" class="calibre7"></a>5.4.2.1 Failed password attempts </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Tectia servers wait two seconds by default after each failed password authentication attempt, to thwart brute-force password-guessing attacks. The <code class="calibre35">AuthInteractiveFailureTimeout</code> keyword controls this delay: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthInteractiveFailureTimeout 5</tt></div></span></div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos951722" class="calibre7"></a>5.4.2.2 Empty passwords </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">If an account has an empty password, both the OpenSSH and Tectia servers may refuse access to the account. This feature is controlled by the keyword <code class="calibre35">PermitEmptyPasswords</code> with a value of <code class="calibre35">yes</code> (the default) or <code class="calibre35">no</code>. If enabled: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    PermitEmptyPasswords yes</tt></div></span><p class="calibre4">empty passwords<a shape="rect" class="calibre15"></a><a id="filepos952431" class="calibre15"></a> are permissible; otherwise, they are not. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos952709" class="calibre7"></a>5.4.2.3 Expired passwords </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Some operating systems support expiration dates for passwords. For those that do, OpenSSH and Tectia allow expired passwords<a shape="rect" class="calibre15"></a><a id="filepos952983" class="calibre15"></a> to be changed during authentication. </p>
+<p class="calibre4">If the OpenSSH server detects an expired password, it runs the system <span><em class="italic">passwd</em></span> command to change it once the user has logged in. It then closes the connection so that the user must log in again: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -oPubKeyAuthentication=no -l smith server.example.com<br class="calibre19"/>    smith@server.example.com's password:<br class="calibre19"/>    Last login: Sat Jan 22 17:07:27 2005 from client.example.com<br class="calibre19"/>    WARNING: Your password has expired.<br class="calibre19"/>    You must change your password now and login again!<br class="calibre19"/>    Changing local password for smith.<br class="calibre19"/>    Old password:<br class="calibre19"/>    New password:<br class="calibre19"/>    Retype new password:<br class="calibre19"/>    Connection to server.example.com closed.</tt></div></span><p class="calibre4">For Tectia, by default, after the server verifies the user's password, if the password is found to be expired, then the system's password-change program (e.g., <span><em class="italic">passwd</em></span>) is run as a forced command. <a shape="rect" href="DB_split_272.html#filepos1787193" class="calibre6">[8.2.3]</a> An alternate password-change program (e.g., one that enforces policies for choosing good passwords) can be specified by the <code class="calibre35">PasswdPath</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    PasswdPath /usr/local/bin/goodpasswd</tt></div></span><p class="calibre4">The password-change program runs with the privileges of the user, not those of the server (typically root). Here's an example of a password change during authentication, from the client's perspective: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh server.example.com<br class="calibre19"/>    rebecca's password: <strong class="calibre45"><code class="calibre35"><em class="italic"><code class="calibre35">&lt; ... old, expired password ... &gt;</code></em></code></strong><br class="calibre19"/>    Authentication successful.<br class="calibre19"/>    <em class="italic"><span>&lt; ... the following output is from running the passwd forced command ... &gt;</span></em><br class="calibre19"/>    Changing password for user rebecca.<br class="calibre19"/>    Changing password for rebecca<br class="calibre19"/>    (current) UNIX password: <strong class="calibre45"><code class="calibre35"><em class="italic"><code class="calibre35">&lt; ... old, expired password, again ... &gt;</code></em></code></strong><br class="calibre19"/>    New password: <strong class="calibre45"><code class="calibre35">&lt; ... new password ... &gt;</code></strong><br class="calibre19"/>    Retype new password: <strong class="calibre45"><code class="calibre35"><em class="italic"><code class="calibre35">&lt; ... new password, again ... &gt;</code></em></code></strong><br class="calibre19"/>    passwd: all authentication tokens updated successfully.<br class="calibre19"/>    Connection to server.example.com closed.</tt></div></span><p class="calibre4">We discuss more powerful alternatives to this technique in a later case study. <a shape="rect" href="DB_split_359.html#filepos2424986" class="calibre6">[11.7.1]</a></p>
+</div>
+</div>
+</body>
+</html>

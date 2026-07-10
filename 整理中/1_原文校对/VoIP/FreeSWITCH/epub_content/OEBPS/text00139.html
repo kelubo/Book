@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.3　其他脚本语言</font>
+</font>
+</p>
+<p height="1em" width="2em">虽然在嵌入式脚本中Lua是值得推荐的，但“萝卜白菜各有所爱”，并不是所有用户都选用Lua语言。而且，FreeSWITCH作为一款优秀的开源软件也是尽量满足更多人的口味。因此，在这里作为对嵌入式语言的补充和比较，我们再来简单看一下另外几种语言。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.3.1　JavaScript</font>
+</font>
+</p>
+<p height="1em" width="2em">相对于Lua，大家可能对JavaScript更熟悉一些。JavaScript是Web浏览器上最主流的编程语言，它最早用于配合HTML渲染页面，近几年由于node.js <sup>
+<small>
+<a href="text00140.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 的发展使它在服务器端的应用也发扬光大。它遵循EMCAScript标准。</p>
+<p height="1em" width="2em">通过加载mod_v8 <sup>
+<small>
+<a href="text00140.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 模块可以使用JavaScript解析器，该模块基于Google的V8 <sup>
+<small>
+<a href="text00140.html">
+<font size="2">
+<font color="#FF6600">[3]</font>
+</font>
+</a>
+</small>
+</sup>
+ JavaScript库。</p>
+<p height="1em" width="2em">我们在16.2.1节对Lua和JavaScript两种语言作了对比解析。在FreeSWITCH中，二者除了语法不同外，其用法类似。如使用JavaScript（它是一个App)执行一个Session相关的脚本，或jsrun（它是一个API）执行一个非Session相关的脚本。</p>
+<p height="1em" width="2em">例如，16.2.3节的Lua脚本可以用JavaScript重写如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+session.answer();<br/>
+<br/>
+session.sleep(1000);<br/>
+<br/>
+session.streamFile("/tmp/hello-js.wav");<br/>
+<br/>
+session.hangup();<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，除了与Lua在语法格式方面有点不同外，函数名都是相同的。但是，mod_spidermonkey对应的Wiki页面上的函数参考说明也没有Lua详细。所以，如果使用JavaScript开发的话，读者可以使用JavaScript的语法，并参考Lua的wiki页面相关的函数说明。</p>
+<p height="1em" width="2em">可以在XML Dialplan中使用如下配置将来话交给上述脚本处理（假设文件名为test.js）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="javascript" data="/tmp/test.js"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在源代码目录中的scripts/javascript目录下，还有几个JavaScript应用的例子，读者可自行研究一下，在这里就不多介绍了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.3.2　Python</font>
+</font>
+</p>
+<p height="1em" width="2em">为了方便读者对各种语言做比较，我们这里再简单讲一下Python语言的例子。Python是一门很流行的脚本语言，实际上，Linux的安装程序的大部分脚本就是用Python写的。</p>
+<p height="1em" width="2em">Python语言能很好地与其他系统集成，不过，它的可嵌入性比起Lua和JS来要差一些，因此，对编译FreeSWITCH Python模块的支持要稍微复杂一些。当然，这对于熟悉Python语言的读者来说也不算什么。因为，大部分在FreeSWITCH中选择使用Python的人都是因为对Python特别熟悉，否则的话，肯定就选择Lua了。</p>
+<p height="1em" width="2em">在编译Python模块前需要安装Python的开发包，笔者在Ubuntu Linux 12.04的安装过程如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# apt-get install python-dev<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">笔者使用的Python版本是2.7，不过Python 2.6到Python 3.x的版本应该都可以支持。</p>
+<p height="1em" width="2em">安装了Python的开发包后，就可以直接安装Python模块了，在FreeSWITCH源代码目录中，执行以下命令就可以安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make mod_python-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果安装过程中提示找不到Python之类的错误提示，则可以尝试重新配置并指定一个Python的路径，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# ./configure --with-python=/usr/bin/python    # <br/>
+<br/>
+配置，指定Python<br/>
+<br/>
+的路径<br/>
+<br/>
+# make &amp;&amp; make install                        # <br/>
+<br/>
+安装FreeSWITCH<br/>
+<br/>
+基本系统<br/>
+<br/>
+# make mod_python-install                     # <br/>
+<br/>
+安装Python<br/>
+<br/>
+模块<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">安装完成后会在FreeSWITCH的mod目录下生成mod_python.so模块，然后就可以在FreeSWITCH中加载该模块了，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_python<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">与Lua和JS脚本不同。你可以将Lua或JS脚本放到任意路径中，但Python有自己的环境和Package/Module机制，因而需要配置特殊的路径。在笔者的Ubuntu Linux上，存放Python脚本的路径是/usr/lib/python2.7/dist-packages/ <sup>
+<small>
+<a href="text00140.html">
+<font size="2">
+<font color="#FF6600">[4]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。</p>
+<p height="1em" width="2em">FreeSWITCH自带了一个Python的例子。我们可以将该例子复制到上述目录中。命令如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# cp src/mod/languages/mod_python/python_examply.py /usr/lib/python2.7/dist-packages/<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，在FreeSWITCH控制台下就可以通过下列命令执行该脚本：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; python python_example<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">执行命令后如果能看到如下输出就证明脚本执行成功了（脚本的实际内容读者可以自己查看一下）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; python python_example<br/>
+<br/>
+w00t!<br/>
+<br/>
+'Event-Name: API<br/>
+<br/>
+Core-UUID: 0611d6ee-1e7f-11e3-927e-bdbdad023004<br/>
+<br/>
+FreeSWITCH-Hostname: localhost.localdomain<br/>
+<br/>
+FreeSWITCH-Switchname: localhost.localdomain<br/>
+<br/>
+FreeSWITCH-IPv4: 192.168.1.124<br/>
+<br/>
+FreeSWITCH-IPv6: %3A%3A1<br/>
+<br/>
+Event-Date-Local: 2013-09-16%2015%3A23%3A48<br/>
+<br/>
+Event-Date-GMT: Mon,%2016%20Sep%202013%2007%3A23%3A48%20GMT<br/>
+<br/>
+Event-Date-Timestamp: 1379316228983106<br/>
+<br/>
+Event-Calling-File: switch_loadable_module.c<br/>
+<br/>
+Event-Calling-Function: switch_api_execute<br/>
+<br/>
+Event-Calling-Line-Number: 2333<br/>
+<br/>
+Event-Sequence: 2523<br/>
+<br/>
+API-Command: python<br/>
+<br/>
+API-Command-Argument: python_example'<br/>
+<br/>
+[NOTICE] mod_python.c:212 Invoking py module: python_example<br/>
+<br/>
+[DEBUG] mod_python.c:281 Call python script<br/>
+<br/>
+[DEBUG] mod_python.c:284 Finished calling python script<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">Python模块加载成功后，我们就可以把前面的Lua和JS脚本重写为Python版的。内容如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+import freeswitch<br/>
+<br/>
+def handler(session, args):<br/>
+<br/>
+    session.answer()<br/>
+<br/>
+    session.sleep(1000);<br/>
+<br/>
+    session.streamFile("/tmp/hello-python.wav");<br/>
+<br/>
+    session.hangup();<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其实各种语言都是相通的，函数的话用方法大同小异。</p>
+<p height="1em" width="2em">这里将上述脚本放到/usr/lib/python2.7/dist-packages/book/test.py中。另外，Python环境还需要在当前的模块目录中有一个__init__.py文件，我们用以下命令生成一个空的文件即可：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# touch /usr/lib/python2.7/dist-packages/book/__init__.py<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，就可以在XML Dialplan中通过如下的设置来调用上述脚本了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="python" data="book/test"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">除此之外，其他脚本语言的使用也类似，读者可参照使用。值得一提的是，FreeSWITCH有一个mod_managed模块支持Windows.NET架构下的语言（F#、VB.NET、C#、IronRuby、IronPython、JScript.NET），通过mono也可以支持其他平台（如Linux）。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00139.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 参见：http://nodejs.org。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00139.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 参见http://wiki.freeswitch.org/wiki/Mod_v8。注意，该模块仅是在最新的1.4版或Master分支上（2014年1月14日以后）才有。对于以前的版本（如1.2版），请使用mod_spidermonkey。mod_v8由于使用了V8库，在性能上比以往有所提升，但两个模块提供的API是兼容的。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00139.html">
+<font color="#FF6600">[3]</font>
+</a>
+ Google的V8库用于在Chrome及node.js中以支持JavaScript，参见http://code.google.com/p/v8/。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00140.html">
+<font color="#FF6600">[4]</font>
+</a>
+ 不同的系统，Python的路径可能不一样，如有的系统默认位置放在/lib/python2.7/site-packages/目录中。</p>
+</body>
+</html>

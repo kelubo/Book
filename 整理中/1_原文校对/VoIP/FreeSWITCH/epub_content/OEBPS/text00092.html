@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.5　录音</font>
+</font>
+</p>
+<p height="1em" width="2em">在实际使用过程中，经常需要对通话进行录音。FreeSWITCH支持多种录音方式，也支持多种格式的录音文件。在此，我们逐一尝试一下。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.5.1　单腿录音</font>
+</font>
+</p>
+<p height="1em" width="2em">如在上一节提到的，在创建IVR或比较复杂的呼叫流程时，我们经常需要一些录音文件，除了使用Windows录音机或其他软件外，我们还可以直接通过FreeSWITCH来实现。</p>
+<p height="1em" width="2em">笔者经常使用以下命令录音，这种方法非常快速和方便：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 &amp;record(/tmp/welcome.wav)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述命令大家已经很熟悉了，我们呼叫1000，1000接听后即可以直接讲话并录音。由于这种录音方式仅涉及一条腿（leg，即一个Channel），因而称为单腿录音。</p>
+<p height="1em" width="2em">另外，我们也可以在Dialplan中录音（与上述命令是等价的）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="record"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^rec(.*)$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="playback" data="tone_stream://%(100,1000,800)"/&gt;<br/>
+<br/>
+        &lt;action application="record" data="/tmp/$1.wav"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">通过设置上述Dialplan，呼叫一个rec开头的号码，如recwelcome，就可以开始录音并将录音文件保存到/tmp/welcome.wav中，同样也可以通过拨打其他的号码录不同名称的声音文件。另外，为了在录音前给个提示，可以在record前先用playback播放一段提示音，如“请在嘀声后开始录音”。在本例中，我们仅用playback播放了一个“嘀”声，该声音是用tone_stream产生的。我们后面还会讲到tone_stream。</p>
+<p height="1em" width="2em">笔者使用的软电话可以呼叫含有字母的被叫号码。如果不支持呼叫含有字母的号码，也可以把这里的rec换成其他的数字，如123。然后，呼叫1231000就可以将录音存到/tmp/1000.wav。</p>
+<p height="1em" width="2em">在这种录音方式中，由于只有一个Channel，所以录音文件是单声道的。我们可以直接用下面的方式使用playback来测试播放刚才的录音：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1000 &amp;playback(/tmp/welcome.wav)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述命令呼叫1000，1000接听后就可以听到刚刚录制的声音了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.5.2　对两条腿的通话进行录音</font>
+</font>
+</p>
+<p height="1em" width="2em">一路正常的通话通常由两个Channel组成。而对于每个Channel我们都可以单独录音。在一个Channel中，语音有两个方向。对于SIP客户端或话机而言，两个方向分别为“说”和“听”，而对于FreeSWITCH而言，则分别为“读”（read，r）和“写”（write，w）。</p>
+<p height="1em" width="2em">以下API命令可以对正在进行的通话录音（需要事先知道相关Channel的UUID）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+uuid_record &lt;channel_uuid&gt; start /tmp/record.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果决定不录音了，则可以使用以下命令停止录音：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+uuid_record &lt;channeL_uuid&gt; stop /tmp/record.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该录音文件会包含两个声道，以后要使用playback播放这种录音时，会在日志中看到如下的警告信息：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1000 &amp;playback(/tmp/record.wav)<br/>
+<br/>
+[WARNING] switch_core_file.c:229 File has 2 channels, muxing to mono will occur.<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这条信息表示，该文件有两个声道，但playback仅是对一个Channel而言的，它仅支持一个声道。因而，FreeSWITCH会先将两个声道混音，变成一个声道后再播放。该警告一般是无害的。只是，由于在播放时会进行混音，会多占用一些CPU，因而在高并发的场合，可以使用一些工具事先将声音文件混为一个声道。如我们可以使用sox命令行进行混音：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ sox record.wav -c 1 record-1.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，“-c”指定Channel的数量。我们这里用的是“-c 1”，就是说将原来的声音文件混成一个声道。可以使用以下ls命令，从中看到混音后的声音文件大小比原来的大约小了一半（从136364到了68204）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ ls -l /tmp/record*.wav<br/>
+<br/>
+-rw-r--r--  1 dujinfang  wheel  136364 Sep 23 15:21 record.wav<br/>
+<br/>
+-rw-r--r--  1 dujinfang  wheel   68204 Sep 23 15:45 record-1.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，也可以使用sox附带的play命令在操作系统命令行上播放声音文件，并查看一些详细的信息，如（注意，该命令在声卡驱动不正常时是不能使用的）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ play /tmp/record.wav<br/>
+<br/>
+/tmp/record.wav:<br/>
+<br/>
+ File Size: 136k      Bit Rate: 256k<br/>
+<br/>
+  Encoding: Signed PCM<br/>
+<br/>
+  Channels: 2 @ 16-bit<br/>
+<br/>
+Samplerate: 8000Hz<br/>
+<br/>
+Replaygain: off<br/>
+<br/>
+  Duration: 00:00:04.26<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看到，上述输出中声音编码（Encoding）是有符号的（Signed）PCM数据；有两个16bit的声道（Channel）；采样率（Samplerate）是8000Hz，文件的长度是4.26秒。读者也可以对比一下它与上面单声道录音文件的区别。</p>
+<p height="1em" width="2em">实际上，录音使用的是FreeSWITCH中的Media Bug功能（即8.3.4节讲的“三通”），声音媒体数据通过一个“三通”流到录音文件中。FreeSWITCH支持同时创建多个Media Bug，因而可以同时录制多个声音文件，这在需要截取不同时间段的录音时非常有用，如可以在不同的时间点分别执行下列命令：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+uuid_record &lt;channel_uuid&gt; start /tmp/1.wav<br/>
+<br/>
+uuid_record &lt;channel_uuid&gt; start /tmp/2.wav<br/>
+<br/>
+uuid_record &lt;channel_uuid&gt; start /tmp/3.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以随时用对应的stop指令停止某个录音，也可以使用特殊的文件名“all”同时停止所有录音，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+uuid_record &lt;channel_uuid&gt; stop all<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，如果在录音过程中电话挂断了，所有录音也就自动停止了。</p>
+<p height="1em" width="2em">另外，在Dialplan中，也可以通过record_session达到类似的效果，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="record"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^(100[0-9])$"&gt;<br/>
+<br/>
+        &lt;action application="record_session" data="/tmp/record-$1.wav"/&gt;<br/>
+<br/>
+        &lt;action application="bridge" data="user/$1"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，在执行bridge前使用record_session开始对当前的Channel进行录音。与uuid_record不同的是，record_sesison是一个App，而前者是一个API。相同的是两者在执行时都会为当前的Channel添加一个Media Bug，因而可以实时录音。</p>
+<p height="1em" width="2em">另外，与record比起来，record_session是非阻塞的，它可以作用于单腿的呼叫也可以用于桥接（Bridge）的呼叫；而record是阻塞的，它会阻塞直到录音完成，即只能录单腿的呼叫。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.5.3　立体声</font>
+</font>
+</p>
+<p height="1em" width="2em">通过使用相关参数，可以录制立体声，即可以将通话的两个人的声音分别存在两个声道里。该特性非常有用。笔者最早在做网络远程一对一教学时，就曾使用了该技术。通过将通话中的老师和学生的声音录在不同的声道里，可以在事后很方便地检查出他们对话的内容，并有针对性地提出建议以提高教学质量。另外，我们也可以很方便地将不同的声道分离到不同的声音文件中，进行更高级的自动声音识别和分析。</p>
+<p height="1em" width="2em">通过事先将RECORD_STEREO通道变量设置为true可以在录音时直接录成立体声。在Dialplan中使用record_session时的设置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="RECORD_STEREO=true"/&gt;<br/>
+<br/>
+&lt;action application="record_session" data="/tmp/record-$1.wav"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，也可以在使用uuid_record录音前使用uuid_setvar设定该通道变量，从而录制成立体声的声音文件。这种方式与上述方式等价，具体命令如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; uuid_setvar &lt;channel_uuid&gt; RECORD_STEREO true<br/>
+<br/>
+freeswitch&gt; uuid_record &lt;channel_uuid&gt; start /tmp/record.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.5.4　录音相关的通道变量</font>
+</font>
+</p>
+<p height="1em" width="2em">除了上面讲到的RECORD_STEREO外，还有一些与录音相关的通道变量，下面简单介绍一下（注意这些变量是区分大小写的）：</p>
+<p height="1em" width="2em">·RECORD_HANGUP_ON_ERROR：默认值为false，如果设置为true则会在录音失败时（如文件不可写入、格式错误等）挂断电话。</p>
+<p height="1em" width="2em">·RECORD_WRITE_ONLY：只录“写”方向的录音。这里的方向是相对FreeSWITCH而言的，即FreeSWITCH发出，也就是对端能够听到的声音。</p>
+<p height="1em" width="2em">·RECORD_READ_ONLY：只录“读”方向的录音，即FreeSWITCH“听”到的录音。</p>
+<p height="1em" width="2em">·RECORD_STEREO：立体声录音。</p>
+<p height="1em" width="2em">·RECORD_STEREO_SWAP：同立体声录音，但将左、右声道互换。</p>
+<p height="1em" width="2em">·RECORD_ANSWER_REQ：默认值为false，如果设为true，则在应答前执行了record_session或uuid_record就暂时不录音，而等到通话被应答后才开始录音。可以防止录上不必要的Early Media（如回铃音或彩铃等）。</p>
+<p height="1em" width="2em">·RECORD_BRIDGE_REQ：与RECORD_ANSWER_REQ类似，只是在当前的通道与其他通道桥接了之后才开始录音。</p>
+<p height="1em" width="2em">·RECORD_APPEND：在默认情况下，如果指定的录音文件已经存在，再次录音就会覆盖该文件。将该选项设为true可以向已经存在的文件后面追加录音。可用于电话中断重新建立后重新录音时。</p>
+<p height="1em" width="2em">·record_sample_rate：可以在录音时指定采样率，以进行实时的转码。合法的采样率在源代码中使用switch_is_valid_rate(rate)宏定义，可能的取值有8000、12000、16000、24000、32000、11025、22050、44100、48000，单位为Hz。</p>
+<p height="1em" width="2em">·enable_file_write_buffering：该变量的默认值为true，即默认先写到一个内存缓冲区中，可以大大减小对存储设备（如硬盘）的访问次数，防止产生IO瓶颈。默认的缓冲区大小是65536字节。</p>
+<p height="1em" width="2em">·RECORD_MIN_SEC：最小录音秒数。如果录音时长小于该数（默认是3秒），则认为是无效的录音，并删除录音文件。</p>
+<p height="1em" width="2em">·RECORD_INITIAL_TIMEOUT_MS：如果从录音开始检测不到声音，则在指定的毫秒后超时，停止录音。</p>
+<p height="1em" width="2em">·RECORD_FINAL_TIMEOUT_MS：如果在录音过程中检测不到声音，则在指定的毫秒后超时，停止录音。</p>
+<p height="1em" width="2em">·RECORD_SILENCE_THRESHOLD：静音能量阈值，即能量小于该值认为是静音。默认值为200。</p>
+<p height="1em" width="2em">·其他：还有一些变量可以设置声音文件的元信息，名字都很直观，在此就不多介绍了。这些变量有RECORD_TITLE、RECORD_COPYRIGHT、RECORD_SOFTWARE、RECORD_ARTIST、RECORD_COMMENT、RECORD_DATE等。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.5.5　原生格式</font>
+</font>
+</p>
+<p height="1em" width="2em">为了最大限度地节省系统资源，可以将声音录制成原生（Native）格式 <sup>
+<small>
+<a href="text00093.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。这种格式是由mod_native_file模块提供的。如果在录音时不提供录音文件的扩展名，就可以以原生的格式录音，例如，下列命令会将录音文件录成/tmp/test.PCMU（假设Channel使用的Codec是PCMU）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; originate user/1000 &amp;record(/tmp/test)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">对于一个两条腿的通话，也可以使用uuid_record进行原生方式的录音，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; uuid_record b40dec66-2f47-480d-88bb-335a025d856e start /tmp/test<br/>
+<br/>
+[INFO] mod_native_file.c:94 Opening File [/tmp/test-in.PCMU] 8000hz<br/>
+<br/>
+[INFO] mod_native_file.c:94 Opening File [/tmp/test-out.PCMU] 8000hz<br/>
+<br/>
+[DEBUG] switch_core_media_bug.c:532 Attaching BUG to sofia/internal/ 1001@123.130.116.42<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从日志中可以看出，由于该通话有两条腿，而原生的格式不支持混音，因此只能将双向的声道录到两个不同的文件中，如上面的“-in”和“-out”分别代表“入”和“出”。</p>
+<p height="1em" width="2em">使用这种录音方式，一个最大的好处是可以直接支持G729编码。G729是受专利保护的编解码器，因而FreeSWITCH中不包含开源的编解码实现。通过使用原生格式录音，不需要进行编码和解码，因而就可以绕开这种限制。另外，使用这种方式也不用在FreeSWITCH中进行编解码处理，因而也会减少对系统CPU的使用。</p>
+<p height="1em" width="2em">如果Channel使用G729编码，则原生格式的录音文件扩展名将是.G729。这种格式的文件可以再使用其他的G729工具进行处理，我们就不多介绍了。在本节结束之前，我们再来讲一下PCM格式的文件的处理。</p>
+<p height="1em" width="2em">PCM格式的原生文件可以使用sox软件中的play命令播放，如：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+play -e u-law -r 8000 -t raw test-in.PCMU<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">注意，由于原生格式的录音文件中不包含录音数据的元信息（即编码、采样率、声道等参数），因而需要在播放时指定。在上述命令中，“-e”指定了编码为“u-law”，即μ律；“-r”参数指定采样率为8000Hz；-t raw说明以原生格式播放。</p>
+<p height="1em" width="2em">当然，也可以使用如下的sox命令将该原生格式的文件转换成WAV文件：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+sox -e u-law -r 8000 -t raw test-in.PCMU test-in.wav<br/>
+<br/>
+sox -e u-law -r 8000 -t raw test-out.PCMU test-out.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以进一步将上述两路文件合成一个文件。下列两条命令都可以将两个声音文件合成到一个中去，其中前者将进行混音，而后者将合成立体声的。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+sox test-in.wav test-out.wav -m test.wav<br/>
+<br/>
+sox test-in.wav test-out.wav -M test.wav<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">更多的使用方法请参阅有关资料。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00093.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 即直接使用音频媒体数据的原始格式（如PCMU、G729等），而不需要转换成其他编码。</p>
+</body>
+</html>

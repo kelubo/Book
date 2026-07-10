@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.9　实现呼叫前转业务</font>
+</font>
+</p>
+<p height="1em" width="2em">在传统的电话系统中，有一项基础的增值业务称为呼叫前转。它的使用方法是：通过拨打一个特定的功能码（一般是“*57*”）登记欲转移到的电话号码，以后所有呼叫都会转移到该号码上。具体来讲，如分机1002是Alice办公室的电话，由于她临时需要到另一个办公室工作，而另一个办公室有一部电话1007，因此，Alice在1002上拨打*57*1007#就可以登记呼叫前转业务，这样如果以后有人呼叫1002，就会自动转移到1007上，这样Alice就不会错过任何电话了。当她从另一个办公室回来时，她可再在1002上拨打#57#取消该业务，以后再有来话1002就会直接振铃了，而不会再发生转移了。</p>
+<p height="1em" width="2em">在传统的交换机上，需要为1002分机开通一个权限的，然后该分机才可以拨打*57*或#57#进行登记和取消。当然，我们在这里先不考虑这些权限问题，认为所有用户都有该权限就可以了。</p>
+<p height="1em" width="2em">为了实现业务登记，我们先建立以下路由：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="call_forward_unconditional_set"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^\*57\*([^#]*)#?$"&gt;<br/>
+<br/>
+    &lt;action application="hash" data="insert/${domain_name}-cfwdu/${username}/$1"/&gt;<br/>
+<br/>
+    &lt;action application="answer"/&gt;<br/>
+<br/>
+    &lt;action application="playback" data="<br/>
+<br/>
+您登记的业务已经成功.wav"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，正则表达式“^\*57\*([^#]*)#?”会匹配“*57*1007#”，并将电话号码存储在变量$1中。这里，考虑到有些话机无法输入末尾的#号键（有些话机会认为按#表示号码输入完毕，因而送给FreeSWITCH的被叫号码不包含#号），我们通过正则表达式中的“?”把它标志为可选的。也就是说，如果用户拨打“*57*1007”也会匹配到这里。</p>
+<p height="1em" width="2em">在电话到达后，我们使用hash <sup>
+<small>
+<a href="text00097.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ App将该信息存储在系统内存中的一个哈希表中。hash的参数是以“/”隔开的几项：insert表示向哈希表中插入数据；${domain_name}-cfwdu表示一个域（realm），该域是我们自己定义的，其中的cfwdu是无条件呼叫前转（Call Forward Unconditional）的英文简写形式，用于标志我们这里的呼叫前转业务；${username}是一个键（key），在本例子中，它就是主叫用户1002；$1是该键的值（value），在此它等于1007。</p>
+<p height="1em" width="2em">当然，登记成功后，我们不会忘记使用playback播放一个友好的语音提示。</p>
+<p height="1em" width="2em">通过下面Dialplan Extension，可以在1002拨打#57#时将登记的信息删除：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="call_forward_unconditional_unset"&gt;<br/>
+<br/>
+  &lt;condition field="destination_number" expression="^#57#?$"&gt;<br/>
+<br/>
+    &lt;action application="hash" data="delete/${domain_name}-cfwdu/${username}"/&gt;<br/>
+<br/>
+    &lt;action application="answer"/&gt;<br/>
+<br/>
+    &lt;action application="playback" data="<br/>
+<br/>
+您登记的业务已经取消.wav"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">同样，我们也不要求被叫号码最后必须有#号，就算没有上面的正则表达式也会匹配#57。可以看出，hash App的参数由insert换成了delete，表示我们要删除一个键。</p>
+<p height="1em" width="2em">在实现了登记的删除后，我们就在正常的路由中进行检查了。来看下面的Dialplan设置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="call_forward_unconditional_check" continue="true"&gt;<br/>
+<br/>
+  &lt;condition&gt;<br/>
+<br/>
+    &lt;action application="info" data=""/&gt;<br/>
+<br/>
+    &lt;action application="set" inline="true"<br/>
+<br/>
+        data="cfwdu=${hash(select/${domain_name}-cfwdu/${destination_number})}"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述Dialplan定义了一个绝对的条件（因为&lt;condition&gt;标签没有其他属性），因而它总是会被匹配到。在电话路由到这里后，我们先使用info App在日志中打印一些调试信息，以方便查找问题。然后，通过set App设置一个cfwdu变量，该变量的值是从哈希表中使用select取出的。如果用*57*进行了登记，则表示它就有值，否则就是一个空字符串。在此，如果有人拨打1002，则这里哈希表的键就是以${destination_number}标志的，即1002。</p>
+<p height="1em" width="2em">注意，此处的inline="true"参数非常关键。有了它，这一行的set命令在Dialplan解析的阶段就会执行，这样到后面我们才能根据该变量来进行后续的条件判断。</p>
+<p height="1em" width="2em">在此，我们也可以用下面的hash API命令进行检查（192.168.7.5是笔者电脑上${domain_name}的值）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; hash select/192.168.7.5-cfwdu/1002<br/>
+<br/>
+1007<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以看出，我们确定可以在域192.168.7.5-cfwdu中通过1002这个键找到1007这个值（当然，前提是1002已经拨打过“*57*1007#”进行登记）。</p>
+<p height="1em" width="2em">然后，继续向下路由，直到下面的Dialplan Extension：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="call_forward_unconditional_check2" continue="true"&gt;<br/>
+<br/>
+  &lt;condition field="${cfwdu}" expression="^10[01][0-9]"&gt;<br/>
+<br/>
+    &lt;action application="bridge" data="user/${cfwdu}"/&gt;<br/>
+<br/>
+  &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该Extension检查的条件是cfwdu这个变量的值（就是我们上一步中set的），如果它的值匹配一个分机号（登记后它将匹配1007），我们就执行bridge，它的参数在本例中将是user/1007，因而电话就“转移”到分机1007上去了。如果不匹配，Dialplan就会继续向下执行，跟没有登记是一样的。</p>
+<p height="1em" width="2em">在本例中，我们用了内存中的哈希表来存储登记的号码，如果FreeSWITCH重启，这些值都会消失。如果希望在重启后也能保存这些值，可以使用持久化的数据库存储。mod_db实现了持久化的数据库存储，与hash类似，它提供了“db insert”、“db delete”、“db select”等。详情请参见http://wiki.freeswitch.org/wiki/Mod_db。</p>
+<p height="1em" width="2em">此外，我们在本例中仅实现了无条件呼叫前转，对于其他转移方式，如遇忙转移和无应答转移等，可以根据本节的内容配合我们在上一节中讲到的方法进行实现。具体的实现方法留给读者自行练习，在此不再赘述。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00096.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 用于在FreeSWITCH中使用内存中的哈稀表存储数据，参见http://wiki.freeswitch.org/wiki/Mod_hash。</p>
+</body>
+</html>

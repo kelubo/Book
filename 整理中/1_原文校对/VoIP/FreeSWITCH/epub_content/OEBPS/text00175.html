@@ -1,0 +1,1272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.1　mod_dptools</font>
+</font>
+</p>
+<p height="1em" width="2em">在此我们找的突破口就是mod_dptools。该模块包含了系统绝大部分的App，其中就包括我们熟悉的answer（应答）和echo（回声）。不管干什么事情，从熟悉的地方入手，往往比较容易。接下来，我们看一看在源代码里能不能找到answer和echo。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.1.1　echo</font>
+</font>
+</p>
+<p height="1em" width="2em">我们先来找echo。通过使用全文搜索工具搜索源代码，我们很快就在mod_dptools.c中找到了一个函数定义——echo_function，它的代码只有下面短短的三行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+2048  SWITCH_STANDARD_APP(echo_function)<br/>
+<br/>
+2049  {<br/>
+<br/>
+2050      switch_ivr_session_echo(session, NULL);<br/>
+<br/>
+2051  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">从上述代码中可以看出，echo_function这个函数是用SWITCH_STANDARD_APP宏来定义的。接着跟踪这个宏的定义，发现它是在switch_types.h:2081行定义的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+2081 #define SWITCH_STANDARD_APP(name) static void name<br/>
+<br/>
+                (switch_core_session_t *session, const char *data)<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">因此，如果将上面的宏展开，那么echo_function的定义就是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+static void echo_function(switch_core_session_t *session, const char *data){<br/>
+<br/>
+    switch_ivr_session_echo(session, NULL);<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们已经知道，每一路通话（一条腿）均有一个Session（即这里的session变量），每个App都是跟Session相关的，因而FreeSWITCH在调用每个App时，均会把当前的Session作为参数传入（一个session指针）。由于echo App没有参数，因而这里的data就是空字符串。当然，如果你在Dialplan中传入参数，如进行如下操作：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;application action="echo" data="some data"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">那么，这里的char*data的值就是some data，只不过我们在此并不需要用到该参数，因而直接忽略掉了。</p>
+<p height="1em" width="2em">echo-function函数就直接调用核心提供的switch_ivr_session_echo函数，将收到的RTP包原样发回去。switch_ivr_session_echo函数我们在20.3.7节已经详细介绍了，这里就不重复了。</p>
+<p height="1em" width="2em">至此，是不是觉得整个呼叫流程一下子就串起来了？当然，如果还是没有这种感觉，我们继续往下看。</p>
+<p height="1em" width="2em">继续在mod_dptools.c文件中找echo_function，我们会发现下面一行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5790 SWITCH_ADD_APP(app_interface, "echo", "Echo",<br/>
+<br/>
+        "Perform an echo test against the calling channel",<br/>
+<br/>
+echo_function, "", SAF_NONE);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它的作用是将我们刚刚定义的echo_function加到app_interface里（即核心的Application Interface指针）。</p>
+<p height="1em" width="2em">SWITCH_ADD_APP也是一个宏，它是在switch_loadable_modules.c:368行定义的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+368 #define SWITCH_ADD_APP(app_int, int_name, short_descript, \<br/>
+<br/>
+369     long_descript, funcptr, syntax_string, app_flags) \<br/>
+<br/>
+370     for (;;) { \<br/>
+<br/>
+        app_int = (switch_application_interface_t *) \<br/>
+<br/>
+        switch_loadable_module_create_interface(*module_interface, \<br/>
+<br/>
+        SWITCH_APPLICATION_INTERFACE); \<br/>
+<br/>
+371     app_int-&gt;interface_name = int_name; \<br/>
+<br/>
+372     app_int-&gt;application_function = funcptr; \<br/>
+<br/>
+373     app_int-&gt;short_desc = short_descript; \<br/>
+<br/>
+374     app_int-&gt;long_desc = long_descript; \<br/>
+<br/>
+375     app_int-&gt;syntax = syntax_string; \<br/>
+<br/>
+376     app_int-&gt;flags = app_flags; \<br/>
+<br/>
+377     break; \<br/>
+<br/>
+378 }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这个宏定义得非常巧妙，它使用了一个无限的for循环，但由于该循环的最后一条语句是break，因此它只会执行一次。该循环跟Linux内核中的“do{...}while(0)”有异曲同工之妙（参见20.3.6节）。</p>
+<p height="1em" width="2em">该宏展开后的结果就相当于（为了易读我们去掉了行尾的续行符）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+for (;;) {<br/>
+<br/>
+    app_interface = (switch_application_interface_t *)<br/>
+<br/>
+        switch_loadable_module_create_interface(*module_interface, SWITCH_APPLICATION_<br/>
+<br/>
+             INTERFACE);<br/>
+<br/>
+    app_interface-&gt;interface_name = "echo";<br/>
+<br/>
+    app_interface-&gt;application_function = echo_function;<br/>
+<br/>
+    app_interface-&gt;short_desc = "Echo";<br/>
+<br/>
+    app_interface-&gt;long_desc = "Perform an echo test against the calling channel";<br/>
+<br/>
+    app_interface-&gt;syntax = "";<br/>
+<br/>
+    app_interface-&gt;flags = SAF_NONE;<br/>
+<br/>
+    break;<br/>
+<br/>
+}<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">所以一个SWITCH_ADD_APP相当于使用switch_loadable_module_create_interface函数创建了一个SWITCH_APPLICATION_INTERFACE类型的接口（即我们所说的Application Interface）变量app_interface，然后给它赋予合适的值。大部分参数都是一些描述信息或帮助字符串，最重要的是下面两行，其确定了echo这个app_interface与我们定义的echo_function的对应关系。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+app_interface-&gt;interface_name = "echo";<br/>
+<br/>
+app_interface-&gt;application_function = echo_function;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">因而，通过SWITCH_ADD_APP这个宏，相当于给系统核心添加了一个echo App，它对应源代码中的echo_function。这样每当系统执行到Dialplan中的echo App时，便通过这里的对应关系找到相应的函数入口，进而执行echo_function函数。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.1.2　answer</font>
+</font>
+</p>
+<p height="1em" width="2em">我们用同样的方法可以找到answer_function，代码不也不算长，因此我们也把它全部贴在这里：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1210  SWITCH_STANDARD_APP(answer_function)<br/>
+<br/>
+1211  {<br/>
+<br/>
+1212      switch_channel_t *channel = switch_core_session_get_channel(session);<br/>
+<br/>
+1213      const char *arg = (char *) data;<br/>
+<br/>
+1214<br/>
+<br/>
+1215      if (zstr(arg)) {<br/>
+<br/>
+1216          arg = switch_channel_get_variable(channel, "answer_flags");<br/>
+<br/>
+1217      }<br/>
+<br/>
+1218<br/>
+<br/>
+1219      if (!zstr(arg)) {<br/>
+<br/>
+1220          if (switch_stristr("is_conference", arg)) {<br/>
+<br/>
+1221              switch_channel_set_flag(channel, CF_CONFERENCE);<br/>
+<br/>
+1222          }<br/>
+<br/>
+1223      }<br/>
+<br/>
+1224<br/>
+<br/>
+1225      switch_channel_answer(channel);<br/>
+<br/>
+1226  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">跟echo_function类似，该函数也是使用SWITCH_STANDARD_APP定义的。我们知道，一个Session对应一个Channel。通过switch_core_session_get_channel函数便可以找当前与Session对应的Channel（第1212行）。</p>
+<p height="1em" width="2em">第1213行定义了一个arg指针，它指向answer的参数data。如果arg（即传过来的data）为空字符串（第1215行，zstr函数用于判断空字符串），则尝试查一下该Channel上有没有answer_flags这个通道变量，如果有（第1219行，其中switch_stristr类似于标准的stristr，不区分大小写），则判断该参数中是否包含“is_conference”，如果包含，则在该Channel上设置一个CF_CONFERENCE标志（该标志主要用于RFC4575/RFC4579描述的会议系统）。</p>
+<p height="1em" width="2em">最后，在第1225行调用核心的函数switch_channel_answer来对该Channel进行应答。</p>
+<p height="1em" width="2em">switch_channel_answer函数实际上是一个宏，在此使用一个宏的作用就是往函数中传入调用者的源文件名和行号信息，以便在日志中打印的文件名和行号是实际上调用该函数处的文件名和行号，而不是该函数实际定义处的行号（否则没有什么实际意义）。该宏展开后实际上是调用switch_channel.c:3693中的switch_channel_perform_answer函数。</p>
+<p height="1em" width="2em">在该函数中，它会首先在第3695行初始化一个msg变量，该变量是switch_core_session_message_t类型的，用于定义一条消息（Message）。然后，第3714～3715行初始化消息的内容，并于第3716行将消息发送出去，消息（Message）是与Core Event类似的另外一种消息传递（调用）方式，与Core Event不同的是，消息的发送总是同步进行的，因此这里的perform_receive_message实际上是直接调用各模块中接收消息的回调函数，我们在21.1.3节还会讲到。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3693  SWITCH_DECLARE(switch_status_t) switch_channel_perform_answer(<br/>
+<br/>
+        switch_channel_t *channel, const char *file, const char *func, int line)<br/>
+<br/>
+3694  {<br/>
+<br/>
+3695      switch_core_session_message_t msg = { 0 };<br/>
+<br/>
+...<br/>
+<br/>
+3714      msg.message_id = SWITCH_MESSAGE_INDICATE_ANSWER;<br/>
+<br/>
+3715      msg.from = channel-&gt;name;<br/>
+<br/>
+3716      status = switch_core_session_perform_receive_message(channel-&gt;session, <br/>
+<br/>
+              &amp;msg, file, func, line);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果消息发送成功，就在第3720行将该Channel的状态置为已经应答的状态。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3719      if (status == SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+3720          switch_channel_perform_mark_answered(channel, file, func, line);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">实际上，如果这里的Channel是一个SIP通话的话，FreeSWITCH中的mod_sofia Endpoint模块便会调用底层的Sofia-SIP协议栈（libsofia）给对方发送“200 OK”的SIP消息。</p>
+<p height="1em" width="2em">answer_function也是由SWITCH_ADD_APP宏安装到核心中去的。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.1.3　set</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH中大量使用通道变量控制通话（Channel）的行为。设置通道变量的操作是由下面的set App实现的。该函数出奇的简单，因为它直接调用了另外一个函数base_set。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1439 SWITCH_STANDARD_APP(set_function)<br/>
+<br/>
+1440 {<br/>
+<br/>
+1441     base_set(session, data, SWITCH_STACK_BOTTOM);<br/>
+<br/>
+1442 }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">base_set其实会被多个函数调用，在此我们只关心它被set_function调用的情况。为了更直观，我们通过实际的例子来说明。假设我们在Dialplan中使用如下配置：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="set" data="dialed_extension=$1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，$1为前面的正则表达式的匹配结果，它是一个变量（我们假设它的值为1001）：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1375   static void base_set (switch_core_session_t *session,<br/>
+<br/>
+                             const char *data, switch_stack_t stack)<br/>
+<br/>
+1376  {<br/>
+<br/>
+1377      char *var, *val = NULL;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在第1385行，会通过switch_core_session_strdup将字符串复制一份。该函数是在session上进行操作的，它会使用该session的内存池申请字符串空间，因而申请以后的内存无需明确释放。为什么要重新复制一份字符串呢？是因为我们接下来的操作会修改该字符串的内存（如第1392行），因而复制一份可以避免破坏原来的字符串所占的内存空间。到此，我们的var变量的值就是“dialed_extension=$1”了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1385          var = switch_core_session_strdup(session, data);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，第1387行判断字符串是否包含等号，在我们的例子里有等号，因此val指向等号所在的内存位置，也可以说val指针所指的字符串值为“=$1”。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1387          if (!(val = strchr(var, '='))) {<br/>
+<br/>
+1388              val = strchr(var, ',');<br/>
+<br/>
+1389          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果val非空（第1391行），则在第1392行将val所指的位置写入“\0”（即C语言中的字符串结束符），并将val指针向后移动一个字节，此时它的值就是“$1”了。同时，由于我们将原字符串中的等号替换改成了“\0”，因此，var所指向的字符串的值也相当于变短了，此时var的值为“dialed_extension”。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1391          if (val) {<br/>
+<br/>
+1392              *val++ = '\0';<br/>
+<br/>
+1393              if (zstr(val)) {<br/>
+<br/>
+1394                  val = NULL;<br/>
+<br/>
+1395              }<br/>
+<br/>
+1396          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第1398行，继续判断如果val为非空（因为已经移动了指针，所以要重新判断），则执行第1399行的函数，就是将val指针中的$1变量替换为它的实际的值。在这里，我们将在expanded变量中得到实际的值是“1001”。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1398          if (val) {<br/>
+<br/>
+1399              expanded = switch_channel_expand_variables(channel, val);<br/>
+<br/>
+1400          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第1404行将调用函数在Channel上设置我们指定的新变量：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1404          switch_channel_add_variable_var_check(channel,var, expanded, <br/>
+<br/>
+                 SWITCH_FALSE, stack);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">它等价于：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+switch_channel_add_variable_var_check(channel,"dialed_extension", "1001", <br/>
+<br/>
+    SWITCH_FALSE, stack);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，最后不要忘记，expanded指针所指向的内存是动态申请的，因此一定要释放内存，以避免引起内存泄漏。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1406          if (expanded &amp;&amp; expanded != val) {<br/>
+<br/>
+1407              switch_safe_free(expanded);<br/>
+<br/>
+1408          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">虽然这里我们讲得比较啰嗦，但实际的过程还是非常简单的。我们接着看一看第1404行调用的switch_channel_add_variable_var_check函数到底都干了些什么。</p>
+<p height="1em" width="2em">该函数定义于switch_channel.c:1400。它在第1407行先对临界区加锁，以防止其他并发的线程同时修改。然后，经过一系列的判断和检查，如果最终所有检查都通过（第1417行），则在第1418行调用switch_event_add_header_string函数将通道变量添加到channel-&gt;variables中去。该函数与我们在18.3.1节讲过的esl_event_add_header_string类似，它实际上是向一个switch_event_t类型的结构体中添加数据，所以这里可以看到，channel-&gt;variables在内部是使用switch_event_t来存储的。这也不奇怪，因为通道变量本来就是一对“键/值”对（varname和value）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1400  SWITCH_DECLARE(switch_status_t) switch_channel_add_variable_var_check(<br/>
+<br/>
+            switch_channel_t *channel,<br/>
+<br/>
+1401        const char *varname, const char *value,<br/>
+<br/>
+            switch_bool_t var_check, switch_stack_t stack)<br/>
+<br/>
+1402  {<br/>
+<br/>
+...<br/>
+<br/>
+1407      switch_mutex_lock(channel-&gt;profile_mutex);<br/>
+<br/>
+...<br/>
+<br/>
+1417              if (ok) {<br/>
+<br/>
+1418                  switch_event_add_header_string(channel-&gt;variables,<br/>
+<br/>
+                          stack, varname, value);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，永远不要忘了释放锁：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1425      switch_mutex_unlock(channel-&gt;profile_mutex);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，set函数就全部剖析完了。通过它设置的通道变量，以后也可以通过switch_channel_get_variable再取出来。当然，这就是另外的事情了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.1.4　bridge</font>
+</font>
+</p>
+<p height="1em" width="2em">接下来我们再来看一下bridge这个App，从某种意义上讲，它属于FreeSWITCH的核心功能，比较有代表性。</p>
+<p height="1em" width="2em">bridge App是由第3017行的audio_bridge_function函数完成的。该函数比较复杂，我们尽量挑简单的部分说。</p>
+<p height="1em" width="2em">首先，该App在Dialplan中的使用方法一般是：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;action application="bridge" data="user/1001"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">因而，该函数中的data参数便是一个指向字符串“user/1001”的指针。在第3052行，首先检查该字符串的有效性。如果它为空字符串，那就没有必要继续进行了，直接返回（return，第3053行）即可。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3037  SWITCH_STANDARD_APP(audio_bridge_function)<br/>
+<br/>
+3038  {<br/>
+<br/>
+...<br/>
+<br/>
+3052      if (zstr(data)) {<br/>
+<br/>
+3053          return;<br/>
+<br/>
+3054      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">我们跳过很多if…else假设，直接跳到第3194行（一般来说都会执行到这里）。接下来的第3195行将调用核心的switch_ivr_originate函数发起一个新的呼叫。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3194          if ((status =<br/>
+<br/>
+3195               switch_ivr_originate(session, &amp;peer_session, &amp;cause,<br/>
+<br/>
+                     data, 0, NULL, NULL, NULL, NULL, NULL, SOF_NONE, NULL))<br/>
+<br/>
+                        != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+3196              fail = 1;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">switch_ivr_originate函数是在switch_ivr_originate.c:1850行定义的。该函数可能是FreeSWITCH中最长的一个函数，在我们参考的版本中，它足足有2048行！因此，笔者在此不准备研究它 <sup>
+<small>
+<a href="text00176.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ ，但我们下面来看一下它使用的这几个参数的意义。</p>
+<p height="1em" width="2em">switch_ivr_originate函数中，session就是指当前的Session，即呼入的那条腿（a-leg），我们执行到此处，调用该函数创建另一条腿（b-leg）。因而，第二个参数peer_session就是新建立的Session。由于我们在该函数执行完成后，需要知道peer_session指针的值，因此这里我们传入的是指针变量的地址（相当于一个双重指针）。同理，我们也需要在呼叫失败时得到呼叫原因（cause），因此把它作为第三个变量。第四个参数便是我们提供的呼叫字符串（data）的指针，在本例中该字符串的值是“user/1001”。</p>
+<p height="1em" width="2em">其他的参数我们就没必要看了，大部分都是空指针。在此，由于我们传入了当前的session指针，因此该函数在执行的时候就有参照物了。比如，它会将a-leg（当前session）中的主叫号码（effective_caller_id_number）作为主叫号码去呼叫b-leg等。当然，b-leg也不是仅参照a-leg，如果b-leg的对端回了呼叫进展消息（如SIP 180或183消息），则a-leg也能听到相关的提示音。</p>
+<p height="1em" width="2em">如果b-leg的对端应答了，或者在呼叫进展过程中返回了媒体消息（如SIP中的183消息），则上述的switch_ivr_originate函数就会返回。在接下来的第3207行，我们将得到新的Channel（b-leg对应的Channel——peer_channel）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3207 switch_channel_t *peer_channel = switch_core_session_get_channel(peer_session);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果我们在呼叫时使用的是Proxy Media模式（第3123行），则执行第3214行的函数时仅进行信令级的桥接，否则（正常情况）就执行第3236行的多线程的桥接函数switch_ivr_multi_threaded_bridge。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3213          if (switch_channel_test_flag(caller_channel, CF_PROXY_MODE)) {<br/>
+<br/>
+3214              switch_ivr_signal_bridge(session, peer_session);<br/>
+<br/>
+3215          } else {<br/>
+<br/>
+...<br/>
+<br/>
+3236              switch_ivr_multi_threaded_bridge(session, peer_session,<br/>
+<br/>
+                      func, a_key, b_key);<br/>
+<br/>
+3237          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来看switch_ivr_multi_threaded_bridge函数。它是在switch_ivr.c:1270行实现的。它首先在第1275行和第1276行始始化了两个switch_ivr_bridge_data_t类型的变量a_leg和b_leg，用于存放与两条腿相关的私有数据（我们后面会用到它们）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1270  SWITCH_DECLARE(switch_status_t) switch_ivr_multi_threaded_bridge(<br/>
+<br/>
+          switch_core_session_t *session,<br/>
+<br/>
+1271      switch_core_session_t *peer_session,<br/>
+<br/>
+1272      switch_input_callback_function_t input_callback, void *session_data,<br/>
+<br/>
+1273      void *peer_session_data)<br/>
+<br/>
+1274  {<br/>
+<br/>
+1275       switch_ivr_bridge_data_t *a_leg =<br/>
+<br/>
+                switch_core_session_alloc(session, sizeof(*a_leg));<br/>
+<br/>
+1276       switch_ivr_bridge_data_t *b_leg =<br/>
+<br/>
+                switch_core_session_alloc(peer_session, sizeof(*b_leg));<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在第1319行，它首先在peer_channel（即b-leg）上安装一些状态回调函数，当b-leg的状态发生变化时，将调用相关的回调函数。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1319      switch_channel_add_state_handler(peer_channel, &amp;audio_bridge_peer_state_handlers);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后产生一个CHANNEL_BRIDGE事件（第1342行），并发送出去（第1347行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1342          if (switch_event_create(&amp;event, SWITCH_EVENT_CHANNEL_BRIDGE) == <br/>
+<br/>
+                 SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+...<br/>
+<br/>
+1347              switch_event_fire(&amp;event);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，分别在a-leg和b-leg上产生一个SWITCH_MESSAGE_INDICATE_BRIDGE消息（Message，用于标志该Channel已经被桥接了），分别发送给这两个leg（第1400行、第1408行）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1396              msg.message_id = SWITCH_MESSAGE_INDICATE_BRIDGE;<br/>
+<br/>
+...<br/>
+<br/>
+1400              if (switch_core_session_receive_message(peer_session, &amp;msg) <br/>
+<br/>
+                     != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+...<br/>
+<br/>
+1408              if (switch_core_session_receive_message(session, &amp;msg) != <br/>
+<br/>
+                     SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在第1439行，将一个b_leg数据指针确定的私有数据绑定到b-leg上（使用私有数据与设置通道变量类似，但后者只能是字符串值，而前者可以绑定为任意值）。然后，在第1440行将b-leg的状态设为媒体交换的状态（CS_EXCHANGE_MEDIA）</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1439              switch_channel_set_private(peer_channel, "_bridge_", b_leg);<br/>
+<br/>
+1440              switch_channel_set_state(peer_channel, CS_EXCHANGE_MEDIA);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这时候，b-leg的状态发生了变化，因而会回调在上面第1319行设置过的回调函数。不过，在讲这些回调函数前，我们先把第1442行讲完。接下来的第1442行很简单，它执行audio_bridge_thread函数，并将一个a_leg数据指针传入。该数据指针包含a-leg的一些信息。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+1442              audio_bridge_thread(NULL, (void *) a_leg);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">第1442行的执行是阻塞的，它将阻塞的执行一直到bridge结束，因此，我们可以倒回来看b-leg上的回调函数了。</p>
+<p height="1em" width="2em">我们在第1319行时就在b-leg上安装了一些回调函数，这里回调函数是在一个全局变量中指定的，具体如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+771  static const switch_state_handler_table_t audio_bridge_peer_state_handlers = {<br/>
+<br/>
+772      /*.on_init */ NULL,<br/>
+<br/>
+773      /*.on_routing */ audio_bridge_on_routing,<br/>
+<br/>
+774      /*.on_execute */ NULL,<br/>
+<br/>
+775      /*.on_hangup */ NULL,<br/>
+<br/>
+776      /*.on_exchange_media */ audio_bridge_on_exchange_media,<br/>
+<br/>
+777      /*.on_soft_execute */ NULL,<br/>
+<br/>
+778      /*.on_consume_media */ audio_bridge_on_consume_media,<br/>
+<br/>
+779  };<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，我们在第1440行将Channel的状态设置为CS_EXCHANGE_MEDIA，Channel的状态发生了改变，它就会回调在第776行指定的audio_bridge_on_exchange_media函数。</p>
+<p height="1em" width="2em">在audio_bridge_on_exchange_media函数（第694行）中，可以看到，它在第697行通过switch_channel_get_private取出了该Channel上的一个私有数据，而该私有数据是在第1439行设置的。该私有数据里面存储了与bridge相关的b-leg上的数据，有了它以后，我们就可以在第704行执行audio_bridge_thread函数了。注意，在此第704行传入的参数是b-leg上的switch_ivr_bridge_data_t结构的私有数据。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+694  static switch_status_t audio_bridge_on_exchange_media(switch_core_<br/>
+<br/>
+         session_t *session)<br/>
+<br/>
+695  {<br/>
+<br/>
+696      switch_channel_t *channel = switch_core_session_get_channel(session);<br/>
+<br/>
+697      switch_ivr_bridge_data_t *bd =<br/>
+<br/>
+            switch_channel_get_private(channel, "_bridge_");<br/>
+<br/>
+...<br/>
+<br/>
+703          if (bd-&gt;session == session &amp;&amp; *bd-&gt;b_uuid) {<br/>
+<br/>
+704              audio_bridge_thread(NULL, (void *) bd);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，我们可以看到，a-leg和b-leg分别在自己的线程中执行了audio_bridge_thread函数（这个很重要，我们的思维现在并行化了，即下面讲的所有代码都是在两条腿上在两个线程中并行执行的），并且在该函数中，它们分别传入了自己所在的那条腿上的switch_ivr_bridge_data_t结构的数据。</p>
+<p height="1em" width="2em">在该函数中，它首先在第207行将传入的数据从obj指针赋值给一个data指针，并在第236行将data指针中的session成员变量赋值给session_a。注意，到了这里，session_a就不一定是a-leg了，而是只在当前线程中的那条腿。即，如果在a-leg中调用该函数，它就是a-leg；如果在b-leg中调用该函数，它就是b-leg。同理，第237行的session_b变量也不一定是b-leg，而是与本条腿相对的那条腿（桥接中的另一条腿）。注意，该腿相关的session_b变量不是直接传入的指针，而是传入了一个Channel的UUID（data-&gt;b_uuid），因此我们需要使用switch_core_session_locate来取得与该UUID对应的Session的指针session_b。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+205  static void *audio_bridge_thread(switch_thread_t *thread, void *obj)<br/>
+<br/>
+206  {<br/>
+<br/>
+207      switch_ivr_bridge_data_t *data = obj;<br/>
+<br/>
+...<br/>
+<br/>
+236      session_a = data-&gt;session;<br/>
+<br/>
+237      if (!(session_b = switch_core_session_locate(data-&gt;b_uuid))) {<br/>
+<br/>
+238          return NULL;<br/>
+<br/>
+239      }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">至此，在两个线程中分别都有了当前的Session和另一个Session的信息了，第256～257行分别取出与它们对应的Channel。然后，就是一个无限循环（第341行），在该循环中，不停地在当前的Session（session_a）中读取一帧媒体数据（第547行），然后写入另一个Session（session_b，第565行）。这就实现了媒体 <sup>
+<small>
+<a href="text00176.html">
+<font size="2">
+<font color="#FF6600">[2]</font>
+</font>
+</a>
+</small>
+</sup>
+ 的交换，也是bridge App的全部秘密。当然，第546行的注释可能更简洁直观一些——从一个Channel中读取音频并写入另一个Channel。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+245      chan_a = switch_core_session_get_channel(session_a);<br/>
+<br/>
+246      chan_b = switch_core_session_get_channel(session_b);<br/>
+<br/>
+...<br/>
+<br/>
+341      for (;;) {<br/>
+<br/>
+...<br/>
+<br/>
+546          /* read audio from 1 channel and write it to the other */<br/>
+<br/>
+547          status = switch_core_session_read_frame(session_a, &amp;read_frame, <br/>
+<br/>
+                SWITCH_IO_FLAG_NONE, stream_id);<br/>
+<br/>
+...<br/>
+<br/>
+565                  if (switch_core_session_write_frame(session_b, read_<br/>
+<br/>
+      frame, SWITCH_IO_FLAG_NONE, stream_id) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当读取数据错误或者检测到挂机时，上述无限循环将终止。在上述函数中，我们在第237行使用了switch_core_session_locate通过一个UUID获得了session_b的指针。而该函数在返回指针的同时会将当前的Session加锁，以防止产生竞争条件（Race Condition）。因此，在任何时候使用switch_core_session_locate函数并获得了非空的指针时，在指针使用完成后都需要明确解锁，如第673行所示：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+673      switch_core_session_rwunlock(session_b);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，当上面的audio_bridge_thread函数完成后，后续还有很多事情要做，如发送CHANNEL_UNBRIDGE事件、检查所有相关的after_bridge（桥接后的）变量（我们常用的hangup_after_bridge变量就是在这里检查的）等，因篇幅所限，我们就不多讲了。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.1.5　Endpoint Interface</font>
+</font>
+</p>
+<p height="1em" width="2em">在mod_dptools模块中，实现了一些常用的“假”的Endpoint Interface。之所以说是“假”的，是因为它们并没有像mod_sofia那样既有底层的协议驱动，又有媒体收、发处理，而是为了简化某些操作，或者为了在某些特殊的情况下使用一些一致的命令或接口而实现的。比如，我们常用的user就是一个Endpoint。一般来说，一个Endpoint都会提供一个用于外呼的呼叫字符串，我们对于user提供的呼叫字符串已经非常熟悉了，如在命令行和Dialplan中我们经常使用如下的呼叫字符串：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+originate user/1000 &amp;echo<br/>
+<br/>
+&lt;action application="bridge" data="user/1000" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">这里面的user就是由user Endpoint实现的。该Interface的指针是在第3879行声明的一个全局变量。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3879  switch_endpoint_interface_t *user_endpoint_interface;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在第3885～3887行，定义了一个switch_io_routines_t类型的结构体，用于定义回调函数。可以看出，由于该Endpoint很简单，它只定义了一个outgoing_channel回调函数。该回调函数将在有人使用user呼叫字符串时（如执行originate和bridge时）被调用。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3885  switch_io_routines_t user_io_routines = {<br/>
+<br/>
+3886      /*.outgoing_channel */ user_outgoing_channel<br/>
+<br/>
+3887  };<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">该回调函数的定义如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3889  static switch_call_cause_t user_outgoing_channel(switch_core_session_t *session,<br/>
+<br/>
+3890             switch_event_t *var_event,<br/>
+<br/>
+3891             switch_caller_profile_t *outbound_profile,<br/>
+<br/>
+3892             switch_core_session_t **new_session,<br/>
+<br/>
+                 switch_memory_pool_t **pool, switch_originate_flag_t flags,<br/>
+<br/>
+3893             switch_call_cause_t *cancel_cause)<br/>
+<br/>
+3894  {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">首先，该函数的输入参数中将包含一个outbound_profile，它的成员变量destination_number即是被叫号码。在第3909行，复制该被叫号码并赋值给user指针。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3909      user = strdup(outbound_profile-&gt;destination_number);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后获取domain的值，如果呼叫字符串中未包含domain（如user/1000@192.168.1.2就包含了domain，而user/1000则未包含），则在第3917行尝试获取默认的domain。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3914      if ((domain = strchr(user, '@'))) {<br/>
+<br/>
+3915          *domain++ = '\0';<br/>
+<br/>
+3916      } else {<br/>
+<br/>
+3917          domain = switch_core_get_domain(SWITCH_TRUE);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">接下来，第3942行，从XML用户目录中查找该用户，并继续在第3593行尝试找到dial-string配置参数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3942      if (switch_xml_locate_user_merged("id", user, domain, NULL,<br/>
+<br/>
+          &amp;x_user, params) != SWITCH_STATUS_SUCCESS) {<br/>
+<br/>
+3953              if (!strcasecmp(pvar, "dial-string")) {<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果该呼叫字符串是在bridge中使用的，则第3992行的判断成立（即说明有a-leg），否则（第4004行）说明是个单腿的呼叫（originate）。然后根据不同的情况进行相关的设置，并得到一个d_dest（第4002行或第4022行）的地址（如sip:1000@192.168.1.100:7890等）。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+3992          if (session) {<br/>
+<br/>
+...<br/>
+<br/>
+4002              d_dest = switch_channel_expand_variables(channel, dest);<br/>
+<br/>
+4003<br/>
+<br/>
+4004          } else {<br/>
+<br/>
+...<br/>
+<br/>
+4022              d_dest = switch_event_expand_headers(event, dest);<br/>
+<br/>
+...<br/>
+<br/>
+4024          }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">随后调用switch_ivr_originate去呼叫该地址，如第4040行所示：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+4040          } else if (switch_ivr_originate(session,new_session, &amp;cause, d_dest, ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">user Endpoint是一个最简单的Endpoint。它目前仅支持SIP呼叫（理论上它还可以扩展支持其他的），实际的呼叫流程还要转到实际的mod_sofia Endpoint上进行处理。我们将在21.3节讲解mod_soifa是如何实现Endpoint Interface的。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">21.1.6　模块框架</font>
+</font>
+</p>
+<p height="1em" width="2em">在20.3.5节我们讲过，一个模块主要是由load、runtime和shutdown回调函数组成的。mod_dptools当然也不例外。</p>
+<p height="1em" width="2em">mod_dptools模块的load函数是在第5578行定义的，它将在模块被加载的时候执行。从第5580～5584行可以看出，它实现了包括API Interface、App Interface、Dialplan Interface在内的多个Interface。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5578  SWITCH_MODULE_LOAD_FUNCTION(mod_dptools_load)<br/>
+<br/>
+5579  {<br/>
+<br/>
+5580      switch_api_interface_t *api_interface;<br/>
+<br/>
+5581      switch_application_interface_t *app_interface;<br/>
+<br/>
+5582      switch_dialplan_interface_t *dp_interface;<br/>
+<br/>
+5583      switch_chat_interface_t *chat_interface;<br/>
+<br/>
+5584      switch_file_interface_t *file_interface;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在初始化了一系列的内存池及其他数据结构后，它在第5593行向核心注册该模块。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5593      *module_interface = switch_loadable_module_create_module_<br/>
+<br/>
+             interface(pool, modname);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在第5595行，它向核心绑定（订阅）了一个SWITCH_EVENT_PRESENCE_PROBE事件的回调函数，即每当系统中产生该事件后，都会执行回调函数pickup_pres_event_handler。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5595      switch_event_bind(modname, SWITCH_EVENT_PRESENCE_PROBE,<br/>
+<br/>
+          SWITCH_EVENT_SUBCLASS_ANY, pickup_pres_event_handler, NULL);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">另外，它还实现了一些EndpointInterface：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5621      error_endpoint_interface = ...<br/>
+<br/>
+5625      group_endpoint_interface = ...<br/>
+<br/>
+5629      user_endpoint_interface = ...<br/>
+<br/>
+5633      pickup_endpoint_interface = ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">向核心注册API和App：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5641      SWITCH_ADD_API(api_interface, "strepoch", ...<br/>
+<br/>
+5645      SWITCH_ADD_API(api_interface, "strftime", ...<br/>
+<br/>
+5790      SWITCH_ADD_APP(app_interface, "echo", ...<br/>
+<br/>
+5791      SWITCH_ADD_APP(app_interface, "park", ...<br/>
+<br/>
+5794      SWITCH_ADD_APP(app_interface, "playback", ...<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">还可以看到，inline Dialplan也是在该模块中实现的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5839      SWITCH_ADD_DIALPLAN(dp_interface, "inline", inline_dialplan_hunt);<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">总之，在该函数的最后，返回SWITCH_STATUS_SUCCESS表明该模块加载成功：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5842      return SWITCH_STATUS_SUCCESS;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">mod_dptoots模块没有runtime函数。其shutdown函数也很简单，该模块没有太多要清理的资源，它只需要在第5573行向核心取消先前在第5593行绑定的事件回调函数：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+5571  SWITCH_MODULE_SHUTDOWN_FUNCTION(mod_dptools_shutdown)<br/>
+<br/>
+5572  {<br/>
+<br/>
+5573      switch_event_unbind_callback(pickup_pres_event_handler);<br/>
+<br/>
+5574<br/>
+<br/>
+5575      return SWITCH_STATUS_SUCCESS;<br/>
+<br/>
+5576  }<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述就是mod_dptoots模块的大体框架。读者可以尝试在FreeSWITCH控制台上使用“reload mod_dptools”命令查看与这些代码相关的日志输出，并对照实际的代码加深一下印象。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00175.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 这一个函数也许就够写一本书了。好多读者也是在阅读源代码时，好像是在学会了originate命令之后，抑或是在知道bridge App调用了该函数之后，就来看这个函数。最后的结果要不是认为一个函数写这么长，代码写得太烂；要不就是一下就被吓住了，看不懂。因此，不建议初学者研究这个函数。笔者也是大致看过，并没有深入研究。</p>
+<p height="0pt" width="0pt" align="justify">
+<a href="text00176.html">
+<font color="#FF6600">[2]</font>
+</a>
+ 注意，这里所说的媒体就是音频，为了简单起见，我们没有分析视频有关的代码。</p>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_166"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos599637" class="calibre7"></a>4.2.2 Downloading and Extracting the Files </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">Distributions are packaged in gzipped <span><em class="italic">tar</em></span> format and are extracted with the <span><em class="italic">tar</em></span> command in the usual way. <a shape="rect" href="DB_split_112.html#filepos572416" class="calibre6">[4.1.4]</a> The results are stored in a directory with a name like <em class="italic">openssh-3.9p1</em>. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>4.2.2.1 Verifying with GnuPG </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Along with each OpenSSH distribution is a GnuPG (Gnu Privacy Guard) signature. The file <em class="italic">openssh-3.9p1.tar.gz</em>, for example, is accompanied by <em class="italic">openssh-3.9p1.tar.gz.sig</em> containing the GnuPG signature. To verify the file is genuine, you need GnuPG installed (<a href="http://www.gnupg.org/" shape="rect" class="calibre6">http://www.gnupg.org/</a>). Then: </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">If you have not done so previously, obtain the GnuPG public key for the distribution, available from various keyservers on the Internet, such as: <div class="calibre3"><span class="calibre27">
+<blockquote class="calibre5"><span class="calibre33">
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre57">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><a href="http://www.keyserver.net" shape="rect" class="calibre6">http://www.keyserver.net</a></span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><a href="http://pgp.mit.edu" shape="rect" class="calibre6">http://pgp.mit.edu</a></span></td>
+</tr></span></table></span></blockquote>
+</span></div><br class="calibre19"/>Add the key to your GnuPG key ring by running:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ gpg --keyserver <em class="italic"><code class="calibre35">keyserver</code></em> --search-keys openssh</tt></div></span><br class="calibre19"/>and following the instructions. </li>
+<li value="2" class="calibre18">Download both the distribution file (e.g., <em class="italic">openssh-3.9p1.tar.gz</em>) and the signature file (e.g., <em class="italic">openssh-3.9p1.tar.gz.sig</em>). </li>
+<li value="3" class="calibre18">Verify the signature with the command:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ gpg --verify openssh-3.9p1.tar.gz.sig openssh-3.9p1.tar.gz</tt></div></span><br class="calibre19"/>If no warning messages are produced, the distribution file is genuine. </li>
+</ol></div>
+<p class="calibre4">Always check the GnuPG signatures.</p>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="center">
+<font size="5">
+<font color="#0468BB">附录C　模块列表</font>
+</font>
+</p>
+<p height="1em" width="2em">FreeSWITCH的模块有很多，它们丰富了FreeSWITCH的功能。实际上，常用的模块本书已经基本都介绍过了。但总有好奇的读者会问：不知道mod_xxx这个模块是干什么用的？因此，这里列出大部分已知的模块，供广大读者参考。有的模块在前面介绍得很详细了，在这里就从简了，另外有些模块笔者也没有用过，说错了不如不说，因而也会一笔带过。</p>
+<p height="1em" width="2em">关于模块的介绍，在官方的Wiki页面上（http://wiki.freeswitch.org/wiki/Modules）大部分都能查到。部分模块也有自己的页面，它们的URL也比较规范，如我们已经介绍过的http://wiki.freeswitch.org/wiki/Mod_sofia、http://wiki.freeswitch.org/wiki/Mod_dptools、http://wiki.freeswitch.org/wiki/Mod_commands等。</p>
+<p height="1em" width="2em">我们基于FreeSWITCH 1.2.22版，以自然的顺序来讲解。这里模块的顺序是在FreeSWITCH源代码目录中用以下命令生成的：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ cd src/mod<br/>
+<br/>
+$ find . -type d -name mod_*<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">各个模块根据其主要功能和提供的接口的不同被分配不同的目录中。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.applications</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供了大部分应用的功能，有的模块因实现了多种Interface而不好归类，这些模块也会存在该目录中。</p>
+<p height="1em" width="2em">·mod_abstraction：用于创建新的API命令。新的命令可以基于原有的API创建，相当于创建原有命令的别名或快捷方式。</p>
+<p height="1em" width="2em">·mod_avmd：avmd是Advanced Voice Mail Detection的缩写，即高级语音邮件检测。它是mod_vmd的高级版。详见mod_vmd。</p>
+<p height="1em" width="2em">·mod_blacklist：黑名单功能。它提供了一些通过Dialplan来添加、删除以及检查黑名单的方法。</p>
+<p height="1em" width="2em">·mod_callcenter：一个比较强大的呼叫中心类应用。</p>
+<p height="1em" width="2em">·mod_cidlookup：用于主叫号码查询，即可根据主叫号码从本地数据库或网络上查询到主叫的名字。网络上有开放的服务，如下面的例子使用curl命令获取与16502530000对应的主叫号码：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+$ curl https://api.opencnam.com/v2/phone/16502530000?format=pbx<br/>
+<br/>
+    GOOGLE INC<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">·mod_cluechoo：该模块是一个例子模块，主要是教大家怎么写模块。另外，它还带了一个好玩的例子，如在命令行上执行cluechoo命令在屏幕上将会看到开过一个小火车。</p>
+<p height="1em" width="2em">·mod_commands：提供了大部分系统的命令API。</p>
+<p height="1em" width="2em">·mod_conference：多人语音及视频会议。</p>
+<p height="1em" width="2em">·mod_curl：使用libcurl作为一个HTTP客户端向Web服务器发送请求，也可以得到返回的结果。</p>
+<p height="1em" width="2em">·mod_db：该模块提供一组接口，用于使用API或App对数据库表进行增、删、改、查等操作。</p>
+<p height="1em" width="2em">·mod_directory：该模块用于按姓名呼叫用户。如果不知道用户的分机号，但知道用户的名字，则可以通过输入该用户名字的前几位进行拨叫。如在下面的例子中，我们可以通过拨打411进入directory程序。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="directory" continue="true"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^411$"&gt;<br/>
+<br/>
+        &lt;action application="directory" data="default $${domain} default"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当系统提示输入名字时，我们输入9378可以找到Brian West（默认是按last_name查找的，West对应键盘按键9378）。</p>
+<p height="1em" width="2em">·mod_distributor：如果需要通过多个网关出局，则该模块可以帮助将呼叫根据一定的比例分发到不同的网关。</p>
+<p height="1em" width="2em">·mod_dptools：提供了大部分系统的App。</p>
+<p height="1em" width="2em">·mod_easyroute：用于根据号码路由，对大规模的DID比较有用。</p>
+<p height="1em" width="2em">·mod_enum：通过ENUM查询可以根据E164号码找到用户的SIP地址。该模块也提供了一个enum Dialplan。</p>
+<p height="1em" width="2em">·mod_esf：esf是Extended SIP Functionality的缩写，即扩展的SIP功能。它提供通过Muticast方法实现组拨的功能。</p>
+<p height="1em" width="2em">·mod_esl：该模块用于实现两个FreeSWITCH间的ESL对接，即一个FreeSWITCH可以作为另一个FreeSWITCH的ESL客户端访问它。</p>
+<p height="1em" width="2em">·mod_expr：提供expr表达式计算。</p>
+<p height="1em" width="2em">·mod_fifo：一个先入先出队列（First In First Out），可以用于简单地呼叫中心排队。</p>
+<p height="1em" width="2em">·mod_fsk：收发FSK（Frequency-shift keying，移频键控）信息。</p>
+<p height="1em" width="2em">·mod_fsv：fsv是FreeSWITCH Video的缩写，它使用了一种私有的格式来进行视频录像，可以支持任何编码的视频格式。它只存储原始的RTP包，对视频流不进行任何处理。</p>
+<p height="1em" width="2em">·mod_hash：用于操作系统内部的哈希表。可以存储一些简单的数据。</p>
+<p height="1em" width="2em">·mod_httapi：一种HTTP格式的API接口，可以通过HTTP方式写IVR。</p>
+<p height="1em" width="2em">·mod_http_cache：通过HTTP方式上传和下载文件，并可以进行本地缓存。</p>
+<p height="1em" width="2em">·mod_ladspa：使用ladspa库对声音进行处理，可以让声音更好听。</p>
+<p height="1em" width="2em">·mod_lcr：LCR是Least Cost Routing的缩写，即最省钱的路由。它会根据数据库配置的路由信息和费率找到最省钱的路由。</p>
+<p height="1em" width="2em">·mod_limit：用于系统资源限制。</p>
+<p height="1em" width="2em">·mod_memcache：与Memcache交互，类似于把mod_hash的数据存到远程的Memcache中。</p>
+<p height="1em" width="2em">·mod_mongo：与Mongodb交互，类似mod_memcache。</p>
+<p height="1em" width="2em">·mod_mp4：提供MP4文件的播放支持。</p>
+<p height="1em" width="2em">·mod_nibblebill：一些简单的计费功能，可用于预付费和电话卡类的应用。</p>
+<p height="1em" width="2em">·mod_oreka：使用oreka进行录音。oreka是一款开源的录音软件。</p>
+<p height="1em" width="2em">·mod_osp：通过Open Settlement Protocol查找路由或上报CDR。</p>
+<p height="1em" width="2em">·mod_rad_auth：使用radius服务器进行鉴权。</p>
+<p height="1em" width="2em">·mod_random：通过访问/dev/hwrandom设备影响随机数的熵。</p>
+<p height="1em" width="2em">·mod_redis：与redis服务器交互，类似于mod_memcache。</p>
+<p height="1em" width="2em">·mod_rss：访问RSS（Really Simple Syndication，简易信息聚合）数据。</p>
+<p height="1em" width="2em">·mod_skel：一个模块的例子框架。</p>
+<p height="1em" width="2em">·mod_sms：处理文本消息，如收发SIP MESSAGE消息等。它实现了消息路由（Chazplan），类似于Dialplan。</p>
+<p height="1em" width="2em">·mod_snapshot：可以截取一段声音的快照。</p>
+<p height="1em" width="2em">·mod_snipe_hunt：一个简单的例子模块。</p>
+<p height="1em" width="2em">·mod_snom：用于snom话机的一些特性。</p>
+<p height="1em" width="2em">·mod_sonar：该模块类似于一个真正的声呐。首先你可以在远端启动一个服务器，其能对来话执行echo App。然后在本地的FreeSWITCH上产生一些铃音，发送到远端的服务器上再反射回来，然后使用VAD检测功能可以检测这些铃音，从而可以在某种程度上确定网络的质量。</p>
+<p height="1em" width="2em">·mod_soundtouch：使用soundtouch库对声音进行处理，可以增加音效。</p>
+<p height="1em" width="2em">·mod_spandsp：使用spandsp <sup>
+<small>
+<a href="text00191.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 支持一些语音编码及传真功能。</p>
+<p height="1em" width="2em">·mod_spy：用于监视某个话机，当该话机有通话时，本机振铃同时可以监听。</p>
+<p height="1em" width="2em">·mod_stress：使用快速傅里叶变换（Fast Fourier Transform，FFT）检测重音。</p>
+<p height="1em" width="2em">·mod_translate：通过既定的规则对号码进行翻译。</p>
+<p height="1em" width="2em">·mod_valet_parking：电话停靠。类似于泊车，有来电时可以将来电依靠在某个泊位上，然后通知某人拨打指定的号码将来话“接”走。</p>
+<p height="1em" width="2em">·mod_vmd：提供Voicemail声音检测。在国外，好多电话都有自动应答功能，如“您好，主人不在家，请留言”。使用该模块可检测到这种声音，应用程序在自动外呼时就可以根据它的结果判断是人工接听的还是机器接听的。</p>
+<p height="1em" width="2em">·mod_voicemail：语音邮箱。</p>
+<p height="1em" width="2em">·mod_voicemail_ivr：带IVR导航的语音邮箱。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.asr_tts</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供自动语音识别及语音合成的功能。</p>
+<p height="1em" width="2em">·mod_cepstral：使用Cepstra语音库支持TTS。</p>
+<p height="1em" width="2em">·mod_flite：使用Festival Lite库支持TTS。</p>
+<p height="1em" width="2em">·mod_pocketsphinx：使用pocketsphinx库支持语音识别。</p>
+<p height="1em" width="2em">·mod_tts_commandline：通过命令行程序使用TTS。</p>
+<p height="1em" width="2em">·mod_unimrcp：通过uniMRCP协议与其他ASR/TTS产品对接。uniMRCP是一个标准的协议，很多语音产品都支持它。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.codecs</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块各种类型的音频、视频编码。大多数名称都很直观，这里不再过多解释。</p>
+<p height="1em" width="2em">·mod_amr。</p>
+<p height="1em" width="2em">·mod_amrwb。</p>
+<p height="1em" width="2em">·mod_b64：Base64编码，可以传输任意数据。</p>
+<p height="1em" width="2em">·mod_bv：BroadVoice的编码。</p>
+<p height="1em" width="2em">·mod_celt。</p>
+<p height="1em" width="2em">·mod_codec2。</p>
+<p height="1em" width="2em">·mod_com_g729：商业的G.729编码，可转码，需要许可证。</p>
+<p height="1em" width="2em">·mod_dahdi_codec：通过DAHDI库提供的编码。</p>
+<p height="1em" width="2em">·mod_g723_1。</p>
+<p height="1em" width="2em">·mod_g729：只支持透传。</p>
+<p height="1em" width="2em">·mod_h26x：提供H261，H263，H264等视频编码。</p>
+<p height="1em" width="2em">·mod_ilbc。</p>
+<p height="1em" width="2em">·mod_isac。</p>
+<p height="1em" width="2em">·mod_mp4v。</p>
+<p height="1em" width="2em">·mod_opus。</p>
+<p height="1em" width="2em">·mod_sangoma_codec：通过硬件板卡支持包括G.729、iLBC等多种编码。</p>
+<p height="1em" width="2em">·mod_silk。</p>
+<p height="1em" width="2em">·mod_siren。</p>
+<p height="1em" width="2em">·mod_skel_codec：例子模块。</p>
+<p height="1em" width="2em">·mod_speex。</p>
+<p height="1em" width="2em">·mod_theora。</p>
+<p height="1em" width="2em">·mod_voipcodecs。</p>
+<p height="1em" width="2em">·mod_vp8。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">4.dialplans</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供拨号计划。</p>
+<p height="1em" width="2em">·mod_dialplan_asterisk：类似于Asterisk格式的拨号计划。</p>
+<p height="1em" width="2em">·mod_dialplan_directory：通过LDAP查询拨号计划。</p>
+<p height="1em" width="2em">·mod_dialplan_xml：XML拨号计划。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">5.directories</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供目录服务。</p>
+<p height="1em" width="2em">mod_ldap：通过LDAP提供目录服务。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">6.endpoints</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供各种Endpoint的实现。</p>
+<p height="1em" width="2em">·mod_alsa：使用ALSA声卡。</p>
+<p height="1em" width="2em">·mod_dingaling：连接Google Talk。</p>
+<p height="1em" width="2em">·mod_gsmopen：使用无线上网卡上的GSM接口或使用手机上的GSM接口给外界发短信或与外界通话。</p>
+<p height="1em" width="2em">·mod_h323：连接H.323设备，使用OpenH323库实现。</p>
+<p height="1em" width="2em">·mod_khomp：使用KHOMP板卡。</p>
+<p height="1em" width="2em">·mod_loopback：提供loopback回环接口。</p>
+<p height="1em" width="2em">·mod_opal：连接H.323设备，使用OPAL库实现。</p>
+<p height="1em" width="2em">·mod_portaudio：通过Portaudio库支持本地声卡。</p>
+<p height="1em" width="2em">·mod_rtmp：通过Adobe的RTMP协议与浏览器中的Flash电话进行通话。</p>
+<p height="1em" width="2em">·mod_skinny：支持思科的SCCP协议话机。</p>
+<p height="1em" width="2em">·mod_skypopen：与Skype互通。</p>
+<p height="1em" width="2em">·mod_sofia：SIP模块。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">7.event_handlers</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供事件处理功能。</p>
+<p height="1em" width="2em">·mod_cdr_csv：CSV格式的话单。</p>
+<p height="1em" width="2em">·mod_cdr_mongodb：将话单写入Mongodb。</p>
+<p height="1em" width="2em">·mod_cdr_pg_csv：将话单写入PostgreSQL数据库。</p>
+<p height="1em" width="2em">·mod_cdr_sqlite：将话单写入SQLite数据库。</p>
+<p height="1em" width="2em">·mod_erlang_event：对接Erlang节点，提供事件、日志、命令接口等。</p>
+<p height="1em" width="2em">·mod_event_multicast：将事件通过组播方式发出去。</p>
+<p height="1em" width="2em">·mod_event_socket：通过ESL库与第三方的接口。</p>
+<p height="1em" width="2em">·mod_event_test：测试。</p>
+<p height="1em" width="2em">·mod_event_zmq：使用ZeroMQ协议与第三方对接。</p>
+<p height="1em" width="2em">·mod_json_cdr：JSON格式的CDR。</p>
+<p height="1em" width="2em">·mod_radius_cdr：将CDR写入Radius服务器。</p>
+<p height="1em" width="2em">·mod_rayo：Rayo支持。</p>
+<p height="1em" width="2em">·mod_snmp：SNMP网管接口。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">8.formats</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供各种格式的文件。</p>
+<p height="1em" width="2em">·mod_local_stream：从本地文件生成媒体流。</p>
+<p height="1em" width="2em">·mod_native_file：支持原生文件读写，如直接读写.PCMU或.G729格式的文件。</p>
+<p height="1em" width="2em">·mod_portaudio_stream：使用portaudio库从本地声卡生成媒体流。</p>
+<p height="1em" width="2em">·mod_shell_stream：从Shell命令中生成媒体流。</p>
+<p height="1em" width="2em">·mod_shout：提MP3文件格式支持和远程Shoutcast服务器支持。</p>
+<p height="1em" width="2em">·mod_sndfile：使用libsndfile支持大多数的声音文件。</p>
+<p height="1em" width="2em">·mod_ssml：SSML格式的文件支持。</p>
+<p height="1em" width="2em">·mod_tone_stream：生成铃流音。</p>
+<p height="1em" width="2em">·mod_vlc：使用libvlc提供媒体文件格式的支持。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">9.languages</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供各种嵌入式编码语言接口。</p>
+<p height="1em" width="2em">·mod_java：Java的接口。</p>
+<p height="1em" width="2em">·mod_lua：Lua的接口。</p>
+<p height="1em" width="2em">·mod_managed：微软平台的语言接口，如C#、VB.NET等。</p>
+<p height="1em" width="2em">·mod_perl：Perl的接口。</p>
+<p height="1em" width="2em">·mod_python：Python的接口。</p>
+<p height="1em" width="2em">·mod_spidermonkey：JavaScript的接口。</p>
+<p height="1em" width="2em">·mod_v8：使用V8 Javascript引擎实现的JavaScript模块，可替换mod_spidermonkey。</p>
+<p height="1em" width="2em">·mod_yaml：Yaml的接口。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">10.loggers</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供与日志相关的功能。</p>
+<p height="1em" width="2em">·mod_console：控制台日志。</p>
+<p height="1em" width="2em">·mod_logfile：日志文件。</p>
+<p height="1em" width="2em">·mod_syslog：将日志写到Syslog。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">11.say</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供多语种接口。</p>
+<p height="1em" width="2em">·mod_say_de：德语。</p>
+<p height="1em" width="2em">·mod_say_en：英语。</p>
+<p height="1em" width="2em">·mod_say_es：西班牙语。</p>
+<p height="1em" width="2em">·mod_say_fa：波斯语。</p>
+<p height="1em" width="2em">·mod_say_fr：法语。</p>
+<p height="1em" width="2em">·mod_say_he：希伯来语。</p>
+<p height="1em" width="2em">·mod_say_hr：克罗地亚语。</p>
+<p height="1em" width="2em">·mod_say_hu：匈牙利语。</p>
+<p height="1em" width="2em">·mod_say_it：意大利语。</p>
+<p height="1em" width="2em">·mod_say_ja：日语。</p>
+<p height="1em" width="2em">·mod_say_nl：荷兰语。</p>
+<p height="1em" width="2em">·mod_say_pl：波兰语。</p>
+<p height="1em" width="2em">·mod_say_pt：葡萄牙语。</p>
+<p height="1em" width="2em">·mod_say_ru：俄语。</p>
+<p height="1em" width="2em">·mod_say_th：泰语。</p>
+<p height="1em" width="2em">·mod_say_zh：汉语。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.timers</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供与定时器相关的功能。</p>
+<p height="1em" width="2em">·mod_posix_timer：Posix定时器。</p>
+<p height="1em" width="2em">·mod_timerfd：使用Linux内核中的timerfd定时器。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">13.xml_int</font>
+</font>
+</p>
+<p height="1em" width="2em">该目录下的模块提供XML接口。</p>
+<p height="1em" width="2em">·mod_xml_cdr：使用XML格式写CDR。</p>
+<p height="1em" width="2em">·mod_xml_curl：从远程HTTP服务器获取XML配置。</p>
+<p height="1em" width="2em">·mod_xml_ldap：从远程LDAP服务器获取XML配置。</p>
+<p height="1em" width="2em">·mod_xml_radius：从远程Radius服务器获取XML配置。</p>
+<p height="1em" width="2em">·mod_xml_rpc：使用XMLRPC接口与第三方交互，提供命令、日志及事件接口等。其本身也是一个简单的Web服务器，并提供一个简单的Web管理界面。</p>
+<p height="1em" width="2em">·mod_xml_scgi：使用SCGI协议获取XML配置。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00190.html">
+<font color="#FF6600">[1]</font>
+</a>
+ http://www.soft-switch.org/。</p>
+</body>
+</html>

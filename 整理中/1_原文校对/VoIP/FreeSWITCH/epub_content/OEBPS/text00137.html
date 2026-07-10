@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">16.1　FreeSWITCH中的嵌入式脚本</font>
+</font>
+</p>
+<p height="1em" width="2em">其实前面我们学到的XML Dialplan已经体现了其非凡的配置能力，它配合FreeSWITCH提供的各种App使用时，也可以认为是一种脚本。当然，毕竟XML是一种描述语言，功能还比较有限，为了扩展其功能，FreeSWITCH通过嵌入其他语言的解析器支持很多流行的编程语言。这些语言一般都能提供if...else判断及等循环跳转控制等，因而控制呼叫流程更加灵活。</p>
+<p height="1em" width="2em">一般来说，编程语言分为两种：编译型语言（如C）和解释型语言（如JavaScript、Perl等）。使用解释型语言编写出来的脚本不需要编译，因而非常灵活方便。比较典型的、FreeSWITCH支持的（可嵌入的）语言有 <sup>
+<small>
+<a href="text00138.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ ：</p>
+<p height="1em" width="2em">·Lua</p>
+<p height="1em" width="2em">·JavaScript</p>
+<p height="1em" width="2em">·Python</p>
+<p height="1em" width="2em">·Perl</p>
+<p height="1em" width="2em">·Java</p>
+<p height="1em" width="2em">一般来说，这些嵌入式脚本主要用于编写IVR类的应用，即主要用来控制一路通话的呼叫流程，虽然它们也可以控制多路通话（在后面我们也会讲到这样的例子，但这不是其擅长的）。</p>
+<p height="1em" width="2em">当然，这里说的一路通话不是说它们只能控制唯一一路通话。以Lua为例，你可以把呼叫路由到一个Lua脚本，当有电话进来时，FreeSWITCH会为每一路通话启动一个线程，控制每一路通话的Lua脚本则在相应的线程内执行，互不干扰。Java语言需要Java的虚拟机环境，比Lua要复杂些。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00137.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 其他脚本语言如PHP、Ruby等以前是支持的，由于它们有内存及性能问题，且没有志愿者维护，所以现在已经不支持了。</p>
+</body>
+</html>

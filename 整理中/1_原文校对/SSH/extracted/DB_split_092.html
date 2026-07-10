@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_133"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos524142" class="calibre7"></a>3.8.3 Hash Functions </span></h2>
+</div>
+</div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.8.3.1 CRC-32 </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">The 32-bit Cyclic Redundancy Check (CRC-32)<a shape="rect" class="calibre15"></a><a id="filepos524602" class="calibre15"></a>, defined in ISO 3309,<sup class="calibre20">[<a id="filepos524689" shape="rect" href="DB_split_093.html#filepos533132" class="calibre6">32</a>]</sup> is a noncryptographic hash function for detecting accidental changes to data. The SSH-1 protocol uses CRC-32 (with the polynomial 0xEDB88320) for integrity checking, and this weakness admits the "insertion attack" discussed elsewhere. <a shape="rect" href="DB_split_078.html#filepos422321" class="calibre6">[3.5]</a> The SSH-2 protocol employs cryptographically strong hash functions<a shape="rect" class="calibre15"></a><a id="filepos525153" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos525192" class="calibre15"></a> for integrity checking, obviating this attack. </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.8.3.2 MD5 </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">MD5<a shape="rect" class="calibre15"></a><a id="filepos525614" class="calibre15"></a> ("Message Digest algorithm number 5") is a cryptographically strong, 128-bit hash algorithm designed by Ron Rivest in 1991, one of a series he designed for RSADSI (MD2 through MD5). MD5 is unpatented, placed in the public domain by RSADSI, and documented in RFC-1321. It has been a standard hash algorithm for several years, used in many cryptographic products and standards. A successful collision attack against the MD5 compression function by den Boer and Bosselaers in 1993 caused some concern, and though the attack hasn't resulted in any practical weaknesses, there is an expectation that it will, and people are beginning to avoid MD5 in favor of newer algorithms. RSADSI recommends moving away from MD5 in favor of SHA-1 or RIPEMD-160<a shape="rect" class="calibre15"></a><a id="filepos526395" class="calibre15"></a> for future applications demanding collision-resistance.<sup class="calibre20">[<a id="filepos526516" shape="rect" href="DB_split_093.html#filepos533629" class="calibre6">33</a>]</sup></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.8.3.3 SHA-1 </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">SHA-1 (Secure Hash Algorithm)<a shape="rect" class="calibre15"></a><a id="filepos526975" class="calibre15"></a> was designed by the NSA and the NIST for use with the U.S. government Digital Signature Standard. Like MD5, it was designed as an improvement on MD4, but takes a different approach. It produces 160-bit hashes. There are no known attacks against SHA-1, and, if secure, it is stronger than MD5 simply for its longer hash value. It has replaced MD5 in some applications; for example, SSH-2 uses SHA-1 as its required MAC hash function, as opposed to MD5 in SSH-1.<sup class="calibre20">[<a id="filepos527501" shape="rect" href="DB_split_093.html#filepos534060" class="calibre6">34</a>]</sup></p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>3.8.3.4 RIPEMD-160 </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">Yet another 160-bit MD4 variant, RIPEMD-160, was developed by Hans Dobbertin, Antoon Bosselaers, and Bart Preneel as part of the European Community RIPE project. RIPE stands for RACE Integrity Primitives Evaluation;<sup class="calibre20">[<a id="filepos528178" shape="rect" href="DB_split_093.html#filepos534446" class="calibre6">35</a>]</sup> RACE, in turn, was the program for Research and Development in Advanced Communications Technologies in Europe, an EC-sponsored program which ran from June 1987 to December 1995. RIPE was part of the RACE effort, devoted to studying and developing data integrity techniques. Hence, RIPEMD-160 should be read as "the RIPE Message Digest (160 bits)." In particular, it has nothing to do with RIPEM, an old Privacy-Enhanced Mail (PEM) implementation by Mark Riordan. </p>
+<p class="calibre4">RIPEMD-160 isn't defined in the SSH protocol, but it is used for an implementation-specific MAC algorithm in OpenSSH, under the name <code class="calibre35">
+<span><a href="mailto:hmac-ripemd160@openssh.com" shape="rect" class="calibre6">hmac-ripemd160@openssh.com</a></span>
+</code>. RIPEMD-160 is unpatented and free for all uses. You can read more about it at: </p>
+<table border="0" summary="Simple list" class="calibre26"><span class="calibre9">
+<tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre32"><span class="calibre37"><a href="http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html" shape="rect" class="calibre6">http://www.esat.kuleuven.ac.be/~bosselae/ripemd160.html</a></span></td>
+</tr></span></table></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_312"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1653420" class="calibre7"></a>7.4.14 Data Compression </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH connections may be compressed. That is, data sent over an SSH connection may be compressed automatically before it is encrypted and sent, and automatically uncompressed after it is received and decrypted. If you're running SSH software on fast, modern processors, compression is generally a win. However, it also depends on your network speed, and whether the data you're transferring is already compressed or not (say, a large compressed <span><em class="italic">tar</em></span> file). </p>
+<p class="calibre4">To enable compression for a single session, use command-line options. Unfortunately, the implementations have incompatible syntax. For OpenSSH, compression is disabled by default, and the <span><em class="italic">-C</em></span> command-line option turns it on: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH: turn compression ON<br class="calibre19"/>    $ ssh -C server.example.com<br class="calibre19"/>    $ scp -C myfile server.example.com:</tt></div></span><p class="calibre4">For Tectia, however, <span><em class="italic">-C</em></span> means the opposite, turning compression off: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: turn compression OFF<br class="calibre19"/>    $ ssh -C server.example.com</tt></div></span><p class="calibre4">and <span><em class="italic">+C</em></span> turns it on: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia: turn compression ON<br class="calibre19"/>    $ ssh +C server.example.com</tt></div></span><p class="calibre4">(There is no compression option for Tectia's <span><em class="italic">scp</em></span>.) To enable or disable compression for all sessions, use the <code class="calibre35">Compression</code> keyword, given a value of <code class="calibre35">yes</code> or <code class="calibre35">no</code> (the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    Compression yes</tt></div></span></div>
+</body>
+</html>

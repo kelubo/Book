@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_208"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos920417" class="calibre7"></a>5.3.7 SSH Protocol Settings </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos920576" class="calibre15"></a>OpenSSH lets you limit its protocol support to SSH-1, SSH-2, or both, using the <code class="calibre35">Protocol</code> keyword. Permissible values are <code class="calibre35">1</code> (for SSH-1), <code class="calibre35">2</code> (for SSH-2), or both <code class="calibre35">1</code> and <code class="calibre35">2</code> separated by a comma (the default): </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    Protocol 2,1</tt></div></span><p class="calibre4">If you specify both protocols, the order doesn't matter since the client, not the server, drives the authentication process. And as we've said before, the SSH-1 protocol is less secure and we recommend avoiding it. <a shape="rect" href="DB_split_078.html#filepos422321" class="calibre6">[3.5]</a></p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>5.3.7.1 Protocol version string </h3>
+</div>
+</div>
+</div>
+<p class="calibre4">SSH servers and clients exchange protocol version information as part of their initial negotiations, to agree on a protocol. <a shape="rect" href="DB_split_077.html#filepos408295" class="calibre6">[3.4.4.2]</a> You can see the protocol version string<a shape="rect" class="calibre15"></a><a id="filepos922091" class="calibre15"></a> used by the server by connecting to the SSH port: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ telnet localhost 22<br class="calibre19"/>    Trying 127.0.0.1...<br class="calibre19"/>    Connected to localhost.<br class="calibre19"/>    Escape character is '^]'.<br class="calibre19"/>    SSH-2.0-4.1.3.2 SSH Secure Shell</tt></div></span><p class="calibre4">By default, Tectia servers use a string like "4.1.3.2 SSH Secure Shell" for the comment part (after the second hyphen) of the protocol version. This can be changed using the undocumented <code class="calibre35">ProtocolVersionString</code> keyword: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    ProtocolVersionString Generic SSH Implementation</tt></div></span><p class="calibre4">Port-scanning tools that connect to the SSH port and observe the protocol version string will not see the detailed information about the specific installed version of Tectia if the string is changed: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ telnet localhost 22<br class="calibre19"/>    Trying 127.0.0.1...<br class="calibre19"/>    Connected to localhost.<br class="calibre19"/>    Escape character is '^]'.<br class="calibre19"/>    SSH-2.0-Generic SSH Implementation</tt></div></span><div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4"><code class="calibre35">ProtocolVersionString</code> changes only the comment part of the version string. The initial parts (e.g., SSH-2.0) always specify the protocol(s) that the server is willing to use, according to the SSH protocol standard. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Although an obscured <code class="calibre35">ProtocolVersionString</code> might thwart very simplistic port-scanning tools, in practice it doesn't help much, since many attacks try to exploit bugs regardless of the version string, and determined attackers can probably figure out the implementation by noticing specific behavioral quirks of the server anyway. If the Tectia server is configured to respond to UDP queries by <span><em class="italic">ssh-probe</em></span>
+<a shape="rect" href="DB_split_148.html#filepos871071" class="calibre6">[5.3.3.10]</a>, then it always will respond to such queries with the actual version information, not the changed <code class="calibre35">ProtocolVersionString</code>. Furthermore, changing <code class="calibre35">ProtocolVersionString</code> might prevent workarounds by clients for known server incompatibilities or bugs. </p>
+<p class="calibre4">The OpenSSH server always uses a string like "OpenSSH_3.9p1" for its protocol version string. This cannot be changed except by modifying the source code. </p>
+</div>
+</div>
+</body>
+</html>

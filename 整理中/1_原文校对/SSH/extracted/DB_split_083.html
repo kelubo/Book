@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_122"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos471315" class="calibre7"></a>3.6.4 Randomness </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos471463" class="calibre15"></a>Cryptographic algorithms and protocols require a good source of random bits<span><em class="italic">.</em></span> Randomness is used in various ways: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18">To generate data-encryption keys</li>
+<li class="calibre18">As plaintext padding and initialization vectors in encryption algorithms, to help foil cryptanalysis </li>
+<li class="calibre18">For check-bytes or <span><em class="italic">cookies</em></span> in protocol exchanges, as a measure against packet-spoofing attacks </li>
+</ul></div>
+<p class="calibre4">Randomness is harder to achieve than you might think; in fact, even defining randomness is difficult (or picking the right definition for a given situation). For example, "random" numbers that are perfectly good for statistical modeling might be terrible for cryptography. Each of these applications requires certain properties of its random input, such as an even distribution. Cryptography, in particular, demands <span><em class="italic">unpredictability</em></span>, so an attacker reading our data can't guess our keys. </p>
+<p class="calibre4">True randomness—in the sense of complete unpredictability—can't be produced by a computer program. Any sequence of bits produced as the output of a program eventually repeats itself. For true randomness, you have to turn to physical processes, such as fluid turbulence or the quantum dice of radioactive decay. Even there, you must take great care that measurement artifacts don't introduce unwanted structure. </p>
+<p class="calibre4">There are algorithms, however, that produce long sequences of practically unpredictable output, with good statistical randomness properties. These are good enough for many cryptographic applications, and such algorithms are called <em class="italic">pseudo-random number generators</em>, or <span><em class="italic">PRNGs</em></span>. A PRNG requires a small random input, called the <span><em class="italic">seed</em></span>, so it doesn't always produce the same output. From the seed, the PRNG produces a much larger string of acceptably random output; essentially, it is a randomness "stretcher." So, a program using a PRNG still needs to find some good random bits, just fewer of them, but they had better be quite unpredictable. </p>
+<p class="calibre4">Since various programs require random bits, some operating systems have built-in facilities for providing them. Some Unix variants (including Linux and OpenBSD) have a device driver, accessed through <em class="italic">/dev/random</em> and <em class="italic">/dev/urandom</em>, that provides random bits when opened and read as a file. These bits are derived by all sorts of methods, some quite clever. Correctly filtered timing measurements of disk accesses, for example, can represent the fluctuations due to air turbulence around the drive heads. Another technique is to look at the least significant bits of noise coming from an unused microphone port. And of course, they can track fluctuating events such as network packet arrival times, keyboard events, interrupts, etc. </p>
+<p class="calibre4">SSH implementations make use of randomness, but the process is largely invisible to the end user. Here's what happens under the hood. OpenSSH and Tectia, for example, use a kernel-based randomness source if it is available, along with their own sampling of (one hopes) fluctuating system parameters, gleaned by running such programs as <span><em class="italic">ps</em></span> or <span><em class="italic">netstat</em></span>. It uses these sources to seed its PRNG, as well as to "stir in" more randomness every once in a while. Since it can be expensive to gather randomness, SSH stores its pool of random bits in a file between invocations of the program, as shown in the following table: </p>
+<div class="calibre3">
+<table border="1" class="calibre26"><span class="calibre27">
+<colgroup span="1" class="calibre28"><col span="1" class="calibre29"/><col span="1" class="calibre29"/><col span="1" class="calibre29"/></colgroup><thead class="calibre50"><tr class="calibre31"><th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><span class="bold"> </span></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+OpenSSH</span></p></span></th>
+<th rowspan="1" colspan="1" class="calibre51"><span class="calibre33"><p class="calibre4"><span class="bold">
+Tectia</span></p></span></th>
+</tr></thead><tbody class="calibre30"><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Server</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">/etc/ssh/ssh_random_seed</em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">/etc/ssh2/random_seed</em>
+</p>
+</span></td>
+</tr><tr class="calibre31"><td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Client</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">~/.ssh/random_seed</em>
+</p>
+</span></td>
+<td rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">
+<em class="italic">~/.ssh2/random_seed</em>
+</p>
+</span></td>
+</tr></tbody></span></table></div>
+<p class="calibre4">These files should be kept protected, since they contain sensitive information that can weaken SSH's security if disclosed to an attacker, although SSH takes steps to reduce that possibility. The seed information is always mixed with some new random bits before being used, and only half the pool is ever saved to disk, to reduce its predictive value if stolen. </p>
+<p class="calibre4">In OpenSSH and Tectia, all this happens automatically and invisibly. OpenSSH links against the OpenSSL library and uses its randomness source, a kernel source if available. When building OpenSSH on a platform without <em class="italic">/dev/random</em>, you have a choice. If you have installed an add-on randomness source, such as the Entropy Gathering Daemon (EGD, <a href="http://www.lothar.com/tech/crypto/" shape="rect" class="calibre6">http://www.lothar.com/tech/crypto/</a>), you can compile OpenSSH to use it with the <code class="calibre35">--with-egd-pool</code> compile-time configuration option. Or you can use the OpenSSH entropy-gathering mechanism. You can tailor which programs are run to gather entropy and "how random" they're considered to be, by editing the file <em class="italic">/etc/ssh/ssh_prng_cmds</em>. Also, note that the OpenSSH random seed is kept in the <em class="italic">~/.ssh/prng_seed</em> file, even the daemon's, which is just the root user's seed file. Earlier versions of OpenSSH use this method internally and automatically if there is no <em class="italic">/dev/random</em> and no pool specified. OpenSSH 3.8 and later have the random generator factored into a separate program, <span><em class="italic">ssh-rand-helper</em></span>, selected with the <code class="calibre35">--with-rand-helper</code> compile-time configuration option. </p>
+</div>
+</body>
+</html>

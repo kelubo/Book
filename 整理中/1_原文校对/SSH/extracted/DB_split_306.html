@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_398"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2039356" class="calibre7"></a>9.5.1 TCP-Wrappers Configuration </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2039520" class="calibre15"></a>The access control language for TCP-wrappers has quite a few options and may vary depending on whose package you use and what version it is. We won't cover the language completely in this book. Consult your local documentation for a complete </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2039871" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="TCP-wrappers and SSH configuration (highlighted parts)" src="images/00043.jpg" class="calibre56"/></div>
+</div>
+</span><p class="calibre4">Figure 9-12. TCP-wrappers and SSH configuration (highlighted parts) </p></div>
+<p class="calibre4">understanding: the manpages on <em class="italic">tcpd</em>, <em class="italic">hosts_access</em>, and <em class="italic">hosts_options</em>. We just indicate some simple, common configurations. </p>
+<p class="calibre4">The TCP-wrapper configuration is kept in the files <em class="italic">/etc/hosts.allow</em> and <em class="italic">/etc/hosts.deny.</em> These files contain patterns of the form: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    service_1 [service_2 service_3 ...] : client_1 [client_2 client_3 ...]</tt></div></span><p class="calibre4">Each pattern matches some (server,client) pairs, and hence may match a particular client/server TCP connection. Specifically, a connection between client C and server S matches this rule if some service <span><em class="italic">servicei</em></span> matches S, and some <span><em class="italic">clientj</em></span> matches C. (We explain the format and matching rules for these subpatterns shortly.) The <em class="italic">hosts.allow</em> file is searched first, followed by <em class="italic">hosts.deny</em>. If a matching pattern is found in <em class="italic">hosts.allow</em>, the connection is allowed. If none is found there, but one matches in <em class="italic">hosts.deny</em>, the connection is dropped. Finally, if no patterns match in either file, the connection is allowed. Nonexistence of either file is treated as if the file existed and contained no matching patterns. Note that the default, then, is to allow everything. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos2042182" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="TCP-wrapper (libwrap) operation" src="images/00044.jpg" class="calibre77"/></div>
+</div>
+</span><p class="calibre4">Figure 9-13. TCP-wrapper (libwrap) operation</p></div>
+<p class="calibre4">There is also an extended syntax, documented on the <em class="italic">hosts_options</em> manpage. It may or may not be available, depending on how your TCP-wrapper library was built. It has many more options, but in particular, it allows tagging an individual rule as denying or rejecting a matching connection, for example: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    sshd : bad.host.com : DENY</tt></div></span><p class="calibre4">Using this syntax, you can put all your rules into the <em class="italic">hosts.allow</em> file, rather than having to use both files. To reject anything not explicitly allowed, just put <code class="calibre35">ALL : ALL : DENY</code> at the end of the file. </p>
+<p class="calibre4">In a pattern, each <span><em class="italic">service</em></span> is a name indicating a server to which this pattern applies. SSH recognizes the following service names: </p>
+<div class="calibre3">
+<div class="calibre3"><span><span><em class="italic">sshd</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The main SSH server. This can be <span><em class="italic">sshd</em></span>, <span><em class="italic">sshd1</em></span>, <span><em class="italic">sshd2</em></span>, or whatever name you invoke the daemon under (its <code class="calibre35">argv[0]</code> value, in C-programmer-speak). </div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">sshdfwd-x11</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">The X forwarding port.</div>
+</blockquote>
+<div class="calibre3"><span><span><em class="italic">sshdfwd-N</em></span></span></div>
+<blockquote class="calibre5">
+<div class="calibre19">Forwarded TCP port <span><em class="italic">n</em></span> (e.g., forwarded port 2001 is <code class="calibre35">service sshdfwd-2001</code>). </div>
+</blockquote>
+</div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<div class="calibre3"><span class="calibre24">
+<h3 class="calibre25"><a shape="rect" class="calibre7"></a>Tip </h3>
+<p class="calibre4">The X and port -orwarding control features are available only in Tectia; OpenSSH uses <span><em class="italic">libwrap</em></span> only to control access to the main server. </p>
+</span></div>
+<div class="calibre3">
+<hr class="calibre16"/></div>
+<p class="calibre4">Each <span><em class="italic">client</em></span> is a pattern that matches a connecting client. It can be: </p>
+<div class="calibre3">
+<ul class="calibre17"><li class="calibre18"> An IP address in dotted-quad notation (e.g., 192.168.10.1). </li>
+<li class="calibre18"> A hostname (DNS, or whatever naming services the host is using). </li>
+<li class="calibre18"> An IP network as <em class="italic"><code class="calibre35">network-number</code></em>/<em class="italic"><code class="calibre35">mask</code></em> (e.g., 192.168.10.0/255.255.255.0; note that the "/<em class="italic"><code class="calibre35">n-mask-bits</code></em>" syntax, 192.168.10.0/24, isn't recognized). </li>
+<li class="calibre18"> "ALL", matching any client source address. </li>
+</ul></div>
+<p class="calibre4"><a shape="rect" href="#filepos2046913" class="calibre6">Example 9-1</a> shows a sample <em class="italic">/etc/hosts.allow</em> configuration. This setup allows connections to any service from the local host's loopback address, and from all addresses 192.168.10.x. This host is running publicly available servers for POP and IMAP, so we allow connections to these from anywhere, but SSH clients are restricted to sources in another particular range of networks. </p>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><a id="filepos2046913" class="calibre15"></a><p class="calibre4">Example 9-1. Sample /etc/hosts.allow file</p>
+<div class="calibre3"><span class="calibre27"><div class="calibre3"><tt class="calibre35">#<br class="calibre19"/># /etc/hosts.allow<br class="calibre19"/>#<br class="calibre19"/># network access control for programs invoked by tcpd (see inetd.conf) or<br class="calibre19"/># using libwrap. See the manpages hosts_access(5) and hosts_options(5).<br class="calibre19"/><br class="calibre19"/># allow all connections from my network or localhost (loopback address)<br class="calibre19"/>#<br class="calibre19"/>ALL : 192.168.10.0/255.255.255.0 localhost<br class="calibre19"/><br class="calibre19"/># allow connections to these services from anywhere<br class="calibre19"/>#<br class="calibre19"/>ipop3d imapd : ALL<br class="calibre19"/><br class="calibre19"/># allow SSH connections from these eight class C networks<br class="calibre19"/># 192.168.20.0, 192.168.21.0, ..., 192.168.27.0<br class="calibre19"/>#<br class="calibre19"/>sshd : 192.168.20.0/255.255.248.0<br class="calibre19"/><br class="calibre19"/># allow connections to forwarded port 1234 from host blynken<br class="calibre19"/># Tectia only<br class="calibre19"/>sshdfwd-1234 : blynken.sleepy.net<br class="calibre19"/><br class="calibre19"/># restrict X forwarding access to localhost<br class="calibre19"/># Tectia only<br class="calibre19"/>sshdfwd-x11 : localhost<br class="calibre19"/><br class="calibre19"/># deny everything else<br class="calibre19"/>#<br class="calibre19"/>ALL : ALL : DENY</tt></div></span></div>
+</div>
+<p class="calibre4">We allow connections to the forwarded port 1234 from a particular host, <span><em class="italic">blynken.sleepy.net</em></span>. Note that this host doesn't have to be on any of the networks listed so far but can be anywhere at all. The rules so far say what is allowed, but don't by themselves forbid any connections. So, for example, the forwarding established by the command <span><em class="italic">ssh -L1234:localhost:21 remote</em></span> is accessible only to the local host, since Tectia defaults to binding only the loopback address in any case. But <span><em class="italic">ssh -g -L1234:localhost:21 remote</em></span> is accessible to <span><em class="italic">blynken.sleepy.net</em></span> as well. The important difference is that with this use of TCP-wrappers, <span><em class="italic">sshd</em></span> rejects connections to the forwarded port, 1234, from any other address. </p>
+<p class="calibre4">The <code class="calibre35">sshdfwd-x11</code> line restricts X-forwarding connections to the local host. This means that if <span><em class="italic">ssh</em></span> connects <span><em class="italic">to</em></span> this host with X forwarding, only local X clients can use the forwarded X connection. X authentication does this already, but this configuration provides an extra bit of protection. </p>
+<p class="calibre4">The final line denies any connection that doesn't match the earlier lines, making this a default-to-closed configuration. If you wanted instead to deny some particular connections but allow all others, you would use something like this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ALL : evil.mordor.net : DENY<br class="calibre19"/>    telnetd : completely.horked.edu : DENY<br class="calibre19"/>    ALL : ALL : ALLOW</tt></div></span><p class="calibre4">The final line is technically not required, but it's a good idea to make your intentions explicit. If you don't have the <em class="italic">host_options</em> syntax available, you instead have an empty <em class="italic">hosts.allow</em> file, and the following lines in <em class="italic">hosts.deny</em>: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ALL : evil.mordor.net<br class="calibre19"/>    telnetd : completely.horked.edu</tt></div></span></div>
+</body>
+</html>

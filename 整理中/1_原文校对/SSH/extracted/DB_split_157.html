@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_214"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos956996" class="calibre7"></a>5.4.3 Public-Key Authentication </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos957159" class="calibre15"></a>Public-key authentication verifies a user's identity by cryptographic key. <a shape="rect" href="DB_split_047.html#filepos219814" class="calibre6">[2.4]</a> In OpenSSH, public-key authentication<a shape="rect" class="calibre15"></a><a id="filepos957376" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos957415" class="calibre15"></a>
+<a shape="rect" class="calibre15"></a><a id="filepos957454" class="calibre15"></a> is permitted or forbidden with the <code class="calibre35">PubKeyAuthentication</code> keyword which may have the value <code class="calibre35">yes</code> (the default) or <code class="calibre35">no</code>:<sup class="calibre20">[<a id="filepos957735" shape="rect" href="DB_split_164.html#filepos1006056" class="calibre6">63</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    #  OpenSSH<br class="calibre19"/>    PubKeyAuthentication yes</tt></div></span><p class="calibre4">For Tectia, you allow or require public-key authentication by adding the value <code class="calibre35">publickey</code> to the lists for <code class="calibre35">AllowedAuthentications</code> or <code class="calibre35">RequiredAuthentications</code>, respectively: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AllowedAuthentications publickey</tt></div></span><p class="calibre4">Tectia provides keywords that restrict the minimum and maximum sizes for public keys: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # Tectia<br class="calibre19"/>    AuthPublicKey.MinSize 1024<br class="calibre19"/>    AuthPublicKey.MaxSize 2048</tt></div></span><p class="calibre4">You might want to require a minimum key size for improved security, but reject huge keys because they slow down authentication. A value of zero (the default) disables the key-size checks. </p>
+<p class="calibre4">Public-key authentication is marvelously configurable for most SSH implementations. See <a shape="rect" href="DB_split_265.html#filepos1765155" class="calibre6">Chapter 8</a> for details on tailoring authentication for individual accounts. </p>
+</div>
+</body>
+</html>

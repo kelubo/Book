@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div style="height:0pt" id="filepos1765155"></div><h1 class="calibre1" id="calibre_pb_347"><span class="calibre2"><a shape="rect" class="calibre7"></a>Chapter 8. Per-Account Server Configuration </span></h1>
+<p class="calibre4">We've seen two techniques for controlling the SSH server's behavior globally: compile-time configuration (<a shape="rect" href="DB_split_107.html#filepos564313" class="calibre6">Chapter 4</a>) and serverwide configuration (<a shape="rect" href="DB_split_135.html#filepos724225" class="calibre6">Chapter 5</a>). These techniques affect <span><em class="italic">all</em></span> incoming SSH connections to a given server machine. Now it's time to introduce a third, finer-grained method of server control: <span><em class="italic">per-account configuration</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos1766122" class="calibre15"></a>. </p>
+<p class="calibre4">As the name implies, per-account configuration controls the SSH server differently for each user account on the server machine. For example, a user account sandy can accept incoming SSH connections from any machine on the Internet, while rick permits connections only from the domain <span><em class="italic">verysafe.com</em></span>, and fraidycat refuses key-based connections. Each user configures his own account, using the facilities highlighted in <a shape="rect" href="DB_split_266.html#filepos1768728" class="calibre6">Figure 8-1</a>, without needing special privileges or assistance from the system administrator. </p>
+<p class="calibre4">We have already seen a simple type of per-account configuration. A user may place a public key into her authorization file, instructing the SSH server to permit logins to her account by public-key authentication. But per-account configuration can go further, becoming a powerful tool for access control and playing some fun tricks with your account. Accepting or rejecting connections by particular keys or hosts is just the beginning. For instance, you can make an incoming SSH connection run a program of your choice, instead of the client's choice. This is called a <span><em class="italic">forced command</em></span>, and we'll cover quite a few interesting applications. </p>
+<p class="calibre4">Per-account configuration may control only <span><em class="italic">incoming</em></span> SSH connections to your account. If you're interested in configuring <span><em class="italic">outgoing</em></span> SSH connections by running SSH clients, refer to <a shape="rect" href="DB_split_214.html#filepos1423419" class="calibre6">Chapter 7</a>. </p>
+</body>
+</html>

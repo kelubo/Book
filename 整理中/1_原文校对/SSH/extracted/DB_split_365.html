@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_477"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2494855" class="calibre7"></a>12.1.2 Server Debugging </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2495010" class="calibre15"></a>The OpenSSH and Tectia servers also print debug messages when asked: <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ sshd -d -e<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ sshd -v<br class="calibre19"/>    $ sshd -d <em class="italic"><code class="calibre35">debug_spec</code></em></tt></div></span><p class="calibre4">In either case, the server enters a special debugging mode. It accepts a single connection, operates normally until the connection terminates, and then exits. It doesn't go into the background or create a child process to handle the connection, and it prints information on its progress to the screen (that is, to the standard error stream). </p>
+<p class="calibre4">Tectia has a more complicated system for debugging: numeric debugging levels, specified with the <span><em class="italic">-d</em></span> option, where a higher number means more information. <a shape="rect" href="DB_split_183.html#filepos1137830" class="calibre6">[5.9]</a> In fact, <span><em class="italic">-v</em></span> for verbose mode is actually just a shorthand for <span><em class="italic">-d2</em></span>. At higher debug levels, the output is so huge that only SSH developers will likely find it of use in tracking down obscure problems. But you may need to crank up the level beyond 2 to see the information you need. For example, to have it report which algorithms are negotiated for a connection, use <span><em class="italic">-d3</em></span>. If you get the error message "TCP/IP Failure," turning up to <span><em class="italic">-d5</em></span> shows the more specific OS-level error message returned from the connection attempt. </p>
+<p class="calibre4">When debugging a server, remember to avoid port conflicts with any other running SSH server. Either terminate the other server, or use an alternative port number for debugging via the <code class="calibre35">Port</code> keyword or <span><em class="italic">-p</em></span> option. For example, using OpenSSH syntax, run the server: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ sshd -d -e -p 54321</tt></div></span><p class="calibre4">Then use the <span><em class="italic">-p</em></span> option in the client when testing this debugging instance of the server: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -p 54321 localhost</tt></div></span><p class="calibre4">This way, you don't interrupt or affect another <span><em class="italic">sshd</em></span> in use. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>The Top 10 SSH Questions </h3>
+</div>
+</div>
+</div>
+<div class="calibre3"><a shape="rect" class="calibre15"></a><table border="1" summary="Q and A Set" class="calibre26"><span class="calibre27">
+<col span="1" class="calibre92"/><col span="1" class="calibre29"/><tbody class="calibre30"><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How do I install my public-key file on the remote host for the first time? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Connect by password authentication and use your terminal program's copy and paste feature. <a shape="rect" href="DB_split_368.html#filepos2536020" class="calibre6">[12.2.2.4]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">I put my SSH public-key file, mykey.pub, into my remote SSH directory, but public-key authentication doesn't work. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">The public key must be referenced in your remote authorization file. <a shape="rect" href="DB_split_368.html#filepos2536020" class="calibre6">[12.2.2.4]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Public-key authentication isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use <span><em class="italic">ssh -v</em></span>, and check your keys, files, and permissions. <a shape="rect" href="DB_split_368.html#filepos2536020" class="calibre6">[12.2.2.4]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Password authentication isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use <span><em class="italic">ssh -v</em></span>. There are a variety of possible causes. <a shape="rect" href="DB_split_368.html#filepos2522750" class="calibre6">[12.2.2.2]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Hostbased authentication isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use <span><em class="italic">ssh -v</em></span>. Check your four control files, hostnames, and setuid status of the SSH client program or <span><em class="italic">ssh-signer2</em></span>. <a shape="rect" href="DB_split_368.html#filepos2530810" class="calibre6">[12.2.2.3]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How do I authenticate without typing a password or passphrase? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4"><span><em class="italic">ssh-agent</em></span>, unencrypted keys, trusted-host authentication, or Kerberos. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">How do I secure FTP with port forwarding?</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Forward a local port to port 21 on the FTP server for the control connection; the data connection is much harder. <a shape="rect" href="DB_split_371.html#filepos2617098" class="calibre6">[12.2.5.6]</a> Alternatively, use an SSH client with special support for FTP forwarding, such as Tectia. <a shape="rect" href="DB_split_294.html#filepos1953099" class="calibre6">[9.2.11]</a> Also consider using the SFTP protocol instead of FTP. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">X forwarding isn't working.</p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Don't set your remote <code class="calibre35">DISPLAY</code> variable manually. (And there are other things to check.) <a shape="rect" href="DB_split_371.html#filepos2617098" class="calibre6">[12.2.5.6]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Why don't wildcards or shell variables work on the scp command line? </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Your local shell expands them before <span><em class="italic">scp</em></span> runs. Escape the special characters. <a shape="rect" href="DB_split_371.html#filepos2597098" class="calibre6">[12.2.5.4]</a></p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33"><a shape="rect" class="calibre15"></a><a shape="rect" class="calibre15"></a><p class="calibre4">Q:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A feature of ssh or scp isn't working, but I'm sure I'm using it correctly. </p>
+</span></td>
+</tr><tr class="calibre31"><td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">A:</p>
+</span></td>
+<td valign="top" rowspan="1" colspan="1" border="1" class="calibre52"><span class="calibre33">
+<p class="calibre4">Use <span><em class="italic">ssh -v</em></span>. Also, the system configuration may be overriding your settings. </p>
+</span></td>
+</tr></tbody></span></table></div>
+</div>
+</div>
+<div class="mbppagebreak" id="calibre_pb_478"></div></body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+<head><title></title>
+</head>
+<body>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.2　使用mod_callcenter实现呼叫中心应用</font>
+</font>
+</p>
+<p height="1em" width="2em">上一节讲的fifo只是实现了一些先入先出的呼叫队列，与实际的呼叫中心应用相比，还是显得简单了点。而mod_callcenter从名字上看就是一个与呼叫中心应用有关的模块。它实现的ACD队列更接近于实际的呼叫中心应用。</p>
+<p height="1em" width="2em">对于主叫用户来说，mod_callcenter采用一种基于积分（score）策略的排队算法。用户在队列中每等待一秒，积分就自动加一 <sup>
+<small>
+<a href="text00101.html">
+<font size="2">
+<font color="#FF6600">[1]</font>
+</font>
+</a>
+</small>
+</sup>
+ 。在座席端，它实现了一个多级的梯队，允许具有不同技能的座席通过不同的优先级来对用户提供服务。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.2.1　mod_callcenter模块简介</font>
+</font>
+</p>
+<p height="1em" width="2em">要想深入了解mod_callcenter模块，就要先安装该模块，并了解其涉及的一些基本概念。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.mod_callcenter模块的安装</font>
+</font>
+</p>
+<p height="1em" width="2em">与mod_fifo不同，mod_callcenter模块并不是默认就编译安装的。因而我们首先要编译安装它。跟其他模块的安装方法类似，可以到FreeSWITCH源代码目录中使用以下命令编译安装：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+# make mod_callcenter-install<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后到FreeSWITCH控制台上加载该模块：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; load mod_callcenter<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">如果需要在FreeSWITCH启动时自动加载该模块，则可以编辑conf/autoload_configs/modules.conf.xml，去掉与该模块相关的行的注释，即如下一行：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;load module="mod_callcenter"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.涉及的基本概念</font>
+</font>
+</p>
+<p height="1em" width="2em">mod_callcenter中有以下基本概念：</p>
+<p height="1em" width="2em">·队列（Queue）：用于标志一个队列，呼入的电话会在相关的队列中进行排队。</p>
+<p height="1em" width="2em">·座席（Agent）：座席会事先登录到一个梯队中（后文会讲到），该梯队会与某个队列相关联，当关联的队列中有来话（排队）时，系统会根据一定的策略选择一个空闲的座席为来话客户服务（接听电话）。</p>
+<p height="1em" width="2em">·策略（Strategy）：队列中座席的分配策略，即当队列中有来话时，如何选择一个空闲的座席。该模块实现了以下几种策略。</p>
+<p height="1em" width="2em">·ring-all：选择所有座席。即让所有座席振铃，哪个先接就选择哪个。</p>
+<p height="1em" width="2em">·long-idel-agent：选择空闲时间最长的座席。</p>
+<p height="1em" width="2em">·round-robin：轮循。</p>
+<p height="1em" width="2em">·top-down：按固定的顺序选择。</p>
+<p height="1em" width="2em">·agent-with-least-talk-time：总是选择通话时间最短的座席；</p>
+<p height="1em" width="2em">·agent-with-fewest-calls：总是选择接电话次数最少的座席；</p>
+<p height="1em" width="2em">·sequentially-by-agent-order：根据梯队和顺序选择；</p>
+<p height="1em" width="2em">·random：随机选择。</p>
+<p height="1em" width="2em">·座席状态：一个座席有两个状态标志，分别是Status和States。Status是一个座席逻辑上的状态，它有以下几种取值：</p>
+<p height="1em" width="2em">·Logged Out：退出服务状态。</p>
+<p height="1em" width="2em">·Available：可用状态，可以接电话。</p>
+<p height="1em" width="2em">·Available(On Demand)：一种特殊的可用状态。</p>
+<p height="1em" width="2em">·On Break：座席已登录，但不可以接电话。</p>
+<p height="1em" width="2em">·States是跟电话呼叫有关的状态，它有以下几种取值：</p>
+<p height="1em" width="2em">·Idle：空闲。</p>
+<p height="1em" width="2em">·Waiting：等待接受呼叫。</p>
+<p height="1em" width="2em">·Receiving：正在接受呼叫。</p>
+<p height="1em" width="2em">·In a queue call：当前正在一个队列呼叫中。</p>
+<p height="1em" width="2em">·座席类型：有callback和uuid-standby两种类型。前者是onhook座席，即如果有电话分配到该座席时，FreeSWITCH将会呼叫座席；而后者是offhook座席，即座席需要首先拨入FreeSWITCH建立一个呼叫，当有来话时则可以立即与座席桥接起来。</p>
+<p height="1em" width="2em">·梯队（Tier）：梯队是将队列与座席连接起来的桥梁。另外，它也可以实现多级服务。例如，通过将不同的座席分配到不同的梯队中，可以实现当有电话进来时先连接到普通的座席，有必要时再转到专家座席这样的应用。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">12.2.2　座席配置与管理</font>
+</font>
+</p>
+<p height="1em" width="2em">本小节我们具体介绍座席的配置、管理方法，以帮助大家将前面的所学的知识应用于实践。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">1.静态座席的配置</font>
+</font>
+</p>
+<p height="1em" width="2em">mod_callcenter默认的配置文件是conf/autoload_configs/callcenter.conf.xml，其中配置了一个support@default队列，部分配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;queue name="support@default"&gt;<br/>
+<br/>
+  &lt;param name="strategy" value="longest-idle-agent"/&gt;<br/>
+<br/>
+  &lt;param name="moh-sound" value="$${hold_music}"/&gt;<br/>
+<br/>
+  ...<br/>
+<br/>
+&lt;/queue&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">其中，strategy参数指定了队列的分配方式，它的值（value）longest-idle-agent说明要优先选择等待时间最长的座席分配。其他的参数我们就不多讲了。</p>
+<p height="1em" width="2em">接着，我们来配置一个座席，它的名字是1005@default，配置如下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;agent name="1005@default" type="callback"<br/>
+<br/>
+    contact="[call_timeout=10]user/1005"<br/>
+<br/>
+    status="Available" max-no-answer="3" wrap-up-time="10"<br/>
+<br/>
+    reject-delay-time="10" busy-delay-time="60" /&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">在该座席的配置中，name指定座席的名字，它的值为1005@default，以后都可使用该名字引用这个座席；type指定座席的类型；contact为座席的呼叫字符串，用于在有来话时呼叫该座席；status为座席的初始状态；max-no-answer定义座席呼叫失败的次数，如果超过这个值，则将座席状态设为On Break；reject-delay-time为座席拒接后再次选到该座席的最短时长；busy-delay-time为如果该座席忙，则再次尝试选到该座席的最短时间。</p>
+<p height="1em" width="2em">同理我们可以按上面的例子再增加其他座席配置，如1006@default、1007@default等。</p>
+<p height="1em" width="2em">然后，还需要配置tier，以将座席与队列关联起来。如下面的配置将三个座席与队列support@default关联起来了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;tier agent="1005@default" queue="support@default" level="1" position="1"/&gt;<br/>
+<br/>
+&lt;tier agent="1006@default" queue="support@default" level="1" position="1"/&gt;<br/>
+<br/>
+&lt;tier agent="1007@default" queue="support@default" level="1" position="1"/&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">上述设置完成后，就可以重新加载模块使之生效了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; reload mod_callcenter<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后，当有电话呼叫（或转移）到support时，就可以使用如下的Dialplan将电话转到该callcenter队列中了：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+&lt;extension name="Callcenter Example"&gt;<br/>
+<br/>
+    &lt;condition field="destination_number" expression="^support$"&gt;<br/>
+<br/>
+        &lt;action application="answer"/&gt;<br/>
+<br/>
+        &lt;action application="callcenter" data="support@default"/&gt;<br/>
+<br/>
+    &lt;/condition&gt;<br/>
+<br/>
+&lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">然后callcenter便会根据我们上面设置的规则去呼叫相关的座席。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">2.动态管理队列和座席</font>
+</font>
+</p>
+<p height="1em" width="2em">mod_callcenter提供了一个callcenter_config的API命令，用于管理与该模块相关的各种资源。比如，可以使用如下命令手工将座席签入：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; callcenter_config agent set status 1005@default 'Available'<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，上述的签入命令用于座席已正确配置的基础上。通过把座席的状态变成Available，该座席就准备好接听电话了。</p>
+<p height="1em" width="2em">下列命令将该座席的状态置为Logged Out，因此，就不会再有电话分配到该座席了。</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; callcenter_config agent set status 1005@default 'Logged Out'<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">可以用以下命令列出当前所有的座席：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; callcenter_config agent list<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，如果座席本身没有在配置文件中配置，也可以使用命令添加。比如，下列命令添加一个名字为1007@default的座席：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; callcenter_config agent add 1007@default callback<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">当然，还需要用下列命令给它设置相关的参数，如contact：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; callcenter_config agent set contact 1007@default user/1007<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">也可以用以下命令列出当前的队列：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; callcenter_config queue list<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">或列出当前的梯队：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+freeswitch&gt; callcenter_config tier list<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">类似的命令还有很多，我们就不一一介绍了。当然，这些命令一般不会仅用手工执行。通过Event Socket或XMLRPC等接口调用这些命令，则可以做出很友好的界面，也可以很容易集成到其他业务系统中去。</p>
+<p height="1em" width="0pt" align="left">
+<font size="4">
+<font color="#0468BB">3.offhook座席</font>
+</font>
+</p>
+<p height="1em" width="2em">mod_callcenter也支持offhook座席。该模块的Wiki页面上有一个示例的Dialplan设置，我们把它稍微简化一下：</p>
+<hr width="43%" />
+<blockquote height="1em">
+<blockquote width="0pt">
+<font size="2">
+<tt><br/>
+<br/>
+01 &lt;extension&gt;<br/>
+<br/>
+02   &lt;condition field="destination_number" expression="^(4099)$"&gt;<br/>
+<br/>
+03     &lt;action application="set" data="transfer_after_bridge=4099"/&gt;<br/>
+<br/>
+04     &lt;action application="sleep" data="300"/&gt;<br/>
+<br/>
+05     &lt;action application="set"<br/>
+<br/>
+          data="r=${callcenter_config(agent set uuid ${caller_id_number}@default '${uuid}')}"/&gt;<br/>
+<br/>
+06     &lt;action application="set"<br/>
+<br/>
+          data="r=${callcenter_config(agent set type ${caller_id_number}@default 'uuid-standby')}"/&gt;<br/>
+<br/>
+07     &lt;action application="set"<br/>
+<br/>
+          data="r=${callcenter_config(agent 10 set status ${caller_id_number}@default 'Available (On Demand)')}"/&gt;<br/>
+<br/>
+08     &lt;action application="set"<br/>
+<br/>
+          data="r=${callcenter_config(agent set state ${caller_id_number}@default 'Waiting')}"/&gt;<br/>
+<br/>
+09     &lt;action application="set"<br/>
+<br/>
+          data="cc_warning_tone=tone_stream://%(15 200,0,500,600,700)"/&gt;<br/>
+<br/>
+10     &lt;action application="answer" /&gt;<br/>
+<br/>
+11     &lt;action application="playback" data="$${hold_music}"/&gt;<br/>
+<br/>
+12   &lt;/condition&gt;<br/>
+<br/>
+13 &lt;/extension&gt;<br/>
+<br/>
+</tt>
+</font>
+</blockquote>
+</blockquote>
+<hr width="43%" />
+<p height="1em" width="2em">为了便于讲解，我们增加了行号。如果座席呼叫4099，则会匹配到第2行，并进入该Dialplan；第3行设置transfer_after_bridge参数，当该座席与来电通话（bridge）完毕后，会再转到4099上，重新等待；第4行加了一个sleep，防止执行得太快；第5行执行set，通过${API(...)}的方式调用callcenter_config API命令，它将设置本座席的uuid参数为当前Channel的UUID；第6行将该座席的类型设为uuid-standby，表示如果有来话就不需要呼叫该座席了，而直接找到前面设置的座席的uuid直接将来话和座席的Channel桥接（bridge）到一起就可以了；第7行设置座席的状态（Status）为可用状态；第8行设置座席的呼叫状态（State）；第9行通过通道变量cc_warning_tone设置一个铃音，当有电话进来时，将向座席播放该铃音；第10行应答；第11行则播放保持音乐。</p>
+<p height="1em" width="2em">至此座席就一直在听音乐，直到有新的电话进来。</p>
+<p height="1em" width="2em">除了上面介绍的参数外，mod_callcenter还有好多配置参数，以及好多可用的命令可以配置不同的队列和运行方式。另外，有一些以cc_开头的通道变量（如上面我们讲到的cc_warning_tone）也会在某些时候发生作用。关于这些，读者可以多参考该模块的Wiki页面，在这里我们就不一一列举了。</p>
+<p height="1em" width="2em">mod_callcenter在排队及电话分配的各个阶段都会产生一些事件，允许第三方的开发者通过Event Socket等接口监控队列的行为，并进行各种集成——如可以在Web界面上实时显示队列及座席的状态，将状态变化写入数据库供以后产生报表等。当然，要做成一个好的应用前端的开发，工作量还是不小的。</p>
+<p height="1em" width="2em">该模块提供的功能与FreeSWITCH中其他的模块功能相比，属于更偏上层（应用）的功能。一般来说类似这种功能的应用大家都是使用Event Socket等接口在外部进行开发，但若在FreeSWITCH内部开发则明显控制力更强一些。当然，不管是在内部开发还是外部开发，对于类似呼叫中心的应用，本模块的一些概念和业务逻辑都是很有参考价值的。</p>
+<p height="1em" width="0pt" align="justify">
+<a href="text00100.html">
+<font color="#FF6600">[1]</font>
+</a>
+ 也可以通过人工干预积分的方式来改变主叫用户在队列中的位置。</p>
+</body>
+</html>

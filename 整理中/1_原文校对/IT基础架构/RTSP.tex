@@ -1,0 +1,141 @@
+% RTSP协议
+% RTSP.tex
+
+\documentclass[12pt,UTF8]{ctexbook}
+
+% 设置纸张信息。
+\input{../../../common/page}
+
+% 设置字体，并解决显示难检字问题。
+\xeCJKsetup{AutoFallBack=true}
+% 注意：ctexbook类已默认设置SimSun为CJKrmdefault
+% 以下设置用于确保字体回退和扩展字体可用
+% 仅设置扩展字体以避免与默认设置冲突
+\setCJKfamilyfont{hei}{SimHei}
+\setCJKfamilyfont{kai}{KaiTi}
+
+% 目录 chapter 级别加点（.）。
+\usepackage{titletoc}
+\titlecontents{chapter}[0pt]{\vspace{3mm}\bf\addvspace{2pt}\filright}{\contentspush{\thecontentslabel\hspace{0.8em}}}{}{\titlerule*[8pt]{.}\contentspage}
+
+% 设置 part 和 chapter 标题格式。
+\ctexset{
+chapter/name={第,章},
+chapter/number={\arabic{chapter}}
+}
+
+% 图片相关设置。
+\usepackage{graphicx}
+\graphicspath{{Images/}}
+
+% 设置署名格式。
+\newenvironment{shuming}{\hfill\zihao{4}}
+
+% 注脚每页重新编号，避免编号过大。
+\usepackage[perpage]{footmisc}
+
+\title{\heiti\zihao{0} RTSP协议详解}
+\author{佚名}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\frontmatter
+
+\mainmatter
+
+\chapter{RTSP协议概述}
+
+RTSP（Real-Time Streaming Protocol，实时流协议）是一种用于控制流媒体服务器的网络协议，主要用于建立和管理实时媒体会话。
+
+\section{基本概念}
+
+\begin{itemize}
+  \item \textbf{定义}：RTSP是由IETF（互联网工程任务组）制定的应用层协议，用于在客户端和流媒体服务器之间建立、控制和终止实时媒体会话。
+  \item \textbf{端口}：默认使用554端口
+  \item \textbf{传输层}：通常基于TCP协议，确保可靠传输
+\end{itemize}
+
+\section{主要功能}
+
+\begin{enumerate}
+  \item \textbf{媒体控制}：允许客户端远程控制媒体流的播放、暂停、快进、快退等操作
+  \item \textbf{会话管理}：建立和维护客户端与服务器之间的媒体会话
+  \item \textbf{媒体协商}：协商媒体类型、编码格式、传输协议等参数
+  \item \textbf{重定向}：支持媒体流的重定向，实现负载均衡
+\end{enumerate}
+
+\chapter{工作原理}
+
+\section{工作流程}
+
+\begin{enumerate}
+  \item \textbf{建立连接}：客户端与服务器建立TCP连接
+  \item \textbf{发送命令}：客户端发送控制命令（如DESCRIBE、SETUP、PLAY等）
+  \item \textbf{服务器响应}：服务器根据命令执行相应操作并返回响应
+  \item \textbf{媒体传输}：实际的媒体数据通常通过RTP（实时传输协议）在UDP上传输，而RTSP仅负责控制
+\end{enumerate}
+
+\section{典型命令}
+
+\begin{itemize}
+  \item \textbf{DESCRIBE}：获取媒体流的描述信息
+  \item \textbf{SETUP}：建立媒体传输通道
+  \item \textbf{PLAY}：开始播放媒体流
+  \item \textbf{PAUSE}：暂停播放
+  \item \textbf{TEARDOWN}：终止会话
+\end{itemize}
+
+\chapter{与其他协议的区别}
+
+\section{RTSP vs HTTP}
+
+RTSP是状态ful协议，支持双向通信和远程控制；HTTP是无状态协议，主要用于单向数据传输
+
+\section{RTSP vs RTP}
+
+RTSP负责控制，RTP负责实际媒体数据的传输
+
+\section{RTSP vs HLS}
+
+RTSP是实时性更好的协议，适合低延迟场景；HLS是基于HTTP的分段流媒体协议，延迟较高但兼容性更好
+
+\chapter{应用场景}
+
+\begin{itemize}
+  \item \textbf{视频监控}：监控摄像头与NVR（网络视频录像机）之间的通信
+  \item \textbf{IPTV}：交互式网络电视的直播流控制
+  \item \textbf{视频会议}：实时视频会议系统的媒体控制
+  \item \textbf{在线直播}：需要低延迟控制的直播场景
+\end{itemize}
+
+\chapter{优缺点}
+
+\section{优点}
+
+\begin{itemize}
+  \item 实时性好，延迟低
+  \item 支持精细的媒体控制
+  \item 协议简洁，易于实现
+\end{itemize}
+
+\section{缺点}
+
+\begin{itemize}
+  \item 穿透防火墙能力较弱
+  \item 移动网络环境下稳定性较差
+  \item 不如HLS等基于HTTP的协议普及
+\end{itemize}
+
+\chapter{实际应用}
+
+在视频监控系统中，摄像头通常提供RTSP流，NVR或客户端软件通过RTSP协议连接摄像头，获取实时视频流并进行控制。例如，使用VLC播放器可以通过RTSP URL（如\verb|rtsp://192.168.1.100:554/stream1|）直接观看摄像头的实时画面。
+
+RTSP是实时流媒体领域的重要协议，尤其在需要低延迟控制的场景中发挥着关键作用。
+
+\backmatter
+
+\end{document}

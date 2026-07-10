@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_456"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos2278738" class="calibre7"></a>11.4.4 SSH-in-SSH with a Proxy Command (OpenSSH) </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos2278918" class="calibre15"></a>Here's yet another way to implement the tunneled SSH technique: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.ssh/config on client C<br class="calibre19"/>    Host S<br class="calibre19"/>      ProxyCommand "ssh -qax G nc S 22"</tt></div></span><p class="calibre4">If a <code class="calibre35">ProxyCommand</code> value is set, OpenSSH uses this command to get a communication channel to the remote host, rather than using the network directly. The command, in turn, can do anything at all—it could connect to an SSH server at the other end of a serial line, for example! In this case, we actually use a second <span><em class="italic">ssh</em></span> command to connect through gateway G to the SSH server TCP port on server S. The trick is that we really want a kind of connection that OpenSSH doesn't provide. Ideally, we'd like to be able to say something like <span><em class="italic">ssh --tcp S:22 G</em></span> (note: this syntax does not currently exist), the meaning of which would be: "connect to G via SSH, instruct G to make a TCP connection to host S port 22, and connect the local stdin/stdout to that stream." Making remote TCP connections is already something <span><em class="italic">sshd</em></span> can do; that's how local TCP forwarding is done. Unfortunately, no SSH clients we know of provide this useful feature. So, we must have a separate program on G, which just makes a simple TCP connection for us; here, we use <span><em class="italic">netcat (nc)</em></span>. </p>
+<p class="calibre4">Expanding on this a bit...instead of a single host on the other side of the gateway, suppose you have many you want to access. If their names follow a pattern, you may be able to express this behavior very succinctly using OpenSSH. Suppose the machines in question are a cluster with hostnames beowulf-1, beowulf-1, etc. Then you can use this: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # ~/.ssh/config on client C<br class="calibre19"/>    Host beowulf-*<br class="calibre19"/>      ProxyCommand "ssh -qax G nc %h %p"</tt></div></span><p class="calibre4">This <code class="calibre35">Host</code> directive will match any of the cluster hostnames, and use an <span><em class="italic">ssh</em></span> subprocess to reach the host in question through the gateway: OpenSSH substitutes the <code class="calibre35">%h</code> and <code class="calibre35">%p</code> in the <code class="calibre35">ProxyCommand</code> with the host and port to use. </p>
+<p class="calibre4">The <code class="calibre35">ProxyCommand</code> technique is simpler than port forwarding: there's no extra SSH command to start separately and no ad hoc port numbers to coordinate and possibly have to change. It also gains in security, since port forwarding always has the problem of unauthenticated access to the forwarded connection. And, we need no <code class="calibre35">HostKeyAlias</code> statements. However, we lose the speed advantage gained over chained <span><em class="italic">ssh</em></span> commands, since once again we end up waiting for two SSH connections every time. A compromise approach would be to use the <code class="calibre35">ProxyCommand</code> method together with an OpenSSH connection server. <a shape="rect" href="DB_split_225.html#filepos1539841" class="calibre6">[7.4.4.2]</a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+	<title>SSH, the Secure Shell, 2nd Edition</title>
+	<meta content="http://www.w3.org/1999/xhtml; charset=utf-8" http-equiv="Content-Type"/><link href="stylesheet.css" type="text/css" rel="stylesheet"/><style type="text/css">
+		@page { margin-bottom: 5.000000pt; margin-top: 5.000000pt; }</style></head>
+  <body class="calibre">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h2 class="calibre21" id="calibre_pb_272"><span class="calibre22"><a shape="rect" class="calibre7"></a><a id="filepos1377375" class="calibre7"></a>6.3.5 Agent Forwarding </span></h2>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1377529" class="calibre15"></a>So far, our SSH clients have conversed with an SSH agent on the same machine. Using a feature called <span><em class="italic">agent forwarding</em></span>
+<a shape="rect" class="calibre15"></a><a id="filepos1377749" class="calibre15"></a>, clients can also communicate with agents on remote machines. This is both a convenience feature—permitting your clients on multiple machines to work with a single agent—and a means for avoiding some firewall-related problems. </p>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>6.3.5.1 A firewall example </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1378356" class="calibre15"></a>Suppose you want to connect from your home computer, H, to a computer at work, W. Like many corporate computers, W is behind a network firewall and not directly accessible from the Internet, so you can't create an SSH connection from H to W. Hmm...what can you do? You call technical support and for once, they have good news. They say that your company maintains a gateway or "bastion" host, B, that is accessible from the Internet and runs an SSH server. This means you <span><em class="italic">should</em></span> be able to reach W by opening an SSH connection from H to B, and then from B to W, since the firewall permits SSH traffic. Tech support gives you an account on the bastion host<a shape="rect" class="calibre15"></a><a id="filepos1379113" class="calibre15"></a> B, and the problem seems to be solved...or is it? </p>
+<p class="calibre4">For security reasons, the company permits access to its computers only by public-key authentication. So, using your private key on home machine H, you successfully connect to bastion host B. And now you run into a roadblock: also for security reasons, the company prohibits users from storing SSH keys on the exposed bastion host B, since they can be stolen if B is hacked. That's bad news, since the SSH client on B needs a key to connect to your work account on W. Your key is at home on H. (<a shape="rect" href="#filepos1379965" class="calibre6">Figure 6-5</a> illustrates the problem.) What now? Use SSH agent forwarding. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1379965" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Bastion host scenario" src="images/00024.jpg" class="calibre65"/></div>
+</div>
+</span><p class="calibre4">Figure 6-5. Bastion host scenario</p></div>
+<p class="calibre4">SSH agent forwarding allows a program running on a remote host, such as B, to access your <span><em class="italic">ssh-agent</em></span> on H transparently, as if the agent were running on B. Thus, a remote SSH client running on <span><em class="italic">B</em></span> can now sign and decrypt data using your key on H, as shown in <a shape="rect" href="#filepos1381010" class="calibre6">Figure 6-6</a>. As a result, you can invoke an SSH session from B to your work machine W, solving the problem. </p>
+<div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1381010" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Solution with SSH agent forwarding" src="images/00025.jpg" class="calibre61"/></div>
+</div>
+</span><p class="calibre4">Figure 6-6. Solution with SSH agent forwarding</p></div>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a>6.3.5.2 How agent forwarding works </h3>
+</div>
+</div>
+</div>
+<p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1381749" class="calibre15"></a>Agent forwarding, like all SSH forwarding (<a shape="rect" href="DB_split_281.html#filepos1865367" class="calibre6">Chapter 9</a>), works "behind the scenes." In this case, the key-related requests of an SSH client are forwarded across a separate, previously established SSH session to an agent holding the needed keys, shown in <a shape="rect" href="#filepos1383823" class="calibre6">Figure 6-7</a>. Let's examine in detail the steps that occur. </p>
+<div class="calibre3">
+<ol class="calibre41"><li value="1" class="calibre18">Suppose you're logged onto machine X, and you invoke ssh to establish a remote terminal session on machine Y.<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # On machine X:<br class="calibre19"/>    $ ssh Y</tt></div></span></li>
+<li value="2" class="calibre18">Assuming that agent forwarding is turned on, the client says to the SSH server, "I would like to request agent forwarding, please," when establishing the connection. </li>
+<li value="3" class="calibre18"><span><em class="italic">sshd</em></span> on machine <code class="calibre35">Y</code> checks its configuration to see if it permits agent forwarding. Let's assume that it's enabled. </li>
+<li value="4" class="calibre18"><span><em class="italic">sshd</em></span> on machine Y sets up an interprocess communication (IPC) channel local to Y by creating some Unix domain sockets and setting some environment variables. <a shape="rect" href="DB_split_201.html#filepos1318422" class="calibre6">[6.3.2.1]</a> The resulting IPC mechanism is just like the one <span><em class="italic">ssh-agent</em></span> sets up. As a result, <span><em class="italic">sshd</em></span> is now prepared to pose as an SSH agent. </li>
+<li value="5" class="calibre18">Your SSH session is now established between X and Y. <div class="calibre19"><span class="italic"><a shape="rect" class="calibre15"></a><a id="filepos1383823" class="calibre15"></a><div class="calibre3">
+<div class="calibre3"><a shape="rect" class="calibre15"></a><img alt="Agent forwarding" src="images/00026.jpg" class="calibre48"/></div>
+</div>
+</span><p class="calibre4">Figure 6-7. Agent forwarding</p></div>
+</li>
+<li value="6" class="calibre18">Next, from machine Y, you run another <span><em class="italic">ssh</em></span> command to establish an SSH session with a third machine, Z:<a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # On machine Y:<br class="calibre19"/>    $ ssh Z</tt></div></span></li>
+<li value="7" class="calibre18">This new <span><em class="italic">ssh</em></span> client now needs a key to make the connection to Z. It believes there's an agent running on machine Y, because <span><em class="italic">sshd</em></span> on Y is posing as one. So, the client makes an authentication request over the agent IPC channel. </li>
+<li value="8" class="calibre18"><span><em class="italic">sshd</em></span> intercepts the request, masquerading as an agent, and says, "Hello, I'm the agent. What would you like to do?" The process is transparent: the client believes it's talking to an agent. </li>
+<li value="9" class="calibre18"><span><em class="italic">sshd</em></span> then forwards the agent-related request back to the original machine, X, over the secure connection between X and Y. The agent on machine X receives the request and accesses your local key, and its response is forwarded back to <span><em class="italic">sshd</em></span> on machine <span><em class="italic">
+<code class="calibre35">Y</code>
+</em></span>. </li>
+<li value="10" class="calibre18"><span><em class="italic">sshd</em></span> on Y passes the response on to the client, and the connection to machine Z proceeds. </li>
+</ol></div>
+<p class="calibre4">Thanks to agent forwarding, you have transparent access from machine Y to any SSH keys back on machine X. Thus, any SSH clients on Y can access any hosts permitted by your keys on X. To test this, run this command on machine Y to list your keys: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # On machine Y:<br class="calibre19"/>    $ ssh-add -l</tt></div></span><p class="calibre4">You see all keys that are loaded in your agent on machine <span><em class="italic">X</em></span>. </p>
+<p class="calibre4">It's worth noting that the agent-forwarding relationship is transitive: if you repeat this process, making a chain of SSH connections from machine to machine, then clients on the final host still have access to your keys on the first host (X). (This assumes agent forwarding is permitted by <span><em class="italic">sshd</em></span> on each intermediate host.) </p>
+</div>
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<div class="calibre3">
+<h3 class="calibre14"><a shape="rect" class="calibre7"></a><a id="filepos1387315" class="calibre7"></a>6.3.5.3 Enabling agent forwarding </h3>
+</div>
+</div>
+</div><a shape="rect" class="calibre15"></a><a id="filepos1387413" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1387451" class="calibre15"></a><a shape="rect" class="calibre15"></a><a id="filepos1387489" class="calibre15"></a><p class="calibre4"><a shape="rect" class="calibre15"></a><a id="filepos1387586" class="calibre15"></a>Before an SSH client can take advantage of agent forwarding, the feature must be turned on. SSH implementations vary in their default settings of this feature, and of course the system administrator can change it. If necessary, you can turn it on manually with the configuration keyword <code class="calibre35">ForwardAgent</code> in the client configuration file <em class="italic">~/.ssh/config</em>, giving a value of <code class="calibre35">yes</code> (the default) or <code class="calibre35">no</code>:<sup class="calibre20">[<a id="filepos1388173" shape="rect" href="DB_split_206.html#filepos1397339" class="calibre6">100</a>]</sup></p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    ForwardAgent yes</tt></div></span><p class="calibre4">Likewise, you can use command-line options. In addition to the <span><em class="italic">-o</em></span> command-line option, which accepts any configuration keyword and its value: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -o "ForwardAgent yes" ...</tt></div></span><p class="calibre4"><span><em class="italic">ssh</em></span> accepts command-line options to turn on agent forwarding, even though it's on by default: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    # OpenSSH<br class="calibre19"/>    $ ssh -A ...<br class="calibre19"/><br class="calibre19"/>    # Tectia<br class="calibre19"/>    $ ssh +a ...</tt></div></span><p class="calibre4">The option <span><em class="italic">-a</em></span> turns off agent forwarding: </p><a shape="rect" class="calibre15"></a><span class="calibre27"><div class="calibre3"><tt class="calibre35">    $ ssh -a ...</tt></div></span></div>
+</div>
+</body>
+</html>
