@@ -29,7 +29,103 @@
     \item \textbf{波长与频率关系}：$\lambda = \frac{c}{f}$，其中$\lambda$为波长，$c$为光速，$f$为频率
 \end{itemize}
 
-无线电波根据频率可分为多个波段：长波、中波、短波、超短波和微波。不同波段的无线电波具有不同的传播特性和应用场景。
+无线电波根据频率可分为多个波段，不同波段的无线电波具有不同的传播特性和应用场景。
+
+\subsection{波段分类}
+\label{sec:wave_bands}
+
+无线电波的波段划分如下表所示：
+
+\begin{table}[htbp]
+    \centering
+    \caption{无线电波波段划分}
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        \textbf{波段名称} & \textbf{频率范围} & \textbf{波长范围} & \textbf{传播方式} & \textbf{主要应用} \\
+        \hline
+        极低频（ELF） & 3Hz-3kHz & 100000km-100km & 地波 & 水下通信、地震研究 \\
+        \hline
+        甚低频（VLF） & 3kHz-30kHz & 100km-10km & 地波 & 导航、水下通信 \\
+        \hline
+        低频（LF） & 30kHz-300kHz & 10km-1km & 地波 & 长波广播、导航 \\
+        \hline
+        中频（MF） & 300kHz-3MHz & 1km-100m & 地波+天波 & 中波广播、海事通信 \\
+        \hline
+        高频（HF） & 3MHz-30MHz & 100m-10m & 天波为主 & 短波广播、业余无线电 \\
+        \hline
+        甚高频（VHF） & 30MHz-300MHz & 10m-1m & 视距传播 & FM广播、电视、航空通信 \\
+        \hline
+        特高频（UHF） & 300MHz-3GHz & 1m-10cm & 视距传播 & 电视、移动通信、卫星通信 \\
+        \hline
+        超高频（SHF） & 3GHz-30GHz & 10cm-1cm & 视距传播 & 微波通信、卫星通信、雷达 \\
+        \hline
+        极高频（EHF） & 30GHz-300GHz & 1cm-1mm & 视距传播 & 毫米波通信、射电天文 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{各波段特性详解}
+\label{sec:band_characteristics}
+
+\subsubsection{长波（LF）}
+\label{sec:long_wave}
+
+长波的频率范围为30kHz-300kHz，波长为1km-10km。
+
+\begin{itemize}
+    \item \textbf{传播特性}：主要通过地波传播，绕射能力强，能绕过障碍物
+    \item \textbf{优点}：传播稳定、受天气影响小
+    \item \textbf{缺点}：需要较大的天线、传输速率低
+    \item \textbf{应用}：长波广播、无线电导航（如罗兰导航系统）
+\end{itemize}
+
+\subsubsection{中波（MF）}
+\label{sec:medium_wave}
+
+中波的频率范围为300kHz-3MHz，波长为100m-1km。
+
+\begin{itemize}
+    \item \textbf{传播特性}：白天主要通过地波传播，晚上天波传播增强
+    \item \textbf{优点}：传播距离适中、设备相对简单
+    \item \textbf{缺点}：易受干扰、夜间接收效果变化较大
+    \item \textbf{应用}：中波广播（AM广播）、海事通信
+\end{itemize}
+
+\subsubsection{短波（HF）}
+\label{sec:short_wave}
+
+短波的频率范围为3MHz-30MHz，波长为10m-100m。
+
+\begin{itemize}
+    \item \textbf{传播特性}：主要通过天波传播，利用电离层反射实现远距离传播
+    \item \textbf{优点}：传播距离远、设备相对简单
+    \item \textbf{缺点}：信号不稳定、受电离层变化影响大
+    \item \textbf{应用}：短波广播、业余无线电、国际通信
+\end{itemize}
+
+\subsubsection{超短波（VHF/UHF）}
+\label{sec:ultra_short_wave}
+
+超短波包括甚高频（VHF，30MHz-300MHz）和特高频（UHF，300MHz-3GHz）。
+
+\begin{itemize}
+    \item \textbf{传播特性}：主要通过视距传播，绕射能力弱
+    \item \textbf{优点}：带宽宽、传输速率高、抗干扰能力强
+    \item \textbf{缺点}：传播距离有限、需要较高的天线位置
+    \item \textbf{应用}：FM广播、电视广播、移动通信、航空通信
+\end{itemize}
+
+\subsubsection{微波（SHF/EHF）}
+\label{sec:microwave}
+
+微波包括超高频（SHF，3GHz-30GHz）和极高频（EHF，30GHz-300GHz）。
+
+\begin{itemize}
+    \item \textbf{传播特性}：直线传播，需要视距条件，可穿透电离层
+    \item \textbf{优点}：带宽极宽、传输速率极高
+    \item \textbf{缺点}：传播距离短、易受天气影响（如雨雪衰减）
+    \item \textbf{应用}：微波通信、卫星通信、雷达、射电天文
+\end{itemize}
 
 \section{调制与解调}
 \label{sec:modulation_demodulation}
@@ -64,7 +160,85 @@
     \item 匹配的阻抗
 \end{itemize}
 
-常用天线类型包括：偶极天线、垂直天线、环形天线、抛物面天线等。天线的增益用分贝（dB）表示。
+常用天线类型包括：偶极天线、垂直天线、环形天线、抛物面天线等。
+
+\subsection{天线增益}
+\label{sec:antenna_gain_intro}
+
+天线增益是衡量天线将能量集中在特定方向上的能力，是天线最重要的性能参数之一。
+
+\subsubsection{什么是增益}
+\label{sec:what_is_gain}
+
+增益表示天线在最大辐射方向上的辐射功率与一个理想的各向同性辐射器（在所有方向上均匀辐射的天线）在相同输入功率下的辐射功率之比。
+
+\begin{itemize}
+    \item \textbf{各向同性辐射器}：一个假想的天线，在所有方向上均匀辐射能量，其增益为0dB
+    \item \textbf{增益的意义}：增益越高，说明天线在特定方向上的辐射或接收能力越强
+\end{itemize}
+
+\subsubsection{增益的计算}
+\label{sec:gain_calculation}
+
+增益通常用分贝（dB）表示，计算公式为：
+
+\[ G(dB) = 10\log\left(\frac{P_{max}}{P_{avg}}\right) \]
+
+其中，$P_{max}$为天线在最大辐射方向上的功率密度，$P_{avg}$为各向同性辐射器在相同距离处的功率密度。
+
+对于一个效率为$\eta$、方向性系数为$D$的天线，其增益为：
+
+\[ G = \eta \cdot D \]
+
+\subsubsection{增益与方向性的关系}
+\label{sec:gain_direction}
+
+增益与天线的方向性密切相关：
+
+\begin{itemize}
+    \item \textbf{全向天线}：在各个方向上均匀辐射，方向性系数$D=1$，增益较低（约0dB）
+    \item \textbf{定向天线}：将能量集中在特定方向上，方向性系数$D>1$，增益较高
+\end{itemize}
+
+\subsubsection{常见天线的增益参考}
+\label{sec:gain_reference}
+
+\begin{table}[htbp]
+    \centering
+    \caption{常见天线的增益参考}
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{天线类型} & \textbf{典型增益（dBi）} \\
+        \hline
+        各向同性辐射器 & 0 \\
+        \hline
+        半波偶极天线 & 2.15 \\
+        \hline
+        垂直天线（四分之一波长） & 2-5 \\
+        \hline
+        八木天线（3单元） & 7-10 \\
+        \hline
+        八木天线（5单元） & 10-12 \\
+        \hline
+        抛物面天线（1米直径） & 20-30 \\
+        \hline
+        对数周期天线 & 6-12 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{增益的实际意义}
+\label{sec:gain_practical}
+
+增益的实际意义在于：
+
+\begin{itemize}
+    \item \textbf{发射时}：增益越高，在相同功率下，信号能传输更远的距离
+    \item \textbf{接收时}：增益越高，能接收更远距离的微弱信号
+    \item \textbf{通信距离}：增益每增加3dB，通信距离约增加41\%
+\end{itemize}
+
+需要注意的是，增益是一个相对值，它表示的是天线在特定方向上相对于各向同性辐射器的性能提升。
 
 \section{传输线理论}
 \label{sec:transmission_line}
