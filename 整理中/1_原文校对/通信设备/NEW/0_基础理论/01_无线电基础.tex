@@ -12,12 +12,6 @@
 % ├── \section{调制与解调}
 % ├── \section{谐振与调谐}
 % ├── \section{天线基础}
-% │   └── \subsection{天线增益}
-% │       ├── \subsubsection{什么是增益}
-% │       ├── \subsubsection{增益的计算}
-% │       ├── \subsubsection{增益与方向性的关系}
-% │       ├── \subsubsection{常见天线的增益参考}
-% │       └── \subsubsection{增益的实际意义}
 % ├── \section{传输线理论}
 % ├── \section{电波传播}
 % └── \section{噪声与干扰}
@@ -152,139 +146,14 @@
 \section{谐振与调谐}
 \label{sec:resonance_tuning}
 
-谐振是指电路在特定频率下发生的电共振现象。在谐振状态下，电路的阻抗达到极值。RLC串联谐振电路的谐振频率为：
-
-\[ f_0 = \frac{1}{2\pi\sqrt{LC}} \]
-
-调谐是通过改变电路参数（如电容或电感）使电路在特定频率上发生谐振的过程，用于从众多信号中选择所需的信号。
+谐振是指电路在特定频率下发生的电共振现象，此时电路阻抗达到极值。调谐是通过改变电路参数（如电容或电感）使电路在特定频率上发生谐振的过程，用于从众多信号中选择所需的信号。关于调谐电路的详细介绍，包括谐振原理、品质因数Q、LC调谐电路、晶体调谐电路以及现代调谐系统等内容，请参见第\ref{chap:tuning_circuits}章「调谐电路」。
 
 \section{天线基础}
 \label{sec:antenna_fundamentals}
 
-天线是用于辐射和接收无线电波的装置。理想天线应具有以下特性：
+天线是用于辐射和接收无线电波的装置，是无线电通信系统中不可或缺的组成部分。天线将高频电流转换为电磁波辐射到空间，或将空间中的电磁波转换为高频电流。理想天线应具有高效率的能量转换、特定的方向性和匹配的阻抗等特性。
 
-\begin{itemize}
-    \item 高效率的能量转换
-    \item 特定的方向性
-    \item 匹配的阻抗
-\end{itemize}
-
-常用天线类型包括：偶极天线、垂直天线、环形天线、抛物面天线等。
-
-\subsection{天线增益}
-\label{sec:antenna_gain_intro}
-
-天线增益是衡量天线将能量集中在特定方向上的能力，是天线最重要的性能参数之一。
-
-\subsubsection{什么是增益}
-\label{sec:what_is_gain}
-
-增益表示天线在最大辐射方向上的辐射功率与一个理想的各向同性辐射器（在所有方向上均匀辐射的天线）在相同输入功率下的辐射功率之比。
-
-\begin{itemize}
-    \item \textbf{各向同性辐射器}：一个假想的天线，在所有方向上均匀辐射能量，其增益为0dB
-    \item \textbf{增益的意义}：增益越高，说明天线在特定方向上的辐射或接收能力越强
-\end{itemize}
-
-各向同性辐射器是一个**理想化的点天线**，这意味着它的尺寸为零。要实现各向同性辐射（在所有方向上均匀辐射），天线必须没有任何物理尺寸——任何有尺寸的实际天线都会在某些方向上辐射更强，在另一些方向上辐射较弱。
-
-各向同性辐射器的辐射功率密度遵循球面波公式：
-
-\[ P_{avg} = \frac{P_{total}}{4\pi r^2} \]
-
-其中，$P_{total}$ 是总辐射功率，$r$ 是距离点源的距离，$4\pi r^2$ 是球表面积。这个公式只有在天线是点源时才成立，因为点源发出的球面波在球面上均匀分布。
-
-虽然各向同性辐射器在现实中不存在，但它是一个非常重要的**理论参考标准**：
-
-\begin{itemize}
-    \item \textbf{增益基准}：所有天线的增益都是相对于各向同性辐射器定义的（单位：dBi，即 dB isotropic）
-    \item \textbf{方向性系数}：方向性系数 $D$ 就是天线最大辐射方向的功率与各向同性辐射器功率的比值
-    \item \textbf{理论计算}：在计算电波传播、场强分布等问题时，常以各向同性辐射器作为简化模型
-\end{itemize}
-
-各向同性辐射器与实际天线的对比：
-
-\begin{table}[htbp]
-    \centering
-    \small
-    \caption{各向同性辐射器与实际天线的对比}
-    \begin{tabular}{|p{2cm}|p{3.5cm}|p{2cm}|}
-        \hline
-        \textbf{特性} & \textbf{各向同性辐射器（点天线）} & \textbf{实际天线} \\
-        \hline
-        尺寸 & 零（理想化） & 有物理尺寸 \\
-        \hline
-        方向性 & 无方向性 & 有方向性 \\
-        \hline
-        增益 & 0 dBi & > 0 dBi \\
-        \hline
-        存在性 & 不存在 & 存在 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{增益的计算}
-\label{sec:gain_calculation}
-
-增益通常用分贝（dB）表示，计算公式为：
-
-\[ G(dB) = 10\log\left(\frac{P_{max}}{P_{avg}}\right) \]
-
-其中，$P_{max}$为天线在最大辐射方向上的功率密度，$P_{avg}$为各向同性辐射器在相同距离处的功率密度。
-
-对于一个效率为$\eta$、方向性系数为$D$的天线，其增益为：
-
-\[ G = \eta \cdot D \]
-
-\subsubsection{增益与方向性的关系}
-\label{sec:gain_direction}
-
-增益与天线的方向性密切相关：
-
-\begin{itemize}
-    \item \textbf{全向天线}：在各个方向上均匀辐射，方向性系数$D=1$，增益较低（约0dB）
-    \item \textbf{定向天线}：将能量集中在特定方向上，方向性系数$D>1$，增益较高
-\end{itemize}
-
-\subsubsection{常见天线的增益参考}
-\label{sec:gain_reference}
-
-\begin{table}[htbp]
-    \centering
-    \caption{常见天线的增益参考}
-    \begin{tabular}{|c|c|}
-        \hline
-        \textbf{天线类型} & \textbf{典型增益（dBi）} \\
-        \hline
-        各向同性辐射器 & 0 \\
-        \hline
-        半波偶极天线 & 2.15 \\
-        \hline
-        垂直天线（四分之一波长） & 2-5 \\
-        \hline
-        八木天线（3单元） & 7-10 \\
-        \hline
-        八木天线（5单元） & 10-12 \\
-        \hline
-        抛物面天线（1米直径） & 20-30 \\
-        \hline
-        对数周期天线 & 6-12 \\
-        \hline
-    \end{tabular}
-\end{table}
-
-\subsubsection{增益的实际意义}
-\label{sec:gain_practical}
-
-增益的实际意义在于：
-
-\begin{itemize}
-    \item \textbf{发射时}：增益越高，在相同功率下，信号能传输更远的距离
-    \item \textbf{接收时}：增益越高，能接收更远距离的微弱信号
-    \item \textbf{通信距离}：增益每增加3dB，通信距离约增加41\%
-\end{itemize}
-
-需要注意的是，增益是一个相对值，它表示的是天线在特定方向上相对于各向同性辐射器的性能提升。
+常用天线类型包括：偶极天线、垂直天线、环形天线、八木天线、抛物面天线、对数周期天线等。关于天线的详细介绍，包括各类天线的结构、特性、应用场景以及天线参数（如增益、方向性、阻抗匹配等），请参见第\ref{chap:antenna_fundamentals}章「天线基础」。
 
 \section{传输线理论}
 \label{sec:transmission_line}
@@ -293,7 +162,75 @@
 
 \[ Z_0 = \sqrt{\frac{R + j\omega L}{G + j\omega C}} \]
 
-当传输线终端阻抗与特性阻抗匹配时，信号无反射传输。驻波比（SWR）用于衡量匹配程度。
+当传输线终端阻抗与特性阻抗匹配时，信号无反射传输。驻波比（SWR，Standing Wave Ratio）用于衡量匹配程度。
+
+\subsection{驻波比的定义}
+\label{sec:swr_definition}
+
+驻波比是传输线上电压最大值与电压最小值之比：
+
+\[ SWR = \frac{V_{max}}{V_{min}} \]
+
+当传输线终端阻抗$Z_L$与特性阻抗$Z_0$不匹配时，部分信号会被反射回信号源，形成驻波。
+
+\subsection{驻波比与反射系数}
+\label{sec:swr_reflection}
+
+驻波比与反射系数$\Gamma$的关系为：
+
+\[ SWR = \frac{1 + |\Gamma|}{1 - |\Gamma|} \]
+
+其中，反射系数$\Gamma$定义为：
+
+\[ \Gamma = \frac{Z_L - Z_0}{Z_L + Z_0} \]
+
+反射系数的取值范围为$-1 \leq \Gamma \leq 1$，其绝对值$|\Gamma|$表示反射功率与入射功率的比值。
+
+\subsection{驻波比的实际意义}
+\label{sec:swr_practical}
+
+驻波比的取值范围和含义：
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{驻波比与匹配状态}
+    \begin{tabular}{|p{2cm}|p{3cm}|p{3.5cm}|}
+        \hline
+        \textbf{SWR值} & \textbf{反射系数$|\Gamma|$} & \textbf{匹配状态} \\
+        \hline
+        1 & 0 & 完全匹配，无反射 \\
+        \hline
+        1.5 & 0.2 & 良好匹配 \\
+        \hline
+        2 & 0.33 & 一般匹配 \\
+        \hline
+        3 & 0.5 & 较差匹配 \\
+        \hline
+        $\infty$ & 1 & 完全失配，全反射 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{SWR = 1}：理想状态，终端阻抗与特性阻抗完全匹配，所有功率都被负载吸收
+    \item \textbf{SWR < 2}：通常认为是可接受的匹配状态，功率损失较小
+    \item \textbf{SWR > 3}：匹配较差，大量功率被反射，可能导致设备损坏
+    \item \textbf{SWR $\to \infty$}：终端开路或短路，所有功率都被反射
+\end{itemize}
+
+\subsection{电压驻波比（VSWR）}
+\label{sec:vswr}
+
+在实际应用中，更常用的是电压驻波比（VSWR，Voltage Standing Wave Ratio），它与SWR含义相同，都是衡量传输线匹配程度的重要指标。
+
+VSWR的重要性在于：
+
+\begin{itemize}
+    \item \textbf{功率传输效率}：VSWR越小，功率传输效率越高
+    \item \textbf{设备保护}：高VSWR会导致反射功率过大，可能损坏发射机
+    \item \textbf{信号质量}：VSWR过大时，信号会产生畸变，影响通信质量
+\end{itemize}
 
 \section{电波传播}
 \label{sec:wave_propagation}

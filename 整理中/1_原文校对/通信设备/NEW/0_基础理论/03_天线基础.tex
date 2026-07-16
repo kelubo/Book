@@ -1,0 +1,465 @@
+% ================================================
+% 文件: 03_天线基础.tex
+% 章节: 第3章 天线基础
+% 所属部分: 基础理论
+% 版本: v1.0
+% ================================================
+% 本章目录结构（树状）:
+% \chapter{天线基础}
+% ├── \section{天线的基本概念}
+% ├── \section{常见天线类型}
+% │   ├── \subsection{鞭状天线}
+% │   ├── \subsection{环形天线}
+% │   ├── \subsection{偶极天线}
+% │   ├── \subsection{垂直天线}
+% │   ├── \subsection{八木天线}
+% │   ├── \subsection{接地平面天线}
+% │   ├── \subsection{菱形天线}
+% │   └── \subsection{对数周期天线}
+% ├── \section{天线参数}
+% │   ├── \subsection{频率范围}
+% │   ├── \subsection{增益}
+% │   ├── \subsection{方向性}
+% │   └── \subsection{阻抗匹配}
+% ├── \section{天线配件}
+% │   ├── \subsection{巴伦（Balun）}
+% │   ├── \subsection{天线调谐器}
+% │   ├── \subsection{馈线}
+% │   └── \subsection{连接器}
+% ├── \section{天线测量与调试}
+% └── \section{天线安全与防雷}
+% ================================================
+
+\chapter{天线基础}
+\label{chap:antenna_fundamentals}
+
+\section{天线的基本概念}
+\label{sec:antenna_concept}
+
+天线是用于辐射和接收无线电波的装置，是无线电通信系统中不可或缺的组成部分。天线将高频电流转换为电磁波辐射到空间，或将空间中的电磁波转换为高频电流。
+
+\begin{itemize}
+    \item \textbf{发射天线}：将发射机输出的高频电流转换为电磁波
+    \item \textbf{接收天线}：将空间中的电磁波转换为高频电流送入接收机
+\end{itemize}
+
+理想天线应具有以下特性：
+
+\begin{itemize}
+    \item 高效率的能量转换
+    \item 特定的方向性
+    \item 匹配的阻抗
+    \item 宽带工作能力
+\end{itemize}
+
+\section{常见天线类型}
+\label{sec:antenna_types}
+
+\subsection{鞭状天线}
+\label{sec:whip_antenna}
+
+鞭状天线是最常见的天线类型之一，结构简单，通常为一根垂直的金属杆。
+
+\begin{itemize}
+    \item \textbf{结构}：单根金属杆，长度通常为四分之一波长或半波长
+    \item \textbf{特点}：全向辐射、结构简单、安装方便
+    \item \textbf{应用}：手持对讲机、移动电台、汽车天线
+    \item \textbf{典型增益}：2-5 dBi
+\end{itemize}
+
+\subsection{环形天线}
+\label{sec:loop_antenna}
+
+环形天线由一个或多个线圈组成，通常用于接收信号。
+
+\begin{itemize}
+    \item \textbf{结构}：圆形或方形线圈，直径通常小于波长
+    \item \textbf{特点}：方向性较强、抗干扰能力好、尺寸小巧
+    \item \textbf{应用}：收音机天线、无线电测向、便携设备
+    \item \textbf{典型增益}：0-2 dBi
+\end{itemize}
+
+\subsection{偶极天线}
+\label{sec:dipole_antenna}
+
+偶极天线是最基本的天线形式，由两段长度相等的导体组成。
+
+\begin{itemize}
+    \item \textbf{结构}：两段导体，总长度为半波长
+    \item \textbf{特点}：双向辐射、结构对称、易于制作
+    \item \textbf{应用}：短波通信、业余无线电、基站天线
+    \item \textbf{典型增益}：2.15 dBi（半波偶极）
+\end{itemize}
+
+半波偶极天线的辐射方向图呈"8"字形，在天线轴线方向上辐射最弱，在垂直于轴线的方向上辐射最强。
+
+\subsection{垂直天线}
+\label{sec:vertical_antenna}
+
+垂直天线是一种特殊的偶极天线，其中一臂为地面或接地平面。
+
+\begin{itemize}
+    \item \textbf{结构}：单根垂直导体，长度通常为四分之一波长
+    \item \textbf{特点}：全向辐射、安装高度要求低、适用于多频段
+    \item \textbf{应用}：短波广播、业余无线电、移动通信
+    \item \textbf{典型增益}：2-5 dBi
+\end{itemize}
+
+四分之一波长垂直天线需要良好的接地系统或径向导线作为镜像反射器。
+
+\subsection{八木天线}
+\label{sec:yagi_antenna}
+
+八木天线是一种定向天线，由一个有源振子和多个无源振子组成。
+
+\begin{itemize}
+    \item \textbf{结构}：一个有源振子（通常为偶极）、多个引向器、一个反射器
+    \item \textbf{特点}：高增益、定向性强、结构紧凑
+    \item \textbf{应用}：电视接收、业余无线电、点对点通信
+    \item \textbf{典型增益}：7-15 dBi（根据单元数量）
+\end{itemize}
+
+八木天线的增益随单元数量增加而提高，但带宽会相应变窄。
+
+\subsection{接地平面天线}
+\label{sec:ground_plane_antenna}
+
+接地平面天线是一种改进的垂直天线，使用金属圆盘或径向导线作为接地平面。
+
+\begin{itemize}
+    \item \textbf{结构}：四分之一波长垂直振子 + 接地平面（至少3根径向导线）
+    \item \textbf{特点}：全向辐射、效率高、易于安装
+    \item \textbf{应用}：基站天线、固定电台、微波通信
+    \item \textbf{典型增益}：3-6 dBi
+\end{itemize}
+
+接地平面天线的性能取决于径向导线的数量和长度。
+
+\subsection{菱形天线}
+\label{sec:diamond_antenna}
+
+菱形天线是一种宽带定向天线，常用于远距离通信。
+
+\begin{itemize}
+    \item \textbf{结构}：菱形金属线框，悬挂在支撑物上
+    \item \textbf{特点}：宽带宽、高增益、适合长距离通信
+    \item \textbf{应用}：短波远距离通信、广播发射
+    \item \textbf{典型增益}：10-15 dBi
+\end{itemize}
+
+菱形天线需要较大的安装空间，通常用于固定站。
+
+\subsection{对数周期天线}
+\label{sec:log_periodic_antenna}
+
+对数周期天线是一种宽带天线，工作频率范围宽，常用于多频段通信。
+
+\begin{itemize}
+    \item \textbf{结构}：多个振子，长度和间距按对数规律排列
+    \item \textbf{特点}：极宽带宽、定向辐射、增益稳定
+    \item \textbf{应用}：多频段通信、电视接收、监测设备
+    \item \textbf{典型增益}：6-12 dBi
+\end{itemize}
+
+对数周期天线的工作带宽可达10:1以上。
+
+\section{天线参数}
+\label{sec:antenna_parameters}
+
+\subsection{频率范围}
+\label{sec:frequency_range}
+
+天线的频率范围是指天线能够有效工作的频率区间。天线的尺寸与工作波长密切相关，因此不同频率需要不同尺寸的天线。
+
+\begin{itemize}
+    \item \textbf{谐振频率}：天线效率最高的频率
+    \item \textbf{带宽}：天线性能在可接受范围内的频率范围
+    \item \textbf{多频段天线}：通过特殊设计可在多个频段工作的天线
+\end{itemize}
+
+\subsection{增益}
+\label{sec:gain}
+
+天线增益是衡量天线将能量集中在特定方向上的能力，通常用dBi表示（相对于各向同性辐射器）。
+
+\subsubsection{各向同性辐射器}
+
+各向同性辐射器是一个**理想化的点天线**，这意味着它的尺寸为零。要实现各向同性辐射（在所有方向上均匀辐射），天线必须没有任何物理尺寸——任何有尺寸的实际天线都会在某些方向上辐射更强，在另一些方向上辐射较弱。
+
+各向同性辐射器的辐射功率密度遵循球面波公式：
+
+\[ P_{avg} = \frac{P_{total}}{4\pi r^2} \]
+
+其中，$P_{total}$ 是总辐射功率，$r$ 是距离点源的距离，$4\pi r^2$ 是球表面积。这个公式只有在天线是点源时才成立，因为点源发出的球面波在球面上均匀分布。
+
+虽然各向同性辐射器在现实中不存在，但它是一个非常重要的**理论参考标准**：
+
+\begin{itemize}
+    \item \textbf{增益基准}：所有天线的增益都是相对于各向同性辐射器定义的（单位：dBi，即 dB isotropic）
+    \item \textbf{方向性系数}：方向性系数 $D$ 就是天线最大辐射方向的功率与各向同性辐射器功率的比值
+    \item \textbf{理论计算}：在计算电波传播、场强分布等问题时，常以各向同性辐射器作为简化模型
+\end{itemize}
+
+各向同性辐射器与实际天线的对比：
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{各向同性辐射器与实际天线的对比}
+    \begin{tabular}{|p{2cm}|p{3.5cm}|p{2cm}|}
+        \hline
+        \textbf{特性} & \textbf{各向同性辐射器（点天线）} & \textbf{实际天线} \\
+        \hline
+        尺寸 & 零（理想化） & 有物理尺寸 \\
+        \hline
+        方向性 & 无方向性 & 有方向性 \\
+        \hline
+        增益 & 0 dBi & > 0 dBi \\
+        \hline
+        存在性 & 不存在 & 存在 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{增益的计算}
+
+增益的计算公式为：
+
+\[ G(dBi) = 10\log\left(\frac{P_{max}}{P_{avg}}\right) \]
+
+其中，$P_{max}$为天线在最大辐射方向上的功率密度，$P_{avg}$为各向同性辐射器在相同距离处的功率密度。
+
+对于一个效率为$\eta$、方向性系数为$D$的天线，其增益为：
+
+\[ G = \eta \cdot D \]
+
+\subsubsection{增益与方向性的关系}
+
+增益与天线的方向性密切相关：
+
+\begin{itemize}
+    \item \textbf{全向天线}：在各个方向上均匀辐射，方向性系数$D=1$，增益较低（约0dB）
+    \item \textbf{定向天线}：将能量集中在特定方向上，方向性系数$D>1$，增益较高
+\end{itemize}
+
+\subsubsection{常见天线的增益参考}
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{常见天线增益参考}
+    \begin{tabular}{|p{3.5cm}|p{2cm}|}
+        \hline
+        \textbf{天线类型} & \textbf{典型增益（dBi）} \\
+        \hline
+        各向同性辐射器 & 0 \\
+        \hline
+        半波偶极天线 & 2.15 \\
+        \hline
+        垂直天线（四分之一波长） & 2-5 \\
+        \hline
+        八木天线（3单元） & 7-10 \\
+        \hline
+        八木天线（5单元） & 10-12 \\
+        \hline
+        抛物面天线（1米直径） & 20-30 \\
+        \hline
+        对数周期天线 & 6-12 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection{增益的实际意义}
+
+增益的实际意义在于：
+
+\begin{itemize}
+    \item \textbf{发射时}：增益越高，在相同功率下，信号能传输更远的距离
+    \item \textbf{接收时}：增益越高，能接收更远距离的微弱信号
+    \item \textbf{通信距离}：增益每增加3dB，通信距离约增加41\%
+\end{itemize}
+
+需要注意的是，增益是一个相对值，它表示的是天线在特定方向上相对于各向同性辐射器的性能提升。
+
+\subsection{方向性}
+\label{sec:directivity}
+
+方向性表示天线在空间各个方向上的辐射能力分布。
+
+\begin{itemize}
+    \item \textbf{全向天线}：在水平面内均匀辐射，如鞭状天线、垂直天线
+    \item \textbf{定向天线}：将能量集中在特定方向，如八木天线、抛物面天线
+    \item \textbf{方向图}：描述天线辐射强度随方向变化的图形
+\end{itemize}
+
+方向性系数$D$定义为：
+
+\[ D = \frac{P_{max}}{P_{avg}} \]
+
+\subsection{阻抗匹配}
+\label{sec:impedance_matching}
+
+天线的输入阻抗需要与馈线的特性阻抗匹配，以实现最大功率传输。
+
+\begin{itemize}
+    \item \textbf{特性阻抗}：传输线固有的阻抗，常见值为50Ω、75Ω
+    \item \textbf{输入阻抗}：天线输入端的阻抗
+    \item \textbf{匹配网络}：用于调整阻抗的电路，如天线调谐器
+\end{itemize}
+
+当阻抗不匹配时，会产生反射波，导致驻波比升高。
+
+\section{天线配件}
+\label{sec:antenna_accessories}
+
+\subsection{巴伦（Balun）}
+\label{sec:balun}
+
+巴伦（平衡-不平衡转换器）用于连接平衡天线（如偶极天线）和不平衡馈线（如同轴电缆）。
+
+\begin{itemize}
+    \item \textbf{作用}：实现平衡与不平衡的转换，防止共模电流
+    \item \textbf{类型}：传输线巴伦、磁芯巴伦、同轴巴伦
+    \item \textbf{常见比率}：1:1、4:1、9:1
+\end{itemize}
+
+巴伦的作用类似于变压器，将平衡信号转换为不平衡信号。
+
+\subsection{天线调谐器}
+\label{sec:antenna_tuner}
+
+天线调谐器用于调整天线的阻抗，使其与馈线和发射机匹配。
+
+\begin{itemize}
+    \item \textbf{作用}：匹配天线阻抗、调整谐振频率、提高效率
+    \item \textbf{原理}：通过可变电容和电感组成的网络实现阻抗变换
+    \item \textbf{应用}：多频段天线、宽带天线、阻抗失配时使用
+\end{itemize}
+
+天线调谐器通常安装在发射机和馈线之间。
+
+\subsection{馈线}
+\label{sec:feeder}
+
+馈线用于连接发射机/接收机和天线，传输高频信号。
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{常见馈线类型}
+    \begin{tabular}{|p{2.5cm}|p{2cm}|p{2cm}|p{3cm}|}
+        \hline
+        \textbf{馈线类型} & \textbf{特性阻抗} & \textbf{频率范围} & \textbf{应用场景} \\
+        \hline
+        平行双线 & 300Ω & HF/VHF & 短距离、低成本 \\
+        \hline
+        同轴电缆 & 50Ω/75Ω & HF-UHF & 通用、屏蔽性好 \\
+        \hline
+        微带线 & 50Ω & UHF以上 & 电路板、微波设备 \\
+        \hline
+        波导 & - & SHF以上 & 微波通信、雷达 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+同轴电缆是最常用的馈线类型，具有良好的屏蔽性能。
+
+\subsection{连接器}
+\label{sec:connectors}
+
+连接器用于连接馈线和天线、馈线和设备。
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \caption{常见连接器类型}
+    \begin{tabular}{|p{2.5cm}|p{2cm}|p{2.5cm}|p{3cm}|}
+        \hline
+        \textbf{连接器类型} & \textbf{特性阻抗} & \textbf{频率范围} & \textbf{应用场景} \\
+        \hline
+        N型连接器 & 50Ω/75Ω & DC-11 GHz & 射频设备、基站 \\
+        \hline
+        BNC连接器 & 50Ω & DC-4 GHz & 测试设备、视频 \\
+        \hline
+        SMA连接器 & 50Ω & DC-18 GHz & 微波设备、小型设备 \\
+        \hline
+        MCX连接器 & 50Ω & DC-6 GHz & 移动设备、GPS \\
+        \hline
+        UHF连接器（PL-259） & 50Ω & DC-300 MHz & 业余无线电、HF设备 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\section{天线测量与调试}
+\label{sec:antenna_measurement}
+
+\subsection{驻波比测量}
+\label{sec:swr_measurement}
+
+驻波比（SWR）是衡量天线匹配程度的重要指标，使用驻波表进行测量。
+
+\begin{itemize}
+    \item \textbf{测量方法}：将驻波表串联在馈线中，读取SWR值
+    \item \textbf{理想值}：SWR = 1（完全匹配）
+    \item \textbf{可接受范围}：SWR < 2
+\end{itemize}
+
+\subsection{方向图测量}
+\label{sec:pattern_measurement}
+
+方向图测量用于确定天线的辐射特性。
+
+\begin{itemize}
+    \item \textbf{测量方法}：固定天线，在周围不同方向测量场强
+    \item \textbf{测量设备}：场强计、频谱分析仪
+    \item \textbf{结果表示}：极坐标图或直角坐标图
+\end{itemize}
+
+\subsection{增益测量}
+\label{sec:gain_measurement}
+
+增益测量需要与标准天线进行比较。
+
+\begin{itemize}
+    \item \textbf{比较法}：将待测天线与已知增益的标准天线进行比较
+    \item \textbf{标准天线}：通常使用半波偶极天线（增益2.15 dBi）
+    \item \textbf{测量环境}：需要开阔场地，避免反射干扰
+\end{itemize}
+
+\section{天线安全与防雷}
+\label{sec:antenna_safety}
+
+\subsection{防雷措施}
+\label{sec:lightning_protection}
+
+天线安装在高处时，需要采取防雷措施。
+
+\begin{itemize}
+    \item \textbf{避雷针}：安装在天线附近，高于天线最高点
+    \item \textbf{接地系统}：良好的接地，接地电阻小于10Ω
+    \item \textbf{避雷器}：安装在馈线输入端，防止雷电感应过电压
+    \item \textbf{断开装置}：在雷雨天气断开天线与设备的连接
+\end{itemize}
+
+\subsection{安全注意事项}
+\label{sec:safety_precautions}
+
+\begin{itemize}
+    \item \textbf{高压危险}：发射机工作时，天线可能带有高电压
+    \item \textbf{射频辐射}：大功率发射时，天线附近存在射频辐射
+    \item \textbf{机械安全}：天线安装和维护时注意高空作业安全
+    \item \textbf{电磁干扰}：天线位置应远离敏感电子设备
+\end{itemize}
+
+\subsection{假负载}
+\label{sec:dummy_load}
+
+假负载用于测试发射机，替代天线作为负载。
+
+\begin{itemize}
+    \item \textbf{作用}：吸收发射机输出功率，避免辐射
+    \item \textbf{特性}：阻抗匹配（通常50Ω）、功率容量足够
+    \item \textbf{应用}：设备测试、维修调试、功率测量
+\end{itemize}
+
+假负载通常由电阻组成，需要良好的散热设计。
