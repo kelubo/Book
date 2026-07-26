@@ -1,0 +1,117 @@
+% =================================================
+% 文件: 05_假负载.tex
+% 章节: 第21章 假负载
+% 所属部分: 仪器仪表
+% 版本: v1.0
+% =================================================
+
+\chapter{假负载}
+\label{chap:dummy_load}
+
+假负载（Dummy Load）是一种用于测试发射机的专用设备，用于替代天线作为负载。
+
+\section{工作原理}
+\label{sec:dummy_load_principle}
+
+假负载通过电阻元件吸收发射机输出的全部功率，并将其转换为热能散发，从而模拟天线的负载特性，同时避免信号辐射到空间。
+
+\section{主要特性}
+\label{sec:dummy_load_features}
+\begin{itemize}
+    \item \textbf{阻抗匹配}：通常设计为50Ω，与射频系统的标准特性阻抗匹配
+    \item \textbf{功率容量}：能够承受发射机的最大输出功率，需要良好的散热设计
+    \item \textbf{低驻波比}：自身驻波比极低，不影响测试精度
+    \item \textbf{频率范围}：覆盖特定的工作频率范围
+\end{itemize}
+
+\section{应用领域}
+\label{sec:dummy_load_applications}
+\begin{itemize}
+    \item \textbf{设备测试}：测试发射机的输出功率、频率稳定性和调制质量
+    \item \textbf{维修调试}：在维修和调试过程中安全地测试设备，避免辐射干扰
+    \item \textbf{功率测量}：配合功率计测量发射机的实际输出功率
+    \item \textbf{天线替换}：在不希望信号辐射时（如室内测试）替代天线使用
+\end{itemize}
+
+\section{类型与选择}
+\label{sec:dummy_load_types}
+
+假负载根据功率容量和频率范围分为多种类型：
+
+\begin{itemize}
+    \item \textbf{低功率假负载}：用于手持对讲机等低功率设备，功率容量通常在几十瓦以下
+    \item \textbf{中功率假负载}：用于电台设备，功率容量可达数百瓦
+    \item \textbf{高功率假负载}：用于广播发射机等大功率设备，功率容量可达数千瓦甚至更高
+    \item \textbf{宽带假负载}：覆盖较宽的频率范围，适用于多波段设备测试
+\end{itemize}
+
+选择假负载时需注意：
+\begin{itemize}
+    \item 功率容量应大于被测设备的最大输出功率
+    \item 工作频率范围应覆盖被测设备的工作频段
+    \item 阻抗必须与被测设备匹配（通常为50Ω）
+\end{itemize}
+
+\section{自制假负载}
+\label{sec:diy_dummy_load}
+
+对于低功率应用，假负载可以自制。自制假负载需要注意以下几点：
+
+\subsection{电阻选择}
+
+\begin{itemize}
+    \item \textbf{电阻值}：必须为50Ω，与射频系统特性阻抗匹配
+    \item \textbf{功率容量}：电阻的额定功率应大于被测设备的最大输出功率，建议取2-3倍余量
+    \item \textbf{电阻类型}：应使用非电感型电阻，如炭膜电阻、金属膜电阻或水泥电阻；绕线电阻具有电感特性，不适合高频应用
+    \item \textbf{频率特性}：高频应用时需考虑电阻的寄生参数，必要时使用多个电阻并联或专用射频电阻
+\end{itemize}
+
+\subsection{电路结构}
+
+常用的自制假负载电路有两种：
+
+\begin{enumerate}
+    \item \textbf{单电阻型}：直接使用一个50Ω电阻，结构简单，适用于频率较低（如中波）或对驻波比要求不高的场合
+    
+    \item \textbf{π型衰减器}：由三个电阻组成π型网络，可实现更好的阻抗匹配和更宽的频率范围，适合高频应用。典型电路为：两个串联电阻各约16Ω，一个并联电阻约110Ω（根据所需衰减量调整）
+\end{enumerate}
+
+\subsection{散热设计}
+
+\begin{itemize}
+    \item 电阻工作时会发热，必须确保良好的散热
+    \item 可将电阻安装在金属散热片上，或使用金属外壳作为散热器
+    \item 高功率应用时需注意通风，避免电阻过热损坏
+\end{itemize}
+
+\subsection{连接接口}
+
+\begin{itemize}
+    \item 接口应与被测设备匹配，常用的有BNC、SMA、PL-259等
+    \item 连接线应使用同轴电缆，长度尽量短以减少损耗
+    \item 接口处应确保良好的电气连接和屏蔽
+\end{itemize}
+
+\subsection{自制示例}
+
+一个简单的低功率假负载制作方案：
+
+\begin{itemize}
+    \item \textbf{材料}：50Ω/20W水泥电阻1只、BNC插座1个、金属外壳1个
+    \item \textbf{制作步骤}：
+    \begin{enumerate}
+        \item 将水泥电阻固定在金属外壳内壁作为散热
+        \item 将电阻一端连接BNC插座的中心引脚，另一端连接外壳（接地）
+        \item 确保外壳良好接地，接口处做好屏蔽
+    \end{enumerate}
+    \item \textbf{适用范围}：适用于10W以下的短波电台测试，频率范围有限（约1-30MHz）
+\end{itemize}
+
+\subsection{注意事项}
+
+\begin{itemize}
+    \item 自制假负载的驻波比通常不如商业产品，适用于要求不高的测试场合
+    \item 高频应用时需注意分布参数的影响，必要时进行阻抗匹配调整
+    \item 切勿在超过电阻额定功率的情况下使用，以免造成设备损坏
+    \item 自制假负载不建议用于精密测量或大功率设备测试
+\end{itemize}
