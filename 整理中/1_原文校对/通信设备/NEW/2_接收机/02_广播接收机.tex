@@ -50,27 +50,732 @@
 \subsection{矿石收音机基础}
 \label{sec:crystal_radio_fundamentals}
 
-% 内容待补充
+矿石收音机（Crystal Radio），又称晶体检波器收音机，是最古老、最简单的无线电接收机之一。它诞生于20世纪初期，在电子管和晶体管发明之前，是人们接收广播信号的唯一方式。
+
+\subsubsection{工作原理}
+\label{sec:crystal_radio_working_principle}
+
+矿石收音机的工作原理基于\textbf{电磁波的接收}和\textbf{晶体的检波作用}。其基本工作流程为：
+
+\begin{enumerate}
+    \item \textbf{天线接收}：天线捕获空间中传播的无线电电磁波，将其转换为高频交流电流
+    \item \textbf{调谐选频}：LC调谐回路通过电磁感应选出所需频率的信号，抑制其他频率的干扰
+    \item \textbf{晶体检波}：利用矿石（如方铅矿、黄铁矿等天然矿物）或早期的晶体二极管的单向导电性，将高频交流信号转换为音频信号
+    \item \textbf{耳机发声}：微弱的音频电流驱动高阻抗耳机的振膜振动，发出声音
+\end{enumerate}
+
+\subsubsection{基本组成}
+\label{sec:crystal_radio_components}
+
+一台典型的矿石收音机由以下几部分组成：
+
+\begin{center}
+\begin{tabular}{|p{2.5cm}|p{3cm}|p{5cm}|p{4cm}|}
+\hline
+\textbf{组成部分} & \textbf{常见元件} & \textbf{作用} & \textbf{备注} \\
+\hline
+天线 & 多股漆包线、铜丝 & 接收无线电波 & 长度通常为波长的1/4或更长 \\
+地线 & 接地棒、水管 & 反射电磁波，提高接收效率 & 必须可靠接地 \\
+调谐回路 & 电感线圈+可变电容器 & 选择特定频率的信号 & 并联谐振电路 \\
+检波器 & 方铅矿晶体+触针 & 解调高频信号 & 天然矿物或二极管 \\
+耳机 & 高阻抗耳机（2000$\Omega$以上） & 将电信号转换为声音 & 必须高阻抗 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{主要特点}
+\label{sec:crystal_radio_features}
+
+\textbf{优点}：
+\begin{itemize}
+    \item \textbf{无源工作}：无需电源，完全靠接收到的无线电信号能量工作
+    \item \textbf{结构简单}：元件极少，易于制作和调试
+    \item \textbf{经久耐用}：无有源器件，寿命极长
+    \item \textbf{环境友好}：不产生电磁辐射
+    \item \textbf{教育价值}：是学习无线电原理的最佳入门项目
+\end{itemize}
+
+\textbf{缺点}：
+\begin{itemize}
+    \item \textbf{灵敏度低}：只能接收强信号电台，远离电台时无法接收
+    \item \textbf{选择性差}：单回路选择性有限，容易串台
+    \item \textbf{音量小}：无放大电路，声音微弱
+    \item \textbf{稳定性差}：受环境温度、湿度影响较大
+    \item \textbf{频率范围有限}：主要用于中波（AM）频段
+\end{itemize}
+
+\subsubsection{发展历史}
+\label{sec:crystal_radio_history}
+
+矿石收音机在无线电发展史上占有重要地位：
+
+\begin{enumerate}
+    \item \textbf{1904年}：英国物理学家\textbf{费明（John Fleming）}发明了真空管二极管，但早期接收器仍以矿石检波为主
+    \item \textbf{1906年}：美国发明家\textbf{邓伍迪（Henry Dunwoody）}和\textbf{皮卡德（Owen Pickard）}几乎同时发现了硅和方铅矿的检波特性
+    \item \textbf{1910-1920年代}：矿石收音机进入全盛时期，成为家庭接收广播的主要方式
+    \item \textbf{1920年代后期}：随着电子管收音机的普及，矿石收音机逐渐退出主流应用
+    \item \textbf{现代}：矿石收音机作为无线电爱好者的入门项目和收藏品，至今仍有大量爱好者
+\end{enumerate}
 
 \subsection{矿石检波器原理}
 \label{sec:crystal_detector_principle}
 
-% 内容待补充
+检波器是矿石收音机的核心部件，其作用是将调谐回路选出的高频已调制信号（通常是AM调幅信号）中的音频信息解调出来。
+
+\subsubsection{检波的基本概念}
+\label{sec:detection_concept}
+
+AM调制的广播信号可以表示为：
+\begin{equation}
+v_{am}(t) = A[1 + \mu \cdot m(t)] \cos(2\pi f_c t)
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item $A$：载波振幅
+    \item $\mu$：调制系数（0$\leq \mu \leq 1$）
+    \item $m(t)$：调制信号（音频信号）
+    \item $f_c$：载波频率
+\end{itemize}
+
+检波的目标就是从这个高频信号中恢复出调制信号$m(t)$。
+
+\subsubsection{晶体的单向导电性}
+\label{sec:crystal_unidirectional}
+
+矿石检波器的工作基础是晶体（如方铅矿PbS、黄铁矿FeS$_2$、硅等）的单向导电性。
+
+\textbf{单向导电性的原理}：
+
+晶体由半导体材料构成，具有PN结的特性。当正向偏置时电流容易通过，反向偏置时电流几乎无法通过。
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{5cm}|p{4cm}|}
+\hline
+\textbf{晶体材料} & \textbf{检波特性} & \textbf{适用场景} \\
+\hline
+方铅矿（PbS） & 最早用于检波，灵敏度较低 & 早期矿石机 \\
+黄铁矿（FeS$_2$） & 灵敏度较高，较稳定 & 早期矿石机 \\
+硅（Si） & 检波效率高，温度稳定性好 & 现代二极管 \\
+锗（Ge） & 正向压降小（约0.2V），适合弱信号 & 2AP9等检波管 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{包络检波原理}
+\label{sec:envelope_detection}
+
+矿石收音机采用的检波方式主要是\textbf{包络检波}（又称幅度检波）。其工作过程如下：
+
+\begin{enumerate}
+    \item \textbf{正向导通}：当输入信号为正半周时，二极管导通，电流通过负载（耳机）
+    \item \textbf{反向截止}：当输入信号为负半周时，二极管截止，无电流通过
+    \item \textbf{电容充放电}：负载电容在二极管导通时充电，截止时通过负载电阻放电
+    \item \textbf{提取包络}：由于载频很高（数百kHz），而调制信号较低（数千Hz），电容充放电速度不同，最终输出信号近似等于输入信号的包络
+\end{enumerate}
+
+\textbf{包络检波的电路条件}：
+
+为了保证检波质量，需要满足以下条件：
+\begin{equation}
+RC \gg \frac{1}{f_c}
+\end{equation}
+
+\begin{equation}
+RC \leq \frac{\sqrt{1-\mu^2}}{\omega_m}
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item $RC$：负载时间常数
+    \item $f_c$：载波频率
+    \item $\mu$：调制系数
+    \item $\omega_m$：最高调制频率
+\end{itemize}
+
+第一个条件保证电容在载频周期内充放电，实现包络提取；第二个条件保证电容在调制周期内能够充分放电，避免对角线失真。
+
+\subsubsection{检波器的非线性特性}
+\label{sec:detector_nonlinearity}
+
+矿石检波器在不同信号强度下表现出不同的检波特性：
+
+\textbf{平方律检波（弱信号）}：
+
+当输入信号非常微弱（$\leq 10$mV）时，二极管工作在其V-I特性的平方律区域。此时输出电压与输入电压的平方成正比，这种检波方式称为平方律检波。
+
+平方律检波的特点：
+\begin{itemize}
+    \item 检波效率低（约为线性检波的一半）
+    \item 输出包含失真成分
+    \item 适用于极微弱信号的检测
+\end{itemize}
+
+\textbf{线性检波（强信号）}：
+
+当输入信号较大（$\geq 100$mV）时，二极管工作在近线性区域。此时输出电压与输入信号的包络近似成正比。
+
+线性检波的特点：
+\begin{itemize}
+    \item 检波效率高（可达90\%以上）
+    \item 失真小
+    \item 动态范围大
+\end{itemize}
+
+\subsubsection{检波器的主要性能指标}
+\label{sec:detector_performance}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{4cm}|p{5cm}|}
+\hline
+\textbf{指标} & \textbf{含义} & \textbf{典型值} \\
+\hline
+检波效率 & 输出音频电压与输入载波电压之比 & 60\%-95\% \\
+输入阻抗 & 检波器输入端的等效阻抗 & 10k$\Omega$-200k$\Omega$ \\
+输出阻抗 & 检波器输出端的等效阻抗 & 数十$\Omega$至数k$\Omega$ \\
+失真度 & 输出信号的非线性失真程度 & 5\%-15\% \\
+频率响应 & 检波器的带宽 & 数百Hz至数kHz \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{常见检波电路}
+\label{sec:detector_circuits}
+
+\textbf{单端检波电路}：
+
+最基本的检波电路，由一个二极管和一个负载电容组成。结构简单但效率较低。
+
+\textbf{倍压检波电路}：
+
+使用两个二极管实现倍压检波，可提高检波效率约一倍。适用于输入信号较弱的场合。
+
+\textbf{环形检波电路}：
+
+采用四个二极管组成环形桥路，可实现全波检波，效率更高，性能更好。
+
+现代矿石收音机通常使用\textbf{肖特基二极管}（如1N5817、BAT85）或\textbf{锗二极管}（如2AP9）作为检波元件，它们具有较低的正向压降和较好的检波效率。
 
 \subsection{单回路矿石收音机}
 \label{sec:single_loop_crystal_radio}
 
-% 内容待补充
+单回路矿石收音机是最基本的矿石接收机架构，由调谐回路、检波器和耳机组成。其核心设计难题在于阻抗匹配，本节将详细阐述阻抗匹配的理论基础、计算方法和调试实操。
+
+\subsubsection{阻抗匹配基础}
+\label{sec:impedance_matching_fundamentals}
+
+阻抗匹配是指让信号源（矿石机）的内阻等于负载（耳机）的阻抗。当两者相等时，负载上能获得的功率最大。
+
+\textbf{物理直觉（用水流来理解）}：
+\begin{itemize}
+    \item \textbf{阻抗} = 水管的粗细程度（阻力）
+    \item \textbf{电压} = 水压
+    \item \textbf{电流} = 水流
+\end{itemize}
+
+矿石机（信号源）内部有一根"很细的水管"（高内阻，几千欧姆），能提供高水压但水流极少。普通耳机（负载）是一根"很粗的水管"（低阻抗，32欧姆），需要大量水流才能推动振膜。
+
+\begin{itemize}
+    \item \textbf{不匹配}：细水管接粗水管，水流瞬间散开，压力骤降，能量浪费在矿石机内部损耗上
+    \item \textbf{匹配}：用变压器作为"水管转接头"，把细水管变成同样粗细，让全部水压作用在负载上，振膜就能被推动
+\end{itemize}
+
+\textbf{数学原理（最大功率传输定理）}：
+
+当负载电阻$R_L = $信号源内阻$R_s$时，负载上消耗的功率达到最大值。
+
+矿石机输出阻抗2000$\Omega$，普通耳机32$\Omega$，直接接入时大部分电压降在矿石机内部。通过变压器将32$\Omega$升到2000$\Omega$后，耳机与矿石机内阻各分一半电压，功率传输效率最大化。
+
+\textbf{关键误区}：阻抗匹配不是追求最高的电压，也不是追求最大的电流，而是追求电压与电流的最佳乘积（功率）。当内阻等于外阻时，这个乘积最大。
+
+\subsubsection{阻抗计算方法}
+\label{sec:impedance_calculation}
+
+矿石机的阻抗不是单一固定值，涉及\textbf{调谐回路、检波器、负载（耳机）}三个关键环节，需要依次计算并互相匹配。
+
+\paragraph{第一步：计算调谐回路（LC回路）的阻抗$R_p$}
+
+\begin{equation}
+R_p = 2\pi f L Q
+\label{eq:tuning_impedance}
+\end{equation}
+
+其中：
+\begin{center}
+\begin{tabular}{|p{2cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{符号} & \textbf{含义} & \textbf{单位} \\
+\hline
+$R_p$ & 调谐回路谐振阻抗 & 欧姆（$\Omega$） \\
+$\pi$ & 圆周率 & 3.14 \\
+$f$ & 接收电台频率 & 赫兹（Hz） \\
+$L$ & 线圈电感量 & 亨利（H） \\
+$Q$ & LC回路品质因数 & 无量纲 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{计算示例}：
+
+$L = 228\mu H$（0.000228H），$Q \approx 500$，接收频率$f = 1000$kHz（1,000,000Hz）
+
+$$R_p = 2 \times 3.14 \times 1,000,000 \times 0.000228 \times 500 \approx 716,000\ \Omega \text{（716k}\Omega\text{）}$$
+
+\paragraph{第二步：了解检波二极管的阻抗$R_d$}
+
+检波二极管（如2AP9、BAT85）的等效内阻$R_d$是一个动态参数，不能用万用表电阻档直接测量。
+
+\textbf{弱信号下}：矿石机工作在"平方律检波"状态，检波器呈现阻抗约等于$R_d$。
+
+\textbf{估算公式}：
+\begin{equation}
+R_d \approx \frac{26\text{mV}}{I_d}
+\end{equation}
+
+其中$I_d$为流过二极管的电流。例如检波电流1$\mu$A时，$R_d \approx 26$k$\Omega$。
+
+\textbf{查阅数据手册}：2AP9的$R_d$约为19.7k$\Omega$，BAT85可达200k$\Omega$。
+
+\paragraph{第三步：确定负载（耳机）的阻抗$R_l$}
+
+\begin{itemize}
+    \item \textbf{直接使用高阻耳机}：$R_l = $耳机标称阻抗（如2000$\Omega$）
+    \item \textbf{通过变压器匹配}：$R_l = (N_p/N_s)^2 \times $耳机阻抗
+\end{itemize}
+
+\textbf{计算示例}：
+
+变压器匝数比25:1，接46$\Omega$耳机：
+$$R_l = (25/1)^2 \times 46 = 625 \times 46 = 28{,}750\ \Omega \text{（28.75k}\Omega\text{）}$$
+
+\paragraph{第四步：三级阻抗匹配黄金法则}
+
+\begin{equation}
+R_p = R_d = R_l
+\label{eq:impedance_match_rule}
+\end{equation}
+
+实现这一法则的手段：
+\begin{itemize}
+    \item \textbf{匹配$R_p$与$R_d$}：在线圈上设置抽头，选择合适位置使抽头处阻抗$\approx R_d$
+    
+    公式：$(\text{抽头圈数} / \text{总圈数})^2 = \text{抽头处阻抗} / \text{线圈总阻抗}$
+    
+    \item \textbf{匹配$R_d$与$R_l$}：通过音频变压器变换阻抗
+\end{itemize}
+
+\subsubsection{阻抗匹配调试实操}
+\label{sec:impedance_matching_practice}
+
+理论算出来后，真正的飞跃在于现场调试。很多爱好者算出了值，声音却不大，问题往往出在实操环节。
+
+\paragraph{调试一：精准找到线圈的"最佳抽头"}
+
+理论阻抗会因线圈分布电容、环境干扰而跑偏。"动刀"不如"动夹子"。
+
+\textbf{准备工作}：
+\begin{itemize}
+    \item 绕制线圈时，从底部（接地端）开始，\textbf{每隔5~10圈刮开漆包线焊上接线柱}，留出3~5个抽头
+    \item 检波二极管的正极（或负极）用\textbf{鳄鱼夹}连接，不要焊死
+\end{itemize}
+
+\textbf{现场调试步骤}：
+\begin{enumerate}
+    \item 将矿石机调到已知的强台
+    \item 鳄鱼夹从\textbf{最靠近接地端（圈数最少）}的抽头开始依次往上夹
+\end{enumerate}
+
+\textbf{关键听感判断}：
+\begin{itemize}
+    \item \textbf{圈数太少}：声音尖锐但音量小（阻抗太低，负载过重）
+    \item \textbf{圈数太多}：声音浑厚但发闷（阻抗太高，高频丢失）
+    \item \textbf{最佳点}：音量最大、语音最清晰自然的抽头点
+\end{itemize}
+
+通常最佳点在总圈数的\textbf{20\%~40\%}处（从接地端算起）。
+
+\textbf{进阶技巧}：用万用表串在二极管后面测\textbf{直流微安电流（$\mu$A）}，电流最大的抽头就是阻抗匹配最完美的点。
+
+\paragraph{调试二：估算和提升线圈的Q值}
+
+Q值决定$R_p$的高低。Q值越高，阻抗越大，选择性越好。但Q值虚高会导致声音发尖，太低则声音小且串台。
+
+\textbf{方法：用"3dB带宽法"粗测Q值}：
+\begin{enumerate}
+    \item 将调谐电容调到\textbf{声音最响}的频率$F_0$
+    \item 继续旋转电容，直到声音降到\textbf{最响时的一半}（电压降到70.7\%，即3dB衰减点）
+    \item 记下偏高频率$F_2$和偏低频率$F_1$
+    \item 计算公式：$Q \approx F_0 / (F_2 - F_1)$
+\end{enumerate}
+
+\textbf{结果分析}：
+\begin{itemize}
+    \item $Q < 100$：线圈损耗太大，需改进
+    \item $Q > 500$：选择性极佳，但声音可能偏尖，可并联兆欧级电阻适当降低Q值以丰富音频
+\end{itemize}
+
+\textbf{提升Q值的"物理外挂"}：
+\begin{center}
+\begin{tabular}{|p{2.5cm}|p{4cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{手法} & \textbf{原理} & \textbf{效果} & \textbf{适用场景} \\
+\hline
+换李兹线 & 0.04$\times$60股或0.07$\times$50股多股绝缘线，增加高频电流表面积，降低高频电阻 & Q值显著提升 & 中短波高Q线圈 \\
+远离导体 & 线圈用塑料柱或亚克力板架高，距金属物3~5cm以上 & 减少涡流损耗 & 通用 \\
+蜂房绕法 & 每圈间有微小夹角，非整齐排列 & 大幅减少分布电容 & 高频应用 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{阻抗匹配的"甜蜜区"}
+\label{sec:impedance_sweet_spot}
+
+阻抗匹配不是一个绝对的数学点，而是一个可调节的"甜蜜区"：
+
+\begin{itemize}
+    \item \textbf{信号极弱时}：阻抗\textbf{稍微偏高}，让检波器更接近平方律检波，能检出更微弱信号 → 牺牲音量换取\textbf{灵敏度}
+    \item \textbf{信号极强时}：阻抗\textbf{稍微偏低}，让检波器进入线性检波，防止失真 → 牺牲灵敏度换取\textbf{大动态范围}
+\end{itemize}
+
+\textbf{调试时的听感策略}：
+
+不仅要听"最响"的那个点，还要听"最清晰"和"最远台"的那个点。矿石机最有魅力的地方在于——没有唯一正确答案，全靠双手去试！
+
+\subsubsection{常见问题自查清单}
+\label{sec:impedance_troubleshooting}
+
+\begin{center}
+\begin{tabular}{|p{2.5cm}|p{3cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{问题现象} & \textbf{可能原因} & \textbf{解决动作} & \textbf{调整方向} \\
+\hline
+声音太小 & 抽头位置不对 & 用鳄鱼夹逐级试抽头，找到$\mu$A电流最大点 & - \\
+声音发闷 & 负载阻抗太高 & 向接地端方向移动抽头 & 降低阻抗 \\
+声音尖锐 & 负载阻抗太低 & 向线圈顶端方向移动抽头 & 提高阻抗 \\
+选择性差（串台） & Q值太低 & 换李兹线、远离金属物、改蜂房绕法 & 提高Q值 \\
+声音失真 & 强信号下阻抗过高 & 并联电阻降低Q值或向低端移动抽头 & 降低阻抗 \\
+\hline
+\end{tabular}
+\end{center}
 
 \subsection{多回路矿石收音机}
 \label{sec:multi_loop_crystal_radio}
 
-% 内容待补充
+单回路矿石收音机的选择性和灵敏度有限，通过增加调谐回路的数量可以显著改善接收机性能。多回路矿石收音机通常采用2-3个调谐回路，以获得更好的选择性和更强的信号接收能力。
+
+\subsubsection{多回路的基本原理}
+\label{sec:multi_loop_principle}
+
+多回路矿石收音机的核心思想是利用\textbf{多个相互耦合的调谐回路}来提高选择性和灵敏度。每个回路都调谐到同一目标频率，通过电感耦合或电容耦合实现能量传递。
+
+\textbf{单回路的局限性}：
+\begin{itemize}
+    \item 选择性有限，难以区分相邻频率的电台
+    \item 调谐回路的Q值不能无限提高，否则会导致带宽过窄
+    \item 信号在一个回路中的损耗较大
+\end{itemize}
+
+\textbf{多回路的优势}：
+\begin{itemize}
+    \item 选择性显著提高，通频带更窄
+    \item 总增益增加，信号更强
+    \item 可以实现更好的阻抗匹配
+    \item 灵敏度更高，能接收更远的电台
+\end{itemize}
+
+\subsubsection{双回路矿石收音机}
+\label{sec:double_loop_crystal_radio}
+
+双回路矿石收音机是最常见的多回路设计，通常由两个LC调谐回路组成。
+
+\textbf{电路结构}：
+\begin{enumerate}
+    \item \textbf{初级回路（天线回路）}：连接天线和地线，负责捕获电磁波能量
+    \item \textbf{次级回路（检波回路）}：连接检波器和耳机，负责选出所需频率的信号
+    \item 两个回路通过\textbf{电感耦合}（互感M）或\textbf{电容耦合}连接
+\end{enumerate}
+
+\textbf{工作原理}：
+\begin{enumerate}
+    \item 天线接收到的电磁能量耦合到初级回路
+    \item 初级回路通过互感将能量耦合到次级回路
+    \item 调节两个可变电容器，使两个回路都谐振到目标频率
+    \item 次级回路选出的信号送入检波器解调
+\end{enumerate}
+
+\textbf{耦合方式}：
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{耦合方式} & \textbf{实现方法} & \textbf{特点} & \textbf{耦合强度} \\
+\hline
+电感耦合（互感） & 两个线圈相互靠近 & 耦合自然，无需额外元件 & 松耦合到紧耦合 \\
+自耦耦合 & 共用一个线圈的一部分 & 结构简单，效率高 & 紧耦合 \\
+电容耦合 & 两个回路之间接电容 & 可调耦合强度 & 松耦合 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{三回路矿石收音机}
+\label{sec:triple_loop_crystal_radio}
+
+三回路矿石收音机进一步提高了选择性和灵敏度，适合接收远距离弱信号电台。
+
+\textbf{电路结构}：
+\begin{enumerate}
+    \item \textbf{天线回路}：与天线耦合，接收电磁波
+    \item \textbf{中间回路}：作为耦合和增益环节，提高选择性
+    \item \textbf{检波回路}：连接检波器，负责最终选频
+\end{enumerate}
+
+三个回路依次耦合，形成"天线$\to$中间$\to$检波"的信号通路。
+
+\textbf{三回路的优势}：
+\begin{itemize}
+    \item 选择性最优，通频带最窄
+    \item 能有效抑制邻台干扰
+    \item 灵敏度最高，可接收更远距离的电台
+    \item 音质好，信号更干净
+\end{itemize}
+
+\subsubsection{多回路的调谐方法}
+\label{sec:multi_loop_tuning}
+
+多回路矿石收音机的调谐比单回路复杂，需要协调调整多个可变电容器。
+
+\textbf{调谐步骤}：
+\begin{enumerate}
+    \item \textbf{预设}：将所有可变电容器调到目标频率的大致位置
+    \item \textbf{粗调}：先调初级回路（天线回路），找到目标电台的大致位置
+    \item \textbf{细调}：依次微调每个回路的电容器，使声音最响、最清晰
+    \item \textbf{反复调整}：由于各回路之间相互影响，需要反复调整2-3次
+\end{enumerate}
+
+\textbf{耦合度的调整}：
+\begin{itemize}
+    \item \textbf{松耦合}：选择性好，但灵敏度低
+    \item \textbf{紧耦合}：灵敏度高，但选择性下降
+    \item \textbf{最佳耦合}：在实际调试中找到灵敏度和选择性的平衡点
+\end{itemize}
+
+\subsubsection{多回路的元件选择}
+\label{sec:multi_loop_components}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{元件} & \textbf{参数要求} & \textbf{说明} \\
+\hline
+天线线圈 & 电感量与初级回路相同 & 通常100-300$\mu$H \\
+初级回路线圈 & 高Q值（$\geq$200），带抽头 & 天线耦合用 \\
+次级回路线圈 & 高Q值（$\geq$300） & 检波选频用 \\
+可变电容器 & 双联或独立（120-365pF） & 频率调谐 \\
+耦合方式 & 电感或电容耦合 & 能量传递 \\
+检波器 & 肖特基二极管或锗二极管 & 信号解调 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{多回路矿石收音机的调试技巧}
+\label{sec:multi_loop_tips}
+
+\textbf{技巧一：串联微调电容}：在初级回路的可变电容器上串联一个5-20pF的微调电容，可以精确调整频率。
+
+\textbf{技巧二：耦合线圈位置可调}：将耦合线圈安装在可滑动的支架上，通过改变两个线圈的相对位置来调整耦合度。
+
+\textbf{技巧三：独立天线回路}：天线回路使用独立的线圈和电容器，通过电感耦合到主回路，可以减小天线对主回路的影响，提高稳定性。
+
+\textbf{技巧四：缓冲放大器}：在多回路之间加入简单的缓冲放大器（如JFET源极跟随器），可以减少回路间的相互影响，提高稳定性。
+
+\textbf{技巧五：频率校准}：使用标准信号发生器对每个回路的频率进行精确校准，确保各回路都准确谐振到目标频率。
 
 \subsection{矿石收音机制作实践}
 \label{sec:crystal_radio_practice}
 
-% 内容待补充
+本节将详细介绍矿石收音机的制作过程，从元件准备到最终调试，帮助爱好者完成一台可以正常工作的矿石接收机。
+
+\subsubsection{元件清单}
+\label{sec:crystal_radio_parts}
+
+\textbf{核心元件}：
+
+\begin{center}
+\begin{tabular}{|p{4cm}|p{3cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{元件名称} & \textbf{参数/型号} & \textbf{数量} & \textbf{说明} \\
+\hline
+可变电容器 & 120-365pF（双联） & 1组 & 中波调谐 \\
+电感线圈 & 200-250$\mu$H & 1个 & 磁棒或空心线圈 \\
+检波二极管 & 2AP9或1N5817 & 1个 & 肖特基或锗二极管 \\
+高阻抗耳机 & 2000$\Omega$以上 & 1副 & 或配合音频变压器 \\
+音频变压器 & 2000$\Omega$/32$\Omega$ & 1个 & 阻抗匹配用 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{辅助元件}：
+
+\begin{center}
+\begin{tabular}{|p{4cm}|p{3cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{元件名称} & \textbf{参数/型号} & \textbf{数量} & \textbf{说明} \\
+\hline
+瓷片电容器 & 100pF & 1-2个 & 高频通路 \\
+碳膜电阻 & 1M$\Omega$ & 1个 & 阻尼电阻 \\
+接线柱 & 小型 & 4-6个 & 连接用 \\
+鳄鱼夹 & 小号 & 2-3个 & 调试用 \\
+开关 & 拨动开关 & 1个 & 电源/电路控制 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{线材和材料}：
+\begin{itemize}
+    \item 漆包线：0.1-0.15mm（绕制线圈），长度根据线圈匝数确定
+    \item 铜线：0.2-0.5mm（连接线）
+    \item 磁棒：100-150mm长，8-10mm直径（中波用）
+    \item 线圈骨架：塑料或纸质，与磁棒配合
+    \item 外壳：木质或塑料盒，尺寸约150$\times$100$\times$50mm
+    \item 其他：焊锡、助焊剂、热缩管、胶带等
+\end{itemize}
+
+\subsubsection{线圈绕制}
+\label{sec:crystal_radio_coil}
+
+线圈是矿石收音机的关键元件，其质量直接影响接收机的性能。
+
+\textbf{中波线圈参数}：
+\begin{itemize}
+    \item 磁棒尺寸：100mm长，8mm直径
+    \item 导线直径：0.1mm漆包线（单股或多股）
+    \item 总匝数：约80-120匝
+    \item 电感量：约200-250$\mu$H
+    \item Q值：$\geq$ 200（测量频率1MHz时）
+\end{itemize}
+
+\textbf{绕制步骤}：
+\begin{enumerate}
+    \item \textbf{准备骨架}：将磁棒插入骨架中，固定一端
+    \item \textbf{绕制线圈}：从骨架一端开始，紧密均匀地绕制漆包线
+    \item \textbf{制作抽头}：每隔5-10匝刮开漆皮，焊上短接线作为抽头
+    \item \textbf{固定线圈}：绕制完成后用胶带固定线圈，防止松动
+    \item \textbf{引出线}：两端引出约10cm的导线，去除漆皮并上锡
+    \item \textbf{测量电感}：使用电感表测量实际电感量，确认是否符合要求
+\end{enumerate}
+
+\textbf{线圈质量检查}：
+\begin{itemize}
+    \item 外观：绕线均匀，无交叉重叠
+    \item 电感值：与设计值误差不超过$\pm$10\%
+    \item Q值：使用Q表测量，应$\geq$200
+    \item 绝缘：用万用表检查线圈与磁棒之间的绝缘电阻（$>100$M$\Omega$）
+\end{itemize}
+
+\subsubsection{电路连接与安装}
+\label{sec:crystal_radio_assembly}
+
+\textbf{布局建议}：
+\begin{itemize}
+    \item 线圈安装在盒子内部中心位置，远离金属外壳
+    \item 可变电容器安装在面板上，便于调谐操作
+    \item 检波器和音频变压器安装在靠近线圈的位置
+    \item 接线柱和开关安装在面板上
+    \item 天线接线柱安装在盒子侧面
+    \item 地线接线柱安装在盒子底部
+\end{itemize}
+
+\textbf{电路连接}：
+\begin{enumerate}
+    \item 将线圈、可变电容器、检波器、音频变压器等元件按照电路图连接
+    \item 注意极性：二极管的正极接调谐回路，负极接耳机
+    \item 音频变压器的初级接检波器，次级接耳机
+    \item 所有连接点应牢固焊接，避免虚焊
+\end{enumerate}
+
+\textbf{天线和地线}：
+\begin{itemize}
+    \item 天线：使用5-15米长的漆包线或铜线，架设在室外或高处
+    \item 地线：连接到埋入地下的接地棒或自来水管
+    \item 天线和地线之间应有良好的绝缘
+\end{itemize}
+
+\subsubsection{调试步骤}
+\label{sec:crystal_radio_debug}
+
+\textbf{第一阶段：基本通路检查}
+\begin{enumerate}
+    \item 检查电路连接，确保无短路、断路
+    \item 用万用表测量线圈电阻（应接近0$\Omega$）
+    \item 用万用表测量检波器正反电阻（正向几十k$\Omega$，反向数百k$\Omega$以上）
+    \item 确认耳机阻抗符合要求
+\end{enumerate}
+
+\textbf{第二阶段：频率校准}
+\begin{enumerate}
+    \item 接好天线和地线
+    \item 缓慢旋转可变电容器，注意听是否有"沙沙"声（背景噪声）
+    \item 若有连续噪声，说明调谐回路工作正常
+    \item 继续旋转电容器，寻找电台信号
+    \item 记录各电台对应的电容位置，制作频率刻度
+\end{enumerate}
+
+\textbf{第三阶段：阻抗匹配调试}
+\begin{enumerate}
+    \item 将检波器接到中间抽头位置
+    \item 调整音频变压器的初级抽头（如有）
+    \item 选择一个已知强台作为测试信号
+    \item 尝试不同的抽头位置和变压器接法
+    \item 找到音量最大、音质最好的组合
+    \item 如有微安表，测量二极管电流，找到电流最大的点
+\end{enumerate}
+
+\textbf{第四阶段：性能优化}
+\begin{enumerate}
+    \item 若灵敏度不够：尝试增加天线长度或改善接地
+    \item 若选择性差：考虑增加多回路或提高线圈Q值
+    \item 若音质差：调整负载电容和阻尼电阻
+    \item 若不稳定：检查接线是否牢固，元件是否有虚焊
+\end{enumerate}
+
+\subsubsection{常见故障排除}
+\label{sec:crystal_radio_troubleshoot}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{故障现象} & \textbf{可能原因} & \textbf{排查方法} & \textbf{解决措施} \\
+\hline
+完全无声 & 天线或地线未接好 & 检查天线和地线连接 & 重新连接并确保良好接触 \\
+完全无声 & 检波器损坏 & 用万用表测量二极管正反向电阻 & 更换检波二极管 \\
+只有噪声无电台 & 调谐回路未调好 & 缓慢旋转可变电容器 & 仔细调谐到电台频率 \\
+只有噪声无电台 & 线圈Q值太低 & 测量线圈Q值 & 重绕线圈或更换磁棒 \\
+声音很小 & 阻抗不匹配 & 调整抽头位置 & 反复试不同抽头 \\
+声音很小 & 天线效率低 & 增加天线长度或架设高度 & 优化天线系统 \\
+声音失真 & 检波电容值不当 & 检查负载电容值 & 调整电容（50-500pF） \\
+串台严重 & 选择性差 & 检查线圈Q值 & 提高Q值或改用多回路 \\
+时断时续 & 接触不良 & 检查所有焊点和连接 & 重新焊接 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{进阶改造}
+\label{sec:crystal_radio_upgrade}
+
+\textbf{增加缓冲放大器}：
+在检波器和耳机之间加入一个简单的JFET缓冲放大器，可以显著提高音量和音质。
+
+\textbf{加入调谐指示}：
+用一个小型LED或电流计制作调谐指示器，帮助精准调谐到电台。
+
+\textbf{多波段设计}：
+通过波段开关切换不同的线圈，覆盖中波（530-1600kHz）和短波（2-30MHz）频段。
+
+\textbf{音频放大}：
+在检波器后加入一个简单的音频放大级（如使用LM386或晶体管放大电路），可以大大提高音量。
+
+\textbf{频率数字化}：
+加入一个简易的频率计数器，显示当前调谐频率，方便精准调谐。
 
 \section{电子管收音机}
 \label{sec:tube_radio}
@@ -78,12 +783,162 @@
 \subsection{电子管收音机概述}
 \label{sec:tube_radio_introduction}
 
-% 内容待补充
+电子管收音机是以真空管（电子管）为核心放大器件的无线电接收机，是20世纪最主要的广播接收设备，从1920年代一直使用到1960年代晶体管普及为止。
+
+\subsubsection{发展历史}
+\label{sec:tube_radio_history}
+
+\begin{enumerate}
+    \item \textbf{1906年}：美国发明家\textbf{德福雷斯特（Lee de Forest）}发明了三极管（Audion），为电子管收音机奠定基础
+    \item \textbf{1920年代}：电子管收音机开始商业化生产，推动了广播业的发展
+    \item \textbf{1930年代}：超外差式电子管收音机成为主流架构
+    \item \textbf{1940-1950年代}：电子管收音机进入黄金时期，出现了许多经典机型
+    \item \textbf{1960年代}：晶体管收音机逐步取代电子管收音机
+\end{enumerate}
+
+\subsubsection{电子管收音机的特点}
+\label{sec:tube_radio_features}
+
+\textbf{优点}：
+\begin{itemize}
+    \item \textbf{音质温暖}：电子管的非线性特性使声音听起来温暖柔和，被发烧友推崇
+    \item \textbf{动态范围大}：电子管放大器具有宽广的动态范围
+    \item \textbf{过载能力强}：短时间过载不会损坏器件
+    \item \textbf{可靠性高}：成熟的技术，使用寿命长
+\end{itemize}
+
+\textbf{缺点}：
+\begin{itemize}
+    \item \textbf{体积大、重量重}：需要较大的外壳和电源
+    \item \textbf{功耗高}：需要灯丝加热功耗
+    \item \textbf{需要预热}：开机后需等待灯丝加热
+    \item \textbf{高压工作}：通常需要数百伏的B+电压
+    \item \textbf{成本较高}：电子管成本高于晶体管
+\end{itemize}
+
+\subsubsection{电子管收音机的分类}
+\label{sec:tube_radio_classification}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{类型} & \textbf{架构} & \textbf{典型电路} & \textbf{应用时期} \\
+\hline
+单管收音机 & 最简单的结构 & 1A7等复合管 & 1920年代 \\
+再生式收音机 & 利用正反馈提高灵敏度 & 1N5GT等 & 1920-1930年代 \\
+直放式收音机 & 多级射频放大 & 2A3等 & 1930年代 \\
+超外差式收音机 & 外差架构 & 6A7/6K7/6Q7等 & 1930-1960年代 \\
+\hline
+\end{tabular}
+\end{center}
 
 \subsection{电子管放大电路}
 \label{sec:tube_amplifier_circuit}
 
-% 内容待补充
+电子管放大器是电子管收音机的核心部分，负责对信号进行多级放大。
+
+\subsubsection{电子管的工作原理}
+\label{sec:tube_working_principle}
+
+电子管是一种通过在真空中加热阴极发射电子，并利用电场控制电子运动的器件。基本结构包括：
+\begin{itemize}
+    \item \textbf{阴极（K）}：加热后发射电子
+    \item \textbf{栅极（G）}：控制电子流的大小
+    \item \textbf{阳极（A/P）}：收集电子
+\end{itemize}
+
+栅极电压控制阳极电流的变化，实现信号放大。
+
+\subsubsection{共阴极放大电路}
+\label{sec:tube_common_cathode}
+
+共阴极电路是最常用的电子管放大电路，类似晶体管的共发射极电路。
+
+\textbf{电路特点}：
+\begin{itemize}
+    \item 电压增益高（可达100-1000倍）
+    \item 输入阻抗中等（数十k$\Omega$至数M$\Omega$）
+    \item 输出阻抗高（数十k$\Omega$）
+    \item 倒相（输出与输入反相）
+    \item 通频带宽，适合音频和中频放大
+\end{itemize}
+
+\textbf{静态工作点}：
+\begin{itemize}
+    \item 栅极偏置：通常采用自给偏压（阴极电阻产生）
+    \item 阳极电流：典型值为0.5-5mA
+    \item 阳极电压：通常为B+电压的20\%-50\%
+\end{itemize}
+
+\subsubsection{共栅极放大电路}
+\label{sec:tube_common_grid}
+
+共栅极电路类似晶体管的共基极电路，主要用于高频放大。
+
+\textbf{电路特点}：
+\begin{itemize}
+    \item 电压增益中等
+    \item 输入阻抗低（数百$\Omega$至数k$\Omega$）
+    \item 输出阻抗高
+    \item 同相（输出与输入同相）
+    \item 高频特性好，内部反馈小
+\end{itemize}
+
+适用于高频射频放大级。
+
+\subsubsection{共阳极放大电路（阴极跟随器）}
+\label{sec:tube_cathode_follower}
+
+共阳极电路类似晶体管的共集电极电路，主要用于缓冲和阻抗匹配。
+
+\textbf{电路特点}：
+\begin{itemize}
+    \item 电压增益略小于1（约0.9-0.95）
+    \item 输入阻抗高（可达数十M$\Omega$）
+    \item 输出阻抗低（数十$\Omega$至数k$\Omega$）
+    \item 同相
+    \item 适合作为阻抗匹配的缓冲级
+\end{itemize}
+
+\subsubsection{常用电子管参数}
+\label{sec:tube_parameters}
+
+\begin{center}
+\begin{tabular}{|p{2cm}|p{3cm}|p{3cm}|p{3cm}|p{2cm}|p{3cm}|}
+\hline
+\textbf{型号} & \textbf{类型} & \textbf{用途} & \textbf{灯丝} & \textbf{B+} & \textbf{特点} \\
+\hline
+6A7 & 七极变频管 & 变频 & 0.3A/6.3V & 100V & 变频用 \\
+6K7 & 五极放大管 & 中频放大 & 0.3A/6.3V & 150V & 中放用 \\
+6Q7 & 双二极三极管 & 检波+预放 & 0.3A/6.3V & 100V & 检波+前放 \\
+6V6 & 束射功率管 & 音频功率 & 0.5A/6.3V & 250V & 单端/推挽 \\
+6L6 & 束射功率管 & 音频功率 & 0.9A/6.3V & 350V & 大功率 \\
+12AU7 & 双三极管 & 音频/射频 & 0.15A/12.6V & 250V & 通用 \\
+12AX7 & 双三极管 & 音频前放 & 0.15A/12.6V & 300V & 高放大系数 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{功率放大电路}
+\label{sec:tube_power_amplifier}
+
+电子管收音机的功率放大级通常采用：
+
+\textbf{单端甲类放大}：
+\begin{itemize}
+    \item 使用一只功率管（如6V6、6L6）
+    \item 电路简单，音色温暖
+    \item 输出功率通常为1-10W
+    \item 适合小功率应用
+\end{itemize}
+
+\textbf{推挽甲乙类放大}：
+\begin{itemize}
+    \item 使用两只功率管（如6V6、EL34）
+    \item 效率高，动态范围大
+    \item 输出功率可达10-50W
+    \item 是电子管功放的主流架构
+\end{itemize}
 
 \subsection{电子管超外差接收机}
 \label{sec:tube_superheterodyne}
@@ -100,12 +955,273 @@
 \subsection{电子管收音机调试与维修}
 \label{sec:tube_radio_maintenance}
 
-% 内容待补充
+\subsubsection{开机与预热}
+\label{sec:tube_radio_startup}
+
+电子管收音机的正确开机步骤：
+
+\begin{enumerate}
+    \item 确认电源电压与收音机要求一致（通常为交流220V或110V）
+    \item 将音量调到最小
+    \item 打开电源开关
+    \item 等待1-2分钟灯丝预热
+    \item 逐渐调大音量，此时应能听到背景噪声
+    \item 开始调谐寻找电台
+\end{enumerate}
+
+\textbf{注意事项}：
+\begin{itemize}
+    \item 严禁频繁开关机，会缩短电子管寿命
+    \item 长时间不使用时应拔下电源插头
+    \item 保持通风，避免过热
+\end{itemize}
+
+\subsubsection{基本调试步骤}
+\label{sec:tube_radio_debug}
+
+\textbf{第一步：静态测试}
+\begin{enumerate}
+    \item 用万用表测量各电子管的灯丝电压（应为标称值的$\pm$10\%以内）
+    \item 测量B+高压电源（通常为150-350V）
+    \item 测量各级静态工作点：
+    \begin{itemize}
+        \item 栅极电压：应为0V或负压（自给偏压）
+        \item 阴极电压：根据阴极电阻和电流计算
+        \item 阳极电压：应为B+的20\%-80\%
+        \item 阳极电流：参考电子管参数表
+    \end{itemize}
+    \item 若工作点异常，检查相关电阻、电容是否损坏
+\end{enumerate}
+
+\textbf{第二步：信号追踪}
+\begin{enumerate}
+    \item 使用信号发生器注入中频信号（465kHz）
+    \item 依次检查各级的信号幅度：
+    \begin{itemize}
+        \item 变频级输出应有中频信号
+        \item 中放级应有放大的中频信号
+        \item 检波级应有音频信号输出
+        \item 音频放大级应有放大的音频信号
+    \end{itemize}
+    \item 使用示波器或电子管电压表（VTVM）测量
+\end{enumerate}
+
+\textbf{第三步：频率校准}
+\begin{enumerate}
+    \item 使用标准信号发生器注入已知频率的信号
+    \item 调整本振频率，使接收频率与信号源频率一致
+    \item 校准频率刻度
+    \item 调整天线线圈和微调电容，使灵敏度最高
+\end{enumerate}
+
+\subsubsection{常见故障诊断}
+\label{sec:tube_radio_troubleshoot}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{故障现象} & \textbf{可能原因} & \textbf{检查方法} & \textbf{解决措施} \\
+\hline
+完全无声 & 灯丝未亮 & 观察灯丝是否发光 & 更换管子或检查灯丝供电 \\
+完全无声 & B+无高压 & 测量B+电压 & 检查整流管和高压滤波 \\
+无声有噪声 & 检波器损坏 & 测量检波器输出 & 更换检波管 \\
+声音很小 & 中放增益低 & 测中放工作点 & 调整偏置或更换中放管 \\
+声音失真 & 功放管工作点不当 & 测功放静态电流 & 调整偏置电阻 \\
+声音失真 & 扬声器损坏 & 换扬声器测试 & 更换扬声器 \\
+交流声大 & 滤波不良 & 测量滤波电容 & 更换滤波电容 \\
+交流声大 & 灯丝交流供电干扰 & 改直流供电 & 改用直流或屏蔽 \\
+接收不到台 & 本振不工作 & 测本振频率 & 检查本振线圈和电容 \\
+接收不到台 & 天线回路失谐 & 调天线线圈 & 重新校准 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{电子管的检测与更换}
+\label{sec:tube_testing}
+
+\textbf{外观检查}：
+\begin{itemize}
+    \item 检查管内是否有蓝光或白雾（正常）
+    \item 检查阴极是否发射电子（正常使用后阴极应明亮）
+    \item 检查是否有机械损坏
+\end{itemize}
+
+\textbf{电气测试}：
+\begin{itemize}
+    \item 用万用表测量灯丝是否导通（应为数$\Omega$）
+    \item 测量各电极间是否短路
+    \item 使用电子管测试仪测量跨导和放大系数
+\end{itemize}
+
+\textbf{更换步骤}：
+\begin{enumerate}
+    \item 断电并等待高压电容放电（至少1分钟）
+    \item 取下电子管管套或屏蔽罩
+    \item 均匀用力拔出旧管（避免弯曲管脚）
+    \item 将新管插入管座（注意管脚方向）
+    \item 恢复管套或屏蔽罩
+    \item 通电测试，观察工作点是否正常
+\end{enumerate}
+
+\subsubsection{维护保养}
+\label{sec:tube_maintenance}
+
+\textbf{定期清洁}：
+\begin{itemize}
+    \item 用软毛刷清理灰尘
+    \item 用压缩空气吹走元件表面的灰尘
+    \item 保持通风孔畅通
+\end{itemize}
+
+\textbf{定期检查}：
+\begin{itemize}
+    \item 检查电解电容是否漏液或膨胀
+    \item 检查电阻是否有变色或烧焦痕迹
+    \item 检查焊点是否有虚焊
+    \item 检查接地线是否可靠
+\end{itemize}
+
+\textbf{长期存储}：
+\begin{itemize}
+    \item 存放前清洁干燥
+    \item 用防尘布覆盖
+    \item 存放环境温度：10-35℃
+    \item 相对湿度：$\leq$60\%
+    \item 每3-6个月开机运行1小时
+\end{itemize}
 
 \subsection{经典电子管收音机电路}
 \label{sec:classic_tube_circuits}
 
-% 内容待补充
+本节介绍几种经典的电子管收音机电路，这些电路代表了电子管时代的技术高峰。
+
+\subsubsection{再生式单管收音机}
+\label{sec:regenerative_radio}
+
+再生式收音机是最早实用化的电子管收音机，仅用一只电子管完成接收、放大和检波。
+
+\textbf{电路组成}：
+\begin{enumerate}
+    \item 天线和调谐回路（LC选频）
+    \item 一只三极管（如1N5GT）作为再生式放大检波器
+    \item 耳机或扬声器作为负载
+\end{enumerate}
+
+\textbf{工作原理}：
+\begin{enumerate}
+    \item 天线接收的信号经LC回路选频后送入栅极
+    \item 电子管对信号进行放大
+    \item 通过再生线圈（正反馈）将部分输出信号反馈到输入，提高灵敏度
+    \item 电子管同时进行检波，将高频信号解调为音频
+    \item 音频信号直接驱动耳机
+\end{enumerate}
+
+\textbf{特点}：
+\begin{itemize}
+    \item 电路简单，仅需1-2只电子管
+    \item 灵敏度高（再生作用）
+    \item 选择性一般
+    \item 容易振荡（再生过强时）
+    \item 音质较差
+\end{itemize}
+
+\subsubsection{直放式两管收音机}
+\label{sec:straight_radio}
+
+直放式收音机使用两级电子管，一级射频放大，一级音频检波放大。
+
+\textbf{电路组成}：
+\begin{enumerate}
+    \item 第一管：射频放大器（如58管），调谐选频并放大射频信号
+    \item 第二管：检波器（如80管或1N5GT），将射频信号检波并放大音频
+    \item 扬声器：通过输出变压器连接
+\end{enumerate}
+
+\textbf{特点}：
+\begin{itemize}
+    \item 电路简单，易制作
+    \item 灵敏度中等
+    \item 选择性一般
+    \item 直放式结构，频率响应不如超外差
+\end{itemize}
+
+\subsubsection{经典超外差三管收音机}
+\label{sec:superheterodyne_radio}
+
+超外差收音机是电子管收音机的主流架构，通常使用4-5只电子管。
+
+\textbf{典型电路（3-4管）}：
+\begin{enumerate}
+    \item \textbf{变频管}（6A7）：七极复合管，完成本振和混频
+    \item \textbf{中放管}（6K7）：五极管，放大465kHz中频信号
+    \item \textbf{检波预放管}（6Q7）：双二极三极管，检波+音频预放
+    \item \textbf{功放管}（6V6）：束射功率管，推动扬声器
+\end{enumerate}
+
+\textbf{工作流程}：
+\begin{enumerate}
+    \item 天线接收$\to$调谐回路选频$\to$变频管产生中频
+    \item 中频信号$\to$中放级放大$\to$检波预放级检波和音频预放
+    \item 音频信号$\to$功放级放大$\to$输出变压器$\to$扬声器
+\end{enumerate}
+
+\textbf{特点}：
+\begin{itemize}
+    \item 选择性好，灵敏度高
+    \item 音质优良
+    \item 是最经典的电子管收音机架构
+    \item 许多经典机型（如德律风根、根德、熊猫等）都采用此架构
+\end{itemize}
+
+\subsubsection{六管AM/FM收音机}
+\label{sec:six_tube_radio}
+
+六管AM/FM收音机是功能完善的经典机型，可同时接收AM和FM广播。
+
+\textbf{电路组成}：
+\begin{center}
+\begin{tabular}{|p{2cm}|p{3cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{管号} & \textbf{型号} & \textbf{功能} & \textbf{备注} \\
+\hline
+V1 & 6A7 & AM变频 & 七极复合管 \\
+V2 & 6K7 & AM中放 & 五极放大管 \\
+V3 & 6N2 & FM高频+AM检波 & 双三极管 \\
+V4 & 6K7 & FM中放+鉴频 & 五极放大管 \\
+V5 & 6Q7 & 音频前放 & 双二极三极管 \\
+V6 & 6V6 & 音频功放 & 束射功率管 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{特点}：
+\begin{itemize}
+    \item 功能完善，可接收AM和FM两种广播
+    \item 电路复杂，但性能优良
+    \item 是1950-1960年代的高端机型
+    \item 部分机型还支持FM立体声
+\end{itemize}
+
+\subsubsection{经典机型欣赏}
+\label{sec:classic_models}
+
+\textbf{国外经典机型}：
+\begin{itemize}
+    \item \textbf{Philips BX998}（1931年）：早期经典，直放式5管
+    \item \textbf{Telefunken T5000}（1950年代）：德国名机，5管超外差
+    \item \textbf{Grundig 5055}（1955年）：德国名机，6管AM/FM
+    \item \textbf{Hammarlund Model 80}（1936年）：美国名机，接收性能极佳
+\end{itemize}
+
+\textbf{国内经典机型}：
+\begin{itemize}
+    \item \textbf{熊猫601}（1956年）：国产经典，3管超外差
+    \item \textbf{红灯711}（1960年代）：国产名机，4管超外差
+    \item \textbf{海燕D322}（1970年代）：国产普及型，3管超外差
+    \item \textbf{牡丹941}（1970年代）：国产普及型，3管超外差
+\end{itemize}
+
+这些经典机型至今仍是收藏爱好者追捧的对象，其中不少仍能正常工作，成为无线电文化的珍贵遗产。
 
 \section{晶体管收音机}
 \label{sec:transistor_radio}
@@ -180,19 +1296,314 @@
 \section{AM广播接收机}
 \label{sec:am_broadcast_receiver}
 
-% 内容待补充
+AM（调幅）广播接收机是接收中波和短波调幅广播信号的接收机，是最传统的广播接收方式。
+
+\subsection{AM广播概述}
+\label{sec:am_broadcast_intro}
+
+AM广播使用的频段主要包括：
+
+\begin{center}
+\begin{tabular}{|p{2cm}|p{3cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{波段} & \textbf{频率范围} & \textbf{波长范围} & \textbf{典型用途} \\
+\hline
+长波（LW） & 150-530 kHz & 2000-566m & 欧洲部分国家广播 \\
+中波（MW） & 530-1710 kHz & 566-175m & 各国主要广播频段 \\
+短波（SW） & 2-30 MHz & 150-10m & 国际广播、远距离传播 \\
+\hline
+\end{tabular}
+\end{center}
+
+AM广播的调制方式为幅度调制（AM），载波幅度随音频信号的变化而变化。
+
+\subsection{AM接收机的工作原理}
+\label{sec:am_receiver_principle}
+
+AM超外差接收机的典型工作流程：
+
+\begin{enumerate}
+    \item \textbf{射频接收}：天线接收空间中的AM广播信号
+    \item \textbf{调谐选频}：输入回路选出所需频率的射频信号
+    \item \textbf{变频}：射频信号与本振信号混频，产生465kHz中频信号
+    \item \textbf{中频放大}：中频放大器对465kHz信号进行高增益放大
+    \item \textbf{检波}：包络检波器从中频信号中恢复音频信号
+    \item \textbf{音频放大}：音频放大器放大解调后的音频信号
+    \item \textbf{扬声器输出}：音频信号驱动扬声器发声
+\end{enumerate}
+
+\subsection{AM接收机的关键技术}
+\label{sec:am_receiver_tech}
+
+\textbf{中频选择}：AM广播接收机的标准中频为465kHz（有些国家为455kHz）。
+
+\textbf{镜像抑制}：通过采用双调谐回路或使用声表面波（SAW）滤波器来抑制镜像频率干扰。
+
+\textbf{自动增益控制（AGC）}：为了适应不同强度的电台信号，接收机采用AGC电路自动调整增益，使输出电平保持稳定。
+
+\textbf{本地振荡器}：传统接收机使用LC振荡器，现代接收机使用频率合成器或PLL。
+
+\subsection{AM接收机的性能特点}
+\label{sec:am_receiver_performance}
+
+\textbf{优点}：
+\begin{itemize}
+    \item 频段覆盖广，可接收国内外大量广播电台
+    \item 传播距离远，中波可覆盖数百公里，短波可达数千公里
+    \item 电路相对简单，成本较低
+    \item 音质自然，适合语音广播
+\end{itemize}
+
+\textbf{缺点}：
+\begin{itemize}
+    \item 抗干扰能力弱，容易受到雷电、电机等电磁干扰
+    \item 带宽较窄（约3kHz），音质不如FM
+    \item 信号衰落现象明显，尤其是短波
+\end{itemize}
 
 \section{FM广播接收机}
 \label{sec:fm_broadcast_receiver}
 
-% 内容待补充
+FM（调频）广播接收机接收调频广播信号，以其优异的音质和抗干扰能力成为现代广播的主流。
+
+\subsection{FM广播概述}
+\label{sec:fm_broadcast_intro}
+
+FM广播使用频段为87.5-108MHz（部分国家为88-108MHz），属于甚高频（VHF）频段。
+
+FM广播的调制方式为频率调制（FM），载波频率随音频信号的变化而变化。FM广播的最大频偏为$\pm$75kHz。
+
+\subsection{FM接收机的工作原理}
+\label{sec:fm_receiver_principle}
+
+FM超外差接收机的典型工作流程：
+
+\begin{enumerate}
+    \item \textbf{射频接收}：天线接收FM广播信号
+    \item \textbf{调谐选频}：输入回路选出所需频率的射频信号
+    \item \textbf{变频}：射频信号与本振信号混频，产生10.7MHz中频信号
+    \item \textbf{中频放大}：中频放大器对10.7MHz信号进行放大和限幅
+    \item \textbf{鉴频}：鉴频器（或检频器）从中频信号中恢复音频信号
+    \item \textbf{去加重}：恢复原始音频信号的高频成分
+    \item \textbf{音频放大}：音频放大器放大音频信号
+    \item \textbf{扬声器输出}：音频信号驱动扬声器发声
+\end{enumerate}
+
+\subsection{FM接收机的关键技术}
+\label{sec:fm_receiver_tech}
+
+\textbf{中频选择}：FM广播接收机的标准中频为10.7MHz。
+
+\textbf{限幅放大器}：FM接收机特有的电路，用于削除幅度波动，消除干扰和噪声。
+
+\textbf{鉴频器}：FM接收机的核心解调电路，常用的有：
+\begin{itemize}
+    \item \textbf{比例鉴频器}：最常用的鉴频电路，具有良好的线性和抗干扰能力
+    \item \textbf{相位鉴频器}：利用LC回路的相位特性进行频率解调
+    \item \textbf{积分鉴频器}：适用于集成电路实现
+\end{itemize}
+
+\textbf{去加重电路}：FM广播在发射时对音频信号进行预加重（提升高频），接收时需要去加重（恢复原始频谱），时间常数通常为50$\mu$s或75$\mu$s。
+
+\textbf{立体声解码}：现代FM接收机支持立体声广播，需要加入立体声解码电路（MPX），从复合信号中分离左右声道。
+
+\subsection{FM接收机的性能特点}
+\label{sec:fm_receiver_performance}
+
+\textbf{优点}：
+\begin{itemize}
+    \item 音质优异，动态范围大，适合音乐播放
+    \item 抗干扰能力强，不易受到电磁干扰
+    \item 信号质量稳定，衰落现象少
+    \item 支持立体声广播
+\end{itemize}
+
+\textbf{缺点}：
+\begin{itemize}
+    \item 传播距离有限（通常50-100km）
+    \item 易受地形影响，山区和建筑物遮挡严重
+    \item 频段占用较宽，电台数量有限
+\end{itemize}
 
 \section{数字广播接收机}
 \label{sec:digital_broadcast_receiver}
 
-% 内容待补充
+数字广播接收机是接收数字广播信号（DAB、HD Radio等）的新一代接收机，代表了广播技术的发展方向。
+
+\subsection{数字广播概述}
+\label{sec:digital_broadcast_intro}
+
+数字广播是将音频信号进行数字化处理、压缩编码后传输的广播方式。主要的数字广播标准包括：
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{标准} & \textbf{全称} & \textbf{频率范围} & \textbf{应用地区} \\
+\hline
+DAB & Digital Audio Broadcasting & 174-230MHz & 欧洲、亚太 \\
+HD Radio & HD Radio & 在现有FM频段内 & 北美 \\
+ISDB-T & Integrated Services Digital Broadcasting & 735-862MHz & 日本、南美 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{数字广播的技术原理}
+\label{sec:digital_broadcast_tech}
+
+数字广播的传输流程：
+
+\begin{enumerate}
+    \item \textbf{音频采样}：将模拟音频信号转换为数字信号（通常44.1kHz/16bit）
+    \item \textbf{压缩编码}：使用MPEG-1/2 Audio Layer II等压缩算法压缩数据
+    \item \textbf{多路复用}：将多个音频节目和数据复用到一个数据流中
+    \item \textbf{信道编码}：添加冗余信息进行前向纠错（FEC）
+    \item \textbf{调制}：使用正交频分复用（OFDM）等调制方式
+    \item \textbf{发射}：通过天线发射射频信号
+\end{enumerate}
+
+\subsection{数字广播接收机的工作原理}
+\label{sec:digital_receiver_principle}
+
+数字广播接收机的典型工作流程：
+
+\begin{enumerate}
+    \item \textbf{射频接收}：天线接收数字广播射频信号
+    \item \textbf{调谐选频}：选择所需频率的射频信号
+    \item \textbf{下变频}：将射频信号转换为中频或基带信号
+    \item \textbf{OFDM解调}：从OFDM信号中恢复出传输数据
+    \item \textbf{信道解码}：进行前向纠错解码
+    \item \textbf{多路分解}：从复合数据流中分离所需的音频节目
+    \item \textbf{音频解码}：解压MPEG音频数据
+    \item \textbf{D/A转换}：将数字音频转换为模拟信号
+    \item \textbf{音频放大}：放大音频信号驱动扬声器
+\end{enumerate}
+
+\subsection{数字广播的优势}
+\label{sec:digital_broadcast_advantages}
+
+\begin{enumerate}
+    \item \textbf{音质优良}：接近CD音质，无模拟广播的失真和噪声
+    \item \textbf{多节目传输}：一个频率可传输多个音频节目和数据服务
+    \item \textbf{抗干扰能力强}：数字信号处理能有效对抗干扰和衰落
+    \item \textbf{频谱效率高}：相同频谱资源可传输更多节目
+    \item \textbf{数据服务}：可传输文字、图像、交通信息等附加服务
+    \item \textbf{移动接收}：支持高速移动接收，适合车载应用
+\end{enumerate}
+
+\subsection{数字广播的未来发展}
+\label{sec:digital_broadcast_future}
+
+数字广播技术仍在不断发展：
+
+\begin{itemize}
+    \item \textbf{DAB+}：DAB的升级版，使用更高效的HE-AAC编码，在相同码率下提供更好的音质
+    \item \textbf{DRM}：面向中短波的数字广播标准，可替代传统AM广播
+    \item \textbf{交互式服务}：支持观众参与、投票、下载等互动功能
+    \item \textbf{多媒体广播}：支持视频、图像等多媒体内容传输
+\end{itemize}
 
 \section{广播接收机技术指标}
 \label{sec:broadcast_receiver_specs}
 
-% 内容待补充
+本节总结广播接收机的主要技术指标及其测试方法。
+
+\subsection{主要技术指标}
+\label{sec:receiver_main_specs}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+\hline
+\textbf{指标} & \textbf{含义} & \textbf{AM典型值} & \textbf{FM典型值} & \textbf{测试条件} \\
+\hline
+频率范围 & 接收机可接收的频率范围 & 530-1710kHz & 87.5-108MHz & - \\
+频率稳定度 & 本振频率的稳定程度 & $\leq \pm$50Hz & $\leq \pm$2kHz & 预热1小时 \\
+灵敏度 & 可接收的最小信号强度 & $\leq$50$\mu$V/m & $\leq$10$\mu$V/m & SNR=10dB \\
+选择性 & 区分相邻信道的能力 & $\geq$40dB & $\geq$60dB & 邻道$\pm$9kHz \\
+中频抑制 & 对中频干扰的抑制 & $\geq$80dB & $\geq$80dB & - \\
+镜像抑制 & 对镜像频率的抑制 & $\geq$60dB & $\geq$60dB & - \\
+音频带宽 & 可还原的音频频率范围 & 150-3500Hz & 30-15000Hz & $\pm$3dB \\
+音频失真 & 音频信号的非线性失真 & $\leq$10\% & $\leq$1\% & 1kHz标准信号 \\
+信噪比 & 输出信号与噪声的比值 & $\geq$40dB & $\geq$60dB & 标准调制 \\
+动态范围 & 可处理的信号强度范围 & 60-80dB & 80-100dB & - \\
+AGC范围 & 自动增益控制范围 & 60dB & 60dB & - \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{指标说明}
+\label{sec:receiver_specs_explain}
+
+\textbf{灵敏度}：
+
+灵敏度是接收机的核心指标，表示接收机能够检测到的最小信号强度。灵敏度越高，越能接收到远距离的弱信号电台。
+
+灵敏度的表示方法：
+\begin{itemize}
+    \item \textbf{电场强度}：$\mu$V/m或dB$\mu$V/m
+    \item \textbf{功率}：dBm或dBf
+    \item \textbf{电压}：$\mu$V（电动势）
+\end{itemize}
+
+\textbf{选择性}：
+
+选择性表示接收机区分相邻信道信号的能力。选择性越好，越不容易受到邻道信号的干扰。
+
+选择性通带宽度：
+\begin{itemize}
+    \item AM：$\pm$4.5kHz（双边带）
+    \item FM：$\pm$75kHz（$\pm$25kHz保护带）
+\end{itemize}
+
+\textbf{动态范围}：
+
+动态范围是接收机能够正常处理的信号强度范围。上限由互调失真决定，下限由接收机噪声决定。
+
+\subsection{测试方法}
+\label{sec:receiver_test_methods}
+
+\textbf{测试设备}：
+\begin{center}
+\begin{tabular}{|p{4cm}|p{5cm}|p{4cm}|}
+\hline
+\textbf{设备} & \textbf{型号示例} & \textbf{用途} \\
+\hline
+标准信号发生器 & HP8640B或同类型 & 产生标准测试信号 \\
+射频接收机测试仪 & Rohde \& Schwarz CMS54 & 综合测试 \\
+频谱分析仪 & HP8590E & 分析信号频谱 \\
+音频分析仪 & HP8903B & 测量音频性能 \\
+天线分析仪 & MFJ-259B & 天线阻抗测量 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{灵敏度测试}：
+\begin{enumerate}
+    \item 将信号发生器连接到接收机输入端
+    \item 设置标准调制（AM：1kHz，30\%调制；FM：1kHz，$\pm$75kHz频偏）
+    \item 逐渐降低信号电平，直到输出信噪比降到规定值
+    \item 记录此时的信号电平作为灵敏度
+\end{enumerate}
+
+\textbf{选择性测试}：
+\begin{enumerate}
+    \item 设置两个信号源：主信号（调谐频率）和干扰信号（邻道频率）
+    \item 调整干扰信号电平，直到主信号输出信噪比下降3dB
+    \item 计算此时干扰信号与主信号的电平比值
+\end{enumerate}
+
+\subsection{典型接收机性能对比}
+\label{sec:receiver_comparison}
+
+\begin{center}
+\begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{接收机类型} & \textbf{灵敏度} & \textbf{选择性} & \textbf{音质} & \textbf{应用场景} \\
+\hline
+矿石收音机 & 差（$\geq$1mV） & 差（$\leq$20dB） & 差 & 教学、实验 \\
+直放式收音机 & 中（$\geq$100$\mu$V） & 中（$\leq$40dB） & 中 & 中波广播 \\
+AM超外差 & 好（$\geq$50$\mu$V） & 好（$\geq$60dB） & 良 & AM广播接收 \\
+FM超外差 & 优（$\geq$10$\mu$V） & 优（$\geq$80dB） & 优 & FM广播接收 \\
+数字广播 & 极佳（$\geq$5$\mu$V） & 极佳（$\geq$100dB） & 极佳 & 数字广播 \\
+\hline
+\end{tabular}
+\end{center}
