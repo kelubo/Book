@@ -32,6 +32,7 @@
 % 图片相关设置。
 \usepackage{graphicx}
 \graphicspath{{Images/}}
+\usepackage{float}
 
 % 设置署名格式。
 \newenvironment{shuming}{\hfill\zihao{4}}
@@ -40,13 +41,31 @@
 \usepackage[perpage]{footmisc}
 
 % 设置古文原文格式。
-\newenvironment{yuanwen}{\bfseries\zihao{4}}
+\newenvironment{yuanwen}{\heiti\zihao{4}}
 
 % 设置段落间距
 \setlength{\parskip}{0.8em plus 0.2em minus 0.1em}
 
 % 列表格式支持，列表项向右偏移。
 \usepackage{enumitem}
+
+% 源代码框
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+	basicstyle=\ttfamily\small,          % 等宽字体，字号小一点
+	breaklines=true,                     % 自动换行（避免溢出页面）
+	numbers=left,                        % 显示行号
+	numberstyle=\tiny\color{gray},       % 行号灰色小字
+	keywordstyle=\color{blue},           % 关键字蓝色
+	commentstyle=\color{teal},           % 注释青色
+	stringstyle=\color{red!70!black},    % 字符串红色
+	frame=single,                        % 加个边框
+	framerule=1pt,
+	columns=fixed,                       % 保持字符对齐
+	showspaces=false,
+	showstringspaces=false,
+}
 
 \title{\heiti\zihao{0} 题目}
 \author{WangFei}
@@ -89,8 +108,16 @@
 剪灯新话
 《剪灯新话》，明代文言短篇小说，中国十大禁书之一，作者是瞿佑。最早在洪武十一年编订成帙，以抄本流行。\\
 
+% 古文原文
+\begin{yuanwen}
+道可道也，非横道也。
+\end{yuanwen}
+
+道可道，非常道。
+
 % 图片插入
-\begin{figure}[htbp]
+如图 \ref{fig:1} 所示：
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=0.7\linewidth]{1}
 	\caption{图片描述}
@@ -98,11 +125,21 @@
 \end{figure}
 
 % 列表
+这是个列表：
 \begin{itemize}[leftmargin=2cm]
 	\item a
 	\item b
 	\item c
 \end{itemize}
+
+% 源代码
+\begin{lstlisting}[language=Python]
+	def hello(name):
+	# 打印问候语
+	print(f"Hello, {name}!")
+	
+	hello("World")
+\end{lstlisting}
 
 \backmatter
 
