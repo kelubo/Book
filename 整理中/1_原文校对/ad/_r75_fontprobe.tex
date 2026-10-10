@@ -1,0 +1,27 @@
+% -*- coding: utf-8 -*-
+% r75 字体覆盖探针：检测各候选字体对三卷缺字的覆盖情况
+\documentclass[12pt]{article}
+\usepackage{fontspec}
+\setmainfont{SimSun}
+\newfontfamily\fbSym{Segoe UI Symbol}
+\newfontfamily\fbSun{SimSun}
+\newfontfamily\fbSunE{SimSun-ExtG}
+\newfontfamily\fbCambria{Cambria}
+\newfontfamily\fbMono{DejaVu Sans Mono}
+
+\newcommand{\probe}[1]{%
+  \par\noindent\texttt{[\detokenize{#1}]}\par
+  \noindent test:\ \fbSym #1\par
+  \noindent suns:\ \fbSun #1\par
+  \noindent sunE:\ \fbSunE #1\par
+  \noindent camb:\ \fbCambria #1\par
+  \noindent mono:\ \fbMono #1\par
+  \bigskip
+}
+\begin{document}
+\probe{①②③④⑤⑥}
+\probe{Ⅰ Ⅱ Ⅲ Ⅳ Ⅴ}
+\probe{α β γ μ ω}
+\probe{≠ ≥ ≤ ≈}
+\probe{─ ■ ・ ⚠ ₂ ⁶ ‧ ⸺}
+\end{document}

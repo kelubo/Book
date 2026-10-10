@@ -1,0 +1,88 @@
+% ================================================
+% 文件: 05_雷达接收机.tex
+% 章节: 第10章 雷达接收机
+% 所属部分: 接收机技术
+% 版本: v1.0
+% ================================================
+% 本章目录结构（树状）:
+% \chapter{雷达接收机}
+% ├── \section{雷达接收机概述}
+% ├── \section{雷达接收机基本原理}
+% ├── \section{雷达接收机主要指标}
+% ├── \section{雷达接收机设计要点}
+% └── \section{雷达接收机技术发展}
+% ================================================
+
+\chapter{雷达接收机}
+\label{chap:radar_receiver}
+
+\section{雷达接收机概述}
+\label{sec:radar_receiver_intro}
+
+雷达接收机是雷达系统的核心组成部分，用于接收目标反射的回波信号。雷达系统通过发射电磁波并接收反射信号来探测目标的距离、方位和速度。
+
+雷达接收机的主要特点：
+\begin{itemize}
+    \item \textbf{极高灵敏度}：能够检测微弱的回波信号
+    \item \textbf{宽动态范围}：能够处理从微弱回波到强干扰的信号
+    \item \textbf{良好的线性度}：确保信号幅度和相位信息准确
+    \item \textbf{低噪声}：减少自身噪声对微弱信号的影响
+\end{itemize}
+
+\section{雷达接收机基本原理}
+\label{sec:radar_principle}
+
+雷达接收机的基本工作流程：
+
+1. \textbf{接收天线}：捕获目标反射的回波信号
+2. \textbf{低噪声放大器（LNA）}：放大微弱信号，同时保持低噪声
+3. \textbf{混频器}：将射频信号转换为中频信号
+4. \textbf{中频放大器}：对中频信号进行高增益放大
+5. \textbf{滤波器}：滤除干扰和噪声
+6. \textbf{检波器/解调器}：提取目标信息（距离、速度、方位）
+
+雷达方程描述了雷达的探测能力：
+
+\[ R_{max} = \left( \frac{P_t G^2 \lambda^2 \sigma}{(4\pi)^3 S_{min}} \right)^{1/4} \]
+
+其中，$P_t$为发射功率，$G$为天线增益，$\lambda$为波长，$\sigma$为目标截面积，$S_{min}$为最小可检测信号功率。
+
+\section{雷达接收机主要指标}
+\label{sec:radar_specifications}
+
+雷达接收机的主要技术指标包括：
+
+\begin{itemize}
+    \item \textbf{噪声系数（NF）}：衡量接收机产生的噪声大小，通常小于1dB
+    \item \textbf{灵敏度}：最小可检测信号功率，通常在-100dBm以下
+    \item \textbf{动态范围}：最大与最小可处理信号的比值，通常大于80dB
+    \item \textbf{带宽}：接收机能够处理的信号频率范围
+    \item \textbf{选择性}：区分目标信号和干扰信号的能力
+    \item \textbf{相位噪声}：本地振荡器的相位稳定性
+\end{itemize}
+
+\section{雷达接收机设计要点}
+\label{sec:radar_design}
+
+设计雷达接收机时需考虑：
+
+\begin{itemize}
+    \item \textbf{前端设计}：低噪声放大器和混频器的选择
+    \item \textbf{频率合成}：稳定的本地振荡器
+    \item \textbf{中频处理}：高Q值滤波器和自动增益控制
+    \item \textbf{数字信号处理}：AD采样、数字滤波、脉冲压缩
+    \item \textbf{抗干扰}：自适应滤波、旁瓣对消
+\end{itemize}
+
+\section{雷达接收机技术发展}
+\label{sec:radar_development}
+
+雷达接收机技术的发展趋势：
+
+\begin{itemize}
+    \item \textbf{数字化}：采用数字接收机技术，提高灵活性和性能
+    \item \textbf{软件定义}：软件定义雷达，支持多种工作模式
+    \item \textbf{多通道}：多输入多输出（MIMO）技术
+    \item \textbf{集成化}：单片微波集成电路（MMIC）和系统级封装（SiP）
+    \item \textbf{智能化}：自适应信号处理和机器学习应用
+\end{itemize}

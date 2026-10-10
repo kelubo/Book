@@ -1,0 +1,61 @@
+% ===== 符号字体回退（r75）：带圈数字 / 罗马数字 / 希腊字母 / 数学符号 / 制表符 ----
+%   背景：西文主字体 Latin Modern 与中文字体 SimSun 均不覆盖下列字符，
+%   不回退则 xelatex 报 Missing character，PDF 对应位置留白（等于丢知识点）。
+%   自检：编译后统计 <file>.log 中 Missing character 条数，应为 0。
+\usepackage{newunicodechar}
+\newfontfamily\symbolfallback{SimSun}           % 带圈数字/罗马数字/希腊字母/数学符号/制表符/几何图形
+\newfontfamily\symbolfallbackx{Segoe UI Symbol} % 警告三角等符号
+\newunicodechar{①}{{\symbolfallback\char"2460}}
+\newunicodechar{②}{{\symbolfallback\char"2461}}
+\newunicodechar{③}{{\symbolfallback\char"2462}}
+\newunicodechar{④}{{\symbolfallback\char"2463}}
+\newunicodechar{⑤}{{\symbolfallback\char"2464}}
+\newunicodechar{⑥}{{\symbolfallback\char"2465}}
+\newunicodechar{⑦}{{\symbolfallback\char"2466}}
+\newunicodechar{⑧}{{\symbolfallback\char"2467}}
+\newunicodechar{⑨}{{\symbolfallback\char"2468}}
+\newunicodechar{⑩}{{\symbolfallback\char"2469}}
+\newunicodechar{Ⅰ}{{\symbolfallback\char"2160}}
+\newunicodechar{Ⅱ}{{\symbolfallback\char"2161}}
+\newunicodechar{Ⅲ}{{\symbolfallback\char"2162}}
+\newunicodechar{Ⅳ}{{\symbolfallback\char"2163}}
+\newunicodechar{Ⅴ}{{\symbolfallback\char"2164}}
+\newunicodechar{Ⅵ}{{\symbolfallback\char"2165}}
+\newunicodechar{Ⅶ}{{\symbolfallback\char"2166}}
+\newunicodechar{Ⅷ}{{\symbolfallback\char"2167}}
+\newunicodechar{Ⅸ}{{\symbolfallback\char"2168}}
+\newunicodechar{Ⅹ}{{\symbolfallback\char"2169}}
+\newunicodechar{Ⅺ}{{\symbolfallback\char"216A}}
+\newunicodechar{Ⅻ}{{\symbolfallback\char"216B}}
+\newunicodechar{α}{{\symbolfallback\char"03B1}}
+\newunicodechar{β}{{\symbolfallback\char"03B2}}
+\newunicodechar{γ}{{\symbolfallback\char"03B3}}
+\newunicodechar{δ}{{\symbolfallback\char"03B4}}
+\newunicodechar{ε}{{\symbolfallback\char"03B5}}
+\newunicodechar{ζ}{{\symbolfallback\char"03B6}}
+\newunicodechar{η}{{\symbolfallback\char"03B7}}
+\newunicodechar{θ}{{\symbolfallback\char"03B8}}
+\newunicodechar{ι}{{\symbolfallback\char"03B9}}
+\newunicodechar{κ}{{\symbolfallback\char"03BA}}
+\newunicodechar{λ}{{\symbolfallback\char"03BB}}
+\newunicodechar{μ}{{\symbolfallback\char"03BC}}
+\newunicodechar{ν}{{\symbolfallback\char"03BD}}
+\newunicodechar{ξ}{{\symbolfallback\char"03BE}}
+\newunicodechar{ο}{{\symbolfallback\char"03BF}}
+\newunicodechar{π}{{\symbolfallback\char"03C0}}
+\newunicodechar{ρ}{{\symbolfallback\char"03C1}}
+\newunicodechar{ς}{{\symbolfallback\char"03C2}}
+\newunicodechar{σ}{{\symbolfallback\char"03C3}}
+\newunicodechar{τ}{{\symbolfallback\char"03C4}}
+\newunicodechar{υ}{{\symbolfallback\char"03C5}}
+\newunicodechar{φ}{{\symbolfallback\char"03C6}}
+\newunicodechar{χ}{{\symbolfallback\char"03C7}}
+\newunicodechar{ψ}{{\symbolfallback\char"03C8}}
+\newunicodechar{ω}{{\symbolfallback\char"03C9}}
+\newunicodechar{≠}{{\symbolfallback\char"2260}}
+\newunicodechar{≈}{{\symbolfallback\char"2248}}
+\newunicodechar{≤}{{\symbolfallback\char"2264}}
+\newunicodechar{≥}{{\symbolfallback\char"2265}}
+\newunicodechar{─}{{\symbolfallback\char"2500}}
+\newunicodechar{■}{{\symbolfallback\char"25A0}}
+\newunicodechar{⚠}{{\symbolfallbackx\char"26A0}}
